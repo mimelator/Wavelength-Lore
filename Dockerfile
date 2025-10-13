@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y nginx
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose the ports for Nginx
-EXPOSE 80
+EXPOSE 8080
 
 # Start Nginx and your Node.js app
 CMD ["sh", "-c", "nginx && node index.js"]
