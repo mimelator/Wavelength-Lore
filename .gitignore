@@ -24,3 +24,10 @@ yarn-error.log*
 # IDE-specific files
 .vscode/
 .idea/
+.sensitve
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+app.zip

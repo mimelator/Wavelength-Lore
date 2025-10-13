@@ -1,0 +1,13 @@
+# DOCKER
+
+# build and run locally
+
+docker build -t wavelength-lore-nginx .
+docker build -t wavelength-lore-nginx .
+
+# Monitor
+
+docker ps
+docker logs <container-id-or-name>
+docker logs -f <container-id-or-name>
+docker logs <container-id-or-name> | grep "keyword"
