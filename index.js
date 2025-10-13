@@ -24,18 +24,22 @@ console.log('DATABASE_URL:', process.env.DATABASE_URL);
 const firebaseApp = initializeApp(firebaseConfig);
 const database = getDatabase(firebaseApp);
 
+// Generate a custom version number
+const version = `v${Date.now()}`;
+
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Serve static files from the public directory
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'static')));
 
 // Render the index.ejs file
 app.get('/', (req, res) => {
   res.render('index', { 
     title: 'Welcome to Wavelength Lore', 
-    cdnUrl: process.env.CDN_URL 
+    cdnUrl: process.env.CDN_URL,
+    cssVersion: version
   });
 });
 
