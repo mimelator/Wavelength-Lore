@@ -11,3 +11,25 @@ docker ps
 docker logs <container-id-or-name>
 docker logs -f <container-id-or-name>
 docker logs <container-id-or-name> | grep "keyword"
+
+# BUILD AND PUSH
+
+docker build -t wavelength-lore-nginx .
+docker tag wavelength-lore-nginx:latest 170023515523.dkr.ecr.us-east-1.amazonaws.com/wavelength-lore:latest
+docker push 170023515523.dkr.ecr.us-east-1.amazonaws.com/wavelength-lore:latest
+
+# UPDATE APP RUNNER TO LATESET IMAGE
+
+docker build -t wavelength-lore-nginx .
+docker tag wavelength-lore-nginx:latest 170023515523.dkr.ecr.us-east-1.amazonaws.com/wavelength-lore:latest
+docker push 170023515523.dkr.ecr.us-east-1.amazonaws.com/wavelength-lore:latest
+
+# App Runner
+
+aws ecr describe-images --repository-name wavelength-lore --region us-east-1
+
+aws apprunner create-service --service-name wavelength-lore \               
+  --source-configuration '{"ImageRepository": {"ImageIdentifier": "170023515523.dkr.ecr.us-east-1.amazonaws.com/wavelength-lore:latest", "ImageRepositoryType": "ECR"}, "AuthenticationConfiguration": {"AccessRoleArn": "arn:aws:iam::170023515523:role/AppRunnerECRAccessRole"}}'
+
+aws apprunner update-service --service-arn <service-arn> \
+  --health-check-configuration '{"Protocol": "HTTP", "Path": "/", "Interval": 10, "Timeout": 5, "HealthyThreshold": 1, "UnhealthyThreshold": 5, "Port": "80"}'

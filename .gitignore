@@ -1,6 +1,13 @@
 # wavelength-develop
 .accounts
+.sensitve
+.commands
 
+# story
+Story/*
+
+# aws
+.aws
 
 # Node.js dependencies
 node_modules/
@@ -18,16 +25,11 @@ yarn-error.log*
 # OS-specific files
 .DS_Store
 
-# AWS Elastic Beanstalk files
-.elasticbeanstalk/
 
 # IDE-specific files
 .vscode/
 .idea/
-.sensitve
 
-# Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml
-app.zip
+
+
+.commands
