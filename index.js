@@ -24,12 +24,19 @@ console.log('DATABASE_URL:', process.env.DATABASE_URL);
 const firebaseApp = initializeApp(firebaseConfig);
 const database = getDatabase(firebaseApp);
 
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname)));
+// Set EJS as the view engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-// Serve the index.html file
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Render the index.ejs file
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.render('index', { 
+    title: 'Welcome to Wavelength Lore', 
+    cdnUrl: process.env.CDN_URL 
+  });
 });
 
 app.listen(port, () => {
