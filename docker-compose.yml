@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  app:
+    image: wavelength-lore-nginx
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    command: npm run dev

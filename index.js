@@ -2,9 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const { initializeApp } = require('firebase/app');
 const { getDatabase, ref, get } = require('firebase/database');
+const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = 8080;
 
 // Firebase configuration
 const firebaseConfig = {
@@ -23,19 +24,12 @@ console.log('DATABASE_URL:', process.env.DATABASE_URL);
 const firebaseApp = initializeApp(firebaseConfig);
 const database = getDatabase(firebaseApp);
 
-app.get('/', async (req, res) => {
-  try {
-    const dbRef = ref(database, 'helloWorld');
-    const snapshot = await get(dbRef);
-    if (snapshot.exists()) {
-      res.send(snapshot.val());
-    } else {
-      res.send('No data available');
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error retrieving data');
-  }
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname)));
+
+// Serve the index.html file
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(port, () => {
