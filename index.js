@@ -43,6 +43,14 @@ app.get('/', (req, res) => {
   });
 });
 
+// Render the gallery.ejs file
+app.get('/gallery', (req, res) => {
+  res.render('gallery', {
+    cdnUrl: process.env.CDN_URL,
+    version: `v${Date.now()}`
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
