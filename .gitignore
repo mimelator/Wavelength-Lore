@@ -35,3 +35,4 @@ yarn-error.log*
 .commands
 .cmds
 redeploy-app.sh
+.rds-chema-work.json

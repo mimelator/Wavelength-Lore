@@ -6,8 +6,6 @@
   font-family: 'AnimeAce';
   src: url('../fonts/animeace2_reg.ttf') format('truetype');
   src: url('../fonts/animeace2_reg.otf') format('opentype');
-  }
-  
 body {
   font-family: 'AnimeAce', Arial, sans-serif;
   margin: 0;
@@ -17,13 +15,14 @@ body {
   animation: gradientBG 15s ease infinite;
 }
 
-
 @media (prefers-reduced-motion: reduce) {
   body {
     animation: none !important;
   }
 }
-  
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+}
 
 @keyframes gradientBG {
   0% { background-position: 0% 50%; }

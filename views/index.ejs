@@ -7,33 +7,19 @@
     <link rel="stylesheet" href="<%= cdnUrl %>/css/styles.css?v=<%= cssVersion %>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
-    <style>
-        .carousel {
-            width: 80%;
-            margin: 0 auto;
-        }
-        .carousel img {
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-        }
-        .section-title {
-            text-align: center;
-            margin: 20px 0;
-            font-size: 24px;
-            font-weight: bold;
-        }
-    </style>
 </head>
 <body>
-    <h1 class="section-title"><%= title %></h1>
-    
+    <h1>Welcome to Wavelength Lore</h1>
+
     <div class="carousel">
-        <div><img src="<%= cdnUrl %>/images/home_page_gallery/GoblinsRule-25.png" alt="Image 1"></div>
-        <div><img src="<%= cdnUrl %>/images/home_page_gallery/IceFortress-13.png" alt="Image 2"></div>
-        <div><img src="<%= cdnUrl %>/images/home_page_gallery/MyLuckyCharm-02.png" alt="Image 3"></div>
-        <div><img src="<%= cdnUrl %>/images/home_page_gallery/Psychopath-06.png" alt="Image 4"></div>
-        <div><img src="<%= cdnUrl %>/images/home_page_gallery/SlowTime-08.png" alt="Image 5"></div>
+        <% for (let key in images) { %>
+            <div>
+                <a href="<%= images[key].youtubeLink %>" target="_blank">
+                    <img src="<%= images[key].url %>" alt="<%= images[key].title %>">
+                </a>
+                <p>Click the image to watch the video: <%= images[key].title %></p>
+            </div>
+        <% } %>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -34,13 +34,33 @@ app.set('views', path.join(__dirname, 'views'));
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'static')));
 
-// Render the index.ejs file
-app.get('/', (req, res) => {
-  res.render('index', { 
-    title: 'Welcome to Wavelength Lore', 
-    cdnUrl: process.env.CDN_URL,
-    cssVersion: version
-  });
+// Render the index.ejs file with gallery data
+app.get('/', async (req, res) => {
+  try {
+    const imagesRef = ref(database, 'assets/images');
+    const snapshot = await get(imagesRef);
+
+    if (snapshot.exists()) {
+      const images = snapshot.val();
+      res.render('index', {
+        title: 'Welcome to Wavelength Lore',
+        cdnUrl: process.env.CDN_URL,
+        version: `v${Date.now()}`,
+        cssVersion: version,
+        images: images
+      });
+    } else {
+      res.render('index', {
+        title: 'Welcome to Wavelength Lore',
+        cdnUrl: process.env.CDN_URL,
+        version: `v${Date.now()}`,
+        images: {}
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching images from Firebase:', error);
+    res.status(500).send('Error fetching images');
+  }
 });
 
 // Render the gallery.ejs file
