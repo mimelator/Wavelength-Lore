@@ -197,6 +197,125 @@ app.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
   }
 });
 
+// Route to render a character page
+app.get('/character/:characterId', async (req, res) => {
+  const { characterId } = req.params;
+
+  try {
+    const charactersRef = ref(database, 'characters');
+    const snapshot = await get(charactersRef);
+
+    if (snapshot.exists()) {
+      const characters = snapshot.val();
+
+      // Recursively search for the character by ID
+      function findCharacterPath(node, path = '') {
+        for (const key in node) {
+          const currentPath = path ? `${path}/${key}` : key;
+          if (node[key].id === characterId) {
+            return { character: node[key], path: currentPath };
+          } else if (typeof node[key] === 'object') {
+            const result = findCharacterPath(node[key], currentPath);
+            if (result) return result;
+          }
+        }
+        return null;
+      }
+
+      const result = findCharacterPath(characters);
+
+      if (!result) {
+        return res.status(404).send('Character not found');
+      }
+
+      const { character, path } = result;
+
+      // Fetch all characters for navigation
+      const allCharacters = [];
+      function collectCharacters(node, path = '') {
+        for (const key in node) {
+          const currentPath = path ? `${path}/${key}` : key;
+          if (node[key].id) {
+            allCharacters.push({ id: node[key].id, title: node[key].title, path: currentPath });
+          } else if (typeof node[key] === 'object') {
+            collectCharacters(node[key], currentPath);
+          }
+        }
+      }
+
+      collectCharacters(characters);
+
+      const currentIndex = allCharacters.findIndex(c => c.id === characterId);
+      const previousCharacter = currentIndex > 0 ? allCharacters[currentIndex - 1] : null;
+      const nextCharacter = currentIndex < allCharacters.length - 1 ? allCharacters[currentIndex + 1] : null;
+
+      res.render('character', {
+        title: character.title,
+        character: {
+          id: character.id,
+          title: character.title,
+          description: character.description,
+          primary_image: character.primary_image,
+          image: character.image, // New field
+          image_gallery: character.image_gallery
+        },
+        previousCharacter,
+        nextCharacter,
+        cdnUrl: process.env.CDN_URL,
+        version: `v${Date.now()}`
+      });
+    } else {
+      res.status(404).send('Character not found');
+    }
+  } catch (error) {
+    console.error('Error fetching character data:', error);
+    res.status(500).send('Error fetching character data');
+  }
+});
+
+// Route to render the Character Gallery page
+app.get('/characters', async (req, res) => {
+  try {
+    const charactersRef = ref(database, 'characters');
+    const snapshot = await get(charactersRef);
+
+    if (snapshot.exists()) {
+      const characters = [];
+
+      // Recursively collect all characters
+      function collectCharacters(node, path = '') {
+        for (const key in node) {
+          const currentPath = path ? `${path}/${key}` : key;
+          if (node[key].id) {
+            characters.push({ id: node[key].id, title: node[key].title, image: node[key].image });
+          } else if (typeof node[key] === 'object') {
+            collectCharacters(node[key], currentPath);
+          }
+        }
+      }
+
+      collectCharacters(snapshot.val());
+
+      res.render('character-gallery', {
+        title: 'Character Gallery',
+        characters,
+        cdnUrl: process.env.CDN_URL,
+        version: `v${Date.now()}`
+      });
+    } else {
+      res.render('character-gallery', {
+        title: 'Character Gallery',
+        characters: [],
+        cdnUrl: process.env.CDN_URL,
+        version: `v${Date.now()}`
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching characters:', error);
+    res.status(500).send('Error fetching characters');
+  }
+});
+
 // Route for About page
 app.get('/about', (req, res) => {
   res.render('about', { title: 'About - Coming Soon', cdnUrl: process.env.CDN_URL, version: `v${Date.now()}` });

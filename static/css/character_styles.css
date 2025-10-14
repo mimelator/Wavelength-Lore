@@ -1,0 +1,54 @@
+/* Character Page Styles */
+main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.character-banner {
+    text-align: center;
+    color: white;
+    padding: 50px 20px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+.character-description {
+    margin: 20px 0;
+    font-size: 18px;
+    line-height: 1.6;
+}
+.character-carousel {
+    margin: 20px 0;
+}
+.character-carousel .carousel {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+}
+.character-carousel .carousel-item {
+    flex: 0 0 auto;
+    width: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.character-carousel .carousel-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+.character-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+.character-navigation .nav-link {
+    text-decoration: none;
+    color: #007BFF;
+    font-size: 16px;
+}
+.character-navigation .nav-link:hover {
+    text-decoration: underline;
+}

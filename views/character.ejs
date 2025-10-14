@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <%- include('partials/head') %>
+    <link rel="stylesheet" href="/css/character_styles.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main>
+        <h1><%= character.title %></h1>
+        <section class="character-banner" style="background-image: url('<%= character.image %>');">
+            
+        </section>
+
+        <section class="character-description">
+            <p><%= character.description %></p>
+        </section>
+
+        <section class="character-carousel">
+            <div class="carousel">
+                <% character.image_gallery.forEach(image => { %>
+                    <div class="carousel-item">
+                        <img src="<%= image %>" alt="<%= character.title %>">
+                    </div>
+                <% }); %>
+            </div>
+        </section>
+
+        <nav class="character-navigation">
+            <% if (previousCharacter) { %>
+                <a href="/character/<%= previousCharacter.id %>" class="nav-link prev">&laquo; <%= previousCharacter.title %></a>
+            <% } %>
+            <% if (nextCharacter) { %>
+                <a href="/character/<%= nextCharacter.id %>" class="nav-link next"><%= nextCharacter.title %> &raquo;</a>
+            <% } %>
+        </nav>
+    </main>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

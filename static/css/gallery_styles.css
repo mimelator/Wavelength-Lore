@@ -1,0 +1,36 @@
+/* Character Gallery Styles */
+.character-gallery {
+    text-align: center;
+    padding: 20px;
+}
+.character-gallery .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+.character-gallery .gallery-item {
+    width: 200px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.character-gallery .gallery-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+.character-gallery .gallery-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+.character-gallery .gallery-item h2 {
+    margin: 10px 0;
+    font-size: 18px;
+    color: #333;
+}
+.character-gallery .gallery-item a {
+    text-decoration: none;
+    color: inherit;
+}

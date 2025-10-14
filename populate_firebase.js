@@ -55,8 +55,43 @@ function processYamlData(data) {
   return data;
 }
 
+// Updated to read all character files from subfolders
+async function populateCharacters() {
+  try {
+    const database = await initializeFirebaseWithToken();
+
+    // Iterate through all subfolders in './content/characters'
+    const characterFolders = fs.readdirSync('./content/characters', { withFileTypes: true });
+
+    for (const folder of characterFolders) {
+      const folderPath = `./content/characters/${folder.name}`;
+
+      if (folder.isDirectory()) {
+        const characterFiles = fs.readdirSync(folderPath);
+
+        for (const file of characterFiles) {
+          if (file.endsWith('.yaml')) {
+            const characterId = file.replace('.yaml', '');
+            const characterRef = ref(database, `characters/${characterId}`);
+
+            // Load and process YAML file
+            const yamlContent = fs.readFileSync(`${folderPath}/${file}`, 'utf8');
+            let data = yaml.load(yamlContent);
+            data = processYamlData(data);
+
+            await set(characterRef, data);
+            console.log(`Firebase populated successfully for character: ${characterId}`);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error populating characters in Firebase:', error);
+  }
+}
+
 // Updated to read one season at a time from separate files
-async function populateFirebase() {
+async function populateSeasons() {
   try {
     const database = await initializeFirebaseWithToken();
 
@@ -75,6 +110,24 @@ async function populateFirebase() {
         await set(seasonRef, data);
         console.log(`Firebase populated successfully for ${seasonName}!`);
       }
+    }
+  } catch (error) {
+    console.error('Error populating seasons in Firebase:', error);
+  }
+}
+
+const args = process.argv.slice(2);
+const deployCharacters = args.includes('--characters') || !args.includes('--seasons');
+const deploySeasons = args.includes('--seasons') || !args.includes('--characters');
+
+// Call population functions based on flags
+async function populateFirebase() {
+  try {
+    if (deploySeasons) {
+      await populateSeasons();
+    }
+    if (deployCharacters) {
+      await populateCharacters();
     }
   } catch (error) {
     console.error('Error populating Firebase:', error);

@@ -1,0 +1,18 @@
+# Character Data Schema
+# This schema defines the structure for character data in the Wavelength Lore project.
+
+# Title: The name or title of the character.
+# Description: A brief description or biography of the character.
+# Primary Image: The main image representing the character.
+# Image Gallery: A list of additional images related to the character.
+# Episodes: A list of episodes where the character appears.
+
+character:
+  id: string  # A unique identifier for the character
+  title: string  # The name of the character
+  description: string  # A brief biography or description
+  primary_image: string  # URL or path to the primary image
+  image_gallery:  # List of additional images
+    - string
+  episodes:  # List of episode identifiers
+    - string

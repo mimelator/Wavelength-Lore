@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Gallery</title>
+    <%- include('partials/head') %>
+    <link rel="stylesheet" href="/css/gallery_styles.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main>
+        <section class="character-gallery">
+            <div class="gallery">
+                <% characters.forEach(character => { %>
+                    <div class="gallery-item">
+                        <a href="/character/<%= character.id %>">
+                            <img src="<%= character.image %>" alt="<%= character.title %>">
+                            <h2><%= character.title %></h2>
+                        </a>
+                    </div>
+                <% }); %>
+            </div>
+        </section>
+    </main>
+
+    <%- include('partials/footer') %>
+</body>
+</html>
