@@ -37,8 +37,14 @@ h1 {
   margin-top: 20px;
 }
 
-/* Carousel Styles */
+/* Center season titles and links */
+.season-title {
+    text-align: center;
+}
+
+/* Add space between carousels */
 .carousel {
+    margin-bottom: 50px;
     width: 80%;
     margin: 0 auto;
 }
@@ -60,6 +66,11 @@ h1 {
     font-size: 14px;
     color: #555;
     margin-top: 5px;
+}
+
+/* Center episode titles */
+.episode-title {
+    text-align: center;
 }
 
 /* Responsive Design for Mobile */

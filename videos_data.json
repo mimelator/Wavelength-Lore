@@ -1,0 +1,33 @@
+{
+  "season1": {
+    "title": "Prelude: Life in the Shire",
+    "seasonLink": "https://www.youtube.com/playlist?list=PLO3KUVl6gwUb_ZrCoj7-ev92oC9Rvo0aH",
+    "image": "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/image.png",
+    "episodes": {
+      "episode1": {
+        "title": "My Lucky Charm",
+        "description": "Everyone needs a little luck sometimes, except for maybe Goblins who need no one",
+        "youtubeLink": "https://youtu.be/07ln1YTcOdg?si=TrWzyJkYOZtx1Zrc",
+        "image": "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/image.png"
+      },
+      "episode2": {
+        "title": "Jump Right In!",
+        "description": "Life is about choices, so make one and see what happens next!",
+        "youtubeLink": "https://youtu.be/07ln1YTcOdg?si=TrWzyJkYOZtx1Zrc",
+        "image": "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/image.png"
+      }
+    }
+  },
+  "season2": {
+    "title": "Season 2: The Goblin King",
+    "seasonLink": "https://www.youtube.com/playlist?list=PLO3KUVl6gwUbaay8aPoO6JZsBEjqQx-5y",
+    "episodes": {
+      "episode1": {
+        "title": "Goblin King",
+        "description": "You've been punched in the head So many times that you don’t know Which is way is left or right",
+        "youtubeLink": "https://youtu.be/kGpLCx63Fh8",
+        "image": "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/image.png"
+      }
+    }
+  }
+}

@@ -37,39 +37,33 @@ app.use(express.static(path.join(__dirname, 'static')));
 // Render the index.ejs file with gallery data
 app.get('/', async (req, res) => {
   try {
-    const imagesRef = ref(database, 'assets/images');
-    const snapshot = await get(imagesRef);
+    const videosRef = ref(database, 'videos');
+    const snapshot = await get(videosRef);
 
     if (snapshot.exists()) {
-      const images = snapshot.val();
+      const videos = snapshot.val();
+      console.debug('Firebase query results:', videos); // Debug message
       res.render('index', {
         title: 'Welcome to Wavelength Lore',
         cdnUrl: process.env.CDN_URL,
         version: `v${Date.now()}`,
-        cssVersion: version,
-        images: images
+        videos: videos
       });
     } else {
+      console.debug('Firebase query returned no results.'); // Debug message
       res.render('index', {
         title: 'Welcome to Wavelength Lore',
         cdnUrl: process.env.CDN_URL,
         version: `v${Date.now()}`,
-        images: {}
+        videos: {}
       });
     }
   } catch (error) {
-    console.error('Error fetching images from Firebase:', error);
-    res.status(500).send('Error fetching images');
+    console.error('Error fetching videos from Firebase:', error);
+    res.status(500).send('Error fetching videos');
   }
 });
 
-// Render the gallery.ejs file
-app.get('/gallery', (req, res) => {
-  res.render('gallery', {
-    cdnUrl: process.env.CDN_URL,
-    version: `v${Date.now()}`
-  });
-});
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
