@@ -147,11 +147,71 @@ season1:
       description: "The intoxicating Daphne flower calls to both pollinators and humans alike"
       youtubeLink: "https://youtu.be/PWYOElJnU0I"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/Daphne_v21.mp3"
+      carouselImages:
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-01.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-02.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-03.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-04.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-06.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-08.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-09.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-11.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-12.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-13.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-15.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-16.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-18.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-19.png
+
+      story: |
+        Wavelength performs a song about the Daphne flower, which is known for its intoxicating fragrance that attracts both pollinators and humans.
+        It explores themes of attraction, desire, and the allure of beauty, many of which King David expresses for Daphne.
+        
+      lyrics: |
+        You're irresistible, You're irresistible to me
+
+        Why do you always leave me Looking for another flower? 
+        For some pollen power?
+
+        Why do you always roam the garden Looking for another source of that golden golden pollen?
+
     episode5:
       title: "Falling"
       description: "When they make your heart go ah-ah-ah-ah"
       youtubeLink: "https://youtu.be/LKDfiCHGeNs"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/Falling_v32.mp3"
+      carouselImages:
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-01.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-03.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-04.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-06.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-07.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-08.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-09.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-11.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-12.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-13.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-14.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-16.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-17.png
+      
+      story: |
+        Wavelength performs a song about the exhilarating feeling of falling in love and the joy that comes with it.
+        Perhaps foreshadowing what Daphne and her partner might feel for each other as their relationship blossoms.
+
+      lyrics: |
+        Like the voice of an angel When I first heard you sing
+        Every second afterwards I've felt the same thing
+
+        I hear your voice and I go ah-ha-ha-ha
+        I am falling in love with you
+
+        Time marches forward and things aren't as easy now
+        I keep coming back to the things that matter most to me
+
+
     episode6:
       title: "Once More"
       description: "In remembrance of dear friends"
