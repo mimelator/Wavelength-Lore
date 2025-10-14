@@ -1,13 +1,14 @@
 # wavelength-develop
 .accounts
 .sensitve
-.commands
+.cmds
 
-# story
-Story/*
 
-# aws
+# aws and firebase config
 .aws
+firebaseServiceAccountKey.json
+
+
 
 # Node.js dependencies
 node_modules/
@@ -32,7 +33,4 @@ yarn-error.log*
 
 
 
-.commands
-.cmds
-redeploy-app.sh
-.rds-chema-work.json
+

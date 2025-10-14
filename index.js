@@ -19,10 +19,31 @@ const firebaseConfig = {
 };
 
 console.log('DATABASE_URL:', process.env.DATABASE_URL);
+console.log('API_KEY:', process.env.API_KEY);
+console.log('Firebase Config:', firebaseConfig);
+
+console.log('Environment Variables:');
+console.log('DATABASE_URL:', process.env.DATABASE_URL);
+console.log('API_KEY:', process.env.API_KEY);
 
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 const database = getDatabase(firebaseApp);
+
+(async () => {
+  try {
+    console.log('Attempting Firebase operation...');
+    const videosRef = ref(database, 'videos'); // Use ref(database, path)
+    const snapshot = await get(videosRef); // Use get() to fetch data
+    if (snapshot.exists()) {
+      console.log('Firebase data:', snapshot.val());
+    } else {
+      console.log('No data available');
+    }
+  } catch (error) {
+    console.error('Firebase error:', error);
+  }
+})();
 
 // Generate a custom version number
 const version = `v${Date.now()}`;
