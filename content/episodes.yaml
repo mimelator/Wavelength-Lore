@@ -217,11 +217,91 @@ season1:
       description: "In remembrance of dear friends"
       youtubeLink: "https://youtu.be/_Ml9tKjgTIs"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/OnceMore_v20.mp3"
+      carouselImages:
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-01.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-02.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-03.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-04.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-05.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-06.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-07.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-08.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-09.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-10.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-11.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-12.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-14.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-15.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-16.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-17.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-18.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-19.png
+      
+      story: |
+        Wavelength performs a poignant song about cherishing memories and the importance of remembering loved ones who have passed away.
+        The song reflects on the enduring impact that these individuals have on our lives and the comfort that comes from holding onto their memory.
+
+      lyrics: |
+        Do you remember all those moments that we used to share?
+        Do you remember all the times that we used to care?
+        Do you remember all those mountains that we used to climb?
+        Do you remember It was always your hand in mine?
+
+        There was nothing that could happen
+        nothing that could ever tear us apart
+
+        It was quite the sight Friendship every night Living heart to heart
+
+        Oh do you remember when?
+
+        Johnny went first then Jason went too
+        They had grand plans and things to do
+        Tommy got into a much darker scene
+        and Jewel's bright light was snuffed out by the machine
+
+        Once more, once more Once more, once more To see you again!
+
     episode7:
       title: "History Lessons"
       description: "In memory of a precious friend, a jewel that couldn’t be outshown"
       youtubeLink: "https://youtu.be/PTTLo-Oetl4"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/HistoryLessons_v8.mp3"
+      carouselImages:
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-01.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-02.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-03.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-04.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-06.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-07.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-09.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-11.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-12.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-13.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-14.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-15.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-16.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-17.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-18.png
+      
+      story: |
+        Wavelength performs a reflective song about learning from the past and the importance of history in shaping our present and future.
+        The song encourages listeners to remember the lessons of history and to use that knowledge to make better choices moving forward.
+
+      lyrics: |
+        I realize that fates have been cruel
+        to take you away a young precious jewel
+        and forever I'll remember you
+
+        I realize that our fates are entwined
+        and though you were struck by the cruel hands of time
+        that forever I'll remember you
+
+        la-da-da-da-da (I will remember)
+        You're a precious jewel who Shines with the stars at night  
+        forever, I'll remember you
+
     episode8:
       title: "Life in the Shire"
       description: "When home is a haven, there’s no limit to what can be done"

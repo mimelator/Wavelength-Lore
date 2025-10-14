@@ -18,6 +18,7 @@ const firebaseConfig = {
   appId: process.env.APP_ID
 };
 
+/*
 console.log('DATABASE_URL:', process.env.DATABASE_URL);
 console.log('API_KEY:', process.env.API_KEY);
 console.log('Firebase Config:', firebaseConfig);
@@ -25,6 +26,7 @@ console.log('Firebase Config:', firebaseConfig);
 console.log('Environment Variables:');
 console.log('DATABASE_URL:', process.env.DATABASE_URL);
 console.log('API_KEY:', process.env.API_KEY);
+*/
 
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
@@ -98,12 +100,13 @@ app.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
       res.render('episode', {
         title: episode.title,
         image: episode.image,
-        carouselImages: episode.carouselImages,
-        summary: episode.story,
-        lyrics: episode.lyrics,
+        carouselImages: episode.carouselImages || [], // Default to an empty array if null
+        summary: episode.story || 'coming soon', // Default to 'coming soon' if null
+        lyrics: episode.lyrics  || 'coming soon', // Default to 'coming soon' if null
         audioUrl: episode.audio, 
         cdnUrl: process.env.CDN_URL,
         version: `v${Date.now()}`,
+        youtubeLink: episode.youtubeLink || '#'
       });
     } else {
       res.status(404).send('Episode not found');
