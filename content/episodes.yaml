@@ -56,11 +56,92 @@ season1:
       description: "Life is about choices, so make one and see what happens next!"
       youtubeLink: "https://youtu.be/07ln1YTcOdg?si=TrWzyJkYOZtx1Zrc"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/JumpRightIn_v24.mp3"
+      carouselImages:
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-01.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-02.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-03.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-04.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-05.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-06.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-07.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-08.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-09.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-10.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-11.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-13.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-15.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-16.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-17.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-18.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-19.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-20.png
+        
+
+      story: |
+        Wavelength performs a song about taking chances and embracing new experiences, which is especially
+        important to them as they are a touring band and love to explore new places and meet new people, cultures, and ideas.
+        
+
+      lyrics: |
+        I get up just a quarter past midnight
+        to get up before the rising sun
+
+        And if you ever see me
+        past the midnight hour
+        Roll me over, ‘cause you know i am done
+
+        But i’ll keep on crusin’
+        Everywhere i’m choosin
+        Everywhere that i want to be
+
+        And i try, and i try 
+        and I try so hard 
+        To be free
+
+        I keep trying to reason about
+        Something i can’t understand
+
+        Why you’d choose, why you’d choose
+        Why you’d choose a looser
+        
+        When you could just lend a hand?
+
     episode3:
       title: "Dream with Me"
       description: "What dreams can be made when two are united in destiny?"
       youtubeLink: "https://youtu.be/L_gxO-rrTSY"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/DreamWithMe_v3.mp3"
+      carouselImages: 
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-01.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-03.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-04.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-06.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-07.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-08.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-09.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-10.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-13.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-14.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-17.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-18.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-19.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-20.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-21.png
+      
+      story: |
+        Wavelength performs a heartfelt song about dreaming together and the power of unity and shared aspirations.
+        The song emphasizes the importance of connection and collaboration in achieving dreams and overcoming challenges.
+        The lyrics convey a sense of hope and optimism, encouraging listeners to believe in the possibility of a brighter future when people come together with a common purpose.
+
+      lyrics: |
+        There is a moment when you dream with me
+        That magic moment is our destiny
+
+        And that magic moment when the stars align
+        It will lead us to a place so divine
+
     episode4:
       title: "Daphne"
       description: "The intoxicating Daphne flower calls to both pollinators and humans alike"
