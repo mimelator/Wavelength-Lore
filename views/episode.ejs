@@ -1,12 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel="stylesheet" href="<%= cdnUrl %>/css/styles.css?v=<%= version %>">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
+    <%- include('partials/head') %>
 </head>
 <body>
     <%- include('partials/header') %>
@@ -14,6 +9,7 @@
     <main>
         <section class="banner-image" style="background-image: url('<%= image %>'); background-size: cover; background-position: center; height: 300px;">
         </section>
+        
         <nav class="episode-navigation" style="display: flex; justify-content: space-between; margin: 10px 20px;">
             <% if (previousLink) { %>
                 <div style="text-align: left;">
@@ -36,10 +32,7 @@
             <% } %>
         </nav>
         
-        
         <h1><%= title %></h1>
-
-        
 
         <section class="carousel">
             <div class="carousel-container" id="episode-carousel">
@@ -50,6 +43,8 @@
                 <% }); %>
             </div>
         </section>
+
+        
 
         <section class="summary">
             <h2>Summary</h2>
