@@ -51,42 +51,115 @@
       description: "Everyday I see what’s yours and I think about taking it all away"
       youtubeLink: "https://youtu.be/17Mbv0XwQvo"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/Psychopath_v6.mp3"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/Psychopath_v8.mp3"
       carouselImages:
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/FallOfTheShire_take2-02.png
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-01.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-02.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-04.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-11.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-17.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-19.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-20.png"
 
       story: |
-        The Goblin King is a Psychopath. He doesn't care about anyone but himself. He takes what he wants and doesn't care who he hurts in the process. Wavelength is starting to realize that he is not to be trusted.
+        Wavelength is forced to perform for the Goblin King. So thinking quickly on the spot, 
+          Wavelength writes a song about being a Psychopath, hoping to impress the Goblin King with Worldview
+          that the Goblin can appreciate. This helps to put the Goblin King off of his guard in order to escape.
 
       lyrics: |
-          Everyday I see what's yours
-          And I think about taking it all away
-          'Cause I don't care about you
-          I just want to see you suffer
+          He's a psycho-psycho-psychopath
 
-          You can try to run away
-          But you can't hide from me
-          I'm a psychopath
-          And I don't care about anyone but me
+          I'm a psycho-psycho-psychopath
+          and I'm gonna take what's yours...
 
-          You can try to fight back
-          But you can't win against me
-          I'm a psychopath
-          And I don't care about anyone but me
+          Everyday I see what's yours and soon i'll be taking it away
+          'cause that's my way How I go through all my days
+          I'm a psychopathic wizard and I'm gonna blow you all away
 
-          I'm a psychopath
-          And I don't care about anyone but me
+          I'm a psycho-psycho-psychopath and I'm gonna take what's yours...
+          ...and give it all away!
+
+          Well there's never been a better path
+          then livin' your life as a psychopath!
+
 
     episode3:
       title: "Countdown"
       description: "There’s a countdown to living There’s a countdown to the end"
       youtubeLink: "https://youtu.be/rSff1_C8fxU"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/Countdown_v6.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/images/Countdown-02.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/images/Countdown-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/images/Countdown-04.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/images/Countdown-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/images/Countdown-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/images/Countdown-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/images/Countdown-10.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/images/Countdown-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/images/Countdown-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/images/Countdown-17.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/images/Countdown-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/images/Countdown-20.png"
+
+      story: |
+        Wavelength is struck by the realization that the Goblins mean to kill and rule the Shire Forever.
+        They realize that in times of crisis, people come together to help each other, and the most important
+        resource you have in times of crisis is your friends and family.
+
+      lyrics: |
+          There's a countdown in the background of every living thing
+          you better know what to look for Or you won't stay in the ring
+
+          There's a countdown to living There's a countdown to the end
+          So if you're lucky  you should hold on
+          to someone that you can call friend
+
+          Until the dark time is past
+          Gather together for what warmth you can have
+          And when the terror tightens its grip,
+          Give your loved ones a kiss!
+
     episode4:
       title: "A Misery of Goblins"
       description: "Hey everybody look what I’ve found: Misery is our Dream"
       youtubeLink: "https://youtu.be/OINvOo93z64"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/A_Misery_of_Goblins_v6.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-01.png"
+      
+      story: |
+        The Goblin King has taken over the Shire and is forcing Wavelength to perform for him.
+        Wavelength tries to reason with the Goblin King, but he is too far gone. The Goblin King
+        believes that misery is the only way to live, and that everyone should be miserable like him.
+
+      lyrics: |
+          Hey everybody look what I've found
+          Misery is our dream
+          So come along and sing this song
+          And join the misery team
+
+          We're a misery of goblins
+          And we want you to be one too
+          So come along and sing this song
+          And join the misery crew
+
+          We're a misery of goblins
+          And we want you to be one too
+          So come along and sing this song
+          And join the misery crew
+
+
+
     episode5:
       title: "Slow Time"
       description: "And every moment that you give into the greed your soul will drift away"
