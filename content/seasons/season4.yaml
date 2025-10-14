@@ -7,16 +7,121 @@
       description: "Nothing will stop us now from reclaiming our Shire."
       youtubeLink: "https://youtu.be/ksahGYnhP8s"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/LockedAndLoaded_v1.mp3"
+
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-02.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-10.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/RebuildTheShire-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/RebuildTheShire-10.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/RebuildTheShire-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/RebuildTheShire-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/WereComingForYou-10.png"
+    
+
+      story: |
+        Wavelength and the Shire Folk escape the Goblin Invasion of the dear Shire, and flee to the far, frozen North. 
+        There they find a place to recover and plan at the Ice Fortress.
+        THe Ice Fortress is a safe haven for all, where everyone is welcome, no matter wealth or looks or race.
+        
+      lyrics: |
+        Welcome to the Icy Fortress
+        We've got room, and food to Spare
+        When you're here you'll be protected under our care at the icy fortress!
+
     episode2:
       title: "The King has Fled"
       description: "The Goblin King fled the Shire before the battle again and took captives."
       youtubeLink: "https://youtu.be/yqc-doJBZgA"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/TheKingHasFled_v1.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-01.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-02.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-10.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-17.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-20.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-23.png"
+     
+      story: |
+        The Goblin king being a coward at heart, fled the battle before it began, fleeing with his main GOblin Misery back
+        to his swampy lair.  He took with him captives from the Shire, including the Royal Family.  Behind the GOblin King
+        he left a token force to hold the Shire, so that the Shire Folk wouldn't pursue him.
+      
+      lyrics: |
+        The Goblin King has fled the battle
+        He can spread no more lies in the Shire
+        No more lying in the shire!
+        No Lies!
+
     episode3:
       title: "Goblin's Rule"
-      description: "The only rule for you is that Goblins gonna Rule all over you"
+      description: "The only goblin rule for you is that Goblins gonna Rule all over you"
       youtubeLink: "https://youtu.be/NatsFD090fA"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/GoblinsRule_v2.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-04.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-10.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-17.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-20.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-21.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-24.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-25.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-26.png"
+      
+      story: |
+        There is only one motivation for a Goblin, and that is to rule over others.  This is the case for all Goblins,
+        from the lowliest grunt to the Goblin King himself.  The Goblin King rules by lying, cheating, and stealing.  He
+        has no honor, and no respect for others.  The only rule that the Goblin King has is that Goblins gonna rule all over you.
+
+      lyrics: |
+        The Only Goblin Rule for You
+        Is that goblins gonna Rule all over you!
+
+        It's no mystery that i'd lie to you
+        It's just the way that the Goblin King's rule!
+
+        When I'm speaking you can bet That I'm lying to you
+        It's just the way that the Goblin King's rule!
+
+        It's no mystery that i'd lie to you...
+        ...that i'd lie to you, and you, and you...
+
     episode4:
       title: "Ice Blue Greed"
       description: "There’s no way that the King can resist the trap set by Lucky"
