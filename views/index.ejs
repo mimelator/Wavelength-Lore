@@ -14,16 +14,16 @@
     <% for (var season in videos) { %>
         <div class="season-title">
             <h2><%= videos[season].title %></h2>
-            <a href="<%= videos[season].seasonLink %>" target="_blank">Watch Full Season</a>
+            <a href="<%= videos[season].seasonLink %>" target="_blank" class="center-link">Watch Full Season</a>
         </div>
         <div class="carousel" id="carousel-<%= season %>">
             <% for (var episode in videos[season].episodes) { %>
                 <div>
                     <h3 class="episode-title"><%= videos[season].episodes[episode].title %></h3>
-                    <p><%= videos[season].episodes[episode].description %></p>
                     <a href="<%= videos[season].episodes[episode].youtubeLink %>" target="_blank">
                         <img src="<%= videos[season].episodes[episode].image %>" alt="<%= videos[season].episodes[episode].title %>">
                     </a>
+                    <p><%= videos[season].episodes[episode].description %></p>
                 </div>
             <% } %>
         </div>

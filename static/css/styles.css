@@ -6,8 +6,8 @@
   font-family: 'AnimeAce';
   src: url('../fonts/animeace2_reg.ttf') format('truetype');
   src: url('../fonts/animeace2_reg.otf') format('opentype');
-  }
-  
+}
+
 body {
   font-family: 'AnimeAce', Arial, sans-serif;
   margin: 0;
@@ -17,13 +17,11 @@ body {
   animation: gradientBG 15s ease infinite;
 }
 
-
 @media (prefers-reduced-motion: reduce) {
   body {
     animation: none !important;
   }
 }
-  
 
 @keyframes gradientBG {
   0% { background-position: 0% 50%; }
@@ -35,23 +33,21 @@ h1 {
   color: #333;
   text-align: center;
   margin-top: 20px;
+  font-size: 4rem; /* Increased font size */
 }
 
-/* Center season titles and links */
-.season-title {
-    text-align: center;
-}
-
-/* Add space between carousels */
+/* Carousel Styles */
 .carousel {
-    margin-bottom: 50px;
     width: 80%;
     margin: 0 auto;
+    display: flex;
+    justify-content: center; /* Center images horizontally */
 }
 .carousel img {
     width: 100%;
     max-width: 400px;
-    height: auto;
+    height: 300px; /* Set a consistent height for all images */
+    object-fit: cover; /* Ensure images maintain aspect ratio within the set height */
     border-radius: 10px;
     cursor: pointer;
     transition: transform 0.3s ease;
@@ -63,19 +59,54 @@ h1 {
 }
 .carousel p {
     text-align: center;
-    font-size: 14px;
+    font-size: 12px; /* Reduced to half of the original size */
     color: #555;
     margin-top: 5px;
+}
+
+/* Center links */
+.center-link {
+    display: block;
+    text-align: center;
+    margin: 10px 0;
+    font-size: 1rem;
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.center-link:hover {
+    text-decoration: underline;
+}
+
+/* Center season titles */
+.season-title {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 2.25rem; /* Increased by 1.5 times the original size */
+    font-weight: bold;
 }
 
 /* Center episode titles */
 .episode-title {
     text-align: center;
+    margin: 10px 0;
+    font-size: 1rem;
+    font-weight: bold;
 }
 
 /* Responsive Design for Mobile */
 @media (max-width: 768px) {
+    .carousel {
+        margin-bottom: 20px; /* Add spacing between carousels */
+    }
+    .section {
+        padding: 10px; /* Add padding to sections for better spacing */
+    }
+    h1 {
+      font-size: 2.5rem; /* Decreased font size for mobile */
+        margin-top: 10px;
+    }
     .carousel img {
-        max-width: 100%;
+        max-width: 1000px; /* Double the current max-width for mobile */
     }
 }
