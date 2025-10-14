@@ -52,6 +52,8 @@ const version = `v${Date.now()}`;
 
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
+
+// Set the views directory
 app.set('views', path.join(__dirname, 'views'));
 
 // Serve static files from the public directory
@@ -193,6 +195,16 @@ app.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
     console.error('Error fetching episode data:', error);
     res.status(500).send('Error fetching episode data');
   }
+});
+
+// Route for About page
+app.get('/about', (req, res) => {
+  res.render('about', { title: 'About - Coming Soon', cdnUrl: process.env.CDN_URL, version: `v${Date.now()}` });
+});
+
+// Route for Contact page
+app.get('/contact', (req, res) => {
+  res.render('contact', { title: 'Contact - Coming Soon', cdnUrl: process.env.CDN_URL, version: `v${Date.now()}` });
 });
 
 app.listen(port, () => {
