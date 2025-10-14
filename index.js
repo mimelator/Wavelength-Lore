@@ -5,7 +5,7 @@ const { getDatabase, ref, get } = require('firebase/database');
 const path = require('path');
 
 const app = express();
-const port = 8080;
+const port = 3001;
 
 // Firebase configuration
 const firebaseConfig = {

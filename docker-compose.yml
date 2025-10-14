@@ -3,7 +3,7 @@ services:
   app:
     image: wavelength-lore-nginx
     ports:
-      - "8080:8080"
+      - "3001:3001"
     volumes:
       - .:/app
     command: npm run dev
