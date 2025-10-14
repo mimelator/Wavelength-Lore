@@ -168,6 +168,11 @@ app.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
         };
       }
 
+      if (episode.carouselImages) {
+        // Shuffle the carouselImages array
+        episode.carouselImages = episode.carouselImages.sort(() => Math.random() - 0.5);
+      }
+
       res.render('episode', {
         title: episode.title,
         image: episode.image,
