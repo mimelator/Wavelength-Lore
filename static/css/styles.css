@@ -96,11 +96,38 @@ h1 {
 /* Responsive Design for Mobile */
 @media (max-width: 768px) {
     .carousel img {
-        max-width: 100%; /* Ensure consistent scaling for mobile */
+        max-width: 80%; /* Ensure consistent scaling for mobile */
+    }
+
+    .carousel {
+        width: 95%; /* Adjust carousel width for smaller screens */
+        margin-bottom: 20px; /* Add spacing between carousels */
+    }
+    .section {
+        padding: 10px; /* Add padding to sections for better spacing */
+        border: 1px solid #eee; /* Add a light border around sections */
+        border-radius: 5px; /* Round the corners of sections */
+        background: rgba(255, 255, 255, 0.8); /* Slightly transparent background */
+    }
+    h1 {
+        font-size: 1.5rem; /* Adjust heading size for smaller screens */
+        margin-top: 10px;
     }
 }
 
 /* Add 2px space between items in the carousel */
 .carousel .slick-slide {
-    margin: 0 1px; /* Add 2px total space between items (1px on each side) */
+    margin: 0 1px; /* Maintain 2px total space between items */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Ensure consistent alignment */
+}
+.carousel .episode-title {
+    min-height: 40px; /* Set a consistent minimum height for episode titles */
+    
+    overflow: hidden; /* Hide overflow if the title is too long */
+    text-align: center;
+    display: flex;
+    align-items: center; /* Vertically center the text */
+    justify-content: center; /* Horizontally center the text */
 }
