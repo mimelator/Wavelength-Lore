@@ -34,3 +34,4 @@ yarn-error.log*
 
 
 
+.firebase.rules.json

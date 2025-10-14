@@ -10,6 +10,21 @@
 <body>
     <%- include('partials/header') %>
 
+    <nav class="character-navigation-top">
+        <% if (previousCharacter) { %>
+            <a href="/character/<%= previousCharacter.id %>" class="nav-link prev">
+                <img src="<%= previousCharacter.image %>" alt="<%= previousCharacter.title %>" class="nav-image tiny">
+                <span class="nav-text">&laquo; <%= previousCharacter.title %></span>
+            </a>
+        <% } %>
+        <% if (nextCharacter) { %>
+            <a href="/character/<%= nextCharacter.id %>" class="nav-link next">
+                <img src="<%= nextCharacter.image %>" alt="<%= nextCharacter.title %>" class="nav-image tiny">
+                <span class="nav-text"><%= nextCharacter.title %> &raquo;</span>
+            </a>
+        <% } %>
+    </nav>
+
     <main>
         <h1><%= character.title %></h1>
         <section class="character-banner" style="background-image: url('<%= character.image %>');">
@@ -29,15 +44,6 @@
                 <% }); %>
             </div>
         </section>
-
-        <nav class="character-navigation">
-            <% if (previousCharacter) { %>
-                <a href="/character/<%= previousCharacter.id %>" class="nav-link prev">&laquo; <%= previousCharacter.title %></a>
-            <% } %>
-            <% if (nextCharacter) { %>
-                <a href="/character/<%= nextCharacter.id %>" class="nav-link next"><%= nextCharacter.title %> &raquo;</a>
-            <% } %>
-        </nav>
     </main>
 
     <%- include('partials/footer') %>

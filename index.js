@@ -38,7 +38,8 @@ const database = getDatabase(firebaseApp);
     const videosRef = ref(database, 'videos'); // Use ref(database, path)
     const snapshot = await get(videosRef); // Use get() to fetch data
     if (snapshot.exists()) {
-      console.log('Firebase data:', snapshot.val());
+      // console.log('Firebase data:', snapshot.val());
+        console.log('Firebase operation successful.');
     } else {
       console.log('No data available');
     }
@@ -67,7 +68,7 @@ app.get('/', async (req, res) => {
 
     if (snapshot.exists()) {
       const videos = snapshot.val();
-      console.debug('Firebase query results:', videos); // Debug message
+      // console.debug('Firebase query results:', videos); // Debug message
       res.render('index', {
         title: 'Welcome to Wavelength Lore',
         cdnUrl: process.env.CDN_URL,
@@ -206,48 +207,33 @@ app.get('/character/:characterId', async (req, res) => {
     const snapshot = await get(charactersRef);
 
     if (snapshot.exists()) {
-      const characters = snapshot.val();
+      const charactersData = snapshot.val();
 
-      // Recursively search for the character by ID
-      function findCharacterPath(node, path = '') {
-        for (const key in node) {
-          const currentPath = path ? `${path}/${key}` : key;
-          if (node[key].id === characterId) {
-            return { character: node[key], path: currentPath };
-          } else if (typeof node[key] === 'object') {
-            const result = findCharacterPath(node[key], currentPath);
-            if (result) return result;
-          }
+      // Search for the character by ID across all categories
+      let character = null;
+      for (const category in charactersData) {
+        if (Array.isArray(charactersData[category])) {
+          character = charactersData[category].find(c => c.id === characterId);
+          if (character) break;
         }
-        return null;
       }
 
-      const result = findCharacterPath(characters);
-
-      if (!result) {
+      if (!character) {
         return res.status(404).send('Character not found');
       }
 
-      const { character, path } = result;
-
       // Fetch all characters for navigation
-      const allCharacters = [];
-      function collectCharacters(node, path = '') {
-        for (const key in node) {
-          const currentPath = path ? `${path}/${key}` : key;
-          if (node[key].id) {
-            allCharacters.push({ id: node[key].id, title: node[key].title, path: currentPath });
-          } else if (typeof node[key] === 'object') {
-            collectCharacters(node[key], currentPath);
-          }
+      let allCharacters = [];
+      for (const category in charactersData) {
+        if (Array.isArray(charactersData[category])) {
+          allCharacters = allCharacters.concat(charactersData[category]);
         }
       }
 
-      collectCharacters(characters);
-
       const currentIndex = allCharacters.findIndex(c => c.id === characterId);
-      const previousCharacter = currentIndex > 0 ? allCharacters[currentIndex - 1] : null;
-      const nextCharacter = currentIndex < allCharacters.length - 1 ? allCharacters[currentIndex + 1] : null;
+      // Adjust navigation to wrap around
+      const previousCharacter = currentIndex > 0 ? allCharacters[currentIndex - 1] : allCharacters[allCharacters.length - 1];
+      const nextCharacter = currentIndex < allCharacters.length - 1 ? allCharacters[currentIndex + 1] : allCharacters[0];
 
       res.render('character', {
         title: character.title,
@@ -280,35 +266,28 @@ app.get('/characters', async (req, res) => {
     const snapshot = await get(charactersRef);
 
     if (snapshot.exists()) {
-      const characters = [];
+      const charactersData = snapshot.val();
 
-      // Recursively collect all characters
-      function collectCharacters(node, path = '') {
-        for (const key in node) {
-          const currentPath = path ? `${path}/${key}` : key;
-          if (node[key].id) {
-            characters.push({ id: node[key].id, title: node[key].title, image: node[key].image });
-          } else if (typeof node[key] === 'object') {
-            collectCharacters(node[key], currentPath);
-          }
+      // Extract all characters from the new schema
+      const allCharacters = [];
+      for (const category in charactersData) {
+        if (Array.isArray(charactersData[category])) {
+          allCharacters.push(...charactersData[category]);
         }
       }
 
-      collectCharacters(snapshot.val());
-
       res.render('character-gallery', {
         title: 'Character Gallery',
-        characters,
+        characters: allCharacters.map(c => ({
+          id: c.id,
+          title: c.title,
+          image: c.image
+        })),
         cdnUrl: process.env.CDN_URL,
         version: `v${Date.now()}`
       });
     } else {
-      res.render('character-gallery', {
-        title: 'Character Gallery',
-        characters: [],
-        cdnUrl: process.env.CDN_URL,
-        version: `v${Date.now()}`
-      });
+      res.status(404).send('No characters found');
     }
   } catch (error) {
     console.error('Error fetching characters:', error);

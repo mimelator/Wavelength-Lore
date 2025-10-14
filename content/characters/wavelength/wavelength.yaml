@@ -1,12 +1,21 @@
-# Example Character Data
-character:
-  id: "andrew"  # Unique identifier for the character
-  title: "Prince Andrew"
-  description: "The leader of Wavelength, husband of Jewel, and father of Alexandria and Eloquence"
-  image: "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-02.png"
-  image_gallery:
-    - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/IceBlueGreed-08.png"
-    - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-02.png"
-    - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-08.png"
-    - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-02.png"
-    - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-19.png"
+  - id: "andrew"  # Unique identifier for the character
+    title: "Prince Andrew"
+    description: "The leader of Wavelength, husband of Jewel, and father of Alexandria and Eloquence"
+    image: "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-02.png"
+    image_gallery:
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/IceBlueGreed-08.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-02.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-08.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-02.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-19.png"
+
+  - id: "jewel"  # Unique identifier for the character
+    title: "Jewel"
+    description: "The Wife of Prince Andrew and mother of Alexandria and Eloquence.  Being half elf, she obtained a superior musical education and has innate gifted musical talents."
+    image: "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/concert4-06.png"
+    image_gallery:
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-11.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/IceBlueGreed-08.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-08.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-02.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-19.png"

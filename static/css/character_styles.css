@@ -48,7 +48,41 @@ main {
     text-decoration: none;
     color: #007BFF;
     font-size: 16px;
+    padding: 5px;
 }
 .character-navigation .nav-link:hover {
     text-decoration: underline;
+}
+/* Add padding to navigation links and images */
+.character-navigation-top .nav-link {
+    padding: 5px;
+}
+.character-navigation-top .nav-image.tiny {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 10px;
+    padding: 5px 5px 0 5px;
+}
+/* Ensure proper alignment for navigation links */
+.character-navigation-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.character-navigation-top .nav-link.prev {
+    justify-self: flex-start;
+}
+.character-navigation-top .nav-link.next {
+    justify-self: flex-end;
+}
+/* Style for navigation text below images */
+.character-navigation-top .nav-text {
+    display: block;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 5px;
+    color: #333;
 }
