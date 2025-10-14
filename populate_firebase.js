@@ -55,19 +55,27 @@ function processYamlData(data) {
   return data;
 }
 
-// Populate Firebase
+// Updated to read one season at a time from separate files
 async function populateFirebase() {
   try {
     const database = await initializeFirebaseWithToken();
-    const videosRef = ref(database, 'videos');
 
-    // Load and process YAML file
-    const yamlContent = fs.readFileSync('./content/episodes.yaml', 'utf8');
-    let data = yaml.load(yamlContent);
-    data = processYamlData(data);
+    // Iterate through season files
+    const seasonFiles = fs.readdirSync('./content/seasons');
+    for (const file of seasonFiles) {
+      if (file.endsWith('.yaml')) {
+        const seasonName = file.replace('.yaml', '');
+        const seasonRef = ref(database, `videos/${seasonName}`);
 
-    await set(videosRef, data);
-    console.log('Firebase populated successfully!');
+        // Load and process YAML file
+        const yamlContent = fs.readFileSync(`./content/seasons/${file}`, 'utf8');
+        let data = yaml.load(yamlContent);
+        data = processYamlData(data);
+
+        await set(seasonRef, data);
+        console.log(`Firebase populated successfully for ${seasonName}!`);
+      }
+    }
   } catch (error) {
     console.error('Error populating Firebase:', error);
   }

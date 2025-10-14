@@ -1,0 +1,38 @@
+  title: "Fall of the Shire"
+  seasonLink: "https://www.youtube.com/playlist?list=PLO3KUVl6gwUbaay8aPoO6JZsBEjqQx-5y"
+  episodes:
+    episode1:
+      title: "Goblin King"
+      description: "You've been punched in the head So many times that you don’t know Which is way is left or right"
+      youtubeLink: "https://youtu.be/kGpLCx63Fh8"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/image.png"
+    episode2:
+      title: "Psychopath"
+      description: "Everyday I see what’s yours and I think about taking it all away"
+      youtubeLink: "https://youtu.be/17Mbv0XwQvo"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/image.png"
+    episode3:
+      title: "Countdown"
+      description: "There’s a countdown to living There’s a countdown to the end"
+      youtubeLink: "https://youtu.be/rSff1_C8fxU"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/image.png"
+    episode4:
+      title: "A Misery of Goblins"
+      description: "Hey everybody look what I’ve found: Misery is our Dream"
+      youtubeLink: "https://youtu.be/OINvOo93z64"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/image.png"
+    episode5:
+      title: "Slow Time"
+      description: "And every moment that you give into the greed your soul will drift away"
+      youtubeLink: "https://youtu.be/J3_gkKZuTQI"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/image.png"
+    episode6:
+      title: "Won't See it Coming"
+      description: "The Goblins don't comprehend science because they aren't able to learn, and won't see the threat right in front of them."
+      youtubeLink: "https://youtu.be/jkH6suRlFGI"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/image.png"
+    episode7:
+      title: "Say Goodbye to the Shire"
+      description: "You can’t coexist with Goblins when they rule the Shire"
+      youtubeLink: "https://youtu.be/A8yY4pPYzVY"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/image.png"

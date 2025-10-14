@@ -1,0 +1,44 @@
+
+  title: "Battle of the Shire"
+  seasonLink: "https://www.youtube.com/playlist?list=PLO3KUVl6gwUbaay8aPoO6JZsBEjqQx-5y"
+  episodes:
+    episode1:
+      title: "Locked And Loaded"
+      description: "Nothing will stop us now from reclaiming our Shire."
+      youtubeLink: "https://youtu.be/ksahGYnhP8s"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/image.png"
+    episode2:
+      title: "The King has Fled"
+      description: "The Goblin King fled the Shire before the battle again and took captives."
+      youtubeLink: "https://youtu.be/yqc-doJBZgA"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/image.png"
+    episode3:
+      title: "Goblin's Rule"
+      description: "The only rule for you is that Goblins gonna Rule all over you"
+      youtubeLink: "https://youtu.be/NatsFD090fA"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/image.png"
+    episode4:
+      title: "Ice Blue Greed"
+      description: "There’s no way that the King can resist the trap set by Lucky"
+      youtubeLink: "https://youtu.be/7JgLiSZnR-g"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/image.png"
+    episode5:
+      title: "The Shire Fortress"
+      description: "Do you want to live under the rule of the hateful and Cruel?"
+      youtubeLink: "https://youtu.be/gNrVgi5NI6I"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/image.png"
+    episode6:
+      title: "Battle of the Shire"
+      description: "Shoot for the king; stopping his lies are the key to everything"
+      youtubeLink: "https://youtu.be/kBQWLbiw6X0"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/image.png"
+    episode7:
+      title: "Song of Mourning"
+      description: "There’s a time for mourning, when we’ll share stories at night about our loved ones passing, and how we hold those memories tight."
+      youtubeLink: "https://youtu.be/fG2rv7z5D6M"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/image.png"
+    episode8:
+      title: "The Shire Dream"
+      description: "I choose to live free and find the shire dream in me."
+      youtubeLink: "https://youtu.be/Gpeh3BfPji4"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/image.png"

@@ -1,0 +1,39 @@
+
+  title: "Ice Fortress"
+  seasonLink: "https://www.youtube.com/playlist?list=PLO3KUVl6gwUbaay8aPoO6JZsBEjqQx-5y"
+  episodes:
+    episode1:
+      title: "Ice Fortress"
+      description: "When you’re here you’ll be protected under our care"
+      youtubeLink: "https://youtu.be/DHspHA3C4Ko"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/image.png"
+    episode2:
+      title: "Ice Whales"
+      description: "Desperate times call for action"
+      youtubeLink: "https://youtu.be/PEXEVqYtPfY"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/image.png"
+    episode3:
+      title: "Rebuild The Shire"
+      description: "Keep the shire dream alive while in the far, frozen north."
+      youtubeLink: "https://youtu.be/qmbZgK0iW7Q"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/image.png"
+    episode4:
+      title: "Sneak Attack"
+      description: "The goblins enjoy spreading terror by sending raiding parties up to the far, frozen North to harass and spy on the Shire Folk."
+      youtubeLink: "https://youtu.be/XHFMcKhgSoE"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/image.png"
+    episode5:
+      title: "Frozen Peace"
+      description: "Here we are, on this frozen shore, very far from our dear home"
+      youtubeLink: "https://youtu.be/Ywnzknawoiw"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/image.png"
+    episode6:
+      title: "We’re Coming For You"
+      description: "We can't rebuild the Shire Dream while Goblins still rule the land. We must take back our home."
+      youtubeLink: "https://youtu.be/g0KXZXay62E"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/image.png"
+    episode7:
+      title: "Prepare for Battle"
+      description: "It’s time to face the Goblin King and retake the Shire"
+      youtubeLink: "https://youtu.be/fka7d0fYWeY"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/image.png"
