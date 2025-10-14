@@ -37,10 +37,16 @@
 
         <section class="character-carousel">
             <div class="carousel">
-                <% character.image_gallery.forEach(image => { %>
-                    <div class="carousel-item">
+                <% const shuffledImages = character.image_gallery.sort(() => Math.random() - 0.5); %>
+                <% shuffledImages.forEach((image, index) => { %>
+                    <div class="carousel-item" data-index="<%= index %>">
                         <img src="<%= image %>" alt="<%= character.title %>">
                     </div>
+                <% }); %>
+            </div>
+            <div class="carousel-dots">
+                <% shuffledImages.forEach((_, index) => { %>
+                    <span class="dot" data-index="<%= index %>"></span>
                 <% }); %>
             </div>
         </section>

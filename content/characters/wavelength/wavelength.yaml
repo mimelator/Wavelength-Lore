@@ -11,7 +11,7 @@
 
   - id: "jewel"  # Unique identifier for the character
     title: "Jewel"
-    description: "The Wife of Prince Andrew and mother of Alexandria and Eloquence.  Being half elf, she obtained a superior musical education and has innate gifted musical talents."
+    description: "The Wife of Prince Andrew and mother of Alexandria and Eloquence.  Being half elf, she obtained a superior musical education and has innate gifted musical talents, but being a half elf her community shunner her.  She met her husband at a Summer Music Workshop and after years of marriage and raising two children they formed the band Wavelength."
     image: "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/concert4-06.png"
     image_gallery:
       - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-11.png"
@@ -19,3 +19,60 @@
       - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-08.png"
       - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-02.png"
       - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-19.png"
+
+  - id: "alex"  # Unique identifier for the character
+    title: "Alexandria"
+    description: "The Daughter of Prince Andrew and Jewel, Alexandria is a quarter elf and musically gifted like her mother.  She loves to teach others how to play and compose music...  Especially young children."
+    image: "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/Final_Race-16.png"
+    image_gallery:
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/Countdown-03.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/Countdown-08.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/Final_Race-05.png"   
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/Final_Race-16.png"
+
+  - id: "eloquence"  # Unique identifier for the character
+    title: "Eloquence"
+    description: "The Son of Prince Andrew and Jewel, Eloquence is a quarter elf and passionate about the Bass Guitar as well as Rhythm Theory.  He was best friends with Magical Maurice the Percussion Wizard of Wavelength until Maurice died at the Battle of the Shire."
+    image: "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-08.png"
+    image_gallery:
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-06.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-18.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/LockedAndLoaded-03.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/LockedAndLoaded-14.png"
+
+  - id: "daphne"  # Unique identifier for the character
+    title: "Daphne"
+    description: "The prodigy daughter of the Shire's Choir Master, Daphne is a gifted drummer who joins Wavelength after the Battle of the Shire when she and her brother are orphaned and Wavelength loses their Drummer Maurice."
+    image: "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-10.png"
+    image_gallery:
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-05.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-06.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-18.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-19.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-11.png"          
+
+  - id: "lucky"  # Unique identifier for the character
+    title: "Lucky"
+    description: "Lucky is the Leprechaun who has an endless supply of Golden Advice.  His wisdom has earned him a role as the a beloved token of luck to the Shire.  But after the Battle of the Shire, Lucky decides to travel with Wavelength for awhile even though he isn't a musician per-se.  He is a fantastic singer though.  Mostly, he wants to fish and everywhere the Wavelength travels, seems to include a convenient fishing opporunity for Lucky."
+    image: "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/IceBlueGreed-15.png"
+    image_gallery:
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-02.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-08.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-10.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/IceBlueGreed-06.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/IceBlueGreed-08.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheBattleOfTheShire-058.png"
+      
+
+  - id: "yeti"  # Unique identifier for the character
+    title: "Yeti"
+    description: "Wavelength first met Yeti up in the far, frozen North at the Ice Castle.  Yeti, while ferocious looking is actually a Nurse in practice.  Although very clumsy, which is how he got the name: Yeti.  He keeps falling down, 'Yeti' gets back up again."
+    image: "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/IceBlueGreed-15.png"
+    image_gallery:
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheKingHasFled-08.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheKingHasFled-13.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/FrozenPeace-16.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-06.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/LockedAndLoaded-04.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheBattleOfTheShire-050.png"
+      - "https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/PrepareForBattle-14.png"

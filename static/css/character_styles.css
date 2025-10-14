@@ -86,3 +86,20 @@ main {
     margin-top: 5px;
     color: #333;
 }
+/* Styles for carousel dots */
+.carousel-dots {
+    text-align: center;
+    margin-top: 10px;
+}
+.carousel-dots .dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    background-color: #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.carousel-dots .dot.active {
+    background-color: #007BFF;
+}
