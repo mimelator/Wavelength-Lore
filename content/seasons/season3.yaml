@@ -7,33 +7,329 @@
       description: "When you’re here you’ll be protected under our care"
       youtubeLink: "https://youtu.be/DHspHA3C4Ko"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/Ice Fortress_v5.mp3"
+
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-04.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-10.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-11.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-17.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-19.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-20.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-21.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-23.png"
+
+      story: |
+        Wavelength and the Shire Folk escape the Goblin Invasion of the dear Shire, and flee to the far, frozen North. 
+        There they find a place to recover and plan at the Ice Fortress.
+        THe Ice Fortress is a safe haven for all, where everyone is welcome, no matter wealth or looks or race.
+        
+      lyrics: |
+        Welcome to the Icy Fortress
+        We've got room, and food to Spare
+        When you're here you'll be protected under our care at the icy fortress!
+        
+        In dark times, just like these
+        Where shirefolk are left out to freeze
+        We still provide your safety in our icy fortress!
+
+        Welcome strangers, all to this place
+        We provide for everyone, No matter wealth or looks or race.
+
+        In dark times, just like these
+        Where people are snatched from the streets!
+        We still provide your safety in our icy fortress!
+
+
     episode2:
       title: "Ice Whales"
       description: "Desperate times call for action"
       youtubeLink: "https://youtu.be/PEXEVqYtPfY"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/The Ice Whales_v5.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-01.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-04.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-17.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-19.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-20.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-21.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-23.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-24.png"
+      
+      story: |
+        While at the Ice Fortress, the Shire Folk realize they need time to heal.  The Ice Whale Hunt is an 
+        annual tradition at the Ice Fortress, and the Shire Folk decide to join in.  They know that they
+        need to learn how to fight against the Goblins, and the Ice Whale Hunt is a good time to test their mettle.
+        The Ice Whales are the most evil creatures in the deep oceans of the far, Frozen North.  However, while
+        completey submerged in the deep depths most of the year, once a year they migrate up to the surface to feed.  
+        This is where the Ice Whale Hunt takes place.  The Shire Folk must work together to take down these evil beasts,
+        and bring back food to the Ice Fortress.
+
+      lyrics: |
+        We're hunting Ice Whales Desperate times call for action
+        We're hunting Ice Whales These evil creatures live for your destruction
+        'Cause the goblins Have chased from our shire
+
+        We need a place to heal And we need food to survive
+        We need our community So we can heal
+        We need to survive So for now
+        We will hunt the Ice Whales The Ice Whales
+
+        Goblins took our shire So desperate times call for action
+
+
     episode3:
       title: "Rebuild The Shire"
       description: "Keep the shire dream alive while in the far, frozen north."
       youtubeLink: "https://youtu.be/qmbZgK0iW7Q"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/RebuildTheShire_v4.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/FallOfTheShire_take1-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/FrozenPeace-25.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/FrozenPeace-30.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/IceFortress-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/IceFortress-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/IceFortress-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Ice_Whale-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Ice_Whale-23.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Ice_Whale-24.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-17.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-23.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-26.png"
+        
+      story: |
+        While at the Ice Fortress, the Shire Folk start the process of dreaming what their new Shire will be like.
+        They value freedom, community, and safety above all else.  With that in mind, they begin to craft their plans to rebuild the Shire.
+
+      lyrics: |
+        We'll rebuild the shire Yes we can Yes we will one day!
+        Let's make the world a better place
+        Yes we can. Yes we will one day!
+        Let's make the world a safer place
+        Get on your feet, we're gonna rebuild one...
+
+        But the shire has been stolen by goblins
+        and they won't go away very easily
+
+
+
     episode4:
       title: "Sneak Attack"
       description: "The goblins enjoy spreading terror by sending raiding parties up to the far, frozen North to harass and spy on the Shire Folk."
       youtubeLink: "https://youtu.be/XHFMcKhgSoE"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/Sneak Attack_v4.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-02.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-19.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-20.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-21.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-23.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-24.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-25.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-26.png"
+      
+      story: |
+        The goblins enjoy spreading terror by sending raiding parties up to the far, frozen North to harass and spy on the Shire Folk.
+        The goblins surpise the Shire Folk, but the Shire Folk are ready for them.  They fight back and send the goblins running.
+        One more sign that the Shire Folk are getting stronger, and the goblins will need something special to defend the Shire.
+
+      lyrics: |
+        It's a sneak attack
+        Goblins coming!
+        Gonna Find you
+
+        Here we go crossing over the line
+        Stealing Shire Folk In the night
+
+        Here we go crossing over the line
+        Killing everyone they don't like
+
+        Here they come It's a sneak attack
+        Here comes the sneak attack.
+        Here's comes it now!
+
+        It's time to fight back to fight for your life!
+        HOld the LIne Hold the Line Hold the Line!
+
+        There's another goblin I'm gonna shoot 'em down
+        Goblin Down!
+        We got them on the RUN!
+
+        The Goblins are running... Away!!!
+        Yes The Goblins have run... Away!!!
+
+        Yes we fought those goblins well
+        We'll make them go back to their hell
+        Send those goblins back to hell!
+
     episode5:
       title: "Frozen Peace"
       description: "Here we are, on this frozen shore, very far from our dear home"
       youtubeLink: "https://youtu.be/Ywnzknawoiw"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/FrozenPeace_v4.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-02.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-23.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-24.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-25.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-26.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-28.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-29.png"
+      
+      story: |
+        After the Sneak Attack by the Goblins, the Shire FOlk take some more time to rest and heal.
+        They know that they will need to be at their best to take back the Shire from the Goblins.
+        They sing a song of hope, and of peace, as they look out over the frozen shore of the far, frozen North.
+
+      lyrics: |
+        We journeyed far from our dear shire Up to the far, Far Frozen North
+        And here we'll stay to rest and heal
+        We will find, Yes we'll find some...
+        Frozen Peace
+
+        Goblins came with ropes and chains
+        Decency all stripped away
+        Somehow we, we got away
+        We will find, Yes we'll find some...
+        Frozen Peace
+
+        Goblins came from our Dear Shire up to the far, far frozen north
+        And here we'll stay to rest and heal
+        We will find, Yes we'll find some...
+        Frozen Peace
+
     episode6:
       title: "We’re Coming For You"
       description: "We can't rebuild the Shire Dream while Goblins still rule the land. We must take back our home."
       youtubeLink: "https://youtu.be/g0KXZXay62E"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/We're Coming For You_v4.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/RebuildTheShire-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/RebuildTheShire-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/RebuildTheShire-16.png"
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-04.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-17.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-20.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-21.png"
+
+      
+      story: |
+        The Goblins have spies everywhere, and they know that the Shire Folk are getting stronger.  The Shire Folk aren't
+        making it a secret of their intentions to take back the Shire.  The Goblins know that they will need something special to defend the Shire.
+
+      lyrics: |
+        Yes we're gonna come for you 
+        So we can build the Shire Dream
+        And we don't give a damn What they say
+        On the GOblin side of things
+        We're gonna rebuild The Shire Dream Today
+
+        Yes I am the Goblin King And I've got my Misery With Me
+        We're gonna gobble up the Shire Folk
+        And complete Our Victory So come and get us!
+
+        Goblins are meant to rule the world
+        We disagree
+        Yes I am the Goblin King
+        YOu are nothing To the SHire and the Free
+
     episode7:
       title: "Prepare for Battle"
       description: "It’s time to face the Goblin King and retake the Shire"
       youtubeLink: "https://youtu.be/fka7d0fYWeY"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/PrepareForBattle_v5.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-01.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-04.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-10.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-17.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-19.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-25.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-26.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/RebuildTheShire-08.png"
+
+      story: |
+        The Shire Folk have healed and are ready to take back the Shire.  They know that they will need to be at their best to take back the Shire from the Goblins.
+        They are determined to succeed, and they know that they will need to work together to defeat the Goblins.
+
+      lyrics: |
+         There's a time for peace And a time for war
+         And Since the Goblins stole our shire...
+         we prepare for battle yes we prepare for battle!
+         It's not the time for peace Oh-oh NO!
+
+         We're marching too a goblin war
+         A Misery of Goblins
+         We're off to war With the Goblin King
+
+         Yes we prepare for battle!
+         It's not the time for Peace Oh-oh NO!
+
+         We've left the safety of the ice fortress behind
+         We need to prepare, We need to prepare for battle!
+
+          We need to prepare
+          We will reclaim the Shire!
