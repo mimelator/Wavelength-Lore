@@ -133,31 +133,51 @@
       description: "Hey everybody look what I’ve found: Misery is our Dream"
       youtubeLink: "https://youtu.be/OINvOo93z64"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/A_Misery_of_Goblins_v6.mp3"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/A Misery of Goblins_v4.mp3"
       carouselImages:
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-01.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-02.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-04.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-10.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-11.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-17.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/Psychopath-20.png"
+      
       
       story: |
-        The Goblin King has taken over the Shire and is forcing Wavelength to perform for him.
-        Wavelength tries to reason with the Goblin King, but he is too far gone. The Goblin King
-        believes that misery is the only way to live, and that everyone should be miserable like him.
+        In order to understand how to escape the Goblins, Wavelength tries to understand their worldview.
+        Wavelength realizes that Goblins are driven by Misery, and that they want to spread Misery to everyone.
+        Wavelength decides to write a song that celebrates Misery in order to better understand the Goblins.
+        This allows him to find a way to escape the Goblins and save the Shire.
 
       lyrics: |
-          Hey everybody look what I've found
-          Misery is our dream
-          So come along and sing this song
-          And join the misery team
+          What goes up must come down
+          Hey everybody look what I've found  
+          There's a secret I Have Seen
+          Misery is our Dream
 
-          We're a misery of goblins
-          And we want you to be one too
-          So come along and sing this song
-          And join the misery crew
+          Everybody gather 'round
+          Come here the secret that I have found
+          MIsery isn't quite what it used to be
+          Now let us celebrate We are no longer free!
+          We are no longer free
 
-          We're a misery of goblins
-          And we want you to be one too
-          So come along and sing this song
-          And join the misery crew
+          Welcome everybody to your new life
 
+          No we're no longer free
+          MIsery loves Company
+          Like an goblin kept in an Ice Cold Cell
+          MIsery loves Company Like a demon in hell
 
 
     episode5:
@@ -165,13 +185,156 @@
       description: "And every moment that you give into the greed your soul will drift away"
       youtubeLink: "https://youtu.be/J3_gkKZuTQI"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/SlowTime_v4.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-01.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-02.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-10.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-11.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-17.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-21.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-23.png"
+      
+      story: |
+        Wavelength is about to make a large decision that will affect the future of the Shire.  They could either
+        save themselves by giving in to the Goblins, or they could try to fight back and save the Shire.
+        But in order to rescue the Shire Folk, they know that they must be willing to risk their own safety.
+        Wavelength realizes that in order to make the right decision, they must take their time and think
+        about what is truly important in life.
+
+      lyrics: |
+        For every moment that you live
+        You can choose to give your hate away
+        And every moment that you give
+        Into the greed Your soul will drift away
+        It will drift away
+
+        This is the slow time of life
+        When you choose wrong from right 'cause it could matter
+        This is the slow time of our lives
+        Where we choose what really matters...
+        ...To Keep us alive 
+
+        As we gather around
+        We can ask Our we on the same team?
+        Do we still dream the same dream?
+        And in the time of choosing...
+        Do you think? Do you think we should all be free?
+
+        Free to sing!
+
+
     episode6:
       title: "Won't See it Coming"
       description: "The Goblins don't comprehend science because they aren't able to learn, and won't see the threat right in front of them."
       youtubeLink: "https://youtu.be/jkH6suRlFGI"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/YouWontSeeItComing_v7.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-01.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-02.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-04.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-10.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-11.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-17.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/SlowTime-22.png"
+      
+      story: |
+        Wavelength realizes that the Goblins are not able to understand science because they are not able to learn.
+        Wavelength uses this knowledge to create a plan to escape the Goblins by using science to create a distraction.
+        Wavelength creates a machine that creates a loud noise that scares the Goblins away, allowing Wavelength to escape
+        and save the Shire.
+
+      lyrics: |
+        No you won't see it coming When i wreck, wreck your world
+        You can't see, 'cause you live in a lie
+        You're just a goblin in disguise
+        You don't know what a virus is
+        How it rules, rules our lives
+        Every lie that the goblins bring
+        Takes your soul a little farther from... true peace
+
+        No you can't see the virus
+        When you live in a goblin lie
+        No your goblin mind, Can't possibly Understand a little word
+
+        No you won't see all the chaos That a virus can become
+        No you can't see that you...
+        ...and the virus have become one.
+
+        No you can't see this virus 'cause it's just out of sight
+        Don't you know that every little thing...
+        ...that you've been taught is a goblin lie?
+        A Goblin lie!
+
     episode7:
       title: "Say Goodbye to the Shire"
       description: "You can’t coexist with Goblins when they rule the Shire"
       youtubeLink: "https://youtu.be/A8yY4pPYzVY"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/SayGoodbyeToTheShire_v4.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/Countdown-20.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/FallOfTheShire_take1-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/Final_Race-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/Final_Race-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/Final_Race-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/Final_Race-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/Final_Race-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/Final_Race-19.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/Final_Race-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/Final_Race-23.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/Final_Race-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/FrozenPeace-24.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/RebuildTheShire-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/RebuildTheShire-10.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/SlowTime-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/SlowTime-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/WereComingForYou-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/WereComingForYou-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/WereComingForYou-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/WereComingForYou-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/images/Won_t_See_it_Coming-16.png"
+
+      story: |
+        Wavelength springs the trap that put the Goblins to sleep.  Wavelength and the Shire Folk escape the Goblins and 
+        begin their long journey to the far, frozen North, where their adventure continues in Season 3: The Ice Fortress.
+
+      lyrics: |
+        And now it's time to say goodbye To all my goblin friends
+        Thank you much for your company,
+        But here is where our friendship ends.
+
+        I can't spend anytime again with you 
+        It's not because of me, It's because of you
+
+        And now it's time to say goodbye to the shire
+
+        Get out! Escape right now!
+        While you still have a chance to live
+        Get out! We can return to rebuild the shire
+
+        Though we've left the goblins behind Back at the shire
+        There greed will never end, It requires more...
+        ...and more...
+        ...and more and more and more...
