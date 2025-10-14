@@ -1,6 +1,8 @@
 const admin = require('firebase-admin');
 const { initializeApp } = require('firebase/app');
 const { getDatabase, ref, set } = require('firebase/database');
+const yaml = require('js-yaml');
+const fs = require('fs');
 const serviceAccount = require('./firebaseServiceAccountKey.json');
 require('dotenv').config();
 
@@ -39,12 +41,31 @@ async function initializeFirebaseWithToken() {
   return getDatabase(firebaseApp);
 }
 
+// Helper function to convert multi-line values to single-line strings
+function processYamlData(data) {
+  if (typeof data === 'object' && data !== null) {
+    for (const key in data) {
+      if (typeof data[key] === 'string') {
+        data[key] = data[key].replace(/\n/g, ' ');
+      } else if (typeof data[key] === 'object') {
+        processYamlData(data[key]);
+      }
+    }
+  }
+  return data;
+}
+
 // Populate Firebase
 async function populateFirebase() {
   try {
     const database = await initializeFirebaseWithToken();
     const videosRef = ref(database, 'videos');
-    const data = require('./content/episodes.json');
+
+    // Load and process YAML file
+    const yamlContent = fs.readFileSync('./content/episodes.yaml', 'utf8');
+    let data = yaml.load(yamlContent);
+    data = processYamlData(data);
+
     await set(videosRef, data);
     console.log('Firebase populated successfully!');
   } catch (error) {

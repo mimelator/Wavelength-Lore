@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="<%= cdnUrl %>/css/styles.css?v=<%= version %>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
+</head>
+<body>
+  
+
+  <main>
+    <section class="banner-image" style="background-image: url('<%= image %>'); background-size: cover; background-position: center; height: 300px;">
+    </section>
+    <h1><%= title %></h1>
+
+    <section class="carousel">
+      <div class="carousel-container" id="episode-carousel">
+        <% carouselImages.forEach(image => { %>
+          <div>
+            <img src="<%= image %>" alt="Carousel Image">
+          </div>
+        <% }); %>
+      </div>
+    </section>
+
+    <section class="summary">
+      <h2>Summary</h2>
+      <p><%= summary %></p>
+    </section>
+
+    <section class="audio-player">
+      <h2>Listen to the Song</h2>
+      <audio controls>
+        <source src="<%= audioUrl %>" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </section>
+
+    <section class="lyrics">
+      <h2>Lyrics</h2>
+      <em><%= lyrics %></em>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Wavelength Lore</p>
+  </footer>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#episode-carousel').slick({
+        infinite: true,
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 4000,
+        dots: true,
+        arrows: true
+      });
+    });
+  </script>
+</body>
+</html>

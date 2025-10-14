@@ -93,6 +93,12 @@ h1 {
     font-weight: bold;
 }
 
+/* Summary and Lyrics Sections */
+.summary, .lyrics, .audio-player {
+  width: 80%;
+  margin: 0 auto;
+}
+
 /* Responsive Design for Mobile */
 @media (max-width: 768px) {
     .carousel img {

@@ -85,6 +85,34 @@ app.get('/', async (req, res) => {
   }
 });
 
+// Route to render an episode page
+app.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
+  const { seasonNumber, episodeNumber } = req.params;
+
+  try {
+    const episodeRef = ref(database, `videos/season${seasonNumber}/episodes/episode${episodeNumber}`);
+    const snapshot = await get(episodeRef);
+
+    if (snapshot.exists()) {
+      const episode = snapshot.val();
+      res.render('episode', {
+        title: episode.title,
+        image: episode.image,
+        carouselImages: episode.carouselImages,
+        summary: episode.story,
+        lyrics: episode.lyrics,
+        audioUrl: episode.audio, 
+        cdnUrl: process.env.CDN_URL,
+        version: `v${Date.now()}`,
+      });
+    } else {
+      res.status(404).send('Episode not found');
+    }
+  } catch (error) {
+    console.error('Error fetching episode data:', error);
+    res.status(500).send('Error fetching episode data');
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);

@@ -17,7 +17,8 @@
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "firebase": "^12.4.0",
-    "firebase-admin": "^13.5.0"
+    "firebase-admin": "^13.5.0",
+    "js-yaml": "^4.1.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

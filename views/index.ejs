@@ -19,7 +19,11 @@
         <div class="carousel" id="carousel-<%= season %>">
             <% for (var episode in videos[season].episodes) { %>
                 <div>
-                    <h3 class="episode-title"><%= videos[season].episodes[episode].title %></h3>
+                    <h3 class="episode-title">
+                        <a href="/season/<%= season.replace('season', '') %>/episode/<%= episode.replace('episode', '') %>">
+                            <%= videos[season].episodes[episode].title %>
+                        </a>
+                    </h3>
                     <a href="<%= videos[season].episodes[episode].youtubeLink %>" target="_blank">
                         <img src="<%= videos[season].episodes[episode].image %>" alt="<%= videos[season].episodes[episode].title %>">
                     </a>
