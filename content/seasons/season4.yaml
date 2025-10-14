@@ -127,16 +127,159 @@
       description: "There’s no way that the King can resist the trap set by Lucky"
       youtubeLink: "https://youtu.be/7JgLiSZnR-g"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/IceBlueGreed_v2.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-01.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-04.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-23.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-25.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-26.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-28.png"
+      
+      story: |
+        The Shire FOlk know that the Goblin King is a coward, and that he won't openly attack a fortified shire
+        without a good reason.  Lucky sets a trap for the Goblin King, using an irresistible Ice Blue Diamond as bait.
+        The much coveted Ice Blue Diamonds can only be found in the far, frozen North as they are guarded by the fearsome Ice Dragons.  
+
+      lyrics: |
+        Yes, we've all heard 'bout the Goblin Greed
+        Now the goblin king has his greed fixed on...   
+        ...an Ice BLue Diamond
+
+        Lucky set a trap, trap for Goblin Greed
+        Showed a goblin spy an irresistible diamond...
+        ...stored at the shire
+
+        There's no way that the King can resist
+        The deadly lure that lucky cast
+
     episode5:
       title: "The Shire Fortress"
       description: "Do you want to live under the rule of the hateful and Cruel?"
       youtubeLink: "https://youtu.be/gNrVgi5NI6I"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/TheShireFortress_v2.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/GoblinsRule-21.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/GoblinsRule-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/GoblinsRule-25.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/GoblinsRule-26.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-02.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-04.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-10.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-19.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-20.png"
+      
+      story: |
+        Knowing that Lucky's trap was set, the Shire Folk set about fortifying the Shire to withstand the coming Goblin attack.
+        They know that the Goblin's will be relentless in their attack, and that they will stop at nothing to reclaim the Shire
+        in order to satisfy the Goblin King's greed.  They will do whatever it takes to not have to submit to the rule of the goblin king.
+
+      lyrics: |
+        Reinforce those Ramparts Get everything done
+        Got to fortify the shire before they come
+
+        Do you want to live under the rule Of the hateful and cruel?
+        Build a Shire FOrtress!
+
+        HIgh Towers and Layered Defenses helps us with any attack any attack!
+        We need to train everyday to learn how to keep  the goblins away
+        Build a Shire FOrtress!
+
+        Do you want to live a life of freedom?
+        Then Build a Shire FOrtress!
+  
     episode6:
       title: "Battle of the Shire"
       description: "Shoot for the king; stopping his lies are the key to everything"
       youtubeLink: "https://youtu.be/kBQWLbiw6X0"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/BattleOfTheShire_v2.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-002.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-006.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-007.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-010.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-013.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-014.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-015.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-016.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-017.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-018.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-019.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-020.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-021.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-028.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-030.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-031.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-039.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-047.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-049.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-051.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-052.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-053.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-056.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-057.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-058.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-059.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-060.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-061.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-063.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-064.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-065.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-066.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-068.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-072.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-074.png"
+      
+      story: |
+        The Goblin King, driven by his insatiable greed for the Ice Blue Diamond, leads his goblin horde to attack the fortified Shire.
+        The Shire Folk, prepared and determined, stand united to defend their home and freedom. The battle is fierce, with both sides showing great courage and resilience.
+        In the end, the Shire Folk's determination and unity prevail, and they successfully defend their home from the Goblin King's forces.
+
+      lyrics: |
+        You've gotta Shoot, Shoot for the King
+        Stopping his lies are the keys to Everything
+        We must destroy, The Mic of the King
+        Stopping his lies are the keys to Everything
+
+        There's a goblin misery, with a goblin war machine
+
+        No matter what we try the king's armor is much to strong
+        Our magic arrows don't have any affects to stop the king's battle song
+
+        We're getting Desperate Down to our final option
+        Bring out the mighty Ballista And aim for the throat of the goblin
+
+        The Goblin King Is not much more than a lying machine
+        To kill the king Put an arrow his throat to stop his singing
+
+        We killed the king The Goblins are defeated
+        The Gobling King is Dead Yes, we've won back the shire!
+        We'll never have to hear him again Or his misery of liars 
+
+        Yes we're back to our shire
+        We're Home Yes we're back to the shire
+
+
+
+
     episode7:
       title: "Song of Mourning"
       description: "There’s a time for mourning, when we’ll share stories at night about our loved ones passing, and how we hold those memories tight."
