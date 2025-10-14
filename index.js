@@ -97,16 +97,89 @@ app.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
 
     if (snapshot.exists()) {
       const episode = snapshot.val();
+
+      // Fetch previous and next episodes
+      const prevEpisodeRef = ref(database, `videos/season${seasonNumber}/episodes/episode${parseInt(episodeNumber) - 1}`);
+      const nextEpisodeRef = ref(database, `videos/season${seasonNumber}/episodes/episode${parseInt(episodeNumber) + 1}`);
+
+      // Fetch previous and next seasons' first episodes
+      const prevSeasonRef = ref(database, `videos/season${parseInt(seasonNumber) - 1}/episodes/episode1`);
+      const nextSeasonRef = ref(database, `videos/season${parseInt(seasonNumber) + 1}/episodes/episode1`);
+
+      const [prevSnapshot, nextSnapshot, prevSeasonSnapshot, nextSeasonSnapshot] = await Promise.all([get(prevEpisodeRef), get(nextEpisodeRef), get(prevSeasonRef), get(nextSeasonRef)]);
+
+      const previousEpisode = prevSnapshot.exists() ? { 
+        id: parseInt(episodeNumber) - 1, 
+        title: prevSnapshot.val().title, 
+        image: prevSnapshot.val().image 
+      } : null;
+
+      const nextEpisode = nextSnapshot.exists() ? { 
+        id: parseInt(episodeNumber) + 1, 
+        title: nextSnapshot.val().title, 
+        image: nextSnapshot.val().image 
+      } : null;
+
+      const isFirstEpisode = parseInt(episodeNumber) === 1;
+      const isLastEpisode = !nextSnapshot.exists();
+
+      const previousSeasonFirstEpisode = isFirstEpisode && prevSeasonSnapshot.exists() ? {
+        id: 1,
+        season: parseInt(seasonNumber) - 1,
+        title: prevSeasonSnapshot.val().title,
+        image: prevSeasonSnapshot.val().image
+      } : null;
+
+      const nextSeasonFirstEpisode = isLastEpisode && nextSeasonSnapshot.exists() ? {
+        id: 1,
+        season: parseInt(seasonNumber) + 1,
+        title: nextSeasonSnapshot.val().title,
+        image: nextSeasonSnapshot.val().image
+      } : null;
+
+      let previousLink = null;
+      let nextLink = null;
+
+      if (previousEpisode) {
+        previousLink = {
+          url: `/season/${seasonNumber}/episode/${previousEpisode.id}`,
+          title: previousEpisode.title,
+          image: previousEpisode.image
+        };
+      } else if (isFirstEpisode && previousSeasonFirstEpisode) {
+        previousLink = {
+          url: `/season/${previousSeasonFirstEpisode.season}/episode/${previousSeasonFirstEpisode.id}`,
+          title: previousSeasonFirstEpisode.title,
+          image: previousSeasonFirstEpisode.image
+        };
+      }
+
+      if (nextEpisode) {
+        nextLink = {
+          url: `/season/${seasonNumber}/episode/${nextEpisode.id}`,
+          title: nextEpisode.title,
+          image: nextEpisode.image
+        };
+      } else if (isLastEpisode && nextSeasonFirstEpisode) {
+        nextLink = {
+          url: `/season/${nextSeasonFirstEpisode.season}/episode/${nextSeasonFirstEpisode.id}`,
+          title: nextSeasonFirstEpisode.title,
+          image: nextSeasonFirstEpisode.image
+        };
+      }
+
       res.render('episode', {
         title: episode.title,
         image: episode.image,
         carouselImages: episode.carouselImages || [], // Default to an empty array if null
         summary: episode.story || 'coming soon', // Default to 'coming soon' if null
-        lyrics: episode.lyrics  || 'coming soon', // Default to 'coming soon' if null
-        audioUrl: episode.audio, 
+        lyrics: episode.lyrics || 'coming soon', // Default to 'coming soon' if null
+        audioUrl: episode.audio,
         cdnUrl: process.env.CDN_URL,
         version: `v${Date.now()}`,
-        youtubeLink: episode.youtubeLink || '#'
+        youtubeLink: episode.youtubeLink || '#',
+        previousLink,
+        nextLink
       });
     } else {
       res.status(404).send('Episode not found');

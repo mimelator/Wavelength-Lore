@@ -119,6 +119,9 @@ h1 {
         font-size: 1.5rem; /* Adjust heading size for smaller screens */
         margin-top: 10px;
     }
+    .episode-navigation a {
+        font-size: 0.5em; /* Reduce font size to half for mobile */
+    }
 }
 
 /* Add 2px space between items in the carousel */
@@ -136,4 +139,17 @@ h1 {
     display: flex;
     align-items: center; /* Vertically center the text */
     justify-content: center; /* Horizontally center the text */
+}
+
+/* Tiny navigation images */
+.episode-navigation img {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    width: 50px;
+    height: auto;
+    margin-top: 8px; /* Add top margin */
+    display: block;
+    margin-left: auto;
+    margin-right: auto; /* Center the image */
 }
