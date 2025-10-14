@@ -307,21 +307,173 @@ season1:
       description: "When home is a haven, there’s no limit to what can be done"
       youtubeLink: "https://youtu.be/slwFjISO70M"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/LIfeInTheShire_v19.mp3"
+      carouselImages:
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-02.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-06.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-07.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-08.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-09.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-11.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-13.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-14.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-15.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-16.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-17.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-18.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-19.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-20.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-21.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-22.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-23.png
+      
+      story: |
+        Wavelength performs an uplifting song about the joys of living in the Shire, a place of peace, community, and gifted artisanship.
+        The song celebrates the simple pleasures of life in the Shire and the sense of belonging that comes from being part of a close-knit community.
+
+      lyrics: |
+        After the fire and all of the flames have been swept away 
+        Life in the Shire comes to an end another day
+
+        After the fire and all of the flames from another day
+        LIfe in the furnace seems to be burning our lives away
+        But we can retreat back where our lives are sweet
+
+        Back to the place where we belong!
+
+        After the fire and all of the flames have been swept away 
+        We clean the ash and the dust and just let it drift away
+        And all we have left is just what is best
+        We have a family!
+
     episode9:
       title: "Feed the Crows"
       description: "Living in and Loving Nature can be a great balm for your pain"
       youtubeLink: "https://youtu.be/tunZ11NdOQA"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/FeedTheCrows_v24.mp3"
+      carouselImages:
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-02.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-03.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-04.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-05.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-06.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-07.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-08.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-09.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-11.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-12.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-13.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-15.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-16.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-17.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-19.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-20.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-21.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-22.png
+      
+      story: |
+        Wavelength performs a soulful song about finding solace and healing in nature.
+        The song emphasizes the therapeutic power of connecting with the natural world and the comfort that comes from being surrounded by its beauty.
+
+      lyrics: |
+        Even after all the pain Even after all the shame 
+        I think I'll go feed the crows
+        Even after all the cost Even after all that's lost
+        I think I'll go feed the crows
+
+        Just remember that even after all
+        All the pain and suffering... you survived it all
+        And your standing tall and your standing strong
+        And now you can help Some other crows along
+
+
     episode10:
       title: "Keep On"
       description: "There are 3 or 4 little words that I enjoy hearing everyday…"
       youtubeLink: "https://youtu.be/en9ir6dq7WQ"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/Keep On_v26.mp3"
+      carouselImages:
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-01.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-03.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-04.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-06.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-07.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-08.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-09.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-12.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-13.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-14.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-15.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-17.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-19.png
+        
+      story: |
+        Wavelength focuses on the importance of relationships and the power of love and connection.
+        The song emphasizes the significance of hearing and expressing love through simple yet meaningful words.
+
+      lyrics: |
+        I keep on looking for one thing That i can't buy on my own
+        And if i can find it, I'm gonna bring it, (bring it) on home!
+
+        And so i keep searching  for that thing I can't buy on a shelf
+        And you know, and you know that there must be someone
+        I can reach out, (someone) I can call for help.
+
+        Keep on, Keep on Keep on looking for 1 2 Love
+        Keep on, Keep on Keep on looking for 3 or 4 little words
+
+        Like I Love you
+        Like I Love you Too!
+
     episode11:
       title: "Back to the Shire (Encore)"
       description: "There’s a place where people practice paradise"
       youtubeLink: "https://youtu.be/07ln1YTcOdg?si=TrWzyJkYOZtx1Zrc"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/BackToTheShire_v18.mp3"
+      carouselImages:
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-02.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-03.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-04.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-05.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-07.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-08.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-09.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-10.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-11.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-12.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-13.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-14.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-15.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-16.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-17.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-18.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-19.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-20.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-21.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-22.png
+        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-23.png
+      
+      story: |
+        Wavelength makes an annual pilgrimage back to the Shire, a place of peace, community, and gifted artisanship.
+        The song celebrates the simple pleasures of life in the Shire and the sense of belonging that comes from being part of a close-knit community.
+
+      lyrics: |
+        We’re coming back,  we’re coming back
+        There is a place I like to go  At least once a year
+        Where the sun shines bright The days are long And the air is clear
+
+        Yes I’m coming back,  Yes I’m coming back to the Shire 
+
+        There is a place Where water and land  have a tidal affair
+        Where the people are kind The food is good,  and the hate is rare
+
+        There is a place I like to go once a year
+        And in that space Heaven is near
+
 season2:
   title: "Fall of the Shire"
   seasonLink: "https://www.youtube.com/playlist?list=PLO3KUVl6gwUbaay8aPoO6JZsBEjqQx-5y"
