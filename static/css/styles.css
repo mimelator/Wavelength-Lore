@@ -40,26 +40,25 @@ h1 {
 .carousel {
     width: 80%;
     margin: 0 auto;
-    display: flex;
-    justify-content: center; /* Center images horizontally */
+    display: block; /* Ensure horizontal layout */
 }
 .carousel img {
-    width: 100%;
-    max-width: 400px;
-    height: 300px; /* Set a consistent height for all images */
-    object-fit: cover; /* Ensure images maintain aspect ratio within the set height */
+    max-width: 100%; /* Ensure images fit within their container */
+    height: auto; /* Maintain aspect ratio */
     border-radius: 10px;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: block;
     margin: 0 auto;
+    border: 5px solid black; /* Changed to solid black */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19); /* Added drop shadows */
 }
 .carousel img:hover {
     transform: scale(1.05);
 }
 .carousel p {
     text-align: center;
-    font-size: 12px; /* Reduced to half of the original size */
+    font-size: 15px; /* Reduced to half of the original size */
     color: #555;
     margin-top: 5px;
 }
@@ -90,23 +89,18 @@ h1 {
 .episode-title {
     text-align: center;
     margin: 10px 0;
-    font-size: 1rem;
+    font-size: 1.5rem;
     font-weight: bold;
 }
 
 /* Responsive Design for Mobile */
 @media (max-width: 768px) {
-    .carousel {
-        margin-bottom: 20px; /* Add spacing between carousels */
-    }
-    .section {
-        padding: 10px; /* Add padding to sections for better spacing */
-    }
-    h1 {
-      font-size: 2.5rem; /* Decreased font size for mobile */
-        margin-top: 10px;
-    }
     .carousel img {
-        max-width: 1000px; /* Double the current max-width for mobile */
+        max-width: 100%; /* Ensure consistent scaling for mobile */
     }
+}
+
+/* Add 2px space between items in the carousel */
+.carousel .slick-slide {
+    margin: 0 1px; /* Add 2px total space between items (1px on each side) */
 }

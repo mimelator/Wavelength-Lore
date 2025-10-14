@@ -44,7 +44,7 @@ async function populateFirebase() {
   try {
     const database = await initializeFirebaseWithToken();
     const videosRef = ref(database, 'videos');
-    const data = require('./videos_data.json');
+    const data = require('./content/episodes.json');
     await set(videosRef, data);
     console.log('Firebase populated successfully!');
   } catch (error) {
