@@ -9,65 +9,62 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
 </head>
 <body>
-  
+    <%- include('partials/header') %>
 
-  <%- include('partials/header') %>
+    <main>
+        <section class="banner-image" style="background-image: url('<%= image %>'); background-size: cover; background-position: center; height: 300px;">
+        </section>
+        <h1><%= title %></h1>
 
-  <main>
-    <section class="banner-image" style="background-image: url('<%= image %>'); background-size: cover; background-position: center; height: 300px;">
-    </section>
-    <h1><%= title %></h1>
+        <section class="carousel">
+            <div class="carousel-container" id="episode-carousel">
+                <% carouselImages.forEach(image => { %>
+                    <div>
+                        <img src="<%= image %>" alt="Carousel Image">
+                    </div>
+                <% }); %>
+            </div>
+        </section>
 
-    <section class="carousel">
-      <div class="carousel-container" id="episode-carousel">
-        <% carouselImages.forEach(image => { %>
-          <div>
-            <img src="<%= image %>" alt="Carousel Image">
-          </div>
-        <% }); %>
-      </div>
-    </section>
+        <section class="summary">
+            <h2>Summary</h2>
+            <p><%= summary %></p>
+        </section>
 
-    <section class="summary">
-      <h2>Summary</h2>
-      <p><%= summary %></p>
-    </section>
+        <section class="audio-player">
+            <h2>Listen to the Song</h2>
+            <audio controls>
+                <source src="<%= audioUrl %>" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </section>
 
-    <section class="audio-player">
-      <h2>Listen to the Song</h2>
-      <audio controls>
-        <source src="<%= audioUrl %>" type="audio/mpeg">
-        Your browser does not support the audio element.
-      </audio>
-    </section>
+        <section class="lyrics">
+            <h2>Lyrics</h2>
+            <em><%= lyrics %></em>
+            <br /><br />
+            <a href="<%= youtubeLink %>" target="_blank" class="watch-video-link">Watch the Video</a>
+        </section>
 
-    <section class="lyrics">
-      <h2>Lyrics</h2>
-      <em><%= lyrics %></em>
-      <br/><br />
-      <a href="<%= youtubeLink %>" target="_blank" class="watch-video-link">Watch the Video</a>
-    </section>
+        <br /><br />
+    </main>
 
-    <br/><br />
-  </main>
+    <%- include('partials/footer') %>
 
-
-  <%- include('partials/footer') %>
-
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
-  <script>
-    $(document).ready(function() {
-      $('#episode-carousel').slick({
-        infinite: true,
-        slidesToShow: 3,
-        slidesToScroll: 1,
-        autoplay: true,
-        autoplaySpeed: 4000,
-        dots: true,
-        arrows: true
-      });
-    });
-  </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#episode-carousel').slick({
+                infinite: true,
+                slidesToShow: 3,
+                slidesToScroll: 1,
+                autoplay: true,
+                autoplaySpeed: 4000,
+                dots: true,
+                arrows: true
+            });
+        });
+    </script>
 </body>
 </html>

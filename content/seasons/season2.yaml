@@ -6,11 +6,77 @@
       description: "You've been punched in the head So many times that you don’t know Which is way is left or right"
       youtubeLink: "https://youtu.be/kGpLCx63Fh8"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/GoblinKing_v8.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-02.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-04.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-10.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-11.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-20.png"
+
+      story: |
+        After the Goblin King found out about the insult at the Shire, he decided to invade with his Misery of Goblins.
+        Wavelength didn't realize what was happening until it was too late. The Goblins took over the Shire and Wavelength was forced to perform a Concert for the Goblin King.
+
+      lyrics: |
+          You've been punched in the head So many times 
+          That you don't know which way is left or right
+          So you gonna hate all that you see 
+
+          And You don't know which way to turn So you turn to company
+          And do you know what?  They don't give a damn about you or me
+
+          You can call me boss Today And grovel at my feet
+          Or you can call me king and I'll still never remember Your Little Name
+
+          You can call me King All day And bow like your head's at stake
+          It don't matter to me That's why I'm the Goblin King
+          Yes you can bow to me  I'm the Goblin King!
+          That I'm the Goblins' King of this whole show
+
+
     episode2:
       title: "Psychopath"
       description: "Everyday I see what’s yours and I think about taking it all away"
       youtubeLink: "https://youtu.be/17Mbv0XwQvo"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/Psychopath_v6.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/FallOfTheShire_take2-02.png
+
+      story: |
+        The Goblin King is a Psychopath. He doesn't care about anyone but himself. He takes what he wants and doesn't care who he hurts in the process. Wavelength is starting to realize that he is not to be trusted.
+
+      lyrics: |
+          Everyday I see what's yours
+          And I think about taking it all away
+          'Cause I don't care about you
+          I just want to see you suffer
+
+          You can try to run away
+          But you can't hide from me
+          I'm a psychopath
+          And I don't care about anyone but me
+
+          You can try to fight back
+          But you can't win against me
+          I'm a psychopath
+          And I don't care about anyone but me
+
+          I'm a psychopath
+          And I don't care about anyone but me
+
     episode3:
       title: "Countdown"
       description: "There’s a countdown to living There’s a countdown to the end"
