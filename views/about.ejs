@@ -6,13 +6,61 @@
     <title>About - Coming Soon</title>
     <!-- Include the shared header partial -->
     <%- include('partials/head') %>
+    <link rel="stylesheet" href="/css/modal_styles.css">
 </head>
 <body>
     <!-- Include the shared header -->
     <%- include('partials/header') %>
 
     <main>
-        <p>Coming Soon...</p>
+        <h1>About Wavelength</h1>
+        <section class="about-description">
+            <p>Wavelength is a unique story telling experience that combines music, art, and narrative to immerse you in its world.
+                 <br /><br />
+                You are encouraged to explore the site, read the lore, and listen to the music.  You can download the songs and art for free, and share them with your friends.
+                <br /><br />
+                What sets Wavelength apart from other stories is that Wavelength is an ongoing adventure. 
+                The adventures of Wavelength are alive and continue to evolve. New chapters, characters, and songs are added every week.
+                With your direct participation you can help steer the course of Wavelength as they travel the land during these very difficult times.
+                <br /><br />
+                While the story of Wavelength is related to current events, it is not a direct allegory.  It is a fantasy world that reflects some of the struggles we face today, but also offers hope and inspiration through its characters and music.   
+            </p>
+        </section>
+
+        <section class="character-carousel">
+            <section class="carousel">
+                <div class="carousel-container" id="character-carousel">
+                    <% characterImages.forEach(image => { %>
+                        <div>
+                            <img src="<%= image %>" alt="Character Image">
+                        </div>
+                    <% }); %>
+                </div>
+            </section>
+
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+            <script>
+                $(document).ready(function() {
+                    $('#character-carousel').slick({
+                        infinite: true,
+                        slidesToShow: 3,
+                        slidesToScroll: 1,
+                        autoplay: true,
+                        autoplaySpeed: 4000,
+                        dots: true,
+                        arrows: true
+                    });
+                });
+            </script>
+        </section>
+
+        <div id="imageModal" class="modal">
+            <span class="modal-close">&times;</span>
+            <img class="modal-content" id="fullSizeImage">
+        </div>
+
+    
     </main>
 
     <!-- Include the shared footer -->

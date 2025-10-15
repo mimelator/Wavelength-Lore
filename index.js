@@ -296,8 +296,31 @@ app.get('/characters', async (req, res) => {
 });
 
 // Route for About page
-app.get('/about', (req, res) => {
-  res.render('about', { title: 'About - Coming Soon', cdnUrl: process.env.CDN_URL, version: `v${Date.now()}` });
+app.get('/about', async (req, res) => {
+  try {
+    const charactersRef = ref(database, 'characters');
+    const snapshot = await get(charactersRef);
+
+    let characterImages = [];
+    if (snapshot.exists()) {
+      const charactersData = snapshot.val();
+
+      // Collect images for all characters in the 'wavelength' category
+      if (Array.isArray(charactersData.wavelength)) {
+        characterImages = charactersData.wavelength.map(c => c.image);
+      }
+    }
+
+    res.render('about', {
+      title: 'About Wavelength',
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`,
+      characterImages
+    });
+  } catch (error) {
+    console.error('Error fetching character images:', error);
+    res.status(500).send('Error fetching character images');
+  }
 });
 
 // Route for Contact page

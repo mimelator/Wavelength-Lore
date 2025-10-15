@@ -153,3 +153,9 @@ h1 {
     margin-left: auto;
     margin-right: auto; /* Center the image */
 }
+
+.about-description {
+    max-width: 70%;
+    margin: 0 auto;
+    text-align: center;
+}
