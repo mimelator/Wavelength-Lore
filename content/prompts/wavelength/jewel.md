@@ -1,5 +1,5 @@
 VERSION ONE
-A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, aregal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.
+A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a regal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.
 
 The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.
 

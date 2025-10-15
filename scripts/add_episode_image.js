@@ -43,17 +43,27 @@ function copyImageToStaticDir(seasonNumber, episodeNumber, imagePath) {
  */
 function processInputPath(seasonNumber, episodeNumber, inputPath) {
   const urls = [];
+  const validImageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp']; // Supported image extensions
 
   if (fs.lstatSync(inputPath).isDirectory()) {
     const files = fs.readdirSync(inputPath);
     for (const file of files) {
       const fullPath = path.join(inputPath, file);
-      if (fs.lstatSync(fullPath).isFile()) {
+      const fileExtension = path.extname(file).toLowerCase();
+
+      if (fs.lstatSync(fullPath).isFile() && validImageExtensions.includes(fileExtension)) {
         urls.push(copyImageToStaticDir(seasonNumber, episodeNumber, fullPath));
+      } else if (fs.lstatSync(fullPath).isFile()) {
+        console.error(`Invalid file type: ${fullPath}. Only image files are allowed.`);
       }
     }
   } else {
-    urls.push(copyImageToStaticDir(seasonNumber, episodeNumber, inputPath));
+    const fileExtension = path.extname(inputPath).toLowerCase();
+    if (validImageExtensions.includes(fileExtension)) {
+      urls.push(copyImageToStaticDir(seasonNumber, episodeNumber, inputPath));
+    } else {
+      console.error(`Invalid file type: ${inputPath}. Only image files are allowed.`);
+    }
   }
 
   return urls;
@@ -103,14 +113,22 @@ function addEpisodeImage(seasonNumber, episodeNumber, inputPath) {
     // Process the input path and get CloudFront URLs
     const cloudfrontUrls = processInputPath(seasonNumber, episodeNumber, inputPath);
 
+    // Filter out URLs that already exist in the carouselImages array
+    const newUrls = cloudfrontUrls.filter((url) => !episode.carouselImages.includes(url));
+
+    if (newUrls.length === 0) {
+      console.log(`No new images to add for season ${seasonNumber}, episode ${episodeNumber}. All provided images already exist.`);
+      return;
+    }
+
     // Add the new images to the carouselImages array
-    episode.carouselImages.push(...cloudfrontUrls);
+    episode.carouselImages.push(...newUrls);
 
     // Write the updated YAML back to the file
     const updatedYaml = yaml.dump(seasonData, { lineWidth: -1 });
     fs.writeFileSync(seasonFilePath, updatedYaml, 'utf8');
 
-    console.log(`Successfully added images to season ${seasonNumber}, episode ${episodeNumber}:`, cloudfrontUrls);
+    console.log(`Successfully added images to season ${seasonNumber}, episode ${episodeNumber}:`, newUrls);
   } catch (error) {
     console.error('Error updating season YAML file:', error);
   }

@@ -2,80 +2,80 @@
   "query": {
     "inferenceIds": [],
     "assetIds": [
-      "asset_iYaguvFaULhMya6XneQcAfzS",
-      "asset_A9LCxah33GZTX936o3Uriuzx",
-      "asset_mLaiDXJA9Fxuxa7oy51XGHKS",
-      "asset_mo3XX1UUBSPkwZUJjhVinb23",
-      "asset_B4TwHUE8heizShPXxtaGs8Vm",
-      "asset_qh8akknwtXFJwUXbtHnXEgzb"
+      "asset_Tyct8CzpP96oxWDyHzPAyKSu",
+      "asset_FGFdzExiqrjzjV3VaWn91NK6",
+      "asset_uCxtRTAk86SZ2DkHUzGocmEv",
+      "asset_qApQ4QowAZ3TuX4MbMW3erPp",
+      "asset_vwnfYxtzxujWjnkDkoGE1RXM",
+      "asset_Lku3nqZYossmK7CYj2XP7fDV"
     ],
     "modelIds": []
   },
   "options": {
-    "fileNameTemplate": "jewel",
+    "fileNameTemplate": "alexandria",
     "flat": true
   },
   "count": 6,
   "assets": [
     {
-      "id": "asset_iYaguvFaULhMya6XneQcAfzS",
+      "id": "asset_Tyct8CzpP96oxWDyHzPAyKSu",
       "tags": [],
       "type": "txt2img",
-      "path": "jewel-1.png",
+      "path": "alexandria-1.png",
       "generator": {
         "name": "Imagen 4 Ultra"
       },
-      "prompt": "A hyper-detailed, photorealistic spring forest at golden hour transitions into a surreal open field. At the center, a regal half-elf woman with faintly glowing green eyes, short pointed ears, and long golden braids sits gracefully on an elegant stool, plucking a full-sized luminous harp.\n\nThe wooden harp is adorned with sparkling jewel inlays that catch the sunlight, casting radiant prisms and vivid energy waves. She wears a flowing elegant dress and a delicate tiara. All around, quaint halfling houses nestle among towering oaks, their smoking chimneys curling into the warm light.\n\nTree trunks are decorated with carved horseshoe charms, clusters of glowing bioluminescent mushrooms, and perched crows. Streaming golden rays filter through the ancient canopy, illuminating intricate natural textures and magical details in this enchanting and cinematic fantasy landscape."
+      "prompt": "A hyper-detailed, photorealistic spring forest at golden hour opens into a surreal field bathed in streaming golden light through towering oaks. At the center stands a tall, athletic, and graceful quarter-elf lady with sandy brown hair, draped in a pale lavender skirt.\n\nShe bows her violin passionately, sending out vivid energy waves that ripple through the air. The vibrant landscape is dotted with quaint halfling houses, each with smoking chimneys, while tree trunks are carved with glowing bioluminescent mushrooms, perched crows, and horseshoe lucky charms.\n\nRich natural textures, dynamic lighting, and atmospheric haze capture the enchanting, magical moment as sunbeams filter through the canopy, illuminating every detail and infusing the scene with a sense of wonder and serene energy."
     },
     {
-      "id": "asset_A9LCxah33GZTX936o3Uriuzx",
+      "id": "asset_FGFdzExiqrjzjV3VaWn91NK6",
       "tags": [],
       "type": "txt2img",
-      "path": "jewel-2.png",
+      "path": "alexandria-2.png",
       "generator": {
         "name": "Imagen 4 Ultra"
       },
-      "prompt": "A hyper-detailed, photorealistic spring forest at golden hour transitions into a surreal open field. At the center, a regal half-elf woman with faintly glowing green eyes, short pointed ears, and long golden braids sits gracefully on an elegant stool, plucking a full-sized luminous harp.\n\nThe wooden harp is adorned with sparkling jewel inlays that catch the sunlight, casting radiant prisms and vivid energy waves. She wears a flowing elegant dress and a delicate tiara. All around, quaint halfling houses nestle among towering oaks, their smoking chimneys curling into the warm light.\n\nTree trunks are decorated with carved horseshoe charms, clusters of glowing bioluminescent mushrooms, and perched crows. Streaming golden rays filter through the ancient canopy, illuminating intricate natural textures and magical details in this enchanting and cinematic fantasy landscape."
+      "prompt": "A hyper-detailed, photorealistic spring forest at golden hour opens into a surreal field bathed in streaming golden light through towering oaks. At the center stands a tall, athletic, and graceful quarter-elf lady with sandy brown hair, draped in a pale lavender skirt.\n\nShe bows her violin passionately, sending out vivid energy waves that ripple through the air. The vibrant landscape is dotted with quaint halfling houses, each with smoking chimneys, while tree trunks are carved with glowing bioluminescent mushrooms, perched crows, and horseshoe lucky charms.\n\nRich natural textures, dynamic lighting, and atmospheric haze capture the enchanting, magical moment as sunbeams filter through the canopy, illuminating every detail and infusing the scene with a sense of wonder and serene energy."
     },
     {
-      "id": "asset_mLaiDXJA9Fxuxa7oy51XGHKS",
+      "id": "asset_uCxtRTAk86SZ2DkHUzGocmEv",
       "tags": [],
       "type": "txt2img",
-      "path": "jewel-3.png",
+      "path": "alexandria-3.png",
       "generator": {
         "name": "Imagen 4 Ultra"
       },
-      "prompt": "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, aregal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.\n\nThe wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.\n\nShe has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks "
+      "prompt": "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a free spirited quarter-elf lady bows her violin that radiates vivid energy waves.\n\nShe is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks "
     },
     {
-      "id": "asset_mo3XX1UUBSPkwZUJjhVinb23",
+      "id": "asset_vwnfYxtzxujWjnkDkoGE1RXM",
       "tags": [],
       "type": "txt2img",
-      "path": "jewel-4.png",
+      "path": "alexandria-4.png",
       "generator": {
         "name": "Imagen 4 Ultra"
       },
-      "prompt": "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, aregal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.\n\nThe wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.\n\nShe has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks "
+      "prompt": "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a free spirited quarter-elf lady bows her violin that radiates vivid energy waves.\n\nShe is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks "
     },
     {
-      "id": "asset_B4TwHUE8heizShPXxtaGs8Vm",
+      "id": "asset_qApQ4QowAZ3TuX4MbMW3erPp",
       "tags": [],
       "type": "txt2img",
-      "path": "jewel-5.png",
+      "path": "alexandria-5.png",
       "generator": {
         "name": "Imagen 4 Ultra"
       },
-      "prompt": "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, aregal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.\n\nThe wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.\n\nShe has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks "
+      "prompt": "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a free spirited quarter-elf lady bows her violin that radiates vivid energy waves.\n\nShe is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks "
     },
     {
-      "id": "asset_qh8akknwtXFJwUXbtHnXEgzb",
+      "id": "asset_Lku3nqZYossmK7CYj2XP7fDV",
       "tags": [],
       "type": "txt2img",
-      "path": "jewel-6.png",
+      "path": "alexandria-6.png",
       "generator": {
         "name": "Imagen 4 Ultra"
       },
-      "prompt": "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, aregal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.\n\nThe wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.\n\nShe has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks "
+      "prompt": "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a free spirited quarter-elf lady bows her violin that radiates vivid energy waves.\n\nShe is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks "
     }
   ]
 }

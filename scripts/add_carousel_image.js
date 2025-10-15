@@ -37,17 +37,25 @@ function copyImageToStaticDir(imagePath) {
  */
 function processInputPath(inputPath) {
   const urls = [];
+  const validImageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp']; // Supported image extensions
 
   if (fs.lstatSync(inputPath).isDirectory()) {
     const files = fs.readdirSync(inputPath);
     for (const file of files) {
       const fullPath = path.join(inputPath, file);
-      if (fs.lstatSync(fullPath).isFile()) {
+      const fileExtension = path.extname(file).toLowerCase();
+
+      if (fs.lstatSync(fullPath).isFile() && validImageExtensions.includes(fileExtension)) {
         urls.push(copyImageToStaticDir(fullPath));
       }
     }
   } else {
-    urls.push(copyImageToStaticDir(inputPath));
+    const fileExtension = path.extname(inputPath).toLowerCase();
+    if (validImageExtensions.includes(fileExtension)) {
+      urls.push(copyImageToStaticDir(inputPath));
+    } else {
+      console.error(`Invalid file type: ${inputPath}. Only image files are allowed.`);
+    }
   }
 
   return urls;
@@ -74,14 +82,22 @@ function addCarouselImage(characterId, inputPath) {
     // Process the input path and get CloudFront URLs
     const cloudfrontUrls = processInputPath(inputPath);
 
+    // Filter out URLs that already exist in the image_gallery
+    const newUrls = cloudfrontUrls.filter((url) => !character.image_gallery.includes(url));
+
+    if (newUrls.length === 0) {
+      console.log(`No new images to add for character '${characterId}'. All provided images already exist.`);
+      return;
+    }
+
     // Add the new images to the gallery
-    character.image_gallery.push(...cloudfrontUrls);
+    character.image_gallery.push(...newUrls);
 
     // Write the updated YAML back to the file
     const updatedYaml = yaml.dump(data, { lineWidth: -1 });
     fs.writeFileSync(yamlFilePath, updatedYaml, 'utf8');
 
-    console.log(`Successfully added images to character '${characterId}':`, cloudfrontUrls);
+    console.log(`Successfully added images to character '${characterId}':`, newUrls);
   } catch (error) {
     console.error('Error updating wavelength.yaml:', error);
   }

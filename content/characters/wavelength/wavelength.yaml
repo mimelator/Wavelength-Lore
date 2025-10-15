@@ -29,16 +29,19 @@
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/jewel-4.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/jewel-5.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/jewel-6.png
-    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/metadata.json
+    
 - id: alex
   title: Alexandria
   description: The Daughter of Prince Andrew and Jewel, Alexandria is a quarter elf and musically gifted like her mother.  She loves to teach others how to play and compose music...  Especially young children.
-  image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/Final_Race-16.png
+  image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-1.png
   image_gallery:
-    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/Countdown-03.png
-    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/Countdown-08.png
-    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/Final_Race-05.png
-    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/Final_Race-16.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-1.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-2.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-3.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-4.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-5.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-6.png
+    
 - id: eloquence
   title: Eloquence
   description: The Son of Prince Andrew and Jewel, Eloquence is a quarter elf and passionate about the Bass Guitar as well as Rhythm Theory.  He was best friends with Magical Maurice the Percussion Wizard of Wavelength until Maurice died at the Battle of the Shire.
