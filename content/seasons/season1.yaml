@@ -1,474 +1,440 @@
-  title: "Prelude: Life in the Shire"
-  seasonLink: "https://www.youtube.com/playlist?list=PLO3KUVl6gwUb_ZrCoj7-ev92oC9Rvo0aH"
-  image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/image.png"
-  episodes:
-    episode1:
-      title: "My Lucky Charm"
-      description: "Everyone needs a little luck sometimes, except for maybe Goblins who need no one"
-      youtubeLink: "https://youtu.be/07ln1YTcOdg?si=TrWzyJkYOZtx1Zrc"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/LuckyCharm_v35.mp3"
-      carouselImages:
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/IceBlueGreed-19.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-11.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/RebuildTheShire-13.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/LockedAndLoaded-14.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-13.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/TheKingHasFled-07.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-09.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-05.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-14.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-12.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-06.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-16.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-10.png
-       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/RebuildTheShire-07.png
-      
-      story: |
-        Wavelength is performing a Shire favorite about their mascot, Lucky the Leprechaun, who brings them good luck and helps them overcome challenges.
-        The song celebrates the joy and positivity that Lucky brings to their lives.
-        Unfortunately, the lyrics in the song include a dig at the goblins, about how they don't need anyone, which is ironic because goblins are known for being selfish and greedy.
-        Eventually, the Goblin King hears about this song and becomes very angry, feeling insulted by the lyrics, and vows to get revenge on Wavelength and the Shire Folk.
-      lyrics: |
-        When I wake up I look around and see
-        Has my luck today run away
-        like a frightened little bunny?
+title: 'Prelude: Life in the Shire'
+seasonLink: https://www.youtube.com/playlist?list=PLO3KUVl6gwUb_ZrCoj7-ev92oC9Rvo0aH
+image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/image.png
+episodes:
+  episode1:
+    title: My Lucky Charm
+    description: Everyone needs a little luck sometimes, except for maybe Goblins who need no one
+    youtubeLink: https://youtu.be/07ln1YTcOdg?si=TrWzyJkYOZtx1Zrc
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/image.png
+    audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/LuckyCharm_v35.mp3
+    carouselImages:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/IceBlueGreed-19.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-11.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/RebuildTheShire-13.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/LockedAndLoaded-14.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-13.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/TheKingHasFled-07.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-09.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-05.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-14.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-12.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-06.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-16.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-10.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/RebuildTheShire-07.png
+    story: |
+      Wavelength is performing a Shire favorite about their mascot, Lucky the Leprechaun, who brings them good luck and helps them overcome challenges.
+      The song celebrates the joy and positivity that Lucky brings to their lives.
+      Unfortunately, the lyrics in the song include a dig at the goblins, about how they don't need anyone, which is ironic because goblins are known for being selfish and greedy.
+      Eventually, the Goblin King hears about this song and becomes very angry, feeling insulted by the lyrics, and vows to get revenge on Wavelength and the Shire Folk.
+    lyrics: |
+      When I wake up I look around and see
+      Has my luck today run away
+      like a frightened little bunny?
 
-        Somedays are good, somedays are bad,
-        It doesn't matter to me.
+      Somedays are good, somedays are bad,
+      It doesn't matter to me.
 
-        When I have you, my lucky charm,
-        I'll never, never have to say:
+      When I have you, my lucky charm,
+      I'll never, never have to say:
 
-        Everyday I need a Lucky Charm
-        Who will be my Lucky Charm today?
+      Everyday I need a Lucky Charm
+      Who will be my Lucky Charm today?
 
-        Even in the Shire it helps to have a Lucky Charm.
-        Unless you're a Goblin, and you need no one.
+      Even in the Shire it helps to have a Lucky Charm.
+      Unless you're a Goblin, and you need no one.
+  episode2:
+    title: Jump Right In!
+    description: Life is about choices, so make one and see what happens next!
+    youtubeLink: https://youtu.be/UJs0aOb8DlM
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/image.png
+    audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/JumpRightIn_v25.mp3
+    carouselImages:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-01.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-02.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-03.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-04.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-05.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-06.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-07.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-08.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-09.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-10.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-11.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-13.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-15.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-16.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-17.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-18.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-19.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-20.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/jump_right_in.jpg
 
+    story: |
+      Wavelength performs a song about taking chances and embracing new experiences, which is especially
+      important to them as they are a touring band and love to explore new places and meet new people, cultures, and ideas.
+    lyrics: |
+      I get up just a quarter past midnight
+      to get up before the rising sun
 
-    episode2:
-      title: "Jump Right In!"
-      description: "Life is about choices, so make one and see what happens next!"
-      youtubeLink: "https://youtu.be/UJs0aOb8DlM"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/JumpRightIn_v25.mp3"
-      carouselImages:
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-01.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-02.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-03.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-04.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-05.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-06.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-07.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-08.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-09.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-10.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-11.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-13.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-15.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-16.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-17.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-18.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-19.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-20.png
-        
+      And if you ever see me
+      past the midnight hour
+      Roll me over, ‘cause you know i am done
 
-      story: |
-        Wavelength performs a song about taking chances and embracing new experiences, which is especially
-        important to them as they are a touring band and love to explore new places and meet new people, cultures, and ideas.
-        
+      But i’ll keep on crusin’
+      Everywhere i’m choosin
+      Everywhere that i want to be
 
-      lyrics: |
-        I get up just a quarter past midnight
-        to get up before the rising sun
+      And i try, and i try 
+      and I try so hard 
+      To be free
 
-        And if you ever see me
-        past the midnight hour
-        Roll me over, ‘cause you know i am done
+      I keep trying to reason about
+      Something i can’t understand
 
-        But i’ll keep on crusin’
-        Everywhere i’m choosin
-        Everywhere that i want to be
+      Why you’d choose, why you’d choose
+      Why you’d choose a looser
 
-        And i try, and i try 
-        and I try so hard 
-        To be free
+      When you could just lend a hand?
+  episode3:
+    title: Dream with Me
+    description: What dreams can be made when two are united in destiny?
+    youtubeLink: https://youtu.be/L_gxO-rrTSY
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/image.png
+    audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/DreamWithMe_v3.mp3
+    carouselImages:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-01.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-03.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-04.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-06.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-07.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-08.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-09.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-10.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-13.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-14.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-17.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-18.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-19.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-20.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-21.png
+    story: |
+      Wavelength performs a heartfelt song about dreaming together and the power of unity and shared aspirations.
+      The song emphasizes the importance of connection and collaboration in achieving dreams and overcoming challenges.
+      The lyrics convey a sense of hope and optimism, encouraging listeners to believe in the possibility of a brighter future when people come together with a common purpose.
+    lyrics: |
+      There is a moment when you dream with me
+      That magic moment is our destiny
 
-        I keep trying to reason about
-        Something i can’t understand
+      And that magic moment when the stars align
+      It will lead us to a place so divine
+  episode4:
+    title: Daphne
+    description: The intoxicating Daphne flower calls to both pollinators and humans alike
+    youtubeLink: https://youtu.be/PWYOElJnU0I
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/image.png
+    audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/Daphne_v21.mp3
+    carouselImages:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-01.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-02.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-03.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-04.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-06.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-08.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-09.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-11.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-12.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-13.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-15.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-16.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-18.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-19.png
+    story: |
+      Wavelength performs a song about the Daphne flower, which is known for its intoxicating fragrance that attracts both pollinators and humans.
+      It explores themes of attraction, desire, and the allure of beauty, many of which King David expresses for Daphne.
+    lyrics: |
+      You're irresistible, You're irresistible to me
 
-        Why you’d choose, why you’d choose
-        Why you’d choose a looser
-        
-        When you could just lend a hand?
+      Why do you always leave me Looking for another flower? 
+      For some pollen power?
 
-    episode3:
-      title: "Dream with Me"
-      description: "What dreams can be made when two are united in destiny?"
-      youtubeLink: "https://youtu.be/L_gxO-rrTSY"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/DreamWithMe_v3.mp3"
-      carouselImages: 
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-01.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-03.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-04.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-06.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-07.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-08.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-09.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-10.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-13.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-14.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-17.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-18.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-19.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-20.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-21.png
-      
-      story: |
-        Wavelength performs a heartfelt song about dreaming together and the power of unity and shared aspirations.
-        The song emphasizes the importance of connection and collaboration in achieving dreams and overcoming challenges.
-        The lyrics convey a sense of hope and optimism, encouraging listeners to believe in the possibility of a brighter future when people come together with a common purpose.
+      Why do you always roam the garden Looking for another source of that golden golden pollen?
+  episode5:
+    title: Falling
+    description: When they make your heart go ah-ah-ah-ah
+    youtubeLink: https://youtu.be/LKDfiCHGeNs
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/image.png
+    audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/Falling_v32.mp3
+    carouselImages:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-01.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-03.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-04.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-06.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-07.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-08.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-09.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-11.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-12.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-13.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-14.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-16.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-17.png
+    story: |
+      Wavelength performs a song about the exhilarating feeling of falling in love and the joy that comes with it.
+      Perhaps foreshadowing what Daphne and her partner might feel for each other as their relationship blossoms.
+    lyrics: |
+      Like the voice of an angel When I first heard you sing
+      Every second afterwards I've felt the same thing
 
-      lyrics: |
-        There is a moment when you dream with me
-        That magic moment is our destiny
+      I hear your voice and I go ah-ha-ha-ha
+      I am falling in love with you
 
-        And that magic moment when the stars align
-        It will lead us to a place so divine
+      Time marches forward and things aren't as easy now
+      I keep coming back to the things that matter most to me
+  episode6:
+    title: Once More
+    description: In remembrance of dear friends
+    youtubeLink: https://youtu.be/_Ml9tKjgTIs
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/image.png
+    audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/OnceMore_v20.mp3
+    carouselImages:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-01.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-02.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-03.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-04.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-05.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-06.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-07.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-08.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-09.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-10.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-11.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-12.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-14.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-15.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-16.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-17.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-18.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-19.png
+    story: |
+      Wavelength performs a poignant song about cherishing memories and the importance of remembering loved ones who have passed away.
+      The song reflects on the enduring impact that these individuals have on our lives and the comfort that comes from holding onto their memory.
+    lyrics: |
+      Do you remember all those moments that we used to share?
+      Do you remember all the times that we used to care?
+      Do you remember all those mountains that we used to climb?
+      Do you remember It was always your hand in mine?
 
-    episode4:
-      title: "Daphne"
-      description: "The intoxicating Daphne flower calls to both pollinators and humans alike"
-      youtubeLink: "https://youtu.be/PWYOElJnU0I"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/Daphne_v21.mp3"
-      carouselImages:
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-01.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-02.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-03.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-04.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-06.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-08.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-09.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-11.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-12.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-13.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-15.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-16.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-18.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-19.png
+      There was nothing that could happen
+      nothing that could ever tear us apart
 
-      story: |
-        Wavelength performs a song about the Daphne flower, which is known for its intoxicating fragrance that attracts both pollinators and humans.
-        It explores themes of attraction, desire, and the allure of beauty, many of which King David expresses for Daphne.
-        
-      lyrics: |
-        You're irresistible, You're irresistible to me
+      It was quite the sight Friendship every night Living heart to heart
 
-        Why do you always leave me Looking for another flower? 
-        For some pollen power?
+      Oh do you remember when?
 
-        Why do you always roam the garden Looking for another source of that golden golden pollen?
+      Johnny went first then Jason went too
+      They had grand plans and things to do
+      Tommy got into a much darker scene
+      and Jewel's bright light was snuffed out by the machine
 
-    episode5:
-      title: "Falling"
-      description: "When they make your heart go ah-ah-ah-ah"
-      youtubeLink: "https://youtu.be/LKDfiCHGeNs"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/Falling_v32.mp3"
-      carouselImages:
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-01.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-03.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-04.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-06.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-07.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-08.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-09.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-11.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-12.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-13.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-14.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-16.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-17.png
-      
-      story: |
-        Wavelength performs a song about the exhilarating feeling of falling in love and the joy that comes with it.
-        Perhaps foreshadowing what Daphne and her partner might feel for each other as their relationship blossoms.
+      Once more, once more Once more, once more To see you again!
+  episode7:
+    title: History Lessons
+    description: In memory of a precious friend, a jewel that couldn’t be outshown
+    youtubeLink: https://youtu.be/PTTLo-Oetl4
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/image.png
+    audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/HistoryLessons_v8.mp3
+    carouselImages:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-01.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-02.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-03.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-04.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-06.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-07.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-09.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-11.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-12.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-13.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-14.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-15.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-16.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-17.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-18.png
+    story: |
+      Wavelength performs a reflective song about learning from the past and the importance of history in shaping our present and future.
+      The song encourages listeners to remember the lessons of history and to use that knowledge to make better choices moving forward.
+    lyrics: |
+      I realize that fates have been cruel
+      to take you away a young precious jewel
+      and forever I'll remember you
 
-      lyrics: |
-        Like the voice of an angel When I first heard you sing
-        Every second afterwards I've felt the same thing
+      I realize that our fates are entwined
+      and though you were struck by the cruel hands of time
+      that forever I'll remember you
 
-        I hear your voice and I go ah-ha-ha-ha
-        I am falling in love with you
+      la-da-da-da-da (I will remember)
+      You're a precious jewel who Shines with the stars at night  
+      forever, I'll remember you
+  episode8:
+    title: Life in the Shire
+    description: When home is a haven, there’s no limit to what can be done
+    youtubeLink: https://youtu.be/slwFjISO70M
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/image.png
+    audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/LIfeInTheShire_v19.mp3
+    carouselImages:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-02.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-06.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-07.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-08.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-09.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-11.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-13.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-14.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-15.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-16.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-17.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-18.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-19.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-20.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-21.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-22.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-23.png
+    story: |
+      Wavelength performs an uplifting song about the joys of living in the Shire, a place of peace, community, and gifted artisanship.
+      The song celebrates the simple pleasures of life in the Shire and the sense of belonging that comes from being part of a close-knit community.
+    lyrics: |
+      After the fire and all of the flames have been swept away 
+      Life in the Shire comes to an end another day
 
-        Time marches forward and things aren't as easy now
-        I keep coming back to the things that matter most to me
+      After the fire and all of the flames from another day
+      LIfe in the furnace seems to be burning our lives away
+      But we can retreat back where our lives are sweet
 
+      Back to the place where we belong!
 
-    episode6:
-      title: "Once More"
-      description: "In remembrance of dear friends"
-      youtubeLink: "https://youtu.be/_Ml9tKjgTIs"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/OnceMore_v20.mp3"
-      carouselImages:
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-01.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-02.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-03.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-04.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-05.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-06.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-07.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-08.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-09.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-10.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-11.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-12.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-14.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-15.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-16.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-17.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-18.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-19.png
-      
-      story: |
-        Wavelength performs a poignant song about cherishing memories and the importance of remembering loved ones who have passed away.
-        The song reflects on the enduring impact that these individuals have on our lives and the comfort that comes from holding onto their memory.
+      After the fire and all of the flames have been swept away 
+      We clean the ash and the dust and just let it drift away
+      And all we have left is just what is best
+      We have a family!
+  episode9:
+    title: Feed the Crows
+    description: Living in and Loving Nature can be a great balm for your pain
+    youtubeLink: https://youtu.be/tunZ11NdOQA
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/image.png
+    audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/FeedTheCrows_v24.mp3
+    carouselImages:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-02.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-03.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-04.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-05.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-06.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-07.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-08.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-09.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-11.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-12.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-13.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-15.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-16.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-17.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-19.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-20.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-21.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-22.png
+    story: |
+      Wavelength performs a soulful song about finding solace and healing in nature.
+      The song emphasizes the therapeutic power of connecting with the natural world and the comfort that comes from being surrounded by its beauty.
+    lyrics: |
+      Even after all the pain Even after all the shame 
+      I think I'll go feed the crows
+      Even after all the cost Even after all that's lost
+      I think I'll go feed the crows
 
-      lyrics: |
-        Do you remember all those moments that we used to share?
-        Do you remember all the times that we used to care?
-        Do you remember all those mountains that we used to climb?
-        Do you remember It was always your hand in mine?
+      Just remember that even after all
+      All the pain and suffering... you survived it all
+      And your standing tall and your standing strong
+      And now you can help Some other crows along
+  episode10:
+    title: Keep On
+    description: There are 3 or 4 little words that I enjoy hearing everyday…
+    youtubeLink: https://youtu.be/en9ir6dq7WQ
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/image.png
+    audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/Keep On_v26.mp3
+    carouselImages:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-01.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-03.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-04.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-06.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-07.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-08.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-09.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-12.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-13.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-14.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-15.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-17.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-19.png
+    story: |
+      Wavelength focuses on the importance of relationships and the power of love and connection.
+      The song emphasizes the significance of hearing and expressing love through simple yet meaningful words.
+    lyrics: |
+      I keep on looking for one thing That i can't buy on my own
+      And if i can find it, I'm gonna bring it, (bring it) on home!
 
-        There was nothing that could happen
-        nothing that could ever tear us apart
+      And so i keep searching  for that thing I can't buy on a shelf
+      And you know, and you know that there must be someone
+      I can reach out, (someone) I can call for help.
 
-        It was quite the sight Friendship every night Living heart to heart
+      Keep on, Keep on Keep on looking for 1 2 Love
+      Keep on, Keep on Keep on looking for 3 or 4 little words
 
-        Oh do you remember when?
+      Like I Love you
+      Like I Love you Too!
+  episode11:
+    title: Back to the Shire (Encore)
+    description: There’s a place where people practice paradise
+    youtubeLink: https://youtu.be/07ln1YTcOdg?si=TrWzyJkYOZtx1Zrc
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/image.png
+    audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/BackToTheShire_v18.mp3
+    carouselImages:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-02.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-03.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-04.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-05.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-07.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-08.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-09.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-10.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-11.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-12.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-13.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-14.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-15.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-16.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-17.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-18.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-19.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-20.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-21.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-22.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-23.png
+    story: |
+      Wavelength makes an annual pilgrimage back to the Shire, a place of peace, community, and gifted artisanship.
+      The song celebrates the simple pleasures of life in the Shire and the sense of belonging that comes from being part of a close-knit community.
+    lyrics: |
+      We’re coming back,  we’re coming back
+      There is a place I like to go  At least once a year
+      Where the sun shines bright The days are long And the air is clear
 
-        Johnny went first then Jason went too
-        They had grand plans and things to do
-        Tommy got into a much darker scene
-        and Jewel's bright light was snuffed out by the machine
+      Yes I’m coming back,  Yes I’m coming back to the Shire 
 
-        Once more, once more Once more, once more To see you again!
+      There is a place Where water and land  have a tidal affair
+      Where the people are kind The food is good,  and the hate is rare
 
-    episode7:
-      title: "History Lessons"
-      description: "In memory of a precious friend, a jewel that couldn’t be outshown"
-      youtubeLink: "https://youtu.be/PTTLo-Oetl4"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/HistoryLessons_v8.mp3"
-      carouselImages:
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-01.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-02.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-03.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-04.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-06.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-07.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-09.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-11.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-12.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-13.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-14.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-15.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-16.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-17.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-18.png
-      
-      story: |
-        Wavelength performs a reflective song about learning from the past and the importance of history in shaping our present and future.
-        The song encourages listeners to remember the lessons of history and to use that knowledge to make better choices moving forward.
-
-      lyrics: |
-        I realize that fates have been cruel
-        to take you away a young precious jewel
-        and forever I'll remember you
-
-        I realize that our fates are entwined
-        and though you were struck by the cruel hands of time
-        that forever I'll remember you
-
-        la-da-da-da-da (I will remember)
-        You're a precious jewel who Shines with the stars at night  
-        forever, I'll remember you
-
-    episode8:
-      title: "Life in the Shire"
-      description: "When home is a haven, there’s no limit to what can be done"
-      youtubeLink: "https://youtu.be/slwFjISO70M"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/LIfeInTheShire_v19.mp3"
-      carouselImages:
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-02.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-06.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-07.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-08.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-09.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-11.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-13.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-14.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-15.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-16.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-17.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-18.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-19.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-20.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-21.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-22.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-23.png
-      
-      story: |
-        Wavelength performs an uplifting song about the joys of living in the Shire, a place of peace, community, and gifted artisanship.
-        The song celebrates the simple pleasures of life in the Shire and the sense of belonging that comes from being part of a close-knit community.
-
-      lyrics: |
-        After the fire and all of the flames have been swept away 
-        Life in the Shire comes to an end another day
-
-        After the fire and all of the flames from another day
-        LIfe in the furnace seems to be burning our lives away
-        But we can retreat back where our lives are sweet
-
-        Back to the place where we belong!
-
-        After the fire and all of the flames have been swept away 
-        We clean the ash and the dust and just let it drift away
-        And all we have left is just what is best
-        We have a family!
-
-    episode9:
-      title: "Feed the Crows"
-      description: "Living in and Loving Nature can be a great balm for your pain"
-      youtubeLink: "https://youtu.be/tunZ11NdOQA"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/FeedTheCrows_v24.mp3"
-      carouselImages:
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-02.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-03.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-04.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-05.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-06.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-07.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-08.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-09.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-11.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-12.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-13.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-15.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-16.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-17.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-19.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-20.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-21.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-22.png
-      
-      story: |
-        Wavelength performs a soulful song about finding solace and healing in nature.
-        The song emphasizes the therapeutic power of connecting with the natural world and the comfort that comes from being surrounded by its beauty.
-
-      lyrics: |
-        Even after all the pain Even after all the shame 
-        I think I'll go feed the crows
-        Even after all the cost Even after all that's lost
-        I think I'll go feed the crows
-
-        Just remember that even after all
-        All the pain and suffering... you survived it all
-        And your standing tall and your standing strong
-        And now you can help Some other crows along
-
-
-    episode10:
-      title: "Keep On"
-      description: "There are 3 or 4 little words that I enjoy hearing everyday…"
-      youtubeLink: "https://youtu.be/en9ir6dq7WQ"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/Keep On_v26.mp3"
-      carouselImages:
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-01.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-03.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-04.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-06.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-07.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-08.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-09.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-12.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-13.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-14.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-15.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-17.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-19.png
-        
-      story: |
-        Wavelength focuses on the importance of relationships and the power of love and connection.
-        The song emphasizes the significance of hearing and expressing love through simple yet meaningful words.
-
-      lyrics: |
-        I keep on looking for one thing That i can't buy on my own
-        And if i can find it, I'm gonna bring it, (bring it) on home!
-
-        And so i keep searching  for that thing I can't buy on a shelf
-        And you know, and you know that there must be someone
-        I can reach out, (someone) I can call for help.
-
-        Keep on, Keep on Keep on looking for 1 2 Love
-        Keep on, Keep on Keep on looking for 3 or 4 little words
-
-        Like I Love you
-        Like I Love you Too!
-
-    episode11:
-      title: "Back to the Shire (Encore)"
-      description: "There’s a place where people practice paradise"
-      youtubeLink: "https://youtu.be/07ln1YTcOdg?si=TrWzyJkYOZtx1Zrc"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/BackToTheShire_v18.mp3"
-      carouselImages:
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-02.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-03.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-04.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-05.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-07.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-08.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-09.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-10.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-11.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-12.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-13.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-14.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-15.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-16.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-17.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-18.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-19.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-20.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-21.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-22.png
-        - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-23.png
-      
-      story: |
-        Wavelength makes an annual pilgrimage back to the Shire, a place of peace, community, and gifted artisanship.
-        The song celebrates the simple pleasures of life in the Shire and the sense of belonging that comes from being part of a close-knit community.
-
-      lyrics: |
-        We’re coming back,  we’re coming back
-        There is a place I like to go  At least once a year
-        Where the sun shines bright The days are long And the air is clear
-
-        Yes I’m coming back,  Yes I’m coming back to the Shire 
-
-        There is a place Where water and land  have a tidal affair
-        Where the people are kind The food is good,  and the hate is rare
-
-        There is a place I like to go once a year
-        And in that space Heaven is near
+      There is a place I like to go once a year
+      And in that space Heaven is near
