@@ -29,7 +29,6 @@
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/jewel-4.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/jewel-5.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/jewel-6.png
-    
 - id: alex
   title: Alexandria
   description: The Daughter of Prince Andrew and Jewel, Alexandria is a quarter elf and musically gifted like her mother.  She loves to teach others how to play and compose music...  Especially young children.
@@ -41,30 +40,40 @@
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-4.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-5.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-6.png
-    
 - id: eloquence
   title: Eloquence
   description: The Son of Prince Andrew and Jewel, Eloquence is a quarter elf and passionate about the Bass Guitar as well as Rhythm Theory.  He was best friends with Magical Maurice the Percussion Wizard of Wavelength until Maurice died at the Battle of the Shire.
-  image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-08.png
+  image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/eloquence-5.png
   image_gallery:
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-06.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-18.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/LockedAndLoaded-03.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/LockedAndLoaded-14.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/eloquence-1.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/eloquence-2.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/eloquence-3.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/eloquence-4.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/eloquence-5.png
 - id: daphne
   title: Daphne
   description: The prodigy daughter of the Shire's Choir Master, Daphne is a gifted drummer who joins Wavelength after the Battle of the Shire when she and her brother are orphaned and Wavelength loses their Drummer Maurice.
-  image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-10.png
+  image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/daphne-6.png
   image_gallery:
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-05.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-06.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-18.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-19.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-11.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/daphne-1.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/daphne-2.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/daphne-3.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/daphne-4.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/daphne-5.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/daphne-6.png
 - id: lucky
   title: Lucky
   description: Lucky is the Leprechaun who has an endless supply of Golden Advice.  His wisdom has earned him a role as the a beloved token of luck to the Shire.  But after the Battle of the Shire, Lucky decides to travel with Wavelength for awhile even though he isn't a musician per-se.  He is a fantastic singer though.  Mostly, he wants to fish and everywhere the Wavelength travels, seems to include a convenient fishing opporunity for Lucky.
-  image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheBattleOfTheShire-058.png
+  image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/lucky_closeup.png
   image_gallery:
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-02.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-08.png
@@ -72,6 +81,13 @@
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/IceBlueGreed-06.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/IceBlueGreed-08.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheBattleOfTheShire-058.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/lucky-1.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/lucky-2.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/lucky-3.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/lucky-4.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/lucky-5.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/lucky-6.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/lucky_closeup.png
 - id: yeti
   title: Yeti
   description: 'Wavelength first met Yeti up in the far, frozen North at the Ice Castle.  Yeti, while ferocious looking is actually a Nurse in practice.  Although very clumsy, which is how he got the name: Yeti.  He keeps falling down, ''Yeti'' gets back up again.'

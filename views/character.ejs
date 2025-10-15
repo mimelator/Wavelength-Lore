@@ -6,6 +6,7 @@
     <title><%= title %></title>
     <%- include('partials/head') %>
     <link rel="stylesheet" href="/css/character_styles.css">
+    <link rel="stylesheet" href="/css/modal_styles.css">
 </head>
 <body>
     <%- include('partials/header') %>
@@ -40,7 +41,7 @@
                 <% const shuffledImages = character.image_gallery.sort(() => Math.random() - 0.5); %>
                 <% shuffledImages.forEach((image, index) => { %>
                     <div class="carousel-item" data-index="<%= index %>">
-                        <img src="<%= image %>" alt="<%= character.title %>">
+                        <img src="<%= image %>" alt="<%= character.title %>" class="gallery-image" data-fullsize="<%= image %>">
                     </div>
                 <% }); %>
             </div>
@@ -50,6 +51,67 @@
                 <% }); %>
             </div>
         </section>
+
+        <style>
+            .modal {
+                display: none; /* Hidden by default */
+                position: fixed; /* Stay in place */
+                z-index: 1000; /* Sit on top */
+                left: 0;
+                top: 0;
+                width: 100%; /* Full width */
+                height: 100%; /* Full height */
+                overflow: auto; /* Enable scroll if needed */
+                background-color: rgba(0, 0, 0, 0.8); /* Black background with opacity */
+            }
+
+            .modal-content {
+                margin: auto;
+                display: block;
+                max-width: 90%;
+                max-height: 90%;
+            }
+
+            .modal-close {
+                position: absolute;
+                top: 10px;
+                right: 25px;
+                color: #fff;
+                font-size: 35px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+        </style>
+
+        <div id="imageModal" class="modal">
+            <span class="modal-close">&times;</span>
+            <img class="modal-content" id="fullSizeImage">
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const modal = document.getElementById('imageModal');
+                const modalImg = document.getElementById('fullSizeImage');
+                const closeModal = document.querySelector('.modal-close');
+
+                document.querySelectorAll('.gallery-image').forEach(image => {
+                    image.addEventListener('click', () => {
+                        modal.style.display = 'block';
+                        modalImg.src = image.dataset.fullsize;
+                    });
+                });
+
+                closeModal.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                });
+
+                modal.addEventListener('click', (event) => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+        </script>
     </main>
 
     <%- include('partials/footer') %>
