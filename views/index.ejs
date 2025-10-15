@@ -8,11 +8,29 @@
 
     <h1>Welcome to Wavelength Lore</h1>
 
+    <style>
+        .youtube-link {
+            font-size: 0.5em; /* Reduce text size by 2x */
+            display: block;
+            text-align: center; /* Center align with the description */
+            margin-top: 5px; /* Add some spacing from the description */
+        }
+        .season-description {
+            font-size: 0.33em; /* Shrink text size by 3x */
+            color: #666; /* Subtle color for better readability */
+            margin-top: -10px; /* Adjust spacing */
+            margin-bottom: 10px;
+        }
+    </style>
+
     <% for (var season in videos) { %>
         <div class="season-title">
             <h2><%= videos[season].title %></h2>
+            <p class="season-description"><%= videos[season].description %></p>
+            <br />
             <a href="<%= videos[season].seasonLink %>" target="_blank" class="center-link">Watch Full Season</a>
         </div>
+        <br /><br />
         <div class="carousel" id="carousel-<%= season %>">
             <% for (var episode in videos[season].episodes) { %>
                 <div>
@@ -21,14 +39,15 @@
                             <%= videos[season].episodes[episode].title %>
                         </a>
                     </h3>
-                    <a href="<%= videos[season].episodes[episode].youtubeLink %>" target="_blank">
+                    <a href="/season/<%= season.replace('season', '') %>/episode/<%= episode.replace('episode', '') %>">
                         <img src="<%= videos[season].episodes[episode].image %>" alt="<%= videos[season].episodes[episode].title %>">
                     </a>
                     <p><%= videos[season].episodes[episode].description %></p>
+                    <a href="<%= videos[season].episodes[episode].youtubeLink %>" target="_blank" class="youtube-link">Watch on YouTube</a>
                 </div>
             <% } %>
         </div>
-
+        <br /><br />
         <br /><hr /><br />
     <% } %>
 
