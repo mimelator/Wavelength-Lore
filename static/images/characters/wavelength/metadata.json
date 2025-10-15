@@ -1,0 +1,81 @@
+{
+  "query": {
+    "inferenceIds": [],
+    "assetIds": [
+      "asset_iYaguvFaULhMya6XneQcAfzS",
+      "asset_A9LCxah33GZTX936o3Uriuzx",
+      "asset_mLaiDXJA9Fxuxa7oy51XGHKS",
+      "asset_mo3XX1UUBSPkwZUJjhVinb23",
+      "asset_B4TwHUE8heizShPXxtaGs8Vm",
+      "asset_qh8akknwtXFJwUXbtHnXEgzb"
+    ],
+    "modelIds": []
+  },
+  "options": {
+    "fileNameTemplate": "jewel",
+    "flat": true
+  },
+  "count": 6,
+  "assets": [
+    {
+      "id": "asset_iYaguvFaULhMya6XneQcAfzS",
+      "tags": [],
+      "type": "txt2img",
+      "path": "jewel-1.png",
+      "generator": {
+        "name": "Imagen 4 Ultra"
+      },
+      "prompt": "A hyper-detailed, photorealistic spring forest at golden hour transitions into a surreal open field. At the center, a regal half-elf woman with faintly glowing green eyes, short pointed ears, and long golden braids sits gracefully on an elegant stool, plucking a full-sized luminous harp.\n\nThe wooden harp is adorned with sparkling jewel inlays that catch the sunlight, casting radiant prisms and vivid energy waves. She wears a flowing elegant dress and a delicate tiara. All around, quaint halfling houses nestle among towering oaks, their smoking chimneys curling into the warm light.\n\nTree trunks are decorated with carved horseshoe charms, clusters of glowing bioluminescent mushrooms, and perched crows. Streaming golden rays filter through the ancient canopy, illuminating intricate natural textures and magical details in this enchanting and cinematic fantasy landscape."
+    },
+    {
+      "id": "asset_A9LCxah33GZTX936o3Uriuzx",
+      "tags": [],
+      "type": "txt2img",
+      "path": "jewel-2.png",
+      "generator": {
+        "name": "Imagen 4 Ultra"
+      },
+      "prompt": "A hyper-detailed, photorealistic spring forest at golden hour transitions into a surreal open field. At the center, a regal half-elf woman with faintly glowing green eyes, short pointed ears, and long golden braids sits gracefully on an elegant stool, plucking a full-sized luminous harp.\n\nThe wooden harp is adorned with sparkling jewel inlays that catch the sunlight, casting radiant prisms and vivid energy waves. She wears a flowing elegant dress and a delicate tiara. All around, quaint halfling houses nestle among towering oaks, their smoking chimneys curling into the warm light.\n\nTree trunks are decorated with carved horseshoe charms, clusters of glowing bioluminescent mushrooms, and perched crows. Streaming golden rays filter through the ancient canopy, illuminating intricate natural textures and magical details in this enchanting and cinematic fantasy landscape."
+    },
+    {
+      "id": "asset_mLaiDXJA9Fxuxa7oy51XGHKS",
+      "tags": [],
+      "type": "txt2img",
+      "path": "jewel-3.png",
+      "generator": {
+        "name": "Imagen 4 Ultra"
+      },
+      "prompt": "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, aregal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.\n\nThe wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.\n\nShe has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks "
+    },
+    {
+      "id": "asset_mo3XX1UUBSPkwZUJjhVinb23",
+      "tags": [],
+      "type": "txt2img",
+      "path": "jewel-4.png",
+      "generator": {
+        "name": "Imagen 4 Ultra"
+      },
+      "prompt": "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, aregal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.\n\nThe wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.\n\nShe has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks "
+    },
+    {
+      "id": "asset_B4TwHUE8heizShPXxtaGs8Vm",
+      "tags": [],
+      "type": "txt2img",
+      "path": "jewel-5.png",
+      "generator": {
+        "name": "Imagen 4 Ultra"
+      },
+      "prompt": "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, aregal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.\n\nThe wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.\n\nShe has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks "
+    },
+    {
+      "id": "asset_qh8akknwtXFJwUXbtHnXEgzb",
+      "tags": [],
+      "type": "txt2img",
+      "path": "jewel-6.png",
+      "generator": {
+        "name": "Imagen 4 Ultra"
+      },
+      "prompt": "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, aregal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.\n\nThe wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.\n\nShe has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks "
+    }
+  ]
+}
