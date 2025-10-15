@@ -35,3 +35,4 @@ yarn-error.log*
 
 
 .firebase.rules.json
+content/prompts/wavelength/Wavelength-Lore.code-workspace

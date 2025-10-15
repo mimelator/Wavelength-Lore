@@ -1,13 +1,18 @@
 - id: andrew
   title: Prince Andrew
   description: The leader of Wavelength, husband of Jewel, and father of Alexandria and Eloquence
-  image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-02.png
+  image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/andrew-4.png
   image_gallery:
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/IceBlueGreed-08.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-02.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-08.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-02.png
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-19.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/andrew-1.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/andrew-2.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/andrew-3.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/andrew-4.png
+    - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/andrew-5.png
 - id: jewel
   title: Jewel
   description: The Wife of Prince Andrew and mother of Alexandria and Eloquence.  Being half elf, she obtained a superior musical education and has innate gifted musical talents, but being a half elf her community shunner her.  She met her husband at a Summer Music Workshop and after years of marriage and raising two children they formed the band Wavelength.
