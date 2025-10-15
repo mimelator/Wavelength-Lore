@@ -47,7 +47,6 @@
         Where people are snatched from the streets!
         We still provide your safety in our icy fortress!
 
-
     episode2:
       title: "Ice Whales"
       description: "Desperate times call for action"
@@ -91,77 +90,31 @@
 
         Goblins took our shire So desperate times call for action
 
-
     episode3:
-      title: "Rebuild The Shire"
-      description: "Keep the shire dream alive while in the far, frozen north."
-      youtubeLink: "https://youtu.be/qmbZgK0iW7Q"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/RebuildTheShire_v4.mp3"
-      carouselImages:
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/FallOfTheShire_take1-05.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/FrozenPeace-25.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/FrozenPeace-30.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/IceFortress-13.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/IceFortress-15.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/IceFortress-18.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Ice_Whale-22.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Ice_Whale-23.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Ice_Whale-24.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-03.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-06.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-07.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-08.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-09.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-12.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-15.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-16.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/RebuildTheShire-17.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-09.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-23.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-26.png"
-        
-      story: |
-        While at the Ice Fortress, the Shire Folk start the process of dreaming what their new Shire will be like.
-        They value freedom, community, and safety above all else.  With that in mind, they begin to craft their plans to rebuild the Shire.
-
-      lyrics: |
-        We'll rebuild the shire Yes we can Yes we will one day!
-        Let's make the world a better place
-        Yes we can. Yes we will one day!
-        Let's make the world a safer place
-        Get on your feet, we're gonna rebuild one...
-
-        But the shire has been stolen by goblins
-        and they won't go away very easily
-
-
-
-    episode4:
       title: "Sneak Attack"
       description: "The goblins enjoy spreading terror by sending raiding parties up to the far, frozen North to harass and spy on the Shire Folk."
       youtubeLink: "https://youtu.be/NULzEKOWCQY"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/Sneak Attack_v6.mp3"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/Sneak Attack_v6.mp3"
       carouselImages:
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-02.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-03.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-05.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-06.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-12.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-13.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-14.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-15.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-16.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-18.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-19.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-20.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-21.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-22.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-23.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-24.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-25.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/Sneak_Attack-26.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-02.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-19.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-20.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-21.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-23.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-24.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-25.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-26.png"
       
       story: |
         The goblins enjoy spreading terror by sending raiding parties up to the far, frozen North to harass and spy on the Shire Folk.
@@ -197,27 +150,27 @@
         We'll make them go back to their hell
         Send those goblins back to hell!
 
-    episode5:
+    episode4:
       title: "Frozen Peace"
       description: "Here we are, on this frozen shore, very far from our dear home"
       youtubeLink: "https://youtu.be/yIvbJXdl7dc"
-      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/FrozenPeace_v5.mp3"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/FrozenPeace_v5.mp3"
       carouselImages:
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-02.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-03.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-05.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-12.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-13.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-14.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-15.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-16.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-23.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-24.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-25.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-26.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-28.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-29.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-02.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-23.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-24.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-25.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-26.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-28.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-29.png"
       
       story: |
         After the Sneak Attack by the Goblins, the Shire FOlk take some more time to rest and heal.
@@ -239,7 +192,50 @@
         Goblins came from our Dear Shire up to the far, far frozen north
         And here we'll stay to rest and heal
         We will find, Yes we'll find some...
-        Frozen Peace
+        Frozen Peace    
+
+    episode5:
+      title: "Rebuild The Shire"
+      description: "Keep the shire dream alive while in the far, frozen north."
+      youtubeLink: "https://youtu.be/qmbZgK0iW7Q"
+      image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/image.png"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/RebuildTheShire_v4.mp3"
+      carouselImages:
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FallOfTheShire_take1-05.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-25.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-30.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/IceFortress-13.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/IceFortress-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/IceFortress-18.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Ice_Whale-22.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Ice_Whale-23.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Ice_Whale-24.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-03.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-06.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-07.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-08.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-12.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-15.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-16.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-17.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Sneak_Attack-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Sneak_Attack-23.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Sneak_Attack-26.png"
+        
+      story: |
+        While at the Ice Fortress, the Shire Folk start the process of dreaming what their new Shire will be like.
+        They value freedom, community, and safety above all else.  With that in mind, they begin to craft their plans to rebuild the Shire.
+
+      lyrics: |
+        We'll rebuild the shire Yes we can Yes we will one day!
+        Let's make the world a better place
+        Yes we can. Yes we will one day!
+        Let's make the world a safer place
+        Get on your feet, we're gonna rebuild one...
+
+        But the shire has been stolen by goblins
+        and they won't go away very easily        
 
     episode6:
       title: "We’re Coming For You"
