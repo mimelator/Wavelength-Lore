@@ -1,5 +1,5 @@
 VERSION ONE
-A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a free a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. 
+A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. 
 
 His hair is just long enough to cover the back of his neck and reaches one of his eyes.
 
