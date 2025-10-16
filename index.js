@@ -5,6 +5,7 @@ const { getDatabase, ref, get } = require('firebase/database');
 const path = require('path');
 const characterHelpers = require('./helpers/character-helpers');
 const loreHelpers = require('./helpers/lore-helpers');
+const episodeHelpers = require('./helpers/episode-helpers');
 
 const app = express();
 const port = 3001;
@@ -42,6 +43,10 @@ characterHelpers.initializeCharacterCache();
 loreHelpers.setDatabaseInstance(database);
 loreHelpers.initializeLoreCache();
 
+// Initialize episode cache and pass database instance
+episodeHelpers.setDatabaseInstance(database);
+episodeHelpers.initializeEpisodeCache();
+
 (async () => {
   try {
     console.log('Attempting Firebase operation...');
@@ -70,7 +75,7 @@ app.set('views', path.join(__dirname, 'views'));
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'static')));
 
-// Middleware to add character and lore helpers to all templates
+// Middleware to add character, lore, and episode helpers to all templates
 app.use(async (req, res, next) => {
   // Character helpers
   res.locals.characterHelpers = characterHelpers;
@@ -84,6 +89,12 @@ app.use(async (req, res, next) => {
   res.locals.linkifyLore = loreHelpers.linkifyLoreMentionsSync;
   res.locals.allLore = loreHelpers.getAllLoreSync();
   
+  // Episode helpers
+  res.locals.episodeHelpers = episodeHelpers;
+  res.locals.episodeLink = episodeHelpers.generateEpisodeLinkSync;
+  res.locals.linkifyEpisodes = episodeHelpers.linkifyEpisodeMentionsSync;
+  res.locals.allEpisodes = episodeHelpers.getAllEpisodesSync();
+  
   // Also provide async versions for routes that can use them
   res.locals.characterLinkAsync = characterHelpers.generateCharacterLink;
   res.locals.linkifyCharactersAsync = characterHelpers.linkifyCharacterMentions;
@@ -91,6 +102,9 @@ app.use(async (req, res, next) => {
   res.locals.loreLinkAsync = loreHelpers.generateLoreLink;
   res.locals.linkifyLoreAsync = loreHelpers.linkifyLoreMentions;
   res.locals.getAllLoreAsync = loreHelpers.getAllLore;
+  res.locals.episodeLinkAsync = episodeHelpers.generateEpisodeLink;
+  res.locals.linkifyEpisodesAsync = episodeHelpers.linkifyEpisodeMentions;
+  res.locals.getAllEpisodesAsync = episodeHelpers.getAllEpisodes;
   
   next();
 });
@@ -465,6 +479,17 @@ app.post('/api/cache/bust', async (req, res) => {
       }
     }
     
+    if (!type || type === 'all' || type === 'episodes') {
+      episodeHelpers.clearEpisodeCache();
+      results.episodes = 'cleared';
+      
+      if (refresh) {
+        await episodeHelpers.initializeEpisodeCache();
+        const episodes = await episodeHelpers.getAllEpisodes();
+        results.episodes = `refreshed with ${episodes.length} items`;
+      }
+    }
+    
     res.json({ 
       success: true, 
       message: 'Cache busting completed',
@@ -565,6 +590,7 @@ app.get('/api/cache/status', async (req, res) => {
   try {
     const characters = characterHelpers.getAllCharactersSync();
     const lore = loreHelpers.getAllLoreSync();
+    const episodes = episodeHelpers.getAllEpisodesSync();
     
     res.json({
       success: true,
@@ -576,6 +602,10 @@ app.get('/api/cache/status', async (req, res) => {
         lore: {
           count: lore.length,
           sample_ids: lore.slice(0, 3).map(l => l.id)
+        },
+        episodes: {
+          count: episodes.length,
+          sample_ids: episodes.slice(0, 3).map(e => e.id)
         }
       },
       timestamp: new Date().toISOString()

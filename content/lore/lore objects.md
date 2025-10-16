@@ -8,11 +8,13 @@ Things
 Places:
 * The Shire
 * Ice Fortress
-* Shire Fortress
+* Shire Sanctuary
 
-Goblin King
-
+Villains:
+* Goblin King
+* Misery
 
 Concepts:
 * Wise Elder
-* Goblin
+* Goblins
+* Goblin's Rule

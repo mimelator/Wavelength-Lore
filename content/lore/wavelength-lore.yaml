@@ -23,3 +23,55 @@ locations:
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-16.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-12.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Sneak_Attack-09.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-24.png
+
+  - id: shire-sanctuary
+    title: Shire Sanctuary
+    type: place
+    description: A serene and peaceful sanctuary located in the heart of the Shire. The Shire Sanctuary is a place of healing and tranquility, where the weary can find rest and solace. Surrounded by lush greenery and vibrant flowers, it is tended by the kind-hearted Hobbits who call this place home.  Occasionally Wavelength will perform impromptu concerts here to lift the spirits of the Shire Folk, as was the case after the Battle for the Shire.
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-05.jpg
+    image_gallery:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.jpg
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-03.jpg
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-07.jpg
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.jpg
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-08.jpg
+
+# Wavelength Lore - Objects & Things
+objects:
+  - id: ice-whales
+    title: Ice Whales
+    type: thing
+    description: Ice Whales are the most dangerous evil creatures known to the deep oceans in the far, frozen North and are very different from more normally known types of whales found in the Oceans.  These ferocious creatures will rip you to shreds just for spite.  Some of the Shire Folk join the Denizens of the Ice Fortress to participate in the Ice Whale Hunt.
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-17.png
+    image_gallery:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-19.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-13.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-17.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-18.png
+
+  - id: ice-dragons
+    title: Ice Dragons
+    type: thing
+    description: Ice Dragons are majestic and powerful creatures that inhabit the frozen landscapes of the far North. With their shimmering scales and icy breath, they are both feared and revered by the inhabitants of the Ice Fortress. These dragons are known to be fiercely protective of their territory and will not hesitate to defend it against intruders.  Their lair is the only place where the rare and precious Ice Blue Diamonds can be found. 
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-02.png
+    image_gallery:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-04.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-10.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-11.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/icefortress-fiery-4.jpg
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/icefortress-fiery-3.jpg
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-24.png
+
+  - id: ice-blue-diamond
+    title: Ice Blue Diamond
+    type: thing
+    description: Ice Blue Diamonds are rare and precious gemstones found only in the lairs of Ice Dragons. These diamonds are known for their stunning blue color and are highly sought after by collectors and adventurers alike. The process of mining these diamonds is extremely dangerous, as it involves navigating the treacherous ice caves guarded by the dragons.  Lucky used one of these diamonds to lure the Goblin King out of hiding during the Battle for the Shire.
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png
+    image_gallery:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-23.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-22.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-28.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png      
