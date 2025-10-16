@@ -12,3 +12,14 @@ locations:
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-19.png
 
+  - id: ice-fortress
+    title: Ice Fortress
+    type: place
+    description: A majestic fortress made of ice, standing tall against the backdrop of a frozen landscape. The Ice Fortress is home to the Frostborne, a community of denizens who welcome all strangers, no matter wealth or looks or race. Here, the beauty of winter is celebrated, and the power of ice magic is harnessed to protect the realm from external threats.
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/icefortress-fiery-3.jpg
+    image_gallery:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-22.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-20.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-16.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-12.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Sneak_Attack-09.png

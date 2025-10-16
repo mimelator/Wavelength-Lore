@@ -217,14 +217,8 @@
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/RebuildTheShire_v5.mp3"
       carouselImages:
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FallOfTheShire_take1-05.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-25.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/FrozenPeace-30.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/IceFortress-13.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/IceFortress-15.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/IceFortress-18.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Ice_Whale-22.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Ice_Whale-23.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Ice_Whale-24.png"
+     
+ 
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-03.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-06.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-07.png"
@@ -234,9 +228,15 @@
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-15.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-16.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-17.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Sneak_Attack-09.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Sneak_Attack-23.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Sneak_Attack-26.png"
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/ice_fortress-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/ice_fortress-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/ice_fortress-3.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/ice_fortress-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/ice_fortress-5.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/ice_fortress-6.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/ice_fortress-7.jpg"        
+
         
       story: |
         While at the Ice Fortress, the Shire Folk start the process of dreaming what their new Shire will be like.

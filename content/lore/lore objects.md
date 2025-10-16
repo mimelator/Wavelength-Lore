@@ -6,6 +6,7 @@ Things
 * Ice Blue Diamond
 
 Places:
+* The Shire
 * Ice Fortress
 * Shire Fortress
 

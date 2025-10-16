@@ -428,6 +428,166 @@ app.get('/contact', (req, res) => {
   res.render('contact', { title: 'Contact - Coming Soon', cdnUrl: process.env.CDN_URL, version: `v${Date.now()}` });
 });
 
+// Route for Cache Management page
+app.get('/cache-management', (req, res) => {
+  res.render('cache-management', { 
+    title: 'Cache Management', 
+    cdnUrl: process.env.CDN_URL, 
+    version: `v${Date.now()}` 
+  });
+});
+
+// Cache busting routes
+app.post('/api/cache/bust', async (req, res) => {
+  try {
+    const { type, refresh } = req.body;
+    const results = {};
+    
+    if (!type || type === 'all' || type === 'characters') {
+      characterHelpers.clearCharacterCache();
+      results.characters = 'cleared';
+      
+      if (refresh) {
+        await characterHelpers.initializeCharacterCache();
+        const characters = await characterHelpers.getAllCharacters();
+        results.characters = `refreshed with ${characters.length} items`;
+      }
+    }
+    
+    if (!type || type === 'all' || type === 'lore') {
+      loreHelpers.clearLoreCache();
+      results.lore = 'cleared';
+      
+      if (refresh) {
+        await loreHelpers.initializeLoreCache();
+        const lore = await loreHelpers.getAllLore();
+        results.lore = `refreshed with ${lore.length} items`;
+      }
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Cache busting completed',
+      results: results,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Cache busting error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// GET routes for simple cache busting (for easy browser testing)
+app.get('/api/cache/bust', async (req, res) => {
+  try {
+    const refresh = req.query.refresh === 'true';
+    const results = {};
+    
+    // Clear all caches
+    characterHelpers.clearCharacterCache();
+    results.characters = 'cleared';
+    loreHelpers.clearLoreCache();
+    results.lore = 'cleared';
+    
+    if (refresh) {
+      await characterHelpers.initializeCharacterCache();
+      const characters = await characterHelpers.getAllCharacters();
+      results.characters = `refreshed with ${characters.length} items`;
+      
+      await loreHelpers.initializeLoreCache();
+      const lore = await loreHelpers.getAllLore();
+      results.lore = `refreshed with ${lore.length} items`;
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Cache busting completed for: all',
+      results: results,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Cache busting error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+app.get('/api/cache/bust/:type', async (req, res) => {
+  try {
+    const { type } = req.params;
+    const refresh = req.query.refresh === 'true';
+    const results = {};
+    
+    if (type === 'all' || type === 'characters') {
+      characterHelpers.clearCharacterCache();
+      results.characters = 'cleared';
+      
+      if (refresh) {
+        await characterHelpers.initializeCharacterCache();
+        const characters = await characterHelpers.getAllCharacters();
+        results.characters = `refreshed with ${characters.length} items`;
+      }
+    }
+    
+    if (type === 'all' || type === 'lore') {
+      loreHelpers.clearLoreCache();
+      results.lore = 'cleared';
+      
+      if (refresh) {
+        await loreHelpers.initializeLoreCache();
+        const lore = await loreHelpers.getAllLore();
+        results.lore = `refreshed with ${lore.length} items`;
+      }
+    }
+    
+    res.json({ 
+      success: true, 
+      message: `Cache busting completed for: ${type}`,
+      results: results,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Cache busting error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// Cache status route
+app.get('/api/cache/status', async (req, res) => {
+  try {
+    const characters = characterHelpers.getAllCharactersSync();
+    const lore = loreHelpers.getAllLoreSync();
+    
+    res.json({
+      success: true,
+      cache_status: {
+        characters: {
+          count: characters.length,
+          sample_ids: characters.slice(0, 3).map(c => c.id)
+        },
+        lore: {
+          count: lore.length,
+          sample_ids: lore.slice(0, 3).map(l => l.id)
+        }
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cache Management</title>
+    <%- include('partials/head') %>
+    <style>
+        .cache-management {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .cache-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cache-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        .cache-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .cache-btn.clear {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .cache-btn.refresh {
+            background: #4ecdc4;
+            color: white;
+        }
+        
+        .cache-btn.status {
+            background: #45b7d1;
+            color: white;
+        }
+        
+        .cache-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cache-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main class="cache-management">
+        <h1>Cache Management</h1>
+        <p>Manage character and lore caches for the Wavelength application.</p>
+
+        <div class="cache-section">
+            <h2>🎭 Character Cache</h2>
+            <p>Clear or refresh character data cache to load updated character information from the database.</p>
+            <div class="cache-buttons">
+                <button class="cache-btn clear" onclick="bustCache('characters', false)">Clear Character Cache</button>
+                <button class="cache-btn refresh" onclick="bustCache('characters', true)">Refresh Characters</button>
+            </div>
+        </div>
+
+        <div class="cache-section">
+            <h2>📚 Lore Cache</h2>
+            <p>Clear or refresh lore data cache to load updated lore information from the database.</p>
+            <div class="cache-buttons">
+                <button class="cache-btn clear" onclick="bustCache('lore', false)">Clear Lore Cache</button>
+                <button class="cache-btn refresh" onclick="bustCache('lore', true)">Refresh Lore</button>
+            </div>
+        </div>
+
+        <div class="cache-section">
+            <h2>🔄 All Caches</h2>
+            <p>Clear or refresh both character and lore caches simultaneously.</p>
+            <div class="cache-buttons">
+                <button class="cache-btn clear" onclick="bustCache('all', false)">Clear All Caches</button>
+                <button class="cache-btn refresh" onclick="bustCache('all', true)">Refresh All</button>
+                <button class="cache-btn status" onclick="getCacheStatus()">Check Cache Status</button>
+            </div>
+        </div>
+
+        <div class="cache-section">
+            <h3>Status & Results</h3>
+            <div id="statusDisplay" class="status-display">
+                Ready to manage caches. Click any button above to start.
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function bustCache(type, refresh) {
+            const statusDisplay = document.getElementById('statusDisplay');
+            const buttons = document.querySelectorAll('.cache-btn');
+            
+            // Disable all buttons during operation
+            buttons.forEach(btn => btn.disabled = true);
+            
+            try {
+                statusDisplay.innerHTML = `<span class="info">🔄 ${refresh ? 'Refreshing' : 'Clearing'} ${type} cache...</span>\n`;
+                
+                const url = `/api/cache/bust/${type}${refresh ? '?refresh=true' : ''}`;
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (result.success) {
+                    statusDisplay.innerHTML += `<span class="success">✅ Success!</span>\n`;
+                    statusDisplay.innerHTML += `<span class="info">Message: ${result.message}</span>\n`;
+                    statusDisplay.innerHTML += `<span class="info">Results:</span>\n`;
+                    
+                    for (const [key, value] of Object.entries(result.results)) {
+                        statusDisplay.innerHTML += `  ${key}: ${value}\n`;
+                    }
+                    
+                    statusDisplay.innerHTML += `<span class="info">Timestamp: ${result.timestamp}</span>\n\n`;
+                } else {
+                    statusDisplay.innerHTML += `<span class="error">❌ Error: ${result.error}</span>\n\n`;
+                }
+                
+            } catch (error) {
+                statusDisplay.innerHTML += `<span class="error">❌ Network Error: ${error.message}</span>\n\n`;
+            } finally {
+                // Re-enable all buttons
+                buttons.forEach(btn => btn.disabled = false);
+            }
+        }
+        
+        async function getCacheStatus() {
+            const statusDisplay = document.getElementById('statusDisplay');
+            const buttons = document.querySelectorAll('.cache-btn');
+            
+            buttons.forEach(btn => btn.disabled = true);
+            
+            try {
+                statusDisplay.innerHTML = `<span class="info">📊 Checking cache status...</span>\n`;
+                
+                const response = await fetch('/api/cache/status');
+                const result = await response.json();
+                
+                if (result.success) {
+                    statusDisplay.innerHTML += `<span class="success">✅ Cache Status Retrieved!</span>\n`;
+                    statusDisplay.innerHTML += `<span class="info">Characters:</span>\n`;
+                    statusDisplay.innerHTML += `  Count: ${result.cache_status.characters.count}\n`;
+                    statusDisplay.innerHTML += `  Sample IDs: ${result.cache_status.characters.sample_ids.join(', ')}\n`;
+                    statusDisplay.innerHTML += `<span class="info">Lore:</span>\n`;
+                    statusDisplay.innerHTML += `  Count: ${result.cache_status.lore.count}\n`;
+                    statusDisplay.innerHTML += `  Sample IDs: ${result.cache_status.lore.sample_ids.join(', ')}\n`;
+                    statusDisplay.innerHTML += `<span class="info">Timestamp: ${result.timestamp}</span>\n\n`;
+                } else {
+                    statusDisplay.innerHTML += `<span class="error">❌ Error: ${result.error}</span>\n\n`;
+                }
+                
+            } catch (error) {
+                statusDisplay.innerHTML += `<span class="error">❌ Network Error: ${error.message}</span>\n\n`;
+            } finally {
+                buttons.forEach(btn => btn.disabled = false);
+            }
+        }
+    </script>
+
+    <%- include('partials/footer') %>
+</body>
+</html>
