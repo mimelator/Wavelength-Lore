@@ -60,10 +60,10 @@
             Object.keys(videos).forEach(season => {
                 $(`#carousel-${season}`).slick({
                     infinite: true,
-                    slidesToShow: 3, // Ensure at most three items are shown at once
+                    slidesToShow: window.innerWidth <= 768 ? 2 : 3, // Show 2 slides on mobile, 3 otherwise
                     slidesToScroll: 1,
                     autoplay: true,
-                    autoplaySpeed: 4000, /* Slowed down to half the speed */
+                    autoplaySpeed: 4000,
                     dots: true,
                     arrows: true
                 });
