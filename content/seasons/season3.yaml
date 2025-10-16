@@ -16,15 +16,21 @@
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-08.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-10.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-11.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-12.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-14.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-17.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-18.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-19.png"
+   
+
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-20.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-21.png"
+
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-22.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-23.png"
+
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/ice_fortress-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/ice_fortress-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/ice_fortress-5.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/ice_fortress-7.jpg"
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/icefortress-fiery-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/icefortress-fiery-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/icefortress-fiery-4.jpg"
 
       story: |
         Wavelength and the Shire Folk escape the Goblin Invasion of the dear Shire, and flee to the far, frozen North. 
@@ -54,20 +60,23 @@
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/The Ice Whales_v5.mp3"
       carouselImages:
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-01.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-04.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-07.png"
+  
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-13.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-14.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-15.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-17.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-18.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-19.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-20.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-21.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-22.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-23.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-24.png"
+    
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/ice_fortress-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/ice_fortress-3.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/ice_fortress-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/ice_fortress-6.jpg"
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/icefortress-fiery-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/icefortress-fiery-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/icefortress-fiery-4.jpg"
       
       story: |
         While at the Ice Fortress, the Shire Folk realize they need time to heal.  The Ice Whale Hunt is an 
@@ -97,10 +106,6 @@
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/Sneak Attack_v6.mp3"
       carouselImages:
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-02.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-03.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-05.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-06.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-12.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-13.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-14.png"
@@ -109,12 +114,19 @@
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-18.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-19.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-20.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-21.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-22.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-23.png"
+
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-24.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-25.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-26.png"
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/ice_fortress-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/ice_fortress-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/ice_fortress-5.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/ice_fortress-7.jpg"
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/icefortress-fiery-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/icefortress-fiery-3.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/icefortress-fiery-4.jpg"
+
+
       
       story: |
         The goblins enjoy spreading terror by sending raiding parties up to the far, frozen North to harass and spy on the Shire Folk.
@@ -200,7 +212,7 @@
     episode5:
       title: "Rebuild The Shire"
       description: "Keep the shire dream alive while in the far, frozen north."
-      youtubeLink: "https://youtu.be/1T7fOHjMMMU"
+      youtubeLink: "https://youtu.be/fnMN0UIKk30"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/RebuildTheShire_v5.mp3"
       carouselImages:
@@ -243,15 +255,15 @@
     episode6:
       title: "We’re Coming For You"
       description: "We can't rebuild the Shire Dream while Goblins still rule the land. We must take back our home."
-      youtubeLink: "https://youtu.be/g0KXZXay62E"
+      youtubeLink: "https://youtu.be/yoWQuAZEncA"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/image.png"
-      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/We're Coming For You_v4.mp3"
+      audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/We're Coming For You_v5.mp3"
       carouselImages:
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/RebuildTheShire-08.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/RebuildTheShire-13.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/RebuildTheShire-16.png"
 
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-04.png"
+   
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-07.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-08.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-09.png"
@@ -259,9 +271,14 @@
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-14.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-15.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-17.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-18.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-20.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-21.png"
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/ice_fortress-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/ice_fortress-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/ice_fortress-7.jpg"
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/icefortress-fiery-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/icefortress-fiery-3.jpg"
+  
 
       
       story: |
@@ -287,12 +304,11 @@
     episode7:
       title: "Prepare for Battle"
       description: "It’s time to face the Goblin King and retake the Shire"
-      youtubeLink: "https://youtu.be/fka7d0fYWeY"
+      youtubeLink: "https://youtu.be/Kne6wTDRlgE"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/PrepareForBattle_v5.mp3"
       carouselImages:
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-01.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-03.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-04.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-05.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-06.png"
@@ -306,9 +322,16 @@
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-16.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-17.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-19.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-22.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-25.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-26.png"
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/ice_fortress-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/ice_fortress-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/ice_fortress-5.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/ice_fortress-7.jpg"
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/icefortress-fiery-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/icefortress-fiery-3.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/icefortress-fiery-4.jpg"
+
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/RebuildTheShire-08.png"
 
       story: |
