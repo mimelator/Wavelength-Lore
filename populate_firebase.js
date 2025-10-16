@@ -6,6 +6,25 @@ const fs = require('fs');
 const serviceAccount = require('./firebaseServiceAccountKey.json');
 require('dotenv').config();
 
+// CLI Usage Documentation
+/*
+Usage: node populate_firebase.js [options]
+
+Options:
+  --characters    Import character data only
+  --seasons       Import season/video data only
+  --lore          Import lore data only
+  --lore-only     Import ONLY lore data (excludes characters and seasons)
+  
+  No flags        Import all content types (characters, seasons, and lore)
+
+Examples:
+  node populate_firebase.js                    # Import everything
+  node populate_firebase.js --lore             # Import lore + default content
+  node populate_firebase.js --lore-only        # Import ONLY lore content
+  node populate_firebase.js --characters --lore # Import characters and lore only
+*/
+
 // Initialize Firebase Admin SDK
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -116,21 +135,98 @@ async function populateSeasons() {
   }
 }
 
+// Read all lore YAML files and populate Firebase
+async function populateLore() {
+  try {
+    const database = await initializeFirebaseWithToken();
+
+    // Iterate through all lore files in './content/lore'
+    const loreFiles = fs.readdirSync('./content/lore');
+
+    for (const file of loreFiles) {
+      if (file.endsWith('.yaml')) {
+        console.log(`Processing lore file: ${file}`);
+        
+        // Load and process YAML file
+        const yamlContent = fs.readFileSync(`./content/lore/${file}`, 'utf8');
+        let data = yaml.load(yamlContent);
+        data = processYamlData(data);
+
+        // Process each category in the lore file
+        for (const category in data) {
+          if (Array.isArray(data[category])) {
+            console.log(`  Processing ${category}: ${data[category].length} items`);
+            
+            // Store each lore item individually by ID
+            for (const item of data[category]) {
+              if (item.id) {
+                const loreRef = ref(database, `lore/${item.id}`);
+                await set(loreRef, item);
+                console.log(`    Imported lore item: ${item.id} (${item.title})`);
+              } else {
+                console.warn(`    Skipping item without ID in category ${category}`);
+              }
+            }
+          }
+        }
+        
+        console.log(`Firebase populated successfully for lore file: ${file}`);
+      }
+    }
+  } catch (error) {
+    console.error('Error populating lore in Firebase:', error);
+  }
+}
+
 const args = process.argv.slice(2);
-const deployCharacters = args.includes('--characters') || !args.includes('--seasons');
-const deploySeasons = args.includes('--seasons') || !args.includes('--characters');
+
+// Parse command line arguments
+const deployCharacters = args.includes('--characters');
+const deploySeasons = args.includes('--seasons');
+const deployLore = args.includes('--lore');
+
+// If no specific flags are provided, deploy all (except when --lore-only is used)
+const deployAll = !deployCharacters && !deploySeasons && !deployLore;
+const loreOnly = args.includes('--lore-only');
+
+// Determine what to deploy
+const shouldDeployCharacters = loreOnly ? false : (deployAll || deployCharacters);
+const shouldDeploySeasons = loreOnly ? false : (deployAll || deploySeasons);
+const shouldDeployLore = loreOnly || deployAll || deployLore;
 
 // Call population functions based on flags
 async function populateFirebase() {
   try {
-    if (deploySeasons) {
+    console.log('🚀 Starting Firebase population...');
+    
+    if (loreOnly) {
+      console.log('📚 Lore-only mode: importing lore content only');
+    } else if (deployAll) {
+      console.log('🌟 Importing all content types');
+    } else {
+      const importing = [];
+      if (shouldDeployCharacters) importing.push('characters');
+      if (shouldDeploySeasons) importing.push('seasons');
+      if (shouldDeployLore) importing.push('lore');
+      console.log(`📦 Importing: ${importing.join(', ')}`);
+    }
+    
+    if (shouldDeploySeasons) {
+      console.log('\n📺 Populating seasons...');
       await populateSeasons();
     }
-    if (deployCharacters) {
+    if (shouldDeployCharacters) {
+      console.log('\n👥 Populating characters...');
       await populateCharacters();
     }
+    if (shouldDeployLore) {
+      console.log('\n📚 Populating lore...');
+      await populateLore();
+    }
+    
+    console.log('\n✅ Firebase population completed successfully!');
   } catch (error) {
-    console.error('Error populating Firebase:', error);
+    console.error('❌ Error populating Firebase:', error);
   }
 }
 

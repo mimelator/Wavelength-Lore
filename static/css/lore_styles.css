@@ -1,0 +1,286 @@
+/* Lore Page Styles */
+/* Main container to match character page layout */
+main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.lore-banner {
+    text-align: center;
+    color: white;
+    padding: 50px 20px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+.lore-description {
+    margin: 20px 0;
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+.lore-carousel {
+    margin: 20px 0;
+}
+
+.lore-carousel .carousel {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+}
+
+.lore-carousel .carousel-item {
+    flex: 0 0 auto;
+    width: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.lore-carousel .carousel-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.lore-navigation-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.lore-navigation-top .nav-link {
+    text-decoration: none;
+    color: #007BFF;
+    font-size: 16px;
+    padding: 5px;
+}
+
+.lore-navigation-top .nav-link:hover {
+    text-decoration: underline;
+}
+
+.lore-navigation-top .nav-link.prev {
+    justify-self: flex-start;
+}
+
+.lore-navigation-top .nav-link.next {
+    justify-self: flex-end;
+}
+
+.lore-navigation-top .nav-image.tiny {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 10px;
+    padding: 5px 5px 0 5px;
+}
+
+/* Style for navigation text below images */
+.lore-navigation-top .nav-text {
+    display: block;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 5px;
+    color: #333;
+}
+
+/* Lore Type Badges */
+.lore-type-badge {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.lore-type-badge.small {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    margin: 0;
+}
+
+.lore-type-badge span {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Type-specific colors */
+.type-place {
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+}
+
+.type-thing {
+    background: linear-gradient(135deg, #FF9800, #E65100);
+}
+
+.type-concept {
+    background: linear-gradient(135deg, #9C27B0, #4A148C);
+}
+
+.type-idea {
+    background: linear-gradient(135deg, #2196F3, #0D47A1);
+}
+
+.type-location {
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+}
+
+.type-object {
+    background: linear-gradient(135deg, #FF9800, #E65100);
+}
+
+.type-magic {
+    background: linear-gradient(135deg, #9C27B0, #4A148C);
+}
+
+.type-other {
+    background: linear-gradient(135deg, #607D8B, #263238);
+}
+
+/* Lore Connections Section */
+.lore-connections {
+    margin: 30px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.lore-connections h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.lore-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.lore-connection-link {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 15px;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    min-width: 100px;
+    text-align: center;
+}
+
+.lore-connection-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.lore-connection-link .lore-type {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+}
+
+/* Gallery Styles for Lore - Match character gallery layout */
+.lore-gallery {
+    text-align: center;
+    padding: 20px;
+}
+
+.lore-gallery .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.lore-gallery .gallery-item {
+    width: 200px;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.lore-gallery .gallery-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.lore-gallery .gallery-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.lore-gallery .gallery-item h2 {
+    margin: 10px 0;
+    font-size: 18px;
+    color: #333;
+    padding-bottom: 10px;
+}
+
+.lore-gallery .gallery-item a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.gallery-subtitle {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
+
+/* Responsive Design for Lore */
+@media (max-width: 768px) {
+    .lore-navigation-top {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .lore-navigation-top .nav-link {
+        justify-content: center;
+    }
+    
+    .lore-links {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .lore-connection-link {
+        min-width: 200px;
+    }
+    
+    .lore-gallery .gallery {
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .lore-gallery .gallery-item {
+        width: 180px;
+    }
+}

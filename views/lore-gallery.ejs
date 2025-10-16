@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lore Gallery</title>
+    <%- include('partials/head') %>
+    <link rel="stylesheet" href="/css/gallery_styles.css">
+    <link rel="stylesheet" href="/css/lore_styles.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main>
+        <h1>Lore Gallery</h1>
+        <p class="gallery-subtitle">Explore the places, things, concepts, and ideas of the Wavelength universe</p>
+        
+        <section class="lore-gallery">
+            <div class="gallery">
+                <% lore.forEach(loreItem => { %>
+                    <div class="gallery-item lore-item">
+                        <a href="/lore/<%= loreItem.id %>">
+                            <img src="<%= loreItem.image %>" alt="<%= loreItem.title %>">
+                            <h2><%= loreItem.title %></h2>
+                            <div class="lore-type-badge">
+                                <span class="type-<%= loreItem.type %>"><%= loreItem.type %></span>
+                            </div>
+                        </a>
+                    </div>
+                <% }); %>
+            </div>
+        </section>
+    </main>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

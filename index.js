@@ -4,6 +4,7 @@ const { initializeApp } = require('firebase/app');
 const { getDatabase, ref, get } = require('firebase/database');
 const path = require('path');
 const characterHelpers = require('./helpers/character-helpers');
+const loreHelpers = require('./helpers/lore-helpers');
 
 const app = express();
 const port = 3001;
@@ -37,6 +38,10 @@ const database = getDatabase(firebaseApp);
 characterHelpers.setDatabaseInstance(database);
 characterHelpers.initializeCharacterCache();
 
+// Initialize lore cache and pass database instance
+loreHelpers.setDatabaseInstance(database);
+loreHelpers.initializeLoreCache();
+
 (async () => {
   try {
     console.log('Attempting Firebase operation...');
@@ -65,17 +70,27 @@ app.set('views', path.join(__dirname, 'views'));
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'static')));
 
-// Middleware to add character helpers to all templates
+// Middleware to add character and lore helpers to all templates
 app.use(async (req, res, next) => {
+  // Character helpers
   res.locals.characterHelpers = characterHelpers;
   res.locals.characterLink = characterHelpers.generateCharacterLinkSync;
   res.locals.linkifyCharacters = characterHelpers.linkifyCharacterMentionsSync;
   res.locals.allCharacters = characterHelpers.getAllCharactersSync();
   
+  // Lore helpers
+  res.locals.loreHelpers = loreHelpers;
+  res.locals.loreLink = loreHelpers.generateLoreLinkSync;
+  res.locals.linkifyLore = loreHelpers.linkifyLoreMentionsSync;
+  res.locals.allLore = loreHelpers.getAllLoreSync();
+  
   // Also provide async versions for routes that can use them
   res.locals.characterLinkAsync = characterHelpers.generateCharacterLink;
   res.locals.linkifyCharactersAsync = characterHelpers.linkifyCharacterMentions;
   res.locals.getAllCharactersAsync = characterHelpers.getAllCharacters;
+  res.locals.loreLinkAsync = loreHelpers.generateLoreLink;
+  res.locals.linkifyLoreAsync = loreHelpers.linkifyLoreMentions;
+  res.locals.getAllLoreAsync = loreHelpers.getAllLore;
   
   next();
 });
@@ -312,6 +327,71 @@ app.get('/characters', async (req, res) => {
   } catch (error) {
     console.error('Error fetching characters:', error);
     res.status(500).send('Error fetching characters');
+  }
+});
+
+// Route to render a lore page
+app.get('/lore/:loreId', async (req, res) => {
+  const { loreId } = req.params;
+
+  try {
+    // Use lore helpers to get lore data
+    const loreItem = await loreHelpers.getLoreById(loreId);
+
+    if (!loreItem) {
+      return res.status(404).send('Lore not found');
+    }
+
+    // Get all lore for navigation
+    const allLore = await loreHelpers.getAllLore();
+    const currentIndex = allLore.findIndex(l => l.id === loreId);
+    
+    // Adjust navigation to wrap around
+    const previousLore = currentIndex > 0 ? allLore[currentIndex - 1] : allLore[allLore.length - 1];
+    const nextLore = currentIndex < allLore.length - 1 ? allLore[currentIndex + 1] : allLore[0];
+
+    res.render('lore', {
+      title: loreItem.title,
+      lore: {
+        id: loreItem.id,
+        title: loreItem.title,
+        description: loreItem.description,
+        primary_image: loreItem.primary_image,
+        image: loreItem.image,
+        image_gallery: loreItem.image_gallery,
+        type: loreItem.type
+      },
+      previousLore,
+      nextLore,
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`
+    });
+  } catch (error) {
+    console.error('Error fetching lore data:', error);
+    res.status(500).send('Error fetching lore data');
+  }
+});
+
+// Route to render the Lore Gallery page
+app.get('/lore', async (req, res) => {
+  try {
+    // Use lore helpers to get all lore data
+    const allLore = await loreHelpers.getAllLore();
+
+    res.render('lore-gallery', {
+      title: 'Lore Gallery',
+      lore: allLore.map(l => ({
+        id: l.id,
+        title: l.title,
+        image: l.image,
+        type: l.type
+      })),
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`
+    });
+  } catch (error) {
+    console.error('Error fetching lore:', error);
+    res.status(500).send('Error fetching lore');
   }
 });
 

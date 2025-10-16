@@ -281,8 +281,10 @@ function getAllCharactersSync() {
  */
 async function initializeCharacterCache() {
   try {
-    // Initialize Firebase first
-    initializeFirebase();
+    // Only initialize Firebase if no database instance was provided
+    if (!database) {
+      initializeFirebase();
+    }
     
     // Then populate the cache
     await getCharacters(); // This will populate the cache

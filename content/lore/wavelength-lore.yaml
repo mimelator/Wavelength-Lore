@@ -1,0 +1,14 @@
+# Wavelength Lore - Locations
+locations:
+  - id: the-shire
+    title: The Shire
+    type: place
+    description: A quiet realm where peace is abundant, and nature thrives alongside the residents of the Shire who are known as The Shire Folk. The Shire is known for its rolling green hills, crystal-clear streams, and the famous Shire Sanctuary where Wavelength first performed their legendary concerts. The Shire Folk are deeply connected to nature, their fellow Shire Folk community and artisian crafts.  Often times, you will find Lucky, their resident Wise Elder, fishing in local streams.
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-08.png
+    image_gallery:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-12.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-15.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-10.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-19.png
+
