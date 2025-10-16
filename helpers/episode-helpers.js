@@ -53,7 +53,7 @@ const fallbackEpisodes = [
     id: 'my-lucky-charm',
     title: 'My Lucky Charm',
     name: 'My Lucky Charm',
-    url: '/episode/season1/episode1',
+    url: '/season/1/episode/1',
     season: 'season1',
     episode: 'episode1'
   },
@@ -61,7 +61,7 @@ const fallbackEpisodes = [
     id: 'the-battle-of-the-shire',
     title: 'The Battle of the Shire',
     name: 'The Battle of the Shire',
-    url: '/episode/season1/episode6',
+    url: '/season/1/episode/6',
     season: 'season1',
     episode: 'episode6'
   },
@@ -69,7 +69,7 @@ const fallbackEpisodes = [
     id: 'prepare-for-battle',
     title: 'Prepare for Battle',
     name: 'Prepare for Battle',
-    url: '/episode/season1/episode5',
+    url: '/season/1/episode/5',
     season: 'season1',
     episode: 'episode5'
   },
@@ -77,7 +77,7 @@ const fallbackEpisodes = [
     id: 'frozen-peace',
     title: 'Frozen Peace',
     name: 'Frozen Peace',
-    url: '/episode/season3/episode4',
+    url: '/season/3/episode/4',
     season: 'season3',
     episode: 'episode4'
   }
@@ -111,11 +111,16 @@ async function fetchEpisodesFromDatabase() {
             const episodeData = seasonData.episodes[episodeId];
             
             if (episodeData.title) {
+              // Extract season number from seasonId (e.g., "season1" -> "1")
+              const seasonNumber = seasonId.replace('season', '');
+              // Extract episode number from episodeId (e.g., "episode1" -> "1")
+              const episodeNumber = episodeId.replace('episode', '');
+              
               allEpisodes.push({
                 id: createEpisodeId(episodeData.title),
                 title: episodeData.title,
                 name: episodeData.title, // Use title as name for matching
-                url: `/episode/${seasonId}/${episodeId}`,
+                url: `/season/${seasonNumber}/episode/${episodeNumber}`,
                 season: seasonId,
                 episode: episodeId,
                 description: episodeData.description,

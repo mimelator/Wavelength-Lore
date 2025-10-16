@@ -6,6 +6,8 @@ const path = require('path');
 const characterHelpers = require('./helpers/character-helpers');
 const loreHelpers = require('./helpers/lore-helpers');
 const episodeHelpers = require('./helpers/episode-helpers');
+const disambiguationHelpers = require('./helpers/disambiguation-helpers');
+const simpleDisambiguation = require('./helpers/simple-disambiguation');
 
 const app = express();
 const port = 3001;
@@ -46,6 +48,12 @@ loreHelpers.initializeLoreCache();
 // Initialize episode cache and pass database instance
 episodeHelpers.setDatabaseInstance(database);
 episodeHelpers.initializeEpisodeCache();
+
+// Initialize disambiguation helpers with references to other helpers
+disambiguationHelpers.setHelperModules(characterHelpers, loreHelpers, episodeHelpers);
+
+// Initialize simple disambiguation with helper instances
+simpleDisambiguation.setHelperInstances(characterHelpers, loreHelpers, episodeHelpers);
 
 (async () => {
   try {
@@ -105,6 +113,19 @@ app.use(async (req, res, next) => {
   res.locals.episodeLinkAsync = episodeHelpers.generateEpisodeLink;
   res.locals.linkifyEpisodesAsync = episodeHelpers.linkifyEpisodeMentions;
   res.locals.getAllEpisodesAsync = episodeHelpers.getAllEpisodes;
+  
+  // Disambiguation helpers
+  res.locals.disambiguationHelpers = disambiguationHelpers;
+  res.locals.smartLinking = disambiguationHelpers.applySmartLinking;
+  res.locals.smartDisambiguation = disambiguationHelpers.applySmartDisambiguation;
+  res.locals.findConflicts = disambiguationHelpers.findConflicts;
+  res.locals.disambiguationScript = disambiguationHelpers.getDisambiguationScript();
+  res.locals.disambiguationStyles = disambiguationHelpers.getDisambiguationStyles();
+  
+  // Simple disambiguation (cleaner approach)
+  res.locals.simpleSmartLinking = simpleDisambiguation.applySmartLinkingSimple;
+  res.locals.simpleDisambiguationScript = simpleDisambiguation.getSimpleDisambiguationScript();
+  res.locals.simpleDisambiguationStyles = simpleDisambiguation.getSimpleDisambiguationStyles();
   
   next();
 });

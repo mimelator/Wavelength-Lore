@@ -18,3 +18,9 @@ Concepts:
 * Wise Elder
 * Goblins
 * Goblin's Rule
+* Pscyhopath
+* Rhythm Theory
+
+events:
+  - id: battle-of-the-shire
+    title: Battle of the Shire

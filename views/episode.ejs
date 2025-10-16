@@ -3,6 +3,7 @@
 <head>
     <%- include('partials/head') %>
     <link rel="stylesheet" href="/css/modal_styles.css">
+    <%- simpleDisambiguationStyles %>
 </head>
 <body>
     <%- include('partials/header') %>
@@ -52,7 +53,7 @@
 
         <section class="summary">
             <h2>Summary</h2>
-            <p><%- linkifyLore(linkifyCharacters(summary)) %></p>
+            <p><%- simpleSmartLinking(summary) %></p>
         </section>
 
         <section class="audio-player">
@@ -65,7 +66,7 @@
 
         <section class="lyrics">
             <h2>Lyrics</h2>
-            <em><%= lyrics %></em>
+            <em><%- simpleSmartLinking(lyrics) %></em>
             <br /><br />
             <a href="<%= youtubeLink %>" target="_blank" class="watch-video-link">Watch the Video</a>
         </section>
@@ -114,5 +115,6 @@
             });
         });
     </script>
+    <%- simpleDisambiguationScript %>
 </body>
 </html>

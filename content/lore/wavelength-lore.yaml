@@ -24,6 +24,8 @@ locations:
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-12.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/Sneak_Attack-09.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-24.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-19.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-15.png
 
   - id: shire-sanctuary
     title: Shire Sanctuary
@@ -49,6 +51,7 @@ objects:
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-13.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-17.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-18.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-01.png
 
   - id: ice-dragons
     title: Ice Dragons
@@ -62,6 +65,9 @@ objects:
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/icefortress-fiery-4.jpg
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/icefortress-fiery-3.jpg
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-24.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-01.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-15.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-14.png
 
   - id: ice-blue-diamond
     title: Ice Blue Diamond
@@ -75,3 +81,42 @@ objects:
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-28.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png      
+
+# Wavelength Lore - Objects & Things
+villains:
+  - id: goblin-king
+    title: Goblin King
+    type: villain
+    description: "The Goblin King is a Psychopath that leads a Misery of Goblins to invade the Shire and begin the Battle of the Shire.  He lives by one Rule: Goblin's Rule, which means that the only rule you ever need to know about when dealing with the Goblin King, is that he will Rule all over you.  He is tricked by Lucky and the fact that Goblin's Greed is insatiable, into leaving his lair to pursue an Ice Blue Diamond, which Lucky uses to lure him out of hiding during the Battle for the Shire."
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-17.png
+    image_gallery:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-23.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-25.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-17.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-23.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-053.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-068.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-047.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-049.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-064.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-039.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/images/Psychopath-13.png
+
+  - id: misery
+    title: Misery of Goblins
+    type: villain
+    description: "A Misery of Goblins is a goblin horde that is enthralled by the Goblin King to do his bidding.  They are driven by one thing: Greed.  Goblins are insatiably greedy and will do anything to get their hands on treasure, especially if it is shiny.  This makes them easy to manipulate, as Lucky discovered when he used an Ice Blue Diamond to lure the Goblin King out of hiding during the Battle for the Shire."
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-06.png
+    image_gallery:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-14.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-01.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/images/SlowTime-21.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-14.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-16.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/Sneak_Attack-15.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/WereComingForYou-15.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-064.png
