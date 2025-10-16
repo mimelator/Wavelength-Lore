@@ -6,18 +6,20 @@
     episode1:
       title: "Locked And Loaded"
       description: "Nothing will stop us now from reclaiming our Shire."
-      youtubeLink: "https://youtu.be/Iox5zgAftq4"
+      youtubeLink: "https://youtu.be/9dUMX2KhR54"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/LockedAndLoaded_v3.mp3"
 
       carouselImages:
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-05.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-06.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-07.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-08.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-09.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-12.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoaded-14.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-3.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-5.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-6.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-7.jpg"
+
+
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-02.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-03.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-05.png"
