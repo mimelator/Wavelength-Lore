@@ -182,7 +182,7 @@
     episode5:
       title: "The Shire Fortress"
       description: "Do you want to live under the rule of the hateful and Cruel?"
-      youtubeLink: "https://youtu.be/gNrVgi5NI6I"
+      youtubeLink: "https://youtu.be/YsREhnlW8B8"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/TheShireFortress_v2.mp3"
       carouselImages:
@@ -231,7 +231,7 @@
     episode6:
       title: "Battle of the Shire"
       description: "Shoot for the king; stopping his lies are the key to everything"
-      youtubeLink: "https://youtu.be/kBQWLbiw6X0"
+      youtubeLink: "https://youtu.be/eMqb8Y8zWGs"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/BattleOfTheShire_v2.mp3"
       carouselImages:
@@ -333,19 +333,16 @@
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheBattleOfTheShire-027.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheBattleOfTheShire-031.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-02.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-03.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-04.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-06.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-08.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-09.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-10.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-12.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-13.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-14.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-17.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-18.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-22.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-23.png"
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-3.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-5.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-7.jpg"
+    
 
       story: |
         After the battle, the Shire Folk take time to mourn their losses and honor the memories of those who have passed.
@@ -375,7 +372,7 @@
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/GoblinsRule-18.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/GoblinsRule-26.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/IceBlueGreed-22.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/IceBlueGreed-26.png"
+        
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/IceFortress-20.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/RebuildTheShire-02.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-017.png"
@@ -384,19 +381,20 @@
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-051.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-062.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheKingHasFled-23.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheShireDream-01.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheShireDream-02.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheShireDream-03.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheShireDream-05.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheShireDream-06.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheShireDream-08.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheShireDream-11.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheShireDream-12.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheShireDream-13.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheShireDream-14.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheShireDream-15.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/TheSongOfMourning-22.png"
-      
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-3.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-5.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-6.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-7.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-8.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-9.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-10.jpg"
+
+
       story: |
         The Goblin King can no longer spread his lies in the Shire, and the Shire Folk can finally live in peace.
         Wavelength has lost a member, but they have gained a new one in Daphne, who has proven herself to be a worthy drummer.
