@@ -159,3 +159,60 @@ h1 {
     margin: 0 auto;
     text-align: center;
 }
+
+/* Character Link Styles */
+.character-link {
+    color: #4a47a3;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.character-link:hover {
+    color: #2e2b6b;
+    background: rgba(255, 255, 255, 0.2);
+    text-decoration: underline;
+    transform: translateY(-1px);
+}
+
+/* Character Connections Section */
+.character-connections {
+    margin: 30px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.character-connections h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.character-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.character-connection-link {
+    display: inline-block;
+    padding: 8px 15px;
+    background: rgba(74, 71, 163, 0.8);
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.character-connection-link:hover {
+    background: rgba(46, 43, 107, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

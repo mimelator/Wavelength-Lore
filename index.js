@@ -3,6 +3,7 @@ const express = require('express');
 const { initializeApp } = require('firebase/app');
 const { getDatabase, ref, get } = require('firebase/database');
 const path = require('path');
+const characterHelpers = require('./helpers/character-helpers');
 
 const app = express();
 const port = 3001;
@@ -59,6 +60,15 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'static')));
+
+// Middleware to add character helpers to all templates
+app.use((req, res, next) => {
+  res.locals.characterHelpers = characterHelpers;
+  res.locals.characterLink = characterHelpers.generateCharacterLink;
+  res.locals.linkifyCharacters = characterHelpers.linkifyCharacterMentions;
+  res.locals.allCharacters = characterHelpers.getAllCharacters();
+  next();
+});
 
 // Render the index.ejs file with gallery data
 app.get('/', async (req, res) => {

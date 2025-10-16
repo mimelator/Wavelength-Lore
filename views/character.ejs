@@ -10,6 +10,7 @@
 </head>
 <body>
     <%- include('partials/header') %>
+    <%- include('partials/character-references') %>
 
     <nav class="character-navigation-top">
         <% if (previousCharacter) { %>
@@ -33,7 +34,19 @@
         </section>
 
         <section class="character-description">
-            <p><%= character.description %></p>
+            <p><%- linkifyCharacters(character.description) %></p>
+        </section>
+
+        <section class="character-connections">
+            <h3>Character Connections</h3>
+            <p>Explore other characters from the Wavelength universe:</p>
+            <div class="character-links">
+                <% allCharacters.filter(c => c.id !== character.id).forEach(otherCharacter => { %>
+                    <a href="<%= otherCharacter.url %>" class="character-connection-link">
+                        <%= otherCharacter.name %>
+                    </a>
+                <% }); %>
+            </div>
         </section>
 
         <section class="character-carousel">
