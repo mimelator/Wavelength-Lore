@@ -198,11 +198,92 @@ h1 {
     border: 2px solid #ddd;
     border-radius: 4px;
     width: 50px;
-    height: auto;
+    height: 50px; /* Fixed height for navigation thumbnails */
+    object-fit: cover; /* Crop to fit while maintaining aspect ratio */
+    object-position: center; /* Center the image content */
     margin-top: 8px; /* Add top margin */
     display: block;
     margin-left: auto;
     margin-right: auto; /* Center the image */
+}
+
+/* Episode Page Carousel - Uniform Image Heights */
+#episode-carousel img {
+    width: 100% !important;
+    height: 250px !important; /* Fixed height for all carousel images */
+    object-fit: cover !important; /* Crop images to fit while maintaining aspect ratio */
+    object-position: center !important; /* Center the image content */
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: block;
+    margin: 0 auto;
+    border: 5px solid black;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
+}
+
+#episode-carousel img:hover {
+    transform: scale(1.05);
+}
+
+/* Mobile responsive for episode carousel */
+@media (max-width: 768px) {
+    #episode-carousel img {
+        height: 200px !important; /* Slightly smaller height for mobile */
+    }
+}
+
+/* Episode carousel container styling */
+#episode-carousel {
+    margin: 20px 0;
+}
+
+#episode-carousel .slick-slide {
+    padding: 0 5px; /* Add some spacing between slides */
+}
+
+#episode-carousel .slick-slide > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+/* Ensure slick carousel dots and arrows are properly spaced */
+#episode-carousel .slick-dots {
+    margin-top: 20px;
+}
+
+#episode-carousel .slick-prev,
+#episode-carousel .slick-next {
+    z-index: 1;
+}
+
+#episode-carousel .slick-prev {
+    left: -30px;
+}
+
+#episode-carousel .slick-next {
+    right: -30px;
+}
+
+/* Episode banner image styling */
+.banner-image {
+    width: 100%;
+    height: 300px !important; /* Ensure consistent banner height */
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive banner for mobile */
+@media (max-width: 768px) {
+    .banner-image {
+        height: 200px !important; /* Smaller banner height for mobile */
+    }
 }
 
 .about-description {

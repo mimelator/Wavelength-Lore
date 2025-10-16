@@ -33,6 +33,10 @@ console.log('API_KEY:', process.env.API_KEY);
 const firebaseApp = initializeApp(firebaseConfig);
 const database = getDatabase(firebaseApp);
 
+// Initialize character cache and pass database instance
+characterHelpers.setDatabaseInstance(database);
+characterHelpers.initializeCharacterCache();
+
 (async () => {
   try {
     console.log('Attempting Firebase operation...');
@@ -62,11 +66,17 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'static')));
 
 // Middleware to add character helpers to all templates
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   res.locals.characterHelpers = characterHelpers;
-  res.locals.characterLink = characterHelpers.generateCharacterLink;
-  res.locals.linkifyCharacters = characterHelpers.linkifyCharacterMentions;
-  res.locals.allCharacters = characterHelpers.getAllCharacters();
+  res.locals.characterLink = characterHelpers.generateCharacterLinkSync;
+  res.locals.linkifyCharacters = characterHelpers.linkifyCharacterMentionsSync;
+  res.locals.allCharacters = characterHelpers.getAllCharactersSync();
+  
+  // Also provide async versions for routes that can use them
+  res.locals.characterLinkAsync = characterHelpers.generateCharacterLink;
+  res.locals.linkifyCharactersAsync = characterHelpers.linkifyCharacterMentions;
+  res.locals.getAllCharactersAsync = characterHelpers.getAllCharacters;
+  
   next();
 });
 
