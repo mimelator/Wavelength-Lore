@@ -130,8 +130,19 @@ h1 {
         font-size: 1.5rem; /* Adjust heading size for smaller screens */
         margin-top: 10px;
     }
-    .episode-navigation a {
-        font-size: 0.5em; /* Reduce font size to half for mobile */
+    .episode-navigation {
+        flex-direction: column;
+        gap: 15px;
+        padding: 10px;
+    }
+    
+    .episode-navigation .nav-link {
+        font-size: 0.9em; /* Slightly smaller font for mobile */
+    }
+    
+    .episode-navigation .nav-image.tiny {
+        width: 40px;
+        height: 40px;
     }
 }
 
@@ -192,8 +203,75 @@ h1 {
     margin-top: auto; /* Push YouTube link to bottom */
 }
 
-/* Tiny navigation images */
-.episode-navigation img {
+/* Episode Navigation Styling - Matching Character/Lore Style */
+.episode-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+}
+
+.episode-navigation .nav-link {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+.episode-navigation .nav-link:hover {
+    color: #007bff;
+}
+
+.episode-navigation .nav-link.prev {
+    justify-self: flex-start;
+    text-align: left;
+}
+
+.episode-navigation .nav-link.next {
+    justify-self: flex-end;
+    text-align: right;
+}
+
+.episode-navigation .nav-image.tiny {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 10px;
+    padding: 5px 5px 0 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+    border: 2px solid #ddd;
+}
+
+.episode-navigation .nav-image.tiny:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    opacity: 0.9;
+    border-color: #007bff;
+}
+
+/* Style for navigation text below images */
+.episode-navigation .nav-text {
+    display: block;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 5px;
+    color: #333;
+}
+
+.episode-navigation .nav-link:hover .nav-text {
+    color: #007bff;
+}
+
+/* Legacy episode navigation image styles - keeping for backwards compatibility */
+.episode-navigation img:not(.nav-image) {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border: 2px solid #ddd;
     border-radius: 4px;
@@ -205,6 +283,14 @@ h1 {
     display: block;
     margin-left: auto;
     margin-right: auto; /* Center the image */
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.episode-navigation img:not(.nav-image):hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    border-color: #007bff;
 }
 
 /* Episode Page Carousel - Uniform Image Heights */

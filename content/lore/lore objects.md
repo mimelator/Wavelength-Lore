@@ -13,13 +13,12 @@ Places:
 Villains:
 * Goblin King
 * Misery
+* Goblins
 
 Concepts:
-* Wise Elder
-* Goblins
 * Goblin's Rule
 * Pscyhopath
-* Rhythm Theory
+* Rhythm Theory (Coming soon...)
 
 events:
   - id: battle-of-the-shire

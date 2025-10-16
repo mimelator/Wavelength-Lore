@@ -12,25 +12,19 @@
         <section class="banner-image" style="background-image: url('<%= image %>'); background-size: cover; background-position: center; height: 300px;">
         </section>
         
-        <nav class="episode-navigation" style="display: flex; justify-content: space-between; margin: 10px 20px;">
+        <nav class="episode-navigation" style="display: flex; justify-content: space-between; align-items: center; margin: 10px 20px;">
             <% if (previousLink) { %>
-                <div style="text-align: left;">
-                    <a href="<%= previousLink.url %>" class="prev-link">
-                        &larr; <%= previousLink.title %>
-                    </a>
-                    <br />
-                    <img src="<%= previousLink.image %>" alt="Previous Episode Image" style="width: 50px; height: auto;">
-                </div>
+                <a href="<%= previousLink.url %>" class="nav-link prev">
+                    <img src="<%= previousLink.image %>" alt="<%= previousLink.title %>" class="nav-image tiny">
+                    <span class="nav-text">&larr; <%= previousLink.title %></span>
+                </a>
             <% } %>
 
             <% if (nextLink) { %>
-                <div style="text-align: right;">
-                    <a href="<%= nextLink.url %>" class="next-link">
-                        <%= nextLink.title %> &rarr;
-                    </a>
-                    <br />
-                    <img src="<%= nextLink.image %>" alt="Next Episode Image" style="width: 50px; height: auto;">
-                </div>
+                <a href="<%= nextLink.url %>" class="nav-link next">
+                    <img src="<%= nextLink.image %>" alt="<%= nextLink.title %>" class="nav-image tiny">
+                    <span class="nav-text"><%= nextLink.title %> &rarr;</span>
+                </a>
             <% } %>
         </nav>
         
