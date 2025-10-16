@@ -50,17 +50,19 @@
     episode2:
       title: "The King has Fled"
       description: "The Goblin King fled the Shire before the battle again and took captives."
-      youtubeLink: "https://youtu.be/yqc-doJBZgA"
+      youtubeLink: "https://youtu.be/SMqrc-2wdAA"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/TheKingHasFled_v1.mp3"
       carouselImages:
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-01.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-02.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-05.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-06.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-07.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-08.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-09.png"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-3.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-5.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-6.jpg"
+        
+        
+        
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-10.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-13.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-14.png"
@@ -70,6 +72,9 @@
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-20.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-22.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-23.png"
+
+        
+
      
       story: |
         The Goblin king being a coward at heart, fled the battle before it began, fleeing with his main GOblin Misery back
@@ -85,19 +90,10 @@
     episode3:
       title: "Goblin's Rule"
       description: "The only goblin rule for you is that Goblins gonna Rule all over you"
-      youtubeLink: "https://youtu.be/NatsFD090fA"
+      youtubeLink: "https://youtu.be/UcTy2Wf4kUg"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/GoblinsRule_v2.mp3"
       carouselImages:
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-04.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-07.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-08.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-09.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-10.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-12.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-13.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-14.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-16.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-17.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-18.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-20.png"
@@ -106,6 +102,18 @@
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-24.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-25.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-26.png"
+
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-3.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-5.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-6.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-7.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-8.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-9.jpg"
+        
       
       story: |
         There is only one motivation for a Goblin, and that is to rule over others.  This is the case for all Goblins,
@@ -128,24 +136,31 @@
     episode4:
       title: "Ice Blue Greed"
       description: "There’s no way that the King can resist the trap set by Lucky"
-      youtubeLink: "https://youtu.be/7JgLiSZnR-g"
+      youtubeLink: "https://youtu.be/LlhYGbc2xXM"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/IceBlueGreed_v2.mp3"
       carouselImages:
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-01.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-03.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-04.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-05.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-06.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-09.png"
+    
+        
+        
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-12.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-22.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-23.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-25.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-26.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-28.png"
+
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-3.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-5.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-6.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-7.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-8.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-9.jpg"        
       
       story: |
         The Shire FOlk know that the Goblin King is a coward, and that he won't openly attack a fortified shire
@@ -175,18 +190,24 @@
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/GoblinsRule-22.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/GoblinsRule-25.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/GoblinsRule-26.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-02.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-03.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-04.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-06.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-09.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-10.png"
+        
+        
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-13.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-15.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-16.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-18.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-19.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/TheShireFortress-20.png"
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-3.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-5.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-6.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-7.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-8.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-9.jpg"               
       
       story: |
         Knowing that Lucky's trap was set, the Shire Folk set about fortifying the Shire to withstand the coming Goblin attack.
@@ -214,14 +235,34 @@
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/BattleOfTheShire_v2.mp3"
       carouselImages:
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-002.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-006.png"
+        
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-01.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-02.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-03.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-04.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-05.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-06.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-07.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-08.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-09.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-10.jpg"
+
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-1.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-2.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-3.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-4.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-5.jpg"
+        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-6.jpg"
+
+
+
+        
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-007.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-010.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-013.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-014.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-015.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-016.png"
+        
+        
+        
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-017.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-018.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-019.png"
@@ -248,8 +289,7 @@
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-066.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-068.png"
         - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-072.png"
-        - "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-074.png"
+   
       
       story: |
         The Goblin King, driven by his insatiable greed for the Ice Blue Diamond, leads his goblin horde to attack the fortified Shire.
