@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Navigate to project root
+cd "$(dirname "$0")/.."
+
 # Define variables
 BUCKET_NAME="wavelength-lore-bucket"
 STATIC_DIR="static"

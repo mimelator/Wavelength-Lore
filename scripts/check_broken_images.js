@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '.env' }); // Load .env file from the parent directory
+require('dotenv').config({ path: '../.env' }); // Load .env file from the parent directory
 
 const axios = require('axios');
 const cheerio = require('cheerio');

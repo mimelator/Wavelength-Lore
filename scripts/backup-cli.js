@@ -5,13 +5,13 @@
  * Command-line interface for managing database backups
  */
 
-const SecureDatabaseBackup = require('./utils/secureBackup');
+const SecureDatabaseBackup = require('../utils/secureBackup');
 const admin = require('firebase-admin');
 const path = require('path');
 
 // Initialize Firebase Admin
 if (!admin.apps.length) {
-  const serviceAccount = require('./firebaseServiceAccountKey.json');
+  const serviceAccount = require('../firebaseServiceAccountKey.json');
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: process.env.FIREBASE_DATABASE_URL

@@ -1,39 +1,165 @@
-# wavelength-develop
+# ===========================================
+# Wavelength Lore Project - .gitignore
+# ===========================================
+
+# ===============================
+# Sensitive & Security Files
+# ===============================
 .accounts
 .sensitve
 .cmds
+.env
+.env.local
+.env.*.local
 
-
-# aws and firebase config
-.aws
+# AWS and Firebase credentials
+.aws/
 firebaseServiceAccountKey.json
+*.pem
+*.key
+*.p12
 
-
-
+# ===============================
+# Dependencies & Build Output
+# ===============================
 # Node.js dependencies
 node_modules/
-
-# Logs
-logs/
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# Environment variables
-.env
+# Build directories
+dist/
+build/
+.cache/
 
-# OS-specific files
+# ===============================
+# Logs & Temporary Files
+# ===============================
+# Application logs
+logs/
+*.log
+server.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary directories
+temp/
+tmp/
+.temp/
+.tmp/
+
+# ===============================
+# Operating System Files
+# ===============================
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
 
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
-# IDE-specific files
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# ===============================
+# IDE & Editor Files
+# ===============================
+# Visual Studio Code
 .vscode/
+*.code-workspace
+
+# JetBrains IDEs
 .idea/
+*.iml
+*.ipr
+*.iws
 
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
 
+# Vim
+*.swp
+*.swo
+*~
 
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
 
+# ===============================
+# Development & Testing
+# ===============================
+# Coverage reports
+coverage/
+*.lcov
+.nyc_output/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.jest/
+
+# ===============================
+# Database & Cache
+# ===============================
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache directories
+.cache/
+.npm/
+.yarn/
+.pnpm-store/
+
+# ===============================
+# Deployment & Production
+# ===============================
+# Production builds
+.next/
+.nuxt/
+.vuepress/dist
+.serverless/
+
+# Docker
+.dockerignore
+
+# ===============================
+# Project Specific
+# ===============================
+# Firebase config (already in config/)
 .firebase.rules.json
-content/prompts/wavelength/Wavelength-Lore.code-workspace
+
+# Content files
 wavelength content 2 aws
+content/prompts/wavelength/Wavelength-Lore.code-workspace
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# Archive files
+*.tar.gz
+*.zip
+*.rar

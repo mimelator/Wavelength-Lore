@@ -3,8 +3,8 @@ const { initializeApp } = require('firebase/app');
 const { getDatabase, ref, set } = require('firebase/database');
 const yaml = require('js-yaml');
 const fs = require('fs');
-const serviceAccount = require('./firebaseServiceAccountKey.json');
-require('dotenv').config();
+const serviceAccount = require('../firebaseServiceAccountKey.json');
+require('dotenv').config({ path: '../.env' });
 
 // CLI Usage Documentation
 /*
