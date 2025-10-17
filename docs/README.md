@@ -1,0 +1,95 @@
+# Wavelength Lore Documentation
+
+Welcome to the comprehensive documentation for the Wavelength Lore application. This directory contains all technical documentation, guides, and reference materials.
+
+## 📚 Documentation Index
+
+### 🔒 Security & Protection
+- **[Security Enhancement Guide](SECURITY_ENHANCEMENT_GUIDE.md)** - Comprehensive security implementation guide covering Firebase, rate limiting, and input sanitization
+- **[Security Incident Response](SECURITY_INCIDENT_RESPONSE.md)** - Emergency response procedures and security incident handling
+- **[Rate Limiting Documentation](RATE_LIMITING_DOCUMENTATION.md)** - Smart rate limiting system configuration and usage
+
+### 💾 Backup & Data Protection
+- **[Backup Configuration](BACKUP_CONFIGURATION.md)** - Complete setup guide for automated S3 backups
+- **[Backup Implementation Summary](BACKUP_IMPLEMENTATION_SUMMARY.md)** - Overview of the implemented backup system features
+
+### 🎮 Application Features
+- **[Character Reference System](CHARACTER_REFERENCE_SYSTEM.md)** - Character linking and disambiguation system
+- **[Lore System Documentation](LORE_SYSTEM_DOCUMENTATION.md)** - Lore management and linking functionality
+- **[Carousel Usage](CAROUSEL_USAGE.md)** - Image carousel implementation and usage
+
+### ⚡ Performance & Optimization
+- **[Cache Busting](CACHE_BUSTING.md)** - Static asset cache management and optimization
+
+## 🚀 Quick Start Guides
+
+### Security Setup
+1. Review [Security Enhancement Guide](SECURITY_ENHANCEMENT_GUIDE.md)
+2. Configure Firebase security rules
+3. Set up rate limiting and input sanitization
+4. Follow [Security Incident Response](SECURITY_INCIDENT_RESPONSE.md) procedures
+
+### Backup Setup
+1. Read [Backup Configuration](BACKUP_CONFIGURATION.md)
+2. Configure AWS S3 credentials
+3. Initialize backup system with `node backup-cli.js init`
+4. Test backups with `node backup-cli.js test`
+
+### Feature Implementation
+1. Character system: [Character Reference System](CHARACTER_REFERENCE_SYSTEM.md)
+2. Lore management: [Lore System Documentation](LORE_SYSTEM_DOCUMENTATION.md)
+3. UI components: [Carousel Usage](CAROUSEL_USAGE.md)
+
+## 📋 Documentation Standards
+
+### File Organization
+- **Security**: All security-related documentation
+- **Features**: Application functionality and usage guides
+- **Technical**: Implementation details and API references
+- **Setup**: Installation and configuration guides
+
+### Naming Convention
+- Use descriptive, uppercase titles with underscores
+- Include file extensions (.md for markdown)
+- Group related documents with common prefixes
+
+### Content Structure
+Each documentation file should include:
+- Clear title and purpose
+- Table of contents for longer documents
+- Code examples with syntax highlighting
+- Step-by-step instructions where applicable
+- Troubleshooting sections
+- Related document links
+
+## 🔧 Maintenance
+
+### Updating Documentation
+1. Keep documentation current with code changes
+2. Update version references when releasing
+3. Review and update examples regularly
+4. Maintain cross-references between documents
+
+### Review Schedule
+- **Security docs**: Review monthly or after security updates
+- **Feature docs**: Review with each major feature release
+- **Setup guides**: Review quarterly for accuracy
+
+## 📞 Support
+
+For questions about documentation or implementation:
+1. Check the relevant documentation file first
+2. Review related troubleshooting sections
+3. Consult the Security Enhancement Guide for security questions
+4. Check backup documentation for data protection issues
+
+## 📈 Version History
+
+- **v1.0** - Initial documentation structure
+- **v1.1** - Added security enhancement guides
+- **v1.2** - Added backup system documentation
+- **v1.3** - Reorganized into centralized docs folder
+
+---
+
+*Last updated: October 17, 2025*
