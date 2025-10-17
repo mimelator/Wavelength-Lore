@@ -2399,11 +2399,12 @@
     margin-bottom: 30px;
     border: 2px solid rgba(52, 152, 219, 0.3);
     box-shadow: 0 0 30px rgba(52, 152, 219, 0.2);
+    font-family: 'AnimeAce', Arial, sans-serif;
 }
 
 .admin-header h1 {
     color: #3498db;
-    font-family: 'AnimeAce', monospace;
+    font-family: 'AnimeAce', Arial, sans-serif;
     font-size: 2.5rem;
     margin: 0 0 20px 0;
     text-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
@@ -2458,6 +2459,7 @@
     padding: 30px;
     border: 2px solid rgba(52, 152, 219, 0.3);
     box-shadow: 0 0 20px rgba(52, 152, 219, 0.2);
+    font-family: 'AnimeAce', Arial, sans-serif;
 }
 
 .section-header {
@@ -2471,7 +2473,7 @@
 
 .section-header h3 {
     color: #3498db;
-    font-family: 'AnimeAce', monospace;
+    font-family: 'AnimeAce', Arial, sans-serif;
     font-size: 1.8rem;
     margin: 0;
     text-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
@@ -2489,7 +2491,7 @@
     border-radius: 20px;
     background: rgba(44, 62, 80, 0.8);
     color: #ecf0f1;
-    font-family: inherit;
+    font-family: 'AnimeAce', Arial, sans-serif;
     transition: border-color 0.3s ease;
 }
 
@@ -2514,6 +2516,7 @@
     padding: 15px;
     text-align: left;
     font-weight: 600;
+    font-family: 'AnimeAce', Arial, sans-serif;
     border-bottom: 2px solid rgba(52, 152, 219, 0.3);
 }
 
@@ -2543,11 +2546,13 @@
 .user-name {
     font-weight: 600;
     color: #3498db;
+    font-family: 'AnimeAce', Arial, sans-serif;
 }
 
 .user-email {
     font-size: 0.85rem;
     color: #bdc3c7;
+    font-family: 'AnimeAce', Arial, sans-serif;
 }
 
 .role-badge {
@@ -2558,6 +2563,7 @@
     border-radius: 15px;
     font-size: 0.85rem;
     font-weight: 600;
+    font-family: 'AnimeAce', Arial, sans-serif;
 }
 
 .role-admin {
@@ -2597,6 +2603,7 @@
     cursor: pointer;
     font-size: 0.8rem;
     font-weight: 600;
+    font-family: 'AnimeAce', Arial, sans-serif;
     transition: all 0.2s ease;
     text-decoration: none;
     display: inline-flex;
@@ -2682,12 +2689,13 @@
     font-size: 2rem;
     font-weight: bold;
     color: #3498db;
-    font-family: 'AnimeAce', monospace;
+    font-family: 'AnimeAce', Arial, sans-serif;
 }
 
 .stat-label {
     font-size: 0.9rem;
     color: #bdc3c7;
+    font-family: 'AnimeAce', Arial, sans-serif;
     margin-top: 5px;
 }
 
@@ -2804,12 +2812,13 @@
     border-radius: 12px;
     padding: 25px;
     border: 2px solid rgba(52, 152, 219, 0.2);
+    font-family: 'AnimeAce', Arial, sans-serif;
 }
 
 .setting-card h4 {
     color: #3498db;
     margin-bottom: 20px;
-    font-family: 'AnimeAce', monospace;
+    font-family: 'AnimeAce', Arial, sans-serif;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -2822,6 +2831,7 @@
 .setting-item label {
     color: #bdc3c7;
     font-weight: 600;
+    font-family: 'AnimeAce', Arial, sans-serif;
     display: block;
     margin-bottom: 8px;
 }
@@ -2833,7 +2843,7 @@
     border-radius: 8px;
     background: rgba(44, 62, 80, 0.8);
     color: #ecf0f1;
-    font-family: inherit;
+    font-family: 'AnimeAce', Arial, sans-serif;
 }
 
 .setting-item input[type="number"]:focus {

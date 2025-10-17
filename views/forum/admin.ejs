@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('../partials/header') %>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum Admin - Wavelength Lore</title>
     
     <!-- Favicon -->
@@ -9,6 +10,7 @@
     
     <link rel="stylesheet" href="/css/forum.css">
     <style>
+        /* Admin Panel Custom Styles - Match main site styling */
         :root {
             --primary-color: #4a90e2;
             --accent-color: #5dade2;
@@ -19,11 +21,129 @@
             --border-color: rgba(52, 152, 219, 0.3);
             --hover-bg: rgba(52, 152, 219, 0.1);
         }
+
+        /* Ensure all admin content uses the site font */
+        .admin-header, .admin-content, .admin-section, .admin-tab {
+            font-family: 'AnimeAce', Arial, sans-serif;
+        }
+
+        /* Match main site section styling for admin sections */
+        .admin-section {
+            background: rgba(255, 255, 255, 0.9);
+            border: 5px solid black;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
+            color: #333;
+        }
+
+        .admin-header {
+            background: rgba(255, 255, 255, 0.9);
+            border: 5px solid black;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
+            color: #333;
+        }
+
+        .admin-header h1 {
+            color: #333;
+            text-shadow: none;
+        }
+
+        .section-header h3 {
+            color: #333;
+            text-shadow: none;
+        }
+
+        /* Update table styling to match site theme */
+        .admin-table {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+        }
+
+        .admin-table th {
+            background: #333;
+            color: #fff;
+        }
+
+        .admin-table td {
+            color: #333;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .admin-table tr:hover {
+            background: rgba(0, 123, 255, 0.1);
+        }
+
+        /* Style form controls to match site */
+        .search-input, .filter-select {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border: 2px solid #333;
+        }
+
+        .search-input:focus, .filter-select:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        .setting-item input[type="number"] {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border: 2px solid #333;
+        }
+
+        .setting-item input[type="number"]:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Update text colors for visibility */
+        .user-email, .stat-label, .setting-item label {
+            color: #666;
+        }
+
+        .user-name {
+            color: #007BFF;
+        }
+
+        /* Style setting cards to match site sections */
+        .setting-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid #333;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .setting-card h4 {
+            color: #333;
+        }
+
+        /* No data placeholders */
+        .no-data, .loading-placeholder {
+            color: #666;
+        }
+
+        /* Tab button styling to match main site buttons */
+        .admin-tab-btn {
+            background: #007BFF;
+            color: white;
+            border: 2px solid black;
+            font-family: 'AnimeAce', Arial, sans-serif;
+        }
+
+        .admin-tab-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .admin-tab-btn.active {
+            background: #333;
+            color: white;
+            border-color: #333;
+        }
     </style>
 </head>
 
 <body>
-    <%- include('../partials/navigation') %>
+    <%- include('../partials/header') %>
 
     <div class="main-wrapper">
         <div class="container">

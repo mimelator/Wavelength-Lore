@@ -129,8 +129,8 @@ const rateLimitConfigs = {
 
   // Very strict rate limiting for sensitive admin operations
   admin: rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 5, // Limit each IP to 5 admin operations per hour
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 50, // Limit each IP to 50 admin operations per 15 minutes
     message: {
       error: 'Too many admin operations from this IP, please try again later.',
       retryAfter: '1 hour'

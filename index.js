@@ -4,6 +4,7 @@ const path = require('path');
 
 // Import shared utilities
 const firebaseUtils = require('./helpers/firebase-utils');
+const firebaseAdminUtils = require('./helpers/firebase-admin-utils');
 
 // Import rate limiting middleware
 const { createSmartRateLimit, admin: adminRateLimit } = require('./middleware/rateLimiting');
@@ -24,8 +25,14 @@ const simpleDisambiguation = require('./helpers/simple-disambiguation');
 const app = express();
 const port = 3001;
 
+// Configure trust proxy for proper IP detection
+app.set('trust proxy', true);
+
 // Initialize Firebase and database connection
 const database = firebaseUtils.initializeFirebase('wavelength-lore-main');
+
+// Initialize Firebase Admin SDK
+firebaseAdminUtils.initializeFirebaseAdmin();
 
 // Initialize all helper caches with shared database instance
 async function initializeAllCaches() {
@@ -101,9 +108,14 @@ app.use('/api', secureForumRoutes);
 const sanitizationTestRoutes = require('./routes/sanitizationTestRoutes');
 app.use('/api', sanitizationTestRoutes);
 
-// Import and use admin backup routes with rate limiting
+// Import and use admin backup routes with authentication and rate limiting
 const adminBackupRoutes = require('./routes/adminBackupRoutes');
-app.use('/api/admin/backup', adminRateLimit, adminBackupRoutes);
+const { adminAuthStrict } = require('./middleware/adminAuth');
+app.use('/api/admin/backup', adminAuthStrict, adminRateLimit, adminBackupRoutes);
+
+// Import and use admin API routes with authentication and rate limiting
+const adminApiRoutes = require('./routes/adminApi');
+app.use('/api/admin', adminRateLimit, adminApiRoutes);
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'static')));
@@ -547,8 +559,25 @@ app.get('/cache-management', (req, res) => {
   });
 });
 
-// Cache busting routes
-app.post('/api/cache/bust', adminRateLimit, async (req, res) => {
+// Import admin authentication middleware
+const { adminAuth, adminHealthCheck, getSecurityLog } = require('./middleware/adminAuth');
+
+// Security monitoring endpoints
+app.get('/api/admin/security/health', adminHealthCheck);
+app.get('/api/admin/security/logs', adminAuth, (req, res) => {
+  const limit = parseInt(req.query.limit) || 100;
+  const logs = getSecurityLog(limit);
+  
+  res.json({
+    success: true,
+    logs,
+    count: logs.length,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Cache busting routes - secured with admin authentication
+app.post('/api/cache/bust', adminAuth, adminRateLimit, async (req, res) => {
   try {
     const { type, refresh } = req.body;
     const results = {};
@@ -601,8 +630,8 @@ app.post('/api/cache/bust', adminRateLimit, async (req, res) => {
   }
 });
 
-// GET routes for simple cache busting (for easy browser testing)
-app.get('/api/cache/bust', async (req, res) => {
+// GET routes for simple cache busting (secured)
+app.get('/api/cache/bust', adminAuth, async (req, res) => {
   try {
     const refresh = req.query.refresh === 'true';
     const results = {};
@@ -638,7 +667,7 @@ app.get('/api/cache/bust', async (req, res) => {
   }
 });
 
-app.get('/api/cache/bust/:type', async (req, res) => {
+app.get('/api/cache/bust/:type', adminAuth, async (req, res) => {
   try {
     const { type } = req.params;
     const refresh = req.query.refresh === 'true';

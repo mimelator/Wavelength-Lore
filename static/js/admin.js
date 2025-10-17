@@ -1,6 +1,7 @@
 /**
  * Forum Admin Management System
  * Handles user management, post moderation, and admin controls
+ * Uses authenticated API endpoints instead of direct Firebase access
  */
 
 class AdminManager {
@@ -9,6 +10,7 @@ class AdminManager {
         this.posts = [];
         this.reports = [];
         this.isAdmin = false;
+        this.apiBaseUrl = '/api/admin';
     }
 
     /**
@@ -22,32 +24,62 @@ class AdminManager {
         }
 
         this.setupEventListeners();
-        this.loadUsers();
-        this.loadPosts();
-        this.loadReports();
+        await this.loadUsers();
+        await this.loadPosts();
+        await this.loadReports();
     }
 
     /**
      * Check if current user has admin access
+     * Now checks for admin key in URL params
      */
     async checkAdminAccess() {
-        if (!window.forumState.isAuthenticated) {
+        // Check if admin key is provided in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const adminKey = urlParams.get('adminKey');
+        
+        if (adminKey) {
+            // Verify admin key with backend
+            try {
+                const response = await this.makeAuthenticatedRequest('/stats');
+                this.isAdmin = response.success;
+            } catch (error) {
+                console.error('Admin key verification failed:', error);
+                this.isAdmin = false;
+            }
+        } else {
             this.isAdmin = false;
-            return;
+        }
+    }
+
+    /**
+     * Make authenticated request to admin API
+     */
+    async makeAuthenticatedRequest(endpoint, options = {}) {
+        // Include admin key from URL if present
+        const urlParams = new URLSearchParams(window.location.search);
+        const adminKey = urlParams.get('adminKey');
+        
+        const url = new URL(this.apiBaseUrl + endpoint, window.location.origin);
+        if (adminKey) {
+            url.searchParams.append('adminKey', adminKey);
         }
 
-        try {
-            const userRef = window.firebaseUtils.ref(window.firebaseDB, 
-                `forum/users/${window.forumState.currentUser.uid}`);
-            
-            const snapshot = await window.firebaseUtils.get(userRef);
-            const userData = snapshot.val();
-            
-            this.isAdmin = userData && (userData.role === 'admin' || userData.role === 'moderator');
-        } catch (error) {
-            console.error('Error checking admin access:', error);
-            this.isAdmin = false;
+        const defaultOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            ...options
+        };
+
+        const response = await fetch(url.toString(), defaultOptions);
+        
+        if (!response.ok) {
+            throw new Error(`API request failed: ${response.status} ${response.statusText}`);
         }
+
+        return await response.json();
     }
 
     /**
@@ -88,65 +120,68 @@ class AdminManager {
     }
 
     /**
-     * Load all users
+     * Load all users from API
      */
     async loadUsers() {
         try {
-            const usersRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/users');
+            console.log('Loading users from API...');
+            const response = await this.makeAuthenticatedRequest('/users');
             
-            window.firebaseUtils.onValue(usersRef, (snapshot) => {
-                const usersData = snapshot.val() || {};
-                this.users = Object.keys(usersData).map(uid => ({
-                    uid,
-                    ...usersData[uid]
-                }));
-                
+            if (response.success) {
+                this.users = response.data || [];
+                console.log(`Loaded ${this.users.length} users`);
                 this.renderUsers();
-            });
+            } else {
+                console.error('Failed to load users:', response.error);
+                this.showNotification('Failed to load users', 'error');
+            }
         } catch (error) {
             console.error('Error loading users:', error);
+            this.showNotification('Error loading users', 'error');
         }
     }
 
     /**
-     * Load all posts
+     * Load all posts from API
      */
     async loadPosts() {
         try {
-            const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
+            console.log('Loading posts from API...');
+            const response = await this.makeAuthenticatedRequest('/posts');
             
-            window.firebaseUtils.onValue(postsRef, (snapshot) => {
-                const postsData = snapshot.val() || {};
-                this.posts = Object.keys(postsData).map(id => ({
-                    id,
-                    ...postsData[id]
-                }));
-                
+            if (response.success) {
+                this.posts = response.data || [];
+                console.log(`Loaded ${this.posts.length} posts`);
                 this.renderPosts();
-            });
+            } else {
+                console.error('Failed to load posts:', response.error);
+                this.showNotification('Failed to load posts', 'error');
+            }
         } catch (error) {
             console.error('Error loading posts:', error);
+            this.showNotification('Error loading posts', 'error');
         }
     }
 
     /**
-     * Load reports
+     * Load reports from API
      */
     async loadReports() {
         try {
-            const reportsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/reports');
+            console.log('Loading reports from API...');
+            const response = await this.makeAuthenticatedRequest('/reports');
             
-            window.firebaseUtils.onValue(reportsRef, (snapshot) => {
-                const reportsData = snapshot.val() || {};
-                this.reports = Object.keys(reportsData).map(id => ({
-                    id,
-                    ...reportsData[id]
-                }));
-                
+            if (response.success) {
+                this.reports = response.data || [];
+                console.log(`Loaded ${this.reports.length} reports`);
                 this.renderReports();
-            });
+            } else {
+                console.error('Failed to load reports:', response.error);
+                this.showNotification('Failed to load reports', 'error');
+            }
         } catch (error) {
             console.error('Error loading reports:', error);
+            this.showNotification('Error loading reports', 'error');
         }
     }
 
@@ -170,20 +205,20 @@ class AdminManager {
             <tr>
                 <td>
                     <div class="user-info">
-                        <img src="${user.avatar || '/icons/hero-icon.svg'}" alt="${user.name}" class="user-avatar-small">
+                        <img src="${user.avatar || '/icons/hero-icon.svg'}" alt="${user.displayName || user.name || 'User'}" class="user-avatar-small">
                         <div>
-                            <div class="user-name">${this.escapeHtml(user.name || 'Unknown')}</div>
+                            <div class="user-name">${this.escapeHtml(user.displayName || user.name || 'Unknown')}</div>
                             <div class="user-email">${this.escapeHtml(user.email || 'No email')}</div>
                         </div>
                     </div>
                 </td>
                 <td>
-                    <span class="role-badge role-${user.role || 'member'}">
-                        ${this.getRoleIcon(user.role)} ${user.role || 'member'}
+                    <span class="role-badge role-${user.role || 'user'}">
+                        ${this.getRoleIcon(user.role)} ${user.role || 'user'}
                     </span>
                 </td>
                 <td>${user.postCount || 0}</td>
-                <td>${new Date(user.joinDate || Date.now()).toLocaleDateString()}</td>
+                <td>${new Date(user.createdAt || user.joinedAt || Date.now()).toLocaleDateString()}</td>
                 <td>${user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Never'}</td>
                 <td>
                     <div class="action-buttons">
@@ -222,11 +257,11 @@ class AdminManager {
                         ${this.escapeHtml(post.title)}
                     </a>
                 </td>
-                <td>${this.escapeHtml(post.authorName || 'Unknown')}</td>
+                <td>${this.escapeHtml(post.authorName || post.author || 'Unknown')}</td>
                 <td>
                     <span class="category-badge">${post.category || 'general'}</span>
                 </td>
-                <td>${post.replyCount || 0}</td>
+                <td>${post.replyCount || post.likeCount || 0}</td>
                 <td>${new Date(post.createdAt || Date.now()).toLocaleDateString()}</td>
                 <td>
                     <div class="action-buttons">
@@ -256,8 +291,10 @@ class AdminManager {
         const resolvedReports = this.reports.filter(r => r.status === 'resolved');
 
         // Update stats
-        document.getElementById('pending-reports').textContent = pendingReports.length;
-        document.getElementById('resolved-reports').textContent = resolvedReports.length;
+        const pendingElement = document.getElementById('pending-reports');
+        const resolvedElement = document.getElementById('resolved-reports');
+        if (pendingElement) pendingElement.textContent = pendingReports.length;
+        if (resolvedElement) resolvedElement.textContent = resolvedReports.length;
 
         if (this.reports.length === 0) {
             container.innerHTML = `
@@ -307,20 +344,25 @@ class AdminManager {
      * Filter users
      */
     filterUsers() {
-        const searchTerm = document.getElementById('user-search').value.toLowerCase();
-        const roleFilter = document.getElementById('role-filter').value;
+        const searchInput = document.getElementById('user-search');
+        const roleFilterSelect = document.getElementById('role-filter');
+        
+        if (!searchInput || !roleFilterSelect) return;
+        
+        const searchTerm = searchInput.value.toLowerCase();
+        const roleFilter = roleFilterSelect.value;
 
         let filtered = this.users;
 
         if (searchTerm) {
             filtered = filtered.filter(user => 
-                (user.name || '').toLowerCase().includes(searchTerm) ||
+                (user.displayName || user.name || '').toLowerCase().includes(searchTerm) ||
                 (user.email || '').toLowerCase().includes(searchTerm)
             );
         }
 
         if (roleFilter) {
-            filtered = filtered.filter(user => (user.role || 'member') === roleFilter);
+            filtered = filtered.filter(user => (user.role || 'user') === roleFilter);
         }
 
         // Temporarily store filtered users and re-render
@@ -334,8 +376,13 @@ class AdminManager {
      * Filter posts
      */
     filterPosts() {
-        const searchTerm = document.getElementById('post-search').value.toLowerCase();
-        const categoryFilter = document.getElementById('category-filter').value;
+        const searchInput = document.getElementById('post-search');
+        const categoryFilterSelect = document.getElementById('category-filter');
+        
+        if (!searchInput || !categoryFilterSelect) return;
+        
+        const searchTerm = searchInput.value.toLowerCase();
+        const categoryFilter = categoryFilterSelect.value;
 
         let filtered = this.posts;
 
@@ -358,23 +405,29 @@ class AdminManager {
     }
 
     /**
-     * Edit user
+     * Edit user via API
      */
     async editUser(userId) {
         const user = this.users.find(u => u.uid === userId);
         if (!user) return;
 
-        const newRole = prompt(`Change role for ${user.name}:\n\nCurrent: ${user.role || 'member'}\n\nOptions: admin, moderator, member, banned`);
+        const newRole = prompt(`Change role for ${user.displayName || user.name}:\n\nCurrent: ${user.role || 'user'}\n\nOptions: admin, moderator, user, banned`);
         
-        if (newRole && ['admin', 'moderator', 'member', 'banned'].includes(newRole)) {
+        if (newRole && ['admin', 'moderator', 'user', 'banned'].includes(newRole)) {
             try {
-                const userRef = window.firebaseUtils.ref(window.firebaseDB, `forum/users/${userId}`);
-                await window.firebaseUtils.update(userRef, {
-                    role: newRole,
-                    updatedAt: window.firebaseUtils.serverTimestamp()
+                const response = await this.makeAuthenticatedRequest(`/users/${userId}/update`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        role: newRole
+                    })
                 });
 
-                this.showNotification(`User role updated to ${newRole}`, 'success');
+                if (response.success) {
+                    this.showNotification(`User role updated to ${newRole}`, 'success');
+                    await this.loadUsers(); // Reload data
+                } else {
+                    this.showNotification('Failed to update user role', 'error');
+                }
             } catch (error) {
                 console.error('Error updating user role:', error);
                 this.showNotification('Failed to update user role', 'error');
@@ -389,37 +442,42 @@ class AdminManager {
         const user = this.users.find(u => u.uid === userId);
         if (!user) return;
 
-        const confirmed = confirm(`Are you sure you want to ${action} user "${user.name}"?`);
+        const confirmed = confirm(`Are you sure you want to ${action} user "${user.displayName || user.name}"?`);
         if (confirmed) {
             this.executeUserAction(userId, action);
         }
     }
 
     /**
-     * Execute user action
+     * Execute user action via API
      */
     async executeUserAction(userId, action) {
         try {
-            const userRef = window.firebaseUtils.ref(window.firebaseDB, `forum/users/${userId}`);
+            let updateData = {};
             
             switch (action) {
                 case 'ban':
-                    await window.firebaseUtils.update(userRef, {
-                        role: 'banned',
-                        bannedAt: window.firebaseUtils.serverTimestamp(),
-                        updatedAt: window.firebaseUtils.serverTimestamp()
-                    });
-                    this.showNotification('User banned successfully', 'success');
+                    updateData = { role: 'banned' };
                     break;
                     
                 case 'unban':
-                    await window.firebaseUtils.update(userRef, {
-                        role: 'member',
-                        bannedAt: null,
-                        updatedAt: window.firebaseUtils.serverTimestamp()
-                    });
-                    this.showNotification('User unbanned successfully', 'success');
+                    updateData = { role: 'user' };
                     break;
+                    
+                default:
+                    return;
+            }
+
+            const response = await this.makeAuthenticatedRequest(`/users/${userId}/update`, {
+                method: 'POST',
+                body: JSON.stringify(updateData)
+            });
+
+            if (response.success) {
+                this.showNotification(`User ${action} successful`, 'success');
+                await this.loadUsers(); // Reload data
+            } else {
+                this.showNotification(`Failed to ${action} user`, 'error');
             }
         } catch (error) {
             console.error(`Error executing ${action} on user:`, error);
@@ -435,7 +493,7 @@ class AdminManager {
     }
 
     /**
-     * Edit post
+     * Edit post via API
      */
     async editPost(postId) {
         const post = this.posts.find(p => p.id === postId);
@@ -444,13 +502,19 @@ class AdminManager {
         const newTitle = prompt('Edit post title:', post.title);
         if (newTitle && newTitle !== post.title) {
             try {
-                const postRef = window.firebaseUtils.ref(window.firebaseDB, `forum/posts/${postId}`);
-                await window.firebaseUtils.update(postRef, {
-                    title: newTitle,
-                    updatedAt: window.firebaseUtils.serverTimestamp()
+                const response = await this.makeAuthenticatedRequest(`/posts/${postId}/update`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        title: newTitle
+                    })
                 });
 
-                this.showNotification('Post updated successfully', 'success');
+                if (response.success) {
+                    this.showNotification('Post updated successfully', 'success');
+                    await this.loadPosts(); // Reload data
+                } else {
+                    this.showNotification('Failed to update post', 'error');
+                }
             } catch (error) {
                 console.error('Error updating post:', error);
                 this.showNotification('Failed to update post', 'error');
@@ -472,25 +536,37 @@ class AdminManager {
     }
 
     /**
-     * Execute post action
+     * Execute post action via API
      */
     async executePostAction(postId, action) {
         try {
-            const postRef = window.firebaseUtils.ref(window.firebaseDB, `forum/posts/${postId}`);
+            let response;
             
             switch (action) {
                 case 'delete':
-                    await window.firebaseUtils.remove(postRef);
-                    this.showNotification('Post deleted successfully', 'success');
+                    response = await this.makeAuthenticatedRequest(`/posts/${postId}`, {
+                        method: 'DELETE'
+                    });
                     break;
                     
                 case 'lock':
-                    await window.firebaseUtils.update(postRef, {
-                        locked: true,
-                        updatedAt: window.firebaseUtils.serverTimestamp()
+                    response = await this.makeAuthenticatedRequest(`/posts/${postId}/update`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            locked: true
+                        })
                     });
-                    this.showNotification('Post locked successfully', 'success');
                     break;
+                    
+                default:
+                    return;
+            }
+
+            if (response.success) {
+                this.showNotification(`Post ${action} successful`, 'success');
+                await this.loadPosts(); // Reload data
+            } else {
+                this.showNotification(`Failed to ${action} post`, 'error');
             }
         } catch (error) {
             console.error(`Error executing ${action} on post:`, error);
@@ -499,62 +575,38 @@ class AdminManager {
     }
 
     /**
-     * Resolve report
+     * View reported content
+     */
+    viewReportedContent(reportId) {
+        const report = this.reports.find(r => r.id === reportId);
+        if (!report) return;
+
+        if (report.postId) {
+            this.viewPost(report.postId);
+        } else {
+            alert('Content reference not found');
+        }
+    }
+
+    /**
+     * Resolve report (placeholder - would need API endpoint)
      */
     async resolveReport(reportId) {
-        try {
-            const reportRef = window.firebaseUtils.ref(window.firebaseDB, `forum/reports/${reportId}`);
-            await window.firebaseUtils.update(reportRef, {
-                status: 'resolved',
-                resolvedAt: window.firebaseUtils.serverTimestamp(),
-                resolvedBy: window.forumState.currentUser.uid
-            });
-
-            this.showNotification('Report resolved successfully', 'success');
-        } catch (error) {
-            console.error('Error resolving report:', error);
-            this.showNotification('Failed to resolve report', 'error');
-        }
+        this.showNotification('Report resolution not yet implemented via API', 'info');
     }
 
     /**
-     * Dismiss report
+     * Dismiss report (placeholder - would need API endpoint)
      */
     async dismissReport(reportId) {
-        try {
-            const reportRef = window.firebaseUtils.ref(window.firebaseDB, `forum/reports/${reportId}`);
-            await window.firebaseUtils.remove(reportRef);
-
-            this.showNotification('Report dismissed successfully', 'success');
-        } catch (error) {
-            console.error('Error dismissing report:', error);
-            this.showNotification('Failed to dismiss report', 'error');
-        }
+        this.showNotification('Report dismissal not yet implemented via API', 'info');
     }
 
     /**
-     * Save settings
+     * Save settings (placeholder - would need API endpoint)
      */
     async saveSettings() {
-        try {
-            const settings = {
-                autoModeration: document.getElementById('auto-moderation').checked,
-                requireApproval: document.getElementById('require-approval').checked,
-                maxPostLength: parseInt(document.getElementById('max-post-length').value),
-                postsPerPage: parseInt(document.getElementById('posts-per-page').value),
-                allowRegistration: document.getElementById('allow-registration').checked,
-                emailVerification: document.getElementById('email-verification').checked,
-                updatedAt: window.firebaseUtils.serverTimestamp()
-            };
-
-            const settingsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/settings');
-            await window.firebaseUtils.update(settingsRef, settings);
-
-            this.showNotification('Settings saved successfully', 'success');
-        } catch (error) {
-            console.error('Error saving settings:', error);
-            this.showNotification('Failed to save settings', 'error');
-        }
+        this.showNotification('Settings save not yet implemented via API', 'info');
     }
 
     /**
@@ -564,10 +616,11 @@ class AdminManager {
         const icons = {
             admin: '👑',
             moderator: '🛡️',
+            user: '👤',
             member: '👤',
             banned: '🚫'
         };
-        return icons[role] || icons.member;
+        return icons[role] || icons.user;
     }
 
     /**
@@ -603,10 +656,21 @@ class AdminManager {
      * Show notification
      */
     showNotification(message, type = 'info') {
+        // Create a simple notification system if forum notification doesn't exist
+        console.log(`[${type.toUpperCase()}] ${message}`);
+        
+        // Try to use existing forum notification system
         if (window.forumJS && window.forumJS.showNotification) {
             window.forumJS.showNotification(message, type);
         } else {
-            alert(message);
+            // Fallback to browser alert for important messages
+            if (type === 'error') {
+                alert(`Error: ${message}`);
+            } else if (type === 'success') {
+                alert(`Success: ${message}`);
+            } else {
+                alert(message);
+            }
         }
     }
 }

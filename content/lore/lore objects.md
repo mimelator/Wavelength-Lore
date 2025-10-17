@@ -24,6 +24,7 @@ Concepts:
 * Pscyhopath (TODO)
 * Scientific THeory from the Mystic Druids (allegory scientific)
 * Rhythm Theory (Coming soon...)
+* Every mistake is a learning opportunity
 
 Events:
   - Battle of the Shire (TODO)
