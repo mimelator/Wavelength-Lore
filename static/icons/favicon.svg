@@ -7,10 +7,32 @@
     </linearGradient>
   </defs>
   <rect width="100" height="100" fill="url(#gradient)" />
-  <!-- Custom "W" path designed to match animeace2_reg font style -->
-  <path d="M18 25 L28 25 L32 75 L38 40 L42 45 L50 70 L58 45 L62 40 L68 75 L72 25 L82 25 L75 85 L65 85 L58 55 L50 80 L42 55 L35 85 L25 85 Z" 
+  <!-- Custom "W" path with rounded edges and serifs -->
+  <path d="M20 27 
+           Q18 25 20 25 L26 25 Q28 25 28 27 
+           L32 73 Q32 75 34 75 
+           L36 42 Q38 40 40 42 L42 47 
+           Q44 45 46 47 L50 68 Q50 70 52 68 
+           L54 47 Q56 45 58 47 L60 42 
+           Q62 40 64 42 L66 73 Q66 75 68 75 
+           Q70 75 72 75 L74 27 Q74 25 76 25 L80 25 
+           Q82 25 80 27 L73 83 Q73 85 71 85 
+           L67 85 Q65 85 65 83 L58 57 
+           Q58 55 56 57 L50 78 Q50 80 48 78 
+           L42 57 Q42 55 40 57 L33 83 
+           Q33 85 31 85 L27 85 Q25 85 25 83 
+           L18 27 Z" 
         fill="#FFFFFF" 
-        stroke="#FFFFFF" 
-        stroke-width="0.5"
-        stroke-linejoin="round"/>
+        stroke="none"/>
+  <!-- Serifs for the "W" -->
+  <!-- Top left serif -->
+  <path d="M16 25 L22 25 Q24 23 22 23 L16 23 Q14 23 16 25 Z" fill="#FFFFFF"/>
+  <!-- Top right serif -->
+  <path d="M78 25 L84 25 Q86 23 84 23 L78 23 Q76 23 78 25 Z" fill="#FFFFFF"/>
+  <!-- Bottom left serif -->
+  <path d="M23 85 L29 85 Q31 87 29 87 L23 87 Q21 87 23 85 Z" fill="#FFFFFF"/>
+  <!-- Bottom right serif -->
+  <path d="M71 85 L77 85 Q79 87 77 87 L71 87 Q69 87 71 85 Z" fill="#FFFFFF"/>
+  <!-- Center bottom serif -->
+  <path d="M47 80 L53 80 Q55 82 53 82 L47 82 Q45 82 47 80 Z" fill="#FFFFFF"/>
 </svg>
