@@ -5,7 +5,8 @@
   episodes:
     episode1:
       title: "Ice Fortress"
-      description: "When you’re here you’ll be protected under our care"
+      description: "When you're here you'll be protected under our care"
+      keywords: ['ice fortress', 'protection', 'safe haven', 'frozen north', 'recovery', 'welcome', 'care']
       youtubeLink: "https://youtu.be/qGoBqL0QlNo"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/Ice Fortress_v5.mp3"
@@ -56,6 +57,7 @@
     episode2:
       title: "Ice Whales"
       description: "Desperate times call for action"
+      keywords: ['ice whales', 'hunting', 'desperate times', 'action', 'survival', 'community', 'evil creatures']
       youtubeLink: "https://youtu.be/nDP2w0vsU5o"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/The Ice Whales_v5.mp3"
@@ -102,6 +104,7 @@
     episode3:
       title: "Sneak Attack"
       description: "The goblins enjoy spreading terror by sending raiding parties up to the far, frozen North to harass and spy on the Shire Folk."
+      keywords: ['sneak attack', 'goblins', 'terror', 'raiding', 'spy', 'fight back', 'defense', 'line']
       youtubeLink: "https://youtu.be/2rCpEm1a9sM"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/Sneak Attack_v6.mp3"
@@ -165,6 +168,7 @@
     episode4:
       title: "Frozen Peace"
       description: "Here we are, on this frozen shore, very far from our dear home"
+      keywords: ['frozen peace', 'shore', 'home', 'rest', 'healing', 'hope', 'journey', 'chains']
       youtubeLink: "https://youtu.be/i24FrJ32Ito"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/FrozenPeace_v5.mp3"
@@ -212,6 +216,7 @@
     episode5:
       title: "Rebuild The Shire"
       description: "Keep the shire dream alive while in the far, frozen north."
+      keywords: ['rebuild the shire', 'shire dream', 'freedom', 'community', 'safety', 'planning', 'better world']
       youtubeLink: "https://youtu.be/fnMN0UIKk30"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/RebuildTheShire_v5.mp3"
@@ -253,8 +258,9 @@
         and they won't go away very easily        
 
     episode6:
-      title: "We’re Coming For You"
+      title: "We're Coming For You"
       description: "We can't rebuild the Shire Dream while Goblins still rule the land. We must take back our home."
+      keywords: ["we're coming for you", 'shire dream', 'goblin king', 'misery', 'victory', 'spies', 'intentions']
       youtubeLink: "https://youtu.be/yoWQuAZEncA"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/We're Coming For You_v5.mp3"
@@ -303,7 +309,8 @@
 
     episode7:
       title: "Prepare for Battle"
-      description: "It’s time to face the Goblin King and retake the Shire"
+      description: "It's time to face the Goblin King and retake the Shire"
+      keywords: ['prepare for battle', 'goblin king', 'retake', 'shire', 'war', 'marching', 'peace', 'reclaim']
       youtubeLink: "https://youtu.be/Kne6wTDRlgE"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/PrepareForBattle_v5.mp3"

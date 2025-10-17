@@ -6,6 +6,7 @@
     episode1:
       title: "Locked And Loaded"
       description: "Nothing will stop us now from reclaiming our Shire."
+      keywords: ['locked and loaded', 'reclaiming', 'determined', 'ready', 'battle', 'preparation']
       youtubeLink: "https://youtu.be/9dUMX2KhR54"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/LockedAndLoaded_v3.mp3"
@@ -50,6 +51,7 @@
     episode2:
       title: "The King has Fled"
       description: "The Goblin King fled the Shire before the battle again and took captives."
+      keywords: ['the king has fled', 'goblin king', 'coward', 'captives', 'royal family', 'lair', 'lies']
       youtubeLink: "https://youtu.be/SMqrc-2wdAA"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/TheKingHasFled_v1.mp3"
@@ -90,6 +92,7 @@
     episode3:
       title: "Goblin's Rule"
       description: "The only goblin rule for you is that Goblins gonna Rule all over you"
+      keywords: ["goblin's rule", 'ruling', 'lying', 'cheating', 'stealing', 'honor', 'mystery', 'goblin king']
       youtubeLink: "https://youtu.be/UcTy2Wf4kUg"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/GoblinsRule_v2.mp3"
@@ -135,7 +138,8 @@
 
     episode4:
       title: "Ice Blue Greed"
-      description: "There’s no way that the King can resist the trap set by Lucky"
+      description: "There's no way that the King can resist the trap set by Lucky"
+      keywords: ['ice blue greed', 'goblin greed', 'diamond', 'trap', 'lucky', 'bait', 'ice dragons', 'lure', 'ice blue diamond']
       youtubeLink: "https://youtu.be/LlhYGbc2xXM"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/IceBlueGreed_v2.mp3"
@@ -182,6 +186,7 @@
     episode5:
       title: "The Shire Fortress"
       description: "Do you want to live under the rule of the hateful and Cruel?"
+      keywords: ['shire fortress', 'fortifying', 'ramparts', 'defenses', 'towers', 'freedom', 'hateful', 'cruel']
       youtubeLink: "https://youtu.be/YsREhnlW8B8"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode5/TheShireFortress_v2.mp3"
@@ -231,6 +236,7 @@
     episode6:
       title: "Battle of the Shire"
       description: "Shoot for the king; stopping his lies are the key to everything"
+      keywords: ['battle of the shire', 'shoot for the king', 'lies', 'ballista', 'armor', 'arrows', 'victory', 'defeated']
       youtubeLink: "https://youtu.be/eMqb8Y8zWGs"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/BattleOfTheShire_v2.mp3"
@@ -325,7 +331,8 @@
 
     episode7:
       title: "Song of Mourning"
-      description: "There’s a time for mourning, when we’ll share stories at night about our loved ones passing, and how we hold those memories tight."
+      description: "There's a time for mourning, when we'll share stories at night about our loved ones passing, and how we hold those memories tight."
+      keywords: ['song of mourning', 'mourning', 'maurice', 'memories', 'magical maurice', 'daphne', 'drummer', 'orphans', 'loss']
       youtubeLink: "https://youtu.be/JLSTXP3ipnQ"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/SongOfMourning_v1.mp3"
@@ -363,6 +370,7 @@
     episode8:
       title: "The Shire Dream"
       description: "I choose to live free and find the shire dream in me."
+      keywords: ['shire dream', 'live free', 'money', 'power', 'humanity', 'peace', 'darkness', 'daylight']
       youtubeLink: "https://youtu.be/iVerMZpk4dM"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.jpg"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/TheShireDream_v1.mp3"

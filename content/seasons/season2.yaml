@@ -5,7 +5,7 @@
     episode1:
       title: "Goblin King"
       description: "You've been punched in the head So many times that you don't know Which is way is left or right"
-      keywords: ['goblin king', 'invasion', 'psychopath', 'villain', 'battle', 'fall', 'shire']
+      keywords: ['goblin king', 'invasion', 'psychopath', 'villain', 'battle', 'fall']
       youtubeLink: "https://youtu.be/kGpLCx63Fh8"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/GoblinKing_v8.mp3"
@@ -50,7 +50,8 @@
 
     episode2:
       title: "Psychopath"
-      description: "Everyday I see what’s yours and I think about taking it all away"
+      description: "Everyday I see what's yours and I think about taking it all away"
+      keywords: ['psychopath', 'taking', 'wizard', 'goblin', 'escape', 'deception']
       youtubeLink: "https://youtu.be/9RzdPJPTXR4"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode2/Psychopath_v9.mp3"
@@ -94,7 +95,8 @@
 
     episode3:
       title: "Countdown"
-      description: "There’s a countdown to living There’s a countdown to the end"
+      description: "There's a countdown to living There's a countdown to the end"
+      keywords: ['countdown', 'living', 'friends', 'family', 'crisis', 'time', 'terror']
       youtubeLink: "https://youtu.be/rSff1_C8fxU"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode3/Countdown_v6.mp3"
@@ -132,7 +134,8 @@
 
     episode4:
       title: "A Misery of Goblins"
-      description: "Hey everybody look what I’ve found: Misery is our Dream"
+      description: "Hey everybody look what I've found: Misery is our Dream"
+      keywords: ['misery', 'goblins', 'company', 'understanding', 'worldview', 'demon', 'celebrate', 'freedom']
       youtubeLink: "https://youtu.be/OINvOo93z64"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode4/A Misery of Goblins_v4.mp3"
@@ -185,6 +188,7 @@
     episode5:
       title: "Slow Time"
       description: "And every moment that you give into the greed your soul will drift away"
+      keywords: ['slow time', 'greed', 'soul', 'decision', 'choosing', 'freedom', 'team', 'dream', 'rescue']
       youtubeLink: "https://youtu.be/J3_gkKZuTQI"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode5/SlowTime_v4.mp3"
@@ -239,6 +243,7 @@
     episode6:
       title: "Won't See it Coming"
       description: "The Goblins don't comprehend science because they aren't able to learn, and won't see the threat right in front of them."
+      keywords: ["won't see it coming", 'science', 'virus', 'goblins', 'chaos', 'learning', 'machine', 'distraction']
       youtubeLink: "https://youtu.be/jkH6suRlFGI"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode6/YouWontSeeItComing_v7.mp3"
@@ -291,7 +296,8 @@
 
     episode7:
       title: "Say Goodbye to the Shire"
-      description: "You can’t coexist with Goblins when they rule the Shire"
+      description: "You can't coexist with Goblins when they rule the Shire"
+      keywords: ['goodbye', 'shire', 'escape', 'trap', 'friendship', 'journey', 'frozen north', 'rebuild']
       youtubeLink: "https://youtu.be/A8yY4pPYzVY"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode7/SayGoodbyeToTheShire_v4.mp3"
