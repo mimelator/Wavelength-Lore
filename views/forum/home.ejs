@@ -160,7 +160,9 @@ async function loadRecentPosts() {
                     <div class="recent-post-item" onclick="location.href='/forum/post/${post.id}'">
                         <div class="post-author">
                             <img src="${post.authorAvatar || '/icons/hero-icon.svg'}" alt="${post.authorName}" class="author-avatar">
-                            <span class="author-name">${post.authorName}</span>
+                            <a href="/forum/user/${post.authorId}" class="author-link" onclick="event.stopPropagation()">
+                                <span class="author-name">${post.authorName}</span>
+                            </a>
                         </div>
                         <div class="post-content">
                             <h5 class="post-title">${post.title}</h5>
@@ -223,7 +225,7 @@ async function loadPinnedPosts() {
 
 async function loadForumStats() {
     try {
-        // Load total posts
+        // Load total posts with real-time updates
         const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
         window.firebaseUtils.onValue(postsRef, (snapshot) => {
             const posts = snapshot.val();
@@ -231,13 +233,63 @@ async function loadForumStats() {
             document.getElementById('total-posts').textContent = totalPosts;
         });
         
-        // Placeholder for other stats
-        document.getElementById('total-members').textContent = '1'; // Will implement user counting
-        document.getElementById('online-users').textContent = '1'; // Will implement online tracking
+        // Load total members with real-time updates
+        const usersRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/users');
+        window.firebaseUtils.onValue(usersRef, (snapshot) => {
+            const users = snapshot.val();
+            const totalMembers = users ? Object.keys(users).length : 0;
+            document.getElementById('total-members').textContent = totalMembers;
+        });
+        
+        // Load online users (users active in last 5 minutes)
+        loadOnlineUsers();
+        
+        // Update online status every minute
+        setInterval(loadOnlineUsers, 60000);
+        
     } catch (error) {
         console.error('Error loading forum stats:', error);
     }
 }
+
+async function loadOnlineUsers() {
+    try {
+        const usersRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/users');
+        window.firebaseUtils.onValue(usersRef, (snapshot) => {
+            const users = snapshot.val();
+            if (users) {
+                const now = Date.now();
+                const fiveMinutesAgo = now - (5 * 60 * 1000);
+                
+                const onlineUsers = Object.values(users).filter(user => 
+                    user.lastSeen && user.lastSeen > fiveMinutesAgo
+                );
+                
+                document.getElementById('online-users').textContent = onlineUsers.length;
+            } else {
+                document.getElementById('online-users').textContent = '0';
+            }
+        }, { onlyOnce: true });
+    } catch (error) {
+        console.error('Error loading online users:', error);
+    }
+}
+
+// Update user's last seen timestamp
+function updateUserActivity() {
+    if (window.forumState.isAuthenticated && window.forumState.currentUser) {
+        const userRef = window.firebaseUtils.ref(window.firebaseDB, 
+            `forum/users/${window.forumState.currentUser.uid}/lastSeen`);
+        window.firebaseUtils.set(userRef, Date.now());
+    }
+}
+
+// Update activity every 2 minutes while user is active
+setInterval(updateUserActivity, 2 * 60 * 1000);
+
+// Update activity when user interacts with the page
+document.addEventListener('click', updateUserActivity);
+document.addEventListener('keydown', updateUserActivity);
 
 // Utility functions
 function formatTimeAgo(timestamp) {

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recent Posts - Wavelength Community Forum</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+    
+    <!-- Reuse existing styles -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/forum.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+      import { getDatabase, ref, push, set, onValue, query, orderByChild, orderByKey, limitToLast } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+      
+      // Initialize Firebase with your existing config
+      const firebaseConfig = {
+        apiKey: "AIzaSyCg-9HMihsWZnvfYOS155Dk4JJt5Rr7XRI",
+        authDomain: "wavelength-lore.firebaseapp.com",
+        databaseURL: "https://wavelength-lore-default-rtdb.firebaseio.com",
+        projectId: "wavelength-lore",
+        storageBucket: "wavelength-lore.firebasestorage.app",
+        messagingSenderId: "78008979957",
+        appId: "1:78008979957:web:799d623c4bd1d5be3b90bc"
+      };
+      
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const database = getDatabase(app);
+      
+      // Make Firebase available globally for forum components
+      window.firebaseAuth = auth;
+      window.firebaseDB = database;
+      window.firebaseUtils = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, ref, push, set, onValue, query, orderByChild, orderByKey, limitToLast };
+    </script>
+    
+    <!-- Forum JavaScript -->
+    <script src="/js/forum.js" defer></script>
+</head>
+<body>
+    <!-- Include main site header -->
+    <%- include('../partials/header') %>
+    
+    <div class="forum-container">
+        <!-- Forum Header -->
+        <header class="forum-header">
+            <div class="container">
+                <div class="forum-header-content">
+                    <div class="forum-branding">
+                        <h1>
+                            <span class="forum-icon">🕒</span>
+                            Recent Posts
+                        </h1>
+                        <p class="forum-tagline">Latest discussions in the community</p>
+                    </div>
+                    
+                    <div class="forum-auth">
+                        <div id="forum-auth-container">
+                            <!-- Auth buttons will be inserted here by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Forum Navigation -->
+        <nav class="forum-nav">
+            <div class="container">
+                <ul class="forum-nav-list">
+                    <li><a href="/forum">🏠 Home</a></li>
+                    <li><a href="/forum/recent" class="active">🕒 Recent Posts</a></li>
+                    <li><a href="/forum/popular">🔥 Popular</a></li>
+                    <li><a href="/forum/search">🔍 Search</a></li>
+                    <li><a href="/forum/create" class="create-post-btn">➕ New Post</a></li>
+                </ul>
+            </div>
+        </nav>
+        
+        <!-- Main Forum Content -->
+        <main class="forum-main">
+            <div class="container">
+                <!-- Breadcrumb -->
+                <div class="forum-breadcrumb">
+                    <a href="/forum">Forum</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <span>Recent Posts</span>
+                </div>
+                
+                <!-- Filter Controls -->
+                <div class="recent-posts-controls">
+                    <div class="filter-section">
+                        <label for="time-filter">Time Period:</label>
+                        <select id="time-filter" class="filter-select">
+                            <option value="today">Today</option>
+                            <option value="week" selected>This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="all">All Time</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <label for="category-filter">Category:</label>
+                        <select id="category-filter" class="filter-select">
+                            <option value="">All Categories</option>
+                            <option value="general">🎵 General Discussion</option>
+                            <option value="lore">📜 Lore & Theories</option>
+                            <option value="episodes">🎬 Episode Discussions</option>
+                            <option value="fanart">🎨 Fan Creations</option>
+                        </select>
+                    </div>
+                    
+                    <div class="view-options">
+                        <button id="refresh-posts" class="btn btn-secondary">
+                            🔄 Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Recent Posts List -->
+                <div class="recent-posts-container">
+                    <div id="recent-posts-list" class="posts-list">
+                        <!-- Loading state -->
+                        <div class="loading-container">
+                            <div class="loading-spinner"></div>
+                            <p>Loading recent posts...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Load More Button -->
+                    <div class="load-more-container" style="display: none;">
+                        <button id="load-more-posts" class="btn btn-primary">
+                            📄 Load More Posts
+                        </button>
+                    </div>
+                    
+                    <!-- No Posts State -->
+                    <div id="no-posts-message" class="no-posts" style="display: none;">
+                        <div class="no-posts-icon">📝</div>
+                        <h3>No Recent Posts</h3>
+                        <p>No posts found for the selected time period and category.</p>
+                        <p>Be the first to start a discussion!</p>
+                        <a href="/forum/create" class="btn btn-primary">
+                            ➕ Create New Post
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Forum Footer -->
+        <footer class="forum-footer">
+            <div class="container">
+                <div class="forum-footer-content">
+                    <div class="forum-stats">
+                        <span>Wavelength Community Forum</span>
+                    </div>
+                    <div class="forum-links">
+                        <a href="/">Return to Wavelength Lore</a>
+                        <a href="/forum/guidelines">Guidelines</a>
+                        <a href="/forum/help">Help</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Recent Posts JavaScript -->
+    <script>
+        class RecentPostsManager {
+            constructor() {
+                this.posts = [];
+                this.currentFilter = {
+                    time: 'week',
+                    category: ''
+                };
+                this.isLoading = false;
+                this.currentPage = 1;
+                this.postsPerPage = 20;
+            }
+
+            initialize() {
+                this.setupEventListeners();
+                this.loadRecentPosts();
+            }
+
+            setupEventListeners() {
+                // Filter controls
+                document.getElementById('time-filter').addEventListener('change', (e) => {
+                    this.currentFilter.time = e.target.value;
+                    this.loadRecentPosts();
+                });
+
+                document.getElementById('category-filter').addEventListener('change', (e) => {
+                    this.currentFilter.category = e.target.value;
+                    this.loadRecentPosts();
+                });
+
+                // Refresh button
+                document.getElementById('refresh-posts').addEventListener('click', () => {
+                    this.loadRecentPosts();
+                });
+
+                // Load more button
+                document.getElementById('load-more-posts').addEventListener('click', () => {
+                    this.loadMorePosts();
+                });
+            }
+
+            async loadRecentPosts() {
+                if (this.isLoading) return;
+                
+                this.isLoading = true;
+                this.currentPage = 1;
+                
+                const container = document.getElementById('recent-posts-list');
+                container.innerHTML = `
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                        <p>Loading recent posts...</p>
+                    </div>
+                `;
+
+                try {
+                    const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
+                    const query = window.firebaseUtils.query(
+                        postsRef,
+                        window.firebaseUtils.orderByChild('createdAt')
+                    );
+
+                    window.firebaseUtils.onValue(query, (snapshot) => {
+                        const postsData = snapshot.val() || {};
+                        let posts = Object.keys(postsData).map(id => ({
+                            id,
+                            ...postsData[id]
+                        }));
+
+                        // Apply filters
+                        posts = this.applyFilters(posts);
+                        
+                        // Sort by creation date (newest first)
+                        posts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                        this.posts = posts;
+                        this.renderPosts();
+                        this.isLoading = false;
+                    });
+
+                } catch (error) {
+                    console.error('Error loading recent posts:', error);
+                    container.innerHTML = `
+                        <div class="error-container">
+                            <div class="error-icon">⚠️</div>
+                            <h3>Error Loading Posts</h3>
+                            <p>Failed to load recent posts. Please try again.</p>
+                            <button onclick="recentPostsManager.loadRecentPosts()" class="btn btn-primary">
+                                🔄 Retry
+                            </button>
+                        </div>
+                    `;
+                    this.isLoading = false;
+                }
+            }
+
+            applyFilters(posts) {
+                let filtered = posts;
+
+                // Time filter
+                if (this.currentFilter.time !== 'all') {
+                    const now = Date.now();
+                    let timeLimit;
+
+                    switch (this.currentFilter.time) {
+                        case 'today':
+                            timeLimit = now - (24 * 60 * 60 * 1000);
+                            break;
+                        case 'week':
+                            timeLimit = now - (7 * 24 * 60 * 60 * 1000);
+                            break;
+                        case 'month':
+                            timeLimit = now - (30 * 24 * 60 * 60 * 1000);
+                            break;
+                        default:
+                            timeLimit = 0;
+                    }
+
+                    filtered = filtered.filter(post => (post.createdAt || 0) > timeLimit);
+                }
+
+                // Category filter
+                if (this.currentFilter.category) {
+                    filtered = filtered.filter(post => post.category === this.currentFilter.category);
+                }
+
+                return filtered;
+            }
+
+            renderPosts() {
+                const container = document.getElementById('recent-posts-list');
+                const loadMoreContainer = document.querySelector('.load-more-container');
+                const noPostsMessage = document.getElementById('no-posts-message');
+
+                if (this.posts.length === 0) {
+                    container.innerHTML = '';
+                    loadMoreContainer.style.display = 'none';
+                    noPostsMessage.style.display = 'block';
+                    return;
+                }
+
+                noPostsMessage.style.display = 'none';
+
+                const displayPosts = this.posts.slice(0, this.currentPage * this.postsPerPage);
+                
+                container.innerHTML = displayPosts.map(post => this.renderPostItem(post)).join('');
+
+                // Show/hide load more button
+                if (this.posts.length > displayPosts.length) {
+                    loadMoreContainer.style.display = 'block';
+                } else {
+                    loadMoreContainer.style.display = 'none';
+                }
+            }
+
+            renderPostItem(post) {
+                const categoryIcons = {
+                    'general': '🎵',
+                    'lore': '📜',
+                    'episodes': '🎬',
+                    'fanart': '🎨'
+                };
+
+                const categoryNames = {
+                    'general': 'General Discussion',
+                    'lore': 'Lore & Theories',
+                    'episodes': 'Episode Discussions',
+                    'fanart': 'Fan Creations'
+                };
+
+                const timeAgo = this.getTimeAgo(post.createdAt);
+                const categoryIcon = categoryIcons[post.category] || '💬';
+                const categoryName = categoryNames[post.category] || 'Discussion';
+
+                return `
+                    <div class="post-item" onclick="window.location.href='/forum/post/${post.id}'">
+                        <div class="post-header">
+                            <div class="post-category">
+                                <span class="category-icon">${categoryIcon}</span>
+                                <span class="category-name">${categoryName}</span>
+                            </div>
+                            <div class="post-time">${timeAgo}</div>
+                        </div>
+                        
+                        <div class="post-content">
+                            <h3 class="post-title">${this.escapeHtml(post.title)}</h3>
+                            <p class="post-preview">${this.getPostPreview(post.content)}</p>
+                            
+                            <div class="post-meta">
+                                <div class="post-author">
+                                    <img src="${post.authorAvatar || '/icons/hero-icon.svg'}" alt="Author" class="author-avatar-small">
+                                    <span class="author-name">${this.escapeHtml(post.authorName || 'Anonymous')}</span>
+                                </div>
+                                
+                                <div class="post-stats">
+                                    <span class="stat-item">
+                                        <span class="stat-icon">💬</span>
+                                        <span class="stat-count">${post.replyCount || 0}</span>
+                                    </span>
+                                    <span class="stat-item">
+                                        <span class="stat-icon">❤️</span>
+                                        <span class="stat-count">${post.likeCount || 0}</span>
+                                    </span>
+                                    <span class="stat-item">
+                                        <span class="stat-icon">👁️</span>
+                                        <span class="stat-count">${post.viewCount || 0}</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            loadMorePosts() {
+                this.currentPage++;
+                this.renderPosts();
+            }
+
+            getPostPreview(content) {
+                if (!content) return 'No content available...';
+                const text = content.replace(/<[^>]*>/g, ''); // Strip HTML
+                return text.length > 150 ? text.substring(0, 150) + '...' : text;
+            }
+
+            getTimeAgo(timestamp) {
+                if (!timestamp) return 'Unknown time';
+                
+                const now = Date.now();
+                const diff = now - timestamp;
+                
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+                
+                if (minutes < 1) return 'Just now';
+                if (minutes < 60) return `${minutes}m ago`;
+                if (hours < 24) return `${hours}h ago`;
+                if (days < 7) return `${days}d ago`;
+                
+                return new Date(timestamp).toLocaleDateString();
+            }
+
+            escapeHtml(text) {
+                if (!text) return '';
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+            }
+        }
+
+        // Initialize recent posts manager
+        window.recentPostsManager = new RecentPostsManager();
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.recentPostsManager.initialize();
+        });
+    </script>
+    
+    <!-- Forum Activity Script -->
+    <script src="/js/forum-activity.js"></script>
+</body>
+</html>

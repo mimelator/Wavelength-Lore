@@ -22,6 +22,7 @@ Villains:
 Concepts:
 * Goblin's Rule (TODO)
 * Pscyhopath (TODO)
+* Scientific THeory from the Mystic Druids (allegory scientific)
 * Rhythm Theory (Coming soon...)
 
 Events:

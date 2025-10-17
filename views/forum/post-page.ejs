@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post - Wavelength Community Forum</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+    
     <!-- Reuse existing styles -->
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/carousel.css">
@@ -39,6 +42,7 @@
     
     <!-- Forum JavaScript -->
     <script src="/js/forum.js" defer></script>
+    <script src="/js/forum-activity.js" defer></script>
 </head>
 <body>
     <!-- Include existing navigation -->
@@ -155,6 +159,7 @@
                 loadPost();
                 loadReplies();
                 setupAuthListener();
+                setupTypingIndicatorListener();
             } else {
                 showNotFound();
             }
@@ -177,13 +182,23 @@
         async function loadPost() {
             try {
                 const postRef = window.firebaseUtils.ref(window.firebaseDB, `forum/posts/${postId}`);
+                
+                // Set up real-time listener for live updates
                 window.firebaseUtils.onValue(postRef, (snapshot) => {
                     const post = snapshot.val();
                     if (post) {
                         currentPost = { id: postId, ...post };
                         displayPost(currentPost);
                         updateBreadcrumbs(currentPost);
-                        incrementViewCount();
+                        
+                        // Update like button state in real-time
+                        updateLikeButtonState(currentPost);
+                        
+                        // Only increment view count once per session
+                        if (!window.postViewIncremented) {
+                            incrementViewCount();
+                            window.postViewIncremented = true;
+                        }
                     } else {
                         showNotFound();
                     }
@@ -194,12 +209,25 @@
             }
         }
         
+        function updateLikeButtonState(post) {
+            const likeButton = document.querySelector('.post-action-btn');
+            if (likeButton && window.forumState.currentUser) {
+                const isLiked = post.likedBy && post.likedBy[window.forumState.currentUser.uid];
+                likeButton.classList.toggle('liked', isLiked);
+                
+                // Update like count in real-time
+                const likeText = likeButton.textContent.split(' ')[0]; // Keep the emoji
+                likeButton.innerHTML = `${likeText} ${post.likes || 0}`;
+            }
+        }
+        
         async function loadReplies() {
             try {
                 const repliesRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/replies');
                 const repliesQuery = window.firebaseUtils.query(repliesRef, 
                     window.firebaseUtils.orderByChild('postId'));
                 
+                // Set up real-time listener for live reply updates
                 window.firebaseUtils.onValue(repliesQuery, (snapshot) => {
                     const allReplies = snapshot.val();
                     if (allReplies) {
@@ -211,9 +239,25 @@
                         replies = [];
                     }
                     displayReplies(replies);
+                    
+                    // Update reply count in real-time
+                    updateReplyCount(replies.length);
                 });
             } catch (error) {
                 console.error('Error loading replies:', error);
+            }
+        }
+        
+        function updateReplyCount(count) {
+            const countElement = document.getElementById('reply-count');
+            if (countElement) {
+                countElement.textContent = count;
+            }
+            
+            // Also update the post stats
+            const postStats = document.querySelector('.post-replies');
+            if (postStats) {
+                postStats.textContent = `💬 ${count} replies`;
             }
         }
         
@@ -259,7 +303,11 @@
                         <div class="post-author-info">
                             <img src="${post.authorAvatar || '/icons/hero-icon.svg'}" alt="${post.authorName}" class="author-avatar">
                             <div class="author-details">
-                                <div class="author-name">${escapeHtml(post.authorName)}</div>
+                                <div class="author-name">
+                                    <a href="/forum/user/${post.authorId}" class="author-link">
+                                        ${escapeHtml(post.authorName)}
+                                    </a>
+                                </div>
                                 <div class="post-date">Posted ${formatTimeAgo(post.createdAt)}</div>
                                 ${post.updatedAt && post.updatedAt !== post.createdAt ? 
                                     `<div class="post-updated">Updated ${formatTimeAgo(post.updatedAt)}</div>` : ''}
@@ -300,26 +348,48 @@
                 return;
             }
             
-            container.innerHTML = replies.map(reply => `
-                <div class="reply-item" data-reply-id="${reply.id}">
-                    <div class="reply-header">
-                        <div class="reply-author">
-                            <img src="${reply.authorAvatar || '/icons/hero-icon.svg'}" alt="${reply.authorName}" class="author-avatar-small">
-                            <span class="author-name">${escapeHtml(reply.authorName)}</span>
+            container.innerHTML = replies.map(reply => {
+                const isLiked = reply.likedBy && window.forumState.currentUser && 
+                               reply.likedBy[window.forumState.currentUser.uid];
+                
+                return `
+                    <div class="reply-item" data-reply-id="${reply.id}">
+                        <div class="reply-header">
+                            <div class="reply-author">
+                                <img src="${reply.authorAvatar || '/icons/hero-icon.svg'}" alt="${reply.authorName}" class="author-avatar-small">
+                                <a href="/forum/user/${reply.authorId}" class="author-link">
+                                    <span class="author-name">${escapeHtml(reply.authorName)}</span>
+                                </a>
+                            </div>
+                            <div class="reply-date">${formatTimeAgo(reply.createdAt)}</div>
                         </div>
-                        <div class="reply-date">${formatTimeAgo(reply.createdAt)}</div>
+                        <div class="reply-content">
+                            <p>${escapeHtml(reply.content).replace(/\n/g, '</p><p>')}</p>
+                        </div>
+                        <div class="reply-actions">
+                            <button class="reply-action-btn ${isLiked ? 'liked' : ''}" 
+                                    onclick="toggleReplyLike('${reply.id}')"
+                                    data-reply-id="${reply.id}">
+                                ❤️ ${reply.likes || 0}
+                            </button>
+                        </div>
                     </div>
-                    <div class="reply-content">
-                        <p>${escapeHtml(reply.content).replace(/\n/g, '</p><p>')}</p>
-                    </div>
-                    <div class="reply-actions">
-                        <button class="reply-action-btn ${reply.likedBy && reply.likedBy[getCurrentUserId()] ? 'liked' : ''}" 
-                                onclick="toggleReplyLike('${reply.id}')">
-                            ❤️ ${reply.likes || 0}
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
+            
+            // Set up real-time like button listeners for replies
+            setupReplyLikeListeners();
+        }
+        
+        function setupReplyLikeListeners() {
+            // This ensures like buttons update in real-time when other users like replies
+            replies.forEach(reply => {
+                const button = document.querySelector(`[data-reply-id="${reply.id}"]`);
+                if (button && window.forumState.currentUser) {
+                    const isLiked = reply.likedBy && reply.likedBy[window.forumState.currentUser.uid];
+                    button.classList.toggle('liked', isLiked);
+                }
+            });
         }
         
         function updateBreadcrumbs(post) {
@@ -360,7 +430,96 @@
             }
             
             document.getElementById('reply-form-container').style.display = 'block';
-            document.getElementById('reply-content').focus();
+            const textarea = document.getElementById('reply-content');
+            textarea.focus();
+            
+            // Set up typing indicator
+            setupTypingIndicator(textarea);
+        }
+        
+        function setupTypingIndicator(textarea) {
+            let typingTimer;
+            let isTyping = false;
+            
+            const sendTypingStatus = (typing) => {
+                if (window.forumState.isAuthenticated && window.forumState.currentUser) {
+                    const typingRef = window.firebaseUtils.ref(window.firebaseDB, 
+                        `forum/typing/${postId}/${window.forumState.currentUser.uid}`);
+                    
+                    if (typing) {
+                        window.firebaseUtils.set(typingRef, {
+                            name: window.forumState.currentUser.name,
+                            timestamp: window.firebaseUtils.serverTimestamp()
+                        });
+                    } else {
+                        window.firebaseUtils.set(typingRef, null);
+                    }
+                }
+            };
+            
+            textarea.addEventListener('input', () => {
+                if (!isTyping) {
+                    isTyping = true;
+                    sendTypingStatus(true);
+                }
+                
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(() => {
+                    isTyping = false;
+                    sendTypingStatus(false);
+                }, 3000);
+            });
+            
+            textarea.addEventListener('blur', () => {
+                clearTimeout(typingTimer);
+                isTyping = false;
+                sendTypingStatus(false);
+            });
+        }
+        
+        function setupTypingIndicatorListener() {
+            const typingRef = window.firebaseUtils.ref(window.firebaseDB, `forum/typing/${postId}`);
+            
+            window.firebaseUtils.onValue(typingRef, (snapshot) => {
+                const typingUsers = snapshot.val();
+                const container = document.getElementById('typing-indicator');
+                
+                if (!container) {
+                    // Create typing indicator container
+                    const indicator = document.createElement('div');
+                    indicator.id = 'typing-indicator';
+                    indicator.className = 'typing-indicator';
+                    indicator.style.cssText = `
+                        padding: 10px;
+                        font-style: italic;
+                        color: #7f8c8d;
+                        font-size: 0.9rem;
+                        min-height: 20px;
+                    `;
+                    
+                    const replySection = document.getElementById('reply-section');
+                    const repliesContainer = document.getElementById('replies-container');
+                    replySection.insertBefore(indicator, repliesContainer);
+                }
+                
+                if (typingUsers && window.forumState.currentUser) {
+                    const currentUserId = window.forumState.currentUser.uid;
+                    const otherTypingUsers = Object.entries(typingUsers)
+                        .filter(([uid, data]) => uid !== currentUserId && data && data.name)
+                        .map(([uid, data]) => data.name);
+                    
+                    if (otherTypingUsers.length > 0) {
+                        const names = otherTypingUsers.slice(0, 3).join(', ');
+                        const extra = otherTypingUsers.length > 3 ? ` and ${otherTypingUsers.length - 3} others` : '';
+                        document.getElementById('typing-indicator').innerHTML = 
+                            `💭 ${names}${extra} ${otherTypingUsers.length === 1 ? 'is' : 'are'} typing...`;
+                    } else {
+                        document.getElementById('typing-indicator').innerHTML = '';
+                    }
+                } else {
+                    document.getElementById('typing-indicator').innerHTML = '';
+                }
+            });
         }
         
         function hideReplyForm() {
@@ -435,8 +594,38 @@
                 return;
             }
             
-            // Implementation for post likes
-            console.log('Toggle post like:', postId);
+            try {
+                const postRef = window.firebaseUtils.ref(window.firebaseDB, `forum/posts/${postId}`);
+                const snapshot = await window.firebaseUtils.get(postRef);
+                const postData = snapshot.val();
+                
+                if (postData) {
+                    const likedBy = postData.likedBy || {};
+                    const userId = window.forumState.currentUser.uid;
+                    
+                    if (likedBy[userId]) {
+                        // Unlike the post
+                        delete likedBy[userId];
+                        postData.likes = Math.max(0, (postData.likes || 0) - 1);
+                    } else {
+                        // Like the post
+                        likedBy[userId] = {
+                            name: window.forumState.currentUser.name,
+                            timestamp: window.firebaseUtils.serverTimestamp()
+                        };
+                        postData.likes = (postData.likes || 0) + 1;
+                    }
+                    
+                    postData.likedBy = likedBy;
+                    await window.firebaseUtils.update(postRef, {
+                        likes: postData.likes,
+                        likedBy: postData.likedBy
+                    });
+                }
+            } catch (error) {
+                console.error('Error toggling post like:', error);
+                alert('Error updating like. Please try again.');
+            }
         }
         
         async function toggleReplyLike(replyId) {
@@ -445,8 +634,37 @@
                 return;
             }
             
-            // Implementation for reply likes
-            console.log('Toggle reply like:', replyId);
+            try {
+                const replyRef = window.firebaseUtils.ref(window.firebaseDB, `forum/replies/${replyId}`);
+                const snapshot = await window.firebaseUtils.get(replyRef);
+                const replyData = snapshot.val();
+                
+                if (replyData) {
+                    const likedBy = replyData.likedBy || {};
+                    const userId = window.forumState.currentUser.uid;
+                    
+                    if (likedBy[userId]) {
+                        // Unlike the reply
+                        delete likedBy[userId];
+                        replyData.likes = Math.max(0, (replyData.likes || 0) - 1);
+                    } else {
+                        // Like the reply
+                        likedBy[userId] = {
+                            name: window.forumState.currentUser.name,
+                            timestamp: window.firebaseUtils.serverTimestamp()
+                        };
+                        replyData.likes = (replyData.likes || 0) + 1;
+                    }
+                    
+                    await window.firebaseUtils.update(replyRef, {
+                        likes: replyData.likes,
+                        likedBy: likedBy
+                    });
+                }
+            } catch (error) {
+                console.error('Error toggling reply like:', error);
+                alert('Error updating like. Please try again.');
+            }
         }
         
         function showNotFound() {

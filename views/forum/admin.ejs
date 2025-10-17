@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/header') %>
+<head>
+    <title>Forum Admin - Wavelength Lore</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+    
+    <link rel="stylesheet" href="/css/forum.css">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --accent-color: #5dade2;
+            --bg-color: #1a252f;
+            --card-bg: #2c3e50;
+            --text-color: #ecf0f1;
+            --text-muted: #bdc3c7;
+            --border-color: rgba(52, 152, 219, 0.3);
+            --hover-bg: rgba(52, 152, 219, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/navigation') %>
+
+    <div class="main-wrapper">
+        <div class="container">
+            <!-- Admin Header -->
+            <div class="admin-header">
+                <h1>🛡️ Forum Administration</h1>
+                <div class="admin-nav">
+                    <button class="admin-tab-btn active" data-tab="users">👥 Users</button>
+                    <button class="admin-tab-btn" data-tab="posts">📝 Posts</button>
+                    <button class="admin-tab-btn" data-tab="reports">⚠️ Reports</button>
+                    <button class="admin-tab-btn" data-tab="settings">⚙️ Settings</button>
+                </div>
+            </div>
+
+            <!-- Admin Content -->
+            <div class="admin-content">
+                <!-- Users Management Tab -->
+                <div id="admin-users" class="admin-tab active">
+                    <div class="admin-section">
+                        <div class="section-header">
+                            <h3>User Management</h3>
+                            <div class="search-controls">
+                                <input type="text" id="user-search" placeholder="Search users..." class="search-input">
+                                <select id="role-filter" class="filter-select">
+                                    <option value="">All Roles</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="moderator">Moderator</option>
+                                    <option value="member">Member</option>
+                                    <option value="banned">Banned</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="users-table-container">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Role</th>
+                                        <th>Posts</th>
+                                        <th>Joined</th>
+                                        <th>Last Active</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                    <tr class="loading-row">
+                                        <td colspan="6">
+                                            <div class="loading-spinner"></div>
+                                            Loading users...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Posts Management Tab -->
+                <div id="admin-posts" class="admin-tab">
+                    <div class="admin-section">
+                        <div class="section-header">
+                            <h3>Post Management</h3>
+                            <div class="search-controls">
+                                <input type="text" id="post-search" placeholder="Search posts..." class="search-input">
+                                <select id="category-filter" class="filter-select">
+                                    <option value="">All Categories</option>
+                                    <option value="general">General</option>
+                                    <option value="lore">Lore</option>
+                                    <option value="episodes">Episodes</option>
+                                    <option value="fanart">Fan Art</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="posts-table-container">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Author</th>
+                                        <th>Category</th>
+                                        <th>Replies</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="posts-table-body">
+                                    <tr class="loading-row">
+                                        <td colspan="6">
+                                            <div class="loading-spinner"></div>
+                                            Loading posts...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="admin-reports" class="admin-tab">
+                    <div class="admin-section">
+                        <div class="section-header">
+                            <h3>Content Reports</h3>
+                            <div class="stats-summary">
+                                <div class="stat-card">
+                                    <span class="stat-number" id="pending-reports">0</span>
+                                    <span class="stat-label">Pending</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-number" id="resolved-reports">0</span>
+                                    <span class="stat-label">Resolved</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="reports-container" id="reports-container">
+                            <div class="loading-placeholder">
+                                <div class="loading-spinner"></div>
+                                <p>Loading reports...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="admin-settings" class="admin-tab">
+                    <div class="admin-section">
+                        <div class="section-header">
+                            <h3>Forum Settings</h3>
+                        </div>
+                        
+                        <div class="settings-grid">
+                            <div class="setting-card">
+                                <h4>🚫 Content Moderation</h4>
+                                <div class="setting-item">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="auto-moderation" checked>
+                                        <span>Enable automatic content moderation</span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="require-approval" checked>
+                                        <span>Require approval for new member posts</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-card">
+                                <h4>💬 Post Settings</h4>
+                                <div class="setting-item">
+                                    <label for="max-post-length">Maximum post length:</label>
+                                    <input type="number" id="max-post-length" value="10000" min="100" max="50000">
+                                </div>
+                                <div class="setting-item">
+                                    <label for="posts-per-page">Posts per page:</label>
+                                    <input type="number" id="posts-per-page" value="20" min="5" max="100">
+                                </div>
+                            </div>
+                            
+                            <div class="setting-card">
+                                <h4>👤 User Settings</h4>
+                                <div class="setting-item">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="allow-registration" checked>
+                                        <span>Allow new user registration</span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="email-verification" checked>
+                                        <span>Require email verification</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button class="btn btn-primary" onclick="adminManager.saveSettings()">
+                                💾 Save Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize admin panel
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching
+            const tabBtns = document.querySelectorAll('.admin-tab-btn');
+            const tabContents = document.querySelectorAll('.admin-tab');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.dataset.tab;
+                    
+                    // Update active tab button
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Update active tab content
+                    tabContents.forEach(content => {
+                        if (content.id === `admin-${tabId}`) {
+                            content.classList.add('active');
+                        } else {
+                            content.classList.remove('active');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <script src="/js/firebase-config.js"></script>
+    <script src="/js/forum.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

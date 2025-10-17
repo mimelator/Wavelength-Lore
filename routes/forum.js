@@ -91,7 +91,8 @@ router.get('/recent', (req, res) => {
         breadcrumbs: [
             { name: 'Recent Posts', url: null }
         ],
-        layout: 'forum/layout'
+        cdnUrl: process.env.CDN_URL || '',
+        version: process.env.VERSION || Date.now()
     });
 });
 
@@ -133,13 +134,21 @@ router.get('/user/:userId', (req, res) => {
     const userId = req.params.userId;
     
     res.render('forum/user-profile', {
-        title: 'User Profile',
-        currentPage: 'profile',
         userId: userId,
-        breadcrumbs: [
-            { name: 'User Profile', url: null }
-        ],
-        layout: 'forum/layout'
+        title: 'User Profile',
+        cdnUrl: process.env.CDN_URL || '',
+        version: process.env.VERSION || Date.now()
+    });
+});
+
+/**
+ * Admin Panel Page
+ */
+router.get('/admin', (req, res) => {
+    res.render('forum/admin', {
+        title: 'Forum Administration',
+        cdnUrl: process.env.CDN_URL || '',
+        version: process.env.VERSION || Date.now()
     });
 });
 

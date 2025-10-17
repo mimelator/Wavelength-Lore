@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Wavelength Community Forum</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+    
+    <!-- Reuse existing styles -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/forum.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+      import { getDatabase, ref, push, set, onValue, query, orderByChild, serverTimestamp, get, update } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+      
+      // Initialize Firebase with your existing config
+      const firebaseConfig = {
+        apiKey: "AIzaSyCg-9HMihsWZnvfYOS155Dk4JJt5Rr7XRI",
+        authDomain: "wavelength-lore.firebaseapp.com",
+        databaseURL: "https://wavelength-lore-default-rtdb.firebaseio.com",
+        projectId: "wavelength-lore",
+        storageBucket: "wavelength-lore.firebasestorage.app",
+        messagingSenderId: "78008979957",
+        appId: "1:78008979957:web:799d623c4bd1d5be3b90bc"
+      };
+      
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const database = getDatabase(app);
+      
+      // Make Firebase available globally for forum components
+      window.firebaseAuth = auth;
+      window.firebaseDB = database;
+      window.firebaseUtils = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, ref, push, set, onValue, query, orderByChild, serverTimestamp, get, update };
+    </script>
+    
+    <!-- Forum JavaScript -->
+    <script src="/js/forum.js" defer></script>
+        <!-- Forum Activity Script -->
+    <script src="/js/forum-activity.js"></script>
+    <!-- User Profile Management Script -->
+    <script src="/js/user-profile.js"></script>
+</body>
+</html>
+</head>
+<body>
+    <!-- Include existing navigation -->
+    <%- include('../partials/header') %>
+    
+    <div class="forum-container">
+        <!-- Forum Header -->
+        <header class="forum-header">
+            <h1 class="forum-title">User Profile</h1>
+            <p class="forum-subtitle">Community member information</p>
+        </header>
+        
+        <!-- Authentication Section -->
+        <section class="auth-section">
+            <div id="forum-auth-container">
+                <div class="guest-message">Sign in to view profiles</div>
+                <div class="auth-actions">
+                    <button class="btn btn-primary" onclick="window.forumJS.signInWithGoogle()">Sign in with Google</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Forum Navigation -->
+        <nav class="forum-nav">
+            <div class="forum-nav-links">
+                <a href="/forum" class="forum-nav-link">🏠 Home</a>
+                <a href="/forum/recent" class="forum-nav-link">🕒 Recent Posts</a>
+                <a href="/forum/popular" class="forum-nav-link">🔥 Popular</a>
+                <a href="/forum/search" class="forum-nav-link">🔍 Search</a>
+                <a href="/" class="forum-nav-link">← Back to Wavelength Lore</a>
+            </div>
+        </nav>
+        
+        <!-- Breadcrumbs -->
+        <div class="breadcrumbs">
+            <span class="breadcrumb-item">
+                <a href="/forum" class="breadcrumb-link">Forum</a>
+            </span>
+            <span class="breadcrumb-item" id="user-breadcrumb">User Profile</span>
+        </div>
+        
+        <!-- Profile Content -->
+        <div class="profile-container" id="profile-container">
+            <div class="loading-placeholder">
+                <div class="loading-spinner"></div>
+                <p>Loading profile...</p>
+            </div>
+        </div>
+        
+        <!-- User Not Found -->
+        <div class="not-found-container" id="user-not-found" style="display: none;">
+            <div class="not-found-content">
+                <div class="not-found-icon">👤❌</div>
+                <h3>User Not Found</h3>
+                <p>The user profile you're looking for doesn't exist or may have been removed.</p>
+                <div class="not-found-actions">
+                    <a href="/forum" class="btn btn-primary">← Back to Forum</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Modals -->
+    <div id="profile-modals"></div>
+
+    <script>
+        // Profile page state
+        const userId = '<%= userId %>';
+        let currentProfile = null;
+        let userPosts = [];
+        let userReplies = [];
+        
+        // Initialize profile page
+        document.addEventListener('DOMContentLoaded', function() {
+            if (userId && userId !== 'undefined') {
+                loadUserProfile();
+                loadUserPosts();
+                loadUserReplies();
+                setupAuthListener();
+            } else {
+                showUserNotFound();
+            }
+        });
+        
+        function setupAuthListener() {
+            if (window.firebaseAuth && window.firebaseUtils) {
+                window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
+                    updateAuthUI();
+                    updateProfilePermissions();
+                });
+            }
+        }
+        
+        async function loadUserProfile() {
+            try {
+                const userRef = window.firebaseUtils.ref(window.firebaseDB, `forum/users/${userId}`);
+                window.firebaseUtils.onValue(userRef, (snapshot) => {
+                    const userData = snapshot.val();
+                    if (userData) {
+                        currentProfile = { id: userId, ...userData };
+                        displayUserProfile(currentProfile);
+                        updateBreadcrumbs(currentProfile);
+                    } else {
+                        showUserNotFound();
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+                showUserNotFound();
+            }
+        }
+        
+        async function loadUserPosts() {
+            try {
+                const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
+                const postsQuery = window.firebaseUtils.query(postsRef, 
+                    window.firebaseUtils.orderByChild('authorId'));
+                
+                window.firebaseUtils.onValue(postsQuery, (snapshot) => {
+                    const allPosts = snapshot.val();
+                    if (allPosts) {
+                        userPosts = Object.entries(allPosts)
+                            .map(([id, post]) => ({ id, ...post }))
+                            .filter(post => post.authorId === userId)
+                            .sort((a, b) => b.createdAt - a.createdAt);
+                    } else {
+                        userPosts = [];
+                    }
+                    updateUserPosts(userPosts);
+                });
+            } catch (error) {
+                console.error('Error loading user posts:', error);
+            }
+        }
+        
+        async function loadUserReplies() {
+            try {
+                const repliesRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/replies');
+                const repliesQuery = window.firebaseUtils.query(repliesRef, 
+                    window.firebaseUtils.orderByChild('authorId'));
+                
+                window.firebaseUtils.onValue(repliesQuery, (snapshot) => {
+                    const allReplies = snapshot.val();
+                    if (allReplies) {
+                        userReplies = Object.entries(allReplies)
+                            .map(([id, reply]) => ({ id, ...reply }))
+                            .filter(reply => reply.authorId === userId)
+                            .sort((a, b) => b.createdAt - a.createdAt);
+                    } else {
+                        userReplies = [];
+                    }
+                    updateUserReplies(userReplies);
+                });
+            } catch (error) {
+                console.error('Error loading user replies:', error);
+            }
+        }
+        
+        function displayUserProfile(profile) {
+            const container = document.getElementById('profile-container');
+            const isOwnProfile = window.forumState.currentUser && 
+                                 window.forumState.currentUser.uid === profile.id;
+            
+            const joinDate = new Date(profile.joinDate || Date.now());
+            const memberSince = joinDate.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            const lastSeenText = profile.lastSeen ? 
+                formatTimeAgo(profile.lastSeen) : 'Unknown';
+            
+            const isOnline = profile.lastSeen && 
+                            (Date.now() - profile.lastSeen) < 300000; // 5 minutes
+            
+            container.innerHTML = `
+                <div class="user-profile">
+                    <!-- Profile Header -->
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <img src="${profile.avatar || '/icons/hero-icon.svg'}" 
+                                 alt="${profile.name}" 
+                                 class="avatar-large">
+                            ${isOnline ? '<div class="online-status-large"></div>' : ''}
+                        </div>
+                        <div class="profile-info">
+                            <h2 class="profile-name">${escapeHtml(profile.name)}</h2>
+                            <div class="profile-role">${getRoleDisplay(profile.role || 'member')}</div>
+                            <div class="profile-status">
+                                <span class="status-item">
+                                    ${isOnline ? '🟢 Online' : '⚫ Offline'}
+                                    ${!isOnline ? ` - Last seen ${lastSeenText}` : ''}
+                                </span>
+                            </div>
+                            <div class="profile-joined">
+                                📅 Member since ${memberSince}
+                            </div>
+                            ${isOwnProfile ? `
+                                <div class="profile-actions">
+                                    <button class="btn btn-secondary" onclick="editProfile()">
+                                        ✏️ Edit Profile
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="viewSettings()">
+                                        ⚙️ Settings
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Statistics -->
+                    <div class="profile-stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="posts-count">${profile.postCount || 0}</div>
+                            <div class="stat-label">Posts</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="replies-count">${profile.replyCount || 0}</div>
+                            <div class="stat-label">Replies</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="likes-received">${calculateLikesReceived()}</div>
+                            <div class="stat-label">Likes Received</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="reputation-score">${calculateReputation()}</div>
+                            <div class="stat-label">Reputation</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Bio -->
+                    <div class="profile-bio">
+                        <h3>About ${escapeHtml(profile.name)}</h3>
+                        <div class="bio-content">
+                            ${profile.bio ? escapeHtml(profile.bio) : 
+                              (isOwnProfile ? 'Add a bio to tell the community about yourself!' : 
+                               'This user hasn\'t added a bio yet.')}
+                        </div>
+                        ${isOwnProfile && !profile.bio ? `
+                            <button class="btn btn-link" onclick="editBio()">Add Bio</button>
+                        ` : ''}
+                    </div>
+                    
+                    <!-- Activity Tabs -->
+                    <div class="profile-tabs">
+                        <div class="tab-navigation">
+                            <button class="tab-btn active" onclick="showTab('posts')">
+                                📝 Posts (${profile.postCount || 0})
+                            </button>
+                            <button class="tab-btn" onclick="showTab('replies')">
+                                💬 Replies (${profile.replyCount || 0})
+                            </button>
+                            <button class="tab-btn" onclick="showTab('activity')">
+                                📊 Activity
+                            </button>
+                        </div>
+                        
+                        <div class="tab-content">
+                            <div id="posts-tab" class="tab-panel active">
+                                <div id="user-posts-container">
+                                    <div class="loading-placeholder">
+                                        <div class="loading-spinner"></div>
+                                        <p>Loading posts...</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="replies-tab" class="tab-panel">
+                                <div id="user-replies-container">
+                                    <div class="loading-placeholder">
+                                        <div class="loading-spinner"></div>
+                                        <p>Loading replies...</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="activity-tab" class="tab-panel">
+                                <div id="user-activity-container">
+                                    ${generateActivityChart()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function updateUserPosts(posts) {
+            const container = document.getElementById('user-posts-container');
+            const postsCountElement = document.getElementById('posts-count');
+            
+            if (postsCountElement) {
+                postsCountElement.textContent = posts.length;
+            }
+            
+            if (posts.length === 0) {
+                container.innerHTML = `
+                    <div class="no-content">
+                        <div class="no-content-icon">📝</div>
+                        <p>No posts yet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = posts.map(post => `
+                <div class="profile-post-item" onclick="location.href='/forum/post/${post.id}'">
+                    <div class="post-header">
+                        <h4 class="post-title">${escapeHtml(post.title)}</h4>
+                        <div class="post-meta">
+                            <span class="post-category">${getCategoryName(post.forumId)}</span>
+                            <span class="post-date">${formatTimeAgo(post.createdAt)}</span>
+                        </div>
+                    </div>
+                    <div class="post-preview">
+                        ${escapeHtml(post.content).substring(0, 150)}${post.content.length > 150 ? '...' : ''}
+                    </div>
+                    <div class="post-stats">
+                        <span class="stat">❤️ ${post.likes || 0}</span>
+                        <span class="stat">💬 ${post.replyCount || 0}</span>
+                        <span class="stat">👁️ ${post.views || 0}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateUserReplies(replies) {
+            const container = document.getElementById('user-replies-container');
+            const repliesCountElement = document.getElementById('replies-count');
+            
+            if (repliesCountElement) {
+                repliesCountElement.textContent = replies.length;
+            }
+            
+            if (replies.length === 0) {
+                container.innerHTML = `
+                    <div class="no-content">
+                        <div class="no-content-icon">💬</div>
+                        <p>No replies yet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = replies.slice(0, 20).map(reply => `
+                <div class="profile-reply-item" onclick="location.href='/forum/post/${reply.postId}'">
+                    <div class="reply-content">
+                        ${escapeHtml(reply.content).substring(0, 200)}${reply.content.length > 200 ? '...' : ''}
+                    </div>
+                    <div class="reply-meta">
+                        <span class="reply-date">${formatTimeAgo(reply.createdAt)}</span>
+                        <span class="reply-likes">❤️ ${reply.likes || 0}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function calculateLikesReceived() {
+            let totalLikes = 0;
+            userPosts.forEach(post => totalLikes += (post.likes || 0));
+            userReplies.forEach(reply => totalLikes += (reply.likes || 0));
+            return totalLikes;
+        }
+        
+        function calculateReputation() {
+            const posts = userPosts.length * 10;
+            const replies = userReplies.length * 5;
+            const likes = calculateLikesReceived() * 2;
+            return posts + replies + likes;
+        }
+        
+        function getRoleDisplay(role) {
+            const roles = {
+                'admin': '👑 Administrator',
+                'moderator': '🛡️ Moderator',
+                'member': '👤 Member',
+                'vip': '⭐ VIP Member'
+            };
+            return roles[role] || '👤 Member';
+        }
+        
+        function getCategoryName(forumId) {
+            const categories = {
+                'general': '🎵 General',
+                'lore': '📜 Lore',
+                'episodes': '🎬 Episodes',
+                'fanart': '🎨 Fan Art'
+            };
+            return categories[forumId] || forumId;
+        }
+        
+        function generateActivityChart() {
+            // Simple activity visualization
+            return `
+                <div class="activity-chart">
+                    <h4>Activity Overview</h4>
+                    <div class="activity-stats">
+                        <div class="activity-item">
+                            <span class="activity-label">Most Active Category:</span>
+                            <span class="activity-value">${getMostActiveCategory()}</span>
+                        </div>
+                        <div class="activity-item">
+                            <span class="activity-label">Average Posts per Month:</span>
+                            <span class="activity-value">${calculateMonthlyAverage()}</span>
+                        </div>
+                        <div class="activity-item">
+                            <span class="activity-label">Total Forum Contributions:</span>
+                            <span class="activity-value">${userPosts.length + userReplies.length}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getMostActiveCategory() {
+            const categories = {};
+            userPosts.forEach(post => {
+                categories[post.forumId] = (categories[post.forumId] || 0) + 1;
+            });
+            
+            const mostActive = Object.entries(categories)
+                .sort(([,a], [,b]) => b - a)[0];
+            
+            return mostActive ? getCategoryName(mostActive[0]) : 'None';
+        }
+        
+        function calculateMonthlyAverage() {
+            if (userPosts.length === 0) return '0';
+            
+            const oldestPost = Math.min(...userPosts.map(p => p.createdAt));
+            const monthsActive = Math.max(1, Math.ceil((Date.now() - oldestPost) / (30 * 24 * 60 * 60 * 1000)));
+            
+            return Math.round(userPosts.length / monthsActive * 10) / 10;
+        }
+        
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function updateBreadcrumbs(profile) {
+            const userBreadcrumb = document.getElementById('user-breadcrumb');
+            userBreadcrumb.textContent = profile.name;
+        }
+        
+        function updateProfilePermissions() {
+            // Update UI based on current user permissions
+            const isOwnProfile = window.forumState.currentUser && 
+                                 window.forumState.currentUser.uid === userId;
+            
+            // Show/hide edit buttons based on permissions
+            const editButtons = document.querySelectorAll('.profile-edit-btn');
+            editButtons.forEach(btn => {
+                btn.style.display = isOwnProfile ? 'inline-block' : 'none';
+            });
+        }
+        
+        function editProfile() {
+            alert('Profile editing functionality coming soon!');
+        }
+        
+        function editBio() {
+            alert('Bio editing functionality coming soon!');
+        }
+        
+        function viewSettings() {
+            alert('User settings functionality coming soon!');
+        }
+        
+        function showUserNotFound() {
+            document.getElementById('profile-container').style.display = 'none';
+            document.getElementById('user-not-found').style.display = 'block';
+        }
+        
+        function formatTimeAgo(timestamp) {
+            if (!timestamp) return 'Unknown time';
+            
+            const now = Date.now();
+            const diff = now - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            return new Date(timestamp).toLocaleDateString();
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+    </script>
+</body>
+</html>

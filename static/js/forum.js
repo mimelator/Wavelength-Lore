@@ -15,7 +15,68 @@ window.forumState = {
 document.addEventListener('DOMContentLoaded', function() {
     initializeForumAuth();
     setupGlobalEventListeners();
+    setupRealtimeNotifications();
 });
+
+/**
+ * Setup real-time notifications for forum activity
+ */
+function setupRealtimeNotifications() {
+    if (!window.firebaseDB || !window.firebaseUtils) return;
+    
+    // Listen for new posts
+    const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
+    window.firebaseUtils.onValue(postsRef, (snapshot) => {
+        const posts = snapshot.val();
+        if (posts && window.forumState.isAuthenticated) {
+            // Check for posts newer than user's last activity
+            const userLastSeen = window.forumState.currentUser?.signInTime || Date.now();
+            const newPosts = Object.values(posts).filter(post => 
+                post.createdAt > userLastSeen && 
+                post.authorId !== window.forumState.currentUser?.uid
+            );
+            
+            // Show notification for new posts (limit to avoid spam)
+            if (newPosts.length > 0 && newPosts.length <= 3) {
+                newPosts.forEach(post => {
+                    showNotification(`📝 New post: "${post.title}" by ${post.authorName}`, 'info');
+                });
+            } else if (newPosts.length > 3) {
+                showNotification(`📝 ${newPosts.length} new posts in the forum!`, 'info');
+            }
+        }
+    });
+}
+
+/**
+ * Setup real-time activity tracking
+ */
+function setupActivityTracking() {
+    // Update user activity every 2 minutes
+    setInterval(() => {
+        if (window.forumState.isAuthenticated && window.forumState.currentUser) {
+            const userRef = window.firebaseUtils.ref(window.firebaseDB, 
+                `forum/users/${window.forumState.currentUser.uid}/lastSeen`);
+            window.firebaseUtils.set(userRef, Date.now());
+        }
+    }, 2 * 60 * 1000);
+    
+    // Update activity on user interaction
+    ['click', 'keydown', 'scroll', 'mousemove'].forEach(event => {
+        let lastActivity = 0;
+        document.addEventListener(event, () => {
+            const now = Date.now();
+            if (now - lastActivity > 30000) { // Throttle to every 30 seconds
+                lastActivity = now;
+                if (window.forumState.isAuthenticated && window.forumState.currentUser) {
+                    const userRef = window.firebaseUtils.ref(window.firebaseDB, 
+                        `forum/users/${window.forumState.currentUser.uid}/lastSeen`);
+                    window.firebaseUtils.set(userRef, now);
+                }
+            }
+        });
+    });
+}
 
 /**
  * Initialize Firebase Authentication for Forum
@@ -54,6 +115,9 @@ function handleUserSignIn(user) {
     
     // Update user data in database
     updateUserProfile(window.forumState.currentUser);
+    
+    // Start activity tracking
+    setupActivityTracking();
 }
 
 /**
