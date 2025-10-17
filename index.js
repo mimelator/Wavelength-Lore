@@ -419,16 +419,18 @@ app.get('/lore', async (req, res) => {
 // Route for About page
 app.get('/about', async (req, res) => {
   try {
-    const charactersRef = ref(database, 'characters');
-    const snapshot = await get(charactersRef);
+    const charactersData = await firebaseUtils.fetchFromFirebase('characters');
 
     let characterImages = [];
-    if (snapshot.exists()) {
-      const charactersData = snapshot.val();
-
-      // Collect images for all characters in the 'wavelength' category
-      if (Array.isArray(charactersData.wavelength)) {
-        characterImages = charactersData.wavelength.map(c => c.image);
+    if (charactersData) {
+      // Collect images from all character categories
+      for (const category in charactersData) {
+        if (Array.isArray(charactersData[category])) {
+          const categoryImages = charactersData[category]
+            .filter(c => c.image_gallery && c.image_gallery.length > 0)
+            .map(c => c.image_gallery[0]); // Get first image from each character's gallery
+          characterImages = characterImages.concat(categoryImages);
+        }
       }
     }
 

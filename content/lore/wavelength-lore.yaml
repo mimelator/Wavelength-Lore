@@ -146,3 +146,23 @@ villains:
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-064.png      
+
+
+
+# Wavelength Lore - bands
+bands:
+  - id: wavelength
+    title: Wavelength
+    type: band
+    keywords: ["band", "music group", "heroes", "family"]
+    description: "Wavelength is a mostly family band of musicians who use music to help them explore the natural world and culture. Wavelength gained their fame due to the Battle of the Shire that they personally experienced and retell in their music.  They are known for their peace nature, kindness, and their ability to bring people together through the power of music."
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.jpg
+    image_gallery:
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.jpg
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-5.jpg
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode3/images/ice_fortress-4.jpg
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/ice_fortress-7.jpg
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-1.jpg
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-7.jpg
+      
+

@@ -1,0 +1,165 @@
+/* Carousel Partial Styles */
+
+.carousel-section {
+    margin: 2rem 0;
+}
+
+.carousel {
+    width: 100%;
+}
+
+.carousel .slick-slide {
+    padding: 0 10px;
+}
+
+.carousel .slick-slide div {
+    outline: none;
+}
+
+.carousel img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.carousel img:hover {
+    transform: scale(1.05);
+}
+
+/* Slick carousel navigation dots */
+.carousel .slick-dots {
+    bottom: -50px;
+}
+
+.carousel .slick-dots li button:before {
+    font-size: 12px;
+    color: #666;
+}
+
+.carousel .slick-dots li.slick-active button:before {
+    color: #333;
+}
+
+/* Slick carousel arrows */
+.carousel .slick-prev,
+.carousel .slick-next {
+    z-index: 1;
+    width: 40px;
+    height: 40px;
+}
+
+.carousel .slick-prev {
+    left: -50px;
+}
+
+.carousel .slick-next {
+    right: -50px;
+}
+
+.carousel .slick-prev:before,
+.carousel .slick-next:before {
+    font-size: 40px;
+    color: #666;
+}
+
+/* Episode titles in season carousels */
+.episode-title {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.episode-title a {
+    text-decoration: none;
+    color: #333;
+}
+
+.episode-title a:hover {
+    color: #007bff;
+}
+
+/* YouTube links */
+.youtube-link {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #ff0000;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.youtube-link:hover {
+    background-color: #cc0000;
+    color: white;
+}
+
+/* Modal styles for image viewing */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    max-height: 90%;
+    animation: zoom 0.6s;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+    color: #bbb;
+    text-decoration: none;
+}
+
+@keyframes zoom {
+    from { transform: scale(0) }
+    to { transform: scale(1) }
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .carousel .slick-prev {
+        left: -25px;
+    }
+    
+    .carousel .slick-next {
+        right: -25px;
+    }
+    
+    .carousel .slick-prev:before,
+    .carousel .slick-next:before {
+        font-size: 30px;
+    }
+    
+    .modal-content {
+        width: 95%;
+    }
+    
+    .modal-close {
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
+    }
+}

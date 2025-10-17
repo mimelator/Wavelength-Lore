@@ -154,6 +154,11 @@ main {
     background: linear-gradient(135deg, #DC143C, #B22222);
 }
 
+.type-band {
+    background: linear-gradient(135deg, #9C27B0, #4A148C);
+}
+
+
 .type-magic {
     background: linear-gradient(135deg, #9C27B0, #4A148C);
 }
