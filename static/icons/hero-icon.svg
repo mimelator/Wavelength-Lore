@@ -1,4 +1,104 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="12" cy="8" r="5"/>
-  <path d="M3 21v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none">
+  <defs>
+    <!-- Purple Crown Gradient -->
+    <linearGradient id="crownGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8A2BE2;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#9932CC;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#6A0DAD;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4B0082;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Rainbow Gradient -->
+    <linearGradient id="rainbowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF0000;stop-opacity:1" />
+      <stop offset="16.66%" style="stop-color:#FF8000;stop-opacity:1" />
+      <stop offset="33.33%" style="stop-color:#FFFF00;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00FF00;stop-opacity:1" />
+      <stop offset="66.66%" style="stop-color:#0080FF;stop-opacity:1" />
+      <stop offset="83.33%" style="stop-color:#8000FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF00FF;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Neon Energy Glow -->
+    <radialGradient id="energyGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#00FF80;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#00FFFF;stop-opacity:0.8" />
+      <stop offset="70%" style="stop-color:#0080FF;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#8000FF;stop-opacity:0.3" />
+    </radialGradient>
+    
+    <!-- Neon Character Gradient -->
+    <linearGradient id="characterGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF00FF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00FFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFFF00;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Neon Ray Gradient -->
+    <linearGradient id="rayGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00FF00;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00FFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF00FF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Bright Neon Energy Aura -->
+  <circle cx="12" cy="8" r="8" fill="url(#energyGlow)" opacity="0.8"/>
+  <circle cx="12" cy="8" r="7" fill="url(#energyGlow)" opacity="0.6"/>
+  <circle cx="12" cy="8" r="6" fill="url(#energyGlow)" opacity="0.4"/>
+  
+  <!-- Neon Energy Rays -->
+  <g stroke="url(#rayGradient)" stroke-width="2" opacity="1">
+    <path d="M12 0 L12 4"/>
+    <path d="M20 3 L17 6"/>
+    <path d="M21 8 L17 8"/>
+    <path d="M20 13 L17 10"/>
+    <path d="M4 3 L7 6"/>
+    <path d="M3 8 L7 8"/>
+    <path d="M4 13 L7 10"/>
+    <path d="M12 16 L12 20"/>
+  </g>
+  
+  <!-- Additional sparkle effects -->
+  <g fill="url(#rayGradient)" opacity="0.9">
+    <circle cx="6" cy="4" r="1"/>
+    <circle cx="18" cy="4" r="1"/>
+    <circle cx="20" cy="12" r="1"/>
+    <circle cx="4" cy="12" r="1"/>
+  </g>
+  
+  <!-- Character head with neon gradient -->
+  <circle cx="12" cy="8" r="5" fill="url(#characterGradient)" stroke="url(#rayGradient)" stroke-width="2"/>
+  
+  <!-- Purple Crown with Rainbow -->
+  <g fill="url(#crownGradient)" stroke="url(#crownGradient)" stroke-width="1">
+    <!-- Crown base -->
+    <path d="M8 5 L16 5 L15.5 3.5 L8.5 3.5 Z"/>
+    <!-- Crown peaks -->
+    <path d="M9 3.5 L9.5 1.5 L10 3.5"/>
+    <path d="M11 3.5 L11.5 0.5 L12 3.5"/>
+    <path d="M12 3.5 L12.5 0.5 L13 3.5"/>
+    <path d="M14 3.5 L14.5 1.5 L15 3.5"/>
+    <!-- Purple Crown Jewel -->
+    <circle cx="12" cy="1.8" r="1.2" fill="url(#crownGradient)" opacity="1"/>
+    <circle cx="12" cy="1.8" r="0.8" fill="#FFFFFF" opacity="0.9"/>
+  </g>
+  
+  <!-- Rainbow Arc Above Crown -->
+  <g stroke="url(#rainbowGradient)" stroke-width="2" fill="none" opacity="0.9">
+    <path d="M6 3 Q12 -2 18 3" stroke-linecap="round"/>
+    <path d="M7 4 Q12 -1 17 4" stroke-linecap="round" opacity="0.7"/>
+  </g>
+  
+  <!-- Rainbow sparkles around crown -->
+  <g fill="url(#rainbowGradient)" opacity="0.8">
+    <circle cx="7" cy="2" r="0.8"/>
+    <circle cx="17" cy="2" r="0.8"/>
+    <circle cx="5" cy="5" r="0.6"/>
+    <circle cx="19" cy="5" r="0.6"/>
+    <circle cx="12" cy="-0.5" r="0.7"/>
+  </g>
+  
+  <!-- Character body with neon outline -->
+  <path d="M3 21v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2" stroke="url(#rayGradient)" stroke-width="3" fill="none"/>
 </svg>

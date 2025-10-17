@@ -423,14 +423,18 @@ h1 {
 }
 
 .character-link:before {
-    content: "👤";
+    content: "";
     position: absolute;
     left: 3px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 10px;
+    width: 12px;
+    height: 12px;
+    background-image: url('/icons/hero-icon.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     opacity: 0.8;
-    line-height: 1;
 }
 
 .character-link:hover {
@@ -438,6 +442,108 @@ h1 {
     background: rgba(255, 255, 255, 0.2);
     text-decoration: underline;
     transform: translateY(-1px);
+}
+
+/* Disambiguation links that point to characters should also show hero icon */
+.disambiguation-link[data-conflicts*='"type":"character"'] {
+    color: #4a47a3;
+    font-weight: bold;
+    padding: 2px 4px 2px 18px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    position: relative;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.disambiguation-link[data-conflicts*='"type":"character"']:before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background-image: url('/icons/hero-icon.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.8;
+}
+
+.disambiguation-link[data-conflicts*='"type":"character"']:hover {
+    color: #2e2b6b;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Disambiguation links that point to episodes should also show episode icon */
+.disambiguation-link[data-conflicts*='"type":"episode"'] {
+    color: #e74c3c;
+    font-weight: bold;
+    padding: 2px 4px 2px 18px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    background: rgba(231, 76, 60, 0.1);
+    position: relative;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.disambiguation-link[data-conflicts*='"type":"episode"']:before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background-image: url('/icons/episode-icon.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.8;
+}
+
+.disambiguation-link[data-conflicts*='"type":"episode"']:hover {
+    color: #c0392b;
+    background: rgba(231, 76, 60, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Disambiguation links that point to lore should also show lore icon */
+.disambiguation-link[data-conflicts*='"type":"lore"'] {
+    color: #6a4c93;
+    font-weight: bold;
+    padding: 2px 4px 2px 18px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    background: rgba(106, 76, 147, 0.1);
+    position: relative;
+    text-decoration: none;
+    cursor: pointer;
+    border-bottom: 1px dotted #6a4c93;
+}
+
+.disambiguation-link[data-conflicts*='"type":"lore"']:before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background-image: url('/icons/lore-icon.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.8;
+}
+
+.disambiguation-link[data-conflicts*='"type":"lore"']:hover {
+    color: #4a3269;
+    background: rgba(106, 76, 147, 0.2);
 }
 
 /* Lore Link Styles */
@@ -454,14 +560,18 @@ h1 {
 }
 
 .lore-link:before {
-    content: "📜";
+    content: "";
     position: absolute;
     left: 3px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 10px;
+    width: 12px;
+    height: 12px;
+    background-image: url('/icons/lore-icon.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     opacity: 0.8;
-    line-height: 1;
 }
 
 .lore-link:hover {
@@ -469,6 +579,41 @@ h1 {
     background: rgba(106, 76, 147, 0.2);
     text-decoration: none;
     border-bottom: 1px solid #6a4c93;
+    transform: translateY(-1px);
+}
+
+/* Episode link styling */
+.episode-link {
+    color: #e74c3c;
+    padding: 2px 4px 2px 18px; /* Add left padding for icon */
+    border-radius: 3px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    background: rgba(231, 76, 60, 0.1);
+    border-bottom: 1px dotted #e74c3c;
+    position: relative;
+}
+
+.episode-link:before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background-image: url('/icons/episode-icon.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.8;
+}
+
+.episode-link:hover {
+    color: #c0392b;
+    background: rgba(231, 76, 60, 0.2);
+    text-decoration: none;
     transform: translateY(-1px);
 }
 

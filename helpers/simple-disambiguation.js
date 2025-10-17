@@ -273,9 +273,30 @@ function applySmartLinkingSimple(text, currentUrl = null) {
     
     let replacementHtml;
     if (uniqueConflicts.length > 1) {
-      // Multiple matches - use disambiguation modal
-      const conflictsJson = JSON.stringify(uniqueConflicts).replace(/"/g, '&quot;');
-      replacementHtml = `<span class="disambiguation-link" onclick="openDisambiguationModal(this)" data-phrase="${originalText}" data-conflicts="${conflictsJson}">${originalText}</span>`;
+      // Check if there's an exact character match that should be prioritized
+      const exactCharacterMatch = uniqueConflicts.find(c => 
+        c.type === 'character' && 
+        c.name.toLowerCase() === originalText.toLowerCase()
+      );
+      
+      if (exactCharacterMatch) {
+        // Prioritize exact character match over episode/lore keyword matches
+        const conflict = exactCharacterMatch;
+        
+        // Don't create self-referential links - leave as plain text
+        if (currentUrl && conflict.url === currentUrl) {
+          replacementHtml = originalText;
+        } else {
+          const linkClass = 'character-link';
+          const title = `View ${conflict.name}'s character page`;
+          
+          replacementHtml = `<a href="${conflict.url}" class="${linkClass}" title="${title}">${originalText}</a>`;
+        }
+      } else {
+        // Multiple matches with no exact character match - use disambiguation modal
+        const conflictsJson = JSON.stringify(uniqueConflicts).replace(/"/g, '&quot;');
+        replacementHtml = `<span class="disambiguation-link" onclick="openDisambiguationModal(this)" data-phrase="${originalText}" data-conflicts="${conflictsJson}">${originalText}</span>`;
+      }
     } else {
       // Single match - create direct link with appropriate class
       const conflict = uniqueConflicts[0];

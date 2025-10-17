@@ -16,7 +16,7 @@ locations:
   - id: ice-fortress
     title: Ice Fortress
     type: place
-    keywords: ["fortress", "ice castle", "frostborne home"]
+    keywords: ["ice fortress", "fortress", "ice castle", "frostborne home"]
     description: A majestic fortress made of ice, standing tall against the backdrop of a frozen landscape. The Ice Fortress is home to the Frostborne, a community of denizens who welcome all strangers, no matter wealth or looks or race. Here, the beauty of winter is celebrated, and the power of ice magic is harnessed to protect the realm from external threats.
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/icefortress-fiery-3.jpg
     image_gallery:
@@ -32,7 +32,7 @@ locations:
   - id: shire-sanctuary
     title: Shire Sanctuary
     type: place
-    keywords: ["sanctuary", "healing place", "concert venue"]
+    keywords: ["shire sanctuary", "sanctuary", "healing place", "concert venue"]
     description: A serene and peaceful sanctuary located in the heart of the Shire. The Shire Sanctuary is a place of healing and tranquility, where the weary can find rest and solace. Surrounded by lush greenery and vibrant flowers, it is tended by the kind-hearted Hobbits who call this place home.  Occasionally Wavelength will perform impromptu concerts here to lift the spirits of the Shire Folk, as was the case after the Battle for the Shire.
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-05.jpg
     image_gallery:
@@ -47,7 +47,7 @@ objects:
   - id: ice-whales
     title: Ice Whales
     type: thing
-    keywords: ["whales", "dangerous creatures", "ocean beasts"]
+    keywords: ["ice whales", "whales", "dangerous creatures", "ocean beasts"]
     description: Ice Whales are the most dangerous evil creatures known to the deep oceans in the far, frozen North and are very different from more normally known types of whales found in the Oceans.  These ferocious creatures will rip you to shreds just for spite.  Some of the Shire Folk join the Denizens of the Ice Fortress to participate in the Ice Whale Hunt.
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode2/images/Ice_Whale-17.png
     image_gallery:
@@ -60,7 +60,7 @@ objects:
   - id: ice-dragons
     title: Ice Dragons
     type: thing
-    keywords: ["dragons", "ice creatures", "dragon lair"]
+    keywords: ["ice dragons", "dragons", "ice creatures", "dragon lair"]
     description: Ice Dragons are majestic and powerful creatures that inhabit the frozen landscapes of the far North. With their shimmering scales and icy breath, they are both feared and revered by the inhabitants of the Ice Fortress. These dragons are known to be fiercely protective of their territory and will not hesitate to defend it against intruders.  Their lair is the only place where the rare and precious Ice Blue Diamonds can be found. 
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-02.png
     image_gallery:
@@ -77,7 +77,7 @@ objects:
   - id: ice-blue-diamond
     title: Ice Blue Diamond
     type: thing
-    keywords: ["diamond", "gems", "blue diamond", "treasure"]
+    keywords: ["ice blue diamond", "diamond", "gems", "blue diamond", "treasure"]
     description: Ice Blue Diamonds are rare and precious gemstones found only in the lairs of Ice Dragons. These diamonds are known for their stunning blue color and are highly sought after by collectors and adventurers alike. The process of mining these diamonds is extremely dangerous, as it involves navigating the treacherous ice caves guarded by the dragons.  Lucky used one of these diamonds to lure the Goblin King out of hiding during the Battle for the Shire.
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png
     image_gallery:
@@ -93,8 +93,8 @@ villains:
   - id: goblin-king
     title: Goblin King
     type: villain
-    keywords: ["king", "goblin ruler", "psychopath", "villain"]
-    description: "The Goblin King is a Psychopath that leads a Misery of Goblins to invade the Shire and begin the Battle of the Shire.  He lives by one Rule: Goblin's Rule, which means that the only rule you ever need to know about when dealing with the Goblin King, is that he will Rule all over you.  He is tricked by Lucky and the fact that Goblin's Greed is insatiable, into leaving his lair to pursue an Ice Blue Diamond, which Lucky uses to lure him out of hiding during the Battle for the Shire."
+    keywords: ["goblin king", "king", "goblin ruler", "psychopath", "villain"]
+    description: "The Goblin King is a Psychopath that leads a Misery of Goblins to invade the Shire and begin the Battle of the Shire.  He lives by one Rule: Goblin's Rule, which means that the only rule you ever need to know about when dealing with the Goblin King, is that he will Rule all over you.  He is tricked by Lucky and the fact that Goblin's Greed is insatiable, into leaving his lair to pursue an Ice Blue Diamond, which Lucky uses to lure him out of hiding during the Battle for the Shire.  Maurice was killed by the Goblin King during this battle while defending the Shire."
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png
     image_gallery:
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png
@@ -154,7 +154,7 @@ bands:
   - id: wavelength
     title: Wavelength
     type: band
-    keywords: ["band", "music group", "heroes", "family"]
+    keywords: ["wavelength", "band", "music group", "heroes", "family"]
     description: "Wavelength is a mostly family band of musicians who use music to help them explore the natural world and culture. Wavelength gained their fame due to the Battle of the Shire that they personally experienced and retell in their music.  They are known for their peace nature, kindness, and their ability to bring people together through the power of music."
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.jpg
     image_gallery:
