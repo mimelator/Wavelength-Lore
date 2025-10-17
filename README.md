@@ -1,6 +1,8 @@
 # Wavelength-Lore
 The Lore Site for the Wavelength Canon
 
+> **Status**: Testing ECR deployment workflow
+
 ## 📚 Documentation
 
 All project documentation has been organized in the [`docs/`](docs/) folder:
