@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AppRunnerServiceAccess",
+      "Effect": "Allow",
+      "Action": [
+        "apprunner:DescribeService",
+        "apprunner:UpdateService"
+      ],
+      "Resource": "arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa"
+    },
+    {
+      "Sid": "AppRunnerListAccess",
+      "Effect": "Allow",
+      "Action": [
+        "apprunner:ListServices"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
