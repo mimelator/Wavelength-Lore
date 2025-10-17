@@ -99,7 +99,7 @@ if [ "$LOCAL_CACHE" = true ]; then
   
   # Run the Node.js cache busting script
   if command -v node &> /dev/null; then
-    node bust-cache.js $NODE_ARGS
+    node scripts/bust-cache.js $NODE_ARGS
     if [ $? -eq 0 ]; then
       echo "✅ Local cache busting completed successfully"
     else
@@ -117,25 +117,21 @@ if [ "$CDN_CACHE" = true ]; then
   echo ""
   echo "☁️  Busting CloudFront CDN Cache..."
   
-  # Define CloudFront variables
-  DISTRIBUTION_ID="E2QFR8E7I4A6ZT"
-  AWS_REGION="us-east-1"
-  
-  # Check if AWS CLI is available
-  if command -v aws &> /dev/null; then
-    # Invalidate the CloudFront cache
-    aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
+  # Use Node.js script with environment variables instead of AWS CLI
+  if command -v node &> /dev/null; then
+    node scripts/cloudfront-cache-bust.js
     
-    # Confirm the invalidation
     if [ $? -eq 0 ]; then
-      echo "✅ CloudFront cache invalidation created successfully for distribution: $DISTRIBUTION_ID"
+      echo "✅ CloudFront cache invalidation completed successfully"
     else
-      echo "❌ Failed to create CloudFront cache invalidation"
+      echo "❌ CloudFront cache invalidation failed"
+      echo "💡 This may be due to missing CloudFront permissions."
+      echo "   Run: node scripts/setup-cloudfront-permissions.js"
+      echo "   Or use local cache only: ./scripts/bust-cache.sh --local"
       exit 1
     fi
   else
-    echo "❌ AWS CLI not found. Cannot bust CloudFront cache."
-    echo "💡 Install AWS CLI: https://aws.amazon.com/cli/"
+    echo "❌ Node.js not found. Cannot bust CloudFront cache."
     exit 1
   fi
 fi

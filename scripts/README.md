@@ -8,7 +8,8 @@ This directory contains utility scripts, build tools, and maintenance scripts fo
 - **`start-dev.sh`** - Start development server with hot reload
 - **`stop-dev.sh`** - Stop development server and clean up processes
 - **`bust-cache.js`** - Clear application caches and regenerate cache-busted assets
-- **`bust-cache.sh`** - Shell script version of cache busting
+- **`bust-cache.sh`** - Shell script version of cache busting (local + CloudFront)
+- **`cloudfront-cache-bust.js`** - CloudFront CDN cache invalidation utility
 - **`sync-assets.sh`** - Synchronize static assets across environments
 
 ### 🗄️ Database & Setup Scripts  
@@ -23,6 +24,17 @@ This directory contains utility scripts, build tools, and maintenance scripts fo
   - List existing backups
   - Restore from backups
   - Test backup functionality
+
+### 🚀 Deployment & Environment Scripts
+- **`apprunner-env-updater.js`** - Update AWS App Runner production environment variables
+  - Sync local `.env` with production App Runner service
+  - Preview changes before applying
+  - Filter production-appropriate variables
+  - Secure credential handling
+- **`setup-apprunner-permissions.js`** - Generate IAM policies for App Runner access
+- **`setup-cloudfront-permissions.js`** - Generate IAM policies for CloudFront cache invalidation
+- **`aws-setup-helper.js`** - Helper for AWS CLI configuration and setup
+- **`env-helper.js`** - Centralized environment variable management for scripts
 
 ### 🖼️ Content Management Scripts
 - **`add_carousel_image.js`** - Add new images to the main site carousel
@@ -41,8 +53,11 @@ This directory contains utility scripts, build tools, and maintenance scripts fo
 # Start development
 ./scripts/start-dev.sh
 
-# Clear caches during development
-node scripts/bust-cache.js
+# Clear caches during development (local only)
+./scripts/bust-cache.sh --local
+
+# Clear all caches (local + CloudFront)
+./scripts/bust-cache.sh
 
 # Stop development
 ./scripts/stop-dev.sh
@@ -73,6 +88,21 @@ node scripts/backup-cli.js list
 
 # Restore from backup
 node scripts/backup-cli.js restore <backup-id>
+```
+
+### Production Deployment
+```bash
+# Preview environment changes for App Runner
+node scripts/apprunner-env-updater.js
+
+# Apply environment updates to production
+node scripts/apprunner-env-updater.js --force
+
+# Check environment configuration
+node scripts/backup-cli.js env
+
+# Setup App Runner permissions (first time only)
+node scripts/setup-apprunner-permissions.js
 ```
 
 ### Content Management

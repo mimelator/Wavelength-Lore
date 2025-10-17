@@ -42,6 +42,49 @@ docker-compose -f deployment/docker-compose.yml -f deployment/docker-compose.pro
 docker-compose -f deployment/docker-compose.yml ps
 ```
 
+### AWS App Runner Deployment
+
+#### Environment Variables Management
+Update production environment variables from your local `.env` file:
+
+```bash
+# Preview changes (safe - shows what would be updated)
+node scripts/apprunner-env-updater.js
+
+# Apply changes to production App Runner service
+node scripts/apprunner-env-updater.js --force
+```
+
+#### First-Time Setup
+If you encounter permissions errors, you need to add App Runner permissions to your IAM user:
+
+1. **Generate IAM Policy**:
+   ```bash
+   node scripts/setup-apprunner-permissions.js
+   ```
+
+2. **Add Permissions via AWS Console**:
+   - Go to AWS Console → IAM → Users → `wavelength-lore-app-user`
+   - Click "Add permissions" → "Create inline policy"
+   - Choose "JSON" tab and paste the generated policy
+   - Name it "AppRunnerEnvironmentUpdate"
+   - Click "Create policy"
+
+3. **Test Connection**:
+   ```bash
+   node scripts/apprunner-env-updater.js
+   ```
+
+#### Production Environment Variables
+The updater automatically filters and deploys these variables:
+- **Firebase Configuration**: API keys, database URL, project settings
+- **AWS Credentials**: Access keys for S3, CloudFront, and other services
+- **Security Settings**: Rate limiting, input sanitization, profanity filtering
+- **External APIs**: YouTube API, CDN configuration
+- **Application Settings**: Version, site URL, port configuration
+
+**Note**: Development-only variables (backup system, local settings) are automatically excluded from production deployment.
+
 ## 🔧 Configuration
 
 ### Environment Variables
