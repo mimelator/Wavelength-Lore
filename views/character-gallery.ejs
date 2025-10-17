@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Character Gallery</title>
+    <title>Hero Gallery</title>
     <%- include('partials/head') %>
     <link rel="stylesheet" href="/css/gallery_styles.css">
 </head>
@@ -11,16 +11,16 @@
     <%- include('partials/header') %>
 
     <main>
-        <h1>Character Gallery</h1>
-        <p class="gallery-subtitle">Meet the characters from the Wavelength universe</p>
+        <h1>Hero Gallery</h1>
+        <p class="gallery-subtitle">Meet the heroes from the Wavelength universe</p>
         
         <section class="character-gallery">
             <div class="gallery">
-                <% characters.forEach(character => { %>
+                <% characters.forEach(hero => { %>
                     <div class="gallery-item">
-                        <a href="/character/<%= character.id %>">
-                            <img src="<%= character.image %>" alt="<%= character.title %>">
-                            <h2><%= character.title %></h2>
+                        <a href="/character/<%= hero.id %>">
+                            <img src="<%= hero.image %>" alt="<%= hero.title %>">
+                            <h2><%= hero.title %></h2>
                         </a>
                     </div>
                 <% }); %>

@@ -37,12 +37,12 @@
         </section>
 
         <section class="character-connections">
-            <h3>Character Connections</h3>
-            <p>Explore other characters from the Wavelength universe:</p>
+            <h3>Hero Connections</h3>
+            <p>Explore other heroes from the Wavelength universe:</p>
             <div class="character-links">
-                <% allCharacters.filter(c => c.id !== character.id).forEach(otherCharacter => { %>
-                    <a href="<%= otherCharacter.url %>" class="character-connection-link">
-                        <%= otherCharacter.name %>
+                <% allCharacters.filter(c => c.id !== character.id).forEach(otherHero => { %>
+                    <a href="<%= otherHero.url %>" class="character-connection-link">
+                        <%= otherHero.name %>
                     </a>
                 <% }); %>
             </div>

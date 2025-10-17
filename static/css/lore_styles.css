@@ -1,5 +1,5 @@
 /* Lore Page Styles */
-/* Main container to match character page layout */
+/* Main container to match hero page layout */
 main {
     max-width: 800px;
     margin: 0 auto;
@@ -150,6 +150,10 @@ main {
     background: linear-gradient(135deg, #FF9800, #E65100);
 }
 
+.type-villain {
+    background: linear-gradient(135deg, #DC143C, #B22222);
+}
+
 .type-magic {
     background: linear-gradient(135deg, #9C27B0, #4A148C);
 }
@@ -207,8 +211,10 @@ main {
     margin-bottom: 2px;
 }
 
-/* Gallery Styles for Lore - Match character gallery layout */
+/* Gallery Styles for Lore - Match hero gallery layout */
 .lore-gallery {
+    width: 80%;
+    margin: 0 auto;
     text-align: center;
     padding: 20px;
 }
@@ -252,14 +258,6 @@ main {
     text-decoration: none;
     color: inherit;
     display: block;
-}
-
-.gallery-subtitle {
-    text-align: center;
-    color: #666;
-    font-style: italic;
-    margin-bottom: 30px;
-    font-size: 1.1rem;
 }
 
 /* Responsive Design for Lore */

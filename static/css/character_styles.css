@@ -1,17 +1,10 @@
-/* Character Page Styles */
+/* Hero Page Styles */
 main {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
 }
 
-.gallery-subtitle {
-    text-align: center;
-    color: #666;
-    font-style: italic;
-    margin-bottom: 30px;
-    font-size: 1.1rem;
-}
 .character-banner {
     text-align: center;
     color: white;
@@ -23,9 +16,51 @@ main {
     overflow: hidden;
 }
 .character-description {
-    margin: 20px 0;
+    width: 80%;
+    margin: 20px auto;
     font-size: 18px;
     line-height: 1.6;
+}
+
+.character-connections {
+    width: 80%;
+    margin: 30px auto;
+    text-align: center;
+}
+
+.character-connections h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.character-connections p {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.character-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.character-connection-link {
+    display: inline-block;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #007BFF, #0056b3);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.character-connection-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    color: white;
+    text-decoration: none;
 }
 .character-carousel {
     margin: 20px 0;

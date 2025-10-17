@@ -91,8 +91,8 @@
             <h2>🎭 Character Cache</h2>
             <p>Clear or refresh character data cache to load updated character information from the database.</p>
             <div class="cache-buttons">
-                <button class="cache-btn clear" onclick="bustCache('characters', false)">Clear Character Cache</button>
-                <button class="cache-btn refresh" onclick="bustCache('characters', true)">Refresh Characters</button>
+                <button class="cache-btn clear" onclick="bustCache('characters', false)">Clear Hero Cache</button>
+                <button class="cache-btn refresh" onclick="bustCache('characters', true)">Refresh Heroes</button>
             </div>
         </div>
 
@@ -192,7 +192,7 @@
                 
                 if (result.success) {
                     statusDisplay.innerHTML += `<span class="success">✅ Cache Status Retrieved!</span>\n`;
-                    statusDisplay.innerHTML += `<span class="info">Characters:</span>\n`;
+                    statusDisplay.innerHTML += `<span class="info">Heroes:</span>\n`;
                     statusDisplay.innerHTML += `  Count: ${result.cache_status.characters.count}\n`;
                     statusDisplay.innerHTML += `  Sample IDs: ${result.cache_status.characters.sample_ids.join(', ')}\n`;
                     statusDisplay.innerHTML += `<span class="info">Lore:</span>\n`;
