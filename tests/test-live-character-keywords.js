@@ -1,4 +1,4 @@
-const { getAllCharacters, linkifyCharacterMentions } = require('./helpers/character-helpers');
+const { getAllCharacters, linkifyCharacterMentions } = require('../helpers/character-helpers');
 
 async function testLiveCharacterKeywords() {
     console.log('🧪 Testing Live Character Keywords...\n');

@@ -9,11 +9,11 @@
  * - Smart linking works as expected
  */
 
-require('dotenv').config();
-const characterHelpers = require('./helpers/character-helpers');
-const loreHelpers = require('./helpers/lore-helpers');
-const episodeHelpers = require('./helpers/episode-helpers');
-const disambiguationHelpers = require('./helpers/disambiguation-helpers');
+require('dotenv').config({ path: '../.env' });
+const characterHelpers = require('../helpers/character-helpers');
+const loreHelpers = require('../helpers/lore-helpers');
+const episodeHelpers = require('../helpers/episode-helpers');
+const disambiguationHelpers = require('../helpers/disambiguation-helpers');
 const { initializeApp } = require('firebase/app');
 const { getDatabase } = require('firebase/database');
 

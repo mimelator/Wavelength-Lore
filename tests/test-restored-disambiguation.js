@@ -1,10 +1,10 @@
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 const { initializeApp } = require('firebase/app');
 const { getDatabase } = require('firebase/database');
-const characterHelpers = require('./helpers/character-helpers');
-const loreHelpers = require('./helpers/lore-helpers');
-const episodeHelpers = require('./helpers/episode-helpers');
-const simpleDisambiguation = require('./helpers/simple-disambiguation');
+const characterHelpers = require('../helpers/character-helpers');
+const loreHelpers = require('../helpers/lore-helpers');
+const episodeHelpers = require('../helpers/episode-helpers');
+const simpleDisambiguation = require('../helpers/simple-disambiguation');
 
 const firebaseConfig = {
   apiKey: process.env.API_KEY,

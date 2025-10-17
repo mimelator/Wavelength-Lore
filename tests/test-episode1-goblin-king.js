@@ -1,8 +1,8 @@
 // Test with exact episode 1 text containing Goblin King
-const characterHelpers = require('./helpers/character-helpers');
-const loreHelpers = require('./helpers/lore-helpers');
-const episodeHelpers = require('./helpers/episode-helpers');
-const simpleDisambiguation = require('./helpers/simple-disambiguation');
+const characterHelpers = require('../helpers/character-helpers');
+const loreHelpers = require('../helpers/lore-helpers');
+const episodeHelpers = require('../helpers/episode-helpers');
+const simpleDisambiguation = require('../helpers/simple-disambiguation');
 
 async function testEpisode1GoblinKing() {
   console.log('🔍 Testing Episode 1 Goblin King Text...\n');

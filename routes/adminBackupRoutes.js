@@ -123,7 +123,7 @@ router.get('/list', async (req, res) => {
  * Download backup
  * GET /api/admin/backup/download/:key
  */
-router.get('/download/:key(*)', async (req, res) => {
+router.get('/download/:key', async (req, res) => {
   try {
     const backupSystem = req.app.locals.backupSystem;
     

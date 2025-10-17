@@ -1,5 +1,5 @@
 // Test script for lore reference system
-const loreHelpers = require('./helpers/lore-helpers');
+const loreHelpers = require('../helpers/lore-helpers');
 
 async function runLoreTests() {
   console.log('=== Lore Reference System Test ===\n');
@@ -48,7 +48,7 @@ async function runLoreTests() {
   console.log('   Sync Processed:', syncProcessed);
 
   console.log('\n7. Combined Character + Lore Processing:');
-  const characterHelpers = require('./helpers/character-helpers');
+  const characterHelpers = require('../helpers/character-helpers');
   await characterHelpers.initializeCharacterCache();
   
   const combinedText = 'Prince Andrew learned Music Magic in The Shire and later visited the Ice Castle with Jewel.';

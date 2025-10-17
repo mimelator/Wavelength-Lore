@@ -6,8 +6,8 @@
  * This script tests the new character keyword functionality
  */
 
-require('dotenv').config();
-const characterHelpers = require('./helpers/character-helpers');
+require('dotenv').config({ path: '../.env' });
+const characterHelpers = require('../helpers/character-helpers');
 const { initializeApp } = require('firebase/app');
 const { getDatabase } = require('firebase/database');
 

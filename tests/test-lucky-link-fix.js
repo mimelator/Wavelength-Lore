@@ -1,9 +1,9 @@
 const { initializeApp } = require('firebase/app');
 const { getDatabase } = require('firebase/database');
-const characterHelpers = require('./helpers/character-helpers');
-const loreHelpers = require('./helpers/lore-helpers');
-const episodeHelpers = require('./helpers/episode-helpers');
-const simpleDisambiguation = require('./helpers/simple-disambiguation');
+const characterHelpers = require('../helpers/character-helpers');
+const loreHelpers = require('../helpers/lore-helpers');
+const episodeHelpers = require('../helpers/episode-helpers');
+const simpleDisambiguation = require('../helpers/simple-disambiguation');
 
 // Firebase configuration
 const firebaseConfig = {

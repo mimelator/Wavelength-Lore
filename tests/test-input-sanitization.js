@@ -4,7 +4,7 @@
  */
 
 const axios = require('axios');
-const InputSanitizer = require('./middleware/inputSanitization');
+const InputSanitizer = require('../middleware/inputSanitization');
 
 const BASE_URL = 'http://localhost:3001';
 

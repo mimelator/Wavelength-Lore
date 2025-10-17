@@ -9,8 +9,8 @@
  * - Cache functions properly
  */
 
-require('dotenv').config();
-const episodeHelpers = require('./helpers/episode-helpers');
+require('dotenv').config({ path: '../.env' });
+const episodeHelpers = require('../helpers/episode-helpers');
 const { initializeApp } = require('firebase/app');
 const { getDatabase } = require('firebase/database');
 

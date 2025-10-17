@@ -1,8 +1,8 @@
 const admin = require('firebase-admin');
 const { initializeApp } = require('firebase/app');
 const { getDatabase, ref, get } = require('firebase/database');
-const serviceAccount = require('./firebaseServiceAccountKey.json');
-require('dotenv').config();
+const serviceAccount = require('../firebaseServiceAccountKey.json');
+require('dotenv').config({ path: '../.env' });
 
 async function testDirectFirebaseAccess() {
   console.log('🔍 Testing direct Firebase database access...');

@@ -1,8 +1,8 @@
 // Test self-referential link prevention
-const characterHelpers = require('./helpers/character-helpers');
-const loreHelpers = require('./helpers/lore-helpers');
-const episodeHelpers = require('./helpers/episode-helpers');
-const simpleDisambiguation = require('./helpers/simple-disambiguation');
+const characterHelpers = require('../helpers/character-helpers');
+const loreHelpers = require('../helpers/lore-helpers');
+const episodeHelpers = require('../helpers/episode-helpers');
+const simpleDisambiguation = require('../helpers/simple-disambiguation');
 
 async function testSelfReferentialLinks() {
   console.log('🔍 Testing Self-Referential Link Prevention...\n');

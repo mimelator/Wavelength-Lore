@@ -1,5 +1,5 @@
 // Quick test to check episode loading with keywords
-const { linkifyEpisodeMentions } = require('./helpers/episode-helpers');
+const { linkifyEpisodeMentions } = require('../helpers/episode-helpers');
 
 async function quickTest() {
     console.log('Testing episode linking...');

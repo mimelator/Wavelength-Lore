@@ -3,11 +3,16 @@
  * Provides comprehensive input cleaning, validation, and content filtering
  */
 
-const DOMPurify = require('isomorphic-dompurify');
+const { JSDOM } = require('jsdom');
+const createDOMPurify = require('dompurify');
 const filter = require('leo-profanity');
 const validator = require('validator');
 const escapeHtml = require('escape-html');
 const { filterXSS } = require('xss');
+
+// Initialize DOMPurify with JSDOM window
+const window = new JSDOM('').window;
+const DOMPurify = createDOMPurify(window);
 
 // Initialize profanity filter
 const profanityFilter = filter;

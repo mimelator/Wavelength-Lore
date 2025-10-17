@@ -1,7 +1,7 @@
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 const { initializeApp } = require('firebase/app');
 const { getDatabase } = require('firebase/database');
-const loreHelpers = require('./helpers/lore-helpers');
+const loreHelpers = require('../helpers/lore-helpers');
 
 const firebaseConfig = {
   apiKey: process.env.API_KEY,

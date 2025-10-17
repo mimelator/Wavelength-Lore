@@ -1,8 +1,8 @@
 // Test Goblin King disambiguation modal data
-const characterHelpers = require('./helpers/character-helpers');
-const loreHelpers = require('./helpers/lore-helpers');
-const episodeHelpers = require('./helpers/episode-helpers');
-const simpleDisambiguation = require('./helpers/simple-disambiguation');
+const characterHelpers = require('../helpers/character-helpers');
+const loreHelpers = require('../helpers/lore-helpers');
+const episodeHelpers = require('../helpers/episode-helpers');
+const simpleDisambiguation = require('../helpers/simple-disambiguation');
 
 async function testGoblinKingDisambiguation() {
   console.log('🔍 Testing Goblin King Disambiguation...\n');

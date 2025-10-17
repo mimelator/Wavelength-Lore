@@ -1,5 +1,5 @@
 // Test script for character reference system
-const characterHelpers = require('./helpers/character-helpers');
+const characterHelpers = require('../helpers/character-helpers');
 
 async function runTests() {
   console.log('=== Character Reference System Test ===\n');

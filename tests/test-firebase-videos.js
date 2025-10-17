@@ -1,5 +1,5 @@
 // Direct Firebase test for episode data
-const firebaseUtils = require('./helpers/firebase-utils');
+const firebaseUtils = require('../helpers/firebase-utils');
 
 async function testFirebaseVideos() {
     console.log('🔥 Testing Firebase videos data directly...');

@@ -1,7 +1,7 @@
-const { getEpisodes } = require('./helpers/episode-helpers');
-const { linkifyEpisodeMentions, linkifyEpisodeMentionsSync } = require('./helpers/episode-helpers');
-const { linkifyCharacterMentions, linkifyCharacterMentionsSync } = require('./helpers/character-helpers');
-const { linkifyLoreMentions, linkifyLoreMentionsSync } = require('./helpers/lore-helpers');
+const { getEpisodes } = require('../helpers/episode-helpers');
+const { linkifyEpisodeMentions, linkifyEpisodeMentionsSync } = require('../helpers/episode-helpers');
+const { linkifyCharacterMentions, linkifyCharacterMentionsSync } = require('../helpers/character-helpers');
+const { linkifyLoreMentions, linkifyLoreMentionsSync } = require('../helpers/lore-helpers');
 
 async function testEpisodeKeywords() {
     console.log('🎬 Testing Episode Keywords System\n');

@@ -28,7 +28,12 @@ app.use('/api/forum', forumLimiter);
 
 Add HTML sanitization for forum content:
 ```javascript
-const DOMPurify = require('isomorphic-dompurify');
+const { JSDOM } = require('jsdom');
+const createDOMPurify = require('dompurify');
+
+// Initialize DOMPurify with JSDOM window
+const window = new JSDOM('').window;
+const DOMPurify = createDOMPurify(window);
 
 // Sanitize user input before saving to Firebase
 const sanitizedContent = DOMPurify.sanitize(userInput, {
