@@ -127,15 +127,87 @@
         
         // Initialize profile page
         document.addEventListener('DOMContentLoaded', function() {
-            if (userId && userId !== 'undefined') {
+            if (userId && userId !== 'undefined' && userId !== 'null') {
+                // Viewing a specific user's profile
                 loadUserProfile();
                 loadUserPosts();
                 loadUserReplies();
                 setupAuthListener();
             } else {
-                showUserNotFound();
+                // Viewing current user's profile - wait for authentication
+                setupCurrentUserProfile();
             }
         });
+        
+        function setupCurrentUserProfile() {
+            if (window.firebaseAuth && window.firebaseUtils) {
+                window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
+                    if (user) {
+                        // Set the userId to current user and load profile
+                        window.currentUserId = user.uid;
+                        loadCurrentUserProfile(user.uid);
+                        loadUserPosts();
+                        loadUserReplies();
+                        updateAuthUI();
+                        updateProfilePermissions();
+                    } else {
+                        // Not signed in, show sign-in prompt
+                        showSignInRequired();
+                    }
+                });
+            } else {
+                // Firebase not ready, try again
+                setTimeout(setupCurrentUserProfile, 100);
+            }
+        }
+        
+        function loadCurrentUserProfile(currentUserId) {
+            const userRef = window.firebaseUtils.ref(window.firebaseDB, `forum/users/${currentUserId}`);
+            window.firebaseUtils.onValue(userRef, (snapshot) => {
+                const userData = snapshot.val();
+                if (userData) {
+                    currentProfile = { id: currentUserId, ...userData };
+                    displayUserProfile(currentProfile);
+                } else {
+                    // Create initial profile for new user
+                    currentProfile = {
+                        id: currentUserId,
+                        name: window.forumState.currentUser?.name || 'User',
+                        email: window.forumState.currentUser?.email || '',
+                        avatar: window.forumState.currentUser?.avatar || '/icons/hero-icon.svg',
+                        bio: '',
+                        joinedAt: Date.now(),
+                        postCount: 0,
+                        replyCount: 0
+                    };
+                    displayUserProfile(currentProfile);
+                }
+            });
+        }
+        
+        function showSignInRequired() {
+            document.getElementById('user-profile-container').innerHTML = `
+                <div class="profile-signin-required">
+                    <div class="signin-card">
+                        <h2>Sign In Required</h2>
+                        <p>You need to sign in to view your profile.</p>
+                        <button class="btn btn-primary" onclick="signInWithGoogle()">
+                            🔐 Sign In with Google
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        async function signInWithGoogle() {
+            try {
+                const provider = new window.firebaseUtils.GoogleAuthProvider();
+                await window.firebaseUtils.signInWithPopup(window.firebaseAuth, provider);
+            } catch (error) {
+                console.error('Sign-in error:', error);
+                alert('Sign-in failed. Please try again.');
+            }
+        }
         
         function setupAuthListener() {
             if (window.firebaseAuth && window.firebaseUtils) {
@@ -173,10 +245,11 @@
                 
                 window.firebaseUtils.onValue(postsQuery, (snapshot) => {
                     const allPosts = snapshot.val();
+                    const targetUserId = userId || window.currentUserId;
                     if (allPosts) {
                         userPosts = Object.entries(allPosts)
                             .map(([id, post]) => ({ id, ...post }))
-                            .filter(post => post.authorId === userId)
+                            .filter(post => post.authorId === targetUserId)
                             .sort((a, b) => b.createdAt - a.createdAt);
                     } else {
                         userPosts = [];
@@ -196,10 +269,11 @@
                 
                 window.firebaseUtils.onValue(repliesQuery, (snapshot) => {
                     const allReplies = snapshot.val();
+                    const targetUserId = userId || window.currentUserId;
                     if (allReplies) {
                         userReplies = Object.entries(allReplies)
                             .map(([id, reply]) => ({ id, ...reply }))
-                            .filter(reply => reply.authorId === userId)
+                            .filter(reply => reply.authorId === targetUserId)
                             .sort((a, b) => b.createdAt - a.createdAt);
                     } else {
                         userReplies = [];

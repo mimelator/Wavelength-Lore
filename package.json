@@ -30,6 +30,7 @@
     "js-yaml": "^4.1.0",
     "jsdom": "^25.0.1",
     "leo-profanity": "^1.8.0",
+    "multer": "^2.0.2",
     "node-cron": "^4.2.1",
     "validator": "^13.15.15",
     "xss": "^1.0.15"

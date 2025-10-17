@@ -115,7 +115,8 @@ router.get('/popular', (req, res) => {
         breadcrumbs: [
             { name: 'Popular Posts', url: null }
         ],
-        layout: 'forum/layout'
+        cdnUrl: process.env.CDN_URL || '',
+        version: process.env.VERSION || Date.now()
     });
 });
 
@@ -133,6 +134,18 @@ router.get('/search', (req, res) => {
             { name: 'Search', url: null }
         ],
         layout: 'forum/layout'
+    });
+});
+
+/**
+ * Current User Profile Page
+ */
+router.get('/profile', (req, res) => {
+    res.render('forum/user-profile', {
+        userId: null, // Will be determined by client-side authentication
+        title: 'My Profile',
+        cdnUrl: process.env.CDN_URL || '',
+        version: process.env.VERSION || Date.now()
     });
 });
 

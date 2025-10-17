@@ -118,7 +118,14 @@ async function setupForumDatabase() {
       maxPostLength: 10000,
       maxReplyLength: 5000,
       allowImageUploads: true,
-      allowFileUploads: false,
+      allowFileUploads: true,
+      maxFileSize: 1048576, // 1MB in bytes
+      maxFilesPerPost: 5,
+      allowedFileTypes: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'txt', 'md', 'pdf'],
+      allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'text/plain', 'text/markdown', 'application/pdf'],
+      fileStorageType: 's3', // Changed from 'firebase' to 's3'
+      s3Bucket: 'wavelength-lore-backups',
+      s3Region: 'us-east-1',
       mainSiteUrl: 'https://wavelengthlore.com',
       version: '1.0.0',
       createdAt: Date.now()

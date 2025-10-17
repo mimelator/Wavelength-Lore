@@ -28,8 +28,9 @@ function initializeFirebaseAdmin() {
     
     adminApp = admin.initializeApp({
       credential: admin.credential.cert(serviceAccountPath),
-      databaseURL: process.env.DATABASE_URL
-    });
+      databaseURL: process.env.DATABASE_URL,
+      storageBucket: process.env.STORAGE_BUCKET
+    }, 'admin');
 
     adminDatabase = adminApp.database();
     console.log('Firebase Admin SDK initialized successfully');

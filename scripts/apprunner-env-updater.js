@@ -97,6 +97,12 @@ class AppRunnerEnvUpdater {
       'SANITIZATION_ENABLED',
       'PROFANITY_FILTER_ENABLED',
       
+      // Forum File Attachments (NEW)
+      'FORUM_ATTACHMENTS_BUCKET',
+      'MAX_FILE_SIZE',
+      'MAX_FILES_PER_POST',
+      'ALLOWED_FILE_TYPES',
+      
       // Backup Configuration (OPTIONAL - only if you want backups in production)
       'ENABLE_BACKUPS',
       'AWS_ACCESS_KEY_ID',

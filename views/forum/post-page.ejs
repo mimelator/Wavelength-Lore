@@ -134,12 +134,17 @@
         </div>
         
         <!-- Reply Section -->
-        <div class="reply-section" id="reply-section" style="display: none;">
+        <div class="reply-section" id="reply-section">
             <div class="reply-header">
                 <h3>💬 Replies (<span id="reply-count">0</span>)</h3>
                 <button class="btn btn-primary" id="reply-btn" onclick="showReplyForm()" style="display: none;">
                     💬 Reply to Post
                 </button>
+                <div id="sign-in-prompt" style="display: none;">
+                    <button class="btn btn-secondary" onclick="signInToReply()">
+                        🔐 Sign In to Reply
+                    </button>
+                </div>
             </div>
             
             <!-- Reply Form -->
@@ -206,14 +211,66 @@
         function setupAuthListener() {
             if (window.firebaseAuth && window.firebaseUtils) {
                 window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
-                    const replyBtn = document.getElementById('reply-btn');
-                    if (user && currentPost && !currentPost.isLocked) {
-                        replyBtn.style.display = 'inline-block';
-                    } else {
-                        replyBtn.style.display = 'none';
-                    }
+                    console.log('Auth state changed:', user ? 'User signed in' : 'User signed out');
+                    updateReplyButtonVisibility();
                     updateAuthUI();
                 });
+            } else {
+                // Firebase not ready, try again
+                setTimeout(setupAuthListener, 100);
+            }
+        }
+        
+        function updateReplyButtonVisibility() {
+            const replyBtn = document.getElementById('reply-btn');
+            const signInPrompt = document.getElementById('sign-in-prompt');
+            const replySection = document.getElementById('reply-section');
+            
+            if (replyBtn && signInPrompt && replySection) {
+                const user = window.firebaseAuth?.currentUser;
+                const hasPost = currentPost && Object.keys(currentPost).length > 0;
+                const isPostLocked = currentPost?.isLocked || false;
+                
+                console.log('Reply button visibility check:', {
+                    user: !!user,
+                    hasPost: hasPost,
+                    isLocked: isPostLocked
+                });
+                
+                if (hasPost) {
+                    replySection.style.display = 'block';
+                    
+                    if (user && !isPostLocked) {
+                        // Show reply button for authenticated users
+                        replyBtn.style.display = 'inline-block';
+                        signInPrompt.style.display = 'none';
+                    } else if (!user) {
+                        // Show sign-in prompt for unauthenticated users
+                        replyBtn.style.display = 'none';
+                        signInPrompt.style.display = 'inline-block';
+                    } else {
+                        // Post is locked
+                        replyBtn.style.display = 'none';
+                        signInPrompt.style.display = 'none';
+                    }
+                } else {
+                    replySection.style.display = 'none';
+                }
+            }
+        }
+        
+        function signInToReply() {
+            if (window.firebaseAuth && window.firebaseUtils) {
+                const provider = new window.firebaseUtils.GoogleAuthProvider();
+                window.firebaseUtils.signInWithPopup(window.firebaseAuth, provider)
+                    .then(() => {
+                        console.log('Sign-in successful');
+                        updateReplyButtonVisibility();
+                    })
+                    .catch((error) => {
+                        console.error('Sign-in error:', error);
+                        alert('Sign-in failed. Please try again.');
+                    });
             }
         }
         
@@ -231,6 +288,9 @@
                         
                         // Update like button state in real-time
                         updateLikeButtonState(currentPost);
+                        
+                        // Update reply button visibility when post loads
+                        updateReplyButtonVisibility();
                         
                         // Only increment view count once per session
                         if (!window.postViewIncremented) {
@@ -328,7 +388,7 @@
                         <h1 class="post-full-title">${escapeHtml(post.title)}</h1>
                         ${post.tags && post.tags.length > 0 ? `
                             <div class="post-tags">
-                                ${post.tags.map(tag => `<span class="post-tag">#${tag}</span>`).join('')}
+                                ${post.tags.map(tag => `<a href="/forum/search?tag=${encodeURIComponent(tag)}" class="post-tag" onclick="searchByTag('${escapeHtml(tag)}'); return false;">#${tag}</a>`).join('')}
                             </div>
                         ` : ''}
                     </header>
@@ -336,6 +396,48 @@
                     <div class="post-full-content">
                         <p>${escapeHtml(post.content).replace(/\n/g, '</p><p>')}</p>
                     </div>
+                    
+                    <!-- Post Attachments -->
+                    ${post.attachments && post.attachments.length > 0 ? `
+                        <div class="post-attachments">
+                            <h4 class="attachments-title">📎 Attachments</h4>
+                            <div class="attachments-grid">
+                                ${post.attachments.map(attachment => {
+                                    const isImage = attachment.type && attachment.type.startsWith('image/');
+                                    const fileName = attachment.originalName || attachment.filename || 'Unknown file';
+                                    const fileSize = attachment.size ? formatFileSize(attachment.size) : '';
+                                    
+                                    if (isImage) {
+                                        return `
+                                            <div class="attachment-item attachment-image">
+                                                <div class="image-attachment">
+                                                    <img src="${attachment.url}" alt="${escapeHtml(fileName)}" 
+                                                         class="attachment-preview" onclick="openImageModal(this.src, '${escapeHtml(fileName)}')" />
+                                                    <div class="image-overlay">
+                                                        <span class="image-filename">${escapeHtml(fileName)}</span>
+                                                        ${fileSize ? `<span class="image-filesize">${fileSize}</span>` : ''}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
+                                    } else {
+                                        return `
+                                            <div class="attachment-item attachment-file">
+                                                <a href="${attachment.url}" target="_blank" class="file-attachment">
+                                                    <div class="file-icon">📄</div>
+                                                    <div class="file-details">
+                                                        <div class="file-name">${escapeHtml(fileName)}</div>
+                                                        ${fileSize ? `<div class="file-size">${fileSize}</div>` : ''}
+                                                    </div>
+                                                    <div class="download-icon">⬇️</div>
+                                                </a>
+                                            </div>
+                                        `;
+                                    }
+                                }).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
                     
                     <footer class="post-full-footer">
                         <div class="post-author-info">
@@ -741,6 +843,65 @@
                 "'": '&#039;'
             };
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function openImageModal(src, filename) {
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.className = 'image-modal-overlay';
+            modal.innerHTML = `
+                <div class="image-modal">
+                    <div class="image-modal-header">
+                        <span class="image-modal-title">${escapeHtml(filename)}</span>
+                        <button class="image-modal-close" onclick="closeImageModal()">&times;</button>
+                    </div>
+                    <div class="image-modal-content">
+                        <img src="${src}" alt="${escapeHtml(filename)}" class="image-modal-img">
+                    </div>
+                    <div class="image-modal-footer">
+                        <a href="${src}" target="_blank" class="btn btn-primary">Open in New Tab</a>
+                    </div>
+                </div>
+            `;
+            
+            // Add click outside to close
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeImageModal();
+                }
+            });
+            
+            document.body.appendChild(modal);
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeImageModal() {
+            const modal = document.querySelector('.image-modal-overlay');
+            if (modal) {
+                modal.remove();
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+        
+        // Tag search functionality
+        function searchByTag(tag) {
+            // Redirect to forum home with tag filter
+            window.location.href = `/forum?tag=${encodeURIComponent(tag)}`;
         }
     </script>
     

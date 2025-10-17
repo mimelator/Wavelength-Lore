@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popular Posts - Wavelength Community Forum</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+    
+    <!-- Reuse existing styles -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/forum.css">
+    
+    <!-- Firebase SDK -->
+    <!-- Firebase SDK - Direct imports for better compatibility -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+      import { getDatabase, ref, push, set, onValue, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+      
+      // Initialize Firebase with environment config
+      const firebaseConfig = {
+        apiKey: "<%= process.env.API_KEY %>",
+        authDomain: "<%= process.env.AUTH_DOMAIN %>",
+        databaseURL: "<%= process.env.DATABASE_URL %>",
+        projectId: "<%= process.env.PROJECT_ID %>",
+        storageBucket: "<%= process.env.STORAGE_BUCKET %>",
+        messagingSenderId: "<%= process.env.MESSAGING_SENDER_ID %>",
+        appId: "<%= process.env.APP_ID %>"
+      };
+      
+      console.log('🔥 Initializing Firebase for popular posts...');
+      
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const database = getDatabase(app);
+      
+      // Configure Firebase Auth persistence for 2-week sessions
+      setPersistence(auth, browserLocalPersistence).then(() => {
+        console.log('✅ Firebase Auth persistence set to LOCAL for extended sessions');
+        
+        // Initialize session manager if not already present
+        if (!window.sessionManager) {
+          window.sessionManager = {
+            SESSION_DURATION: 14 * 24 * 60 * 60 * 1000,
+            isSessionValid: function() {
+              const lastActivity = localStorage.getItem('wavelength_last_activity');
+              if (!lastActivity) return false;
+              const now = Date.now();
+              const timeSinceActivity = now - parseInt(lastActivity);
+              return timeSinceActivity < this.SESSION_DURATION;
+            },
+            updateActivity: function() {
+              localStorage.setItem('wavelength_last_activity', Date.now().toString());
+            },
+            clearExpiredSession: function() {
+              if (!this.isSessionValid()) {
+                localStorage.removeItem('wavelength_last_activity');
+                auth.signOut();
+                return true;
+              }
+              return false;
+            }
+          };
+        }
+        
+        window.sessionManager.clearExpiredSession();
+      }).catch((error) => {
+        console.error('❌ Failed to set Firebase persistence:', error);
+      });
+      
+      // Make Firebase available globally for forum components
+      window.firebaseAuth = auth;
+      window.firebaseDB = database;
+      window.firebaseUtils = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, ref, push, set, onValue, query, orderByChild };
+      
+      console.log('✅ Firebase initialized successfully for popular posts');
+    </script>    <!-- Forum JavaScript -->
+    <script src="/js/forum.js" defer></script>
+</head>
+<body>
+    <!-- Include main site header -->
+    <%- include('../partials/header') %>
+    
+    <div class="forum-container">
+        <!-- Forum Header -->
+        <header class="forum-header">
+            <div class="container">
+                <div class="forum-header-content">
+                    <div class="forum-branding">
+                        <h1>
+                            <span class="forum-icon">🔥</span>
+                            Popular Posts
+                        </h1>
+                        <p class="forum-tagline">Most engaging discussions in the community</p>
+                    </div>
+                    
+                    <div class="forum-auth">
+                        <div id="forum-auth-container">
+                            <!-- Auth buttons will be inserted here by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Forum Navigation -->
+        <nav class="forum-nav">
+            <div class="container">
+                <ul class="forum-nav-list">
+                    <li><a href="/forum">🏠 Home</a></li>
+                    <li><a href="/forum/recent">🕒 Recent Posts</a></li>
+                    <li><a href="/forum/popular" class="active">🔥 Popular</a></li>
+                    <li><a href="/forum/search">🔍 Search</a></li>
+                    <li><a href="/forum/create" class="create-post-btn">➕ New Post</a></li>
+                </ul>
+            </div>
+        </nav>
+        
+        <!-- Main Forum Content -->
+        <main class="forum-main">
+            <div class="container">
+                <!-- Breadcrumb -->
+                <div class="forum-breadcrumb">
+                    <a href="/forum">Forum</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <span>Popular Posts</span>
+                </div>
+                
+                <!-- Filter Controls -->
+                <div class="popular-posts-controls">
+                    <div class="filter-section">
+                        <label for="time-filter">Time Period:</label>
+                        <select id="time-filter" class="filter-select">
+                            <option value="today">Today</option>
+                            <option value="week" selected>This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="all">All Time</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <label for="category-filter">Category:</label>
+                        <select id="category-filter" class="filter-select">
+                            <option value="">All Categories</option>
+                            <option value="general">🎵 General Discussion</option>
+                            <option value="lore">📜 Lore & Theories</option>
+                            <option value="episodes">🎬 Episode Discussions</option>
+                            <option value="fanart">🎨 Fan Creations</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <label for="sort-filter">Sort By:</label>
+                        <select id="sort-filter" class="filter-select">
+                            <option value="engagement" selected>🔥 Total Engagement</option>
+                            <option value="likes">❤️ Most Liked</option>
+                            <option value="replies">💬 Most Replies</option>
+                            <option value="views">👁️ Most Viewed</option>
+                        </select>
+                    </div>
+                    
+                    <div class="view-options">
+                        <button id="refresh-posts" class="btn btn-secondary">
+                            🔄 Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Popular Posts List -->
+                <div class="popular-posts-container">
+                    <div id="popular-posts-list" class="posts-list">
+                        <!-- Loading state -->
+                        <div class="loading-container">
+                            <div class="loading-spinner"></div>
+                            <p>Loading popular posts...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Load More Button -->
+                    <div class="load-more-container" style="display: none;">
+                        <button id="load-more-posts" class="btn btn-primary">
+                            📄 Load More Posts
+                        </button>
+                    </div>
+                    
+                    <!-- No Posts State -->
+                    <div id="no-posts-message" class="no-posts" style="display: none;">
+                        <div class="no-posts-icon">🔥</div>
+                        <h3>No Popular Posts</h3>
+                        <p>No posts found for the selected criteria.</p>
+                        <p>Be the first to create an engaging post!</p>
+                        <a href="/forum/create" class="btn btn-primary">
+                            ➕ Create New Post
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Forum Footer -->
+        <footer class="forum-footer">
+            <div class="container">
+                <div class="forum-footer-content">
+                    <div class="forum-stats">
+                        <span>Wavelength Community Forum</span>
+                    </div>
+                    <div class="forum-links">
+                        <a href="/">Return to Wavelength Lore</a>
+                        <a href="/forum/guidelines">Guidelines</a>
+                        <a href="/forum/help">Help</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Popular Posts JavaScript -->
+    <script>
+        class PopularPostsManager {
+            constructor() {
+                this.posts = [];
+                this.currentFilter = {
+                    time: 'week',
+                    category: '',
+                    sort: 'engagement'
+                };
+                this.isLoading = false;
+                this.currentPage = 1;
+                this.postsPerPage = 20;
+            }
+
+            initialize() {
+                this.setupEventListeners();
+                this.loadPopularPosts();
+            }
+
+            setupEventListeners() {
+                // Filter controls
+                document.getElementById('time-filter').addEventListener('change', (e) => {
+                    this.currentFilter.time = e.target.value;
+                    this.loadPopularPosts();
+                });
+
+                document.getElementById('category-filter').addEventListener('change', (e) => {
+                    this.currentFilter.category = e.target.value;
+                    this.loadPopularPosts();
+                });
+
+                document.getElementById('sort-filter').addEventListener('change', (e) => {
+                    this.currentFilter.sort = e.target.value;
+                    this.sortAndRenderPosts();
+                });
+
+                // Refresh button
+                document.getElementById('refresh-posts').addEventListener('click', () => {
+                    this.loadPopularPosts();
+                });
+
+                // Load more button
+                document.getElementById('load-more-posts').addEventListener('click', () => {
+                    this.loadMorePosts();
+                });
+            }
+
+            async loadPopularPosts() {
+                if (this.isLoading) return;
+                
+                this.isLoading = true;
+                this.currentPage = 1;
+                
+                const container = document.getElementById('popular-posts-list');
+                container.innerHTML = `
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                        <p>Loading popular posts...</p>
+                    </div>
+                `;
+
+                try {
+                    const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
+                    const query = window.firebaseUtils.query(
+                        postsRef,
+                        window.firebaseUtils.orderByChild('createdAt')
+                    );
+
+                    window.firebaseUtils.onValue(query, (snapshot) => {
+                        const postsData = snapshot.val() || {};
+                        let posts = Object.keys(postsData).map(id => ({
+                            id,
+                            ...postsData[id]
+                        }));
+
+                        // Apply filters
+                        posts = this.applyFilters(posts);
+                        
+                        // Calculate engagement scores and sort
+                        posts = this.calculateEngagementScores(posts);
+                        posts = this.sortPosts(posts);
+
+                        this.posts = posts;
+                        this.renderPosts();
+                        this.isLoading = false;
+                    });
+
+                } catch (error) {
+                    console.error('Error loading popular posts:', error);
+                    container.innerHTML = `
+                        <div class="error-container">
+                            <div class="error-icon">⚠️</div>
+                            <h3>Error Loading Posts</h3>
+                            <p>Failed to load popular posts. Please try again.</p>
+                            <button onclick="popularPostsManager.loadPopularPosts()" class="btn btn-primary">
+                                🔄 Retry
+                            </button>
+                        </div>
+                    `;
+                    this.isLoading = false;
+                }
+            }
+
+            applyFilters(posts) {
+                let filtered = posts;
+
+                // Time filter
+                if (this.currentFilter.time !== 'all') {
+                    const now = Date.now();
+                    let timeLimit;
+
+                    switch (this.currentFilter.time) {
+                        case 'today':
+                            timeLimit = now - (24 * 60 * 60 * 1000);
+                            break;
+                        case 'week':
+                            timeLimit = now - (7 * 24 * 60 * 60 * 1000);
+                            break;
+                        case 'month':
+                            timeLimit = now - (30 * 24 * 60 * 60 * 1000);
+                            break;
+                        default:
+                            timeLimit = 0;
+                    }
+
+                    filtered = filtered.filter(post => (post.createdAt || 0) > timeLimit);
+                }
+
+                // Category filter
+                if (this.currentFilter.category) {
+                    filtered = filtered.filter(post => post.category === this.currentFilter.category);
+                }
+
+                return filtered;
+            }
+
+            calculateEngagementScores(posts) {
+                return posts.map(post => {
+                    const likes = post.likeCount || 0;
+                    const replies = post.replyCount || 0;
+                    const views = post.viewCount || 0;
+                    
+                    // Calculate engagement score with weighted formula
+                    // Likes are worth 3 points, replies 5 points, views 0.1 points
+                    const engagementScore = (likes * 3) + (replies * 5) + (views * 0.1);
+                    
+                    return {
+                        ...post,
+                        engagementScore
+                    };
+                });
+            }
+
+            sortPosts(posts) {
+                switch (this.currentFilter.sort) {
+                    case 'likes':
+                        return posts.sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0));
+                    case 'replies':
+                        return posts.sort((a, b) => (b.replyCount || 0) - (a.replyCount || 0));
+                    case 'views':
+                        return posts.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
+                    case 'engagement':
+                    default:
+                        return posts.sort((a, b) => (b.engagementScore || 0) - (a.engagementScore || 0));
+                }
+            }
+
+            sortAndRenderPosts() {
+                this.posts = this.sortPosts(this.posts);
+                this.currentPage = 1;
+                this.renderPosts();
+            }
+
+            renderPosts() {
+                const container = document.getElementById('popular-posts-list');
+                const loadMoreContainer = document.querySelector('.load-more-container');
+                const noPostsMessage = document.getElementById('no-posts-message');
+
+                if (this.posts.length === 0) {
+                    container.innerHTML = '';
+                    loadMoreContainer.style.display = 'none';
+                    noPostsMessage.style.display = 'block';
+                    return;
+                }
+
+                noPostsMessage.style.display = 'none';
+
+                const displayPosts = this.posts.slice(0, this.currentPage * this.postsPerPage);
+                
+                container.innerHTML = displayPosts.map((post, index) => this.renderPostItem(post, index + 1)).join('');
+
+                // Show/hide load more button
+                if (this.posts.length > displayPosts.length) {
+                    loadMoreContainer.style.display = 'block';
+                } else {
+                    loadMoreContainer.style.display = 'none';
+                }
+            }
+
+            renderPostItem(post, rank) {
+                const categoryIcons = {
+                    'general': '🎵',
+                    'lore': '📜',
+                    'episodes': '🎬',
+                    'fanart': '🎨'
+                };
+
+                const categoryNames = {
+                    'general': 'General Discussion',
+                    'lore': 'Lore & Theories',
+                    'episodes': 'Episode Discussions',
+                    'fanart': 'Fan Creations'
+                };
+
+                const timeAgo = this.getTimeAgo(post.createdAt);
+                const categoryIcon = categoryIcons[post.category] || '💬';
+                const categoryName = categoryNames[post.category] || 'Discussion';
+
+                // Get rank badge
+                const rankBadge = this.getRankBadge(rank);
+
+                return `
+                    <div class="post-item popular-post-item" onclick="window.location.href='/forum/post/${post.id}'">
+                        <div class="post-rank">
+                            ${rankBadge}
+                        </div>
+                        
+                        <div class="post-content-wrapper">
+                            <div class="post-header">
+                                <div class="post-category">
+                                    <span class="category-icon">${categoryIcon}</span>
+                                    <span class="category-name">${categoryName}</span>
+                                </div>
+                                <div class="post-time">${timeAgo}</div>
+                            </div>
+                            
+                            <div class="post-content">
+                                <h3 class="post-title">${this.escapeHtml(post.title)}</h3>
+                                <p class="post-preview">${this.getPostPreview(post.content)}</p>
+                                
+                                <div class="post-meta">
+                                    <div class="post-author">
+                                        <img src="${post.authorAvatar || '/icons/hero-icon.svg'}" alt="Author" class="author-avatar-small">
+                                        <span class="author-name">${this.escapeHtml(post.authorName || 'Anonymous')}</span>
+                                    </div>
+                                    
+                                    <div class="post-stats">
+                                        <span class="stat-item ${this.currentFilter.sort === 'likes' ? 'highlighted' : ''}">
+                                            <span class="stat-icon">❤️</span>
+                                            <span class="stat-count">${post.likeCount || 0}</span>
+                                        </span>
+                                        <span class="stat-item ${this.currentFilter.sort === 'replies' ? 'highlighted' : ''}">
+                                            <span class="stat-icon">💬</span>
+                                            <span class="stat-count">${post.replyCount || 0}</span>
+                                        </span>
+                                        <span class="stat-item ${this.currentFilter.sort === 'views' ? 'highlighted' : ''}">
+                                            <span class="stat-icon">👁️</span>
+                                            <span class="stat-count">${post.viewCount || 0}</span>
+                                        </span>
+                                        ${this.currentFilter.sort === 'engagement' ? `
+                                            <span class="stat-item highlighted">
+                                                <span class="stat-icon">🔥</span>
+                                                <span class="stat-count">${Math.round(post.engagementScore || 0)}</span>
+                                            </span>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getRankBadge(rank) {
+                if (rank <= 3) {
+                    const medals = ['🥇', '🥈', '🥉'];
+                    return `<div class="rank-badge medal">${medals[rank - 1]}</div>`;
+                } else {
+                    return `<div class="rank-badge number">#${rank}</div>`;
+                }
+            }
+
+            loadMorePosts() {
+                this.currentPage++;
+                this.renderPosts();
+            }
+
+            getPostPreview(content) {
+                if (!content) return 'No content available...';
+                const text = content.replace(/<[^>]*>/g, ''); // Strip HTML
+                return text.length > 150 ? text.substring(0, 150) + '...' : text;
+            }
+
+            getTimeAgo(timestamp) {
+                if (!timestamp) return 'Unknown time';
+                
+                const now = Date.now();
+                const diff = now - timestamp;
+                
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+                
+                if (minutes < 1) return 'Just now';
+                if (minutes < 60) return `${minutes}m ago`;
+                if (hours < 24) return `${hours}h ago`;
+                if (days < 7) return `${days}d ago`;
+                
+                return new Date(timestamp).toLocaleDateString();
+            }
+
+            escapeHtml(text) {
+                if (!text) return '';
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+            }
+        }
+
+        // Initialize popular posts manager
+        window.popularPostsManager = new PopularPostsManager();
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.popularPostsManager.initialize();
+        });
+    </script>
+    
+    <!-- Add some additional styles for popular posts -->
+    <style>
+        .popular-post-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .post-rank {
+            flex-shrink: 0;
+            width: 60px;
+            text-align: center;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .rank-badge.medal {
+            background: linear-gradient(45deg, #f39c12, #e74c3c);
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .rank-badge.number {
+            background: var(--primary-color);
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .post-content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .stat-item.highlighted {
+            background: rgba(231, 76, 60, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .stat-item.highlighted .stat-icon {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .popular-posts-controls {
+            background: var(--card-background);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-section label {
+            font-weight: 600;
+            color: var(--text-color);
+            white-space: nowrap;
+        }
+
+        .filter-select {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--background-color);
+            color: var(--text-color);
+            min-width: 120px;
+        }
+
+        .view-options {
+            margin-left: auto;
+        }
+
+        @media (max-width: 768px) {
+            .popular-posts-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-section {
+                justify-content: space-between;
+            }
+            
+            .view-options {
+                margin-left: 0;
+            }
+            
+            .popular-post-item {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .post-rank {
+                align-self: flex-start;
+            }
+        }
+    </style>
+    
+    <!-- Forum Activity Script -->
+    <script src="/js/forum-activity.js"></script>
+    
+    <!-- Disambiguation Scripts -->
+    <%- simpleDisambiguationScript %>
+    <%- simpleDisambiguationStyles %>
+</body>
+</html>
