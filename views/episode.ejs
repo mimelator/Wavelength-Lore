@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <%- include('partials/head') %>
+    <link rel="stylesheet" href="/css/lore_styles.css">
     <link rel="stylesheet" href="/css/modal_styles.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/carousel.css">
     <%- simpleDisambiguationStyles %>
 </head>
 <body>
@@ -45,6 +49,8 @@
             <img class="modal-content" id="fullSizeImage">
         </div>
 
+        <br /><br />
+
         <section class="summary">
             <h2>Summary</h2>
             <p><%- simpleSmartLinking(summary) %></p>
@@ -76,12 +82,15 @@
         $(document).ready(function() {
             $('#episode-carousel').slick({
                 infinite: true,
-                slidesToShow: window.innerWidth <= 768 ? 2 : 3, // Show 2 slides on mobile, 3 otherwise
+                slidesToShow: window.innerWidth <= 768 ? 2 : 5, // Show 2 slides on mobile, 5 otherwise
                 slidesToScroll: 1,
                 autoplay: true,
                 autoplaySpeed: 4000,
                 dots: true,
-                arrows: true
+                arrows: true,
+                centerMode: false,
+                variableWidth: false,
+                adaptiveHeight: false
             });
         });
     </script>

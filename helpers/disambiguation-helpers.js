@@ -149,15 +149,29 @@ function findConflicts(text) {
   Object.keys(nameGroups).forEach(key => {
     const matches = nameGroups[key];
     if (matches.length > 1) {
-      conflicts.push({
-        phrase: matches[0].name, // Use the original case from the first match
-        matches: {
-          characters: matches.filter(m => m.type === 'character'),
-          lore: matches.filter(m => m.type === 'lore'),
-          episodes: matches.filter(m => m.type === 'episode')
-        },
-        allMatches: matches
+      // Deduplicate matches by URL to avoid duplicate entries in the modal
+      const uniqueMatches = [];
+      const seenUrls = new Set();
+      
+      matches.forEach(match => {
+        if (!seenUrls.has(match.url)) {
+          seenUrls.add(match.url);
+          uniqueMatches.push(match);
+        }
       });
+      
+      // Only create conflict if we still have multiple unique matches after deduplication
+      if (uniqueMatches.length > 1) {
+        conflicts.push({
+          phrase: uniqueMatches[0].name, // Use the original case from the first match
+          matches: {
+            characters: uniqueMatches.filter(m => m.type === 'character'),
+            lore: uniqueMatches.filter(m => m.type === 'lore'),
+            episodes: uniqueMatches.filter(m => m.type === 'episode')
+          },
+          allMatches: uniqueMatches
+        });
+      }
     }
   });
   

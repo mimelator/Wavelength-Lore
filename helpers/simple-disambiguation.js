@@ -28,6 +28,7 @@ function setHelperInstances(charHelpers, loreHelpersInstance, episodeHelpersInst
  */
 function detectConflictsForTerm(term) {
   const conflicts = [];
+  const seenUrls = new Set();
   
   // Check characters
   if (characterHelpers) {
@@ -41,14 +42,18 @@ function detectConflictsForTerm(term) {
       if (searchTerms.some(searchTerm => 
         searchTerm && searchTerm.toLowerCase() === term.toLowerCase()
       )) {
-        conflicts.push({
-          type: 'character',
-          url: char.url,
-          name: char.name,
-          description: 'Character',
-          image: char.image,
-          subtitle: char.role || 'Character'
-        });
+        // Only add if we haven't seen this URL before
+        if (!seenUrls.has(char.url)) {
+          seenUrls.add(char.url);
+          conflicts.push({
+            type: 'character',
+            url: char.url,
+            name: char.name,
+            description: 'Character',
+            image: char.image,
+            subtitle: char.role || 'Character'
+          });
+        }
       }
     });
   }
@@ -65,14 +70,18 @@ function detectConflictsForTerm(term) {
       if (searchTerms.some(searchTerm => 
         searchTerm && searchTerm.toLowerCase() === term.toLowerCase()
       )) {
-        conflicts.push({
-          type: 'lore',
-          url: loreItem.url,
-          name: loreItem.name,
-          description: loreItem.type || 'Lore',
-          image: loreItem.image,
-          subtitle: loreItem.type || 'Lore'
-        });
+        // Only add if we haven't seen this URL before
+        if (!seenUrls.has(loreItem.url)) {
+          seenUrls.add(loreItem.url);
+          conflicts.push({
+            type: 'lore',
+            url: loreItem.url,
+            name: loreItem.name,
+            description: loreItem.type || 'Lore',
+            image: loreItem.image,
+            subtitle: loreItem.type || 'Lore'
+          });
+        }
       }
     });
   }
@@ -89,14 +98,18 @@ function detectConflictsForTerm(term) {
       if (searchTerms.some(searchTerm => 
         searchTerm && searchTerm.toLowerCase() === term.toLowerCase()
       )) {
-        conflicts.push({
-          type: 'episode',
-          url: episode.url,
-          name: episode.name,
-          description: 'Episode',
-          image: episode.image,
-          subtitle: `Season ${episode.season}, Episode ${episode.episode_number}`
-        });
+        // Only add if we haven't seen this URL before
+        if (!seenUrls.has(episode.url)) {
+          seenUrls.add(episode.url);
+          conflicts.push({
+            type: 'episode',
+            url: episode.url,
+            name: episode.name,
+            description: 'Episode',
+            image: episode.image,
+            subtitle: `Season ${episode.season}, Episode ${episode.episode_number}`
+          });
+        }
       }
     });
   }
@@ -247,14 +260,25 @@ function applySmartLinkingSimple(text, currentUrl = null) {
   replacements.forEach(replacement => {
     const { start, end, originalText, conflicts } = replacement;
     
+    // Deduplicate conflicts by URL to avoid duplicate entries in the modal
+    const uniqueConflicts = [];
+    const seenUrls = new Set();
+    
+    conflicts.forEach(conflict => {
+      if (!seenUrls.has(conflict.url)) {
+        seenUrls.add(conflict.url);
+        uniqueConflicts.push(conflict);
+      }
+    });
+    
     let replacementHtml;
-    if (conflicts.length > 1) {
+    if (uniqueConflicts.length > 1) {
       // Multiple matches - use disambiguation modal
-      const conflictsJson = JSON.stringify(conflicts).replace(/"/g, '&quot;');
+      const conflictsJson = JSON.stringify(uniqueConflicts).replace(/"/g, '&quot;');
       replacementHtml = `<span class="disambiguation-link" onclick="openDisambiguationModal(this)" data-phrase="${originalText}" data-conflicts="${conflictsJson}">${originalText}</span>`;
     } else {
       // Single match - create direct link with appropriate class
-      const conflict = conflicts[0];
+      const conflict = uniqueConflicts[0];
       
       // Don't create self-referential links - leave as plain text
       if (currentUrl && conflict.url === currentUrl) {

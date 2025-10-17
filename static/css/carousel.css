@@ -4,6 +4,11 @@
     margin: 2rem 0;
 }
 
+.carousel-container {
+    position: relative;
+    margin: 0 60px; /* Add space for arrows */
+}
+
 .carousel {
     width: 100%;
 }
@@ -51,11 +56,11 @@
 }
 
 .carousel .slick-prev {
-    left: -50px;
+    left: -60px;
 }
 
 .carousel .slick-next {
-    right: -50px;
+    right: -60px;
 }
 
 .carousel .slick-prev:before,
@@ -140,12 +145,16 @@
 
 /* Responsive adjustments */
 @media screen and (max-width: 768px) {
+    .carousel-container {
+        margin: 0 40px; /* Less space needed on mobile */
+    }
+    
     .carousel .slick-prev {
-        left: -25px;
+        left: -35px;
     }
     
     .carousel .slick-next {
-        right: -25px;
+        right: -35px;
     }
     
     .carousel .slick-prev:before,
