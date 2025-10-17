@@ -357,6 +357,11 @@ app.get('/character/:characterId', async (req, res) => {
           image: character.image, // New field
           image_gallery: character.image_gallery
         },
+        allCharacters: allCharacters.map(char => ({
+          id: char.id,
+          name: char.title,
+          url: `/character/${char.id}`
+        })),
         previousCharacter,
         nextCharacter,
         cdnUrl: process.env.CDN_URL,

@@ -3,26 +3,59 @@
  */
 
 const admin = require('firebase-admin');
+const { initializeApp } = require('firebase/app');
+const { getDatabase, ref, get } = require('firebase/database');
+require('dotenv').config();
 
 // Initialize Firebase Admin SDK
 const serviceAccount = require('./firebaseServiceAccountKey.json');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://wavelength-lore-default-rtdb.firebaseio.com"
+    databaseURL: process.env.DATABASE_URL
 });
 
-const db = admin.database();
+// Generate a custom token for script authentication
+async function getCustomToken() {
+  const customToken = await admin.auth().createCustomToken('check_post_script', {
+    isScript: true
+  });
+  return customToken;
+}
+
+// Initialize Firebase App with the custom token
+async function initializeFirebaseWithToken() {
+  const customToken = await getCustomToken();
+  const firebaseApp = initializeApp({
+    apiKey: process.env.API_KEY,
+    authDomain: process.env.AUTH_DOMAIN,
+    databaseURL: process.env.DATABASE_URL,
+    projectId: process.env.PROJECT_ID,
+    storageBucket: process.env.STORAGE_BUCKET,
+    messagingSenderId: process.env.MESSAGING_SENDER_ID,
+    appId: process.env.APP_ID
+  });
+  
+  // Sign in with the custom token
+  const { getAuth, signInWithCustomToken } = require('firebase/auth');
+  const auth = getAuth(firebaseApp);
+  await signInWithCustomToken(auth, customToken);
+  
+  return getDatabase(firebaseApp);
+}
 
 async function checkPost() {
     try {
+        // Initialize Firebase with custom token
+        const db = await initializeFirebaseWithToken();
+        
         const postId = '-Obmj_eOlZ4OEQdZ9OEq'; // The post ID from the URL
         
         console.log(`🔍 Checking for post: ${postId}`);
         
         // Check if the post exists
-        const postRef = db.ref(`forum/posts/${postId}`);
-        const snapshot = await postRef.once('value');
+        const postRef = ref(db, `forum/posts/${postId}`);
+        const snapshot = await get(postRef);
         
         if (snapshot.exists()) {
             const postData = snapshot.val();
@@ -33,8 +66,8 @@ async function checkPost() {
             
             // Let's check what posts do exist
             console.log('\n🔍 Checking all posts...');
-            const allPostsRef = db.ref('forum/posts');
-            const allPostsSnapshot = await allPostsRef.once('value');
+            const allPostsRef = ref(db, 'forum/posts');
+            const allPostsSnapshot = await get(allPostsRef);
             
             if (allPostsSnapshot.exists()) {
                 const allPosts = allPostsSnapshot.val();

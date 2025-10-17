@@ -109,18 +109,15 @@ main {
     text-decoration: underline;
 }
 /* Add padding to navigation links and images */
-.character-navigation-top .nav-link {
-    padding: 5px;
-}
 .character-navigation-top .nav-image.tiny {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     object-fit: cover;
     margin: 0 10px;
-    padding: 5px 5px 0 5px;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+    flex-shrink: 0; /* Prevent image from shrinking */
 }
 
 .character-navigation-top .nav-image.tiny:hover {
@@ -134,20 +131,34 @@ main {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    min-height: 70px; /* Ensure consistent height */
+}
+.character-navigation-top .nav-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #007BFF;
+    padding: 10px;
+    transition: all 0.3s ease;
 }
 .character-navigation-top .nav-link.prev {
     justify-self: flex-start;
+    flex-direction: row; /* Image then text */
 }
 .character-navigation-top .nav-link.next {
     justify-self: flex-end;
+    flex-direction: row-reverse; /* Text then image */
 }
-/* Style for navigation text below images */
+.character-navigation-top .nav-link:hover {
+    color: #0056b3;
+    text-decoration: none;
+}
+/* Style for navigation text */
 .character-navigation-top .nav-text {
-    display: block;
-    text-align: center;
     font-size: 14px;
-    margin-top: 5px;
-    color: #333;
+    color: inherit;
+    white-space: nowrap; /* Prevent text wrapping */
+    flex-shrink: 0; /* Prevent text from shrinking */
 }
 /* Styles for carousel dots */
 .carousel-dots {
@@ -171,5 +182,26 @@ main {
 @media (max-width: 768px) {
     .character-carousel .carousel-item img {
         height: 200px !important; /* Slightly smaller height for mobile */
+    }
+    
+    /* Responsive navigation for mobile */
+    .character-navigation-top {
+        flex-direction: column;
+        gap: 15px;
+        min-height: auto;
+    }
+    
+    .character-navigation-top .nav-link {
+        justify-content: center;
+    }
+    
+    .character-navigation-top .nav-text {
+        font-size: 12px;
+    }
+    
+    .character-navigation-top .nav-image.tiny {
+        width: 40px;
+        height: 40px;
+        margin: 0 8px;
     }
 }

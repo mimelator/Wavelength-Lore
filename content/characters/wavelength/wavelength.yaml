@@ -1,6 +1,6 @@
 - id: andrew
   title: Prince Andrew
-  description: The leader of Wavelength, husband of Jewel, and father of Alexandria and Eloquence
+  description: The lead singer and lutist of Wavelength, husband of Jewel, and father of Alexandria and Eloquence
   keywords: ["The Prince", "The Leader", "Andrew", "Band Leader", "Father", "Husband"]
   image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/andrew-4.png
   image_gallery:
@@ -16,7 +16,7 @@
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/andrew-5.png
 - id: jewel
   title: Jewel
-  description: The Wife of Prince Andrew and mother of Alexandria and Eloquence.  Being half elf, she obtained a superior musical education and has innate gifted musical talents, but being a half elf her community shunner her.  She met her husband at a Summer Music Workshop and after years of marriage and raising two children they formed the band Wavelength.
+  description: The harpist of Wavelength and Wife of Prince Andrew and mother of Alexandria and Eloquence.  Being half elf, she obtained a superior musical education and has innate gifted musical talents, but being a half elf her community shunner her.  She met her husband at a Summer Music Workshop and after years of marriage and raising two children they formed the band Wavelength.
   keywords: ["jewel", "Princess Jewel", "Half Elf", "Musical Talent", "Mother", "Wife"]
   image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/jewel-5.png
   image_gallery:
@@ -33,7 +33,7 @@
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/jewel-6.png
 - id: alex
   title: Alexandria
-  description: The Daughter of Prince Andrew and Jewel, Alexandria is a quarter elf and musically gifted like her mother.  She loves to teach others how to play and compose music...  Especially young children.
+  description: The Precocious Free-Spirited Violinist of Wavelength and Daughter of Prince Andrew and Jewel, Alexandria is a quarter elf and musically gifted like her mother.  She loves to teach others how to play and compose music...  Especially young children.
   keywords: ["alexandria", "Alex", "The Daughter", "Quarter Elf", "Music Teacher", "Young Teacher"]
   image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-1.png
   image_gallery:
@@ -45,7 +45,7 @@
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-6.png
 - id: eloquence
   title: Eloquence
-  description: The Son of Prince Andrew and Jewel, Eloquence is a quarter elf and passionate about the Bass Guitar as well as Rhythm Theory.  He was best friends with Magical Maurice the Percussion Wizard of Wavelength until Maurice died at the Battle of the Shire.
+  description: The Bass player of Wavelength Son of Prince Andrew and Jewel, Eloquence is a quarter elf and passionate about the Bass Guitar as well as Rhythm Theory.  He was best friends with Magical Maurice the Percussion Wizard of Wavelength until Maurice died at the Battle of the Shire.
   keywords: ["eloquence", "The Son", "Bass Player", "Quarter Elf", "Rhythm Expert", "Best Friend"]
   image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/eloquence-5.png
   image_gallery:

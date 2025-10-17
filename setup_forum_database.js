@@ -1,4 +1,6 @@
 const admin = require('firebase-admin');
+const { initializeApp } = require('firebase/app');
+const { getDatabase, ref, set } = require('firebase/database');
 const serviceAccount = require('./firebaseServiceAccountKey.json');
 require('dotenv').config();
 
@@ -10,7 +12,34 @@ if (!admin.apps.length) {
   });
 }
 
-const db = admin.database();
+// Generate a custom token for script authentication
+async function getCustomToken() {
+  const customToken = await admin.auth().createCustomToken('setup_forum_script', {
+    isScript: true
+  });
+  return customToken;
+}
+
+// Initialize Firebase App with the custom token
+async function initializeFirebaseWithToken() {
+  const customToken = await getCustomToken();
+  const firebaseApp = initializeApp({
+    apiKey: process.env.API_KEY,
+    authDomain: process.env.AUTH_DOMAIN,
+    databaseURL: process.env.DATABASE_URL,
+    projectId: process.env.PROJECT_ID,
+    storageBucket: process.env.STORAGE_BUCKET,
+    messagingSenderId: process.env.MESSAGING_SENDER_ID,
+    appId: process.env.APP_ID
+  });
+  
+  // Sign in with the custom token
+  const { getAuth, signInWithCustomToken } = require('firebase/auth');
+  const auth = getAuth(firebaseApp);
+  await signInWithCustomToken(auth, customToken);
+  
+  return getDatabase(firebaseApp);
+}
 
 /**
  * Initialize forum database structure in Firebase Realtime Database
@@ -20,6 +49,9 @@ async function setupForumDatabase() {
   console.log('🏗️ Setting up Wavelength Forum Database...');
   
   try {
+    // Initialize Firebase with custom token
+    const db = await initializeFirebaseWithToken();
+    
     // Forum Categories Setup
     const forumCategories = {
       general: {
@@ -118,13 +150,13 @@ async function setupForumDatabase() {
 
     // Write to database
     console.log('📝 Creating forum categories...');
-    await db.ref('forum/categories').set(forumCategories);
+    await set(ref(db, 'forum/categories'), forumCategories);
     
     console.log('⚙️ Setting up forum configuration...');
-    await db.ref('forum/settings').set(forumSettings);
+    await set(ref(db, 'forum/settings'), forumSettings);
     
     console.log('👥 Setting up user roles...');
-    await db.ref('forum/roles').set(userRoles);
+    await set(ref(db, 'forum/roles'), userRoles);
 
     // Create initial welcome post in general category
     const welcomePost = {
@@ -162,11 +194,11 @@ Ready to join the conversation? Create your first post and introduce yourself!`,
     };
 
     console.log('📌 Creating welcome post...');
-    await db.ref('forum/posts/welcome-post').set(welcomePost);
+    await set(ref(db, 'forum/posts/welcome-post'), welcomePost);
 
     // Update category post count
-    await db.ref('forum/categories/general/postCount').set(1);
-    await db.ref('forum/categories/general/lastActivity').set(Date.now());
+    await set(ref(db, 'forum/categories/general/postCount'), 1);
+    await set(ref(db, 'forum/categories/general/lastActivity'), Date.now());
 
     console.log('✅ Forum database setup completed successfully!');
     console.log(`

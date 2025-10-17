@@ -415,19 +415,19 @@ h1 {
     color: #4a47a3;
     text-decoration: none;
     font-weight: bold;
-    padding: 2px 4px 2px 18px; /* Add left padding for icon */
+    padding: 2px 4px 2px 0px; /* Remove left padding since we're using inline icon */
     border-radius: 3px;
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.1);
     position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
 }
 
 .character-link:before {
     content: "";
-    position: absolute;
-    left: 3px;
-    top: 50%;
-    transform: translateY(-50%);
+    display: inline-block;
     width: 12px;
     height: 12px;
     background-image: url('/icons/hero-icon.svg');
@@ -435,6 +435,7 @@ h1 {
     background-repeat: no-repeat;
     background-position: center;
     opacity: 0.8;
+    flex-shrink: 0;
 }
 
 .character-link:hover {
