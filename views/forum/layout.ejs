@@ -10,15 +10,14 @@
     <link rel="stylesheet" href="/css/carousel.css">
     <link rel="stylesheet" href="/css/forum.css">
     
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK - Direct imports for better compatibility -->
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
       import { getDatabase, ref, push, set, onValue, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
       
       // Initialize Firebase with your existing config
       const firebaseConfig = {
-        // Add your Firebase config here
         apiKey: "<%= process.env.API_KEY %>",
         authDomain: "<%= process.env.AUTH_DOMAIN %>",
         databaseURL: "<%= process.env.DATABASE_URL %>",
@@ -28,14 +27,101 @@
         appId: "<%= process.env.APP_ID %>"
       };
       
+      console.log('🔥 Initializing Firebase for forum...');
+      
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const database = getDatabase(app);
       
+      // Configure Firebase Auth persistence for 2-week sessions
+      setPersistence(auth, browserLocalPersistence).then(() => {
+        console.log('✅ Firebase Auth persistence set to LOCAL for extended sessions');
+        
+        // Custom session manager for 2-week duration
+        window.sessionManager = {
+          // 2 weeks in milliseconds
+          SESSION_DURATION: 14 * 24 * 60 * 60 * 1000,
+          
+          // Check if session is valid
+          isSessionValid: function() {
+            const lastActivity = localStorage.getItem('wavelength_last_activity');
+            if (!lastActivity) return false;
+            
+            const now = Date.now();
+            const timeSinceActivity = now - parseInt(lastActivity);
+            return timeSinceActivity < this.SESSION_DURATION;
+          },
+          
+          // Update session activity
+          updateActivity: function() {
+            localStorage.setItem('wavelength_last_activity', Date.now().toString());
+          },
+          
+          // Clear expired session
+          clearExpiredSession: function() {
+            if (!this.isSessionValid()) {
+              localStorage.removeItem('wavelength_last_activity');
+              auth.signOut();
+              return true;
+            }
+            return false;
+          },
+          
+          // Get remaining session time (for display purposes)
+          getRemainingTime: function() {
+            const lastActivity = localStorage.getItem('wavelength_last_activity');
+            if (!lastActivity) return 0;
+            
+            const now = Date.now();
+            const timeSinceActivity = now - parseInt(lastActivity);
+            return Math.max(0, this.SESSION_DURATION - timeSinceActivity);
+          },
+          
+          // Format remaining time for display
+          formatRemainingTime: function() {
+            const remaining = this.getRemainingTime();
+            const days = Math.floor(remaining / (24 * 60 * 60 * 1000));
+            const hours = Math.floor((remaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+            
+            if (days > 0) {
+              return `${days} day${days !== 1 ? 's' : ''}, ${hours} hour${hours !== 1 ? 's' : ''}`;
+            } else if (hours > 0) {
+              return `${hours} hour${hours !== 1 ? 's' : ''}`;
+            } else {
+              const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+              return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+            }
+          }
+        };
+        
+        // Check session validity on load
+        window.sessionManager.clearExpiredSession();
+        
+        console.log('✅ Session manager initialized for 2-week persistence');
+        
+      }).catch((error) => {
+        console.error('❌ Failed to set Firebase persistence:', error);
+      });
+      
       // Make Firebase available globally for forum components
       window.firebaseAuth = auth;
       window.firebaseDB = database;
-      window.firebaseUtils = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, ref, push, set, onValue, query, orderByChild };
+      window.firebaseUtils = { 
+        signInWithPopup, 
+        GoogleAuthProvider, 
+        signOut, 
+        onAuthStateChanged, 
+        setPersistence, 
+        browserLocalPersistence, 
+        ref, 
+        push, 
+        set, 
+        onValue, 
+        query, 
+        orderByChild 
+      };
+      
+      console.log('✅ Firebase initialized successfully for forum');
     </script>
     
     <!-- Forum JavaScript -->

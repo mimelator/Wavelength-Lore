@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        #results { margin-top: 20px; }
+        .config-item { margin: 5px 0; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>🔥 Firebase Connection Diagnostic</h1>
+    <p>Testing Firebase configuration and connectivity...</p>
+    
+    <div id="results">
+        <div class="status info">
+            <strong>Starting tests...</strong>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Test -->
+    <script type="module">
+        const resultsDiv = document.getElementById('results');
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            resultsDiv.appendChild(div);
+        }
+
+        // Test 1: Firebase SDK Loading
+        try {
+            addResult('🔄 Loading Firebase SDKs...', 'info');
+            
+            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
+            const { getAuth } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+            const { getDatabase } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
+            
+            addResult('✅ Firebase SDKs loaded successfully', 'success');
+            
+            // Test 2: Configuration
+            const firebaseConfig = {
+                apiKey: "<%= process.env.API_KEY %>",
+                authDomain: "<%= process.env.AUTH_DOMAIN %>",
+                databaseURL: "<%= process.env.DATABASE_URL %>",
+                projectId: "<%= process.env.PROJECT_ID %>",
+                storageBucket: "<%= process.env.STORAGE_BUCKET %>",
+                messagingSenderId: "<%= process.env.MESSAGING_SENDER_ID %>",
+                appId: "<%= process.env.APP_ID %>"
+            };
+            
+            addResult('🔄 Testing Firebase configuration...', 'info');
+            
+            // Show config (without sensitive data)
+            addResult(`<strong>Configuration check:</strong><br>
+                <div class="config-item">Project ID: ${firebaseConfig.projectId || 'MISSING'}</div>
+                <div class="config-item">Auth Domain: ${firebaseConfig.authDomain || 'MISSING'}</div>
+                <div class="config-item">Database URL: ${firebaseConfig.databaseURL ? 'SET' : 'MISSING'}</div>
+                <div class="config-item">API Key: ${firebaseConfig.apiKey ? 'SET' : 'MISSING'}</div>
+            `, 'info');
+            
+            // Test 3: App Initialization
+            addResult('🔄 Initializing Firebase app...', 'info');
+            const app = initializeApp(firebaseConfig);
+            addResult('✅ Firebase app initialized successfully', 'success');
+            
+            // Test 4: Auth Service
+            addResult('🔄 Testing Auth service...', 'info');
+            const auth = getAuth(app);
+            addResult('✅ Firebase Auth service ready', 'success');
+            
+            // Test 5: Database Service
+            addResult('🔄 Testing Database service...', 'info');
+            const database = getDatabase(app);
+            addResult('✅ Firebase Database service ready', 'success');
+            
+            // Test 6: Connection Test
+            addResult('🔄 Testing database connection...', 'info');
+            
+            // Try a simple database operation
+            const { ref, get } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
+            
+            try {
+                const testRef = ref(database, '.info/connected');
+                const snapshot = await get(testRef);
+                
+                if (snapshot.exists()) {
+                    addResult('✅ Database connection successful', 'success');
+                } else {
+                    addResult('⚠️ Database connection test inconclusive', 'info');
+                }
+            } catch (dbError) {
+                addResult(`❌ Database connection failed: ${dbError.message}`, 'error');
+            }
+            
+            addResult('🎉 <strong>All Firebase tests completed!</strong>', 'success');
+            
+        } catch (error) {
+            addResult(`❌ Firebase test failed: ${error.message}`, 'error');
+            console.error('Firebase test error:', error);
+        }
+    </script>
+</body>
+</html>

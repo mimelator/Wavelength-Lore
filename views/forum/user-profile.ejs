@@ -13,13 +13,10 @@
     <link rel="stylesheet" href="/css/carousel.css">
     <link rel="stylesheet" href="/css/forum.css">
     
-    <!-- Firebase SDK -->
-    <script type="module">
-      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-      import { getDatabase, ref, push, set, onValue, query, orderByChild, serverTimestamp, get, update } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
-      
-      // Initialize Firebase with environment config
+    <!-- Firebase Configuration -->
+    <script src="/js/firebase-config.js"></script>
+    <script>
+      // Initialize Firebase with configuration
       const firebaseConfig = {
         apiKey: "<%= process.env.API_KEY %>",
         authDomain: "<%= process.env.AUTH_DOMAIN %>",
@@ -30,14 +27,22 @@
         appId: "<%= process.env.APP_ID %>"
       };
       
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const database = getDatabase(app);
-      
-      // Make Firebase available globally for forum components
-      window.firebaseAuth = auth;
-      window.firebaseDB = database;
-      window.firebaseUtils = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, ref, push, set, onValue, query, orderByChild, serverTimestamp, get, update };
+      // Initialize Firebase with 2-week session persistence
+      window.initializeWavelengthFirebase(firebaseConfig).then(() => {
+        console.log('Wavelength Forum Firebase initialized with extended sessions');
+        
+        // Add additional Firebase utilities needed for user profile page
+        return Promise.all([
+          import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js')
+        ]).then(([dbModule]) => {
+          const { serverTimestamp, get, update } = dbModule;
+          window.firebaseUtils.serverTimestamp = serverTimestamp;
+          window.firebaseUtils.get = get;
+          window.firebaseUtils.update = update;
+        });
+      }).catch(error => {
+        console.error('Firebase initialization failed:', error);
+      });
     </script>
     
     <!-- Forum JavaScript -->

@@ -20,6 +20,15 @@ router.get('/', (req, res) => {
 });
 
 /**
+ * Firebase Connection Test Page - Diagnostic tool
+ */
+router.get('/firebase-test', (req, res) => {
+    res.render('firebase-test', {
+        title: 'Firebase Connection Test'
+    });
+});
+
+/**
  * Forum Category View - Display posts in a specific category
  */
 router.get('/category/:categoryId', (req, res) => {

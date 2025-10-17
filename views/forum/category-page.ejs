@@ -13,10 +13,10 @@
     <link rel="stylesheet" href="/css/carousel.css">
     <link rel="stylesheet" href="/css/forum.css">
     
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK - Direct imports for better compatibility -->
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
       import { getDatabase, ref, push, set, onValue, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
       
       // Initialize Firebase with environment config
@@ -30,14 +30,52 @@
         appId: "<%= process.env.APP_ID %>"
       };
       
+      console.log('🔥 Initializing Firebase for category page...');
+      
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const database = getDatabase(app);
       
+      // Configure Firebase Auth persistence for 2-week sessions
+      setPersistence(auth, browserLocalPersistence).then(() => {
+        console.log('✅ Firebase Auth persistence set to LOCAL for extended sessions');
+        
+        // Initialize session manager if not already present
+        if (!window.sessionManager) {
+          window.sessionManager = {
+            SESSION_DURATION: 14 * 24 * 60 * 60 * 1000,
+            isSessionValid: function() {
+              const lastActivity = localStorage.getItem('wavelength_last_activity');
+              if (!lastActivity) return false;
+              const now = Date.now();
+              const timeSinceActivity = now - parseInt(lastActivity);
+              return timeSinceActivity < this.SESSION_DURATION;
+            },
+            updateActivity: function() {
+              localStorage.setItem('wavelength_last_activity', Date.now().toString());
+            },
+            clearExpiredSession: function() {
+              if (!this.isSessionValid()) {
+                localStorage.removeItem('wavelength_last_activity');
+                auth.signOut();
+                return true;
+              }
+              return false;
+            }
+          };
+        }
+        
+        window.sessionManager.clearExpiredSession();
+      }).catch((error) => {
+        console.error('❌ Failed to set Firebase persistence:', error);
+      });
+      
       // Make Firebase available globally for forum components
       window.firebaseAuth = auth;
       window.firebaseDB = database;
-      window.firebaseUtils = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, ref, push, set, onValue, query, orderByChild };
+      window.firebaseUtils = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, ref, push, set, onValue, query, orderByChild };
+      
+      console.log('✅ Firebase initialized successfully for category page');
     </script>
     
     <!-- Forum JavaScript -->

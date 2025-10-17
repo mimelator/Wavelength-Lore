@@ -58,6 +58,11 @@ function setupActivityTracking() {
             const userRef = window.firebaseUtils.ref(window.firebaseDB, 
                 `forum/users/${window.forumState.currentUser.uid}/lastSeen`);
             window.firebaseUtils.set(userRef, Date.now());
+            
+            // Update session activity for 2-week persistence
+            if (window.sessionManager) {
+                window.sessionManager.updateActivity();
+            }
         }
     }, 2 * 60 * 1000);
     
@@ -72,6 +77,11 @@ function setupActivityTracking() {
                     const userRef = window.firebaseUtils.ref(window.firebaseDB, 
                         `forum/users/${window.forumState.currentUser.uid}/lastSeen`);
                     window.firebaseUtils.set(userRef, now);
+                    
+                    // Update session activity for 2-week persistence
+                    if (window.sessionManager) {
+                        window.sessionManager.updateActivity();
+                    }
                 }
             }
         });
@@ -87,9 +97,20 @@ function initializeForumAuth() {
         return;
     }
 
+    // Check for expired sessions before setting up auth listener
+    if (window.sessionManager && window.sessionManager.clearExpiredSession()) {
+        console.log('Expired session cleared');
+    }
+
     // Listen for auth state changes
     window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
         if (user) {
+            // Verify session is still valid when user is detected
+            if (window.sessionManager && !window.sessionManager.isSessionValid()) {
+                console.log('Session expired, signing out user');
+                window.firebaseUtils.signOut(window.firebaseAuth);
+                return;
+            }
             handleUserSignIn(user);
         } else {
             handleUserSignOut();
@@ -112,6 +133,11 @@ function handleUserSignIn(user) {
     window.forumState.isAuthenticated = true;
     
     console.log('User signed in:', user.displayName);
+    
+    // Update session activity for 2-week persistence
+    if (window.sessionManager) {
+        window.sessionManager.updateActivity();
+    }
     
     // Update user data in database
     updateUserProfile(window.forumState.currentUser);
@@ -164,6 +190,13 @@ async function signInWithGoogle() {
         
         const result = await window.firebaseUtils.signInWithPopup(window.firebaseAuth, provider);
         console.log('Google sign-in successful:', result.user);
+        
+        // Initialize session tracking after successful sign-in
+        if (window.sessionManager) {
+            window.sessionManager.updateActivity();
+        }
+        
+        showNotification('Welcome to Wavelength Forum!', 'success');
     } catch (error) {
         console.error('Sign-in error:', error);
         showNotification('Sign-in failed. Please try again.', 'error');
@@ -175,6 +208,11 @@ async function signInWithGoogle() {
  */
 async function signOutUser() {
     try {
+        // Clear session data before signing out
+        if (window.sessionManager) {
+            localStorage.removeItem('wavelength_last_activity');
+        }
+        
         await window.firebaseUtils.signOut(window.firebaseAuth);
         showNotification('Successfully signed out', 'success');
     } catch (error) {
