@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Wavelength Community Forum</title>
+    
+    <!-- Reuse existing styles -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/forum.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+      import { getDatabase, ref, push, set, onValue, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+      
+      // Initialize Firebase with your existing config
+      const firebaseConfig = {
+        // Add your Firebase config here
+        apiKey: "<%= process.env.API_KEY %>",
+        authDomain: "<%= process.env.AUTH_DOMAIN %>",
+        databaseURL: "<%= process.env.DATABASE_URL %>",
+        projectId: "<%= process.env.PROJECT_ID %>",
+        storageBucket: "<%= process.env.STORAGE_BUCKET %>",
+        messagingSenderId: "<%= process.env.MESSAGING_SENDER_ID %>",
+        appId: "<%= process.env.APP_ID %>"
+      };
+      
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const database = getDatabase(app);
+      
+      // Make Firebase available globally for forum components
+      window.firebaseAuth = auth;
+      window.firebaseDB = database;
+      window.firebaseUtils = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, ref, push, set, onValue, query, orderByChild };
+    </script>
+    
+    <!-- Forum JavaScript -->
+    <script src="/js/forum.js" defer></script>
+</head>
+<body>
+    <!-- Include existing navigation -->
+    <%- include('../partials/head') %>
+    
+    <div class="forum-container">
+        <!-- Forum Header -->
+        <header class="forum-header">
+            <div class="container">
+                <div class="forum-header-content">
+                    <div class="forum-branding">
+                        <h1>
+                            <span class="forum-icon">🎵</span>
+                            Wavelength Community Forum
+                        </h1>
+                        <p class="forum-tagline">Connect with fellow Wavelength fans</p>
+                    </div>
+                    
+                    <div class="forum-auth">
+                        <div id="forum-auth-container">
+                            <!-- Auth buttons will be inserted here by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Forum Navigation -->
+        <nav class="forum-nav">
+            <div class="container">
+                <ul class="forum-nav-list">
+                    <li><a href="/forum" class="<%= currentPage === 'home' ? 'active' : '' %>">🏠 Home</a></li>
+                    <li><a href="/forum/recent" class="<%= currentPage === 'recent' ? 'active' : '' %>">🕒 Recent Posts</a></li>
+                    <li><a href="/forum/popular" class="<%= currentPage === 'popular' ? 'active' : '' %>">🔥 Popular</a></li>
+                    <li><a href="/forum/search" class="<%= currentPage === 'search' ? 'active' : '' %>">🔍 Search</a></li>
+                    <li><a href="/" class="forum-nav-back">← Back to Wavelength Lore</a></li>
+                </ul>
+            </div>
+        </nav>
+        
+        <!-- Main Forum Content -->
+        <main class="forum-main">
+            <div class="container">
+                <!-- Breadcrumb -->
+                <div class="forum-breadcrumb">
+                    <a href="/forum">Forum</a>
+                    <% if (typeof breadcrumbs !== 'undefined' && breadcrumbs.length > 0) { %>
+                        <% breadcrumbs.forEach(crumb => { %>
+                            <span class="breadcrumb-separator">›</span>
+                            <% if (crumb.url) { %>
+                                <a href="<%= crumb.url %>"><%= crumb.name %></a>
+                            <% } else { %>
+                                <span><%= crumb.name %></span>
+                            <% } %>
+                        <% }); %>
+                    <% } %>
+                </div>
+                
+                <!-- Forum Content Area -->
+                <div class="forum-content">
+                    <%- body %>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Forum Footer -->
+        <footer class="forum-footer">
+            <div class="container">
+                <div class="forum-footer-content">
+                    <div class="forum-stats">
+                        <span>Powered by Wavelength Community</span>
+                    </div>
+                    <div class="forum-links">
+                        <a href="/">Return to Wavelength Lore</a>
+                        <a href="/forum/guidelines">Community Guidelines</a>
+                        <a href="/forum/help">Help</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Forum Modals -->
+    <div id="forum-modals"></div>
+</body>
+</html>

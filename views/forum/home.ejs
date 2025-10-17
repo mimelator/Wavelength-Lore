@@ -1,0 +1,271 @@
+<!-- Forum Categories Overview -->
+<div class="forum-welcome">
+    <h2>Welcome to the Wavelength Community! 🎵</h2>
+    <p>Connect with fellow fans, discuss episodes, share theories, and dive deep into the world of Wavelength.</p>
+</div>
+
+<!-- Forum Statistics -->
+<div class="forum-stats-bar">
+    <div class="stat-item">
+        <span class="stat-number" id="total-posts">-</span>
+        <span class="stat-label">Posts</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number" id="total-members">-</span>
+        <span class="stat-label">Members</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number" id="online-users">-</span>
+        <span class="stat-label">Online</span>
+    </div>
+</div>
+
+<!-- Forum Categories -->
+<div class="forum-categories">
+    <h3>Discussion Categories</h3>
+    
+    <div class="categories-grid" id="forum-categories-container">
+        <!-- Categories will be loaded here by JavaScript -->
+        <div class="loading-placeholder">
+            <div class="loading-spinner"></div>
+            <p>Loading categories...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="forum-recent-activity">
+    <div class="section-header">
+        <h3>Recent Activity</h3>
+        <a href="/forum/recent" class="view-all-link">View All →</a>
+    </div>
+    
+    <div class="recent-posts-container" id="recent-posts-container">
+        <!-- Recent posts will be loaded here -->
+        <div class="loading-placeholder">
+            <div class="loading-spinner"></div>
+            <p>Loading recent posts...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions for Authenticated Users -->
+<div class="forum-quick-actions" id="forum-quick-actions" style="display: none;">
+    <h3>Quick Actions</h3>
+    <div class="quick-actions-grid">
+        <button class="quick-action-btn" onclick="showCreatePostModal()">
+            <span class="action-icon">✏️</span>
+            <span class="action-text">Create New Post</span>
+        </button>
+        <button class="quick-action-btn" onclick="showSearchModal()">
+            <span class="action-icon">🔍</span>
+            <span class="action-text">Search Forum</span>
+        </button>
+        <a href="/forum/profile" class="quick-action-btn">
+            <span class="action-icon">👤</span>
+            <span class="action-text">My Profile</span>
+        </a>
+    </div>
+</div>
+
+<!-- Featured/Pinned Posts -->
+<div class="forum-featured-posts">
+    <h3>📌 Pinned Posts</h3>
+    <div class="pinned-posts-container" id="pinned-posts-container">
+        <!-- Pinned posts will be loaded here -->
+    </div>
+</div>
+
+<script>
+// Initialize forum home page
+document.addEventListener('DOMContentLoaded', function() {
+    loadForumCategories();
+    loadRecentPosts();
+    loadPinnedPosts();
+    loadForumStats();
+    
+    // Set up auth state listener
+    if (window.firebaseAuth) {
+        window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
+            if (user) {
+                document.getElementById('forum-quick-actions').style.display = 'block';
+            } else {
+                document.getElementById('forum-quick-actions').style.display = 'none';
+            }
+        });
+    }
+});
+
+async function loadForumCategories() {
+    try {
+        const categoriesRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/categories');
+        window.firebaseUtils.onValue(categoriesRef, (snapshot) => {
+            const categories = snapshot.val();
+            const container = document.getElementById('forum-categories-container');
+            
+            if (categories) {
+                const categoriesArray = Object.values(categories).sort((a, b) => a.order - b.order);
+                container.innerHTML = categoriesArray.map(category => `
+                    <div class="category-card" onclick="location.href='/forum/category/${category.id}'">
+                        <div class="category-header">
+                            <div class="category-icon">
+                                <img src="${category.iconSvg}" alt="${category.icon}" class="category-icon-svg">
+                            </div>
+                            <div class="category-info">
+                                <h4 class="category-title" style="color: ${category.color}">${category.title}</h4>
+                                <p class="category-description">${category.description}</p>
+                            </div>
+                        </div>
+                        <div class="category-stats">
+                            <div class="stat">
+                                <span class="stat-number">${category.postCount || 0}</span>
+                                <span class="stat-label">Posts</span>
+                            </div>
+                            <div class="category-last-activity">
+                                ${category.lastActivity ? 
+                                    `<span class="last-activity">Latest: ${formatTimeAgo(category.lastActivity)}</span>` : 
+                                    '<span class="no-activity">No posts yet</span>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p class="no-content">No categories found.</p>';
+            }
+        });
+    } catch (error) {
+        console.error('Error loading categories:', error);
+        document.getElementById('forum-categories-container').innerHTML = 
+            '<p class="error-message">Error loading categories. Please refresh the page.</p>';
+    }
+}
+
+async function loadRecentPosts() {
+    try {
+        const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
+        const recentQuery = window.firebaseUtils.query(postsRef, window.firebaseUtils.orderByChild('createdAt'));
+        
+        window.firebaseUtils.onValue(recentQuery, (snapshot) => {
+            const posts = snapshot.val();
+            const container = document.getElementById('recent-posts-container');
+            
+            if (posts) {
+                const postsArray = Object.entries(posts)
+                    .map(([id, post]) => ({id, ...post}))
+                    .sort((a, b) => b.createdAt - a.createdAt)
+                    .slice(0, 5);
+                
+                container.innerHTML = postsArray.map(post => `
+                    <div class="recent-post-item" onclick="location.href='/forum/post/${post.id}'">
+                        <div class="post-author">
+                            <img src="${post.authorAvatar || '/icons/hero-icon.svg'}" alt="${post.authorName}" class="author-avatar">
+                            <span class="author-name">${post.authorName}</span>
+                        </div>
+                        <div class="post-content">
+                            <h5 class="post-title">${post.title}</h5>
+                            <p class="post-preview">${truncateText(post.content, 100)}</p>
+                            <div class="post-meta">
+                                <span class="post-time">${formatTimeAgo(post.createdAt)}</span>
+                                <span class="post-replies">${post.replyCount || 0} replies</span>
+                                <span class="post-likes">${post.likes || 0} likes</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p class="no-content">No recent posts found.</p>';
+            }
+        });
+    } catch (error) {
+        console.error('Error loading recent posts:', error);
+        document.getElementById('recent-posts-container').innerHTML = 
+            '<p class="error-message">Error loading recent posts.</p>';
+    }
+}
+
+async function loadPinnedPosts() {
+    try {
+        const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
+        
+        window.firebaseUtils.onValue(postsRef, (snapshot) => {
+            const posts = snapshot.val();
+            const container = document.getElementById('pinned-posts-container');
+            
+            if (posts) {
+                const pinnedPosts = Object.entries(posts)
+                    .map(([id, post]) => ({id, ...post}))
+                    .filter(post => post.isPinned)
+                    .sort((a, b) => b.createdAt - a.createdAt);
+                
+                if (pinnedPosts.length > 0) {
+                    container.innerHTML = pinnedPosts.map(post => `
+                        <div class="pinned-post-item" onclick="location.href='/forum/post/${post.id}'">
+                            <div class="pinned-icon">📌</div>
+                            <div class="post-info">
+                                <h5 class="post-title">${post.title}</h5>
+                                <div class="post-meta">
+                                    <span class="post-author">by ${post.authorName}</span>
+                                    <span class="post-time">${formatTimeAgo(post.createdAt)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p class="no-content">No pinned posts.</p>';
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error loading pinned posts:', error);
+    }
+}
+
+async function loadForumStats() {
+    try {
+        // Load total posts
+        const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
+        window.firebaseUtils.onValue(postsRef, (snapshot) => {
+            const posts = snapshot.val();
+            const totalPosts = posts ? Object.keys(posts).length : 0;
+            document.getElementById('total-posts').textContent = totalPosts;
+        });
+        
+        // Placeholder for other stats
+        document.getElementById('total-members').textContent = '1'; // Will implement user counting
+        document.getElementById('online-users').textContent = '1'; // Will implement online tracking
+    } catch (error) {
+        console.error('Error loading forum stats:', error);
+    }
+}
+
+// Utility functions
+function formatTimeAgo(timestamp) {
+    const now = Date.now();
+    const diff = now - timestamp;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    return new Date(timestamp).toLocaleDateString();
+}
+
+function truncateText(text, maxLength) {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+}
+
+function showCreatePostModal() {
+    // Will implement post creation modal
+    alert('Create post functionality coming soon!');
+}
+
+function showSearchModal() {
+    // Will implement search modal
+    alert('Search functionality coming soon!');
+}
+</script>

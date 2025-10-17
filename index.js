@@ -129,6 +129,10 @@ app.use(async (req, res, next) => {
   next();
 });
 
+// Import and setup forum routes
+const forumRoutes = require('./routes/forum');
+app.use('/forum', forumRoutes);
+
 // Render the index.ejs file with gallery data
 app.get('/', async (req, res) => {
   try {

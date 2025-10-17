@@ -1,0 +1,810 @@
+<!-- Category Header -->
+<div class="category-header-section">
+    <div class="category-info">
+        <h2 class="category-title">
+            <span class="category-icon-large" id="category-icon">🎵</span>
+            <span id="category-title-text"><%= categoryName %></span>
+        </h2>
+        <p class="category-description" id="category-description">Loading category information...</p>
+    </div>
+    
+    <div class="category-actions">
+        <button class="btn btn-primary" onclick="showCreatePostModal('<%= categoryId %>')" id="create-post-btn" style="display: none;">
+            ✏️ Create New Post
+        </button>
+        <div class="category-tools">
+            <button class="btn btn-secondary" onclick="toggleCategoryFilters()">
+                🔧 Filters
+            </button>
+            <div class="sort-dropdown">
+                <select id="sort-select" onchange="applySorting(this.value)">
+                    <option value="newest">📅 Newest First</option>
+                    <option value="oldest">📅 Oldest First</option>
+                    <option value="popular">🔥 Most Popular</option>
+                    <option value="replies">💬 Most Replies</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Stats -->
+<div class="category-stats-bar" id="category-stats">
+    <div class="stat-item">
+        <span class="stat-number" id="category-post-count">-</span>
+        <span class="stat-label">Posts</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number" id="category-member-count">-</span>
+        <span class="stat-label">Active Members</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-text" id="category-last-activity">-</span>
+        <span class="stat-label">Last Activity</span>
+    </div>
+</div>
+
+<!-- Filter Panel (Initially Hidden) -->
+<div class="filter-panel" id="filter-panel" style="display: none;">
+    <div class="filter-options">
+        <div class="filter-group">
+            <label>Time Range:</label>
+            <select id="time-filter">
+                <option value="all">All Time</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Post Type:</label>
+            <select id="type-filter">
+                <option value="all">All Posts</option>
+                <option value="pinned">Pinned Only</option>
+                <option value="discussions">Discussions</option>
+                <option value="questions">Questions</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Author:</label>
+            <input type="text" id="author-filter" placeholder="Filter by author...">
+        </div>
+        <div class="filter-actions">
+            <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+        </div>
+    </div>
+</div>
+
+<!-- Posts List -->
+<div class="posts-section">
+    <div class="posts-header">
+        <h3>Posts in <%= categoryName %></h3>
+        <div class="posts-count" id="posts-count-display">Loading posts...</div>
+    </div>
+    
+    <div class="posts-container" id="posts-container">
+        <div class="loading-placeholder">
+            <div class="loading-spinner"></div>
+            <p>Loading posts...</p>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="pagination-container" id="pagination-container" style="display: none;">
+        <!-- Pagination will be inserted here -->
+    </div>
+</div>
+
+<!-- Empty State -->
+<div class="empty-state" id="empty-state" style="display: none;">
+    <div class="empty-state-content">
+        <div class="empty-icon">📝</div>
+        <h3>No posts yet</h3>
+        <p>Be the first to start a discussion in this category!</p>
+        <button class="btn btn-primary" onclick="showCreatePostModal('<%= categoryId %>')">
+            Create First Post
+        </button>
+    </div>
+</div>
+
+<script>
+// Category page state
+const categoryData = {
+    id: '<%= categoryId %>',
+    name: '<%= categoryName %>',
+    currentPage: 1,
+    postsPerPage: 10,
+    totalPosts: 0,
+    currentSort: 'newest',
+    filters: {
+        time: 'all',
+        type: 'all',
+        author: ''
+    }
+};
+
+// Initialize category page
+document.addEventListener('DOMContentLoaded', function() {
+    loadCategoryData();
+    loadCategoryPosts();
+    setupAuthStateListener();
+});
+
+async function loadCategoryData() {
+    try {
+        const categoryRef = window.firebaseUtils.ref(window.firebaseDB, `forum/categories/${categoryData.id}`);
+        window.firebaseUtils.onValue(categoryRef, (snapshot) => {
+            const category = snapshot.val();
+            if (category) {
+                updateCategoryDisplay(category);
+            }
+        });
+    } catch (error) {
+        console.error('Error loading category data:', error);
+    }
+}
+
+function updateCategoryDisplay(category) {
+    // Update header
+    document.getElementById('category-title-text').textContent = category.title;
+    document.getElementById('category-description').textContent = category.description;
+    
+    // Update icon
+    const iconElement = document.getElementById('category-icon');
+    if (category.iconSvg) {
+        iconElement.innerHTML = `<img src="${category.iconSvg}" alt="${category.icon}" class="category-icon-svg">`;
+    } else {
+        iconElement.textContent = category.icon;
+    }
+    
+    // Update stats
+    document.getElementById('category-post-count').textContent = category.postCount || 0;
+    document.getElementById('category-member-count').textContent = '1'; // Placeholder
+    document.getElementById('category-last-activity').textContent = 
+        category.lastActivity ? formatTimeAgo(category.lastActivity) : 'No activity';
+    
+    // Update title color
+    const titleElement = document.getElementById('category-title-text');
+    titleElement.style.color = category.color;
+}
+
+async function loadCategoryPosts() {
+    try {
+        const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
+        const categoryQuery = window.firebaseUtils.query(
+            postsRef,
+            window.firebaseUtils.orderByChild('forumId')
+        );
+        
+        window.firebaseUtils.onValue(categoryQuery, (snapshot) => {
+            const allPosts = snapshot.val();
+            if (allPosts) {
+                // Filter posts for this category
+                const categoryPosts = Object.entries(allPosts)
+                    .map(([id, post]) => ({id, ...post}))
+                    .filter(post => post.forumId === categoryData.id);
+                
+                displayPosts(categoryPosts);
+                updatePostsCount(categoryPosts.length);
+                
+                if (categoryPosts.length === 0) {
+                    showEmptyState();
+                }
+            } else {
+                showEmptyState();
+            }
+        });
+    } catch (error) {
+        console.error('Error loading category posts:', error);
+        document.getElementById('posts-container').innerHTML = 
+            '<p class="error-message">Error loading posts. Please refresh the page.</p>';
+    }
+}
+
+function displayPosts(posts) {
+    const container = document.getElementById('posts-container');
+    const emptyState = document.getElementById('empty-state');
+    
+    if (posts.length === 0) {
+        container.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    container.style.display = 'block';
+    emptyState.style.display = 'none';
+    
+    // Apply sorting
+    const sortedPosts = sortPosts(posts, categoryData.currentSort);
+    
+    // Apply pagination
+    const startIndex = (categoryData.currentPage - 1) * categoryData.postsPerPage;
+    const endIndex = startIndex + categoryData.postsPerPage;
+    const paginatedPosts = sortedPosts.slice(startIndex, endIndex);
+    
+    container.innerHTML = paginatedPosts.map(post => `
+        <div class="post-item ${post.isPinned ? 'pinned' : ''}" onclick="location.href='/forum/post/${post.id}'">
+            <div class="post-main">
+                <div class="post-header">
+                    <div class="post-title-section">
+                        ${post.isPinned ? '<span class="pin-indicator">📌</span>' : ''}
+                        <h4 class="post-title">${escapeHtml(post.title)}</h4>
+                        ${post.tags && post.tags.length > 0 ? 
+                            `<div class="post-tags">
+                                ${post.tags.map(tag => `<span class="post-tag">#${tag}</span>`).join('')}
+                            </div>` : ''
+                        }
+                    </div>
+                    <div class="post-actions">
+                        <button class="btn-like ${post.likedBy && post.likedBy[getCurrentUserId()] ? 'liked' : ''}" 
+                                onclick="event.stopPropagation(); togglePostLike('${post.id}')">
+                            ❤️ ${post.likes || 0}
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="post-content-preview">
+                    <p>${truncateText(post.content, 200)}</p>
+                </div>
+                
+                <div class="post-meta">
+                    <div class="post-author">
+                        <img src="${post.authorAvatar || '/icons/hero-icon.svg'}" alt="${post.authorName}" class="author-avatar-small">
+                        <span class="author-name">${escapeHtml(post.authorName)}</span>
+                    </div>
+                    <div class="post-stats">
+                        <span class="post-time">${formatTimeAgo(post.createdAt)}</span>
+                        <span class="post-replies">💬 ${post.replyCount || 0}</span>
+                        <span class="post-likes">❤️ ${post.likes || 0}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    // Update pagination
+    updatePagination(sortedPosts.length);
+}
+
+function sortPosts(posts, sortBy) {
+    switch (sortBy) {
+        case 'newest':
+            return posts.sort((a, b) => b.createdAt - a.createdAt);
+        case 'oldest':
+            return posts.sort((a, b) => a.createdAt - b.createdAt);
+        case 'popular':
+            return posts.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+        case 'replies':
+            return posts.sort((a, b) => (b.replyCount || 0) - (a.replyCount || 0));
+        default:
+            return posts;
+    }
+}
+
+function updatePostsCount(count) {
+    categoryData.totalPosts = count;
+    document.getElementById('posts-count-display').textContent = 
+        `${count} post${count !== 1 ? 's' : ''}`;
+}
+
+function updatePagination(totalPosts) {
+    const totalPages = Math.ceil(totalPosts / categoryData.postsPerPage);
+    const container = document.getElementById('pagination-container');
+    
+    if (totalPages <= 1) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.style.display = 'block';
+    container.innerHTML = generatePaginationHTML(categoryData.currentPage, totalPages);
+}
+
+function generatePaginationHTML(currentPage, totalPages) {
+    let html = '<div class="pagination">';
+    
+    // Previous button
+    if (currentPage > 1) {
+        html += `<button class="pagination-btn" onclick="changePage(${currentPage - 1})">‹ Previous</button>`;
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+            html += `<span class="pagination-current">${i}</span>`;
+        } else if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+            html += `<button class="pagination-btn" onclick="changePage(${i})">${i}</button>`;
+        } else if (i === currentPage - 3 || i === currentPage + 3) {
+            html += '<span class="pagination-ellipsis">...</span>';
+        }
+    }
+    
+    // Next button
+    if (currentPage < totalPages) {
+        html += `<button class="pagination-btn" onclick="changePage(${currentPage + 1})">Next ›</button>`;
+    }
+    
+    html += '</div>';
+    return html;
+}
+
+function changePage(page) {
+    categoryData.currentPage = page;
+    loadCategoryPosts();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function applySorting(sortBy) {
+    categoryData.currentSort = sortBy;
+    categoryData.currentPage = 1; // Reset to first page
+    loadCategoryPosts();
+}
+
+function toggleCategoryFilters() {
+    const panel = document.getElementById('filter-panel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function applyFilters() {
+    categoryData.filters.time = document.getElementById('time-filter').value;
+    categoryData.filters.type = document.getElementById('type-filter').value;
+    categoryData.filters.author = document.getElementById('author-filter').value;
+    categoryData.currentPage = 1; // Reset to first page
+    
+    loadCategoryPosts();
+    toggleCategoryFilters();
+}
+
+function clearFilters() {
+    document.getElementById('time-filter').value = 'all';
+    document.getElementById('type-filter').value = 'all';
+    document.getElementById('author-filter').value = '';
+    
+    categoryData.filters = { time: 'all', type: 'all', author: '' };
+    categoryData.currentPage = 1;
+    
+    loadCategoryPosts();
+}
+
+function showEmptyState() {
+    document.getElementById('posts-container').style.display = 'none';
+    document.getElementById('empty-state').style.display = 'block';
+    document.getElementById('posts-count-display').textContent = '0 posts';
+}
+
+function setupAuthStateListener() {
+    if (window.firebaseAuth) {
+        window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
+            const createBtn = document.getElementById('create-post-btn');
+            if (user) {
+                createBtn.style.display = 'block';
+            } else {
+                createBtn.style.display = 'none';
+            }
+        });
+    }
+}
+
+function showCreatePostModal(categoryId) {
+    if (!window.forumState.isAuthenticated) {
+        window.forumJS.showNotification('Please sign in to create a post', 'error');
+        return;
+    }
+    
+    // For now, redirect to create page
+    window.location.href = `/forum/create?category=${categoryId}`;
+}
+
+function getCurrentUserId() {
+    return window.forumState.currentUser ? window.forumState.currentUser.uid : null;
+}
+
+// Utility functions
+function formatTimeAgo(timestamp) {
+    const now = Date.now();
+    const diff = now - timestamp;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    return new Date(timestamp).toLocaleDateString();
+}
+
+function truncateText(text, maxLength) {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+}
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+</script>
+
+<style>
+/* Category-specific styles */
+.category-header-section {
+    background: rgba(74, 71, 163, 0.1);
+    border: 1px solid rgba(74, 71, 163, 0.2);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.category-icon-large {
+    font-size: 3rem;
+    margin-right: 1rem;
+}
+
+.category-icon-large img {
+    width: 48px;
+    height: 48px;
+}
+
+.category-title {
+    display: flex;
+    align-items: center;
+    margin: 0 0 1rem 0;
+    font-size: 2rem;
+}
+
+.category-description {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 600px;
+}
+
+.category-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.category-tools {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.sort-dropdown select {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(74, 71, 163, 0.3);
+    background: rgba(74, 71, 163, 0.1);
+    color: var(--text-color, #eee);
+}
+
+.filter-panel {
+    background: rgba(74, 71, 163, 0.1);
+    border: 1px solid rgba(74, 71, 163, 0.2);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.filter-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(74, 71, 163, 0.3);
+    background: rgba(74, 71, 163, 0.1);
+    color: var(--text-color, #eee);
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.posts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.posts-header h3 {
+    margin: 0;
+    color: #4a47a3;
+}
+
+.posts-count {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.post-item {
+    background: rgba(74, 71, 163, 0.1);
+    border: 1px solid rgba(74, 71, 163, 0.2);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.post-item:hover {
+    background: rgba(74, 71, 163, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(74, 71, 163, 0.2);
+}
+
+.post-item.pinned {
+    border-left: 4px solid #6a4c93;
+    background: rgba(106, 76, 147, 0.1);
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.post-title-section {
+    flex: 1;
+}
+
+.pin-indicator {
+    color: #6a4c93;
+    margin-right: 0.5rem;
+}
+
+.post-title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color, #eee);
+}
+
+.post-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.post-tag {
+    background: rgba(74, 71, 163, 0.3);
+    color: #4a47a3;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.post-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-like {
+    background: none;
+    border: 1px solid rgba(74, 71, 163, 0.3);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--text-color, #eee);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-like:hover {
+    background: rgba(74, 71, 163, 0.2);
+}
+
+.btn-like.liked {
+    background: rgba(231, 76, 60, 0.2);
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+.post-content-preview {
+    margin-bottom: 1rem;
+}
+
+.post-content-preview p {
+    margin: 0;
+    opacity: 0.8;
+    line-height: 1.5;
+}
+
+.post-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.post-author {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.author-avatar-small {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.author-name {
+    font-weight: 500;
+    color: #4a47a3;
+}
+
+.post-stats {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.pagination-btn {
+    padding: 0.75rem 1rem;
+    background: rgba(74, 71, 163, 0.1);
+    border: 1px solid rgba(74, 71, 163, 0.2);
+    border-radius: 0.5rem;
+    color: var(--text-color, #eee);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pagination-btn:hover {
+    background: rgba(74, 71, 163, 0.2);
+}
+
+.pagination-current {
+    padding: 0.75rem 1rem;
+    background: #4a47a3;
+    color: white;
+    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+.pagination-ellipsis {
+    padding: 0.75rem;
+    opacity: 0.5;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: rgba(74, 71, 163, 0.1);
+    border: 1px solid rgba(74, 71, 163, 0.2);
+    border-radius: 1rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    color: #4a47a3;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    opacity: 0.8;
+    margin-bottom: 2rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Button styles */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: #4a47a3;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #3a356b;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: rgba(74, 71, 163, 0.2);
+    color: var(--text-color, #eee);
+    border: 1px solid rgba(74, 71, 163, 0.3);
+}
+
+.btn-secondary:hover {
+    background: rgba(74, 71, 163, 0.3);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .category-header-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .category-actions {
+        align-items: stretch;
+    }
+    
+    .category-tools {
+        flex-direction: column;
+    }
+    
+    .filter-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .post-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .post-meta {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .pagination {
+        flex-wrap: wrap;
+    }
+}
+</style>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Wavelength Community Forum</title>
+    
+    <!-- Reuse existing styles -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/forum.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+      import { getDatabase, ref, push, set, onValue, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+      
+      // Initialize Firebase with your existing config
+      const firebaseConfig = {
+        apiKey: "AIzaSyCg-9HMihsWZnvfYOS155Dk4JJt5Rr7XRI",
+        authDomain: "wavelength-lore.firebaseapp.com",
+        databaseURL: "https://wavelength-lore-default-rtdb.firebaseio.com",
+        projectId: "wavelength-lore",
+        storageBucket: "wavelength-lore.firebasestorage.app",
+        messagingSenderId: "78008979957",
+        appId: "1:78008979957:web:799d623c4bd1d5be3b90bc"
+      };
+      
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const database = getDatabase(app);
+      
+      // Make Firebase available globally for forum components
+      window.firebaseAuth = auth;
+      window.firebaseDB = database;
+      window.firebaseUtils = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, ref, push, set, onValue, query, orderByChild };
+    </script>
+    
+    <!-- Forum JavaScript -->
+    <script src="/js/forum.js" defer></script>
+</head>
+<body>
+    <!-- Include existing navigation -->
+    <%- include('../partials/head') %>
+    
+    <div class="forum-container">
+        <!-- Forum Header -->
+        <header class="forum-header">
+            <h1 class="forum-title">Wavelength Community Forum</h1>
+            <p class="forum-subtitle">Connect with fellow Wavelength fans</p>
+        </header>
+        
+        <!-- Authentication Section -->
+        <section class="auth-section">
+            <div id="forum-auth-container">
+                <div class="guest-message">Sign in to participate in discussions</div>
+                <div class="auth-actions">
+                    <button class="btn btn-primary" onclick="window.forumJS.signInWithGoogle()">Sign in with Google</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Forum Navigation -->
+        <nav class="forum-nav">
+            <div class="forum-nav-links">
+                <a href="/forum" class="forum-nav-link <%= currentPage === 'home' ? 'active' : '' %>">🏠 Home</a>
+                <a href="/forum/recent" class="forum-nav-link <%= currentPage === 'recent' ? 'active' : '' %>">🕒 Recent Posts</a>
+                <a href="/forum/popular" class="forum-nav-link <%= currentPage === 'popular' ? 'active' : '' %>">🔥 Popular</a>
+                <a href="/forum/search" class="forum-nav-link <%= currentPage === 'search' ? 'active' : '' %>">🔍 Search</a>
+                <a href="/" class="forum-nav-link">← Back to Wavelength Lore</a>
+            </div>
+        </nav>
+        
+        <!-- Breadcrumbs -->
+        <div class="breadcrumbs">
+            <span class="breadcrumb-item">
+                <a href="/forum" class="breadcrumb-link">Forum</a>
+            </span>
+            <% if (typeof breadcrumbs !== 'undefined' && breadcrumbs.length > 0) { %>
+                <% breadcrumbs.forEach(crumb => { %>
+                    <span class="breadcrumb-item">
+                        <% if (crumb.url) { %>
+                            <a href="<%= crumb.url %>" class="breadcrumb-link"><%= crumb.name %></a>
+                        <% } else { %>
+                            <%= crumb.name %>
+                        <% } %>
+                    </span>
+                <% }); %>
+            <% } %>
+        </div>
+        
+        <!-- Category Content -->
+        <%- include('category') %>
+    </div>
+    
+    <!-- Forum Modals -->
+    <div id="forum-modals"></div>
+</body>
+</html>
