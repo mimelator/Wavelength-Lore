@@ -5,6 +5,9 @@ const path = require('path');
 // Import shared utilities
 const firebaseUtils = require('./helpers/firebase-utils');
 
+// Import rate limiting middleware
+const { createSmartRateLimit, admin: adminRateLimit } = require('./middleware/rateLimiting');
+
 // Import helper modules
 const characterHelpers = require('./helpers/character-helpers');
 const loreHelpers = require('./helpers/lore-helpers');
@@ -75,6 +78,10 @@ app.set('views', path.join(__dirname, 'views'));
 // Body parser middleware for JSON requests
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Apply rate limiting middleware
+console.log('🛡️ Initializing rate limiting protection...');
+app.use(createSmartRateLimit());
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'static')));
@@ -519,7 +526,7 @@ app.get('/cache-management', (req, res) => {
 });
 
 // Cache busting routes
-app.post('/api/cache/bust', async (req, res) => {
+app.post('/api/cache/bust', adminRateLimit, async (req, res) => {
   try {
     const { type, refresh } = req.body;
     const results = {};
