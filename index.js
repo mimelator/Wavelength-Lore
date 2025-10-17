@@ -8,6 +8,9 @@ const firebaseUtils = require('./helpers/firebase-utils');
 // Import rate limiting middleware
 const { createSmartRateLimit, admin: adminRateLimit } = require('./middleware/rateLimiting');
 
+// Import input sanitization middleware
+const InputSanitizer = require('./middleware/inputSanitization');
+
 // Import helper modules
 const characterHelpers = require('./helpers/character-helpers');
 const loreHelpers = require('./helpers/lore-helpers');
@@ -82,6 +85,18 @@ app.use(express.urlencoded({ extended: true }));
 // Apply rate limiting middleware
 console.log('🛡️ Initializing rate limiting protection...');
 app.use(createSmartRateLimit());
+
+// Apply input sanitization middleware
+console.log('🧹 Initializing input sanitization...');
+app.use(InputSanitizer.createMiddleware({ logging: true }));
+
+// Import and use secure forum routes
+const secureForumRoutes = require('./routes/secureForumRoutes');
+app.use('/api', secureForumRoutes);
+
+// Import and use sanitization test routes
+const sanitizationTestRoutes = require('./routes/sanitizationTestRoutes');
+app.use('/api', sanitizationTestRoutes);
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'static')));
