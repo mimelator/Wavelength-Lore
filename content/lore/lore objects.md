@@ -5,6 +5,10 @@ Things
 * Ice Dragons
 * Ice Blue Diamond
 
+Bands:
+* Wavelength
+* The Crows (Backyard Ballads)
+
 Places:
 * The Shire
 * Ice Fortress
@@ -16,10 +20,11 @@ Villains:
 * Goblins
 
 Concepts:
-* Goblin's Rule
-* Pscyhopath
+* Goblin's Rule (TODO)
+* Pscyhopath (TODO)
 * Rhythm Theory (Coming soon...)
 
-events:
-  - id: battle-of-the-shire
-    title: Battle of the Shire
+Events:
+  - Battle of the Shire (TODO)
+  - Summer Solstice Bazaar (Coming soon...)
+  - Great Autumn Festival (Coming soon...)

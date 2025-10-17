@@ -1,51 +1,9 @@
 // Episode helper functions for generating episode links and references
-const { initializeApp, getApps } = require('firebase/app');
-const { getDatabase, ref, get } = require('firebase/database');
+const firebaseUtils = require('./firebase-utils');
+const cacheUtils = require('./cache-utils');
 
-// Firebase configuration (same as main app)
-const firebaseConfig = {
-  apiKey: process.env.API_KEY,
-  authDomain: process.env.AUTH_DOMAIN,
-  databaseURL: process.env.DATABASE_URL,
-  projectId: process.env.PROJECT_ID,
-  storageBucket: process.env.STORAGE_BUCKET,
-  messagingSenderId: process.env.MESSAGING_SENDER_ID,
-  appId: process.env.APP_ID
-};
-
-// Initialize Firebase (reuse existing app if available)
-let firebaseApp;
-let database;
-
-function initializeFirebase() {
-  try {
-    const existingApps = getApps();
-    if (existingApps.length > 0) {
-      // Use the first existing app
-      firebaseApp = existingApps[0];
-    } else {
-      // Create new app
-      firebaseApp = initializeApp(firebaseConfig, 'episode-helpers');
-    }
-    database = getDatabase(firebaseApp);
-  } catch (error) {
-    console.warn('Firebase initialization in episode-helpers failed:', error.message);
-    // Firebase will be null, and we'll use fallback data
-  }
-}
-
-/**
- * Set database instance (useful when called from main app)
- * @param {object} dbInstance - Firebase database instance
- */
-function setDatabaseInstance(dbInstance) {
-  database = dbInstance;
-}
-
-// Cache for episode data
-let episodeCache = null;
-let cacheTimestamp = null;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+// Create cache manager for episodes
+const episodeCache = cacheUtils.createCacheManager('Episodes');
 
 // Fallback episode data (in case database is unavailable)
 const fallbackEpisodes = [
@@ -89,17 +47,13 @@ const fallbackEpisodes = [
  */
 async function fetchEpisodesFromDatabase() {
   try {
-    if (!database) {
-      console.warn('Database not available, using fallback episodes');
-      return fallbackEpisodes;
+    if (!firebaseUtils.isFirebaseReady()) {
+      firebaseUtils.initializeFirebase('episode-helpers');
     }
 
-    const videosRef = ref(database, 'videos');
-    const snapshot = await get(videosRef);
-
-    if (snapshot.exists()) {
-      const videosData = snapshot.val();
-      
+    const videosData = await firebaseUtils.fetchFromFirebase('videos');
+    
+    if (videosData) {
       // Extract all episodes from all seasons
       let allEpisodes = [];
       
@@ -257,7 +211,7 @@ async function getAllEpisodes() {
  * @returns {object|null} Episode object or null if not found
  */
 function getEpisodeByIdSync(id) {
-  const episodes = episodeCache || fallbackEpisodes;
+  const episodes = cacheUtils.getSync(episodeCache, fallbackEpisodes);
   return episodes.find(episode => episode.id === id) || null;
 }
 
@@ -267,7 +221,7 @@ function getEpisodeByIdSync(id) {
  * @returns {Array} Array of episodes in the season
  */
 function getEpisodesBySeasonSync(season) {
-  const episodes = episodeCache || fallbackEpisodes;
+  const episodes = cacheUtils.getSync(episodeCache, fallbackEpisodes);
   return episodes.filter(episode => episode.season === season);
 }
 
@@ -290,7 +244,7 @@ function generateEpisodeLinkSync(episodeId) {
  * @returns {string} Text with episode names replaced by links
  */
 function linkifyEpisodeMentionsSync(text) {
-  const episodes = episodeCache || fallbackEpisodes;
+  const episodes = cacheUtils.getSync(episodeCache, fallbackEpisodes);
   let processedText = text;
   
   for (const episode of episodes) {
@@ -309,7 +263,7 @@ function linkifyEpisodeMentionsSync(text) {
  * @returns {Array} Array of all episodes
  */
 function getAllEpisodesSync() {
-  return episodeCache || fallbackEpisodes;
+  return cacheUtils.getSync(episodeCache, fallbackEpisodes);
 }
 
 /**
@@ -335,14 +289,12 @@ async function initializeEpisodeCache() {
  * Clear episode cache
  */
 function clearEpisodeCache() {
-  episodeCache = null;
-  cacheTimestamp = null;
-  console.log('Episode cache cleared');
+  episodeCache.clear();
 }
 
 // Export functions
 module.exports = {
-  setDatabaseInstance,
+  setDatabaseInstance: firebaseUtils.setDatabaseInstance,
   getEpisodes,
   getEpisodeById,
   getEpisodesBySeason,

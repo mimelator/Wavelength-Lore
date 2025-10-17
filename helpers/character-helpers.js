@@ -1,51 +1,10 @@
 // Character helper functions for generating character links and references
-const { initializeApp, getApps } = require('firebase/app');
-const { getDatabase, ref, get } = require('firebase/database');
+const linkingUtils = require('./linking-utils');
+const firebaseUtils = require('./firebase-utils');
+const cacheUtils = require('./cache-utils');
 
-// Firebase configuration (same as main app)
-const firebaseConfig = {
-  apiKey: process.env.API_KEY,
-  authDomain: process.env.AUTH_DOMAIN,
-  databaseURL: process.env.DATABASE_URL,
-  projectId: process.env.PROJECT_ID,
-  storageBucket: process.env.STORAGE_BUCKET,
-  messagingSenderId: process.env.MESSAGING_SENDER_ID,
-  appId: process.env.APP_ID
-};
-
-// Initialize Firebase (reuse existing app if available)
-let firebaseApp;
-let database;
-
-function initializeFirebase() {
-  try {
-    const existingApps = getApps();
-    if (existingApps.length > 0) {
-      // Use the first existing app
-      firebaseApp = existingApps[0];
-    } else {
-      // Create new app
-      firebaseApp = initializeApp(firebaseConfig, 'character-helpers');
-    }
-    database = getDatabase(firebaseApp);
-  } catch (error) {
-    console.warn('Firebase initialization in character-helpers failed:', error.message);
-    // Firebase will be null, and we'll use fallback data
-  }
-}
-
-/**
- * Set database instance (useful when called from main app)
- * @param {object} dbInstance - Firebase database instance
- */
-function setDatabaseInstance(dbInstance) {
-  database = dbInstance;
-}
-
-// Cache for characters data
-let charactersCache = null;
-let cacheTimestamp = null;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+// Create cache manager for characters
+const charactersCache = cacheUtils.createCacheManager('Characters');
 
 // Fallback character data (in case database is unavailable)
 const fallbackCharacters = [
@@ -113,17 +72,13 @@ const fallbackCharacters = [
  */
 async function fetchCharactersFromDatabase() {
   try {
-    if (!database) {
-      console.warn('Database not available, using fallback characters');
-      return fallbackCharacters;
+    if (!firebaseUtils.isFirebaseReady()) {
+      firebaseUtils.initializeFirebase('character-helpers');
     }
 
-    const charactersRef = ref(database, 'characters');
-    const snapshot = await get(charactersRef);
-
-    if (snapshot.exists()) {
-      const charactersData = snapshot.val();
-      
+    const charactersData = await firebaseUtils.fetchFromFirebase('characters');
+    
+    if (charactersData) {
       // Extract all characters from all categories
       let allCharacters = [];
       for (const category in charactersData) {
@@ -158,18 +113,11 @@ async function fetchCharactersFromDatabase() {
  * @returns {Promise<Array>} Array of character objects
  */
 async function getCharacters() {
-  const now = Date.now();
-  
-  // Check if cache is valid
-  if (charactersCache && cacheTimestamp && (now - cacheTimestamp) < CACHE_DURATION) {
-    return charactersCache;
-  }
-  
-  // Fetch fresh data
-  charactersCache = await fetchCharactersFromDatabase();
-  cacheTimestamp = now;
-  
-  return charactersCache;
+  return await cacheUtils.getWithCache(
+    charactersCache,
+    fetchCharactersFromDatabase,
+    fallbackCharacters
+  );
 }
 
 /**
@@ -205,95 +153,7 @@ async function generateCharacterLink(id, customText = null) {
  */
 async function linkifyCharacterMentions(text) {
   const characters = await getCharacters();
-  let processedText = text;
-  
-  // Create a map of terms to their matching character items
-  const termConflicts = new Map();
-  
-  for (const character of characters) {
-    // Build array of all searchable terms (title + keywords)
-    const searchTerms = [character.name];
-    if (character.keywords && Array.isArray(character.keywords)) {
-      searchTerms.push(...character.keywords);
-    }
-    
-    // Add each term to the conflicts map
-    for (const term of searchTerms) {
-      if (!term || term.trim() === '') continue;
-      
-      const lowerTerm = term.toLowerCase();
-      if (!termConflicts.has(lowerTerm)) {
-        termConflicts.set(lowerTerm, []);
-      }
-      termConflicts.get(lowerTerm).push({
-        item: character,
-        matchText: term
-      });
-    }
-  }
-  
-  // Sort terms by length (longest first) to avoid partial replacements
-  const sortedTerms = Array.from(termConflicts.keys()).sort((a, b) => b.length - a.length);
-  
-  // Process each term, being extra careful not to link inside existing HTML or already-linked text
-  for (const term of sortedTerms) {
-    const matches = termConflicts.get(term);
-    if (!matches || matches.length === 0) continue;
-    
-    // Use the first match for linking (conflicts should be handled by disambiguation system)
-    const match = matches[0];
-    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    
-    // Track positions of existing links to avoid overlapping
-    const existingLinks = [];
-    let linkMatch;
-    const linkRegex = /<a\s[^>]*>.*?<\/a>/gi;
-    while ((linkMatch = linkRegex.exec(processedText)) !== null) {
-      existingLinks.push({
-        start: linkMatch.index,
-        end: linkMatch.index + linkMatch[0].length
-      });
-    }
-    
-    // Find all matches of our term
-    let termMatches = [];
-    let termMatch;
-    const termRegex = new RegExp(`\\b${escapedTerm}\\b`, 'gi');
-    while ((termMatch = termRegex.exec(processedText)) !== null) {
-      // Check if this match overlaps with any existing link
-      const matchStart = termMatch.index;
-      const matchEnd = termMatch.index + termMatch[0].length;
-      
-      let isInsideLink = false;
-      for (const link of existingLinks) {
-        if (matchStart >= link.start && matchEnd <= link.end) {
-          isInsideLink = true;
-          break;
-        }
-      }
-      
-      if (!isInsideLink) {
-        termMatches.push({
-          match: termMatch[0],
-          start: matchStart,
-          end: matchEnd
-        });
-      }
-    }
-    
-    // Replace from right to left to maintain correct positions
-    termMatches.reverse().forEach(termMatchInfo => {
-      const beforeMatch = processedText.substring(0, termMatchInfo.start);
-      const afterMatch = processedText.substring(termMatchInfo.end);
-      
-      // Create the link
-      const linkHtml = `<a href="${match.item.url}" class="character-link" title="View ${match.item.name}'s character page">${termMatchInfo.match}</a>`;
-      
-      processedText = beforeMatch + linkHtml + afterMatch;
-    });
-  }
-  
-  return processedText;
+  return linkingUtils.linkifyItemMentions(text, characters, 'character');
 }
 
 /**
@@ -314,7 +174,7 @@ async function getAllCharacters() {
  * @returns {object|null} Character object or null if not found
  */
 function getCharacterByIdSync(id) {
-  const characters = charactersCache || fallbackCharacters;
+  const characters = cacheUtils.getSync(charactersCache, fallbackCharacters);
   return characters.find(character => character.id === id) || null;
 }
 
@@ -340,96 +200,8 @@ function generateCharacterLinkSync(id, customText = null) {
  * @returns {string} Text with character names replaced by links
  */
 function linkifyCharacterMentionsSync(text) {
-  const characters = charactersCache || fallbackCharacters;
-  let processedText = text;
-  
-  // Create a comprehensive list of all terms with their associated character items
-  const termMap = new Map();
-  
-  characters.forEach(character => {
-    // Build array of all searchable terms (title + keywords)
-    const searchTerms = [character.name];
-    if (character.keywords && Array.isArray(character.keywords)) {
-      searchTerms.push(...character.keywords);
-    }
-    
-    // Add each term to the map
-    searchTerms.forEach(term => {
-      if (!term || term.trim() === '') return;
-      
-      const lowerTerm = term.toLowerCase();
-      if (!termMap.has(lowerTerm)) {
-        termMap.set(lowerTerm, []);
-      }
-      termMap.get(lowerTerm).push({
-        item: character,
-        matchText: term
-      });
-    });
-  });
-  
-  // Sort terms by length (longest first) to avoid partial replacements
-  const sortedTerms = Array.from(termMap.keys()).sort((a, b) => b.length - a.length);
-  
-  // Process each term, being extra careful not to link inside existing HTML or already-linked text
-  for (const term of sortedTerms) {
-    const matches = termMap.get(term);
-    if (!matches || matches.length === 0) continue;
-    
-    // Use the first match for linking
-    const match = matches[0];
-    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    
-    // Track positions of existing links to avoid overlapping
-    const existingLinks = [];
-    let linkMatch;
-    const linkRegex = /<a\s[^>]*>.*?<\/a>/gi;
-    while ((linkMatch = linkRegex.exec(processedText)) !== null) {
-      existingLinks.push({
-        start: linkMatch.index,
-        end: linkMatch.index + linkMatch[0].length
-      });
-    }
-    
-    // Find all matches of our term
-    let termMatches = [];
-    let termMatch;
-    const termRegex = new RegExp(`\\b${escapedTerm}\\b`, 'gi');
-    while ((termMatch = termRegex.exec(processedText)) !== null) {
-      // Check if this match overlaps with any existing link
-      const matchStart = termMatch.index;
-      const matchEnd = termMatch.index + termMatch[0].length;
-      
-      let isInsideLink = false;
-      for (const link of existingLinks) {
-        if (matchStart >= link.start && matchEnd <= link.end) {
-          isInsideLink = true;
-          break;
-        }
-      }
-      
-      if (!isInsideLink) {
-        termMatches.push({
-          match: termMatch[0],
-          start: matchStart,
-          end: matchEnd
-        });
-      }
-    }
-    
-    // Replace from right to left to maintain correct positions
-    termMatches.reverse().forEach(termMatchInfo => {
-      const beforeMatch = processedText.substring(0, termMatchInfo.start);
-      const afterMatch = processedText.substring(termMatchInfo.end);
-      
-      // Create the link
-      const linkHtml = `<a href="${match.item.url}" class="character-link" title="View ${match.item.name}'s character page">${termMatchInfo.match}</a>`;
-      
-      processedText = beforeMatch + linkHtml + afterMatch;
-    });
-  }
-  
-  return processedText;
+  const characters = cacheUtils.getSync(charactersCache, fallbackCharacters);
+  return linkingUtils.linkifyItemMentions(text, characters, 'character');
 }
 
 /**
@@ -437,7 +209,7 @@ function linkifyCharacterMentionsSync(text) {
  * @returns {array} Array of all characters
  */
 function getAllCharactersSync() {
-  return charactersCache || fallbackCharacters;
+  return cacheUtils.getSync(charactersCache, fallbackCharacters);
 }
 
 /**
@@ -445,26 +217,18 @@ function getAllCharactersSync() {
  * @returns {Promise<void>}
  */
 async function initializeCharacterCache() {
-  try {
-    // Only initialize Firebase if no database instance was provided
-    if (!database) {
-      initializeFirebase();
-    }
-    
-    // Then populate the cache
-    await getCharacters(); // This will populate the cache
-    console.log('Character cache initialized successfully');
-  } catch (error) {
-    console.error('Failed to initialize character cache:', error);
-  }
+  return await cacheUtils.initializeCache(
+    charactersCache,
+    async () => await getCharacters(),
+    'Character'
+  );
 }
 
 /**
  * Clear character cache (useful for testing or forced refresh)
  */
 function clearCharacterCache() {
-  charactersCache = null;
-  cacheTimestamp = null;
+  charactersCache.clear();
 }
 
 module.exports = {
@@ -483,7 +247,7 @@ module.exports = {
   // Cache management
   initializeCharacterCache,
   clearCharacterCache,
-  setDatabaseInstance,
+  setDatabaseInstance: firebaseUtils.setDatabaseInstance,
   
   // Backward compatibility aliases
   characters: getAllCharactersSync(), // This will be empty initially

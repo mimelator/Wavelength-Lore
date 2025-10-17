@@ -1,51 +1,10 @@
 // Lore helper functions for generating lore links and references (places, things, concepts, ideas)
-const { initializeApp, getApps } = require('firebase/app');
-const { getDatabase, ref, get } = require('firebase/database');
+const linkingUtils = require('./linking-utils');
+const firebaseUtils = require('./firebase-utils');
+const cacheUtils = require('./cache-utils');
 
-// Firebase configuration (same as main app)
-const firebaseConfig = {
-  apiKey: process.env.API_KEY,
-  authDomain: process.env.AUTH_DOMAIN,
-  databaseURL: process.env.DATABASE_URL,
-  projectId: process.env.PROJECT_ID,
-  storageBucket: process.env.STORAGE_BUCKET,
-  messagingSenderId: process.env.MESSAGING_SENDER_ID,
-  appId: process.env.APP_ID
-};
-
-// Initialize Firebase (reuse existing app if available)
-let firebaseApp;
-let database;
-
-function initializeFirebase() {
-  try {
-    const existingApps = getApps();
-    if (existingApps.length > 0) {
-      // Use the first existing app
-      firebaseApp = existingApps[0];
-    } else {
-      // Create new app
-      firebaseApp = initializeApp(firebaseConfig, 'lore-helpers');
-    }
-    database = getDatabase(firebaseApp);
-  } catch (error) {
-    console.warn('Firebase initialization in lore-helpers failed:', error.message);
-    // Firebase will be null, and we'll use fallback data
-  }
-}
-
-/**
- * Set database instance (useful when called from main app)
- * @param {object} dbInstance - Firebase database instance
- */
-function setDatabaseInstance(dbInstance) {
-  database = dbInstance;
-}
-
-// Cache for lore data
-let loreCache = null;
-let cacheTimestamp = null;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+// Create cache manager for lore
+const loreCache = cacheUtils.createCacheManager('Lore');
 
 // Fallback lore data (in case database is unavailable)
 const fallbackLore = [
@@ -97,6 +56,21 @@ const fallbackLore = [
     image_gallery: [
       'https://df5sj8f594cdx.cloudfront.net/images/episodes/TheSongOfMourning-19.png'
     ]
+  },
+  {
+    id: 'goblin-king',
+    title: 'Goblin King',
+    name: 'Goblin King',
+    url: '/lore/goblin-king',
+    type: 'villain',
+    keywords: ['king', 'goblin ruler', 'psychopath', 'villain'],
+    description: "The Goblin King is a Psychopath that leads a Misery of Goblins to invade the Shire and begin the Battle of the Shire. He lives by one Rule: Goblin's Rule, which means that the only rule you ever need to know about when dealing with the Goblin King, is that he will Rule all over you. He is tricked by Lucky and the fact that Goblin's Greed is insatiable, into leaving his lair to pursue an Ice Blue Diamond, which Lucky uses to lure him out of hiding during the Battle for the Shire.",
+    image: 'https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png',
+    image_gallery: [
+      'https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png',
+      'https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-23.png',
+      'https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-25.png'
+    ]
   }
 ];
 
@@ -106,17 +80,13 @@ const fallbackLore = [
  */
 async function fetchLoreFromDatabase() {
   try {
-    if (!database) {
-      console.warn('Database not available, using fallback lore');
-      return fallbackLore;
+    if (!firebaseUtils.isFirebaseReady()) {
+      firebaseUtils.initializeFirebase('lore-helpers');
     }
 
-    const loreRef = ref(database, 'lore');
-    const snapshot = await get(loreRef);
-
-    if (snapshot.exists()) {
-      const loreData = snapshot.val();
-      
+    const loreData = await firebaseUtils.fetchFromFirebase('lore');
+    
+    if (loreData) {
       // Handle new structure where each lore item is stored by ID
       let allLore = [];
       
@@ -156,18 +126,11 @@ async function fetchLoreFromDatabase() {
  * @returns {Promise<Array>} Array of lore objects
  */
 async function getLore() {
-  const now = Date.now();
-  
-  // Check if cache is valid
-  if (loreCache && cacheTimestamp && (now - cacheTimestamp) < CACHE_DURATION) {
-    return loreCache;
-  }
-  
-  // Fetch fresh data
-  loreCache = await fetchLoreFromDatabase();
-  cacheTimestamp = now;
-  
-  return loreCache;
+  return await cacheUtils.getWithCache(
+    loreCache,
+    fetchLoreFromDatabase,
+    fallbackLore
+  );
 }
 
 /**
@@ -203,95 +166,7 @@ async function generateLoreLink(id, customText = null) {
  */
 async function linkifyLoreMentions(text) {
   const lore = await getLore();
-  let processedText = text;
-  
-  // Create a map of terms to their matching lore items
-  const termConflicts = new Map();
-  
-  for (const loreItem of lore) {
-    // Build array of all searchable terms (title + keywords)
-    const searchTerms = [loreItem.name];
-    if (loreItem.keywords && Array.isArray(loreItem.keywords)) {
-      searchTerms.push(...loreItem.keywords);
-    }
-    
-    // Add each term to the conflicts map
-    for (const term of searchTerms) {
-      if (!term || term.trim() === '') continue;
-      
-      const lowerTerm = term.toLowerCase();
-      if (!termConflicts.has(lowerTerm)) {
-        termConflicts.set(lowerTerm, []);
-      }
-      termConflicts.get(lowerTerm).push({
-        item: loreItem,
-        matchText: term
-      });
-    }
-  }
-  
-  // Sort terms by length (longest first) to avoid partial replacements
-  const sortedTerms = Array.from(termConflicts.keys()).sort((a, b) => b.length - a.length);
-  
-  // Process each term, being extra careful not to link inside existing HTML or already-linked text
-  for (const term of sortedTerms) {
-    const matches = termConflicts.get(term);
-    if (!matches || matches.length === 0) continue;
-    
-    // Use the first match for linking (conflicts should be handled by disambiguation system)
-    const match = matches[0];
-    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    
-    // Track positions of existing links to avoid overlapping
-    const existingLinks = [];
-    let linkMatch;
-    const linkRegex = /<a\s[^>]*>.*?<\/a>/gi;
-    while ((linkMatch = linkRegex.exec(processedText)) !== null) {
-      existingLinks.push({
-        start: linkMatch.index,
-        end: linkMatch.index + linkMatch[0].length
-      });
-    }
-    
-    // Find all matches of our term
-    let termMatches = [];
-    let termMatch;
-    const termRegex = new RegExp(`\\b${escapedTerm}\\b`, 'gi');
-    while ((termMatch = termRegex.exec(processedText)) !== null) {
-      // Check if this match overlaps with any existing link
-      const matchStart = termMatch.index;
-      const matchEnd = termMatch.index + termMatch[0].length;
-      
-      let isInsideLink = false;
-      for (const link of existingLinks) {
-        if (matchStart >= link.start && matchEnd <= link.end) {
-          isInsideLink = true;
-          break;
-        }
-      }
-      
-      if (!isInsideLink) {
-        termMatches.push({
-          match: termMatch[0],
-          start: matchStart,
-          end: matchEnd
-        });
-      }
-    }
-    
-    // Replace from right to left to maintain correct positions
-    termMatches.reverse().forEach(termMatchInfo => {
-      const beforeMatch = processedText.substring(0, termMatchInfo.start);
-      const afterMatch = processedText.substring(termMatchInfo.end);
-      
-      // Create the link
-      const linkHtml = `<a href="${match.item.url}" class="lore-link" title="Learn about ${match.item.name}">${termMatchInfo.match}</a>`;
-      
-      processedText = beforeMatch + linkHtml + afterMatch;
-    });
-  }
-  
-  return processedText;
+  return linkingUtils.linkifyItemMentions(text, lore, 'lore');
 }
 
 /**
@@ -322,7 +197,7 @@ async function getLoreByType(type) {
  * @returns {object|null} Lore object or null if not found
  */
 function getLoreByIdSync(id) {
-  const lore = loreCache || fallbackLore;
+  const lore = cacheUtils.getSync(loreCache, fallbackLore);
   return lore.find(loreItem => loreItem.id === id) || null;
 }
 
@@ -348,99 +223,8 @@ function generateLoreLinkSync(id, customText = null) {
  * @returns {string} Text with lore names replaced by links
  */
 function linkifyLoreMentionsSync(text) {
-  const lore = loreCache || fallbackLore;
-  let processedText = text;
-  
-  // Create a comprehensive list of all terms with their associated lore items
-  const termMap = new Map();
-  
-  lore.forEach(loreItem => {
-    // Build array of all searchable terms (title + keywords)
-    const searchTerms = [loreItem.name];
-    if (loreItem.keywords && Array.isArray(loreItem.keywords)) {
-      searchTerms.push(...loreItem.keywords);
-    }
-    
-    // Add each term to the map
-    searchTerms.forEach(term => {
-      if (!term || term.trim() === '') return;
-      
-      const lowerTerm = term.toLowerCase();
-      if (!termMap.has(lowerTerm)) {
-        termMap.set(lowerTerm, []);
-      }
-      termMap.get(lowerTerm).push({
-        item: loreItem,
-        matchText: term
-      });
-    });
-  });
-  
-  // Sort terms by length (longest first) to avoid partial replacements
-  const sortedTerms = Array.from(termMap.keys()).sort((a, b) => b.length - a.length);
-  
-  // Process each term, being extra careful not to link inside existing HTML or already-linked text
-  for (const term of sortedTerms) {
-    const matches = termMap.get(term);
-    if (!matches || matches.length === 0) continue;
-    
-    // Use the first match for linking
-    const match = matches[0];
-    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    
-    // More robust regex that avoids linking inside existing HTML tags or anchor tags
-    const regex = new RegExp(`\\b${escapedTerm}\\b(?![^<]*>)(?![^<]*<\/a>)(?!.*<\/a>[^<]*$)`, 'gi');
-    
-    // Track positions of existing links to avoid overlapping
-    const existingLinks = [];
-    let linkMatch;
-    const linkRegex = /<a\s[^>]*>.*?<\/a>/gi;
-    while ((linkMatch = linkRegex.exec(processedText)) !== null) {
-      existingLinks.push({
-        start: linkMatch.index,
-        end: linkMatch.index + linkMatch[0].length
-      });
-    }
-    
-    // Find all matches of our term
-    let termMatches = [];
-    let termMatch;
-    const termRegex = new RegExp(`\\b${escapedTerm}\\b`, 'gi');
-    while ((termMatch = termRegex.exec(processedText)) !== null) {
-      // Check if this match overlaps with any existing link
-      const matchStart = termMatch.index;
-      const matchEnd = termMatch.index + termMatch[0].length;
-      
-      let isInsideLink = false;
-      for (const link of existingLinks) {
-        if (matchStart >= link.start && matchEnd <= link.end) {
-          isInsideLink = true;
-          break;
-        }
-      }
-      
-      if (!isInsideLink) {
-        termMatches.push({
-          match: termMatch[0],
-          start: matchStart,
-          end: matchEnd
-        });
-      }
-    }
-    
-    // Replace from right to left to maintain correct positions
-    termMatches.reverse().forEach(termMatchInfo => {
-      const beforeMatch = processedText.substring(0, termMatchInfo.start);
-      const afterMatch = processedText.substring(termMatchInfo.end);
-      
-      // Create the link
-      const linkHtml = `<a href="${match.item.url}" class="lore-link" title="Learn about ${match.item.name}">${termMatchInfo.match}</a>`;
-      
-      processedText = beforeMatch + linkHtml + afterMatch;
-    });
-  }
-  
-  return processedText;
+  const lore = cacheUtils.getSync(loreCache, fallbackLore);
+  return linkingUtils.linkifyItemMentions(text, lore, 'lore');
 }
 
 /**
@@ -448,7 +232,7 @@ function linkifyLoreMentionsSync(text) {
  * @returns {array} Array of all lore
  */
 function getAllLoreSync() {
-  return loreCache || fallbackLore;
+  return cacheUtils.getSync(loreCache, fallbackLore);
 }
 
 /**
@@ -457,7 +241,7 @@ function getAllLoreSync() {
  * @returns {array} Array of lore matching the type
  */
 function getLoreByTypeSync(type) {
-  const lore = loreCache || fallbackLore;
+  const lore = cacheUtils.getSync(loreCache, fallbackLore);
   return lore.filter(loreItem => loreItem.type === type);
 }
 
@@ -466,26 +250,18 @@ function getLoreByTypeSync(type) {
  * @returns {Promise<void>}
  */
 async function initializeLoreCache() {
-  try {
-    // Only initialize Firebase if no database instance was provided
-    if (!database) {
-      initializeFirebase();
-    }
-    
-    // Then populate the cache
-    await getLore(); // This will populate the cache
-    console.log('Lore cache initialized successfully');
-  } catch (error) {
-    console.error('Failed to initialize lore cache:', error);
-  }
+  return await cacheUtils.initializeCache(
+    loreCache,
+    async () => await getLore(),
+    'Lore'
+  );
 }
 
 /**
  * Clear lore cache (useful for testing or forced refresh)
  */
 function clearLoreCache() {
-  loreCache = null;
-  cacheTimestamp = null;
+  loreCache.clear();
 }
 
 module.exports = {
@@ -506,7 +282,7 @@ module.exports = {
   // Cache management
   initializeLoreCache,
   clearLoreCache,
-  setDatabaseInstance,
+  setDatabaseInstance: firebaseUtils.setDatabaseInstance,
   
   // Backward compatibility aliases
   lore: getAllLoreSync(), // This will be empty initially

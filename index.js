@@ -1,8 +1,11 @@
 require('dotenv').config();
 const express = require('express');
-const { initializeApp } = require('firebase/app');
-const { getDatabase, ref, get } = require('firebase/database');
 const path = require('path');
+
+// Import shared utilities
+const firebaseUtils = require('./helpers/firebase-utils');
+
+// Import helper modules
 const characterHelpers = require('./helpers/character-helpers');
 const loreHelpers = require('./helpers/lore-helpers');
 const episodeHelpers = require('./helpers/episode-helpers');
@@ -12,42 +15,32 @@ const simpleDisambiguation = require('./helpers/simple-disambiguation');
 const app = express();
 const port = 3001;
 
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: process.env.API_KEY,
-  authDomain: process.env.AUTH_DOMAIN,
-  databaseURL: process.env.DATABASE_URL,
-  projectId: process.env.PROJECT_ID,
-  storageBucket: process.env.STORAGE_BUCKET,
-  messagingSenderId: process.env.MESSAGING_SENDER_ID,
-  appId: process.env.APP_ID
-};
+// Initialize Firebase and database connection
+const database = firebaseUtils.initializeFirebase('wavelength-lore-main');
 
-/*
-console.log('DATABASE_URL:', process.env.DATABASE_URL);
-console.log('API_KEY:', process.env.API_KEY);
-console.log('Firebase Config:', firebaseConfig);
+// Initialize all helper caches with shared database instance
+async function initializeAllCaches() {
+  try {
+    // Set database instance for all helpers
+    characterHelpers.setDatabaseInstance(database);
+    loreHelpers.setDatabaseInstance(database);
+    episodeHelpers.setDatabaseInstance(database);
+    
+    // Initialize caches
+    await Promise.all([
+      characterHelpers.initializeCharacterCache(),
+      loreHelpers.initializeLoreCache(),
+      episodeHelpers.initializeEpisodeCache()
+    ]);
+    
+    console.log('All caches initialized successfully');
+  } catch (error) {
+    console.error('Error initializing caches:', error);
+  }
+}
 
-console.log('Environment Variables:');
-console.log('DATABASE_URL:', process.env.DATABASE_URL);
-console.log('API_KEY:', process.env.API_KEY);
-*/
-
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-const database = getDatabase(firebaseApp);
-
-// Initialize character cache and pass database instance
-characterHelpers.setDatabaseInstance(database);
-characterHelpers.initializeCharacterCache();
-
-// Initialize lore cache and pass database instance
-loreHelpers.setDatabaseInstance(database);
-loreHelpers.initializeLoreCache();
-
-// Initialize episode cache and pass database instance
-episodeHelpers.setDatabaseInstance(database);
-episodeHelpers.initializeEpisodeCache();
+// Initialize all systems
+initializeAllCaches();
 
 // Initialize disambiguation helpers with references to other helpers
 disambiguationHelpers.setHelperModules(characterHelpers, loreHelpers, episodeHelpers);
@@ -55,19 +48,18 @@ disambiguationHelpers.setHelperModules(characterHelpers, loreHelpers, episodeHel
 // Initialize simple disambiguation with helper instances
 simpleDisambiguation.setHelperInstances(characterHelpers, loreHelpers, episodeHelpers);
 
+// Test Firebase connection
 (async () => {
   try {
-    console.log('Attempting Firebase operation...');
-    const videosRef = ref(database, 'videos'); // Use ref(database, path)
-    const snapshot = await get(videosRef); // Use get() to fetch data
-    if (snapshot.exists()) {
-      // console.log('Firebase data:', snapshot.val());
-        console.log('Firebase operation successful.');
+    console.log('Testing Firebase connection...');
+    const testData = await firebaseUtils.fetchFromFirebase('videos');
+    if (testData) {
+      console.log('✅ Firebase connection successful');
     } else {
-      console.log('No data available');
+      console.log('⚠️ No data available at videos path');
     }
   } catch (error) {
-    console.error('Firebase error:', error);
+    console.error('❌ Firebase connection error:', error);
   }
 })();
 
@@ -136,111 +128,108 @@ app.use(async (req, res, next) => {
 // Render the index.ejs file with gallery data
 app.get('/', async (req, res) => {
   try {
-    const videosRef = ref(database, 'videos');
-    const snapshot = await get(videosRef);
-
-    if (snapshot.exists()) {
-      const videos = snapshot.val();
-      // console.debug('Firebase query results:', videos); // Debug message
-      res.render('index', {
-        title: 'Welcome to Wavelength Lore',
-        cdnUrl: process.env.CDN_URL,
-        version: `v${Date.now()}`,
-        videos: videos
-      });
-    } else {
-      console.debug('Firebase query returned no results.'); // Debug message
-      res.render('index', {
-        title: 'Welcome to Wavelength Lore',
-        cdnUrl: process.env.CDN_URL,
-        version: `v${Date.now()}`,
-        videos: {}
-      });
-    }
+    const videos = await firebaseUtils.fetchFromFirebase('videos');
+    
+    res.render('index', {
+      title: 'Welcome to Wavelength Lore',
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`,
+      videos: videos || {}
+    });
   } catch (error) {
     console.error('Error fetching videos from Firebase:', error);
     res.status(500).send('Error fetching videos');
   }
 });
 
+// Helper function to fetch episode navigation data
+async function getEpisodeNavigation(seasonNumber, episodeNumber) {
+  try {
+    const season = parseInt(seasonNumber);
+    const episode = parseInt(episodeNumber);
+    
+    // Fetch navigation data in parallel
+    const [prevEpisode, nextEpisode, prevSeasonFirst, nextSeasonFirst] = await Promise.all([
+      firebaseUtils.fetchFromFirebase(`videos/season${season}/episodes/episode${episode - 1}`),
+      firebaseUtils.fetchFromFirebase(`videos/season${season}/episodes/episode${episode + 1}`),
+      firebaseUtils.fetchFromFirebase(`videos/season${season - 1}/episodes/episode1`),
+      firebaseUtils.fetchFromFirebase(`videos/season${season + 1}/episodes/episode1`)
+    ]);
+    
+    const isFirstEpisode = episode === 1;
+    const isLastEpisode = !nextEpisode;
+    
+    return {
+      previousEpisode: prevEpisode ? {
+        id: episode - 1,
+        title: prevEpisode.title,
+        image: prevEpisode.image
+      } : null,
+      
+      nextEpisode: nextEpisode ? {
+        id: episode + 1,
+        title: nextEpisode.title,
+        image: nextEpisode.image
+      } : null,
+      
+      previousSeasonFirstEpisode: isFirstEpisode && prevSeasonFirst ? {
+        id: 1,
+        season: season - 1,
+        title: prevSeasonFirst.title,
+        image: prevSeasonFirst.image
+      } : null,
+      
+      nextSeasonFirstEpisode: isLastEpisode && nextSeasonFirst ? {
+        id: 1,
+        season: season + 1,
+        title: nextSeasonFirst.title,
+        image: nextSeasonFirst.image
+      } : null
+    };
+  } catch (error) {
+    console.error('Error fetching episode navigation:', error);
+    return { previousEpisode: null, nextEpisode: null, previousSeasonFirstEpisode: null, nextSeasonFirstEpisode: null };
+  }
+}
+
 // Route to render an episode page
 app.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
   const { seasonNumber, episodeNumber } = req.params;
 
   try {
-    const episodeRef = ref(database, `videos/season${seasonNumber}/episodes/episode${episodeNumber}`);
-    const snapshot = await get(episodeRef);
+    const episode = await firebaseUtils.fetchFromFirebase(`videos/season${seasonNumber}/episodes/episode${episodeNumber}`);
 
-    if (snapshot.exists()) {
-      const episode = snapshot.val();
-
-      // Fetch previous and next episodes
-      const prevEpisodeRef = ref(database, `videos/season${seasonNumber}/episodes/episode${parseInt(episodeNumber) - 1}`);
-      const nextEpisodeRef = ref(database, `videos/season${seasonNumber}/episodes/episode${parseInt(episodeNumber) + 1}`);
-
-      // Fetch previous and next seasons' first episodes
-      const prevSeasonRef = ref(database, `videos/season${parseInt(seasonNumber) - 1}/episodes/episode1`);
-      const nextSeasonRef = ref(database, `videos/season${parseInt(seasonNumber) + 1}/episodes/episode1`);
-
-      const [prevSnapshot, nextSnapshot, prevSeasonSnapshot, nextSeasonSnapshot] = await Promise.all([get(prevEpisodeRef), get(nextEpisodeRef), get(prevSeasonRef), get(nextSeasonRef)]);
-
-      const previousEpisode = prevSnapshot.exists() ? { 
-        id: parseInt(episodeNumber) - 1, 
-        title: prevSnapshot.val().title, 
-        image: prevSnapshot.val().image 
-      } : null;
-
-      const nextEpisode = nextSnapshot.exists() ? { 
-        id: parseInt(episodeNumber) + 1, 
-        title: nextSnapshot.val().title, 
-        image: nextSnapshot.val().image 
-      } : null;
-
-      const isFirstEpisode = parseInt(episodeNumber) === 1;
-      const isLastEpisode = !nextSnapshot.exists();
-
-      const previousSeasonFirstEpisode = isFirstEpisode && prevSeasonSnapshot.exists() ? {
-        id: 1,
-        season: parseInt(seasonNumber) - 1,
-        title: prevSeasonSnapshot.val().title,
-        image: prevSeasonSnapshot.val().image
-      } : null;
-
-      const nextSeasonFirstEpisode = isLastEpisode && nextSeasonSnapshot.exists() ? {
-        id: 1,
-        season: parseInt(seasonNumber) + 1,
-        title: nextSeasonSnapshot.val().title,
-        image: nextSeasonSnapshot.val().image
-      } : null;
+    if (episode) {
+      const navigation = await getEpisodeNavigation(seasonNumber, episodeNumber);
 
       let previousLink = null;
       let nextLink = null;
 
-      if (previousEpisode) {
+      if (navigation.previousEpisode) {
         previousLink = {
-          url: `/season/${seasonNumber}/episode/${previousEpisode.id}`,
-          title: previousEpisode.title,
-          image: previousEpisode.image
+          url: `/season/${seasonNumber}/episode/${navigation.previousEpisode.id}`,
+          title: navigation.previousEpisode.title,
+          image: navigation.previousEpisode.image
         };
-      } else if (isFirstEpisode && previousSeasonFirstEpisode) {
+      } else if (navigation.previousSeasonFirstEpisode) {
         previousLink = {
-          url: `/season/${previousSeasonFirstEpisode.season}/episode/${previousSeasonFirstEpisode.id}`,
-          title: previousSeasonFirstEpisode.title,
-          image: previousSeasonFirstEpisode.image
+          url: `/season/${navigation.previousSeasonFirstEpisode.season}/episode/${navigation.previousSeasonFirstEpisode.id}`,
+          title: navigation.previousSeasonFirstEpisode.title,
+          image: navigation.previousSeasonFirstEpisode.image
         };
       }
 
-      if (nextEpisode) {
+      if (navigation.nextEpisode) {
         nextLink = {
-          url: `/season/${seasonNumber}/episode/${nextEpisode.id}`,
-          title: nextEpisode.title,
-          image: nextEpisode.image
+          url: `/season/${seasonNumber}/episode/${navigation.nextEpisode.id}`,
+          title: navigation.nextEpisode.title,
+          image: navigation.nextEpisode.image
         };
-      } else if (isLastEpisode && nextSeasonFirstEpisode) {
+      } else if (navigation.nextSeasonFirstEpisode) {
         nextLink = {
-          url: `/season/${nextSeasonFirstEpisode.season}/episode/${nextSeasonFirstEpisode.id}`,
-          title: nextSeasonFirstEpisode.title,
-          image: nextSeasonFirstEpisode.image
+          url: `/season/${navigation.nextSeasonFirstEpisode.season}/episode/${navigation.nextSeasonFirstEpisode.id}`,
+          title: navigation.nextSeasonFirstEpisode.title,
+          image: navigation.nextSeasonFirstEpisode.image
         };
       }
 
@@ -276,12 +265,9 @@ app.get('/character/:characterId', async (req, res) => {
   const { characterId } = req.params;
 
   try {
-    const charactersRef = ref(database, 'characters');
-    const snapshot = await get(charactersRef);
+    const charactersData = await firebaseUtils.fetchFromFirebase('characters');
 
-    if (snapshot.exists()) {
-      const charactersData = snapshot.val();
-
+    if (charactersData) {
       // Search for the character by ID across all categories
       let character = null;
       for (const category in charactersData) {
@@ -335,12 +321,9 @@ app.get('/character/:characterId', async (req, res) => {
 // Route to render the Character Gallery page
 app.get('/characters', async (req, res) => {
   try {
-    const charactersRef = ref(database, 'characters');
-    const snapshot = await get(charactersRef);
+    const charactersData = await firebaseUtils.fetchFromFirebase('characters');
 
-    if (snapshot.exists()) {
-      const charactersData = snapshot.val();
-
+    if (charactersData) {
       // Extract all characters from the new schema
       const allCharacters = [];
       for (const category in charactersData) {
