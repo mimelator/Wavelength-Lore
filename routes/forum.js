@@ -55,14 +55,11 @@ router.get('/category/:categoryId', (req, res) => {
 router.get('/post/:postId', (req, res) => {
     const postId = req.params.postId;
     
-    res.render('forum/post', {
-        title: 'Post Discussion',
-        currentPage: 'post',
+    res.render('forum/post-page', {
         postId: postId,
-        breadcrumbs: [
-            { name: 'Post Discussion', url: null }
-        ],
-        layout: 'forum/layout'
+        title: 'Post Discussion',
+        cdnUrl: process.env.CDN_URL || '',
+        version: process.env.VERSION || Date.now()
     });
 });
 
@@ -72,14 +69,15 @@ router.get('/post/:postId', (req, res) => {
 router.get('/create', (req, res) => {
     const categoryId = req.query.category || 'general';
     
-    res.render('forum/create-post', {
+    res.render('forum/create-post-page', {
         title: 'Create New Post',
         currentPage: 'create',
         defaultCategory: categoryId,
         breadcrumbs: [
             { name: 'Create New Post', url: null }
         ],
-        layout: 'forum/layout'
+        cdnUrl: process.env.CDN_URL,
+        version: `v${Date.now()}`
     });
 });
 

@@ -1,0 +1,93 @@
+{
+  "rules": {
+    "lore": {
+      ".read": true,
+      ".write": false
+    },
+    "characters": {
+      ".read": true,
+      ".write": false
+    },
+    "episodes": {
+      ".read": true,
+      ".write": false
+    },
+    "videos": {
+      ".read": true,
+      ".write": false
+    },
+    "forum": {
+      "categories": {
+        ".read": true,
+        ".write": false
+      },
+      "posts": {
+        ".read": true,
+        "$postId": {
+          ".write": "auth != null && (!data.exists() || data.child('authorId').val() == auth.uid)",
+          ".validate": "newData.hasChildren(['title', 'content', 'authorId', 'authorName', 'createdAt', 'forumId'])",
+          "title": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 200"
+          },
+          "content": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 10000"
+          },
+          "authorId": {
+            ".validate": "newData.val() == auth.uid"
+          },
+          "authorName": {
+            ".validate": "newData.isString() && newData.val().length > 0"
+          },
+          "forumId": {
+            ".validate": "newData.isString() && (newData.val() == 'general' || newData.val() == 'lore' || newData.val() == 'episodes' || newData.val() == 'fanart')"
+          },
+          "type": {
+            ".validate": "newData.isString() && (newData.val() == 'discussion' || newData.val() == 'question' || newData.val() == 'theory' || newData.val() == 'fanart' || newData.val() == 'news')"
+          },
+          "tags": {
+            ".validate": "newData.hasChildren()"
+          },
+          "createdAt": {
+            ".validate": "newData.val() <= now"
+          },
+          "updatedAt": {
+            ".validate": "newData.val() <= now"
+          }
+        }
+      },
+      "replies": {
+        ".read": true,
+        "$replyId": {
+          ".write": "auth != null && (!data.exists() || data.child('authorId').val() == auth.uid)",
+          ".validate": "newData.hasChildren(['content', 'postId', 'authorId', 'authorName', 'createdAt'])",
+          "content": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 5000"
+          },
+          "postId": {
+            ".validate": "newData.isString() && newData.val().length > 0"
+          },
+          "authorId": {
+            ".validate": "newData.val() == auth.uid"
+          },
+          "authorName": {
+            ".validate": "newData.isString() && newData.val().length > 0"
+          },
+          "createdAt": {
+            ".validate": "newData.val() <= now"
+          }
+        }
+      },
+      "users": {
+        "$userId": {
+          ".read": "auth != null",
+          ".write": "auth != null && auth.uid == $userId",
+          ".validate": "newData.hasChildren(['displayName', 'email', 'joinedAt'])"
+        }
+      },
+      "settings": {
+        ".read": true,
+        ".write": false
+      }
+    }
+  }
+}

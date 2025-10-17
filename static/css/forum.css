@@ -898,3 +898,666 @@
 .breadcrumb-link:hover {
     text-decoration: underline;
 }
+
+/* Post Creation Form Styles */
+.create-post-container {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 5px solid black;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
+}
+
+.create-post-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+    font-family: 'AnimeAce', Arial, sans-serif;
+    font-size: 1rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    color: #333;
+    font-family: 'AnimeAce', Arial, sans-serif;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #007BFF;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 200px;
+    line-height: 1.5;
+}
+
+.form-help {
+    display: block;
+    margin-top: 5px;
+    color: #555;
+    font-size: 14px;
+    font-style: italic;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+/* Post Preview Styles */
+.post-preview-container {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 5px solid black;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #007BFF;
+}
+
+.preview-header h3 {
+    margin: 0;
+    color: #333;
+    font-family: 'AnimeAce', Arial, sans-serif;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.post-preview .post-item {
+    margin: 0;
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid #007BFF;
+}
+
+.post-meta-preview {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 5px;
+    flex-wrap: wrap;
+}
+
+.post-category {
+    background: rgba(0, 123, 255, 0.1);
+    color: #007BFF;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.post-tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.post-tag {
+    background: rgba(74, 71, 163, 0.3);
+    color: #4a47a3;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Loading and Success States */
+.loading-container,
+.success-container {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 40px 20px;
+    margin-bottom: 20px;
+    border: 5px solid black;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
+    text-align: center;
+}
+
+.success-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.success-container h3 {
+    color: #28a745;
+    margin-bottom: 10px;
+    font-family: 'AnimeAce', Arial, sans-serif;
+}
+
+.success-container p {
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.success-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Responsive Design for Forms */
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+    
+    .preview-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+    
+    .preview-actions {
+        justify-content: center;
+    }
+    
+    .success-actions {
+        flex-direction: column;
+    }
+    
+    .post-meta-preview {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* Individual Post Page Styles */
+.post-full {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    border: 2px solid rgba(52, 152, 219, 0.3);
+    box-shadow: 0 0 30px rgba(52, 152, 219, 0.2);
+}
+
+.post-full-header {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+}
+
+.post-full-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.post-category, .post-type {
+    background: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+.post-pinned {
+    background: rgba(241, 196, 15, 0.2);
+    color: #f1c40f;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(241, 196, 15, 0.3);
+}
+
+.post-locked {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.post-full-title {
+    font-family: 'AnimeAce', monospace;
+    color: #3498db;
+    font-size: 2rem;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+    line-height: 1.3;
+}
+
+.post-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.post-tag {
+    background: rgba(155, 89, 182, 0.2);
+    color: #9b59b6;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    border: 1px solid rgba(155, 89, 182, 0.3);
+}
+
+.post-full-content {
+    color: #ecf0f1;
+    line-height: 1.8;
+    margin-bottom: 25px;
+}
+
+.post-full-content p {
+    margin-bottom: 15px;
+}
+
+.post-full-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 2px solid rgba(52, 152, 219, 0.3);
+}
+
+.post-author-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.author-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid rgba(52, 152, 219, 0.5);
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
+}
+
+.author-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.author-name {
+    color: #3498db;
+    font-weight: bold;
+    font-family: 'AnimeAce', monospace;
+}
+
+.post-date, .post-updated {
+    color: #bdc3c7;
+    font-size: 0.9rem;
+}
+
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.post-action-btn {
+    background: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.post-action-btn:hover {
+    background: rgba(52, 152, 219, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+.post-action-btn.liked {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border-color: rgba(231, 76, 60, 0.3);
+}
+
+.post-stats {
+    display: flex;
+    gap: 15px;
+    color: #bdc3c7;
+    font-size: 0.9rem;
+}
+
+/* Reply Section Styles */
+.reply-section {
+    margin-top: 30px;
+}
+
+.reply-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.reply-header h3 {
+    color: #3498db;
+    font-family: 'AnimeAce', monospace;
+    text-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+}
+
+/* Reply Form Styles */
+.reply-form-container {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 2px solid rgba(52, 152, 219, 0.3);
+    box-shadow: 0 0 20px rgba(52, 152, 219, 0.2);
+}
+
+.reply-form .form-group {
+    margin-bottom: 20px;
+}
+
+.reply-form label {
+    display: block;
+    color: #3498db;
+    margin-bottom: 8px;
+    font-weight: bold;
+    font-family: 'AnimeAce', monospace;
+}
+
+.reply-form textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 15px;
+    border: 2px solid rgba(52, 152, 219, 0.3);
+    border-radius: 10px;
+    background: rgba(44, 62, 80, 0.8);
+    color: #ecf0f1;
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+}
+
+.reply-form textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+}
+
+.reply-form .form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+/* Reply Items */
+.replies-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.reply-item {
+    background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+    border-radius: 12px;
+    padding: 20px;
+    border: 2px solid rgba(52, 152, 219, 0.2);
+    transition: all 0.3s ease;
+}
+
+.reply-item:hover {
+    border-color: rgba(52, 152, 219, 0.4);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+}
+
+.reply-item .reply-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.reply-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.author-avatar-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(52, 152, 219, 0.3);
+}
+
+.reply-author .author-name {
+    color: #3498db;
+    font-weight: bold;
+    font-family: 'AnimeAce', monospace;
+}
+
+.reply-date {
+    color: #bdc3c7;
+    font-size: 0.9rem;
+}
+
+.reply-content {
+    color: #ecf0f1;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.reply-content p {
+    margin-bottom: 10px;
+}
+
+.reply-actions {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.reply-action-btn {
+    background: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    padding: 6px 12px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+}
+
+.reply-action-btn:hover {
+    background: rgba(52, 152, 219, 0.3);
+    transform: translateY(-1px);
+}
+
+.reply-action-btn.liked {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border-color: rgba(231, 76, 60, 0.3);
+}
+
+/* No Replies State */
+.no-replies {
+    text-align: center;
+    padding: 40px 20px;
+    color: #7f8c8d;
+}
+
+.no-replies-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.7;
+}
+
+.no-replies p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* Not Found State */
+.not-found-container {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    border-radius: 15px;
+    border: 2px solid rgba(231, 76, 60, 0.3);
+    box-shadow: 0 0 30px rgba(231, 76, 60, 0.2);
+}
+
+.not-found-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.not-found-container h3 {
+    color: #e74c3c;
+    margin-bottom: 15px;
+    font-family: 'AnimeAce', monospace;
+    text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+}
+
+.not-found-container p {
+    color: #ecf0f1;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.not-found-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    margin-bottom: 20px;
+    color: #bdc3c7;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-item {
+    display: inline;
+}
+
+.breadcrumb-item:not(:last-child)::after {
+    content: ' › ';
+    margin: 0 8px;
+    opacity: 0.6;
+}
+
+.breadcrumb-link {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-link:hover {
+    color: #5dade2;
+}
+
+/* Loading states */
+.loading-placeholder {
+    text-align: center;
+    padding: 60px 20px;
+    color: #7f8c8d;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(52, 152, 219, 0.2);
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design for Post Page */
+@media (max-width: 768px) {
+    .post-full {
+        padding: 20px;
+    }
+    
+    .post-full-title {
+        font-size: 1.5rem;
+    }
+    
+    .post-full-footer {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .post-actions {
+        align-self: stretch;
+        justify-content: space-between;
+    }
+    
+    .reply-form .form-actions {
+        justify-content: stretch;
+    }
+    
+    .reply-form .form-actions .btn {
+        flex: 1;
+    }
+    
+    .not-found-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .not-found-actions .btn {
+        width: 100%;
+        max-width: 250px;
+    }
+}

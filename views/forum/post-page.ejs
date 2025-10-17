@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post - Wavelength Community Forum</title>
+    
+    <!-- Reuse existing styles -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/forum.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+      import { getDatabase, ref, push, set, onValue, query, orderByChild, serverTimestamp, get, update } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+      
+      // Initialize Firebase with your existing config
+      const firebaseConfig = {
+        apiKey: "AIzaSyCg-9HMihsWZnvfYOS155Dk4JJt5Rr7XRI",
+        authDomain: "wavelength-lore.firebaseapp.com",
+        databaseURL: "https://wavelength-lore-default-rtdb.firebaseio.com",
+        projectId: "wavelength-lore",
+        storageBucket: "wavelength-lore.firebasestorage.app",
+        messagingSenderId: "78008979957",
+        appId: "1:78008979957:web:799d623c4bd1d5be3b90bc"
+      };
+      
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const database = getDatabase(app);
+      
+      // Make Firebase available globally for forum components
+      window.firebaseAuth = auth;
+      window.firebaseDB = database;
+      window.firebaseUtils = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, ref, push, set, onValue, query, orderByChild, serverTimestamp, get, update };
+    </script>
+    
+    <!-- Forum JavaScript -->
+    <script src="/js/forum.js" defer></script>
+</head>
+<body>
+    <!-- Include existing navigation -->
+    <%- include('../partials/header') %>
+    
+    <div class="forum-container">
+        <!-- Forum Header -->
+        <header class="forum-header">
+            <h1 class="forum-title">Wavelength Community Forum</h1>
+            <p class="forum-subtitle">Connect with fellow Wavelength fans</p>
+        </header>
+        
+        <!-- Authentication Section -->
+        <section class="auth-section">
+            <div id="forum-auth-container">
+                <div class="guest-message">Sign in to participate in discussions</div>
+                <div class="auth-actions">
+                    <button class="btn btn-primary" onclick="window.forumJS.signInWithGoogle()">Sign in with Google</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Forum Navigation -->
+        <nav class="forum-nav">
+            <div class="forum-nav-links">
+                <a href="/forum" class="forum-nav-link">🏠 Home</a>
+                <a href="/forum/recent" class="forum-nav-link">🕒 Recent Posts</a>
+                <a href="/forum/popular" class="forum-nav-link">🔥 Popular</a>
+                <a href="/forum/search" class="forum-nav-link">🔍 Search</a>
+                <a href="/" class="forum-nav-link">← Back to Wavelength Lore</a>
+            </div>
+        </nav>
+        
+        <!-- Breadcrumbs -->
+        <div class="breadcrumbs">
+            <span class="breadcrumb-item">
+                <a href="/forum" class="breadcrumb-link">Forum</a>
+            </span>
+            <span class="breadcrumb-item" id="category-breadcrumb">
+                <a href="#" class="breadcrumb-link" id="category-link">Loading...</a>
+            </span>
+            <span class="breadcrumb-item" id="post-breadcrumb">Loading post...</span>
+        </div>
+        
+        <!-- Post Content -->
+        <div class="post-container" id="post-container">
+            <div class="loading-placeholder">
+                <div class="loading-spinner"></div>
+                <p>Loading post...</p>
+            </div>
+        </div>
+        
+        <!-- Reply Section -->
+        <div class="reply-section" id="reply-section" style="display: none;">
+            <div class="reply-header">
+                <h3>💬 Replies (<span id="reply-count">0</span>)</h3>
+                <button class="btn btn-primary" id="reply-btn" onclick="showReplyForm()" style="display: none;">
+                    💬 Reply to Post
+                </button>
+            </div>
+            
+            <!-- Reply Form -->
+            <div class="reply-form-container" id="reply-form-container" style="display: none;">
+                <form id="reply-form" class="reply-form">
+                    <div class="form-group">
+                        <label for="reply-content">Your Reply *</label>
+                        <textarea id="reply-content" name="content" required 
+                                  placeholder="Share your thoughts on this post..."
+                                  rows="6"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="hideReplyForm()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            💬 Post Reply
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Replies List -->
+            <div class="replies-container" id="replies-container">
+                <!-- Replies will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Post Not Found -->
+        <div class="not-found-container" id="not-found-container" style="display: none;">
+            <div class="not-found-content">
+                <div class="not-found-icon">❌</div>
+                <h3>Post Not Found</h3>
+                <p>The post you're looking for doesn't exist or may have been removed.</p>
+                <div class="not-found-actions">
+                    <a href="/forum" class="btn btn-primary">← Back to Forum</a>
+                    <a href="/forum/create" class="btn btn-secondary">Create New Post</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Forum Modals -->
+    <div id="forum-modals"></div>
+
+    <script>
+        // Post page state
+        const postId = '<%= postId %>';
+        let currentPost = null;
+        let replies = [];
+        
+        // Initialize post page
+        document.addEventListener('DOMContentLoaded', function() {
+            if (postId && postId !== 'undefined') {
+                loadPost();
+                loadReplies();
+                setupAuthListener();
+            } else {
+                showNotFound();
+            }
+        });
+        
+        function setupAuthListener() {
+            if (window.firebaseAuth && window.firebaseUtils) {
+                window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
+                    const replyBtn = document.getElementById('reply-btn');
+                    if (user && currentPost && !currentPost.isLocked) {
+                        replyBtn.style.display = 'inline-block';
+                    } else {
+                        replyBtn.style.display = 'none';
+                    }
+                    updateAuthUI();
+                });
+            }
+        }
+        
+        async function loadPost() {
+            try {
+                const postRef = window.firebaseUtils.ref(window.firebaseDB, `forum/posts/${postId}`);
+                window.firebaseUtils.onValue(postRef, (snapshot) => {
+                    const post = snapshot.val();
+                    if (post) {
+                        currentPost = { id: postId, ...post };
+                        displayPost(currentPost);
+                        updateBreadcrumbs(currentPost);
+                        incrementViewCount();
+                    } else {
+                        showNotFound();
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading post:', error);
+                showNotFound();
+            }
+        }
+        
+        async function loadReplies() {
+            try {
+                const repliesRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/replies');
+                const repliesQuery = window.firebaseUtils.query(repliesRef, 
+                    window.firebaseUtils.orderByChild('postId'));
+                
+                window.firebaseUtils.onValue(repliesQuery, (snapshot) => {
+                    const allReplies = snapshot.val();
+                    if (allReplies) {
+                        replies = Object.entries(allReplies)
+                            .map(([id, reply]) => ({ id, ...reply }))
+                            .filter(reply => reply.postId === postId)
+                            .sort((a, b) => a.createdAt - b.createdAt);
+                    } else {
+                        replies = [];
+                    }
+                    displayReplies(replies);
+                });
+            } catch (error) {
+                console.error('Error loading replies:', error);
+            }
+        }
+        
+        function displayPost(post) {
+            const container = document.getElementById('post-container');
+            const categoryNames = {
+                'general': '🎵 General Discussion',
+                'lore': '📜 Lore & Theories',
+                'episodes': '🎬 Episode Discussions',
+                'fanart': '🎨 Fan Creations'
+            };
+            
+            const typeEmojis = {
+                'discussion': '💬',
+                'question': '❓',
+                'theory': '🧠',
+                'fanart': '🎨',
+                'news': '📰'
+            };
+            
+            container.innerHTML = `
+                <article class="post-full">
+                    <header class="post-full-header">
+                        <div class="post-full-meta">
+                            <span class="post-category">${categoryNames[post.forumId] || post.forumId}</span>
+                            <span class="post-type">${typeEmojis[post.type] || '💬'} ${post.type}</span>
+                            ${post.isPinned ? '<span class="post-pinned">📌 Pinned</span>' : ''}
+                            ${post.isLocked ? '<span class="post-locked">🔒 Locked</span>' : ''}
+                        </div>
+                        <h1 class="post-full-title">${escapeHtml(post.title)}</h1>
+                        ${post.tags && post.tags.length > 0 ? `
+                            <div class="post-tags">
+                                ${post.tags.map(tag => `<span class="post-tag">#${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </header>
+                    
+                    <div class="post-full-content">
+                        <p>${escapeHtml(post.content).replace(/\n/g, '</p><p>')}</p>
+                    </div>
+                    
+                    <footer class="post-full-footer">
+                        <div class="post-author-info">
+                            <img src="${post.authorAvatar || '/icons/hero-icon.svg'}" alt="${post.authorName}" class="author-avatar">
+                            <div class="author-details">
+                                <div class="author-name">${escapeHtml(post.authorName)}</div>
+                                <div class="post-date">Posted ${formatTimeAgo(post.createdAt)}</div>
+                                ${post.updatedAt && post.updatedAt !== post.createdAt ? 
+                                    `<div class="post-updated">Updated ${formatTimeAgo(post.updatedAt)}</div>` : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="post-actions">
+                            <button class="post-action-btn ${post.likedBy && post.likedBy[getCurrentUserId()] ? 'liked' : ''}" 
+                                    onclick="togglePostLike('${post.id}')">
+                                ❤️ ${post.likes || 0}
+                            </button>
+                            <div class="post-stats">
+                                <span class="post-views">👁️ ${post.views || 0} views</span>
+                                <span class="post-replies">💬 ${post.replyCount || 0} replies</span>
+                            </div>
+                        </div>
+                    </footer>
+                </article>
+            `;
+            
+            // Show reply section
+            document.getElementById('reply-section').style.display = 'block';
+        }
+        
+        function displayReplies(replies) {
+            const container = document.getElementById('replies-container');
+            const countElement = document.getElementById('reply-count');
+            
+            countElement.textContent = replies.length;
+            
+            if (replies.length === 0) {
+                container.innerHTML = `
+                    <div class="no-replies">
+                        <div class="no-replies-icon">💭</div>
+                        <p>No replies yet. Be the first to share your thoughts!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = replies.map(reply => `
+                <div class="reply-item" data-reply-id="${reply.id}">
+                    <div class="reply-header">
+                        <div class="reply-author">
+                            <img src="${reply.authorAvatar || '/icons/hero-icon.svg'}" alt="${reply.authorName}" class="author-avatar-small">
+                            <span class="author-name">${escapeHtml(reply.authorName)}</span>
+                        </div>
+                        <div class="reply-date">${formatTimeAgo(reply.createdAt)}</div>
+                    </div>
+                    <div class="reply-content">
+                        <p>${escapeHtml(reply.content).replace(/\n/g, '</p><p>')}</p>
+                    </div>
+                    <div class="reply-actions">
+                        <button class="reply-action-btn ${reply.likedBy && reply.likedBy[getCurrentUserId()] ? 'liked' : ''}" 
+                                onclick="toggleReplyLike('${reply.id}')">
+                            ❤️ ${reply.likes || 0}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateBreadcrumbs(post) {
+            const categoryNames = {
+                'general': 'General Discussion',
+                'lore': 'Lore & Theories',
+                'episodes': 'Episode Discussions',
+                'fanart': 'Fan Creations'
+            };
+            
+            const categoryLink = document.getElementById('category-link');
+            const postBreadcrumb = document.getElementById('post-breadcrumb');
+            
+            categoryLink.textContent = categoryNames[post.forumId] || post.forumId;
+            categoryLink.href = `/forum/category/${post.forumId}`;
+            
+            postBreadcrumb.textContent = post.title.length > 50 ? 
+                post.title.substring(0, 50) + '...' : post.title;
+        }
+        
+        async function incrementViewCount() {
+            if (!currentPost) return;
+            
+            try {
+                const postRef = window.firebaseUtils.ref(window.firebaseDB, `forum/posts/${postId}/views`);
+                const snapshot = await window.firebaseUtils.get(postRef);
+                const currentViews = snapshot.val() || 0;
+                await window.firebaseUtils.set(postRef, currentViews + 1);
+            } catch (error) {
+                console.error('Error incrementing view count:', error);
+            }
+        }
+        
+        function showReplyForm() {
+            if (!window.forumState.isAuthenticated) {
+                alert('Please sign in to reply to this post');
+                return;
+            }
+            
+            document.getElementById('reply-form-container').style.display = 'block';
+            document.getElementById('reply-content').focus();
+        }
+        
+        function hideReplyForm() {
+            document.getElementById('reply-form-container').style.display = 'none';
+            document.getElementById('reply-content').value = '';
+        }
+        
+        // Setup reply form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const replyForm = document.getElementById('reply-form');
+            if (replyForm) {
+                replyForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    await submitReply();
+                });
+            }
+        });
+        
+        async function submitReply() {
+            const content = document.getElementById('reply-content').value.trim();
+            
+            if (!content) {
+                alert('Please enter a reply');
+                return;
+            }
+            
+            if (!window.forumState.isAuthenticated) {
+                alert('Please sign in to reply');
+                return;
+            }
+            
+            try {
+                const replyData = {
+                    postId: postId,
+                    content: content,
+                    authorId: window.forumState.currentUser.uid,
+                    authorName: window.forumState.currentUser.name,
+                    authorAvatar: window.forumState.currentUser.avatar,
+                    createdAt: window.firebaseUtils.serverTimestamp(),
+                    likes: 0,
+                    status: 'published'
+                };
+                
+                // Add reply to Firebase
+                const repliesRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/replies');
+                await window.firebaseUtils.push(repliesRef, replyData);
+                
+                // Update post reply count
+                const postRef = window.firebaseUtils.ref(window.firebaseDB, `forum/posts/${postId}`);
+                const postSnapshot = await window.firebaseUtils.get(postRef);
+                const postData = postSnapshot.val();
+                
+                if (postData) {
+                    await window.firebaseUtils.update(postRef, {
+                        replyCount: (postData.replyCount || 0) + 1,
+                        lastActivity: window.firebaseUtils.serverTimestamp()
+                    });
+                }
+                
+                // Clear and hide form
+                hideReplyForm();
+                
+            } catch (error) {
+                console.error('Error submitting reply:', error);
+                alert('Error submitting reply. Please try again.');
+            }
+        }
+        
+        async function togglePostLike(postId) {
+            if (!window.forumState.isAuthenticated) {
+                alert('Please sign in to like posts');
+                return;
+            }
+            
+            // Implementation for post likes
+            console.log('Toggle post like:', postId);
+        }
+        
+        async function toggleReplyLike(replyId) {
+            if (!window.forumState.isAuthenticated) {
+                alert('Please sign in to like replies');
+                return;
+            }
+            
+            // Implementation for reply likes
+            console.log('Toggle reply like:', replyId);
+        }
+        
+        function showNotFound() {
+            document.getElementById('post-container').style.display = 'none';
+            document.getElementById('reply-section').style.display = 'none';
+            document.getElementById('not-found-container').style.display = 'block';
+        }
+        
+        function getCurrentUserId() {
+            return window.forumState.currentUser ? window.forumState.currentUser.uid : null;
+        }
+        
+        function formatTimeAgo(timestamp) {
+            if (!timestamp) return 'Unknown time';
+            
+            const now = Date.now();
+            const diff = now - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            return new Date(timestamp).toLocaleDateString();
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+    </script>
+</body>
+</html>

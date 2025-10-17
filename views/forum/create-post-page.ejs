@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Post - Wavelength Community Forum</title>
+    
+    <!-- Reuse existing styles -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/forum.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+      import { getDatabase, ref, push, set, onValue, query, orderByChild, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+      
+      // Initialize Firebase with your existing config
+      const firebaseConfig = {
+        apiKey: "AIzaSyCg-9HMihsWZnvfYOS155Dk4JJt5Rr7XRI",
+        authDomain: "wavelength-lore.firebaseapp.com",
+        databaseURL: "https://wavelength-lore-default-rtdb.firebaseio.com",
+        projectId: "wavelength-lore",
+        storageBucket: "wavelength-lore.firebasestorage.app",
+        messagingSenderId: "78008979957",
+        appId: "1:78008979957:web:799d623c4bd1d5be3b90bc"
+      };
+      
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const database = getDatabase(app);
+      
+      // Make Firebase available globally for forum components
+      window.firebaseAuth = auth;
+      window.firebaseDB = database;
+      window.firebaseUtils = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, ref, push, set, onValue, query, orderByChild, serverTimestamp };
+    </script>
+    
+    <!-- Forum JavaScript -->
+    <script src="/js/forum.js" defer></script>
+</head>
+<body>
+    <!-- Include existing navigation -->
+    <%- include('../partials/header') %>
+    
+    <div class="forum-container">
+        <!-- Forum Header -->
+        <header class="forum-header">
+            <h1 class="forum-title">Create New Post</h1>
+            <p class="forum-subtitle">Share your thoughts with the Wavelength community</p>
+        </header>
+        
+        <!-- Authentication Section -->
+        <section class="auth-section">
+            <div id="forum-auth-container">
+                <div class="guest-message">You must be signed in to create a post</div>
+                <div class="auth-actions">
+                    <button class="btn btn-primary" onclick="window.forumJS.signInWithGoogle()">Sign in with Google</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Forum Navigation -->
+        <nav class="forum-nav">
+            <div class="forum-nav-links">
+                <a href="/forum" class="forum-nav-link">🏠 Home</a>
+                <a href="/forum/recent" class="forum-nav-link">🕒 Recent Posts</a>
+                <a href="/forum/popular" class="forum-nav-link">🔥 Popular</a>
+                <a href="/forum/search" class="forum-nav-link">🔍 Search</a>
+                <a href="/" class="forum-nav-link">← Back to Wavelength Lore</a>
+            </div>
+        </nav>
+        
+        <!-- Breadcrumbs -->
+        <div class="breadcrumbs">
+            <span class="breadcrumb-item">
+                <a href="/forum" class="breadcrumb-link">Forum</a>
+            </span>
+            <span class="breadcrumb-item">Create New Post</span>
+        </div>
+        
+        <!-- Post Creation Form -->
+        <div class="create-post-container" id="create-post-container" style="display: none;">
+            <form id="create-post-form" class="create-post-form">
+                <!-- Category Selection -->
+                <div class="form-group">
+                    <label for="post-category">Category *</label>
+                    <select id="post-category" name="category" required>
+                        <option value="">Select a category...</option>
+                        <option value="general" <%= defaultCategory === 'general' ? 'selected' : '' %>>🎵 General Discussion</option>
+                        <option value="lore" <%= defaultCategory === 'lore' ? 'selected' : '' %>>📜 Lore & Theories</option>
+                        <option value="episodes" <%= defaultCategory === 'episodes' ? 'selected' : '' %>>🎬 Episode Discussions</option>
+                        <option value="fanart" <%= defaultCategory === 'fanart' ? 'selected' : '' %>>🎨 Fan Creations</option>
+                    </select>
+                </div>
+                
+                <!-- Post Title -->
+                <div class="form-group">
+                    <label for="post-title">Title *</label>
+                    <input type="text" id="post-title" name="title" required 
+                           placeholder="Enter your post title..." maxlength="200">
+                    <small class="form-help">Make it descriptive and engaging!</small>
+                </div>
+                
+                <!-- Post Tags -->
+                <div class="form-group">
+                    <label for="post-tags">Tags</label>
+                    <input type="text" id="post-tags" name="tags" 
+                           placeholder="Enter tags separated by commas (e.g., lucky, goblin king, theory)">
+                    <small class="form-help">Help others find your post with relevant tags</small>
+                </div>
+                
+                <!-- Post Content -->
+                <div class="form-group">
+                    <label for="post-content">Content *</label>
+                    <textarea id="post-content" name="content" required 
+                              placeholder="Share your thoughts, theories, fan art, or discussion topics..."
+                              rows="12"></textarea>
+                    <small class="form-help">Support for links, mentions, and basic formatting</small>
+                </div>
+                
+                <!-- Post Type -->
+                <div class="form-group">
+                    <label for="post-type">Post Type</label>
+                    <select id="post-type" name="type">
+                        <option value="discussion">💬 Discussion</option>
+                        <option value="question">❓ Question</option>
+                        <option value="theory">🧠 Theory</option>
+                        <option value="fanart">🎨 Fan Art</option>
+                        <option value="news">📰 News</option>
+                    </select>
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="previewPost()">
+                        👁️ Preview
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submit-post-btn">
+                        📝 Create Post
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Post Preview -->
+        <div class="post-preview-container" id="post-preview-container" style="display: none;">
+            <div class="preview-header">
+                <h3>Post Preview</h3>
+                <div class="preview-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hidePreview()">
+                        ✏️ Edit
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="submitPost()">
+                        📝 Publish Post
+                    </button>
+                </div>
+            </div>
+            <div class="post-preview" id="post-preview">
+                <!-- Preview content will be inserted here -->
+            </div>
+        </div>
+        
+        <!-- Loading State -->
+        <div class="loading-container" id="loading-container" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Creating your post...</p>
+        </div>
+        
+        <!-- Success Message -->
+        <div class="success-container" id="success-container" style="display: none;">
+            <div class="success-icon">✅</div>
+            <h3>Post Created Successfully!</h3>
+            <p>Your post has been published and is now live in the forum.</p>
+            <div class="success-actions">
+                <button class="btn btn-primary" onclick="viewCreatedPost()">
+                    👁️ View Post
+                </button>
+                <button class="btn btn-secondary" onclick="createAnotherPost()">
+                    ➕ Create Another Post
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Forum Modals -->
+    <div id="forum-modals"></div>
+
+    <script>
+        // Post creation page state
+        let createdPostId = null;
+        let selectedCategory = '<%= defaultCategory || "general" %>';
+        
+        // Initialize post creation page
+        document.addEventListener('DOMContentLoaded', function() {
+            setupAuthListener();
+            setupFormHandlers();
+            
+            // Set default category if provided
+            if (selectedCategory) {
+                document.getElementById('post-category').value = selectedCategory;
+            }
+        });
+        
+        function setupAuthListener() {
+            if (window.firebaseAuth && window.firebaseUtils) {
+                window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
+                    const authSection = document.querySelector('.auth-section');
+                    const createContainer = document.getElementById('create-post-container');
+                    
+                    if (user) {
+                        // User is signed in
+                        authSection.style.display = 'none';
+                        createContainer.style.display = 'block';
+                        updateAuthUI();
+                    } else {
+                        // User is signed out
+                        authSection.style.display = 'block';
+                        createContainer.style.display = 'none';
+                    }
+                });
+            }
+        }
+        
+        function setupFormHandlers() {
+            const form = document.getElementById('create-post-form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    submitPost();
+                });
+            }
+            
+            // Auto-save draft (optional enhancement)
+            const inputs = form.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                input.addEventListener('input', saveDraft);
+            });
+        }
+        
+        function previewPost() {
+            const formData = getFormData();
+            if (!validateForm(formData)) return;
+            
+            const previewContainer = document.getElementById('post-preview-container');
+            const createContainer = document.getElementById('create-post-container');
+            const preview = document.getElementById('post-preview');
+            
+            // Generate preview HTML
+            const categoryNames = {
+                'general': '🎵 General Discussion',
+                'lore': '📜 Lore & Theories',
+                'episodes': '🎬 Episode Discussions',
+                'fanart': '🎨 Fan Creations'
+            };
+            
+            const typeEmojis = {
+                'discussion': '💬',
+                'question': '❓',
+                'theory': '🧠',
+                'fanart': '🎨',
+                'news': '📰'
+            };
+            
+            preview.innerHTML = `
+                <div class="post-item preview">
+                    <div class="post-header">
+                        <div class="post-title-section">
+                            <h2 class="post-title">${typeEmojis[formData.type]} ${escapeHtml(formData.title)}</h2>
+                            <div class="post-meta-preview">
+                                <span class="post-category">${categoryNames[formData.category]}</span>
+                                ${formData.tags ? `<div class="post-tags">
+                                    ${formData.tags.split(',').map(tag => `<span class="post-tag">#${tag.trim()}</span>`).join('')}
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <p>${escapeHtml(formData.content).replace(/\n/g, '</p><p>')}</p>
+                    </div>
+                    <div class="post-meta">
+                        <div class="post-author">
+                            <img src="${window.forumState.currentUser?.avatar || '/icons/hero-icon.svg'}" alt="Author" class="author-avatar-small">
+                            <span class="author-name">${window.forumState.currentUser?.name || 'You'}</span>
+                        </div>
+                        <div class="post-stats">
+                            <span class="post-time">Just now</span>
+                            <span class="post-type">${typeEmojis[formData.type]} ${formData.type}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            createContainer.style.display = 'none';
+            previewContainer.style.display = 'block';
+        }
+        
+        function hidePreview() {
+            const previewContainer = document.getElementById('post-preview-container');
+            const createContainer = document.getElementById('create-post-container');
+            
+            previewContainer.style.display = 'none';
+            createContainer.style.display = 'block';
+        }
+        
+        async function submitPost() {
+            const formData = getFormData();
+            if (!validateForm(formData)) return;
+            
+            if (!window.forumState.isAuthenticated) {
+                alert('Please sign in to create a post');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                // Prepare post data
+                const postData = {
+                    title: formData.title,
+                    content: formData.content,
+                    forumId: formData.category,
+                    type: formData.type,
+                    tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : [],
+                    authorId: window.forumState.currentUser.uid,
+                    authorName: window.forumState.currentUser.name,
+                    authorAvatar: window.forumState.currentUser.avatar,
+                    createdAt: window.firebaseUtils.serverTimestamp(),
+                    updatedAt: window.firebaseUtils.serverTimestamp(),
+                    likes: 0,
+                    replyCount: 0,
+                    views: 0,
+                    isPinned: false,
+                    isLocked: false,
+                    status: 'published'
+                };
+                
+                // Create post in Firebase
+                const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
+                const newPostRef = window.firebaseUtils.push(postsRef);
+                await window.firebaseUtils.set(newPostRef, postData);
+                
+                createdPostId = newPostRef.key;
+                
+                // Update category post count
+                await updateCategoryStats(formData.category);
+                
+                // Clear form and show success
+                clearForm();
+                showSuccess();
+                
+            } catch (error) {
+                console.error('Error creating post:', error);
+                hideLoading();
+                alert('Error creating post. Please try again.');
+            }
+        }
+        
+        async function updateCategoryStats(categoryId) {
+            try {
+                const categoryRef = window.firebaseUtils.ref(window.firebaseDB, `forum/categories/${categoryId}`);
+                const categorySnapshot = await window.firebaseUtils.get(categoryRef);
+                const categoryData = categorySnapshot.val() || {};
+                
+                const updatedData = {
+                    ...categoryData,
+                    postCount: (categoryData.postCount || 0) + 1,
+                    lastActivity: window.firebaseUtils.serverTimestamp()
+                };
+                
+                await window.firebaseUtils.set(categoryRef, updatedData);
+            } catch (error) {
+                console.error('Error updating category stats:', error);
+            }
+        }
+        
+        function getFormData() {
+            return {
+                category: document.getElementById('post-category').value,
+                title: document.getElementById('post-title').value,
+                tags: document.getElementById('post-tags').value,
+                content: document.getElementById('post-content').value,
+                type: document.getElementById('post-type').value
+            };
+        }
+        
+        function validateForm(data) {
+            if (!data.category) {
+                alert('Please select a category');
+                return false;
+            }
+            if (!data.title.trim()) {
+                alert('Please enter a title');
+                return false;
+            }
+            if (!data.content.trim()) {
+                alert('Please enter some content');
+                return false;
+            }
+            if (data.title.length > 200) {
+                alert('Title must be 200 characters or less');
+                return false;
+            }
+            return true;
+        }
+        
+        function showLoading() {
+            document.getElementById('post-preview-container').style.display = 'none';
+            document.getElementById('create-post-container').style.display = 'none';
+            document.getElementById('loading-container').style.display = 'block';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading-container').style.display = 'none';
+        }
+        
+        function showSuccess() {
+            hideLoading();
+            document.getElementById('success-container').style.display = 'block';
+        }
+        
+        function clearForm() {
+            document.getElementById('create-post-form').reset();
+            if (selectedCategory) {
+                document.getElementById('post-category').value = selectedCategory;
+            }
+        }
+        
+        function viewCreatedPost() {
+            if (createdPostId) {
+                window.location.href = `/forum/post/${createdPostId}`;
+            }
+        }
+        
+        function createAnotherPost() {
+            document.getElementById('success-container').style.display = 'none';
+            document.getElementById('create-post-container').style.display = 'block';
+        }
+        
+        function saveDraft() {
+            const formData = getFormData();
+            localStorage.setItem('forum-draft', JSON.stringify(formData));
+        }
+        
+        function loadDraft() {
+            const draft = localStorage.getItem('forum-draft');
+            if (draft) {
+                const data = JSON.parse(draft);
+                document.getElementById('post-category').value = data.category || selectedCategory;
+                document.getElementById('post-title').value = data.title || '';
+                document.getElementById('post-tags').value = data.tags || '';
+                document.getElementById('post-content').value = data.content || '';
+                document.getElementById('post-type').value = data.type || 'discussion';
+            }
+        }
+        
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+    </script>
+</body>
+</html>
