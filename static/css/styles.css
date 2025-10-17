@@ -201,6 +201,12 @@ h1 {
 
 .carousel .youtube-link {
     margin-top: auto; /* Push YouTube link to bottom */
+    text-decoration: none; /* Remove underline from YouTube links */
+}
+
+/* Episode page YouTube link styling */
+.watch-video-link {
+    text-decoration: none; /* Remove underline from YouTube links */
 }
 
 /* Episode Navigation Styling - Matching Hero/Lore Style */
@@ -319,6 +325,32 @@ h1 {
     }
 }
 
+/* About Page Carousel - Matching Episode Carousel Style */
+#character-carousel img {
+    width: 100% !important;
+    height: 250px !important; /* Fixed height for all carousel images */
+    object-fit: cover !important; /* Crop images to fit while maintaining aspect ratio */
+    object-position: center !important; /* Center the image content */
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: block;
+    margin: 0 auto;
+    border: 5px solid black;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
+}
+
+#character-carousel img:hover {
+    transform: scale(1.05);
+}
+
+/* Mobile responsive for about page carousel */
+@media (max-width: 768px) {
+    #character-carousel img {
+        height: 200px !important; /* Slightly smaller height for mobile */
+    }
+}
+
 /* Episode carousel container styling */
 #episode-carousel {
     margin: 20px 0;
@@ -383,10 +415,22 @@ h1 {
     color: #4a47a3;
     text-decoration: none;
     font-weight: bold;
-    padding: 2px 4px;
+    padding: 2px 4px 2px 18px; /* Add left padding for icon */
     border-radius: 3px;
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+.character-link:before {
+    content: "👤";
+    position: absolute;
+    left: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    opacity: 0.8;
+    line-height: 1;
 }
 
 .character-link:hover {
@@ -401,11 +445,23 @@ h1 {
     color: #6a4c93;
     text-decoration: none;
     font-weight: bold;
-    padding: 2px 4px;
+    padding: 2px 4px 2px 18px; /* Add left padding for icon */
     border-radius: 3px;
     transition: all 0.3s ease;
     background: rgba(106, 76, 147, 0.1);
     border-bottom: 1px dotted #6a4c93;
+    position: relative;
+}
+
+.lore-link:before {
+    content: "📜";
+    position: absolute;
+    left: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    opacity: 0.8;
+    line-height: 1;
 }
 
 .lore-link:hover {

@@ -1,6 +1,7 @@
 - id: andrew
   title: Prince Andrew
   description: The leader of Wavelength, husband of Jewel, and father of Alexandria and Eloquence
+  keywords: ["The Prince", "The Leader", "Andrew", "Band Leader", "Father", "Husband"]
   image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/andrew-4.png
   image_gallery:
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/IceBlueGreed-08.png
@@ -16,6 +17,7 @@
 - id: jewel
   title: Jewel
   description: The Wife of Prince Andrew and mother of Alexandria and Eloquence.  Being half elf, she obtained a superior musical education and has innate gifted musical talents, but being a half elf her community shunner her.  She met her husband at a Summer Music Workshop and after years of marriage and raising two children they formed the band Wavelength.
+  keywords: ["Princess Jewel", "Half Elf", "Musical Talent", "Mother", "Wife"]
   image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/jewel-5.png
   image_gallery:
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheShireDream-11.png
@@ -32,6 +34,7 @@
 - id: alex
   title: Alexandria
   description: The Daughter of Prince Andrew and Jewel, Alexandria is a quarter elf and musically gifted like her mother.  She loves to teach others how to play and compose music...  Especially young children.
+  keywords: ["Alex", "The Daughter", "Quarter Elf", "Music Teacher", "Young Teacher"]
   image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-1.png
   image_gallery:
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/alexandria-1.png
@@ -43,6 +46,7 @@
 - id: eloquence
   title: Eloquence
   description: The Son of Prince Andrew and Jewel, Eloquence is a quarter elf and passionate about the Bass Guitar as well as Rhythm Theory.  He was best friends with Magical Maurice the Percussion Wizard of Wavelength until Maurice died at the Battle of the Shire.
+  keywords: ["The Son", "Bass Player", "Quarter Elf", "Rhythm Expert", "Best Friend"]
   image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/eloquence-5.png
   image_gallery:
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-06.png
@@ -57,6 +61,7 @@
 - id: daphne
   title: Daphne
   description: The prodigy daughter of the Shire's Choir Master, Daphne is a gifted drummer who joins Wavelength after the Battle of the Shire when she and her brother are orphaned and Wavelength loses their Drummer Maurice.
+  keywords: ["The Prodigy", "Drummer Girl", "Orphan", "New Drummer", "Choir Master's Daughter"]
   image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/daphne-6.png
   image_gallery:
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheSongOfMourning-05.png
@@ -73,6 +78,7 @@
 - id: lucky
   title: Lucky
   description: Lucky is the Leprechaun who has an endless supply of Golden Advice.  His wisdom has earned him a role as the a beloved token of luck to the Shire.  But after the Battle of the Shire, Lucky decides to travel with Wavelength for awhile even though he isn't a musician per-se.  He is a fantastic singer though.  Mostly, he wants to fish and everywhere the Wavelength travels, seems to include a convenient fishing opporunity for Lucky.
+  keywords: ["The Leprechaun", "Wise Elder", "Golden Advice", "Fisher", "Token of Luck", "Singing Fisherman"]
   image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/lucky_closeup.png
   image_gallery:
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/MyLuckyCharm-02.png
@@ -91,6 +97,7 @@
 - id: yeti
   title: Yeti
   description: 'Wavelength first met Yeti up in the far, frozen North at the Ice Castle.  Yeti, while ferocious looking is actually a Nurse in practice.  Although very clumsy, which is how he got the name: Yeti.  He keeps falling down, ''Yeti'' gets back up again.'
+  keywords: ["Ice Beast", "The Nurse", "Clumsy Giant", "Ice Castle Guardian", "Ferocious Healer"]
   image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/yeti-5.png
   image_gallery:
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/TheKingHasFled-08.png
@@ -111,6 +118,7 @@
 - id: maurice
   title: Maurice
   description: "Wavelength has been blessed with the Percussion Wizard, Maurice.  Maurice is a Dwarf who is short in stature but big in heart.  He is a master of rhythm and percussion, and his drumming skills are unmatched in all the land.  Maurice's beats can shake the very earth and inspire courage in the hearts of his allies.  He is a loyal companion to Wavelength and will stop at nothing to protect his friends and their music.  He is also very much a big brother figure to Eloquence.  Sadly, he died at the Battle of the Shire, defending the Shire from the Goblin King and his Misery of Goblins."
+  keywords: ["The Merchant", "Percussion Wizard", "Magical Maurice", "The Dwarf", "Big Brother", "Fallen Hero"]
   image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/maurice-4.jpg
   image_gallery:
     - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/maurice-1.jpg

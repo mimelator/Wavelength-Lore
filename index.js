@@ -123,7 +123,10 @@ app.use(async (req, res, next) => {
   res.locals.disambiguationStyles = disambiguationHelpers.getDisambiguationStyles();
   
   // Simple disambiguation (cleaner approach)
-  res.locals.simpleSmartLinking = simpleDisambiguation.applySmartLinkingSimple;
+  res.locals.simpleSmartLinking = (text) => {
+    const currentUrl = req.originalUrl || req.url;
+    return simpleDisambiguation.applySmartLinkingSimple(text, currentUrl);
+  };
   res.locals.simpleDisambiguationScript = simpleDisambiguation.getSimpleDisambiguationScript();
   res.locals.simpleDisambiguationStyles = simpleDisambiguation.getSimpleDisambiguationStyles();
   

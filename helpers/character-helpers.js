@@ -53,48 +53,56 @@ const fallbackCharacters = [
     id: 'andrew',
     title: 'Prince Andrew',
     name: 'Prince Andrew',
+    keywords: ['The Prince', 'The Leader', 'Andrew', 'Band Leader', 'Father', 'Husband'],
     url: '/character/andrew'
   },
   {
     id: 'jewel',
     title: 'Jewel',
     name: 'Jewel',
+    keywords: ['Princess Jewel', 'Half Elf', 'Musical Talent', 'Mother', 'Wife', 'The Princess'],
     url: '/character/jewel'
   },
   {
     id: 'alex',
     title: 'Alexandria',
     name: 'Alexandria',
+    keywords: ['Alex', 'The Daughter', 'Quarter Elf', 'Music Teacher', 'Young Teacher'],
     url: '/character/alex'
   },
   {
     id: 'eloquence',
     title: 'Eloquence',
     name: 'Eloquence',
+    keywords: ['The Son', 'Bass Player', 'Quarter Elf', 'Rhythm Expert', 'Best Friend'],
     url: '/character/eloquence'
   },
   {
     id: 'daphne',
     title: 'Daphne',
     name: 'Daphne',
+    keywords: ['The Prodigy', 'Drummer Girl', 'Orphan', 'New Drummer', 'Choir Master\'s Daughter'],
     url: '/character/daphne'
   },
   {
     id: 'lucky',
     title: 'Lucky',
     name: 'Lucky',
+    keywords: ['The Leprechaun', 'Wise Elder', 'Golden Advice', 'Fisher', 'Token of Luck', 'Singing Fisherman'],
     url: '/character/lucky'
   },
   {
     id: 'yeti',
     title: 'Yeti',
     name: 'Yeti',
+    keywords: ['Ice Beast', 'The Nurse', 'Clumsy Giant', 'Ice Castle Guardian', 'Ferocious Healer'],
     url: '/character/yeti'
   },
   {
     id: 'maurice',
     title: 'Maurice',
     name: 'Maurice',
+    keywords: ['The Merchant', 'Percussion Wizard', 'Magical Maurice', 'The Dwarf', 'Big Brother', 'Fallen Hero'],
     url: '/character/maurice'
   }
 ];
@@ -125,6 +133,7 @@ async function fetchCharactersFromDatabase() {
             id: char.id,
             title: char.title,
             name: char.title, // Use title as name for consistency
+            keywords: char.keywords || [], // Include keywords for enhanced linking
             url: `/character/${char.id}`,
             description: char.description,
             image: char.image
@@ -198,11 +207,89 @@ async function linkifyCharacterMentions(text) {
   const characters = await getCharacters();
   let processedText = text;
   
+  // Create a map of terms to their matching character items
+  const termConflicts = new Map();
+  
   for (const character of characters) {
-    // Create regex to match character name (case insensitive, word boundaries)
-    const regex = new RegExp(`\\b${character.name}\\b`, 'gi');
-    processedText = processedText.replace(regex, (match) => {
-      return `<a href="${character.url}" class="character-link" title="View ${character.name}'s character page">${match}</a>`;
+    // Build array of all searchable terms (title + keywords)
+    const searchTerms = [character.name];
+    if (character.keywords && Array.isArray(character.keywords)) {
+      searchTerms.push(...character.keywords);
+    }
+    
+    // Add each term to the conflicts map
+    for (const term of searchTerms) {
+      if (!term || term.trim() === '') continue;
+      
+      const lowerTerm = term.toLowerCase();
+      if (!termConflicts.has(lowerTerm)) {
+        termConflicts.set(lowerTerm, []);
+      }
+      termConflicts.get(lowerTerm).push({
+        item: character,
+        matchText: term
+      });
+    }
+  }
+  
+  // Sort terms by length (longest first) to avoid partial replacements
+  const sortedTerms = Array.from(termConflicts.keys()).sort((a, b) => b.length - a.length);
+  
+  // Process each term, being extra careful not to link inside existing HTML or already-linked text
+  for (const term of sortedTerms) {
+    const matches = termConflicts.get(term);
+    if (!matches || matches.length === 0) continue;
+    
+    // Use the first match for linking (conflicts should be handled by disambiguation system)
+    const match = matches[0];
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    
+    // Track positions of existing links to avoid overlapping
+    const existingLinks = [];
+    let linkMatch;
+    const linkRegex = /<a\s[^>]*>.*?<\/a>/gi;
+    while ((linkMatch = linkRegex.exec(processedText)) !== null) {
+      existingLinks.push({
+        start: linkMatch.index,
+        end: linkMatch.index + linkMatch[0].length
+      });
+    }
+    
+    // Find all matches of our term
+    let termMatches = [];
+    let termMatch;
+    const termRegex = new RegExp(`\\b${escapedTerm}\\b`, 'gi');
+    while ((termMatch = termRegex.exec(processedText)) !== null) {
+      // Check if this match overlaps with any existing link
+      const matchStart = termMatch.index;
+      const matchEnd = termMatch.index + termMatch[0].length;
+      
+      let isInsideLink = false;
+      for (const link of existingLinks) {
+        if (matchStart >= link.start && matchEnd <= link.end) {
+          isInsideLink = true;
+          break;
+        }
+      }
+      
+      if (!isInsideLink) {
+        termMatches.push({
+          match: termMatch[0],
+          start: matchStart,
+          end: matchEnd
+        });
+      }
+    }
+    
+    // Replace from right to left to maintain correct positions
+    termMatches.reverse().forEach(termMatchInfo => {
+      const beforeMatch = processedText.substring(0, termMatchInfo.start);
+      const afterMatch = processedText.substring(termMatchInfo.end);
+      
+      // Create the link
+      const linkHtml = `<a href="${match.item.url}" class="character-link" title="View ${match.item.name}'s character page">${termMatchInfo.match}</a>`;
+      
+      processedText = beforeMatch + linkHtml + afterMatch;
     });
   }
   
@@ -256,13 +343,91 @@ function linkifyCharacterMentionsSync(text) {
   const characters = charactersCache || fallbackCharacters;
   let processedText = text;
   
+  // Create a comprehensive list of all terms with their associated character items
+  const termMap = new Map();
+  
   characters.forEach(character => {
-    // Create regex to match character name (case insensitive, word boundaries)
-    const regex = new RegExp(`\\b${character.name}\\b`, 'gi');
-    processedText = processedText.replace(regex, (match) => {
-      return `<a href="${character.url}" class="character-link" title="View ${character.name}'s character page">${match}</a>`;
+    // Build array of all searchable terms (title + keywords)
+    const searchTerms = [character.name];
+    if (character.keywords && Array.isArray(character.keywords)) {
+      searchTerms.push(...character.keywords);
+    }
+    
+    // Add each term to the map
+    searchTerms.forEach(term => {
+      if (!term || term.trim() === '') return;
+      
+      const lowerTerm = term.toLowerCase();
+      if (!termMap.has(lowerTerm)) {
+        termMap.set(lowerTerm, []);
+      }
+      termMap.get(lowerTerm).push({
+        item: character,
+        matchText: term
+      });
     });
   });
+  
+  // Sort terms by length (longest first) to avoid partial replacements
+  const sortedTerms = Array.from(termMap.keys()).sort((a, b) => b.length - a.length);
+  
+  // Process each term, being extra careful not to link inside existing HTML or already-linked text
+  for (const term of sortedTerms) {
+    const matches = termMap.get(term);
+    if (!matches || matches.length === 0) continue;
+    
+    // Use the first match for linking
+    const match = matches[0];
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    
+    // Track positions of existing links to avoid overlapping
+    const existingLinks = [];
+    let linkMatch;
+    const linkRegex = /<a\s[^>]*>.*?<\/a>/gi;
+    while ((linkMatch = linkRegex.exec(processedText)) !== null) {
+      existingLinks.push({
+        start: linkMatch.index,
+        end: linkMatch.index + linkMatch[0].length
+      });
+    }
+    
+    // Find all matches of our term
+    let termMatches = [];
+    let termMatch;
+    const termRegex = new RegExp(`\\b${escapedTerm}\\b`, 'gi');
+    while ((termMatch = termRegex.exec(processedText)) !== null) {
+      // Check if this match overlaps with any existing link
+      const matchStart = termMatch.index;
+      const matchEnd = termMatch.index + termMatch[0].length;
+      
+      let isInsideLink = false;
+      for (const link of existingLinks) {
+        if (matchStart >= link.start && matchEnd <= link.end) {
+          isInsideLink = true;
+          break;
+        }
+      }
+      
+      if (!isInsideLink) {
+        termMatches.push({
+          match: termMatch[0],
+          start: matchStart,
+          end: matchEnd
+        });
+      }
+    }
+    
+    // Replace from right to left to maintain correct positions
+    termMatches.reverse().forEach(termMatchInfo => {
+      const beforeMatch = processedText.substring(0, termMatchInfo.start);
+      const afterMatch = processedText.substring(termMatchInfo.end);
+      
+      // Create the link
+      const linkHtml = `<a href="${match.item.url}" class="character-link" title="View ${match.item.name}'s character page">${termMatchInfo.match}</a>`;
+      
+      processedText = beforeMatch + linkHtml + afterMatch;
+    });
+  }
   
   return processedText;
 }

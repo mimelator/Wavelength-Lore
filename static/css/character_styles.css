@@ -78,9 +78,21 @@ main {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 .character-carousel .carousel-item img {
-    width: 100%;
-    height: auto;
+    width: 100% !important;
+    height: 250px !important; /* Fixed height for all carousel images */
+    object-fit: cover !important; /* Crop images to fit while maintaining aspect ratio */
+    object-position: center !important; /* Center the image content */
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: block;
+    margin: 0 auto;
+    border: 5px solid black;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
+}
+
+.character-carousel .carousel-item img:hover {
+    transform: scale(1.05);
 }
 .character-navigation {
     display: flex;
@@ -153,4 +165,11 @@ main {
 }
 .carousel-dots .dot.active {
     background-color: #007BFF;
+}
+
+/* Mobile responsive for hero page carousel */
+@media (max-width: 768px) {
+    .character-carousel .carousel-item img {
+        height: 200px !important; /* Slightly smaller height for mobile */
+    }
 }

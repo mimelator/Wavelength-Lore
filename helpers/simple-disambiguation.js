@@ -107,9 +107,10 @@ function detectConflictsForTerm(term) {
 /**
  * Apply smart linking with simple conflict resolution
  * @param {string} text - Original text
+ * @param {string} currentUrl - Current page URL to avoid self-referential links (optional)
  * @returns {string} Text with smart linking applied
  */
-function applySmartLinkingSimple(text) {
+function applySmartLinkingSimple(text, currentUrl = null) {
   let result = text;
   
   // Collect all potential terms from all helpers with their conflict info
@@ -192,7 +193,7 @@ function applySmartLinkingSimple(text) {
           name: episode.name,
           description: 'Episode',
           image: episode.image,
-          subtitle: `Season ${episode.season}, Episode ${episode.episode_number}`,
+          subtitle: `${episode.season.replace('season', 'Season ')}, ${episode.episode.replace('episode', 'Episode ')}`,
           matchText: term
         });
       });
@@ -252,137 +253,32 @@ function applySmartLinkingSimple(text) {
       const conflictsJson = JSON.stringify(conflicts).replace(/"/g, '&quot;');
       replacementHtml = `<span class="disambiguation-link" onclick="openDisambiguationModal(this)" data-phrase="${originalText}" data-conflicts="${conflictsJson}">${originalText}</span>`;
     } else {
-      // Single match - create direct link
+      // Single match - create direct link with appropriate class
       const conflict = conflicts[0];
-      replacementHtml = `<a href="${conflict.url}" class="lore-link" title="Learn about ${conflict.name}">${originalText}</a>`;
+      
+      // Don't create self-referential links - leave as plain text
+      if (currentUrl && conflict.url === currentUrl) {
+        replacementHtml = originalText;
+      } else {
+        let linkClass = 'lore-link'; // default
+        if (conflict.type === 'character') {
+          linkClass = 'character-link';
+        } else if (conflict.type === 'episode') {
+          linkClass = 'episode-link';
+        }
+        
+        let title = `Learn about ${conflict.name}`;
+        if (conflict.type === 'character') {
+          title = `View ${conflict.name}'s character page`;
+        } else if (conflict.type === 'episode') {
+          title = `Watch ${conflict.name}`;
+        }
+        
+        replacementHtml = `<a href="${conflict.url}" class="${linkClass}" title="${title}">${originalText}</a>`;
+      }
     }
     
     result = result.substring(0, start) + replacementHtml + result.substring(end);
-  });
-
-  return result;
-}
-
-/**
- * Get the simple disambiguation script
-      { 
-        type: 'lore', 
-        url: '/lore/ice-fortress', 
-        name: 'Ice Fortress', 
-        description: 'Place/Location',
-        image: 'https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode6/images/icefortress-fiery-3.jpg',
-        subtitle: 'A majestic fortress made of ice'
-      },
-      { 
-        type: 'episode', 
-        url: '/season/3/episode/1', 
-        name: 'Ice Fortress', 
-        description: 'Episode',
-        image: 'https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-22.png',
-        subtitle: 'Season 3, Episode 1'
-      }
-    ],
-    'Goblin King': [
-      { 
-        type: 'lore', 
-        url: '/lore/goblin-king', 
-        name: 'Goblin King', 
-        description: 'Villain/Character',
-        image: 'https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-25.png',
-        subtitle: 'A psychopath that leads goblins'
-      },
-      { 
-        type: 'episode', 
-        url: '/season/2/episode/1', 
-        name: 'Goblin King', 
-        description: 'Episode',
-        image: 'https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-06.png',
-        subtitle: 'Season 2, Episode 1'
-      }
-    ]
-  };
-
-  let result = text;
-
-  // Handle known conflicts first
-  Object.keys(knownConflicts).forEach(phrase => {
-    const conflicts = knownConflicts[phrase];
-    if (conflicts.length > 1) {
-      const regex = new RegExp(`\\b${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g');
-      
-      if (regex.test(result)) {
-        // Create a unique ID for this disambiguation instance
-        const disambigId = 'disambig-' + Math.random().toString(36).substr(2, 9);
-        
-        // Create the clickable link that opens the modal
-        const conflictsJson = JSON.stringify(conflicts).replace(/"/g, '&quot;');
-        const replacement = `<span class="disambiguation-link" onclick="openDisambiguationModal(this)" data-phrase="${phrase}" data-conflicts="${conflictsJson}">${phrase}</span>`;
-
-        result = result.replace(regex, replacement);
-      }
-    }
-  });
-
-  // Apply normal linking to everything else
-  // Use the regular helpers but exclude terms we've already handled
-  // Process in order: episodes (longest phrases), lore, characters (shortest)
-  
-  // Temporarily replace our disambiguation links
-  const disambigPlaceholders = [];
-  result = result.replace(/<span class="disambiguation-link"[^>]*>.*?<\/span>/g, (match) => {
-    const placeholder = `__DISAMBIG_${disambigPlaceholders.length}__`;
-    disambigPlaceholders.push(match);
-    return placeholder;
-  });
-
-  // Apply episode linking first (episodes often have longer, more specific titles)
-  if (episodeHelpers && episodeHelpers.linkifyEpisodeMentionsSync) {
-    // Don't link terms we handle specially in disambiguation
-    let tempResult = result.replace(/Ice Fortress/g, '__ICE_FORTRESS_TEMP__');
-    tempResult = tempResult.replace(/Goblin King/g, '__GOBLIN_KING_TEMP__');
-    result = episodeHelpers.linkifyEpisodeMentionsSync(tempResult);
-    result = result.replace(/__ICE_FORTRESS_TEMP__/g, 'Ice Fortress');
-    result = result.replace(/__GOBLIN_KING_TEMP__/g, 'Goblin King');
-  }
-
-  // Temporarily protect existing links
-  const linkPlaceholders = [];
-  result = result.replace(/<a [^>]*>.*?<\/a>/g, (match) => {
-    const placeholder = `__LINK_${linkPlaceholders.length}__`;
-    linkPlaceholders.push(match);
-    return placeholder;
-  });
-
-  // Apply lore linking second
-  if (loreHelpers && loreHelpers.linkifyLoreMentionsSync) {
-    // Don't link terms we handle specially in disambiguation
-    let tempResult = result.replace(/Ice Fortress/g, '__ICE_FORTRESS_TEMP__');
-    tempResult = tempResult.replace(/Goblin King/g, '__GOBLIN_KING_TEMP__');
-    result = loreHelpers.linkifyLoreMentionsSync(tempResult);
-    result = result.replace(/__ICE_FORTRESS_TEMP__/g, 'Ice Fortress');
-    result = result.replace(/__GOBLIN_KING_TEMP__/g, 'Goblin King');
-  }
-
-  // Protect existing links again after lore linking
-  result = result.replace(/<a [^>]*>.*?<\/a>/g, (match) => {
-    const placeholder = `__LINK_${linkPlaceholders.length}__`;
-    linkPlaceholders.push(match);
-    return placeholder;
-  });
-
-  // Apply character linking last (characters often have shorter, more general names)
-  if (characterHelpers && characterHelpers.linkifyCharacterMentionsSync) {
-    result = characterHelpers.linkifyCharacterMentionsSync(result);
-  }
-
-  // Restore all protected links
-  linkPlaceholders.forEach((replacement, index) => {
-    result = result.replace(`__LINK_${index}__`, replacement);
-  });
-
-  // Restore disambiguation links
-  disambigPlaceholders.forEach((replacement, index) => {
-    result = result.replace(`__DISAMBIG_${index}__`, replacement);
   });
 
   return result;
