@@ -19,15 +19,15 @@
       import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
       import { getDatabase, ref, push, set, onValue, query, orderByChild, orderByKey, limitToLast } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
       
-      // Initialize Firebase with your existing config
+      // Initialize Firebase with environment config
       const firebaseConfig = {
-        apiKey: "AIzaSyCg-9HMihsWZnvfYOS155Dk4JJt5Rr7XRI",
-        authDomain: "wavelength-lore.firebaseapp.com",
-        databaseURL: "https://wavelength-lore-default-rtdb.firebaseio.com",
-        projectId: "wavelength-lore",
-        storageBucket: "wavelength-lore.firebasestorage.app",
-        messagingSenderId: "78008979957",
-        appId: "1:78008979957:web:799d623c4bd1d5be3b90bc"
+        apiKey: "<%= process.env.API_KEY %>",
+        authDomain: "<%= process.env.AUTH_DOMAIN %>",
+        databaseURL: "<%= process.env.DATABASE_URL %>",
+        projectId: "<%= process.env.PROJECT_ID %>",
+        storageBucket: "<%= process.env.STORAGE_BUCKET %>",
+        messagingSenderId: "<%= process.env.MESSAGING_SENDER_ID %>",
+        appId: "<%= process.env.APP_ID %>"
       };
       
       const app = initializeApp(firebaseConfig);
