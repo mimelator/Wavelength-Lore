@@ -22,14 +22,106 @@ function setHelperInstances(charHelpers, loreHelpersInstance, episodeHelpersInst
 }
 
 /**
+ * Detect conflicts dynamically by checking all helper systems
+ * @param {string} term - The term to check for conflicts
+ * @returns {Array} Array of conflict objects with type, url, name, etc.
+ */
+function detectConflictsForTerm(term) {
+  const conflicts = [];
+  
+  // Check characters
+  if (characterHelpers) {
+    const characters = characterHelpers.getAllCharactersSync();
+    characters.forEach(char => {
+      const searchTerms = [char.name];
+      if (char.keywords && Array.isArray(char.keywords)) {
+        searchTerms.push(...char.keywords);
+      }
+      
+      if (searchTerms.some(searchTerm => 
+        searchTerm && searchTerm.toLowerCase() === term.toLowerCase()
+      )) {
+        conflicts.push({
+          type: 'character',
+          url: char.url,
+          name: char.name,
+          description: 'Character',
+          image: char.image,
+          subtitle: char.role || 'Character'
+        });
+      }
+    });
+  }
+  
+  // Check lore
+  if (loreHelpers) {
+    const lore = loreHelpers.getAllLoreSync();
+    lore.forEach(loreItem => {
+      const searchTerms = [loreItem.name];
+      if (loreItem.keywords && Array.isArray(loreItem.keywords)) {
+        searchTerms.push(...loreItem.keywords);
+      }
+      
+      if (searchTerms.some(searchTerm => 
+        searchTerm && searchTerm.toLowerCase() === term.toLowerCase()
+      )) {
+        conflicts.push({
+          type: 'lore',
+          url: loreItem.url,
+          name: loreItem.name,
+          description: loreItem.type || 'Lore',
+          image: loreItem.image,
+          subtitle: loreItem.type || 'Lore'
+        });
+      }
+    });
+  }
+  
+  // Check episodes
+  if (episodeHelpers) {
+    const episodes = episodeHelpers.getAllEpisodesSync();
+    episodes.forEach(episode => {
+      const searchTerms = [episode.name];
+      if (episode.keywords && Array.isArray(episode.keywords)) {
+        searchTerms.push(...episode.keywords);
+      }
+      
+      if (searchTerms.some(searchTerm => 
+        searchTerm && searchTerm.toLowerCase() === term.toLowerCase()
+      )) {
+        conflicts.push({
+          type: 'episode',
+          url: episode.url,
+          name: episode.name,
+          description: 'Episode',
+          image: episode.image,
+          subtitle: `Season ${episode.season}, Episode ${episode.episode_number}`
+        });
+      }
+    });
+  }
+  
+  return conflicts;
+}
+
+/**
  * Apply smart linking with simple conflict resolution
  * @param {string} text - Original text
  * @returns {string} Text with smart linking applied
  */
 function applySmartLinkingSimple(text) {
-  // Known conflicts - these are terms that appear in multiple categories
-  const knownConflicts = {
-    'Ice Fortress': [
+  let result = text;
+  
+  // Use the lore helpers directly which have better nested HTML protection
+  if (loreHelpers && loreHelpers.linkifyLoreMentionsSync) {
+    result = loreHelpers.linkifyLoreMentionsSync(result);
+  }
+  
+  return result;
+}
+
+/**
+ * Get the simple disambiguation script
       { 
         type: 'lore', 
         url: '/lore/ice-fortress', 
@@ -440,6 +532,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     setHelperInstances,
     applySmartLinkingSimple,
+    detectConflictsForTerm,
     getSimpleDisambiguationScript,
     getSimpleDisambiguationStyles
   };

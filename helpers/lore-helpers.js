@@ -129,6 +129,7 @@ async function fetchLoreFromDatabase() {
             id: loreItem.id,
             title: loreItem.title,
             name: loreItem.title, // Use title as name for consistency
+            keywords: loreItem.keywords || [], // Include keywords for enhanced linking
             url: `/lore/${loreItem.id}`,
             description: loreItem.description,
             image: loreItem.image,
@@ -204,11 +205,89 @@ async function linkifyLoreMentions(text) {
   const lore = await getLore();
   let processedText = text;
   
+  // Create a map of terms to their matching lore items
+  const termConflicts = new Map();
+  
   for (const loreItem of lore) {
-    // Create regex to match lore name (case insensitive, word boundaries)
-    const regex = new RegExp(`\\b${loreItem.name}\\b`, 'gi');
-    processedText = processedText.replace(regex, (match) => {
-      return `<a href="${loreItem.url}" class="lore-link" title="Learn about ${loreItem.name}">${match}</a>`;
+    // Build array of all searchable terms (title + keywords)
+    const searchTerms = [loreItem.name];
+    if (loreItem.keywords && Array.isArray(loreItem.keywords)) {
+      searchTerms.push(...loreItem.keywords);
+    }
+    
+    // Add each term to the conflicts map
+    for (const term of searchTerms) {
+      if (!term || term.trim() === '') continue;
+      
+      const lowerTerm = term.toLowerCase();
+      if (!termConflicts.has(lowerTerm)) {
+        termConflicts.set(lowerTerm, []);
+      }
+      termConflicts.get(lowerTerm).push({
+        item: loreItem,
+        matchText: term
+      });
+    }
+  }
+  
+  // Sort terms by length (longest first) to avoid partial replacements
+  const sortedTerms = Array.from(termConflicts.keys()).sort((a, b) => b.length - a.length);
+  
+  // Process each term, being extra careful not to link inside existing HTML or already-linked text
+  for (const term of sortedTerms) {
+    const matches = termConflicts.get(term);
+    if (!matches || matches.length === 0) continue;
+    
+    // Use the first match for linking (conflicts should be handled by disambiguation system)
+    const match = matches[0];
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    
+    // Track positions of existing links to avoid overlapping
+    const existingLinks = [];
+    let linkMatch;
+    const linkRegex = /<a\s[^>]*>.*?<\/a>/gi;
+    while ((linkMatch = linkRegex.exec(processedText)) !== null) {
+      existingLinks.push({
+        start: linkMatch.index,
+        end: linkMatch.index + linkMatch[0].length
+      });
+    }
+    
+    // Find all matches of our term
+    let termMatches = [];
+    let termMatch;
+    const termRegex = new RegExp(`\\b${escapedTerm}\\b`, 'gi');
+    while ((termMatch = termRegex.exec(processedText)) !== null) {
+      // Check if this match overlaps with any existing link
+      const matchStart = termMatch.index;
+      const matchEnd = termMatch.index + termMatch[0].length;
+      
+      let isInsideLink = false;
+      for (const link of existingLinks) {
+        if (matchStart >= link.start && matchEnd <= link.end) {
+          isInsideLink = true;
+          break;
+        }
+      }
+      
+      if (!isInsideLink) {
+        termMatches.push({
+          match: termMatch[0],
+          start: matchStart,
+          end: matchEnd
+        });
+      }
+    }
+    
+    // Replace from right to left to maintain correct positions
+    termMatches.reverse().forEach(termMatchInfo => {
+      const beforeMatch = processedText.substring(0, termMatchInfo.start);
+      const afterMatch = processedText.substring(termMatchInfo.end);
+      
+      // Create the link
+      const linkHtml = `<a href="${match.item.url}" class="lore-link" title="Learn about ${match.item.name}">${termMatchInfo.match}</a>`;
+      
+      processedText = beforeMatch + linkHtml + afterMatch;
     });
   }
   
@@ -272,13 +351,94 @@ function linkifyLoreMentionsSync(text) {
   const lore = loreCache || fallbackLore;
   let processedText = text;
   
+  // Create a comprehensive list of all terms with their associated lore items
+  const termMap = new Map();
+  
   lore.forEach(loreItem => {
-    // Create regex to match lore name (case insensitive, word boundaries)
-    const regex = new RegExp(`\\b${loreItem.name}\\b`, 'gi');
-    processedText = processedText.replace(regex, (match) => {
-      return `<a href="${loreItem.url}" class="lore-link" title="Learn about ${loreItem.name}">${match}</a>`;
+    // Build array of all searchable terms (title + keywords)
+    const searchTerms = [loreItem.name];
+    if (loreItem.keywords && Array.isArray(loreItem.keywords)) {
+      searchTerms.push(...loreItem.keywords);
+    }
+    
+    // Add each term to the map
+    searchTerms.forEach(term => {
+      if (!term || term.trim() === '') return;
+      
+      const lowerTerm = term.toLowerCase();
+      if (!termMap.has(lowerTerm)) {
+        termMap.set(lowerTerm, []);
+      }
+      termMap.get(lowerTerm).push({
+        item: loreItem,
+        matchText: term
+      });
     });
   });
+  
+  // Sort terms by length (longest first) to avoid partial replacements
+  const sortedTerms = Array.from(termMap.keys()).sort((a, b) => b.length - a.length);
+  
+  // Process each term, being extra careful not to link inside existing HTML or already-linked text
+  for (const term of sortedTerms) {
+    const matches = termMap.get(term);
+    if (!matches || matches.length === 0) continue;
+    
+    // Use the first match for linking
+    const match = matches[0];
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    
+    // More robust regex that avoids linking inside existing HTML tags or anchor tags
+    const regex = new RegExp(`\\b${escapedTerm}\\b(?![^<]*>)(?![^<]*<\/a>)(?!.*<\/a>[^<]*$)`, 'gi');
+    
+    // Track positions of existing links to avoid overlapping
+    const existingLinks = [];
+    let linkMatch;
+    const linkRegex = /<a\s[^>]*>.*?<\/a>/gi;
+    while ((linkMatch = linkRegex.exec(processedText)) !== null) {
+      existingLinks.push({
+        start: linkMatch.index,
+        end: linkMatch.index + linkMatch[0].length
+      });
+    }
+    
+    // Find all matches of our term
+    let termMatches = [];
+    let termMatch;
+    const termRegex = new RegExp(`\\b${escapedTerm}\\b`, 'gi');
+    while ((termMatch = termRegex.exec(processedText)) !== null) {
+      // Check if this match overlaps with any existing link
+      const matchStart = termMatch.index;
+      const matchEnd = termMatch.index + termMatch[0].length;
+      
+      let isInsideLink = false;
+      for (const link of existingLinks) {
+        if (matchStart >= link.start && matchEnd <= link.end) {
+          isInsideLink = true;
+          break;
+        }
+      }
+      
+      if (!isInsideLink) {
+        termMatches.push({
+          match: termMatch[0],
+          start: matchStart,
+          end: matchEnd
+        });
+      }
+    }
+    
+    // Replace from right to left to maintain correct positions
+    termMatches.reverse().forEach(termMatchInfo => {
+      const beforeMatch = processedText.substring(0, termMatchInfo.start);
+      const afterMatch = processedText.substring(termMatchInfo.end);
+      
+      // Create the link
+      const linkHtml = `<a href="${match.item.url}" class="lore-link" title="Learn about ${match.item.name}">${termMatchInfo.match}</a>`;
+      
+      processedText = beforeMatch + linkHtml + afterMatch;
+    });
+  }
   
   return processedText;
 }
