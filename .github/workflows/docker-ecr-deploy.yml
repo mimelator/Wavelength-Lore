@@ -45,6 +45,13 @@ jobs:
           echo "::notice::Pushed images with tags: $IMAGE_TAG, ${COMMIT_SHA:0:8}"
 
       - name: Invalidate CloudFront Cache (Optional)
-        if: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID != '' }}
+        if: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID || secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        env:
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+          if [ -n "$CLOUDFRONT_DISTRIBUTION_ID" ]; then
+            aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
+            echo "::notice::CloudFront cache invalidated for distribution: $CLOUDFRONT_DISTRIBUTION_ID"
+          else
+            echo "::warning::CLOUDFRONT_DISTRIBUTION_ID not set, skipping cache invalidation"
+          fi
