@@ -112,11 +112,154 @@ function detectConflictsForTerm(term) {
 function applySmartLinkingSimple(text) {
   let result = text;
   
-  // Use the lore helpers directly which have better nested HTML protection
-  if (loreHelpers && loreHelpers.linkifyLoreMentionsSync) {
-    result = loreHelpers.linkifyLoreMentionsSync(result);
+  // Collect all potential terms from all helpers with their conflict info
+  const termMap = new Map();
+  
+  // Collect from characters
+  if (characterHelpers) {
+    const characters = characterHelpers.getAllCharactersSync();
+    characters.forEach(char => {
+      const searchTerms = [char.name];
+      if (char.keywords && Array.isArray(char.keywords)) {
+        searchTerms.push(...char.keywords);
+      }
+      
+      searchTerms.forEach(term => {
+        if (!term || term.trim() === '') return;
+        const lowerTerm = term.toLowerCase();
+        if (!termMap.has(lowerTerm)) {
+          termMap.set(lowerTerm, []);
+        }
+        termMap.get(lowerTerm).push({
+          type: 'character',
+          url: char.url,
+          name: char.name,
+          description: 'Character',
+          image: char.image,
+          subtitle: char.role || 'Character',
+          matchText: term
+        });
+      });
+    });
   }
   
+  // Collect from lore
+  if (loreHelpers) {
+    const lore = loreHelpers.getAllLoreSync();
+    lore.forEach(loreItem => {
+      const searchTerms = [loreItem.name];
+      if (loreItem.keywords && Array.isArray(loreItem.keywords)) {
+        searchTerms.push(...loreItem.keywords);
+      }
+      
+      searchTerms.forEach(term => {
+        if (!term || term.trim() === '') return;
+        const lowerTerm = term.toLowerCase();
+        if (!termMap.has(lowerTerm)) {
+          termMap.set(lowerTerm, []);
+        }
+        termMap.get(lowerTerm).push({
+          type: 'lore',
+          url: loreItem.url,
+          name: loreItem.name,
+          description: loreItem.type || 'Lore',
+          image: loreItem.image,
+          subtitle: loreItem.type || 'Lore',
+          matchText: term
+        });
+      });
+    });
+  }
+  
+  // Collect from episodes
+  if (episodeHelpers) {
+    const episodes = episodeHelpers.getAllEpisodesSync();
+    episodes.forEach(episode => {
+      const searchTerms = [episode.name];
+      if (episode.keywords && Array.isArray(episode.keywords)) {
+        searchTerms.push(...episode.keywords);
+      }
+      
+      searchTerms.forEach(term => {
+        if (!term || term.trim() === '') return;
+        const lowerTerm = term.toLowerCase();
+        if (!termMap.has(lowerTerm)) {
+          termMap.set(lowerTerm, []);
+        }
+        termMap.get(lowerTerm).push({
+          type: 'episode',
+          url: episode.url,
+          name: episode.name,
+          description: 'Episode',
+          image: episode.image,
+          subtitle: `Season ${episode.season}, Episode ${episode.episode_number}`,
+          matchText: term
+        });
+      });
+    });
+  }
+  
+  // Sort terms by length (longest first) to avoid partial replacements
+  const sortedTerms = Array.from(termMap.keys()).sort((a, b) => b.length - a.length);
+  
+  // Track all replacements to avoid overlapping
+  const replacements = [];
+  
+  // Find all potential replacements first
+  sortedTerms.forEach(term => {
+    if (!term || term.trim() === '') return;
+    
+    const conflicts = termMap.get(term);
+    if (!conflicts || conflicts.length === 0) return;
+    
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b${escapedTerm}\\b`, 'gi');
+    
+    let match;
+    while ((match = regex.exec(result)) !== null) {
+      const start = match.index;
+      const end = match.index + match[0].length;
+      
+      // Check if this overlaps with any existing replacement
+      const overlaps = replacements.some(r => 
+        (start >= r.start && start < r.end) || 
+        (end > r.start && end <= r.end) ||
+        (start <= r.start && end >= r.end)
+      );
+      
+      if (!overlaps) {
+        replacements.push({
+          start,
+          end,
+          originalText: match[0],
+          conflicts,
+          term
+        });
+      }
+    }
+  });
+  
+  // Sort replacements by start position (right to left for safe replacement)
+  replacements.sort((a, b) => b.start - a.start);
+  
+  // Apply replacements
+  replacements.forEach(replacement => {
+    const { start, end, originalText, conflicts } = replacement;
+    
+    let replacementHtml;
+    if (conflicts.length > 1) {
+      // Multiple matches - use disambiguation modal
+      const conflictsJson = JSON.stringify(conflicts).replace(/"/g, '&quot;');
+      replacementHtml = `<span class="disambiguation-link" onclick="openDisambiguationModal(this)" data-phrase="${originalText}" data-conflicts="${conflictsJson}">${originalText}</span>`;
+    } else {
+      // Single match - create direct link
+      const conflict = conflicts[0];
+      replacementHtml = `<a href="${conflict.url}" class="lore-link" title="Learn about ${conflict.name}">${originalText}</a>`;
+    }
+    
+    result = result.substring(0, start) + replacementHtml + result.substring(end);
+  });
+
   return result;
 }
 
