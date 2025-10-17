@@ -14,6 +14,10 @@ Welcome to the comprehensive documentation for the Wavelength Lore application. 
 - **[Backup Configuration](BACKUP_CONFIGURATION.md)** - Complete setup guide for automated S3 backups
 - **[Backup Implementation Summary](BACKUP_IMPLEMENTATION_SUMMARY.md)** - Overview of the implemented backup system features
 
+### 🚨 Disaster Recovery
+- **[Disaster Recovery Guide](DISASTER_RECOVERY.md)** - Complete catastrophic failure recovery procedures
+- **[Quick Recovery Checklist](QUICK_RECOVERY_CHECKLIST.md)** - Emergency reference for immediate disaster recovery
+
 ### 🎮 Application Features
 - **[Character Reference System](CHARACTER_REFERENCE_SYSTEM.md)** - Character linking and disambiguation system
 - **[Lore System Documentation](LORE_SYSTEM_DOCUMENTATION.md)** - Lore management and linking functionality

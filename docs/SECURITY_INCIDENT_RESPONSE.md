@@ -7,9 +7,9 @@
 The following credentials were exposed in your GitHub repository and must be rotated:
 
 #### Firebase Credentials:
-- **API Key**: `AIzaSyCg-9HMihsWZnvfYOS155Dk4JJt5Rr7XRI` ⚠️ EXPOSED (but cannot be changed)
+- **API Key**: `YOUR_FIREBASE_API_KEY` ⚠️ EXPOSED (but cannot be changed)
 - **Project ID**: `wavelength-lore` 
-- **App ID**: `1:78008979957:web:799d623c4bd1d5be3b90bc` ❌ COMPROMISED (this CAN be changed)
+- **App ID**: `YOUR_FIREBASE_APP_ID` ❌ COMPROMISED (this CAN be changed)
 
 #### AWS Credentials:
 - **Access Key ID**: `AKIASPFRQ6WB5DS[REDACTED]` ❌ COMPROMISED  
@@ -411,7 +411,7 @@ YOUTUBE_API_KEY="your_new_restricted_api_key_here"
 Update your .env file RIGHT NOW with your new Firebase credentials:
 ```bash
 # The API_KEY stays the same (this is normal and cannot be changed):
-API_KEY="AIzaSyCg-9HMihsWZnvfYOS155Dk4JJt5Rr7XRI"  # ✅ SAME - this is normal!
+API_KEY="YOUR_FIREBASE_API_KEY"  # ✅ SAME - this is normal!
 
 # But you MUST update the APP_ID with the new one from Firebase Console:
 APP_ID="your_new_app_id_from_firebase_console"  # ✅ This MUST be different!

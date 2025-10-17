@@ -117,6 +117,25 @@ node scripts/check_broken_images.js
 node scripts/check_youtube_links.js
 ```
 
+### Cache Management
+```bash
+# Clear all caches (local + CloudFront)
+./scripts/bust-cache.sh
+
+# Clear local caches only
+./scripts/bust-cache.sh --local
+
+# Clear CloudFront CDN only
+./scripts/bust-cache.sh --cdn
+
+# Clear specific cache types
+./scripts/bust-cache.sh --local --characters
+./scripts/bust-cache.sh --local --lore --refresh
+
+# Direct CloudFront cache invalidation
+node scripts/cloudfront-cache-bust.js
+```
+
 ## 📋 Script Requirements
 
 ### Environment Configuration

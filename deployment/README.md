@@ -85,6 +85,28 @@ The updater automatically filters and deploys these variables:
 
 **Note**: Development-only variables (backup system, local settings) are automatically excluded from production deployment.
 
+#### Cache Management
+Clear application and CDN caches after deployments:
+
+```bash
+# Clear all caches (local application + CloudFront CDN)
+./scripts/bust-cache.sh
+
+# Clear only local application caches
+./scripts/bust-cache.sh --local
+
+# Clear only CloudFront CDN cache
+./scripts/bust-cache.sh --cdn
+
+# Clear specific cache types with refresh
+./scripts/bust-cache.sh --local --characters --refresh
+```
+
+**CloudFront Cache Setup**: If you encounter CloudFront permissions errors:
+1. **Generate IAM Policy**: `node scripts/setup-cloudfront-permissions.js`
+2. **Add Policy to IAM User**: Follow the displayed instructions
+3. **Test**: `node scripts/cloudfront-cache-bust.js`
+
 ## 🔧 Configuration
 
 ### Environment Variables
