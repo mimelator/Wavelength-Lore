@@ -4,7 +4,8 @@
   episodes:
     episode1:
       title: "Goblin King"
-      description: "You've been punched in the head So many times that you don’t know Which is way is left or right"
+      description: "You've been punched in the head So many times that you don't know Which is way is left or right"
+      keywords: ['goblin king', 'invasion', 'psychopath', 'villain', 'battle', 'fall', 'shire']
       youtubeLink: "https://youtu.be/kGpLCx63Fh8"
       image: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/image.png"
       audio: "https://df5sj8f594cdx.cloudfront.net/images/seasons/season2/episodes/episode1/GoblinKing_v8.mp3"

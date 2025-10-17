@@ -1,6 +1,7 @@
 // Episode helper functions for generating episode links and references
 const firebaseUtils = require('./firebase-utils');
 const cacheUtils = require('./cache-utils');
+const linkingUtils = require('./linking-utils');
 
 // Create cache manager for episodes
 const episodeCache = cacheUtils.createCacheManager('Episodes');
@@ -46,12 +47,16 @@ const fallbackEpisodes = [
  * @returns {Promise<Array>} Array of episode objects
  */
 async function fetchEpisodesFromDatabase() {
+  console.log('🎬 fetchEpisodesFromDatabase called');
   try {
     if (!firebaseUtils.isFirebaseReady()) {
       firebaseUtils.initializeFirebase('episode-helpers');
     }
 
+    console.log('🔥 Fetching videos data from Firebase...');
     const videosData = await firebaseUtils.fetchFromFirebase('videos');
+    console.log('🔥 Videos data result:', videosData ? 'data received' : 'null/undefined');
+    console.log('Videos data structure:', videosData ? Object.keys(videosData) : 'null');
     
     if (videosData) {
       // Extract all episodes from all seasons
@@ -59,10 +64,17 @@ async function fetchEpisodesFromDatabase() {
       
       for (const seasonId in videosData) {
         const seasonData = videosData[seasonId];
+        console.log(`Processing season ${seasonId}:`, seasonData ? Object.keys(seasonData) : 'null');
         
         if (seasonData.episodes) {
+          console.log(`Episodes in ${seasonId}:`, Object.keys(seasonData.episodes));
           for (const episodeId in seasonData.episodes) {
             const episodeData = seasonData.episodes[episodeId];
+            console.log(`Episode ${episodeId} data:`, episodeData ? {
+              title: episodeData.title,
+              hasKeywords: !!(episodeData.keywords),
+              keywords: episodeData.keywords
+            } : 'null');
             
             if (episodeData.title) {
               // Extract season number from seasonId (e.g., "season1" -> "1")
@@ -79,7 +91,8 @@ async function fetchEpisodesFromDatabase() {
                 episode: episodeId,
                 description: episodeData.description,
                 youtubeLink: episodeData.youtubeLink,
-                image: episodeData.image
+                image: episodeData.image,
+                keywords: episodeData.keywords || [] // Include keywords field
               });
             }
           }
@@ -87,6 +100,7 @@ async function fetchEpisodesFromDatabase() {
       }
       
       console.log(`Loaded ${allEpisodes.length} episodes from Firebase`);
+      console.log('Episodes with keywords:', allEpisodes.filter(ep => ep.keywords && ep.keywords.length > 0).length);
       return allEpisodes;
     } else {
       console.warn('No episode data found in database, using fallback');
@@ -117,18 +131,11 @@ function createEpisodeId(title) {
  * @returns {Promise<Array>} Array of episode objects
  */
 async function getEpisodes() {
-  const now = Date.now();
-  
-  // Check if cache is still valid
-  if (episodeCache && cacheTimestamp && (now - cacheTimestamp) < CACHE_DURATION) {
-    return episodeCache;
-  }
-  
-  // Fetch fresh data and update cache
-  episodeCache = await fetchEpisodesFromDatabase();
-  cacheTimestamp = now;
-  
-  return episodeCache;
+  return await cacheUtils.getWithCache(
+    episodeCache,
+    fetchEpisodesFromDatabase,
+    fallbackEpisodes
+  );
 }
 
 /**
@@ -171,26 +178,7 @@ async function generateEpisodeLink(episodeId) {
  */
 async function linkifyEpisodeMentions(text) {
   const episodes = await getEpisodes();
-  let processedText = text;
-  
-  for (const episode of episodes) {
-    // Create regex to match episode name (case insensitive, word boundaries)
-    const regex = new RegExp(`\\b${escapeRegex(episode.name)}\\b`, 'gi');
-    processedText = processedText.replace(regex, (match) => {
-      return `<a href="${episode.url}" class="episode-link" title="Watch ${episode.name}">${match}</a>`;
-    });
-  }
-  
-  return processedText;
-}
-
-/**
- * Escape special characters for regex
- * @param {string} string - String to escape
- * @returns {string} Escaped string
- */
-function escapeRegex(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return linkingUtils.linkifyItemMentions(text, episodes, 'episode');
 }
 
 /**
@@ -239,23 +227,13 @@ function generateEpisodeLinkSync(episodeId) {
 }
 
 /**
- * Replace episode mentions in text with links (sync version using cache)
+ * Replace episode mentions in text with links (sync version)
  * @param {string} text - Text to process
  * @returns {string} Text with episode names replaced by links
  */
 function linkifyEpisodeMentionsSync(text) {
   const episodes = cacheUtils.getSync(episodeCache, fallbackEpisodes);
-  let processedText = text;
-  
-  for (const episode of episodes) {
-    // Create regex to match episode name (case insensitive, word boundaries)
-    const regex = new RegExp(`\\b${escapeRegex(episode.name)}\\b`, 'gi');
-    processedText = processedText.replace(regex, (match) => {
-      return `<a href="${episode.url}" class="episode-link" title="Watch ${episode.name}">${match}</a>`;
-    });
-  }
-  
-  return processedText;
+  return linkingUtils.linkifyItemMentions(text, episodes, 'episode');
 }
 
 /**
@@ -272,9 +250,9 @@ function getAllEpisodesSync() {
  */
 async function initializeEpisodeCache() {
   try {
-    // Only initialize Firebase if no database instance was provided
-    if (!database) {
-      initializeFirebase();
+    // Only initialize Firebase if not already ready
+    if (!firebaseUtils.isFirebaseReady()) {
+      firebaseUtils.initializeFirebase('episode-cache-init');
     }
     
     // Then populate the cache

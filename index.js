@@ -625,6 +625,65 @@ app.get('/api/cache/status', async (req, res) => {
   }
 });
 
+// Debug endpoint to check episode cache
+app.get('/debug/episodes', async (req, res) => {
+  try {
+    const allEpisodes = episodeHelpers.getAllEpisodesSync();
+    const episodesWithKeywords = allEpisodes.filter(ep => ep.keywords && ep.keywords.length > 0);
+    
+    res.json({
+      totalEpisodes: allEpisodes.length,
+      episodesWithKeywords: episodesWithKeywords.length,
+      sampleEpisode: allEpisodes[0],
+      episodesWithKeywordsSample: episodesWithKeywords.slice(0, 3)
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Debug endpoint to force refresh episode cache
+app.get('/debug/episodes/refresh', async (req, res) => {
+  try {
+    console.log('🔄 Forcing episode cache refresh...');
+    
+    // Clear the cache first
+    episodeHelpers.clearEpisodeCache && episodeHelpers.clearEpisodeCache();
+    
+    await episodeHelpers.initializeEpisodeCache();
+    const allEpisodes = episodeHelpers.getAllEpisodesSync();
+    const episodesWithKeywords = allEpisodes.filter(ep => ep.keywords && ep.keywords.length > 0);
+    
+    // Log detailed episode info
+    console.log('📊 Episode cache contents:');
+    allEpisodes.slice(0, 3).forEach(ep => {
+      console.log(`  - ${ep.title}:`, {
+        id: ep.id,
+        hasKeywords: !!(ep.keywords),
+        keywords: ep.keywords || [],
+        season: ep.season,
+        episode: ep.episode
+      });
+    });
+    
+    res.json({
+      message: 'Cache refreshed',
+      totalEpisodes: allEpisodes.length,
+      episodesWithKeywords: episodesWithKeywords.length,
+      sampleEpisodeWithKeywords: episodesWithKeywords[0] || null,
+      allEpisodesSample: allEpisodes.slice(0, 3).map(ep => ({
+        title: ep.title,
+        id: ep.id,
+        keywords: ep.keywords || [],
+        url: ep.url
+      }))
+    });
+  } catch (error) {
+    console.error('Error refreshing cache:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });

@@ -7,6 +7,7 @@ episodes:
   episode1:
     title: My Lucky Charm
     description: Everyone needs a little luck sometimes, except for maybe Goblins who need no one
+    keywords: ['lucky', 'leprechaun', 'charm', 'luck', 'goblin', 'shire', 'mascot']
     youtubeLink: https://youtu.be/ejFr89hKB1M
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/image.png
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/LuckyCharm_v35.mp3
@@ -52,6 +53,7 @@ episodes:
   episode2:
     title: Jump Right In!
     description: Life is about choices, so make one and see what happens next!
+    keywords: ['jump', 'choices', 'adventure', 'decision', 'life', 'action']
     youtubeLink: https://youtu.be/UJs0aOb8DlM
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/image.png
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/JumpRightIn_v25.mp3
@@ -105,6 +107,7 @@ episodes:
   episode3:
     title: Dream with Me
     description: What dreams can be made when two are united in destiny?
+    keywords: ['dream', 'destiny', 'unity', 'together', 'hope', 'future']
     youtubeLink: https://youtu.be/L_gxO-rrTSY
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/image.png
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/DreamWithMe_v3.mp3
@@ -137,6 +140,7 @@ episodes:
   episode4:
     title: Daphne
     description: The intoxicating Daphne flower calls to both pollinators and humans alike
+    keywords: ['daphne', 'flower', 'intoxicating', 'pollinators', 'nature', 'beauty']
     youtubeLink: https://youtu.be/PWYOElJnU0I
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/image.png
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/Daphne_v21.mp3
@@ -168,6 +172,7 @@ episodes:
   episode5:
     title: Falling
     description: When they make your heart go ah-ah-ah-ah
+    keywords: ['falling', 'love', 'heart', 'angel', 'romance', 'emotion']
     youtubeLink: https://youtu.be/LKDfiCHGeNs
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/image.png
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/Falling_v32.mp3
@@ -200,6 +205,7 @@ episodes:
   episode6:
     title: Once More
     description: In remembrance of dear friends
+    keywords: ['remembrance', 'friends', 'memory', 'nostalgia', 'dear', 'once more']
     youtubeLink: https://youtu.be/_Ml9tKjgTIs
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/image.png
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/OnceMore_v20.mp3
@@ -246,7 +252,8 @@ episodes:
       Once more, once more Once more, once more To see you again!
   episode7:
     title: History Lessons
-    description: In memory of a precious friend, a jewel that couldn’t be outshown
+    description: In memory of a precious friend, a jewel that couldn't be outshone
+    keywords: ['history', 'lessons', 'memory', 'jewel', 'precious', 'friend', 'past', 'remember']
     youtubeLink: https://youtu.be/PTTLo-Oetl4
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/image.png
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/HistoryLessons_v8.mp3
@@ -283,8 +290,9 @@ episodes:
       forever, I'll remember you
   episode8:
     title: Life in the Shire
-    description: When home is a haven, there’s no limit to what can be done
-    youtubeLink: https://youtu.be/slwFjISO70M
+    description: When home is a haven, there's no limit to what can be done
+    keywords: ['shire', 'home', 'haven', 'life', 'peaceful', 'community']
+    youtubeLink: https://youtu.be/4wKUohlpnPo
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/image.png
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/LIfeInTheShire_v19.mp3
     carouselImages:
@@ -325,6 +333,7 @@ episodes:
   episode9:
     title: Feed the Crows
     description: Living in and Loving Nature can be a great balm for your pain
+    keywords: ['crows', 'nature', 'healing', 'pain', 'comfort', 'solace', 'wildlife']
     youtubeLink: https://youtu.be/tunZ11NdOQA
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/image.png
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/FeedTheCrows_v24.mp3
@@ -363,6 +372,7 @@ episodes:
   episode10:
     title: Keep On
     description: There are 3 or 4 little words that I enjoy hearing everyday…
+    keywords: ['keep on', 'perseverance', 'love', 'relationships', 'words', 'searching']
     youtubeLink: https://youtu.be/en9ir6dq7WQ
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/image.png
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/Keep On_v26.mp3
@@ -398,7 +408,8 @@ episodes:
       Like I Love you Too!
   episode11:
     title: Back to the Shire (Encore)
-    description: There’s a place where people practice paradise
+    description: There's a place where people practice paradise
+    keywords: ['shire', 'paradise', 'encore', 'home', 'practice', 'peace', 'return']
     youtubeLink: https://youtu.be/07ln1YTcOdg?si=TrWzyJkYOZtx1Zrc
     image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/image.png
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/BackToTheShire_v18.mp3
