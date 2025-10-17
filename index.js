@@ -152,13 +152,58 @@ async function getEpisodeNavigation(seasonNumber, episodeNumber) {
     const season = parseInt(seasonNumber);
     const episode = parseInt(episodeNumber);
     
-    // Fetch navigation data in parallel
-    const [prevEpisode, nextEpisode, prevSeasonFirst, nextSeasonFirst] = await Promise.all([
-      firebaseUtils.fetchFromFirebase(`videos/season${season}/episodes/episode${episode - 1}`),
-      firebaseUtils.fetchFromFirebase(`videos/season${season}/episodes/episode${episode + 1}`),
-      firebaseUtils.fetchFromFirebase(`videos/season${season - 1}/episodes/episode1`),
-      firebaseUtils.fetchFromFirebase(`videos/season${season + 1}/episodes/episode1`)
-    ]);
+    // Define known season/episode bounds to avoid unnecessary Firebase calls
+    const seasonBounds = {
+      1: { min: 1, max: 11 },
+      2: { min: 1, max: 7 },
+      3: { min: 1, max: 7 },
+      4: { min: 1, max: 8 }
+    };
+    
+    const validSeasons = [1, 2, 3, 4];
+    
+    // Build fetch promises only for potentially valid episodes
+    const fetchPromises = [];
+    const fetchKeys = [];
+    
+    // Previous episode in same season
+    if (episode > 1 && seasonBounds[season] && episode - 1 >= seasonBounds[season].min) {
+      fetchPromises.push(firebaseUtils.fetchFromFirebase(`videos/season${season}/episodes/episode${episode - 1}`));
+      fetchKeys.push('prevEpisode');
+    } else {
+      fetchKeys.push('prevEpisode');
+      fetchPromises.push(Promise.resolve(null));
+    }
+    
+    // Next episode in same season  
+    if (seasonBounds[season] && episode + 1 <= seasonBounds[season].max) {
+      fetchPromises.push(firebaseUtils.fetchFromFirebase(`videos/season${season}/episodes/episode${episode + 1}`));
+      fetchKeys.push('nextEpisode');
+    } else {
+      fetchKeys.push('nextEpisode');
+      fetchPromises.push(Promise.resolve(null));
+    }
+    
+    // Previous season first episode
+    if (validSeasons.includes(season - 1)) {
+      fetchPromises.push(firebaseUtils.fetchFromFirebase(`videos/season${season - 1}/episodes/episode1`));
+      fetchKeys.push('prevSeasonFirst');
+    } else {
+      fetchKeys.push('prevSeasonFirst');
+      fetchPromises.push(Promise.resolve(null));
+    }
+    
+    // Next season first episode
+    if (validSeasons.includes(season + 1)) {
+      fetchPromises.push(firebaseUtils.fetchFromFirebase(`videos/season${season + 1}/episodes/episode1`));
+      fetchKeys.push('nextSeasonFirst');
+    } else {
+      fetchKeys.push('nextSeasonFirst');
+      fetchPromises.push(Promise.resolve(null));
+    }
+    
+    const results = await Promise.all(fetchPromises);
+    const [prevEpisode, nextEpisode, prevSeasonFirst, nextSeasonFirst] = results;
     
     const isFirstEpisode = episode === 1;
     const isLastEpisode = !nextEpisode;
