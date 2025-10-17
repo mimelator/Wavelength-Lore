@@ -21,6 +21,10 @@ Welcome to the comprehensive documentation for the Wavelength Lore application. 
 ### ⚡ Performance & Optimization
 - **[Cache Busting](CACHE_BUSTING.md)** - Static asset cache management and optimization
 
+### 🛠️ Development & Debugging
+- **[Node.js v24 Compatibility Fix](NODE_V24_COMPATIBILITY_FIX.md)** - Compatibility fixes for Node.js v24
+- **[Debug Scripts](../debug/README.md)** - Debug and diagnostic scripts for troubleshooting
+
 ## 🚀 Quick Start Guides
 
 ### Security Setup

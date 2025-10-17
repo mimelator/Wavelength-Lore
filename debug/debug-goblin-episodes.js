@@ -1,5 +1,5 @@
 // Debug episode collection for Goblin King
-const episodeHelpers = require('./helpers/episode-helpers');
+const episodeHelpers = require('../helpers/episode-helpers');
 
 async function debugGoblinKingEpisodes() {
   console.log('🔍 Debugging Goblin King Episodes...\n');

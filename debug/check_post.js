@@ -5,10 +5,10 @@
 const admin = require('firebase-admin');
 const { initializeApp } = require('firebase/app');
 const { getDatabase, ref, get } = require('firebase/database');
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 
 // Initialize Firebase Admin SDK
-const serviceAccount = require('./firebaseServiceAccountKey.json');
+const serviceAccount = require('../firebaseServiceAccountKey.json');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),

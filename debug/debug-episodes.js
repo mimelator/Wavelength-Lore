@@ -1,6 +1,6 @@
 // Debug episode loading
-const firebaseUtils = require('./helpers/firebase-utils');
-const { getEpisodes } = require('./helpers/episode-helpers');
+const firebaseUtils = require('../helpers/firebase-utils');
+const { getEpisodes } = require('../helpers/episode-helpers');
 
 async function debugEpisodes() {
     console.log('🔍 Debugging Episode Loading...\n');

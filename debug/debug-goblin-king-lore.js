@@ -1,5 +1,5 @@
 // Debug Goblin King lore linking
-const loreHelpers = require('./helpers/lore-helpers');
+const loreHelpers = require('../helpers/lore-helpers');
 
 async function debugGoblinKingLore() {
   console.log('🔍 Debugging Goblin King Lore...\n');

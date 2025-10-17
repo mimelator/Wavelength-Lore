@@ -7,8 +7,8 @@ const admin = require('firebase-admin');
 const { initializeApp } = require('firebase/app');
 const { getDatabase, ref, get } = require('firebase/database');
 const { getAuth, signInWithCustomToken } = require('firebase/auth');
-const serviceAccount = require('./firebaseServiceAccountKey.json');
-require('dotenv').config();
+const serviceAccount = require('../firebaseServiceAccountKey.json');
+require('dotenv').config({ path: '../.env' });
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {

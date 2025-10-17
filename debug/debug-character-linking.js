@@ -1,5 +1,5 @@
 // Debug character linking directly
-const characterHelpers = require('./helpers/character-helpers');
+const characterHelpers = require('../helpers/character-helpers');
 
 async function debugCharacterLinking() {
   console.log('🔍 Debugging Character Linking...\n');

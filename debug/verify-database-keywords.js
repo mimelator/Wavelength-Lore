@@ -1,4 +1,4 @@
-const { getAllCharacters } = require('./helpers/character-helpers');
+const { getAllCharacters } = require('../helpers/character-helpers');
 
 async function verifyDatabaseKeywords() {
     console.log('🔍 Verifying Database Character Keywords...\n');

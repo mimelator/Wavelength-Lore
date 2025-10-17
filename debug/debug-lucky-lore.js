@@ -1,5 +1,5 @@
 // Debug Lucky linking issue
-const loreHelpers = require('./helpers/lore-helpers');
+const loreHelpers = require('../helpers/lore-helpers');
 
 async function debugLuckyLoreLinking() {
   console.log('🔍 Debugging Lucky Lore Linking...\n');
