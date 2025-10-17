@@ -6,6 +6,7 @@
     <title>Hero Gallery</title>
     <%- include('partials/head') %>
     <link rel="stylesheet" href="/css/gallery_styles.css">
+    <link rel="stylesheet" href="/css/lore_styles.css">
 </head>
 <body>
     <%- include('partials/header') %>
@@ -14,13 +15,16 @@
         <h1>Hero Gallery</h1>
         <p class="gallery-subtitle">Meet the heroes from the Wavelength universe</p>
         
-        <section class="character-gallery">
+        <section class="lore-gallery">
             <div class="gallery">
                 <% characters.forEach(hero => { %>
-                    <div class="gallery-item">
+                    <div class="gallery-item lore-item">
                         <a href="/character/<%= hero.id %>">
                             <img src="<%= hero.image %>" alt="<%= hero.title %>">
                             <h2><%= hero.title %></h2>
+                            <div class="lore-type-badge">
+                                <span class="type-band">Hero</span>
+                            </div>
                         </a>
                     </div>
                 <% }); %>
