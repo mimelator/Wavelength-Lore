@@ -71,20 +71,64 @@ if (filter.isProfane(content)) {
 }
 ```
 
-## 7. Backup and Recovery
+## 7. Automated Database Backups
 
-Regular database backups:
-```bash
-# Export database backup
-firebase database:get / --project your-project-id > backup.json
+Secure automated backups to AWS S3:
+```javascript
+const SecureDatabaseBackup = require('./utils/secureBackup');
 
-# Automated backup script
-#!/bin/bash
-DATE=$(date +%Y%m%d_%H%M%S)
-firebase database:get / --project your-project-id > "backups/backup_$DATE.json"
+// Initialize backup system
+const backup = new SecureDatabaseBackup({
+  bucketName: 'wavelength-lore-backups',
+  retentionDays: 30,
+  encryptionEnabled: true
+});
+
+await backup.initialize();
 ```
 
-## 8. Security Headers
+### Backup Features:
+- **Encryption**: AES-256-GCM encryption for sensitive data
+- **Compression**: Gzip compression to reduce storage costs
+- **Scheduling**: Automated daily and weekly backups
+- **Retention**: Configurable retention with automatic cleanup
+- **Monitoring**: Health checks and status reporting
+
+### Configuration:
+```bash
+# Required environment variables
+BACKUP_S3_BUCKET=your-backup-bucket
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+BACKUP_ENCRYPTION_KEY=your-encryption-key
+```
+
+### CLI Management:
+```bash
+# Create backup
+node backup-cli.js backup manual
+
+# List backups
+node backup-cli.js list
+
+# Restore backup
+node backup-cli.js restore backup-key
+```
+
+## 8. Content Moderation
+
+Add automatic content filtering:
+```javascript
+const Filter = require('bad-words');
+const filter = new Filter();
+
+// Check for inappropriate content
+if (filter.isProfane(content)) {
+  throw new Error('Content contains inappropriate language');
+}
+```
+
+## 9. Security Headers
 
 Add security headers to your Express app:
 ```javascript
@@ -102,7 +146,7 @@ app.use(helmet({
 }));
 ```
 
-## 9. API Key Rotation
+## 10. API Key Rotation
 
 Regularly rotate your Firebase service account keys:
 1. Generate new service account key in Firebase Console
@@ -110,7 +154,7 @@ Regularly rotate your Firebase service account keys:
 3. Restart application
 4. Delete old service account key
 
-## 10. User Session Management
+## 11. User Session Management
 
 Implement proper session handling:
 ```javascript

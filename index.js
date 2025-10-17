@@ -11,6 +11,9 @@ const { createSmartRateLimit, admin: adminRateLimit } = require('./middleware/ra
 // Import input sanitization middleware
 const InputSanitizer = require('./middleware/inputSanitization');
 
+// Import secure backup system
+const SecureDatabaseBackup = require('./utils/secureBackup');
+
 // Import helper modules
 const characterHelpers = require('./helpers/character-helpers');
 const loreHelpers = require('./helpers/lore-helpers');
@@ -97,6 +100,10 @@ app.use('/api', secureForumRoutes);
 // Import and use sanitization test routes
 const sanitizationTestRoutes = require('./routes/sanitizationTestRoutes');
 app.use('/api', sanitizationTestRoutes);
+
+// Import and use admin backup routes with rate limiting
+const adminBackupRoutes = require('./routes/adminBackupRoutes');
+app.use('/api/admin/backup', adminRateLimit, adminBackupRoutes);
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'static')));
@@ -766,6 +773,30 @@ app.get('/debug/episodes/refresh', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
+// Initialize secure backup system
+async function initializeBackupSystem() {
+  try {
+    if (process.env.ENABLE_BACKUPS !== 'false') {
+      console.log('🔧 Initializing secure backup system...');
+      const backupSystem = new SecureDatabaseBackup();
+      await backupSystem.initialize();
+      
+      // Store reference for access from other parts of the app
+      app.locals.backupSystem = backupSystem;
+      
+      console.log('✅ Backup system initialized successfully');
+    } else {
+      console.log('ℹ️  Backup system disabled via ENABLE_BACKUPS=false');
+    }
+  } catch (error) {
+    console.error('⚠️  Backup system initialization failed:', error.message);
+    console.log('📝 Note: Set AWS credentials and S3 bucket to enable backups');
+  }
+}
+
+app.listen(port, async () => {
   console.log(`Server is running at http://localhost:${port}`);
+  
+  // Initialize backup system after server starts
+  await initializeBackupSystem();
 });
