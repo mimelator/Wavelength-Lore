@@ -5,6 +5,9 @@
  * Command-line interface for managing database backups
  */
 
+// Load environment variables with centralized helper
+const envHelper = require('./env-helper');
+
 const SecureDatabaseBackup = require('../utils/secureBackup');
 const admin = require('firebase-admin');
 const path = require('path');
@@ -12,9 +15,11 @@ const path = require('path');
 // Initialize Firebase Admin
 if (!admin.apps.length) {
   const serviceAccount = require('../firebaseServiceAccountKey.json');
+  const firebaseConfig = envHelper.getFirebaseConfig();
+  
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: process.env.FIREBASE_DATABASE_URL
+    databaseURL: firebaseConfig.databaseURL
   });
 }
 
@@ -44,6 +49,9 @@ async function main() {
       case 'test':
         await testBackupSystem();
         break;
+      case 'env':
+        envHelper.showEnvironmentSummary();
+        break;
       default:
         showHelp();
     }
@@ -55,6 +63,16 @@ async function main() {
 
 async function initializeBackup() {
   console.log('🔧 Initializing backup system...');
+  
+  // Validate environment first
+  try {
+    envHelper.validateEnvironment('backup');
+  } catch (error) {
+    console.error('❌ Environment validation failed:', error.message);
+    console.log('\n💡 Run "node backup-cli.js env" to see current configuration');
+    throw error;
+  }
+  
   await backup.initialize();
   console.log('✅ Backup system ready!');
 }
@@ -164,6 +182,7 @@ function showHelp() {
   console.log('  restore <key> [path]   Restore from backup');
   console.log('  status                 Show backup system status');
   console.log('  test                   Test backup system');
+  console.log('  env                    Show environment configuration');
   console.log('');
   console.log('Examples:');
   console.log('  node backup-cli.js init');
@@ -171,6 +190,7 @@ function showHelp() {
   console.log('  node backup-cli.js list daily');
   console.log('  node backup-cli.js restore backups/daily/20251017/backup_daily_20251017_020000.json');
   console.log('  node backup-cli.js status');
+  console.log('  node backup-cli.js env');
   console.log('');
   console.log('Environment Variables:');
   console.log('  BACKUP_S3_BUCKET          S3 bucket name for backups');
@@ -179,6 +199,7 @@ function showHelp() {
   console.log('  BACKUP_ENCRYPTION_KEY     Key for backup encryption');
   console.log('  AWS_ACCESS_KEY_ID         AWS access key');
   console.log('  AWS_SECRET_ACCESS_KEY     AWS secret key');
+  console.log('  DATABASE_URL              Firebase database URL');
 }
 
 // Run CLI

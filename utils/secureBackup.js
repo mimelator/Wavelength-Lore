@@ -3,7 +3,10 @@
  * Automated backups to AWS S3 with encryption and retention management
  */
 
-const AWS = require('aws-sdk');
+const { S3Client, CreateBucketCommand, HeadBucketCommand, PutBucketEncryptionCommand, 
+         PutBucketVersioningCommand, PutBucketLifecycleConfigurationCommand, 
+         PutObjectCommand, ListObjectsV2Command, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { fromEnv } = require('@aws-sdk/credential-providers');
 const admin = require('firebase-admin');
 const fs = require('fs').promises;
 const path = require('path');
@@ -32,11 +35,11 @@ class SecureDatabaseBackup {
       ...config
     };
 
-    this.s3 = new AWS.S3({
+    this.s3Client = new S3Client({
       region: this.config.region,
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-      serverSideEncryption: 'AES256'
+      credentials: fromEnv(),
+      maxAttempts: 3,
+      retryMode: 'adaptive'
     });
 
     this.isInitialized = false;
@@ -87,10 +90,11 @@ class SecureDatabaseBackup {
   async verifyS3Access() {
     try {
       // Check if bucket exists
-      await this.s3.headBucket({ Bucket: this.config.bucketName }).promise();
+      const command = new HeadBucketCommand({ Bucket: this.config.bucketName });
+      await this.s3Client.send(command);
       console.log(`✅ S3 bucket verified: ${this.config.bucketName}`);
     } catch (error) {
-      if (error.statusCode === 404) {
+      if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
         // Create bucket
         await this.createSecureS3Bucket();
       } else {
@@ -108,21 +112,20 @@ class SecureDatabaseBackup {
       
       // Create bucket
       const createParams = {
-        Bucket: this.config.bucketName,
-        CreateBucketConfiguration: {
-          LocationConstraint: this.config.region
-        }
+        Bucket: this.config.bucketName
       };
       
       if (this.config.region !== 'us-east-1') {
-        await this.s3.createBucket(createParams).promise();
-      } else {
-        // us-east-1 doesn't need LocationConstraint
-        await this.s3.createBucket({ Bucket: this.config.bucketName }).promise();
+        createParams.CreateBucketConfiguration = {
+          LocationConstraint: this.config.region
+        };
       }
+      
+      const createCommand = new CreateBucketCommand(createParams);
+      await this.s3Client.send(createCommand);
 
       // Configure bucket encryption
-      const encryptionParams = {
+      const encryptionCommand = new PutBucketEncryptionCommand({
         Bucket: this.config.bucketName,
         ServerSideEncryptionConfiguration: {
           Rules: [{
@@ -131,17 +134,19 @@ class SecureDatabaseBackup {
             }
           }]
         }
-      };
+      });
       
-      await this.s3.putBucketEncryption(encryptionParams).promise();
+      await this.s3Client.send(encryptionCommand);
 
       // Configure bucket versioning
-      await this.s3.putBucketVersioning({
+      const versioningCommand = new PutBucketVersioningCommand({
         Bucket: this.config.bucketName,
         VersioningConfiguration: {
           Status: 'Enabled'
         }
-      }).promise();
+      });
+      
+      await this.s3Client.send(versioningCommand);
 
       // Configure lifecycle policy for retention
       await this.configureBucketLifecycle();
@@ -156,7 +161,7 @@ class SecureDatabaseBackup {
    * Configure bucket lifecycle for automatic cleanup
    */
   async configureBucketLifecycle() {
-    const lifecycleParams = {
+    const lifecycleCommand = new PutBucketLifecycleConfigurationCommand({
       Bucket: this.config.bucketName,
       LifecycleConfiguration: {
         Rules: [{
@@ -171,9 +176,9 @@ class SecureDatabaseBackup {
           }
         }]
       }
-    };
+    });
 
-    await this.s3.putBucketLifecycleConfiguration(lifecycleParams).promise();
+    await this.s3Client.send(lifecycleCommand);
     console.log(`🔄 Lifecycle policy configured: ${this.config.retentionDays} days retention`);
   }
 
@@ -337,7 +342,11 @@ class SecureDatabaseBackup {
   encryptData(data) {
     const encryptionKey = process.env.BACKUP_ENCRYPTION_KEY || this.generateEncryptionKey();
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipher('aes-256-gcm', encryptionKey);
+    
+    // Convert hex key to buffer if needed
+    const keyBuffer = Buffer.isBuffer(encryptionKey) ? encryptionKey : Buffer.from(encryptionKey, 'hex');
+    
+    const cipher = crypto.createCipheriv('aes-256-gcm', keyBuffer, iv);
     
     let encrypted = cipher.update(data, 'utf8', 'hex');
     encrypted += cipher.final('hex');
@@ -369,7 +378,7 @@ class SecureDatabaseBackup {
     try {
       const fileContent = await fs.readFile(localFilePath);
       
-      const uploadParams = {
+      const uploadCommand = new PutObjectCommand({
         Bucket: this.config.bucketName,
         Key: backupInfo.s3Key,
         Body: fileContent,
@@ -377,13 +386,14 @@ class SecureDatabaseBackup {
         ServerSideEncryption: 'AES256',
         Metadata: backupInfo.metadata,
         StorageClass: backupInfo.type === 'weekly' ? 'STANDARD_IA' : 'STANDARD'
-      };
+      });
       
-      const result = await this.s3.upload(uploadParams).promise();
+      const result = await this.s3Client.send(uploadCommand);
       
-      console.log(`☁️  Uploaded to S3: ${result.Location}`);
+      const location = `https://${this.config.bucketName}.s3.${this.config.region}.amazonaws.com/${backupInfo.s3Key}`;
+      console.log(`☁️  Uploaded to S3: ${location}`);
       
-      return result;
+      return { ...result, Location: location };
     } catch (error) {
       throw new Error(`S3 upload failed: ${error.message}`);
     }
@@ -408,15 +418,15 @@ class SecureDatabaseBackup {
     try {
       const prefix = type ? `backups/${type}/` : 'backups/';
       
-      const params = {
+      const listCommand = new ListObjectsV2Command({
         Bucket: this.config.bucketName,
         Prefix: prefix,
         MaxKeys: limit
-      };
+      });
       
-      const result = await this.s3.listObjectsV2(params).promise();
+      const result = await this.s3Client.send(listCommand);
       
-      return result.Contents.map(obj => ({
+      return (result.Contents || []).map(obj => ({
         key: obj.Key,
         size: obj.Size,
         lastModified: obj.LastModified,
@@ -435,13 +445,20 @@ class SecureDatabaseBackup {
       console.log(`🔄 Restoring from backup: ${backupKey}`);
       
       // Download from S3
-      const downloadParams = {
+      const getCommand = new GetObjectCommand({
         Bucket: this.config.bucketName,
         Key: backupKey
-      };
+      });
       
-      const result = await this.s3.getObject(downloadParams).promise();
-      let data = result.Body.toString();
+      const result = await this.s3Client.send(getCommand);
+      const chunks = [];
+      
+      // AWS SDK v3 returns a stream for the Body
+      for await (const chunk of result.Body) {
+        chunks.push(chunk);
+      }
+      
+      let data = Buffer.concat(chunks).toString();
       
       // Check if data is encrypted (basic detection)
       try {
@@ -477,7 +494,13 @@ class SecureDatabaseBackup {
       throw new Error('Encryption key not found in environment variables');
     }
     
-    const decipher = crypto.createDecipher(encryptedData.algorithm, encryptionKey);
+    // Convert hex key to buffer if needed
+    const keyBuffer = Buffer.isBuffer(encryptionKey) ? encryptionKey : Buffer.from(encryptionKey, 'hex');
+    const iv = Buffer.from(encryptedData.iv, 'hex');
+    const authTag = Buffer.from(encryptedData.authTag, 'hex');
+    
+    const decipher = crypto.createDecipheriv('aes-256-gcm', keyBuffer, iv);
+    decipher.setAuthTag(authTag);
     
     let decrypted = decipher.update(encryptedData.encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');

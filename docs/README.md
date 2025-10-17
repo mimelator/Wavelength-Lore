@@ -10,6 +10,7 @@ Welcome to the comprehensive documentation for the Wavelength Lore application. 
 - **[Rate Limiting Documentation](RATE_LIMITING_DOCUMENTATION.md)** - Smart rate limiting system configuration and usage
 
 ### 💾 Backup & Data Protection
+- **[Database Backup Setup Guide](DATABASE_BACKUP_SETUP_GUIDE.md)** - Complete step-by-step setup and usage guide
 - **[Backup Configuration](BACKUP_CONFIGURATION.md)** - Complete setup guide for automated S3 backups
 - **[Backup Implementation Summary](BACKUP_IMPLEMENTATION_SUMMARY.md)** - Overview of the implemented backup system features
 
