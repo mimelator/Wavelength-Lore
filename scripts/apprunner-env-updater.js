@@ -87,11 +87,29 @@ class AppRunnerEnvUpdater {
       // CDN Configuration
       'CDN_URL',
       
-      // Security Configuration
+      // Admin Authentication (NEW)
+      'ADMIN_SECRET_KEY',
+      'ADMIN_ALLOWED_IPS',
+      
+      // Security Configuration (NEW)
       'RATE_LIMIT_WINDOW',
       'RATE_LIMIT_MAX_REQUESTS',
       'SANITIZATION_ENABLED',
       'PROFANITY_FILTER_ENABLED',
+      
+      // Backup Configuration (OPTIONAL - only if you want backups in production)
+      'ENABLE_BACKUPS',
+      'AWS_ACCESS_KEY_ID',
+      'AWS_SECRET_ACCESS_KEY',
+      'BACKUP_S3_BUCKET',
+      'BACKUP_S3_REGION',
+      'BACKUP_RETENTION_DAYS',
+      'BACKUP_COMPRESSION',
+      'BACKUP_ENCRYPTION',
+      'BACKUP_ENCRYPTION_KEY',
+      'BACKUP_DAILY_TIME',
+      'BACKUP_WEEKLY_TIME',
+      'BACKUP_TEMP_DIR',
       
       // Application Configuration
       'VERSION',
