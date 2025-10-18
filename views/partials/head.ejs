@@ -1,6 +1,49 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><%= title %></title>
+
+<!-- SEO Meta Tags -->
+<title><%= (typeof pageTitle !== 'undefined' ? pageTitle : '') || title || 'Wavelength Lore - Multimedia Storytelling Universe' %></title>
+<meta name="description" content="<%= (typeof pageDescription !== 'undefined' ? pageDescription : '') || 'Explore the Wavelength universe through animated episodes, character stories, and lore. A multimedia project exploring music, storytelling, and visual art.' %>">
+<meta name="keywords" content="<%= (typeof pageKeywords !== 'undefined' ? pageKeywords : '') || 'wavelength, animation, storytelling, music, characters, episodes, multimedia, visual art' %>">
+<meta name="author" content="Wavelength Lore">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="<%= (typeof ogType !== 'undefined' ? ogType : '') || 'website' %>">
+<% if (typeof ogUrl !== 'undefined' && ogUrl) { %>
+<meta property="og:url" content="<%= ogUrl %>">
+<% } else if (typeof req !== 'undefined') { %>
+<meta property="og:url" content="<%= req.protocol + '://' + req.get('host') + req.originalUrl %>">
+<% } %>
+<meta property="og:title" content="<%= (typeof ogTitle !== 'undefined' ? ogTitle : '') || (typeof pageTitle !== 'undefined' ? pageTitle : '') || title || 'Wavelength Lore' %>">
+<meta property="og:description" content="<%= (typeof ogDescription !== 'undefined' ? ogDescription : '') || (typeof pageDescription !== 'undefined' ? pageDescription : '') || 'Explore the Wavelength universe through animated episodes, character stories, and lore.' %>">
+<meta property="og:image" content="<%= (typeof ogImage !== 'undefined' ? ogImage : '') || (cdnUrl + '/images/wavelength-og-default.jpg') %>">
+<meta property="og:site_name" content="Wavelength Lore">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<% if (typeof ogUrl !== 'undefined' && ogUrl) { %>
+<meta property="twitter:url" content="<%= ogUrl %>">
+<% } else if (typeof req !== 'undefined') { %>
+<meta property="twitter:url" content="<%= req.protocol + '://' + req.get('host') + req.originalUrl %>">
+<% } %>
+<meta property="twitter:title" content="<%= (typeof ogTitle !== 'undefined' ? ogTitle : '') || (typeof pageTitle !== 'undefined' ? pageTitle : '') || title || 'Wavelength Lore' %>">
+<meta property="twitter:description" content="<%= (typeof ogDescription !== 'undefined' ? ogDescription : '') || (typeof pageDescription !== 'undefined' ? pageDescription : '') || 'Explore the Wavelength universe through animated episodes, character stories, and lore.' %>">
+<meta property="twitter:image" content="<%= (typeof ogImage !== 'undefined' ? ogImage : '') || (cdnUrl + '/images/wavelength-og-default.jpg') %>">
+
+<!-- Canonical URL -->
+<% if (typeof canonicalUrl !== 'undefined' && canonicalUrl) { %>
+<link rel="canonical" href="<%= canonicalUrl %>">
+<% } else if (typeof req !== 'undefined') { %>
+<link rel="canonical" href="<%= req.protocol + '://' + req.get('host') + req.originalUrl %>">
+<% } %>
+
+<!-- Structured Data -->
+<% if (typeof structuredData !== 'undefined' && structuredData) { %>
+<script type="application/ld+json">
+<%- JSON.stringify(structuredData) %>
+</script>
+<% } %>
+
 <link rel="stylesheet" href="<%= cdnUrl %>/css/styles.css?v=<%= version %>">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">

@@ -209,9 +209,27 @@ app.get('/', async (req, res) => {
     
     res.render('index', {
       title: 'Welcome to Wavelength Lore',
+      pageTitle: 'Wavelength Lore - Animated Storytelling Universe',
+      pageDescription: 'Explore the Wavelength universe through animated episodes, character stories, and immersive lore. A multimedia project blending music, storytelling, and visual art.',
+      pageKeywords: 'wavelength, animation, storytelling, music, episodes, characters, lore, multimedia, visual art, animated series',
+      ogType: 'website',
+      ogImage: process.env.CDN_URL + '/images/wavelength-homepage-og.jpg',
+      structuredData: {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Wavelength Lore",
+        "description": "Explore the Wavelength universe through animated episodes, character stories, and immersive lore.",
+        "url": req.protocol + '://' + req.get('host'),
+        "creator": {
+          "@type": "Organization",
+          "name": "Wavelength Lore"
+        },
+        "genre": ["Animation", "Storytelling", "Music", "Visual Art"]
+      },
       cdnUrl: process.env.CDN_URL,
       version: `v${Date.now()}`,
-      videos: videos || {}
+      videos: videos || {},
+      req: req
     });
   } catch (error) {
     console.error('Error fetching videos from Firebase:', error);
@@ -362,6 +380,29 @@ app.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
 
       res.render('episode', {
         title: episode.title,
+        pageTitle: `${episode.title} - Season ${seasonNumber} Episode ${episodeNumber} | Wavelength Lore`,
+        pageDescription: episode.story ? (episode.story.substring(0, 155) + '...') : `Watch ${episode.title} from Season ${seasonNumber} of the Wavelength animated series.`,
+        pageKeywords: `wavelength, season ${seasonNumber}, episode ${episodeNumber}, ${episode.title}, animation, music, storytelling`,
+        ogType: 'video.episode',
+        ogImage: episode.image,
+        ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl,
+        structuredData: {
+          "@context": "https://schema.org",
+          "@type": "TVEpisode",
+          "name": episode.title,
+          "description": episode.story || `${episode.title} from Season ${seasonNumber} of Wavelength`,
+          "episodeNumber": episodeNumber,
+          "seasonNumber": seasonNumber,
+          "partOfSeries": {
+            "@type": "TVSeries",
+            "name": "Wavelength"
+          },
+          "image": episode.image,
+          "url": req.protocol + '://' + req.get('host') + req.originalUrl,
+          "thumbnailUrl": episode.image,
+          "uploadDate": new Date().toISOString(),
+          "genre": ["Animation", "Music", "Fantasy"]
+        },
         image: episode.image,
         carouselImages: episode.carouselImages || [], // Default to an empty array if null
         summary: episode.story || 'coming soon', // Default to 'coming soon' if null
@@ -373,7 +414,8 @@ app.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
         seasonNumber,
         episodeNumber,
         previousLink,
-        nextLink
+        nextLink,
+        req: req
       });
     } else {
       res.status(404).send('Episode not found');
@@ -420,6 +462,28 @@ app.get('/character/:characterId', async (req, res) => {
 
       res.render('character', {
         title: character.title,
+        pageTitle: `${character.title} - Character Profile | Wavelength Lore`,
+        pageDescription: character.description ? (character.description.substring(0, 155) + '...') : `Learn about ${character.title}, a character from the Wavelength universe.`,
+        pageKeywords: `wavelength, character, ${character.title}, hero, animation, storytelling`,
+        ogType: 'profile',
+        ogImage: character.image || character.primary_image,
+        ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl,
+        structuredData: {
+          "@context": "https://schema.org",
+          "@type": "Person",
+          "name": character.title,
+          "description": character.description,
+          "image": character.image || character.primary_image,
+          "url": req.protocol + '://' + req.get('host') + req.originalUrl,
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": req.protocol + '://' + req.get('host') + req.originalUrl
+          },
+          "isPartOf": {
+            "@type": "CreativeWorkSeries",
+            "name": "Wavelength"
+          }
+        },
         character: {
           id: character.id,
           title: character.title,
@@ -436,7 +500,8 @@ app.get('/character/:characterId', async (req, res) => {
         previousCharacter,
         nextCharacter,
         cdnUrl: process.env.CDN_URL,
-        version: `v${Date.now()}`
+        version: `v${Date.now()}`,
+        req: req
       });
     } else {
       res.status(404).send('Character not found');
@@ -463,13 +528,32 @@ app.get('/characters', async (req, res) => {
 
       res.render('character-gallery', {
         title: 'Character Gallery',
+        pageTitle: 'Character Gallery - All Wavelength Heroes',
+        pageDescription: 'Browse all characters from the Wavelength universe. Discover heroes, their stories, and connections in this comprehensive character gallery.',
+        pageKeywords: 'wavelength, characters, heroes, gallery, animation, character profiles',
+        ogType: 'website',
+        ogImage: process.env.CDN_URL + '/images/character-gallery-og.jpg',
+        ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl,
+        structuredData: {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "name": "Wavelength Character Gallery",
+          "description": "Browse all characters from the Wavelength universe",
+          "url": req.protocol + '://' + req.get('host') + req.originalUrl,
+          "mainEntity": {
+            "@type": "ItemList",
+            "name": "Wavelength Characters",
+            "numberOfItems": allCharacters.length
+          }
+        },
         characters: allCharacters.map(c => ({
           id: c.id,
           title: c.title,
           image: c.image
         })),
         cdnUrl: process.env.CDN_URL,
-        version: `v${Date.now()}`
+        version: `v${Date.now()}`,
+        req: req
       });
     } else {
       res.status(404).send('No characters found');
@@ -502,6 +586,33 @@ app.get('/lore/:loreId', async (req, res) => {
 
     res.render('lore', {
       title: loreItem.title,
+      pageTitle: `${loreItem.title} - Lore | Wavelength Lore`,
+      pageDescription: loreItem.description ? (loreItem.description.substring(0, 155) + '...') : `Discover the lore of ${loreItem.title} in the Wavelength universe.`,
+      pageKeywords: `wavelength, lore, ${loreItem.title}, world building, storytelling, universe`,
+      ogType: 'article',
+      ogImage: loreItem.image || loreItem.primary_image,
+      ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl,
+      structuredData: {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": loreItem.title,
+        "description": loreItem.description,
+        "image": loreItem.image || loreItem.primary_image,
+        "url": req.protocol + '://' + req.get('host') + req.originalUrl,
+        "author": {
+          "@type": "Organization",
+          "name": "Wavelength Lore"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Wavelength Lore"
+        },
+        "datePublished": new Date().toISOString(),
+        "isPartOf": {
+          "@type": "CreativeWorkSeries",
+          "name": "Wavelength"
+        }
+      },
       lore: {
         id: loreItem.id,
         title: loreItem.title,
@@ -514,7 +625,8 @@ app.get('/lore/:loreId', async (req, res) => {
       previousLore,
       nextLore,
       cdnUrl: process.env.CDN_URL,
-      version: `v${Date.now()}`
+      version: `v${Date.now()}`,
+      req: req
     });
   } catch (error) {
     console.error('Error fetching lore data:', error);
@@ -530,6 +642,24 @@ app.get('/lore', async (req, res) => {
 
     res.render('lore-gallery', {
       title: 'Lore Gallery',
+      pageTitle: 'Lore Gallery - Wavelength Universe World Building',
+      pageDescription: 'Explore the rich lore and world-building of the Wavelength universe. Discover locations, artifacts, and the deep mythology behind the stories.',
+      pageKeywords: 'wavelength, lore, world building, mythology, universe, locations, artifacts, storytelling',
+      ogType: 'website',
+      ogImage: process.env.CDN_URL + '/images/lore-gallery-og.jpg',
+      ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl,
+      structuredData: {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "Wavelength Lore Gallery",
+        "description": "Explore the rich lore and world-building of the Wavelength universe",
+        "url": req.protocol + '://' + req.get('host') + req.originalUrl,
+        "mainEntity": {
+          "@type": "ItemList",
+          "name": "Wavelength Lore",
+          "numberOfItems": allLore.length
+        }
+      },
       lore: allLore.map(l => ({
         id: l.id,
         title: l.title,
@@ -537,7 +667,8 @@ app.get('/lore', async (req, res) => {
         type: l.type
       })),
       cdnUrl: process.env.CDN_URL,
-      version: `v${Date.now()}`
+      version: `v${Date.now()}`,
+      req: req
     });
   } catch (error) {
     console.error('Error fetching lore:', error);
@@ -565,9 +696,29 @@ app.get('/about', async (req, res) => {
 
     res.render('about', {
       title: 'About Wavelength',
+      pageTitle: 'About Wavelength - Multimedia Storytelling Project',
+      pageDescription: 'Learn about the Wavelength project - a multimedia universe exploring music, storytelling, and visual art through animated episodes and rich character development.',
+      pageKeywords: 'wavelength, about, multimedia project, animation, music, storytelling, visual art, creator',
+      ogType: 'website',
+      ogImage: process.env.CDN_URL + '/images/wavelength-about-og.jpg',
+      ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl,
+      structuredData: {
+        "@context": "https://schema.org",
+        "@type": "AboutPage",
+        "name": "About Wavelength",
+        "description": "Learn about the Wavelength project - a multimedia universe exploring music, storytelling, and visual art.",
+        "url": req.protocol + '://' + req.get('host') + req.originalUrl,
+        "mainEntity": {
+          "@type": "CreativeWorkSeries",
+          "name": "Wavelength",
+          "description": "A multimedia project exploring the intersection of music, storytelling, and visual art",
+          "genre": ["Animation", "Music", "Fantasy", "Storytelling"]
+        }
+      },
       cdnUrl: process.env.CDN_URL,
       version: `v${Date.now()}`,
-      characterImages
+      characterImages,
+      req: req
     });
   } catch (error) {
     console.error('Error fetching character images:', error);
@@ -575,9 +726,153 @@ app.get('/about', async (req, res) => {
   }
 });
 
+// Sitemap.xml route for SEO
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const baseUrl = req.protocol + '://' + req.get('host');
+    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${baseUrl}/</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/about</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/characters</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/lore</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/forum</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+
+    // Add episodes to sitemap
+    const videos = await firebaseUtils.fetchFromFirebase('videos');
+    if (videos) {
+      for (const season in videos) {
+        if (videos[season].episodes) {
+          for (const episode in videos[season].episodes) {
+            const seasonNum = season.replace('season', '');
+            const episodeNum = episode.replace('episode', '');
+            sitemap += `
+  <url>
+    <loc>${baseUrl}/season/${seasonNum}/episode/${episodeNum}</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`;
+          }
+        }
+      }
+    }
+
+    // Add characters to sitemap
+    const charactersData = await firebaseUtils.fetchFromFirebase('characters');
+    if (charactersData) {
+      for (const category in charactersData) {
+        if (Array.isArray(charactersData[category])) {
+          charactersData[category].forEach(character => {
+            sitemap += `
+  <url>
+    <loc>${baseUrl}/character/${character.id}</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>`;
+          });
+        }
+      }
+    }
+
+    // Add lore to sitemap
+    const allLore = await loreHelpers.getAllLore();
+    allLore.forEach(loreItem => {
+      sitemap += `
+  <url>
+    <loc>${baseUrl}/lore/${loreItem.id}</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>`;
+    });
+
+    sitemap += `
+</urlset>`;
+
+    res.set('Content-Type', 'text/xml');
+    res.send(sitemap);
+  } catch (error) {
+    console.error('Error generating sitemap:', error);
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
+// Robots.txt route for SEO
+app.get('/robots.txt', (req, res) => {
+  const baseUrl = req.protocol + '://' + req.get('host');
+  const robots = `User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: ${baseUrl}/sitemap.xml
+
+# Disallow admin and cache management pages
+Disallow: /admin/
+Disallow: /cache-management
+Disallow: /api/admin/
+
+# Allow forum but limit crawl rate
+User-agent: *
+Crawl-delay: 1
+
+# Allow all search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /`;
+
+  res.set('Content-Type', 'text/plain');
+  res.send(robots);
+});
+
 // Route for Contact page
 app.get('/contact', (req, res) => {
-  res.render('contact', { title: 'Contact - Coming Soon', cdnUrl: process.env.CDN_URL, version: `v${Date.now()}` });
+  res.render('contact', { 
+    title: 'Contact - Coming Soon', 
+    pageTitle: 'Contact Wavelength Lore - Get in Touch',
+    pageDescription: 'Get in touch with the Wavelength Lore team. Contact us for questions, feedback, or collaboration opportunities.',
+    pageKeywords: 'wavelength, contact, feedback, collaboration, questions, support',
+    ogType: 'website',
+    ogImage: process.env.CDN_URL + '/images/wavelength-contact-og.jpg',
+    ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl,
+    cdnUrl: process.env.CDN_URL, 
+    version: `v${Date.now()}`,
+    req: req
+  });
 });
 
 // Route for Cache Management page
