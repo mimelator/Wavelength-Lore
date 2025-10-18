@@ -4,7 +4,40 @@ This directory contains utility scripts, build tools, and maintenance scripts fo
 
 ## 📁 Script Categories
 
-### 🔧 Build & Development Scripts
+### � Deployment & Monitoring Scripts
+- **`apprunner-deploy-monitor.js`** - Force redeploy and monitor AWS App Runner deployment status
+- **`deploy.sh`** - Convenience wrapper for deployment monitoring
+- **`apprunner-env-updater.js`** - Update environment variables and trigger redeploy
+
+#### Deployment Monitor Features
+The deployment monitor provides comprehensive deployment management:
+
+- ⏱️ **Real-time status updates** every 30 seconds
+- 🎯 **Final deployment status** (success/failure)  
+- ⏳ **Total deployment time** tracking
+- 🌐 **Automatic connectivity testing**
+- 📊 **Service health information**
+- 🔧 **Troubleshooting guidance** on failure
+
+**Usage Examples:**
+```bash
+# Quick deployment
+./deploy.sh
+
+# Deployment with custom reason
+./deploy.sh --reason "Fix production bug"
+
+# Direct script usage
+node apprunner-deploy-monitor.js --reason "Update environment variables"
+```
+
+**Status Indicators:**
+- 🟢 **RUNNING**: Service is healthy and ready
+- 🟡 **DEPLOYING**: Deployment in progress  
+- 🔴 **FAILED**: Deployment failed
+- ⏸️ **PAUSED**: Service paused (manual intervention needed)
+
+### �🔧 Build & Development Scripts
 - **`start-dev.sh`** - Start development server with hot reload
 - **`stop-dev.sh`** - Stop development server and clean up processes
 - **`bust-cache.js`** - Clear application caches and regenerate cache-busted assets

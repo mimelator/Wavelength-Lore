@@ -213,7 +213,8 @@ router.get('/guidelines', (req, res) => {
         breadcrumbs: [
             { name: 'Community Guidelines', url: null }
         ],
-        layout: 'forum/layout'
+        layout: 'forum/layout',
+        contactEmail: process.env.CONTACT_EMAIL || 'community@wavelengthlore.com'
     });
 });
 

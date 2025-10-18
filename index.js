@@ -23,7 +23,23 @@ const disambiguationHelpers = require('./helpers/disambiguation-helpers');
 const simpleDisambiguation = require('./helpers/simple-disambiguation');
 
 const app = express();
-const port = process.env.NODE_PORT || process.env.PORT || 3001;
+// Port configuration: Always use NODE_PORT if set, ignore App Runner's automatic PORT
+let port;
+if (process.env.NODE_PORT) {
+  port = parseInt(process.env.NODE_PORT);
+  console.log(`🎯 Using NODE_PORT: ${port}`);
+} else if (process.env.PORT) {
+  port = parseInt(process.env.PORT);
+  console.log(`⚠️  Using fallback PORT: ${port}`);
+} else {
+  port = 3001;
+  console.log(`🔧 Using default port: ${port}`);
+}
+
+console.log(`🔧 Port Configuration:`);
+console.log(`   NODE_PORT: ${process.env.NODE_PORT || 'not set'}`);
+console.log(`   PORT: ${process.env.PORT || 'not set'}`);
+console.log(`   Selected port: ${port}`);
 
 // Configure trust proxy for proper IP detection
 app.set('trust proxy', true);

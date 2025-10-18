@@ -118,6 +118,9 @@ class AppRunnerEnvUpdater {
       'BACKUP_TEMP_DIR',
       
       // Application Configuration
+      'NODE_PORT',
+      'NGINX_PORT',
+      'CONTACT_EMAIL',
       'VERSION',
       'SITE_URL',
       'PORT'
