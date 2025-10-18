@@ -67,7 +67,9 @@
 
         <section class="summary">
             <h2>Summary</h2>
-            <p><%- simpleSmartLinking(summary) %></p>
+            <div class="content-with-links episode-summary">
+                <p><%- simpleSmartLinking(summary) %></p>
+            </div>
         </section>
 
         <section class="audio-player">
@@ -80,7 +82,9 @@
 
         <section class="lyrics">
             <h2>Lyrics</h2>
-            <em><%- simpleSmartLinking(lyrics) %></em>
+            <div class="content-with-links episode-lyrics">
+                <em><%- simpleSmartLinking(lyrics) %></em>
+            </div>
             <br /><br />
             <a href="<%= youtubeLink %>" target="_blank" class="watch-video-link">Watch the Video</a>
         </section>

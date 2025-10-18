@@ -476,9 +476,17 @@ function getDisambiguationScript() {
 function getDisambiguationStyles() {
   return `
     <style>
+      /* Increased line-height for content areas with dynamic links */
+      p:has(.disambiguation-link),
+      em:has(.disambiguation-link),
+      div:has(.disambiguation-link) {
+        line-height: 1.8 !important;
+      }
+      
       .disambiguation-container {
         display: inline-block;
         position: relative;
+        line-height: 1.8;
       }
       
       .disambiguation-select {

@@ -62,7 +62,7 @@ objects:
     type: thing
     keywords: ["ice dragons", "dragons", "ice creatures", "dragon lair"]
     description: Ice Dragons are majestic and powerful creatures that inhabit the frozen landscapes of the far North. With their shimmering scales and icy breath, they are both feared and revered by the inhabitants of the Ice Fortress. These dragons are known to be fiercely protective of their territory and will not hesitate to defend it against intruders.  Their lair is the only place where the rare and precious Ice Blue Diamonds can be found. 
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode4/images/FrozenPeace-02.png
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode7/images/PrepareForBattle-14.png
     image_gallery:
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-04.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode1/images/IceFortress-10.png
@@ -79,7 +79,7 @@ objects:
     type: thing
     keywords: ["ice blue diamond", "diamond", "gems", "blue diamond", "treasure"]
     description: Ice Blue Diamonds are rare and precious gemstones found only in the lairs of Ice Dragons. These diamonds are known for their stunning blue color and are highly sought after by collectors and adventurers alike. The process of mining these diamonds is extremely dangerous, as it involves navigating the treacherous ice caves guarded by the dragons.  Lucky used one of these diamonds to lure the Goblin King out of hiding during the Battle for the Shire.
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.png
     image_gallery:
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-23.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png
@@ -95,7 +95,7 @@ villains:
     type: villain
     keywords: ["goblin king", "king", "goblin ruler", "psychopath", "villain"]
     description: "The Goblin King is a Psychopath that leads a Misery of Goblins to invade the Shire and begin the Battle of the Shire.  He lives by one Rule: Goblin's Rule, which means that the only rule you ever need to know about when dealing with the Goblin King, is that he will Rule all over you.  He is tricked by Lucky and the fact that Goblin's Greed is insatiable, into leaving his lair to pursue an Ice Blue Diamond, which Lucky uses to lure him out of hiding during the Battle for the Shire.  Maurice was killed by the Goblin King during this battle while defending the Shire."
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-17.png
     image_gallery:
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png
       - https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-23.png

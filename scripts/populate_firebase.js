@@ -3,8 +3,13 @@ const { initializeApp } = require('firebase/app');
 const { getDatabase, ref, set } = require('firebase/database');
 const yaml = require('js-yaml');
 const fs = require('fs');
+const path = require('path');
 const serviceAccount = require('../firebaseServiceAccountKey.json');
 require('dotenv').config({ path: '../.env' });
+
+// Determine if we're running from scripts directory or project root
+const isRunningFromScripts = __dirname.endsWith('scripts');
+const contentPath = isRunningFromScripts ? '../content' : './content';
 
 // CLI Usage Documentation
 /*
@@ -17,6 +22,8 @@ Options:
   --lore-only     Import ONLY lore data (excludes characters and seasons)
   
   No flags        Import all content types (characters, seasons, and lore)
+
+Note: This script can be run from either the project root or the scripts directory.
 
 Examples:
   node populate_firebase.js                    # Import everything
@@ -79,11 +86,11 @@ async function populateCharacters() {
   try {
     const database = await initializeFirebaseWithToken();
 
-    // Iterate through all subfolders in './content/characters'
-    const characterFolders = fs.readdirSync('./content/characters', { withFileTypes: true });
+    // Iterate through all subfolders in content/characters
+    const characterFolders = fs.readdirSync(`${contentPath}/characters`, { withFileTypes: true });
 
     for (const folder of characterFolders) {
-      const folderPath = `./content/characters/${folder.name}`;
+      const folderPath = `${contentPath}/characters/${folder.name}`;
 
       if (folder.isDirectory()) {
         const characterFiles = fs.readdirSync(folderPath);
@@ -115,14 +122,14 @@ async function populateSeasons() {
     const database = await initializeFirebaseWithToken();
 
     // Iterate through season files
-    const seasonFiles = fs.readdirSync('./content/seasons');
+    const seasonFiles = fs.readdirSync(`${contentPath}/seasons`);
     for (const file of seasonFiles) {
       if (file.endsWith('.yaml')) {
         const seasonName = file.replace('.yaml', '');
         const seasonRef = ref(database, `videos/${seasonName}`);
 
         // Load and process YAML file
-        const yamlContent = fs.readFileSync(`./content/seasons/${file}`, 'utf8');
+        const yamlContent = fs.readFileSync(`${contentPath}/seasons/${file}`, 'utf8');
         let data = yaml.load(yamlContent);
         data = processYamlData(data);
 
@@ -140,15 +147,15 @@ async function populateLore() {
   try {
     const database = await initializeFirebaseWithToken();
 
-    // Iterate through all lore files in './content/lore'
-    const loreFiles = fs.readdirSync('./content/lore');
+    // Iterate through all lore files in content/lore
+    const loreFiles = fs.readdirSync(`${contentPath}/lore`);
 
     for (const file of loreFiles) {
       if (file.endsWith('.yaml')) {
         console.log(`Processing lore file: ${file}`);
         
         // Load and process YAML file
-        const yamlContent = fs.readFileSync(`./content/lore/${file}`, 'utf8');
+        const yamlContent = fs.readFileSync(`${contentPath}/lore/${file}`, 'utf8');
         let data = yaml.load(yamlContent);
         data = processYamlData(data);
 

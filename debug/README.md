@@ -27,6 +27,11 @@ This directory contains debug and diagnostic scripts for the Wavelength Lore app
 ### Forum Integration Testing
 - **`test-lore-forum-integration.js`** - Test lore-specific forum integration functionality
 - **`test-all-forum-integrations.js`** - Comprehensive test of all content-to-forum integrations (episodes, characters, lore)
+- **`test-forum-button-placement.js`** - Test consistency of forum button placement across all content types
+
+### UI Structure Validation
+- **validate-ui-structure.js** - Comprehensive validation of UI component structure and integration
+- **test-disambiguation-spacing.js** - Test disambiguation link spacing improvements and text overlap fixes
 
 ## 📋 Usage
 

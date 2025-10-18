@@ -449,19 +449,22 @@ h1 {
 .disambiguation-link[data-conflicts*='"type":"character"'] {
     color: #4a47a3;
     font-weight: bold;
-    padding: 2px 4px 2px 18px;
+    padding: 4px 6px 4px 20px;
+    margin: 3px 2px;
     border-radius: 3px;
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.1);
     position: relative;
     text-decoration: none;
     cursor: pointer;
+    display: inline-block;
+    line-height: 1.6;
 }
 
 .disambiguation-link[data-conflicts*='"type":"character"']:before {
     content: "";
     position: absolute;
-    left: 3px;
+    left: 4px;
     top: 50%;
     transform: translateY(-50%);
     width: 12px;
@@ -483,19 +486,22 @@ h1 {
 .disambiguation-link[data-conflicts*='"type":"episode"'] {
     color: #e74c3c;
     font-weight: bold;
-    padding: 2px 4px 2px 18px;
+    padding: 4px 6px 4px 20px;
+    margin: 3px 2px;
     border-radius: 3px;
     transition: all 0.3s ease;
     background: rgba(231, 76, 60, 0.1);
     position: relative;
     text-decoration: none;
     cursor: pointer;
+    display: inline-block;
+    line-height: 1.6;
 }
 
 .disambiguation-link[data-conflicts*='"type":"episode"']:before {
     content: "";
     position: absolute;
-    left: 3px;
+    left: 4px;
     top: 50%;
     transform: translateY(-50%);
     width: 12px;
@@ -517,7 +523,8 @@ h1 {
 .disambiguation-link[data-conflicts*='"type":"lore"'] {
     color: #6a4c93;
     font-weight: bold;
-    padding: 2px 4px 2px 18px;
+    padding: 4px 6px 4px 20px;
+    margin: 3px 2px;
     border-radius: 3px;
     transition: all 0.3s ease;
     background: rgba(106, 76, 147, 0.1);
@@ -525,12 +532,14 @@ h1 {
     text-decoration: none;
     cursor: pointer;
     border-bottom: 1px dotted #6a4c93;
+    display: inline-block;
+    line-height: 1.6;
 }
 
 .disambiguation-link[data-conflicts*='"type":"lore"']:before {
     content: "";
     position: absolute;
-    left: 3px;
+    left: 4px;
     top: 50%;
     transform: translateY(-50%);
     width: 12px;
@@ -655,4 +664,36 @@ h1 {
     background: rgba(46, 43, 107, 0.9);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced line-height for content areas with dynamic links */
+.episode-summary p,
+.lore-description p,
+.episode-lyrics em {
+    line-height: 1.8 !important;
+    margin-bottom: 1em;
+}
+
+/* Ensure disambiguation links don't cause overlap */
+.disambiguation-link {
+    line-height: 1.8;
+    display: inline-block;
+    margin: 2px 1px;
+    vertical-align: baseline;
+}
+
+/* Specific spacing for content areas that use simpleSmartLinking */
+p:has(.disambiguation-link),
+em:has(.disambiguation-link),
+div:has(.disambiguation-link) {
+    line-height: 1.8 !important;
+    padding: 3px 0;
+}
+
+/* Fallback for browsers that don't support :has() */
+.content-with-links p,
+.content-with-links em,
+.content-with-links div {
+    line-height: 1.8 !important;
+    padding: 3px 0;
 }
