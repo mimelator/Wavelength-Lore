@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Font import for consistency with website -->
+    <style type="text/css">
+      @font-face {
+        font-family: 'AnimeAce';
+        src: url('../../static/fonts/animeace2_reg.ttf') format('truetype'),
+             url('../../static/fonts/animeace2_reg.otf') format('opentype'),
+             url('/static/fonts/animeace2_reg.ttf') format('truetype'),
+             url('/static/fonts/animeace2_reg.otf') format('opentype');
+      }
+    </style>
+    
+    <!-- Arcane parchment texture -->
+    <filter id="parchment" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence baseFrequency="0.04" numOctaves="5" result="noise" seed="2"/>
+      <feColorMatrix in="noise" type="saturate" values="0"/>
+      <feColorMatrix type="matrix" values="0.15 0.15 0.15 0 0.8
+                                           0.12 0.12 0.12 0 0.75
+                                           0.08 0.08 0.08 0 0.65
+                                           0 0 0 1 0"/>
+      <feComposite in2="SourceGraphic" operator="multiply"/>
+    </filter>
+    
+    <!-- Mystical ocean with depth -->
+    <radialGradient id="oceanGradient" cx="30%" cy="20%" r="80%">
+      <stop offset="0%" style="stop-color:#1a4d66;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#2c5f7a;stop-opacity:1" />
+      <stop offset="60%" style="stop-color:#1e3a4a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0d1f2d;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- Ancient ice with mystical undertones -->
+    <radialGradient id="iceGradient" cx="40%" cy="30%" r="90%">
+      <stop offset="0%" style="stop-color:#f8fcff;stop-opacity:1" />
+      <stop offset="25%" style="stop-color:#e8f4f8;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#d6e8f0;stop-opacity:0.95" />
+      <stop offset="75%" style="stop-color:#b8d4e3;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#8bb5cc;stop-opacity:0.85" />
+    </radialGradient>
+    
+    <!-- Enchanted Shire with living energy -->
+    <radialGradient id="shireGradient" cx="60%" cy="40%" r="120%">
+      <stop offset="0%" style="stop-color:#9ccc65;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#7cb342;stop-opacity:0.95" />
+      <stop offset="60%" style="stop-color:#689f38;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#4a6741;stop-opacity:0.85" />
+    </radialGradient>
+    
+    <!-- Ancient mountain depths -->
+    <radialGradient id="mountainGradient" cx="40%" cy="20%" r="80%">
+      <stop offset="0%" style="stop-color:#a68b5b;stop-opacity:1" />
+      <stop offset="40%" style="stop-color:#8d7053;stop-opacity:0.95" />
+      <stop offset="70%" style="stop-color:#6b5d4f;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#4a403a;stop-opacity:0.85" />
+    </radialGradient>
+    
+    <!-- Ice Fortress blue gradient -->
+    <linearGradient id="iceFortressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#b3d9ff;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#7db8e8;stop-opacity:1" />
+      <stop offset="60%" style="stop-color:#4a90d9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2c5aa0;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Sophisticated terrain patterns -->
+    <pattern id="ancientForest" patternUnits="userSpaceOnUse" width="16" height="16">
+      <rect width="16" height="16" fill="#3a5d3a"/>
+      <circle cx="4" cy="4" r="1.5" fill="#4a7c4a" opacity="0.8"/>
+      <circle cx="12" cy="8" r="1" fill="#5a8a5a" opacity="0.6"/>
+      <circle cx="8" cy="12" r="1.2" fill="#2d4a2d" opacity="0.9"/>
+      <path d="M2,2 Q8,6 14,2 M2,14 Q8,10 14,14" stroke="#1a2d1a" stroke-width="0.5" opacity="0.4"/>
+    </pattern>
+    
+    <pattern id="mysticIce" patternUnits="userSpaceOnUse" width="20" height="20">
+      <rect width="20" height="20" fill="#e8f4f8"/>
+      <path d="M0,10 L10,0 M10,20 L20,10 M0,10 L10,20 M10,0 L20,10" 
+            stroke="#d0e8f0" stroke-width="0.8" opacity="0.6"/>
+      <circle cx="5" cy="5" r="0.8" fill="#c0d8e8" opacity="0.4"/>
+      <circle cx="15" cy="15" r="0.6" fill="#b0c8d8" opacity="0.3"/>
+    </pattern>
+    
+    <pattern id="eldritchMountains" patternUnits="userSpaceOnUse" width="24" height="24">
+      <rect width="24" height="24" fill="#6b5d4f"/>
+      <path d="M0,18 L6,12 L12,18 M12,6 L18,0 L24,6" 
+            stroke="#5a4d3f" stroke-width="1.5" fill="none"/>
+      <circle cx="6" cy="18" r="1" fill="#8d7053" opacity="0.7"/>
+      <circle cx="18" cy="6" r="0.8" fill="#a68b5b" opacity="0.5"/>
+    </pattern>
+    
+    <!-- Arcane border decorations -->
+    <pattern id="runeBorder" patternUnits="userSpaceOnUse" width="40" height="40">
+      <rect width="40" height="40" fill="none"/>
+      <path d="M10,5 L15,10 L10,15 L5,10 Z M25,5 L30,10 L25,15 L20,10 Z 
+               M5,25 L10,30 L5,35 L0,30 Z M25,25 L30,30 L25,35 L20,30 Z" 
+            fill="#8d6e63" opacity="0.6"/>
+      <circle cx="20" cy="20" r="2" fill="none" stroke="#6d4c41" stroke-width="0.8"/>
+    </pattern>
+    
+    <!-- Advanced filters for mystical effects -->
+    <filter id="arcaneGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feOffset in="coloredBlur" dx="0" dy="0" result="offsetBlur"/>
+      <feColorMatrix in="offsetBlur" type="matrix" 
+                     values="0 0 0 0 0.3
+                             0 0 0 0 0.6
+                             0 0 0 0 0.9
+                             0 0 0 0.8 0"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="ancientShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="3" dy="3" stdDeviation="5" flood-color="#2c1810" flood-opacity="0.6"/>
+      <feDropShadow dx="1" dy="1" stdDeviation="2" flood-color="#1a0f08" flood-opacity="0.4"/>
+    </filter>
+    
+    <filter id="mysticalAura" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="6" result="aura"/>
+      <feColorMatrix in="aura" type="matrix" 
+                     values="0 0 0 0 0.4
+                             0 0 0 0 0.2
+                             0 0 0 0 0.8
+                             0 0 0 0.3 0"/>
+      <feMerge>
+        <feMergeNode in="aura"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="weathered" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence baseFrequency="0.02" numOctaves="3" result="weatherNoise"/>
+      <feColorMatrix in="weatherNoise" type="saturate" values="0"/>
+      <feColorMatrix type="matrix" values="0.1 0.1 0.1 0 0.85
+                                           0.08 0.08 0.08 0 0.82
+                                           0.06 0.06 0.06 0 0.78
+                                           0 0 0 0.15 0"/>
+      <feComposite in2="SourceGraphic" operator="overlay"/>
+    </filter>
+    
+    <!-- Natural terrain blending filter -->
+    <filter id="terrainBlend" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence baseFrequency="0.008" numOctaves="2" result="blendNoise"/>
+      <feColorMatrix in="blendNoise" type="saturate" values="0"/>
+      <feGaussianBlur in="blendNoise" stdDeviation="8" result="blurredNoise"/>
+      <feColorMatrix in="blurredNoise" type="matrix" 
+                     values="0.05 0.05 0.05 0 0.9
+                             0.04 0.04 0.04 0 0.88
+                             0.03 0.03 0.03 0 0.85
+                             0 0 0 0.1 0"/>
+      <feComposite in2="SourceGraphic" operator="soft-light"/>
+    </filter>
+    
+    <!-- Soft edge blending for coastlines -->
+    <filter id="coastBlend" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="softEdge"/>
+      <feOffset in="softEdge" dx="0" dy="0" result="offsetEdge"/>
+      <feComposite in="SourceGraphic" in2="offsetEdge" operator="over"/>
+    </filter>
+    
+    <!-- Mystical energy patterns -->
+    <pattern id="magicFlow" patternUnits="userSpaceOnUse" width="30" height="30">
+      <rect width="30" height="30" fill="none"/>
+      <path d="M5,15 Q15,5 25,15 Q15,25 5,15" fill="none" stroke="#4a90e2" 
+            stroke-width="0.8" opacity="0.3"/>
+      <circle cx="15" cy="15" r="1.5" fill="#6bb6ff" opacity="0.5"/>
+    </pattern>
+  </defs>
+
+  <style>
+    /* Arcane base styling with weathered parchment feel */
+    .ocean { fill: url(#oceanGradient); filter: url(#weathered); }
+    .ice-ocean { fill: #1e3a4a; opacity: 0.9; filter: url(#coastBlend); }
+    .frozen-land { 
+      fill: url(#iceGradient); 
+      stroke: none;
+      filter: url(#terrainBlend);
+    }
+    .shire-land { 
+      fill: url(#shireGradient); 
+      stroke: none;
+      filter: url(#terrainBlend);
+    }
+    .wild-land { 
+      fill: #c8a882; 
+      stroke: none;
+      filter: url(#terrainBlend);
+    }
+    
+    /* Mystical geographic features */
+    .mountains { 
+      fill: url(#eldritchMountains); 
+      stroke: none;
+      filter: url(#ancientShadow);
+    }
+    .mountain-peaks { 
+      fill: none; 
+      stroke: #6b5d4f; 
+      stroke-width: 3; 
+      stroke-linecap: round; 
+      filter: url(#arcaneGlow);
+    }
+    .forest { 
+      fill: url(#ancientForest); 
+      opacity: 0.85; 
+      filter: url(#weathered);
+    }
+    .swamp { 
+      fill: #4a5c2a; 
+      opacity: 0.8; 
+      filter: url(#terrainBlend);
+    }
+    .ice-forest { 
+      fill: url(#mysticIce); 
+      opacity: 0.8; 
+      filter: url(#mysticalAura);
+    }
+    .river { 
+      fill: none; 
+      stroke: #3a7399; 
+      stroke-width: 4; 
+      stroke-linecap: round; 
+      opacity: 0.9;
+      filter: url(#arcaneGlow);
+    }
+    .ice-river { 
+      fill: none; 
+      stroke: #6bb8d3; 
+      stroke-width: 3; 
+      stroke-linecap: round; 
+      opacity: 0.8;
+      filter: url(#mysticalAura);
+    }
+    
+    /* Sophisticated location markers */
+    .major-city { 
+      fill: #8b1538; 
+      stroke: #f4e4c1; 
+      stroke-width: 2; 
+      filter: url(#arcaneGlow);
+    }
+    .town { 
+      fill: #6a1b9a; 
+      stroke: #f4e4c1; 
+      stroke-width: 1.5; 
+      filter: url(#mysticalAura);
+    }
+    .village { 
+      fill: #2e7d32; 
+      stroke: #f4e4c1; 
+      stroke-width: 1.5;
+    }
+    .fortress { 
+      fill: #37474f; 
+      stroke: none; 
+      filter: url(#terrainBlend);
+    }
+    .sanctuary { 
+      fill: #e65100; 
+      stroke: #fff3e0; 
+      stroke-width: 1; 
+      filter: url(#arcaneGlow);
+    }
+    
+    /* Arcane special locations */
+    .goblin-lair { 
+      fill: #1b5e20; 
+      stroke: #66bb6a; 
+      stroke-width: 2; 
+      opacity: 0.8;
+    }
+    
+    /* Enhanced typography with medieval feel */
+    .region-label { 
+      font-family: 'AnimeAce', Arial, sans-serif; 
+      font-size: 22px; 
+      font-weight: bold; 
+      fill: #3e2723; 
+      text-anchor: middle; 
+      filter: url(#ancientShadow);
+      letter-spacing: 2px;
+    }
+    .location-label { 
+      font-family: 'AnimeAce', Arial, sans-serif; 
+      font-size: 16px; 
+      fill: #2d1810; 
+      text-anchor: middle; 
+      font-weight: 600;
+      filter: url(#ancientShadow);
+    }
+    .feature-label { 
+      font-family: 'AnimeAce', Arial, sans-serif; 
+      font-size: 13px; 
+      fill: #4a3728; 
+      text-anchor: middle; 
+      font-style: italic;
+      opacity: 0.9;
+    }
+    .water-label { 
+      font-family: 'AnimeAce', Arial, sans-serif; 
+      font-size: 14px; 
+      fill: #1e3a4a; 
+      text-anchor: middle; 
+      font-style: italic;
+      opacity: 0.8;
+    }
+    
+    /* Interactive enhancements */
+    .clickable { 
+      cursor: pointer; 
+      transition: all 0.3s ease;
+    }
+    .clickable:hover { 
+      opacity: 0.8; 
+      stroke-width: 5; 
+      filter: url(#arcaneGlow);
+      transform: scale(1.1);
+    }
+    
+    /* Ornate decorative elements */
+    .compass-rose { 
+      fill: #6d4c41; 
+      stroke: #3e2723; 
+      stroke-width: 2; 
+      filter: url(#ancientShadow);
+    }
+    .scale-bar { 
+      fill: none; 
+      stroke: #3e2723; 
+      stroke-width: 3;
+      filter: url(#ancientShadow);
+    }
+    .border-decoration {
+      fill: url(#runeBorder);
+      opacity: 0.6;
+    }
+    
+    /* Mystical animations */
+    @keyframes runeGlow {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.7; }
+    }
+    
+    .magical-energy {
+      animation: runeGlow 4s ease-in-out infinite;
+    }
+  </style>
+
+  <!-- Parchment background with mystical texture -->
+  <rect width="100%" height="100%" fill="#f4e4c1" />
+  <rect class="ocean" width="100%" height="100%" />
+  
+  <!-- Subtle border decoration -->
+  <rect x="10" y="10" width="1004" height="8" fill="#8d6e63" opacity="0.2" />
+  <rect x="10" y="1006" width="1004" height="8" fill="#8d6e63" opacity="0.2" />
+  <rect x="10" y="10" width="8" height="1004" fill="#8d6e63" opacity="0.2" />
+  <rect x="1006" y="10" width="8" height="1004" fill="#8d6e63" opacity="0.2" />
+
+  <!-- Far Northern Ice Ocean with mystical depths -->
+  <rect class="ice-ocean" x="0" y="0" width="1024" height="140" />
+  
+  <!-- Large icy lake/fjord near Ice Fortress -->
+  <ellipse class="ice-ocean" cx="280" cy="220" rx="120" ry="60" opacity="0.95" />
+  <ellipse class="ice-ocean" cx="280" cy="220" rx="90" ry="45" opacity="0.8" />
+  
+  <!-- Mystical energy currents in ice ocean -->
+  <path d="M 0,90 Q 256,70 512,90 T 1024,90" fill="none" stroke="#4a90e2" 
+        stroke-width="2" opacity="0.4" class="magical-energy" />
+  <path d="M 0,130 Q 256,150 512,130 T 1024,130" fill="none" stroke="#6bb6ff" 
+        stroke-width="1.5" opacity="0.3" class="magical-energy" />
+        
+  <!-- Ice currents in the large icy lake -->
+  <path d="M 180,220 Q 230,200 280,220 Q 330,240 380,220" fill="none" stroke="#6bb6ff" 
+        stroke-width="1.5" opacity="0.4" class="magical-energy" />
+
+  <!-- NORTHERN FROZEN REALM -->
+  <!-- Main ice continent with irregular coastline -->
+  <path id="northern-ice-continent" class="frozen-land" 
+        d="M 0,100 
+           C 150,85 300,75 450,80 
+           S 750,70 900,90 
+           S 1024,110 1024,130 
+           L 1024,250 
+           C 900,235 750,240 600,238 
+           S 300,232 150,245 
+           S 0,255 0,240 Z" />
+
+  <!-- Ice Fortress - Repositioned to western edge of Frozen North -->
+  <g id="ice-fortress-complex" transform="translate(-80, 0) scale(0.7)">
+    <!-- Subtle runic circle foundation -->
+    <circle cx="235" cy="180" r="20" fill="none" stroke="#7aa8bd" stroke-width="1" 
+            opacity="0.3" class="magical-energy" />
+    
+    <!-- Fortress structure with eldritch geometry -->
+    <polygon fill="url(#iceFortressGradient)" stroke="#2c5aa0" stroke-width="1" points="205,165 220,145 235,140 250,145 265,165 265,200 205,200" />
+    <polygon fill="url(#iceFortressGradient)" stroke="#4a90d9" stroke-width="1" points="215,145 235,125 255,145 245,165 225,165" />
+    
+    <!-- Mystical ice spires -->
+    <polygon fill="url(#iceFortressGradient)" stroke="#7db8e8" stroke-width="1" points="200,140 208,120 216,140" />
+    <polygon fill="url(#iceFortressGradient)" stroke="#7db8e8" stroke-width="1" points="262,140 270,120 278,140" />
+    
+    <!-- Central mystical keep -->
+    <polygon fill="url(#iceFortressGradient)" stroke="#2c5aa0" stroke-width="1" points="225,135 235,120 245,135 245,160 225,160" />
+    
+    <!-- Subtle arcane energy emanations -->
+    <circle cx="235" cy="150" r="2" fill="#b3d9ff" opacity="0.6" class="magical-energy" />
+    
+    <circle class="major-city clickable" cx="235" cy="180" r="6" data-location="ice-fortress" />
+    <text class="location-label" x="235" y="220">Ice Fortress</text>
+  </g>
+
+  <!-- Northern ice forests and mystical territories -->
+  <ellipse class="ice-forest" cx="120" cy="200" rx="45" ry="25" />
+  <ellipse class="ice-forest" cx="480" cy="180" rx="60" ry="35" />
+  <ellipse class="ice-forest" cx="650" cy="210" rx="40" ry="30" />
+  <ellipse class="ice-forest" cx="800" cy="190" rx="50" ry="28" />
+
+  <!-- CENTRAL WILD LANDS -->
+  <!-- Large central landmass - wild and untamed, now covering entire southern region -->
+  <path id="central-wildlands" class="wild-land"
+        d="M 380,360 
+           C 400,350 420,355 440,345 
+           C 460,355 480,350 500,360 
+           C 520,370 540,365 560,375 
+           C 580,385 600,380 620,390 
+           C 640,400 660,395 680,405 
+           C 700,415 720,410 740,420 
+           C 760,430 780,425 800,435 
+           C 820,445 840,440 860,450 
+           C 880,460 900,455 920,465 
+           C 940,475 960,470 980,480 
+           C 990,490 995,510 990,530 
+           C 985,550 1000,570 995,590 
+           C 990,610 1005,630 1000,650 
+           C 1005,670 1010,690 1015,710 
+           C 1020,730 1024,750 1024,770 
+           L 1024,1024 
+           L 0,1024 
+           L 0,750 
+           C 50,740 100,730 150,720 
+           C 200,710 250,700 300,690 
+           C 340,680 360,670 370,650 
+           C 375,630 365,610 370,590 
+           C 365,570 350,550 355,530 
+           C 360,510 375,490 370,470 
+           C 365,450 350,430 355,410 
+           C 360,390 365,370 350,360 
+           C 355,365 365,362 375,361 380,360 Z" />
+
+  <!-- Central mountain ranges -->
+  <g id="central-mountains">
+    <!-- Small mountain range on Eastern Expanse side near Shire border -->
+    <path class="mountains" d="M 420,380 L 440,365 L 460,380 L 480,370 L 500,385 L 520,375 L 540,390" />
+    <path class="mountain-peaks" d="M 430,390 L 440,375 L 450,390 M 470,385 L 480,370 L 490,385 M 510,395 L 520,380 L 530,395" />
+    <circle class="mountains" cx="430" cy="375" r="3" />
+    <circle class="mountains" cx="450" cy="378" r="4" />
+    <circle class="mountains" cx="470" cy="375" r="3" />
+    <circle class="mountains" cx="490" cy="380" r="4" />
+    <circle class="mountains" cx="510" cy="378" r="3" />
+    <circle class="mountains" cx="530" cy="383" r="4" />
+  </g>
+
+  <!-- Central forests -->
+  <ellipse class="forest" cx="600" cy="550" rx="70" ry="45" />
+  <ellipse class="forest" cx="750" cy="480" rx="60" ry="38" />
+  <ellipse class="forest" cx="580" cy="580" rx="80" ry="50" />
+  <ellipse class="forest" cx="720" cy="520" rx="55" ry="35" />
+  <ellipse class="forest" cx="650" cy="620" rx="65" ry="40" />
+  <ellipse class="forest" cx="800" cy="560" rx="70" ry="45" />
+
+  <!-- Eastern swamplands -->
+  <ellipse class="swamp" cx="450" cy="620" rx="60" ry="40" />
+  <ellipse class="swamp" cx="520" cy="650" rx="45" ry="35" />
+  <ellipse class="swamp" cx="380" cy="580" rx="50" ry="30" />
+  <ellipse class="swamp" cx="480" cy="580" rx="55" ry="25" />
+  
+  <!-- Southern extension swamplands -->
+  <ellipse class="swamp" cx="600" cy="800" rx="70" ry="45" />
+  <ellipse class="swamp" cx="450" cy="850" rx="55" ry="35" />
+  <ellipse class="swamp" cx="750" cy="880" rx="60" ry="40" />
+  <ellipse class="swamp" cx="550" cy="920" rx="65" ry="30" />
+  
+  <!-- Southern extension forests -->
+  <ellipse class="forest" cx="700" cy="750" rx="55" ry="35" />
+  <ellipse class="forest" cx="400" cy="780" rx="50" ry="30" />
+  <ellipse class="forest" cx="850" cy="820" rx="60" ry="40" />
+  <ellipse class="forest" cx="500" cy="960" rx="45" ry="25" />
+  <ellipse class="forest" cx="800" cy="950" rx="70" ry="45" />
+
+  <!-- NORTHWESTERN SHIRE PENINSULA -->
+  <!-- The peaceful Shire - now as a peninsula extending into northern waters -->
+  <path id="shire-region" class="shire-land"
+        d="M 90,320 
+           C 74,290 86,260 124,268 
+           S 180,260 244,272 
+           S 344,280 376,312 
+           C 392,352 376,392 344,422 
+           S 260,452 196,442 
+           S 116,432 104,402 
+           S 72,362 90,320 Z" />
+
+  <!-- Mountain range between Shire and Eastern Expanse -->
+    <!-- The Shire settlement with mystical hobbit architecture -->
+
+  <!-- Shire hills and gentle terrain on the peninsula -->
+  <ellipse class="forest" cx="170" cy="356" rx="36" ry="20" opacity="0.6" />
+  <ellipse class="forest" cx="264" cy="372" rx="44" ry="24" opacity="0.6" />
+  <ellipse class="forest" cx="320" cy="348" rx="32" ry="20" opacity="0.6" />
+
+  <!-- The Shire settlement with mystical hobbit architecture -->
+  <g id="shire-village">
+    <!-- Subtle ley line convergence -->
+    <circle cx="196" cy="372" r="16" fill="none" stroke="#7cb342" stroke-width="1" 
+            opacity="0.3" class="magical-energy" />
+    
+    <!-- Village structures with organic curves -->
+    <ellipse class="village" cx="196" cy="368" rx="4" ry="3.2" />
+    <ellipse class="village" cx="208" cy="364" rx="3.2" ry="2.4" />
+    <ellipse class="village" cx="188" cy="376" rx="3.2" ry="2.4" />
+    <ellipse class="village" cx="200" cy="380" rx="2.4" ry="2.4" />
+    <ellipse class="village" cx="192" cy="360" rx="2.4" ry="1.6" />
+    
+    <!-- Mystical village center -->
+    <circle class="major-city clickable" cx="196" cy="372" r="5.6" data-location="the-shire" />
+    
+    <!-- Ancient standing stones -->
+    <rect x="184" y="352" width="1.6" height="6.4" fill="#8d7053" opacity="0.5" />
+    <rect x="212" y="356" width="1.6" height="4.8" fill="#8d7053" opacity="0.5" />
+    
+    <text class="location-label" x="196" y="400">The Shire</text>
+  </g>
+
+  <!-- Shire Sanctuary with sacred geometry -->
+    <!-- Shire Sanctuary with sacred geometry -->
+  <g id="shire-sanctuary">
+    <!-- Subtle sacred circle -->
+    <circle cx="276" cy="390" r="9.6" fill="none" stroke="#e65100" stroke-width="1" 
+            opacity="0.4" />
+    
+    <!-- Sacred sanctuary marker -->
+    <circle class="sanctuary clickable" cx="276" cy="390" r="4.8" data-location="shire-sanctuary" />
+    
+    <!-- Sacred grove markers -->
+    <circle cx="272" cy="386" r="1.6" fill="#e65100" opacity="0.3" />
+    <circle cx="280" cy="394" r="1.6" fill="#e65100" opacity="0.3" />
+    
+    <text class="location-label" x="276" y="414">Shire Sanctuary</text>
+  </g>
+
+  <!-- Goblin territories (hidden) -->
+  <g id="goblin-lands">
+    <ellipse class="forest" cx="150" cy="550" rx="40" ry="25" opacity="0.7" fill="#4a5c4a" />
+    <circle class="goblin-lair clickable" cx="150" cy="550" r="4" data-location="goblin-lair" />
+    <text class="feature-label" x="150" y="580">Desolate Island</text>
+  </g>
+
+  <!-- Goblin King's domain in the eastern swamplands -->
+  <g id="goblin-king-domain">
+    <circle class="major-city clickable" cx="450" cy="620" r="6" data-location="goblin-king-lair" 
+            fill="#8b0000" stroke="#2e0e0e" stroke-width="2" opacity="0.9" />
+    <text class="location-label" x="450" y="645">Goblin King's Lair</text>
+  </g>
+
+  <!-- EASTERN WILD ISLANDS -->
+
+  <!-- ORNATE COMPASS ROSE -->
+  <g id="compass" transform="translate(950,80)">
+    <!-- Outer decorative ring -->
+    <circle class="compass-rose" cx="0" cy="0" r="35" fill="none" stroke="#6d4c41" stroke-width="3" />
+    <circle class="compass-rose" cx="0" cy="0" r="30" fill="none" stroke="#8d6e63" stroke-width="1.5" />
+    
+    <!-- Inner mystical design -->
+    <circle cx="0" cy="0" r="25" fill="#f4e4c1" opacity="0.8" />
+    
+    <!-- Ornate directional points -->
+    <path class="compass-rose" d="M 0,-28 L 8,-15 L 0,-8 L -8,-15 Z" />
+    <path class="compass-rose" d="M 28,0 L 15,8 L 8,0 L 15,-8 Z" />
+    <path class="compass-rose" d="M 0,28 L 8,15 L 0,8 L -8,15 Z" />
+    <path class="compass-rose" d="M -28,0 L -15,8 L -8,0 L -15,-8 Z" />
+    
+    <!-- Secondary points -->
+    <path class="compass-rose" d="M 20,-20 L 12,-12 L 8,-16 Z" opacity="0.7" />
+    <path class="compass-rose" d="M 20,20 L 12,12 L 16,8 Z" opacity="0.7" />
+    <path class="compass-rose" d="M -20,20 L -12,12 L -8,16 Z" opacity="0.7" />
+    <path class="compass-rose" d="M -20,-20 L -12,-12 L -16,-8 Z" opacity="0.7" />
+    
+    <!-- Central mystical symbol -->
+    <circle cx="0" cy="0" r="5" fill="#6d4c41" />
+    <circle cx="0" cy="0" r="3" fill="#f4e4c1" />
+    
+    <!-- Directional labels with flourishes -->
+    <text class="feature-label" x="0" y="-42" text-anchor="middle" font-size="14" font-weight="bold">N</text>
+    <text class="feature-label" x="42" y="5" text-anchor="middle" font-size="14" font-weight="bold">E</text>
+    <text class="feature-label" x="0" y="50" text-anchor="middle" font-size="14" font-weight="bold">S</text>
+    <text class="feature-label" x="-42" y="5" text-anchor="middle" font-size="14" font-weight="bold">W</text>
+  </g>
+
+  <!-- ENHANCED SCALE BAR -->
+  <g id="scale" transform="translate(800,920)">
+    <!-- Decorative base with better visibility and more space -->
+    <rect x="-40" y="-35" width="250" height="70" fill="#f4e4c1" stroke="#6d4c41" 
+          stroke-width="3" rx="8" opacity="0.95" filter="url(#ancientShadow)" />
+    
+    <!-- Scale title -->
+    <text class="feature-label" x="85" y="-20" text-anchor="middle" font-weight="bold" font-size="16" fill="#2d1810">Scale</text>
+    
+    <!-- Scale markings with enhanced visibility -->
+    <line class="scale-bar" x1="0" y1="0" x2="160" y2="0" stroke="#6d4c41" stroke-width="4" />
+    <line class="scale-bar" x1="0" y1="-12" x2="0" y2="12" stroke="#6d4c41" stroke-width="4" />
+    <line class="scale-bar" x1="40" y1="-8" x2="40" y2="8" stroke="#6d4c41" stroke-width="3" />
+    <line class="scale-bar" x1="80" y1="-8" x2="80" y2="8" stroke="#6d4c41" stroke-width="3" />
+    <line class="scale-bar" x1="120" y1="-8" x2="120" y2="8" stroke="#6d4c41" stroke-width="3" />
+    <line class="scale-bar" x1="160" y1="-12" x2="160" y2="12" stroke="#6d4c41" stroke-width="4" />
+    
+    <!-- Ornate end decorations -->
+    <circle cx="0" cy="0" r="5" fill="#6d4c41" />
+    <circle cx="160" cy="0" r="5" fill="#6d4c41" />
+    
+    <!-- Clear, legible labels with proper spacing -->
+    <text class="feature-label" x="80" y="-8" text-anchor="middle" font-weight="bold" font-size="14" fill="#2d1810">160 Leagues</text>
+    <text class="feature-label" x="0" y="26" text-anchor="middle" font-size="14" fill="#2d1810">0</text>
+    <text class="feature-label" x="40" y="26" text-anchor="middle" font-size="14" fill="#2d1810">40</text>
+    <text class="feature-label" x="80" y="26" text-anchor="middle" font-size="14" fill="#2d1810">80</text>
+    <text class="feature-label" x="120" y="26" text-anchor="middle" font-size="14" fill="#2d1810">120</text>
+    <text class="feature-label" x="160" y="26" text-anchor="middle" font-size="14" fill="#2d1810">160</text>
+  </g>
+
+  <!-- REGION LABELS -->
+  <text class="region-label" x="400" y="180" text-anchor="middle">The Frozen North</text>
+  <text class="region-label" x="650" y="520" text-anchor="middle">Eastern Expanse</text>
+  <text class="region-label" x="244" y="340" text-anchor="middle">The Shire</text>
+  
+  <!-- WATER LABELS -->
+  <text class="water-label" x="150" y="50" text-anchor="middle">Ice Sea</text>
+  <text class="water-label" x="100" y="300" text-anchor="middle">Northern Waters</text>
+  <text class="water-label" x="950" y="400" text-anchor="middle">Eastern Sea</text>
+
+  <!-- MAJESTIC TITLE CARTOUCHE -->
+  <g id="title" transform="translate(512,50)">
+    <!-- Ornate title frame with mystical elements -->
+    <rect x="-230" y="-30" width="460" height="60" fill="#f4e4c1" stroke="#6d4c41" 
+          stroke-width="4" rx="12" filter="url(#ancientShadow)" />
+    
+    <text class="region-label" x="0" y="10" text-anchor="middle" font-size="28" letter-spacing="3px">
+      The World of Wavelength
+    </text>
+  </g>
+
+  <!-- Ancient mystical symbols scattered across the map -->
+  <g id="mystical-symbols" opacity="0.3">
+    <text x="800" y="200" fill="#6d4c41" font-size="12">⚡</text>
+    <text x="150" y="400" fill="#6d4c41" font-size="10">❄</text>
+    <text x="600" y="800" fill="#6d4c41" font-size="11">🌿</text>
+    <text x="900" y="600" fill="#6d4c41" font-size="9">⭐</text>
+    <text x="300" y="300" fill="#6d4c41" font-size="8">◈</text>
+  </g>
+
+  <!-- TERRAIN LEGEND -->
+  <g id="terrain-legend">
+    <!-- Legend background -->
+    <rect x="20" y="800" width="180" height="200" 
+          fill="#f4e4c1" 
+          stroke="#6d4c41" 
+          stroke-width="3" 
+          rx="8" 
+          opacity="0.95" 
+          filter="url(#ancientShadow)" />
+    
+    <!-- Legend title -->
+    <text x="110" y="825" text-anchor="middle" 
+          fill="#2d1810" 
+          font-family="AnimeAce, serif" 
+          font-size="16" 
+          font-weight="bold">TERRAIN LEGEND</text>
+    
+    <!-- Ocean -->
+    <rect x="30" y="840" width="15" height="12" class="ocean" />
+    <text x="50" y="850" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Ocean</text>
+    
+    <!-- Ice Ocean -->
+    <rect x="30" y="860" width="15" height="12" class="ice-ocean" />
+    <text x="50" y="870" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Frozen Seas</text>
+    
+    <!-- Frozen Land -->
+    <rect x="30" y="880" width="15" height="12" class="frozen-land" />
+    <text x="50" y="890" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Frozen Lands</text>
+    
+    <!-- Grasslands (Shire) -->
+    <rect x="30" y="900" width="15" height="12" class="shire-land" />
+    <text x="50" y="910" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Grasslands</text>
+    
+    <!-- Wild Land -->
+    <rect x="30" y="920" width="15" height="12" class="wild-land" />
+    <text x="50" y="930" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Wild Lands</text>
+    
+    <!-- Swamp -->
+    <ellipse cx="37" cy="946" rx="7" ry="5" class="swamp" />
+    <text x="50" y="950" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Swampland</text>
+    
+    <!-- Forest -->
+    <ellipse cx="37" cy="966" rx="7" ry="5" class="forest" />
+    <text x="50" y="970" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Forest</text>
+    
+    <!-- Mountains -->
+    <path d="M 30,985 L 37,975 L 44,985" class="mountains" stroke-width="2" fill="none" />
+    <text x="50" y="982" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Mountains</text>
+  </g>
+
+</svg>
