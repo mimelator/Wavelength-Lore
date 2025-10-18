@@ -22,6 +22,11 @@ Welcome to the comprehensive documentation for the Wavelength Lore application. 
 - **[Character Reference System](CHARACTER_REFERENCE_SYSTEM.md)** - Character linking and disambiguation system
 - **[Lore System Documentation](LORE_SYSTEM_DOCUMENTATION.md)** - Lore management and linking functionality
 - **[Carousel Usage](CAROUSEL_USAGE.md)** - Image carousel implementation and usage
+- **[Forum Delete Functionality](FORUM_DELETE_FUNCTIONALITY.md)** - User post/reply deletion with authentication and S3 cleanup
+
+### 🔧 Admin & Management
+- **[Admin Access Guide](ADMIN_ACCESS_GUIDE.md)** - Admin panel access and API endpoints
+- **[Firebase Admin Implementation](FIREBASE_ADMIN_IMPLEMENTATION.md)** - Firebase Admin SDK integration and usage
 
 ### ⚡ Performance & Optimization
 - **[Cache Busting](CACHE_BUSTING.md)** - Static asset cache management and optimization
@@ -48,6 +53,8 @@ Welcome to the comprehensive documentation for the Wavelength Lore application. 
 1. Character system: [Character Reference System](CHARACTER_REFERENCE_SYSTEM.md)
 2. Lore management: [Lore System Documentation](LORE_SYSTEM_DOCUMENTATION.md)
 3. UI components: [Carousel Usage](CAROUSEL_USAGE.md)
+4. Delete functionality: [Forum Delete Functionality](FORUM_DELETE_FUNCTIONALITY.md)
+5. Admin operations: [Admin Access Guide](ADMIN_ACCESS_GUIDE.md)
 
 ## 📋 Documentation Standards
 

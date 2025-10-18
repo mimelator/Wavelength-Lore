@@ -105,6 +105,16 @@ curl "http://localhost:3001/api/cache/bust?adminKey=YOUR_ADMIN_KEY_HERE"
 - `POST /api/admin/posts/:id/update` - Update post data (title, content, etc.)
 - `DELETE /api/admin/posts/:id` - Delete posts with admin privileges
 
+### User Delete Endpoints (Authenticated Users)
+- `DELETE /forum/posts/:id` - Users can delete their own posts (with authentication)
+- `DELETE /forum/replies/:id` - Users can delete their own replies (with authentication)
+
+**Note**: User delete endpoints require Firebase ID token authentication and include:
+- Ownership verification (users can only delete their own content)
+- Cascade deletion (deleting posts removes all replies)
+- S3 attachment cleanup (removes associated files)
+- Database operations using Firebase Admin SDK
+
 ### Basic Admin Endpoints (admin key only)
 - `GET /api/cache/bust` - View cache status
 - `POST /api/cache/bust` - Clear all caches
@@ -169,10 +179,25 @@ curl -X POST \
      -d '{"title": "New Post Title"}' \
      http://localhost:3001/api/admin/posts/POST_ID_HERE/update
 
-# Delete a post
+# Delete a post (admin)
 curl -X DELETE \
      -H "X-Admin-Key: YOUR_ADMIN_KEY_HERE" \
      http://localhost:3001/api/admin/posts/POST_ID_HERE
+```
+
+### User Delete API Usage
+```bash
+# Delete own post (requires Firebase ID token)
+curl -X DELETE \
+     -H "Authorization: Bearer YOUR_FIREBASE_ID_TOKEN" \
+     -H "Content-Type: application/json" \
+     http://localhost:3001/forum/posts/POST_ID_HERE
+
+# Delete own reply (requires Firebase ID token)
+curl -X DELETE \
+     -H "Authorization: Bearer YOUR_FIREBASE_ID_TOKEN" \
+     -H "Content-Type: application/json" \
+     http://localhost:3001/forum/replies/REPLY_ID_HERE
 ```
 
 ### Cache Management

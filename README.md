@@ -24,5 +24,19 @@ All project documentation has been organized in the [`docs/`](docs/) folder:
 - ✅ Smart rate limiting with endpoint detection
 - ✅ Input sanitization with XSS protection
 - ✅ Automated encrypted backups to AWS S3
+- ✅ User authentication with Firebase ID tokens
+- ✅ Secure delete functionality with ownership verification
+
+## 🗑️ Forum Delete Functionality
+
+Users can now delete their own posts and replies with comprehensive security:
+
+- **Authenticated Deletion**: Uses Firebase ID tokens for secure user verification
+- **Ownership Verification**: Users can only delete their own content
+- **Cascade Deletion**: Deleting posts automatically removes all replies
+- **File Cleanup**: Automatically removes S3 attachments when content is deleted
+- **Admin Override**: Administrators can delete any content through admin panel
+
+See [Forum Delete Documentation](docs/FORUM_DELETE_FUNCTIONALITY.md) for complete implementation details.
 
 See [Security Enhancement Guide](docs/SECURITY_ENHANCEMENT_GUIDE.md) for complete details.

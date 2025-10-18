@@ -33,7 +33,7 @@ Firebase Realtime Database
 - `fetchDataAsAdmin(path)` - Read data with admin privileges
 - `writeDataAsAdmin(path, data)` - Write data with admin privileges
 - `updateDataAsAdmin(path, updates)` - Update data with admin privileges
-- `deleteDataAsAdmin(path)` - Delete data with admin privileges
+- `deleteDataAsAdmin(path)` - Delete data with admin privileges (used for user deletions)
 
 ### 2. Admin API Routes
 **File:** `routes/adminApi.js`
@@ -46,7 +46,9 @@ Protected REST API endpoints for admin operations:
 - **GET /api/admin/stats** - Get statistics dashboard
 - **POST /api/admin/users/:uid/update** - Update user data
 - **POST /api/admin/posts/:id/update** - Update post data
-- **DELETE /api/admin/posts/:id** - Delete posts
+- **DELETE /api/admin/posts/:id** - Delete posts (admin)
+- **DELETE /forum/posts/:id** - Delete posts (user, with auth)
+- **DELETE /forum/replies/:id** - Delete replies (user, with auth)
 
 ### 3. Client-Side Admin Panel
 **File:** `static/js/admin.js`
@@ -100,8 +102,9 @@ Protected REST API endpoints for admin operations:
 ### Data Access Patterns
 - **Read Operations**: Fetch all data for admin review
 - **Write Operations**: Logged updates with admin attribution
-- **Delete Operations**: Permanent removal with audit trail
+- **Delete Operations**: Permanent removal with audit trail (admin and user-initiated)
 - **Role Management**: Secure user role modifications
+- **User Content Deletion**: Authenticated users can delete their own posts/replies with S3 cleanup
 
 ## Implementation Benefits
 
