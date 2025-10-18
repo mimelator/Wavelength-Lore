@@ -23,6 +23,7 @@ Welcome to the comprehensive documentation for the Wavelength Lore application. 
 - **[Lore System Documentation](LORE_SYSTEM_DOCUMENTATION.md)** - Lore management and linking functionality
 - **[Carousel Usage](CAROUSEL_USAGE.md)** - Image carousel implementation and usage
 - **[Forum Delete Functionality](FORUM_DELETE_FUNCTIONALITY.md)** - User post/reply deletion with authentication and S3 cleanup
+- **[Forum Category Guide](FORUM_CATEGORY_GUIDE.md)** - Complete guide for adding, modifying, and managing forum categories
 
 ### 🔧 Admin & Management
 - **[Admin Access Guide](ADMIN_ACCESS_GUIDE.md)** - Admin panel access and API endpoints
@@ -36,6 +37,9 @@ Welcome to the comprehensive documentation for the Wavelength Lore application. 
 - **[GitHub Action Monitor](GITHUB_ACTION_MONITOR.md)** - CI/CD pipeline monitoring and deployment tracking
 - **[Deployment Troubleshooting](DEPLOYMENT_TROUBLESHOOTING.md)** - Comprehensive guide for ECR caching issues and production deployment problems
 - **[Debug Scripts](../debug/README.md)** - Debug and diagnostic scripts for troubleshooting
+
+### 📋 Implementation Plans
+- **[Email Login Implementation Plan](EMAIL_LOGIN_IMPLEMENTATION_PLAN.md)** - Comprehensive plan for adding email/password authentication to the forum system
 
 ## 🚀 Quick Start Guides
 
