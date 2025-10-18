@@ -35,14 +35,27 @@ jobs:
           IMAGE_TAG: latest
           COMMIT_SHA: ${{ github.sha }}
         run: |
-          # Build and tag with both latest and commit SHA
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:${COMMIT_SHA:0:8} .
+          # Extract short commit SHA
+          SHORT_SHA=${COMMIT_SHA:0:8}
+          
+          echo "Building with tags: $IMAGE_TAG and $SHORT_SHA"
+          
+          # Build the image
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          
+          # Tag with commit SHA
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$SHORT_SHA
           
           # Push both tags
+          echo "Pushing $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${COMMIT_SHA:0:8}
           
-          echo "::notice::Pushed images with tags: $IMAGE_TAG, ${COMMIT_SHA:0:8}"
+          echo "Pushing $ECR_REGISTRY/$ECR_REPOSITORY:$SHORT_SHA"
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$SHORT_SHA
+          
+          echo "::notice::Successfully pushed images with tags: $IMAGE_TAG, $SHORT_SHA"
+          echo "::notice::Commit SHA: $COMMIT_SHA"
+          echo "::notice::Short SHA: $SHORT_SHA"
 
       - name: Invalidate CloudFront Cache (Optional)
         env:
