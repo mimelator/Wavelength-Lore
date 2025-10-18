@@ -159,6 +159,25 @@ class FileUploadHandler {
   }
 
   /**
+   * Delete a single file from AWS S3
+   */
+  async deleteFile(s3Key) {
+    try {
+      const deleteCommand = new DeleteObjectCommand({
+        Bucket: this.bucketName,
+        Key: s3Key
+      });
+      
+      await this.s3Client.send(deleteCommand);
+      console.log(`✅ Successfully deleted file: ${s3Key}`);
+      return true;
+    } catch (error) {
+      console.error(`❌ Failed to delete file ${s3Key}:`, error);
+      throw error;
+    }
+  }
+
+  /**
    * Validate uploaded files
    */
   validateFiles(files) {

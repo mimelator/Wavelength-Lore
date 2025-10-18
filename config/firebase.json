@@ -1,6 +1,6 @@
 {
   "database": {
-    "rules": "firebase-database-rules.json"
+    "rules": "firebase-database-rules-delete-enabled.json"
   },
   "hosting": {
     "public": "public",

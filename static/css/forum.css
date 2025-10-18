@@ -3683,3 +3683,176 @@
     font-size: 1.1em;
     padding: 12px 24px;
 }
+
+/* Delete Modal Styles */
+.delete-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(3px);
+}
+
+.delete-modal {
+    background: white;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    border: 2px solid #e74c3c;
+}
+
+.delete-modal-header {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-modal-header h3 {
+    margin: 0;
+    font-family: 'AnimeAce', Arial, sans-serif;
+    font-size: 1.2em;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.delete-modal-content {
+    padding: 25px;
+}
+
+.delete-modal-content p {
+    margin: 0 0 15px 0;
+    line-height: 1.6;
+    color: #333;
+}
+
+.delete-modal-content .warning-text {
+    color: #e74c3c;
+    font-weight: bold;
+    background: rgba(231, 76, 60, 0.1);
+    padding: 10px;
+    border-radius: 6px;
+    border-left: 4px solid #e74c3c;
+}
+
+.delete-modal-actions {
+    padding: 20px 25px;
+    background: #f8f9fa;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    border-top: 1px solid #dee2e6;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+.btn-danger:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+/* Delete Button Styles */
+.delete-btn {
+    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+    color: white !important;
+    border: 1px solid #e74c3c !important;
+}
+
+.delete-btn:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226) !important;
+    border-color: #c0392b !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+.post-action-btn.delete-btn,
+.reply-action-btn.delete-btn {
+    margin-left: 10px;
+    font-size: 0.9em;
+}
+
+/* Mobile responsiveness for delete modal */
+@media (max-width: 768px) {
+    .delete-modal {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .delete-modal-header {
+        padding: 15px;
+    }
+    
+    .delete-modal-content {
+        padding: 20px;
+    }
+    
+    .delete-modal-actions {
+        padding: 15px 20px;
+        flex-direction: column;
+    }
+    
+    .delete-modal-actions .btn {
+        width: 100%;
+        margin: 5px 0;
+    }
+}

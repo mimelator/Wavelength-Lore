@@ -7,6 +7,8 @@ const express = require('express');
 const router = express.Router();
 const InputSanitizer = require('../middleware/inputSanitization');
 const FileUploadHandler = require('../utils/fileUpload');
+const { verifyToken, optionalAuth } = require('../middleware/firebaseAuth');
+const { fetchDataAsAdmin, deleteDataAsAdmin, getAdminDatabase, writeDataAsAdmin } = require('../helpers/firebase-admin-utils');
 
 // Initialize file upload handler lazily
 let fileUploader = null;
@@ -23,7 +25,7 @@ function getUploadMiddleware() {
 }
 
 // Forum post creation endpoint with file upload support
-router.post('/forum/posts', (req, res, next) => {
+router.post('/forum/posts', optionalAuth, (req, res, next) => {
   const upload = getUploadMiddleware();
   upload.array('attachments', 5)(req, res, next);
 }, async (req, res) => {
@@ -97,6 +99,9 @@ router.post('/forum/posts', (req, res, next) => {
       attachments: attachments
     };
 
+    // Save to Firebase database
+    await writeDataAsAdmin(`forum/posts/${postId}`, forumPost);
+
     console.log('✅ Forum post created successfully:', forumPost.id);
     console.log(`📎 Attachments: ${attachments.length} files`);
     
@@ -116,8 +121,8 @@ router.post('/forum/posts', (req, res, next) => {
   }
 });
 
-// Example forum reply creation endpoint
-router.post('/forum/replies', async (req, res) => {
+// Forum reply creation endpoint
+router.post('/forum/replies', optionalAuth, async (req, res) => {
   try {
     console.log('💬 Processing forum reply creation...');
     
@@ -143,7 +148,7 @@ router.post('/forum/replies', async (req, res) => {
       });
     }
 
-    // Simulate saving to database
+    // Save reply to Firebase database
     const forumReply = {
       id: `reply_${Date.now()}`,
       ...validation.sanitized,
@@ -151,6 +156,20 @@ router.post('/forum/replies', async (req, res) => {
       createdAt: Date.now(),
       likeCount: 0
     };
+
+    await writeDataAsAdmin(`forum/replies/${forumReply.id}`, forumReply);
+
+    // Update post reply count if postId is provided
+    if (forumReply.postId) {
+      const post = await fetchDataAsAdmin(`forum/posts/${forumReply.postId}`);
+      if (post) {
+        const db = getAdminDatabase();
+        const postRef = db.ref(`forum/posts/${forumReply.postId}/replyCount`);
+        const newCount = (post.replyCount || 0) + 1;
+        await postRef.set(newCount);
+        console.log(`✅ Updated post ${forumReply.postId} reply count to ${newCount}`);
+      }
+    }
 
     console.log('✅ Forum reply created successfully:', forumReply.id);
     
@@ -165,6 +184,163 @@ router.post('/forum/replies', async (req, res) => {
     res.status(500).json({
       error: 'Internal server error',
       message: 'Failed to create reply'
+    });
+  }
+});
+
+// Delete forum post endpoint (author only)
+router.delete('/forum/posts/:postId', verifyToken, async (req, res) => {
+  try {
+    console.log('🗑️ Processing forum post deletion...');
+    
+    const postId = req.params.postId;
+    const userId = req.user?.uid;
+    
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        message: 'You must be signed in to delete posts'
+      });
+    }
+
+    if (!postId) {
+      return res.status(400).json({
+        error: 'Invalid request',
+        message: 'Post ID is required'
+      });
+    }
+
+    // Fetch the post from Firebase to verify ownership and get attachment info
+    const post = await fetchDataAsAdmin(`forum/posts/${postId}`);
+    
+    if (!post) {
+      return res.status(404).json({ 
+        error: 'Post not found',
+        message: 'The post you are trying to delete does not exist'
+      });
+    }
+    
+    if (post.authorId !== userId) {
+      return res.status(403).json({ 
+        error: 'Not authorized to delete this post',
+        message: 'You can only delete your own posts'
+      });
+    }
+    
+    // Delete S3 attachments if any exist
+    if (post.attachments && post.attachments.length > 0) {
+      try {
+        const fileUploader = getFileUploader();
+        for (const attachment of post.attachments) {
+          await fileUploader.deleteFile(attachment.s3Key);
+          console.log(`✅ Deleted attachment: ${attachment.s3Key}`);
+        }
+      } catch (error) {
+        console.error('⚠️ Failed to delete some attachments:', error);
+        // Continue with post deletion even if attachment cleanup fails
+      }
+    }
+    
+    // Delete all replies to this post
+    const db = getAdminDatabase();
+    const repliesRef = db.ref('forum/replies');
+    const repliesSnapshot = await repliesRef.orderByChild('postId').equalTo(postId).once('value');
+    const replies = repliesSnapshot.val() || {};
+    
+    for (const replyId of Object.keys(replies)) {
+      await deleteDataAsAdmin(`forum/replies/${replyId}`);
+      console.log(`✅ Deleted reply: ${replyId}`);
+    }
+    
+    // Delete the post
+    await deleteDataAsAdmin(`forum/posts/${postId}`);
+    
+    console.log(`✅ Post ${postId} and ${Object.keys(replies).length} replies deleted by user ${userId}`);
+    
+    res.json({
+      success: true,
+      message: 'Post deleted successfully',
+      postId: postId,
+      deletedReplies: Object.keys(replies).length,
+      deletedAttachments: post.attachments ? post.attachments.length : 0
+    });
+
+  } catch (error) {
+    console.error('💥 Error deleting forum post:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to delete post'
+    });
+  }
+});
+
+// Delete forum reply endpoint (author only)
+router.delete('/forum/replies/:replyId', verifyToken, async (req, res) => {
+  try {
+    console.log('🗑️ Processing forum reply deletion...');
+    
+    const replyId = req.params.replyId;
+    const userId = req.user?.uid;
+    
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        message: 'You must be signed in to delete replies'
+      });
+    }
+
+    if (!replyId) {
+      return res.status(400).json({
+        error: 'Invalid request',
+        message: 'Reply ID is required'
+      });
+    }
+
+    // Fetch the reply from Firebase to verify ownership
+    const reply = await fetchDataAsAdmin(`forum/replies/${replyId}`);
+    
+    if (!reply) {
+      return res.status(404).json({ 
+        error: 'Reply not found',
+        message: 'The reply you are trying to delete does not exist'
+      });
+    }
+    
+    if (reply.authorId !== userId) {
+      return res.status(403).json({ 
+        error: 'Not authorized to delete this reply',
+        message: 'You can only delete your own replies'
+      });
+    }
+    
+    // Delete the reply from Firebase
+    await deleteDataAsAdmin(`forum/replies/${replyId}`);
+    
+    // Update the post reply count
+    if (reply.postId) {
+      const post = await fetchDataAsAdmin(`forum/posts/${reply.postId}`);
+      if (post) {
+        const db = getAdminDatabase();
+        const postRef = db.ref(`forum/posts/${reply.postId}/replyCount`);
+        const newCount = Math.max(0, (post.replyCount || 0) - 1);
+        await postRef.set(newCount);
+        console.log(`✅ Updated post ${reply.postId} reply count to ${newCount}`);
+      }
+    }
+    
+    console.log(`✅ Reply ${replyId} deleted by user ${userId}`);
+    
+    res.json({
+      success: true,
+      message: 'Reply deleted successfully',
+      replyId: replyId
+    });
+
+  } catch (error) {
+    console.error('💥 Error deleting forum reply:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to delete reply'
     });
   }
 });
