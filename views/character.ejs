@@ -28,7 +28,22 @@
 
     <main>
         <h1><%= character.title %></h1>
-        <section class="character-banner" style="background-image: url('<%= character.image %>');">
+
+        <!-- Forum Create Post Section -->
+        <section class="character-forum-section" style="text-align: center; margin: 20px 0; background: rgba(255, 255, 255, 0.9); padding: 15px; border-radius: 10px; border: 3px solid #333; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+            <a href="/forum/create?category=general&characterName=<%= encodeURIComponent(character.title) %>&characterId=<%= character.id %>" 
+               class="btn btn-primary character-forum-btn"
+               style="background-color: #6a4c93; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; border: 2px solid #333; font-family: 'AnimeAce', Arial, sans-serif; font-size: 14px; display: inline-block; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);"
+               onmouseover="this.style.backgroundColor='#5a3c83'; this.style.transform='translateY(-2px)'"
+               onmouseout="this.style.backgroundColor='#6a4c93'; this.style.transform='translateY(0)'">
+                🗣️ Create a Post about this Hero
+            </a>
+            <p style="font-size: 12px; margin-top: 8px; color: #666; font-family: 'AnimeAce', Arial, sans-serif;">
+                Share your thoughts about <%= character.title %> with the community
+            </p>
+        </section>
+
+        <section class="character-banner" style="background-image: url('<%= character.image %>');">"
             
         </section>
 

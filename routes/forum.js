@@ -80,11 +80,22 @@ router.get('/create', (req, res) => {
     const episodeTitle = req.query.episodeTitle || '';
     const seasonNumber = req.query.seasonNumber || '';
     const episodeNumber = req.query.episodeNumber || '';
+    const characterName = req.query.characterName || '';
+    const characterId = req.query.characterId || '';
+    const loreName = req.query.loreName || '';
+    const loreId = req.query.loreId || '';
+    const loreType = req.query.loreType || '';
     
-    // Generate suggested title if episode info is provided
+    // Generate suggested title based on context
     let suggestedTitle = '';
+    let suggestedContent = '';
+    
     if (episodeTitle && seasonNumber && episodeNumber) {
         suggestedTitle = `Discussion: ${episodeTitle} (Season ${seasonNumber}, Episode ${episodeNumber})`;
+    } else if (characterName) {
+        suggestedTitle = `Character Discussion: ${characterName}`;
+    } else if (loreName && loreType) {
+        suggestedTitle = `Lore Discussion: ${loreName} (${loreType})`;
     }
     
     res.render('forum/create-post-page', {
@@ -94,6 +105,11 @@ router.get('/create', (req, res) => {
         episodeTitle: episodeTitle,
         seasonNumber: seasonNumber,
         episodeNumber: episodeNumber,
+        characterName: characterName,
+        characterId: characterId,
+        loreName: loreName,
+        loreId: loreId,
+        loreType: loreType,
         suggestedTitle: suggestedTitle,
         breadcrumbs: [
             { name: 'Create New Post', url: null }

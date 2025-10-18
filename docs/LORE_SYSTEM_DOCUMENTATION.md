@@ -30,6 +30,12 @@ Lore encompasses all non-character elements of the Wavelength universe:
 - Navigation between related lore items
 - Responsive image galleries
 
+### **Forum Integration**
+- **Create Post Button**: Each lore page includes a "Create a Post about this Lore" button
+- **Type-Based Styling**: Button colors match lore type (green for places, purple for concepts, etc.)
+- **Smart Prepopulation**: Forum create page auto-fills with lore name, ID, and type
+- **Community Discussion**: Enables community discussion about specific lore elements
+
 ## 🎯 **Usage Examples**
 
 ### **Automatic Lore Linking in Templates**
@@ -197,6 +203,41 @@ linkifyLoreAsync()
 3. **`views/episode.ejs`** - Added lore linking to summaries
 4. **`views/character.ejs`** - Added lore linking to descriptions
 5. **`static/css/styles.css`** - Added lore link styling
+6. **`views/lore.ejs`** - Added forum integration section with type-based button styling
+7. **`routes/forum.js`** - Added lore parameter support for forum post creation
+8. **`views/forum/create-post-page.ejs`** - Added lore prepopulation for post creation
+
+## 🗣️ **Forum Integration Details**
+
+### **Lore-to-Forum Flow**
+1. **Button Placement**: "Create a Post about this Lore" button on each lore page
+2. **Parameter Passing**: `loreName`, `loreId`, and `loreType` passed to forum
+3. **Smart Prepopulation**: Title, tags, and content auto-filled based on lore
+4. **Type-Based Styling**: Button colors match lore type categories
+
+### **Forum Route Enhancement**
+```javascript
+// Enhanced forum create route supports lore parameters
+router.get('/create', (req, res) => {
+  const loreName = req.query.loreName || '';
+  const loreId = req.query.loreId || '';
+  const loreType = req.query.loreType || '';
+  
+  // Generate lore-specific suggested content
+  if (loreName && loreType) {
+    suggestedTitle = `Lore Discussion: ${loreName} (${loreType})`;
+  }
+});
+```
+
+### **CSS Button Styling**
+```css
+/* Type-based lore forum button colors */
+.lore-forum-btn.lore-type-place { background-color: #2e7b32; }
+.lore-forum-btn.lore-type-concept { background-color: #7b1fa2; }
+.lore-forum-btn.lore-type-thing { background-color: #f57c00; }
+.lore-forum-btn.lore-type-idea { background-color: #1976d2; }
+```
 
 ## 🔄 **Routes Added**
 

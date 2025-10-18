@@ -1,8 +1,8 @@
-# Forum Delete and Episode Integration Documentation
+# Forum Delete and Episode/Character Integration Documentation
 
 ## Overview
 
-The Wavelength Lore forum includes comprehensive delete functionality that allows users to delete their own posts and replies with proper authentication, file attachment cleanup, and cascade deletion support. Additionally, it features seamless integration with episode pages, allowing users to create episode-specific forum posts directly from episode pages. This document covers the complete implementation including API endpoints, authentication middleware, frontend UI, file handling, and episode integration features.
+The Wavelength Lore forum includes comprehensive delete functionality that allows users to delete their own posts and replies with proper authentication, file attachment cleanup, and cascade deletion support. Additionally, it features seamless integration with both episode pages and character/hero pages, allowing users to create content-specific forum posts directly from any content page. This document covers the complete implementation including API endpoints, authentication middleware, frontend UI, file handling, and content integration features.
 
 ## Architecture
 
@@ -810,14 +810,139 @@ This feature creates a seamless connection between:
 - **Forum Pages**: Community discussion and long-term engagement
 - **User Experience**: Reduced friction for creating episode-specific content
 
+### Character/Hero-to-Forum Integration
+
+The forum also includes seamless integration with character pages, allowing users to create character-specific discussion posts directly from any hero page.
+
+#### Create Post Button on Character Pages
+**Location:** `/character/:characterId`
+**Implementation:** `views/character.ejs`
+
+Each character page now features a prominent "Create a Post about this Hero" button that:
+
+```html
+<!-- Forum Create Post Section -->
+<section class="character-forum-section">
+    <a href="/forum/create?category=general&characterName=CHARACTER_NAME&characterId=CHARACTER_ID" 
+       class="btn btn-primary character-forum-btn">
+        🗣️ Create a Post about this Hero
+    </a>
+    <p>Share your thoughts about CHARACTER_NAME with the community</p>
+</section>
+```
+
+**Features:**
+- **Visual Integration**: Purple color scheme (#6a4c93) distinguishing it from episode buttons
+- **Hover Effects**: Interactive button with smooth transitions and lift animation
+- **Context Awareness**: Button text includes the specific character name
+- **Category Targeting**: Automatically routes to "General Discussion" category
+
+#### URL Parameter Structure for Characters
+The button generates URLs with the following parameters:
+```
+/forum/create?category=general&characterName=CHARACTER_NAME&characterId=CHARACTER_ID
+```
+
+**Parameters:**
+- `category=general`: Automatically selects "🎵 General Discussion" category
+- `characterName`: URL-encoded character name for form prepopulation
+- `characterId`: Character ID for internal tracking and future features
+
+#### Character-Specific Form Prepopulation
+
+When users click the character button, the forum create form is automatically prepopulated with:
+
+**1. Category Selection**
+```html
+<option value="general" selected>🎵 General Discussion</option>
+```
+
+**2. Character-Focused Title**
+```html
+<input type="text" id="post-title" name="title" 
+       value="Character Discussion: CHARACTER_NAME">
+```
+
+**3. Character-Specific Tags**
+```html
+<input type="text" id="post-tags" name="tags" 
+       value="character-name-slug, character, hero">
+```
+
+**4. Character Discussion Template**
+```html
+<textarea id="post-content" name="content">
+What are your thoughts about CHARACTER_NAME?
+
+Let's discuss this character:
+- What's your favorite thing about CHARACTER_NAME?
+- How do they fit into the Wavelength universe?
+- Any theories about their role or backstory?
+- Which episodes feature them prominently?
+
+Character discussion thread about CHARACTER_NAME.
+</textarea>
+```
+
+#### Enhanced Route Handling
+
+The forum create route now handles both episode and character parameters:
+
+```javascript
+router.get('/create', (req, res) => {
+    const categoryId = req.query.category || 'general';
+    const episodeTitle = req.query.episodeTitle || '';
+    const seasonNumber = req.query.seasonNumber || '';
+    const episodeNumber = req.query.episodeNumber || '';
+    const characterName = req.query.characterName || '';
+    const characterId = req.query.characterId || '';
+    
+    // Generate suggested title based on context
+    let suggestedTitle = '';
+    if (episodeTitle && seasonNumber && episodeNumber) {
+        suggestedTitle = `Discussion: ${episodeTitle} (Season ${seasonNumber}, Episode ${episodeNumber})`;
+    } else if (characterName) {
+        suggestedTitle = `Character Discussion: ${characterName}`;
+    }
+    
+    // Pass all context to template
+    res.render('forum/create-post-page', {
+        // ... all parameters including character data
+    });
+});
+```
+
+#### Character Integration Benefits
+
+**User Experience Improvements:**
+1. **Direct Character Discussion**: One-click transition from character exploration to discussion
+2. **Contextual Content**: Discussion prompts specifically tailored for character analysis
+3. **Proper Categorization**: Character posts automatically categorized appropriately
+4. **Enhanced Discovery**: Character-specific tags improve post findability
+5. **Structured Discussions**: Template encourages comprehensive character analysis
+
+**Community Engagement:**
+- **Character Analysis**: Encourages deeper exploration of character development
+- **Fan Theories**: Provides platform for character-related theories and speculation
+- **Episode Connections**: Prompts users to connect characters across episodes
+- **Universe Building**: Facilitates discussions about character relationships and lore
+
+#### Cross-Page Integration
+
+This feature creates a comprehensive content-to-community bridge:
+- **Episode Pages**: Episode-specific discussions and reactions
+- **Character Pages**: Character analysis and development discussions
+- **Forum Pages**: Centralized community engagement hub
+
 #### Future Enhancements
 
 **Planned Features:**
-- **Character Integration**: Add character-specific post creation from character pages
 - **Lore Integration**: Create lore discussion posts from lore pages
 - **Automatic Linking**: Detect and link episode mentions in forum posts
 - **Episode Post Categories**: Sub-categories for different types of episode discussions
 - **Related Posts**: Show related episode discussions on episode pages
+- **Character Post Categories**: Sub-categories for character discussions (analysis, theories, fan art)
+- **Cross-Content Linking**: Link character and episode discussions automatically
 
 **Technical Improvements:**
 - **Template Variations**: Different templates for different episode types
@@ -825,4 +950,4 @@ This feature creates a seamless connection between:
 - **Rich Content**: Pre-populate with episode metadata (air date, duration, etc.)
 - **Social Features**: Include episode rating or favorite moment prompts
 
-This comprehensive delete functionality provides secure, user-friendly content management while maintaining data integrity and proper cleanup of all associated resources. The episode integration features create a seamless bridge between content consumption and community engagement, encouraging active participation in episode discussions.
+This comprehensive delete functionality provides secure, user-friendly content management while maintaining data integrity and proper cleanup of all associated resources. The episode and character integration features create a seamless bridge between content consumption and community engagement, encouraging active participation in both episode discussions and character analysis throughout the Wavelength universe.

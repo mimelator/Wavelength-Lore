@@ -23,7 +23,7 @@ const disambiguationHelpers = require('./helpers/disambiguation-helpers');
 const simpleDisambiguation = require('./helpers/simple-disambiguation');
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 // Configure trust proxy for proper IP detection
 app.set('trust proxy', true);

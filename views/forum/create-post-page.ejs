@@ -106,7 +106,7 @@
                     <label for="post-tags">Tags</label>
                     <input type="text" id="post-tags" name="tags" 
                            placeholder="Enter tags separated by commas (e.g., lucky, goblin king, theory)"
-                           value="<% if (episodeTitle && seasonNumber && episodeNumber) { %>season<%= seasonNumber %>, episode<%= episodeNumber %>, <%= episodeTitle.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-') %><% } %>">
+                           value="<% if (episodeTitle && seasonNumber && episodeNumber) { %>season<%= seasonNumber %>, episode<%= episodeNumber %>, <%= episodeTitle.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-') %><% } else if (characterName) { %><%= characterName.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-') %>, character, hero<% } else if (loreName && loreType) { %><%= loreName.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-') %>, lore, <%= loreType %><% } %>">
                     <small class="form-help">Help others find your post with relevant tags</small>
                 </div>
                 
@@ -123,6 +123,26 @@ Share your thoughts about this episode:
 - How did it connect to the overall Wavelength story?
 
 Season <%= seasonNumber %>, Episode <%= episodeNumber %> discussion thread.
+
+<% } else if (characterName) { %>What are your thoughts about <%= characterName %>?
+
+Let's discuss this character:
+- What's your favorite thing about <%= characterName %>?
+- How do they fit into the Wavelength universe?
+- Any theories about their role or backstory?
+- Which episodes feature them prominently?
+
+Character discussion thread about <%= characterName %>.
+
+<% } else if (loreName && loreType) { %>Let's discuss <%= loreName %>!
+
+Share your thoughts about this <%= loreType %>:
+- What role does <%= loreName %> play in the Wavelength universe?
+- How does it connect to other lore elements?
+- Any theories about its significance or history?
+- Which episodes or characters interact with <%= loreName %>?
+
+Lore discussion thread about <%= loreName %> (<%- loreType.charAt(0).toUpperCase() + loreType.slice(1) %>).
 
 <% } %></textarea>
                     <small class="form-help">Support for links, mentions, and basic formatting</small>

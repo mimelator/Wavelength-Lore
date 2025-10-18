@@ -24,6 +24,10 @@ This directory contains debug and diagnostic scripts for the Wavelength Lore app
 ### Content Validation
 - **`check_post.js`** - Check and validate forum post content and structure
 
+### Forum Integration Testing
+- **`test-lore-forum-integration.js`** - Test lore-specific forum integration functionality
+- **`test-all-forum-integrations.js`** - Comprehensive test of all content-to-forum integrations (episodes, characters, lore)
+
 ## 📋 Usage
 
 ### Running Debug Scripts
@@ -48,6 +52,9 @@ node debug/verify-firebase-security.js
 
 ### Character System Debugging
 Scripts for troubleshooting character reference systems, lore connections, and keyword linking functionality.
+
+### Forum Integration Testing
+Scripts for testing and validating the content-to-forum integration functionality across episodes, characters, and lore objects.
 
 ### Database Integrity
 Scripts for verifying data consistency, security rules, and overall database health.

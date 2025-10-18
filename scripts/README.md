@@ -24,6 +24,12 @@ This directory contains utility scripts, build tools, and maintenance scripts fo
   - List existing backups
   - Restore from backups
   - Test backup functionality
+- **`cleanup-test-posts.js`** - Remove leftover test posts from e2e testing
+  - Identifies test posts by title/author patterns
+  - Cleans up associated S3 attachments
+  - Removes test replies
+  - Interactive confirmation with dry-run option
+- **`check-forum-database.js`** - Quick overview of current forum database contents
 
 ### 🚀 Deployment & Environment Scripts
 - **`apprunner-env-updater.js`** - Update AWS App Runner production environment variables
@@ -73,6 +79,12 @@ node scripts/setup_forum_database.js
 
 # Update security rules
 node scripts/update_firebase_rules.js
+
+# Clean up test data from e2e tests
+node scripts/cleanup-test-posts.js
+
+# Check current forum database contents
+node scripts/check-forum-database.js
 ```
 
 ### Backup Operations
