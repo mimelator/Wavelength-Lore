@@ -726,6 +726,48 @@ app.get('/about', async (req, res) => {
   }
 });
 
+// Route for Map page
+app.get('/map', async (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    
+    // Read the SVG map file
+    const mapPath = path.join(__dirname, 'content/maps/wavelength-world-map.svg');
+    let mapContent = '';
+    
+    try {
+      mapContent = fs.readFileSync(mapPath, 'utf8');
+    } catch (error) {
+      console.error('Error reading map file:', error);
+      mapContent = '<p>Map temporarily unavailable</p>';
+    }
+    
+    res.render('map', {
+      title: 'World Map - Wavelength Lore',
+      pageTitle: 'World Map - Wavelength Lore',
+      pageDescription: 'Explore the interactive world map of Wavelength, featuring locations, characters, and lore from the series.',
+      pageKeywords: 'wavelength map, interactive map, fantasy world, lore locations, character locations',
+      description: 'Explore the interactive world map of Wavelength, featuring locations, characters, and lore from the series.',
+      keywords: 'wavelength map, interactive map, fantasy world, lore locations, character locations',
+      ogType: 'website',
+      ogImage: process.env.CDN_URL + '/images/wavelength-map-og.jpg',
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`,
+      mapContent: mapContent,
+      req: req
+    });
+  } catch (error) {
+    console.error('Error rendering map page:', error);
+    res.status(500).send('Error loading map page');
+  }
+});
+
+// Test route for modal debugging
+app.get('/test-modal', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'test-modal.html'));
+});
+
 // Sitemap.xml route for SEO
 app.get('/sitemap.xml', async (req, res) => {
   try {
@@ -743,6 +785,12 @@ app.get('/sitemap.xml', async (req, res) => {
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/map</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>${baseUrl}/characters</loc>

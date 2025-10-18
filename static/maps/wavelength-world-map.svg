@@ -5,8 +5,10 @@
     <style type="text/css">
       @font-face {
         font-family: 'AnimeAce';
-        src: url('/fonts/animeace2_reg.ttf') format('truetype'),
-             url('/fonts/animeace2_reg.otf') format('opentype');
+        src: url('../../static/fonts/animeace2_reg.ttf') format('truetype'),
+             url('../../static/fonts/animeace2_reg.otf') format('opentype'),
+             url('/static/fonts/animeace2_reg.ttf') format('truetype'),
+             url('/static/fonts/animeace2_reg.otf') format('opentype');
       }
     </style>
     
@@ -18,7 +20,7 @@
                                            0.12 0.12 0.12 0 0.75
                                            0.08 0.08 0.08 0 0.65
                                            0 0 0 1 0"/>
-      <feComposite in2="SourceGraphic" operator="over"/>
+      <feComposite in2="SourceGraphic" operator="multiply"/>
     </filter>
     
     <!-- Mystical ocean with depth -->
@@ -136,7 +138,7 @@
                                            0.08 0.08 0.08 0 0.82
                                            0.06 0.06 0.06 0 0.78
                                            0 0 0 0.15 0"/>
-      <feComposite in2="SourceGraphic" operator="over"/>
+      <feComposite in2="SourceGraphic" operator="overlay"/>
     </filter>
     
     <!-- Natural terrain blending filter -->
@@ -149,7 +151,7 @@
                              0.04 0.04 0.04 0 0.88
                              0.03 0.03 0.03 0 0.85
                              0 0 0 0.1 0"/>
-      <feComposite in2="SourceGraphic" operator="over"/>
+      <feComposite in2="SourceGraphic" operator="soft-light"/>
     </filter>
     
     <!-- Soft edge blending for coastlines -->
@@ -284,6 +286,12 @@
     }
     
     /* Arcane special locations */
+    .goblin-lair { 
+      fill: #1b5e20; 
+      stroke: #66bb6a; 
+      stroke-width: 2; 
+      opacity: 0.8;
+    }
     
     /* Enhanced typography with medieval feel */
     .region-label { 
@@ -294,7 +302,6 @@
       text-anchor: middle; 
       filter: url(#ancientShadow);
       letter-spacing: 2px;
-      pointer-events: none;
     }
     .location-label { 
       font-family: 'AnimeAce', Arial, sans-serif; 
@@ -303,7 +310,6 @@
       text-anchor: middle; 
       font-weight: 600;
       filter: url(#ancientShadow);
-      pointer-events: none;
     }
     .feature-label { 
       font-family: 'AnimeAce', Arial, sans-serif; 
@@ -312,7 +318,6 @@
       text-anchor: middle; 
       font-style: italic;
       opacity: 0.9;
-      pointer-events: none;
     }
     .water-label { 
       font-family: 'AnimeAce', Arial, sans-serif; 
@@ -321,7 +326,6 @@
       text-anchor: middle; 
       font-style: italic;
       opacity: 0.8;
-      pointer-events: none;
     }
     
     /* Interactive enhancements */
@@ -406,9 +410,9 @@
 
   <!-- Ice Fortress - Repositioned to western edge of Frozen North -->
   <g id="ice-fortress-complex" transform="translate(-80, 40) scale(0.7)">
-    <!-- Subtle runic circle foundation (no click events) -->
+    <!-- Subtle runic circle foundation -->
     <circle cx="235" cy="180" r="20" fill="none" stroke="#7aa8bd" stroke-width="1" 
-            opacity="0.3" class="magical-energy" pointer-events="none" />
+            opacity="0.3" class="magical-energy" />
     
     <!-- Fortress structure with eldritch geometry -->
     <polygon fill="url(#iceFortressGradient)" stroke="#2c5aa0" stroke-width="1" points="205,165 220,145 235,140 250,145 265,165 265,200 205,200" />
@@ -422,13 +426,9 @@
     <polygon fill="url(#iceFortressGradient)" stroke="#2c5aa0" stroke-width="1" points="225,135 235,120 245,135 245,160 225,160" />
     
     <!-- Subtle arcane energy emanations -->
-    <circle cx="235" cy="150" r="2" fill="#b3d9ff" opacity="0.6" class="magical-energy" pointer-events="none" />
+    <circle cx="235" cy="150" r="2" fill="#b3d9ff" opacity="0.6" class="magical-energy" />
     
-    <!-- Visual marker (non-clickable to avoid conflicts) -->
-    <circle class="major-city" cx="235" cy="180" r="12" fill="#2196f3" stroke="#0d47a1" stroke-width="2" pointer-events="none" />
-    
-    <!-- Click Target - transparent for clean appearance -->
-    <circle class="click-target clickable" cx="235" cy="180" r="35" fill="transparent" stroke="transparent" stroke-width="0" data-location="ice-fortress" style="cursor: pointer;" />
+    <circle class="major-city clickable" cx="235" cy="180" r="6" data-location="ice-fortress" />
   </g>
 
   <!-- Shield Mountains - Protective shield adjacent to Ice Fortress -->
@@ -492,7 +492,7 @@
            C 360,510 375,490 370,470 
            C 365,450 350,430 355,410 
            C 360,390 365,370 350,360 
-           C 355,365 365,362 375,361 L 380,360 Z" />
+           C 355,365 365,362 375,361 380,360 Z" />
 
   <!-- Central mountain ranges -->
   <g id="central-mountains">
@@ -567,6 +567,9 @@
     <!-- Shire forests - include in masked group -->
     <ellipse class="forest" cx="394" cy="372" rx="21" ry="12" opacity="0.6" />
     <ellipse class="forest" cx="360" cy="345" rx="16" ry="10" opacity="0.6" />
+    
+    <!-- Desolate Island forest - small island biome -->
+    <ellipse class="forest" cx="150" cy="560" rx="20" ry="12" opacity="0.7" fill="#3d5a3d" />
   </g>
 
   <!-- SWAMP BIOMES - Layer 3 (positioned to avoid forests and mountains) -->
@@ -598,23 +601,6 @@
     <ellipse class="farmland" cx="670" cy="880" rx="18" ry="12" />
   </g>
 
-  <!-- DESOLATE ISLAND - Remote island west of Port Gamble -->
-  <g id="desolate-island">
-    <!-- Island landmass -->
-    <ellipse cx="150" cy="560" rx="25" ry="18" fill="#8d6e63" stroke="#5d4037" stroke-width="1" opacity="0.8" />
-    
-    <!-- Forest on island -->
-    <ellipse class="forest" cx="150" cy="560" rx="20" ry="12" opacity="0.7" fill="#3d5a3d" />
-    
-    <!-- Click target for Desolate Island -->
-    <circle class="click-target" cx="150" cy="560" r="25" fill="transparent" stroke="transparent" stroke-width="0" data-location="desolate-island" style="cursor: pointer;" />
-    
-    <!-- Coming soon location marker (smaller and more subtle) -->
-    <circle class="coming-soon" cx="150" cy="560" r="4" 
-            fill="#f57c00" stroke="#ef6c00" stroke-width="1" opacity="0.9" style="pointer-events: none;" />
-    <text class="location-label" x="150" y="540">Desolate Island</text>
-  </g>
-
   <!-- NORTHWESTERN SHIRE PENINSULA -->
   <!-- The peaceful Shire - now as a peninsula extending into northern waters -->
   <path id="shire-region" class="shire-land"
@@ -634,19 +620,17 @@
   <g id="shire-village">
     <!-- Subtle ley line convergence -->
     <circle cx="336" cy="372" r="10" fill="none" stroke="#7cb342" stroke-width="1" 
-            opacity="0.3" class="magical-energy" style="pointer-events: none;" />
+            opacity="0.3" class="magical-energy" />
     
     <!-- Village structures with organic curves -->
-    <ellipse class="village" cx="336" cy="368" rx="2.6" ry="2.1" style="pointer-events: none;" />
-    <ellipse class="village" cx="348" cy="364" rx="2.1" ry="1.6" style="pointer-events: none;" />
-    <ellipse class="village" cx="328" cy="376" rx="2.1" ry="1.6" style="pointer-events: none;" />
-    <ellipse class="village" cx="340" cy="380" rx="1.6" ry="1.6" style="pointer-events: none;" />
-    <ellipse class="village" cx="332" cy="360" rx="1.6" ry="1.0" style="pointer-events: none;" />
+    <ellipse class="village" cx="336" cy="368" rx="2.6" ry="2.1" />
+    <ellipse class="village" cx="348" cy="364" rx="2.1" ry="1.6" />
+    <ellipse class="village" cx="328" cy="376" rx="2.1" ry="1.6" />
+    <ellipse class="village" cx="340" cy="380" rx="1.6" ry="1.6" />
+    <ellipse class="village" cx="332" cy="360" rx="1.6" ry="1.0" />
     
-
-    
-    <!-- Mystical village center (visual only) -->
-    <circle class="major-city" cx="336" cy="372" r="7.2" fill="#4caf50" stroke="#2e7d32" stroke-width="1" style="pointer-events: none;" />
+    <!-- Mystical village center -->
+    <circle class="major-city clickable" cx="336" cy="372" r="3.6" data-location="the-shire" />
     
     <!-- Ancient standing stones -->
     <rect x="324" y="352" width="1.0" height="4.2" fill="#8d7053" opacity="0.5" />
@@ -664,9 +648,7 @@
             opacity="0.4" />
     
     <!-- Sacred sanctuary marker -->
-    <circle class="sanctuary clickable" cx="275" cy="320" r="6.2" data-location="shire-sanctuary" />
-    <!-- Larger invisible click target for better UX -->
-    <circle class="click-target" cx="275" cy="320" r="18" fill="transparent" stroke="transparent" stroke-width="0" data-location="shire-sanctuary" style="cursor: pointer;" />
+    <circle class="sanctuary clickable" cx="275" cy="320" r="3.1" data-location="shire-sanctuary" />
     
     <!-- Sacred grove markers -->
     <circle cx="271" cy="316" r="1.0" fill="#e65100" opacity="0.3" />
@@ -675,14 +657,16 @@
     <text class="location-label" x="275" y="308">Shire Sanctuary</text>
   </g>
 
-  <!-- Goblin territories (hidden) - removed duplicate goblin-lair, using goblin-king-lair instead -->
+  <!-- Goblin territories (hidden) -->
+  <g id="goblin-lands">
+    <circle class="goblin-lair clickable" cx="150" cy="550" r="4" data-location="goblin-lair" />
+    <text class="feature-label" x="150" y="580">Desolate Island</text>
+  </g>
 
   <!-- Goblin King's domain in the eastern swamplands - positioned in main swamp area -->
   <g id="goblin-king-domain">
-    <circle class="major-city clickable" cx="720" cy="600" r="12" data-location="goblin-king-lair" 
+    <circle class="major-city clickable" cx="720" cy="600" r="6" data-location="goblin-king-lair" 
             fill="#8b0000" stroke="#2e0e0e" stroke-width="2" opacity="0.9" />
-    <!-- Larger invisible click target for better UX -->
-    <circle class="click-target" cx="720" cy="600" r="22" fill="transparent" stroke="transparent" stroke-width="0" data-location="goblin-king-lair" style="cursor: pointer;" />
     <text class="location-label" x="720" y="625">Goblin King's Lair</text>
   </g>
 
@@ -701,12 +685,9 @@
     <circle cx="905" cy="838" r="2.5" fill="#2e5233" opacity="0.9" />
     <circle cx="890" cy="842" r="2" fill="#2e5233" opacity="0.9" />
     
-    <!-- Click target for Mystic Druids -->
-    <circle class="click-target" cx="895" cy="800" r="25" fill="transparent" stroke="transparent" stroke-width="0" data-location="mystic-druids" style="cursor: pointer;" />
-    
     <!-- Location marker (beside mountain) -->
-    <circle class="major-city clickable" cx="895" cy="800" r="8" data-location="mystic-druids" 
-            fill="#6a1b9a" stroke="#ffffff" stroke-width="2" opacity="1" style="pointer-events: none;" />
+    <circle class="major-city clickable" cx="895" cy="800" r="4" data-location="mystic-druids" 
+            fill="#6a1b9a" stroke="#ffffff" stroke-width="2" opacity="1" />
     <text class="location-label" x="895" y="870">Mystic Druids</text>
   </g>
 
@@ -724,12 +705,9 @@
     <rect x="360" y="535" width="12" height="8" fill="#6d4c41" />
     <polygon points="360,535 366,530 372,535" fill="#4e342e" />
     
-    <!-- Click target for Port Gamble -->
-    <circle class="click-target" cx="350" cy="540" r="25" fill="transparent" stroke="transparent" stroke-width="0" data-location="port-gamble" style="cursor: pointer;" />
-    
-    <!-- City marker (coming soon - reduced size) -->
+    <!-- City marker -->
     <circle class="major-city clickable" cx="350" cy="540" r="7" data-location="port-gamble" 
-            fill="#2e7d32" stroke="#1b5e20" stroke-width="2" opacity="0.9" style="pointer-events: none;" />
+            fill="#2e7d32" stroke="#1b5e20" stroke-width="2" opacity="0.9" />
     <text class="location-label" x="350" y="525">Port Gamble</text>
   </g>
 
@@ -744,12 +722,9 @@
     <!-- Crossroads intersection -->
     <path d="M 630,905 L 680,905 M 650,885 L 650,925" stroke="#8d6e63" stroke-width="3" opacity="0.6" />
     
-    <!-- Click target for Northern Crossroads -->
-    <circle class="click-target" cx="650" cy="905" r="25" fill="transparent" stroke="transparent" stroke-width="0" data-location="northern-crossroads" style="cursor: pointer;" />
-    
     <!-- Settlement marker -->
-    <circle class="minor-settlement clickable" cx="650" cy="905" r="10" data-location="northern-crossroads" 
-            fill="#8bc34a" stroke="#689f38" stroke-width="2" opacity="0.9" style="pointer-events: none;" />
+    <circle class="minor-settlement clickable" cx="650" cy="905" r="5" data-location="northern-crossroads" 
+            fill="#8bc34a" stroke="#689f38" stroke-width="2" opacity="0.9" />
     <text class="location-label" x="650" y="880">Northern Crossroads</text>
   </g>
 
@@ -818,11 +793,11 @@
   </g>
 
   <!-- REGION LABELS -->
-  <text class="region-label" x="650" y="180" text-anchor="middle" style="pointer-events: none;">The Frozen North</text>
-  <text class="region-label" x="450" y="480" text-anchor="middle" style="pointer-events: none;">Western Rainlands</text>
-  <text class="region-label" x="780" y="520" text-anchor="middle" style="pointer-events: none;">Eastern Drylands</text>
-  <text class="region-label" x="350" y="385" text-anchor="middle" style="pointer-events: none;">The Shire</text>
-  <text class="region-label" x="512" y="980" text-anchor="middle" opacity="0.8" style="pointer-events: none;">The Southern Reach ↓</text>
+  <text class="region-label" x="650" y="180" text-anchor="middle">The Frozen North</text>
+  <text class="region-label" x="450" y="480" text-anchor="middle">Western Rainlands</text>
+  <text class="region-label" x="780" y="520" text-anchor="middle">Eastern Drylands</text>
+  <text class="region-label" x="350" y="385" text-anchor="middle">The Shire</text>
+  <text class="region-label" x="512" y="980" text-anchor="middle" opacity="0.8">The Southern Reach ↓</text>
   
   <!-- MAJOR LOCATION LABELS (rendered on top) -->
   <text class="location-label" x="155" y="200" text-anchor="middle">Ice Fortress</text>
@@ -909,9 +884,5 @@
     <path d="M 30,990 L 37,980 L 44,990" class="mountains" stroke-width="2" fill="none" />
     <text x="50" y="987" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Mountains</text>
   </g>
-
-  <!-- CLICKABLE OVERLAYS (rendered on top of ALL content including text labels) -->
-  <!-- Shire click target positioned at absolute end for highest z-order -->
-  <circle class="click-target clickable" cx="336" cy="372" r="20" fill="transparent" stroke="transparent" stroke-width="0" data-location="the-shire" style="cursor: pointer;" />
 
 </svg>

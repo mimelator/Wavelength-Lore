@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Map Modal Test</title>
+    <link rel="stylesheet" href="/css/map.css">
+</head>
+<body>
+    <h1>Map Modal Test</h1>
+    
+    <button onclick="testModal('ice-fortress')">Test Ice Fortress Modal</button>
+    <button onclick="testModal('the-shire')">Test The Shire Modal</button>
+    <button onclick="testModal('goblin-king-lair')">Test Goblin King Lair Modal</button>
+    
+    <div id="map-disambiguation-container"></div>
+    
+    <script src="/js/map-disambiguation.js"></script>
+    <script>
+        function testModal(location) {
+            console.log('Testing modal for:', location);
+            showMapDisambiguationModal(location);
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMapDisambiguation();
+        });
+    </script>
+</body>
+</html>

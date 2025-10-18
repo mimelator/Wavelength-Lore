@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <%- include('partials/head', { 
+    title: 'World Map - Wavelength Lore', 
+    description: 'Explore the interactive world map of Wavelength, featuring locations, characters, and lore from the series.',
+    keywords: 'wavelength map, interactive map, fantasy world, lore locations, character locations'
+  }) %>
+  <!-- External CSS for map page -->
+  <link rel="stylesheet" href="/css/map.css">
+</head>
+<body>
+  <%- include('partials/header') %>
+  
+  <main>
+    <div class="map-container">
+      <div class="map-wrapper">
+        <h1 class="map-title">World of Wavelength</h1>
+        
+        <div class="map-description">
+          <p>
+            Explore the unique world of Wavelength, where the band Wavelength 
+            tours the land, performs concerts and takes on adventures. Click on locations to learn 
+            more about the areas and characters associated with them.
+          </p>
+        </div>
+
+        <div id="map-display">
+          <%- mapContent %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Disambiguation Modal Container -->
+    <div id="map-disambiguation-container"></div>
+  </main>
+
+  <%- include('partials/footer') %>
+
+  <!-- JavaScript for map disambiguation -->
+  <!-- <script src="/js/map-disambiguation.js"></script> -->
+  <!-- Modal scrolling fix with complete disambiguation system -->
+  <script src="/js/map-modal-fix.js"></script>
+  
+  <!-- Make site data available to map disambiguation system -->
+  <script>
+    // Expose site data for dynamic disambiguation
+    window.allCharacters = <%- JSON.stringify(allCharacters || []) %>;
+    window.allLore = <%- JSON.stringify(allLore || []) %>;
+    window.allEpisodes = <%- JSON.stringify(allEpisodes || []) %>;
+    
+    console.log('Site data loaded for map disambiguation:');
+    console.log('Characters:', window.allCharacters.length);
+    console.log('Lore items:', window.allLore.length); 
+    console.log('Episodes:', window.allEpisodes.length);
+  </script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Wait a moment for SVG to be fully loaded, then attach event handlers
+      setTimeout(function() {
+        attachClickHandlers();
+      }, 100);
+    });
+    
+    function attachClickHandlers() {
+      // Add click event handlers to map elements - prioritize click-target class
+      const clickTargets = document.querySelectorAll('.click-target[data-location]');
+      const fallbackElements = document.querySelectorAll('.clickable[data-location]:not(.click-target)');
+      
+      console.log('Found click-target elements:', clickTargets.length);
+      console.log('Found fallback clickable elements:', fallbackElements.length);
+      
+      // Debug: Log all click targets
+      clickTargets.forEach((el, i) => {
+        console.log(`Click target ${i}:`, el.getAttribute('data-location'), 'at', el.getAttribute('cx'), el.getAttribute('cy'));
+      });
+      
+      const allClickableElements = [...clickTargets, ...fallbackElements];
+      
+      if (allClickableElements.length === 0) {
+        console.warn('No clickable elements found, retrying in 500ms...');
+        setTimeout(attachClickHandlers, 500);
+        return;
+      }
+      
+      allClickableElements.forEach(element => {
+        // Remove any existing listeners to prevent duplicates
+        element.removeEventListener('click', handleMapClick);
+        
+        element.addEventListener('click', handleMapClick);
+        
+        // Add hover effect with improved tooltips
+        element.addEventListener('mouseenter', function() {
+          const location = this.getAttribute('data-location');
+          if (location) {
+            const title = location.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            this.setAttribute('title', `Click to explore ${title}`);
+          }
+        });
+      });
+    }
+    
+    function handleMapClick(e) {
+      e.preventDefault();
+      const location = this.getAttribute('data-location');
+      
+      console.log('Clicked location:', location);
+      
+      if (location) {
+        // Use disambiguation system for map navigation
+        showMapDisambiguationModal(location);
+      }
+    }
+  </script>
+
+  <!-- Include the site's disambiguation system -->
+  <%- simpleDisambiguationScript %>
+</body>
+</html>
