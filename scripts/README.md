@@ -4,38 +4,107 @@ This directory contains utility scripts, build tools, and maintenance scripts fo
 
 ## 📁 Script Categories
 
-### � Deployment & Monitoring Scripts
-- **`apprunner-deploy-monitor.js`** - Force redeploy and monitor AWS App Runner deployment status
-- **`deploy.sh`** - Convenience wrapper for deployment monitoring
-- **`apprunner-env-updater.js`** - Update environment variables and trigger redeploy
+### 🚀 Deployment & Monitoring Scripts
+- **`apprunner-deploy-monitor.js`** - Force redeploy and monitor AWS App Runner deployment status with real-time progress tracking
+- **`deploy.sh`** - Convenient wrapper script for deployment monitoring
+- **`apprunner-env-updater.js`** - Update environment variables and trigger automatic redeploy
+- **`production-port-diagnostic.js`** - Diagnose and fix port configuration issues in production
+- **`check-production-env.js`** - Quick check of production environment variables
 
 #### Deployment Monitor Features
-The deployment monitor provides comprehensive deployment management:
+The deployment monitor provides comprehensive deployment management with enterprise-grade monitoring:
 
-- ⏱️ **Real-time status updates** every 30 seconds
-- 🎯 **Final deployment status** (success/failure)  
-- ⏳ **Total deployment time** tracking
-- 🌐 **Automatic connectivity testing**
-- 📊 **Service health information**
-- 🔧 **Troubleshooting guidance** on failure
+- ⏱️ **Real-time status updates** every 30 seconds with live progress tracking
+- 🎯 **Deployment lifecycle management** from initiation to completion
+- ⏳ **Accurate timing metrics** with elapsed time tracking
+- 🌐 **Automatic connectivity testing** with retry logic and health validation
+- 📊 **Comprehensive service health reporting** including CPU/memory/scaling metrics
+- 🔧 **Intelligent troubleshooting guidance** with specific recommendations
+- 🛡️ **Graceful interruption handling** (Ctrl+C safe - deployment continues)
+- 📈 **Production-ready monitoring** with detailed logging and error reporting
+
+#### Port Configuration Management
+Advanced port configuration system for production deployment reliability:
+
+- **`NODE_PORT=3001`** - Internal Node.js application port (behind proxy)
+- **`NGINX_PORT=8080`** - External Nginx proxy port (public interface)
+- **`DEPLOYMENT_TIMESTAMP`** - Automatic deployment tracking and redeploy triggers
+- **`CONTACT_EMAIL`** - Centralized contact configuration for forum functionality
+
+#### Production Diagnostics
+Comprehensive diagnostic tools for production environment troubleshooting:
+
+- **Port Configuration Analysis** - Automatic detection of port mismatches and conflicts
+- **Environment Variable Validation** - Verification of all required production settings
+- **Service Health Monitoring** - Real-time status checks and connectivity validation
+- **Deployment History Tracking** - Timestamp-based deployment audit trail
 
 **Usage Examples:**
 ```bash
-# Quick deployment
-./deploy.sh
-
-# Deployment with custom reason
+# Quick deployment with monitoring
 ./deploy.sh --reason "Fix production bug"
 
-# Direct script usage
-node apprunner-deploy-monitor.js --reason "Update environment variables"
+# Advanced deployment with custom reason
+node apprunner-deploy-monitor.js --reason "Deploy port configuration fix"
+
+# Environment variable updates with automatic redeploy
+node apprunner-env-updater.js --force
+
+# Production diagnostics and troubleshooting
+node production-port-diagnostic.js --fix
+node check-production-env.js
+
+# Preview environment changes
+node apprunner-env-updater.js --dry-run
 ```
 
-**Status Indicators:**
-- 🟢 **RUNNING**: Service is healthy and ready
-- 🟡 **DEPLOYING**: Deployment in progress  
-- 🔴 **FAILED**: Deployment failed
-- ⏸️ **PAUSED**: Service paused (manual intervention needed)
+#### Deployment Status Indicators
+- 🟢 **RUNNING**: Service is healthy and ready for traffic
+- 🟡 **DEPLOYING**: Deployment in progress with real-time monitoring
+- 🔴 **FAILED**: Deployment failed with detailed error analysis
+- ⏸️ **PAUSED**: Service paused (requires manual intervention)
+
+#### Monitoring & Alerting Features
+- **Real-time Progress Updates**: Live status updates every 30 seconds
+- **Health Check Automation**: Post-deployment connectivity validation
+- **Error Detection & Analysis**: Intelligent failure diagnosis
+- **Deployment Metrics**: Comprehensive timing and performance data
+- **Service Configuration Reporting**: CPU, memory, and auto-scaling status
+
+#### Production Environment Variables
+The deployment system manages these critical production settings:
+
+**Port Configuration:**
+- `NODE_PORT=3001` - Node.js internal port (Nginx proxy target)
+- `NGINX_PORT=8080` - Nginx external port (public interface)
+
+**Application Settings:**
+- `CONTACT_EMAIL` - Forum contact email (dynamically configurable)
+- `DEPLOYMENT_TIMESTAMP` - Deployment tracking and redeploy triggers
+- `CDN_URL` - CloudFront CDN endpoint for static assets
+
+**Database & Services:**
+- Firebase configuration (API_KEY, DATABASE_URL, PROJECT_ID, etc.)
+- AWS credentials and S3 bucket settings
+- Security and rate limiting configurations
+
+#### Troubleshooting Guide
+Common issues and solutions:
+
+**502 Bad Gateway Errors:**
+1. Check port configuration: `node check-production-env.js`
+2. Verify NODE_PORT=3001 and application startup
+3. Run diagnostics: `node production-port-diagnostic.js --fix`
+
+**Deployment Failures:**
+1. Monitor deployment: `node apprunner-deploy-monitor.js`
+2. Check service logs in AWS CloudWatch
+3. Verify environment variables: `node apprunner-env-updater.js --dry-run`
+
+**Environment Variable Issues:**
+1. Update variables: `node apprunner-env-updater.js --force`
+2. Verify changes: `node check-production-env.js`
+3. Monitor redeploy: `node apprunner-deploy-monitor.js`
 
 ### �🔧 Build & Development Scripts
 - **`start-dev.sh`** - Start development server with hot reload

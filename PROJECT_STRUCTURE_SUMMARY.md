@@ -10,7 +10,8 @@ The Wavelength Lore project has been fully reorganized into a professional, ente
 Wavelength-Lore/
 ├── 📚 docs/                      # Centralized documentation
 ├── 🧪 tests/                     # Organized test suite  
-├── 🛠️ helpers/                   # Utility modules
+├── � scripts/                    # Deployment and automation scripts
+├── �🛠️ helpers/                   # Utility modules
 ├── 🚀 routes/                     # Express.js route handlers
 ├── 🔧 utils/                      # Core utilities and services
 ├── 🏠 public/                     # Static web assets
@@ -84,18 +85,28 @@ Wavelength-Lore/
 - **Firebase Security Rules** - Database access control and validation
 - **Authentication** - Token-based security for admin operations
 
-### 💾 Backup Infrastructure
-- **AWS S3 Integration** - Automated secure cloud backups
-- **AES-256-GCM Encryption** - Enterprise-grade data encryption
-- **Automated Scheduling** - Configurable backup intervals
-- **CLI Management** - Complete command-line backup tools
-- **API Endpoints** - RESTful backup management interface
-- **Retention Policies** - Automated cleanup and lifecycle management
+### � Forum Infrastructure
+- **Community Forum** - Complete discussion system with threaded replies
+- **Advanced Search** - Real-time search with filters and category support
+- **Content Management** - Rich text posts with file attachments via S3
+- **User Authentication** - Firebase-based user management and verification
+- **Moderation System** - Community guidelines and admin controls
+- **Contact Integration** - Configurable moderator contact system
+
+### 🚀 Production Deployment
+- **AWS App Runner** - Containerized production deployment platform
+- **Port Configuration** - Advanced port management (NODE_PORT=3001, NGINX_PORT=8080)
+- **Environment Management** - Comprehensive production variable handling
+- **Deployment Monitoring** - Real-time deployment tracking with health checks
+- **Continuous Deployment** - Automated environment updates and redeployment
+- **Production Diagnostics** - Advanced troubleshooting and configuration tools
 
 ### 🛠️ Development Tools
 - **Test Runner Framework** - Categorized test execution with reporting
 - **CLI Backup Tools** - `backup-cli.js` for manual backup operations  
 - **Development Scripts** - Enhanced start/stop/sync scripts
+- **Deployment Automation** - Real-time monitoring and environment management
+- **Production Diagnostics** - Port configuration and health checking tools
 - **Error Handling** - Comprehensive error tracking and reporting
 
 ## 📊 Implementation Status
@@ -151,6 +162,25 @@ node backup-cli.js list
 node backup-cli.js status
 ```
 
+### Deployment Management
+```bash
+# Quick deployment with monitoring
+./scripts/deploy.sh --reason "Production update"
+
+# Advanced deployment tracking
+node scripts/apprunner-deploy-monitor.js --reason "Port configuration fix"
+
+# Environment variable management
+node scripts/apprunner-env-updater.js --force
+
+# Production diagnostics
+node scripts/production-port-diagnostic.js --fix
+node scripts/check-production-env.js
+
+# Preview environment changes
+node scripts/apprunner-env-updater.js --dry-run
+```
+
 ### Documentation Access
 ```bash
 # View complete documentation index
@@ -171,9 +201,26 @@ The Wavelength Lore project now features:
 4. **🧪 Comprehensive Testing** - 15 categorized tests with unified runner framework
 5. **📚 Centralized Documentation** - Complete guides and implementation references
 6. **🛠️ Development Tools** - CLI utilities and management interfaces
-7. **🚀 Production Ready** - Deployment guides and operational procedures
+7. **� Community Forum** - Full-featured discussion system with search and moderation
+8. **�🚀 Production Deployment** - AWS App Runner with monitoring and diagnostics
+9. **⚙️ Environment Management** - Advanced configuration and port handling
+10. **🔧 Operational Tools** - Real-time deployment monitoring and troubleshooting
 
-The project is now organized as an enterprise-ready application with professional structure, comprehensive security, automated backup capabilities, and complete documentation for development and deployment.
+### Forum System Features
+- ✅ **Discussion Posts & Replies** - Threaded conversations with real-time updates
+- ✅ **Advanced Search** - Real-time search with category filters and content matching
+- ✅ **Community Guidelines** - Comprehensive moderation policies and contact system
+- ✅ **Content Security** - Authenticated deletion with ownership verification
+- ✅ **File Management** - S3 integration for attachments with automatic cleanup
+
+### Production Infrastructure
+- ✅ **AWS App Runner Deployment** - Containerized production hosting
+- ✅ **Port Configuration** - Advanced port management (NODE_PORT=3001, NGINX_PORT=8080)
+- ✅ **Real-time Monitoring** - Live deployment tracking with health checks
+- ✅ **Environment Automation** - Automatic variable updates and redeployment
+- ✅ **Diagnostic Tools** - Comprehensive troubleshooting and configuration validation
+
+The project is now organized as an enterprise-ready application with professional structure, comprehensive security, automated backup capabilities, complete forum functionality, production deployment automation, and comprehensive documentation for development and operations.
 
 ---
 

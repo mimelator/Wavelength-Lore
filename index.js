@@ -1,4 +1,11 @@
-require('dotenv').config();
+// Load environment variables (safe for production containers)
+require('dotenv').config({ silent: true });
+
+console.log(`🔧 Environment Detection:`);
+console.log(`   .env loaded: ${process.env.NODE_ENV !== 'production' ? 'yes' : 'container-based'}`);
+console.log(`   NODE_PORT from env: ${process.env.NODE_PORT || 'not set'}`);
+console.log(`   PORT from env: ${process.env.PORT || 'not set'}`);
+
 const express = require('express');
 const path = require('path');
 
@@ -23,23 +30,28 @@ const disambiguationHelpers = require('./helpers/disambiguation-helpers');
 const simpleDisambiguation = require('./helpers/simple-disambiguation');
 
 const app = express();
-// Port configuration: Always use NODE_PORT if set, ignore App Runner's automatic PORT
+
+// Enhanced port configuration with App Runner compatibility
+console.log(`🔧 Raw Environment Variables:`);
+console.log(`   NODE_PORT: ${process.env.NODE_PORT || 'undefined'}`);
+console.log(`   PORT: ${process.env.PORT || 'undefined'}`);
+console.log(`   NGINX_PORT: ${process.env.NGINX_PORT || 'undefined'}`);
+
+// Port selection logic: Always prioritize NODE_PORT over App Runner's PORT
 let port;
-if (process.env.NODE_PORT) {
+if (process.env.NODE_PORT && process.env.NODE_PORT !== 'undefined') {
   port = parseInt(process.env.NODE_PORT);
-  console.log(`🎯 Using NODE_PORT: ${port}`);
-} else if (process.env.PORT) {
+  console.log(`🎯 Using explicit NODE_PORT: ${port}`);
+} else if (process.env.PORT && process.env.PORT !== 'undefined') {
   port = parseInt(process.env.PORT);
-  console.log(`⚠️  Using fallback PORT: ${port}`);
+  console.log(`⚠️  Using App Runner PORT: ${port} (NODE_PORT not set)`);
 } else {
   port = 3001;
-  console.log(`🔧 Using default port: ${port}`);
+  console.log(`🔧 Using default port: ${port} (no env vars set)`);
 }
 
-console.log(`🔧 Port Configuration:`);
-console.log(`   NODE_PORT: ${process.env.NODE_PORT || 'not set'}`);
-console.log(`   PORT: ${process.env.PORT || 'not set'}`);
-console.log(`   Selected port: ${port}`);
+console.log(`� Final port configuration: ${port}`);
+console.log(`🔗 App will be available at: http://localhost:${port}`);
 
 // Configure trust proxy for proper IP detection
 app.set('trust proxy', true);

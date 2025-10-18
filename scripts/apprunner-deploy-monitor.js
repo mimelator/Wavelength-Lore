@@ -61,17 +61,21 @@ class AppRunnerDeploymentMonitor {
       }
       
       // Force update by updating the service configuration
-      // We'll update a harmless setting to trigger redeploy
+      // We'll add a deployment timestamp to environment variables to trigger redeploy
+      const currentEnvVars = currentService.SourceConfiguration?.ImageRepository?.ImageConfiguration?.RuntimeEnvironmentVariables || {};
+      const newEnvVars = {
+        ...currentEnvVars,
+        DEPLOYMENT_TIMESTAMP: new Date().toISOString()
+      };
+      
       const updateParams = {
         ServiceArn: this.serviceArn,
         SourceConfiguration: {
           ImageRepository: {
             ...currentService.SourceConfiguration.ImageRepository,
-            // Force update by ensuring auto deployments are enabled
             ImageConfiguration: {
               ...currentService.SourceConfiguration.ImageRepository.ImageConfiguration,
-              // Add a timestamp to force update (this will be ignored but triggers redeploy)
-              StartCommand: currentService.SourceConfiguration.ImageRepository.ImageConfiguration.StartCommand || ''
+              RuntimeEnvironmentVariables: newEnvVars
             }
           },
           AutoDeploymentsEnabled: true // Ensure auto deployments are enabled
@@ -288,9 +292,6 @@ class AppRunnerDeploymentMonitor {
    */
   async execute(options = {}) {
     try {
-      // Load environment variables
-      require('dotenv').config();
-      
       const reason = options.reason || 'Manual redeploy via deployment monitor';
       
       // Force redeploy
@@ -320,6 +321,10 @@ class AppRunnerDeploymentMonitor {
 
 // CLI Interface
 async function main() {
+  // Load environment variables first, before doing anything else
+  const path = require('path');
+  require('dotenv').config({ path: path.join(__dirname, '../.env') });
+  
   const args = process.argv.slice(2);
   const serviceArn = 'arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa';
   

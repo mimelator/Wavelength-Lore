@@ -121,6 +121,7 @@ class AppRunnerEnvUpdater {
       'NODE_PORT',
       'NGINX_PORT',
       'CONTACT_EMAIL',
+      'DEPLOYMENT_TIMESTAMP',
       'VERSION',
       'SITE_URL',
       'PORT'

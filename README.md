@@ -27,16 +27,36 @@ All project documentation has been organized in the [`docs/`](docs/) folder:
 - ✅ User authentication with Firebase ID tokens
 - ✅ Secure delete functionality with ownership verification
 
-## 🗑️ Forum Delete Functionality
+## � Forum Features
 
-Users can now delete their own posts and replies with comprehensive security:
+The Wavelength Lore site includes a comprehensive community forum with:
 
-- **Authenticated Deletion**: Uses Firebase ID tokens for secure user verification
-- **Ownership Verification**: Users can only delete their own content
-- **Cascade Deletion**: Deleting posts automatically removes all replies
-- **File Cleanup**: Automatically removes S3 attachments when content is deleted
-- **Admin Override**: Administrators can delete any content through admin panel
+### Core Functionality
+- ✅ **Discussion Posts**: Create and participate in community discussions
+- ✅ **Reply System**: Threaded replies with real-time updates
+- ✅ **Search & Discovery**: Advanced search with filters and category support
+- ✅ **Community Guidelines**: Comprehensive moderation policies and rules
+- ✅ **Contact System**: Direct moderator contact with configurable email
 
-See [Forum Delete Documentation](docs/FORUM_DELETE_FUNCTIONALITY.md) for complete implementation details.
+### Content Management
+- ✅ **Rich Text Support**: Markdown formatting and media attachments
+- ✅ **File Attachments**: Secure S3 integration for images and documents
+- ✅ **Content Categories**: Organized discussion topics and filtering
+- ✅ **User Profiles**: Display user information and post history
+
+### Moderation & Safety
+- ✅ **Authenticated Deletion**: Secure post and reply removal with ownership verification
+- ✅ **Admin Controls**: Administrative override capabilities for content management
+- ✅ **Cascade Deletion**: Automatic cleanup of replies when posts are deleted
+- ✅ **File Cleanup**: Automatic S3 attachment removal for deleted content
+- ✅ **Rate Limiting**: Smart protection against spam and abuse
+
+### Navigation & Discovery
+- ✅ **Unified Navigation**: Consistent forum navigation across all pages
+- ✅ **Search Integration**: Real-time search with category and content filtering
+- ✅ **Guidelines Integration**: Easy access to community rules and policies
+- ✅ **Help System**: Comprehensive user guides and support resources
+
+See [Forum Delete Documentation](docs/FORUM_DELETE_FUNCTIONALITY.md) and [Security Enhancement Guide](docs/SECURITY_ENHANCEMENT_GUIDE.md) for implementation details.
 
 See [Security Enhancement Guide](docs/SECURITY_ENHANCEMENT_GUIDE.md) for complete details.
