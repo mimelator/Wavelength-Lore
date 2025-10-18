@@ -189,6 +189,13 @@
       stroke: none;
       filter: url(#terrainBlend);
     }
+    .farmland { 
+      fill: #9ccc65; 
+      stroke: #689f38;
+      stroke-width: 1;
+      opacity: 0.7;
+      filter: url(#terrainBlend);
+    }
     
     /* Mystical geographic features */
     .mountains { 
@@ -422,7 +429,6 @@
     <circle cx="235" cy="150" r="2" fill="#b3d9ff" opacity="0.6" class="magical-energy" />
     
     <circle class="major-city clickable" cx="235" cy="180" r="6" data-location="ice-fortress" />
-    <text class="location-label" x="235" y="220">Ice Fortress</text>
   </g>
 
   <!-- Shield Mountains - Protective shield adjacent to Ice Fortress -->
@@ -434,28 +440,19 @@
     <path class="ice-mountains" d="M 220,186 L 240,156 L 260,186 Z" fill="#b3e5fc" stroke="#0277bd" stroke-width="2" />
     <path class="ice-mountains" d="M 240,206 L 260,176 L 280,206 Z" fill="#b3e5fc" stroke="#0277bd" stroke-width="2" />
     
-    <!-- Eastern shield wall -->
-    <path class="ice-mountains" d="M 260,116 L 280,86 L 300,116 Z" fill="#b3e5fc" stroke="#0277bd" stroke-width="2" />
-    <path class="ice-mountains" d="M 280,136 L 300,106 L 320,136 Z" fill="#b3e5fc" stroke="#0277bd" stroke-width="2" />
-    <path class="ice-mountains" d="M 300,156 L 320,126 L 340,156 Z" fill="#b3e5fc" stroke="#0277bd" stroke-width="2" />
-    
     <!-- Secondary smaller ice peaks for natural variation -->
     <path class="ice-mountains" d="M 145,141 L 160,121 L 175,141 Z" fill="#e1f5fe" stroke="#0288d1" stroke-width="1.5" />
     <path class="ice-mountains" d="M 225,101 L 240,81 L 255,101 Z" fill="#e1f5fe" stroke="#0288d1" stroke-width="1.5" />
-    <path class="ice-mountains" d="M 265,151 L 280,131 L 295,151 Z" fill="#e1f5fe" stroke="#0288d1" stroke-width="1.5" />
-    <path class="ice-mountains" d="M 285,171 L 300,151 L 315,171 Z" fill="#e1f5fe" stroke="#0288d1" stroke-width="1.5" />
     
     <!-- Ice crystal formations on peaks -->
     <polygon points="180,96 175,106 185,106" fill="#ffffff" stroke="#81d4fa" stroke-width="1" opacity="0.8" />
     <polygon points="200,116 195,126 205,126" fill="#ffffff" stroke="#81d4fa" stroke-width="1" opacity="0.8" />
     <polygon points="220,136 215,146 225,146" fill="#ffffff" stroke="#81d4fa" stroke-width="1" opacity="0.8" />
     <polygon points="240,156 235,166 245,166" fill="#ffffff" stroke="#81d4fa" stroke-width="1" opacity="0.8" />
-    <polygon points="280,86 275,96 285,96" fill="#ffffff" stroke="#81d4fa" stroke-width="1" opacity="0.8" />
-    <polygon points="300,106 295,116 305,116" fill="#ffffff" stroke="#81d4fa" stroke-width="1" opacity="0.8" />
     <polygon points="320,126 315,136 325,136" fill="#ffffff" stroke="#81d4fa" stroke-width="1" opacity="0.8" />
     
     <!-- Mountain range label -->
-    <text class="feature-label" x="230" y="236" text-anchor="middle" font-size="14" font-weight="bold" 
+    <text class="feature-label" x="320" y="156" text-anchor="start" font-size="14" font-weight="bold" 
           fill="#0277bd" letter-spacing="1px">Shield Mountains</text>
   </g>
 
@@ -499,15 +496,7 @@
 
   <!-- Central mountain ranges -->
   <g id="central-mountains">
-    <!-- Small mountain range on Eastern Expanse side near Shire border -->
-    <path class="mountains" d="M 420,380 L 440,365 L 460,380 L 480,370 L 500,385 L 520,375 L 540,390" />
-    <path class="mountain-peaks" d="M 430,390 L 440,375 L 450,390 M 470,385 L 480,370 L 490,385 M 510,395 L 520,380 L 530,395" />
-    <circle class="mountains" cx="430" cy="375" r="3" />
-    <circle class="mountains" cx="450" cy="378" r="4" />
-    <circle class="mountains" cx="470" cy="375" r="3" />
-    <circle class="mountains" cx="490" cy="380" r="4" />
-    <circle class="mountains" cx="510" cy="378" r="3" />
-    <circle class="mountains" cx="530" cy="383" r="4" />
+    <!-- Mountains between Shire and Eastern Expanse removed -->
     
     <!-- The Great Spine - North-South Continental Mountain Range with Inverted V Symbols -->
     
@@ -559,28 +548,28 @@
     <ellipse class="forest" cx="420" cy="580" rx="45" ry="25" />
     <ellipse class="forest" cx="460" cy="630" rx="45" ry="25" />
     <ellipse class="forest" cx="430" cy="460" rx="50" ry="20" />
+    
+    <!-- Temperate rain forest - redistributed across western continent -->
+    <ellipse class="forest" cx="520" cy="680" rx="35" ry="20" opacity="0.8" />
 
     <!-- Eastern forests - positioned east of mountain spine, respecting boundaries -->
-    <ellipse class="forest" cx="740" cy="480" rx="45" ry="30" />
-    <ellipse class="forest" cx="780" cy="550" rx="35" ry="20" />
-    <ellipse class="forest" cx="760" cy="600" rx="35" ry="25" />
+    <ellipse class="forest" cx="800" cy="480" rx="45" ry="30" />
+    <ellipse class="forest" cx="840" cy="550" rx="35" ry="20" />
+    <ellipse class="forest" cx="820" cy="600" rx="35" ry="25" />
 
     <!-- Southern extension forests - contained within land boundaries -->
-    <ellipse class="forest" cx="460" cy="760" rx="65" ry="40" />
-    <ellipse class="forest" cx="540" cy="940" rx="35" ry="20" />
-    <ellipse class="forest" cx="830" cy="930" rx="55" ry="35" />
+    <ellipse class="forest" cx="440" cy="800" rx="60" ry="35" />
 
-    <!-- Additional western rainforest - moved further inland -->
-    <ellipse class="forest" cx="440" cy="710" rx="45" ry="25" />
-    <ellipse class="forest" cx="380" cy="640" rx="30" ry="20" />
+    <!-- Additional western rainforest - better distributed -->
+    <ellipse class="forest" cx="500" cy="720" rx="35" ry="18" />
+    <ellipse class="forest" cx="380" cy="550" rx="25" ry="15" />
     
     <!-- Shire forests - include in masked group -->
-    <ellipse class="forest" cx="190" cy="356" rx="28" ry="16" opacity="0.6" />
-    <ellipse class="forest" cx="254" cy="372" rx="32" ry="18" opacity="0.6" />
-    <ellipse class="forest" cx="310" cy="348" rx="25" ry="15" opacity="0.6" />
+    <ellipse class="forest" cx="394" cy="372" rx="21" ry="12" opacity="0.6" />
+    <ellipse class="forest" cx="360" cy="345" rx="16" ry="10" opacity="0.6" />
     
-    <!-- Goblin island forest - reduced size to fit on island -->
-    <ellipse class="forest" cx="150" cy="550" rx="25" ry="15" opacity="0.7" fill="#4a5c4a" />
+    <!-- Desolate Island forest - small island biome -->
+    <ellipse class="forest" cx="150" cy="560" rx="20" ry="12" opacity="0.7" fill="#3d5a3d" />
   </g>
 
   <!-- SWAMP BIOMES - Layer 3 (positioned to avoid forests and mountains) -->
@@ -589,34 +578,40 @@
     <ellipse class="swamp" cx="720" cy="650" rx="70" ry="45" />
     
     <!-- Eastern swamplands - contained within landmass boundaries -->
-    <ellipse class="swamp" cx="780" cy="680" rx="45" ry="30" />
-    <ellipse class="swamp" cx="850" cy="720" rx="40" ry="25" />
+    <ellipse class="swamp" cx="820" cy="720" rx="40" ry="25" />
+    <ellipse class="swamp" cx="880" cy="680" rx="35" ry="20" />
     
     <!-- Southern swamplands - well within southern landmass -->
-    <ellipse class="swamp" cx="600" cy="850" rx="60" ry="40" />
-    <ellipse class="swamp" cx="520" cy="880" rx="50" ry="30" />
+    <ellipse class="swamp" cx="600" cy="850" rx="35" ry="25" />
   </g>
 
   <!-- GRASSLAND BIOMES - Layer 4 (fill remaining open areas) -->
   <g id="grassland-biomes">
     <!-- Eastern grasslands - well-defined dry ecosystem areas -->
-    <ellipse class="grassland" cx="820" cy="470" rx="35" ry="25" opacity="0.6" />
-    <ellipse class="grassland" cx="860" cy="540" rx="30" ry="20" opacity="0.6" />
-    <ellipse class="grassland" cx="880" cy="790" rx="55" ry="35" opacity="0.6" />
-    <ellipse class="grassland" cx="750" cy="900" rx="45" ry="30" opacity="0.6" />
+    <ellipse class="grassland" cx="900" cy="540" rx="25" ry="18" opacity="0.6" />
+    <ellipse class="grassland" cx="810" cy="900" rx="45" ry="30" opacity="0.6" />
+  </g>
+
+  <!-- FARMING BIOMES - Agricultural areas around settlements -->
+  <g id="farming-biomes">
+    <!-- Northern Crossroads farming area -->
+    <ellipse class="farmland" cx="620" cy="890" rx="30" ry="20" />
+    <ellipse class="farmland" cx="680" cy="910" rx="25" ry="18" />
+    <ellipse class="farmland" cx="640" cy="930" rx="20" ry="15" />
+    <ellipse class="farmland" cx="670" cy="880" rx="18" ry="12" />
   </g>
 
   <!-- NORTHWESTERN SHIRE PENINSULA -->
   <!-- The peaceful Shire - now as a peninsula extending into northern waters -->
   <path id="shire-region" class="shire-land"
-        d="M 90,320 
-           C 74,290 86,260 124,268 
-           S 180,260 244,272 
-           S 344,280 376,312 
-           C 392,352 376,392 344,422 
-           S 260,452 196,442 
-           S 116,432 104,402 
-           S 72,362 90,320 Z" />
+        d="M 267,340 
+           C 257,322 264,304 285,309 
+           S 319,304 343,311 
+           S 401,316 421,335 
+           C 431,366 421,395 401,413 
+           S 349,429 336,424 
+           S 290,418 284,398 
+           S 262,378 267,340 Z" />
 
   <!-- Mountain range between Shire and Eastern Expanse -->
     <!-- The Shire settlement with mystical hobbit architecture -->
@@ -624,41 +619,42 @@
   <!-- The Shire settlement with mystical hobbit architecture -->
   <g id="shire-village">
     <!-- Subtle ley line convergence -->
-    <circle cx="196" cy="372" r="16" fill="none" stroke="#7cb342" stroke-width="1" 
+    <circle cx="336" cy="372" r="10" fill="none" stroke="#7cb342" stroke-width="1" 
             opacity="0.3" class="magical-energy" />
     
     <!-- Village structures with organic curves -->
-    <ellipse class="village" cx="196" cy="368" rx="4" ry="3.2" />
-    <ellipse class="village" cx="208" cy="364" rx="3.2" ry="2.4" />
-    <ellipse class="village" cx="188" cy="376" rx="3.2" ry="2.4" />
-    <ellipse class="village" cx="200" cy="380" rx="2.4" ry="2.4" />
-    <ellipse class="village" cx="192" cy="360" rx="2.4" ry="1.6" />
+    <ellipse class="village" cx="336" cy="368" rx="2.6" ry="2.1" />
+    <ellipse class="village" cx="348" cy="364" rx="2.1" ry="1.6" />
+    <ellipse class="village" cx="328" cy="376" rx="2.1" ry="1.6" />
+    <ellipse class="village" cx="340" cy="380" rx="1.6" ry="1.6" />
+    <ellipse class="village" cx="332" cy="360" rx="1.6" ry="1.0" />
     
     <!-- Mystical village center -->
-    <circle class="major-city clickable" cx="196" cy="372" r="5.6" data-location="the-shire" />
+    <circle class="major-city clickable" cx="336" cy="372" r="3.6" data-location="the-shire" />
     
     <!-- Ancient standing stones -->
-    <rect x="184" y="352" width="1.6" height="6.4" fill="#8d7053" opacity="0.5" />
-    <rect x="212" y="356" width="1.6" height="4.8" fill="#8d7053" opacity="0.5" />
+    <rect x="324" y="352" width="1.0" height="4.2" fill="#8d7053" opacity="0.5" />
+    <rect x="352" y="356" width="1.0" height="3.1" fill="#8d7053" opacity="0.5" />
     
-    <text class="location-label" x="196" y="400">The Shire</text>
+    <!-- Village label hidden - territory label shown instead -->
+    <!-- <text class="location-label" x="336" y="400">The Shire</text> -->
   </g>
 
   <!-- Shire Sanctuary with sacred geometry -->
     <!-- Shire Sanctuary with sacred geometry -->
   <g id="shire-sanctuary">
     <!-- Subtle sacred circle -->
-    <circle cx="100" cy="280" r="9.6" fill="none" stroke="#e65100" stroke-width="1" 
+    <circle cx="275" cy="320" r="6.2" fill="none" stroke="#e65100" stroke-width="1" 
             opacity="0.4" />
     
     <!-- Sacred sanctuary marker -->
-    <circle class="sanctuary clickable" cx="100" cy="280" r="4.8" data-location="shire-sanctuary" />
+    <circle class="sanctuary clickable" cx="275" cy="320" r="3.1" data-location="shire-sanctuary" />
     
     <!-- Sacred grove markers -->
-    <circle cx="96" cy="276" r="1.6" fill="#e65100" opacity="0.3" />
-    <circle cx="104" cy="284" r="1.6" fill="#e65100" opacity="0.3" />
+    <circle cx="271" cy="316" r="1.0" fill="#e65100" opacity="0.3" />
+    <circle cx="279" cy="324" r="1.0" fill="#e65100" opacity="0.3" />
     
-    <text class="location-label" x="100" y="304">Shire Sanctuary</text>
+    <text class="location-label" x="275" y="308">Shire Sanctuary</text>
   </g>
 
   <!-- Goblin territories (hidden) -->
@@ -698,7 +694,6 @@
   <!-- Port Gamble - coastal trading city on western side, facing Desolate Island -->
   <g id="port-gamble">
     <!-- Harbor structures -->
-    <ellipse cx="350" cy="540" rx="25" ry="15" fill="#8b7355" opacity="0.8" />
     <rect x="345" y="535" width="10" height="15" fill="#6d4c41" />
     <rect x="355" y="530" width="8" height="12" fill="#6d4c41" />
     
@@ -714,6 +709,23 @@
     <circle class="major-city clickable" cx="350" cy="540" r="7" data-location="port-gamble" 
             fill="#2e7d32" stroke="#1b5e20" stroke-width="2" opacity="0.9" />
     <text class="location-label" x="350" y="525">Port Gamble</text>
+  </g>
+
+  <!-- Northern Crossroads - Farming community at southern tip of mountain range -->
+  <g id="northern-crossroads">
+    <!-- Farm buildings -->
+    <rect x="650" y="895" width="8" height="12" fill="#8d6e63" />
+    <polygon points="650,895 654,890 658,895" fill="#5d4037" />
+    <rect x="655" y="900" width="6" height="8" fill="#6d4c41" />
+    <polygon points="655,900 658,897 661,900" fill="#4e342e" />
+    
+    <!-- Crossroads intersection -->
+    <path d="M 630,905 L 680,905 M 650,885 L 650,925" stroke="#8d6e63" stroke-width="3" opacity="0.6" />
+    
+    <!-- Settlement marker -->
+    <circle class="minor-settlement clickable" cx="650" cy="905" r="5" data-location="northern-crossroads" 
+            fill="#8bc34a" stroke="#689f38" stroke-width="2" opacity="0.9" />
+    <text class="location-label" x="650" y="880">Northern Crossroads</text>
   </g>
 
   <!-- EASTERN WILD ISLANDS -->
@@ -784,7 +796,11 @@
   <text class="region-label" x="650" y="180" text-anchor="middle">The Frozen North</text>
   <text class="region-label" x="450" y="480" text-anchor="middle">Western Rainlands</text>
   <text class="region-label" x="780" y="520" text-anchor="middle">Eastern Drylands</text>
-  <text class="region-label" x="244" y="340" text-anchor="middle">The Shire</text>
+  <text class="region-label" x="350" y="385" text-anchor="middle">The Shire</text>
+  <text class="region-label" x="512" y="980" text-anchor="middle" opacity="0.8">The Southern Reach ↓</text>
+  
+  <!-- MAJOR LOCATION LABELS (rendered on top) -->
+  <text class="location-label" x="155" y="200" text-anchor="middle">Ice Fortress</text>
   
   <!-- MOUNTAIN RANGE LABEL -->
   <text class="feature-label" x="620" y="640" text-anchor="middle" font-size="24" font-weight="bold" fill="#3e2723" letter-spacing="3px">The Great Spine</text>
@@ -852,17 +868,21 @@
     <rect x="30" y="920" width="15" height="12" class="wild-land" />
     <text x="50" y="930" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Wild Lands</text>
     
+    <!-- Farmland -->
+    <ellipse cx="37" cy="941" rx="7" ry="5" class="farmland" />
+    <text x="50" y="945" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Farmland</text>
+    
     <!-- Swamp -->
-    <ellipse cx="37" cy="946" rx="7" ry="5" class="swamp" />
-    <text x="50" y="950" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Swampland</text>
+    <ellipse cx="37" cy="956" rx="7" ry="5" class="swamp" />
+    <text x="50" y="960" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Swampland</text>
     
     <!-- Forest -->
-    <ellipse cx="37" cy="961" rx="7" ry="5" class="forest" />
-    <text x="50" y="965" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Forest</text>
+    <ellipse cx="37" cy="971" rx="7" ry="5" class="forest" />
+    <text x="50" y="975" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Forest</text>
     
     <!-- Mountains -->
-    <path d="M 30,980 L 37,970 L 44,980" class="mountains" stroke-width="2" fill="none" />
-    <text x="50" y="977" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Mountains</text>
+    <path d="M 30,990 L 37,980 L 44,990" class="mountains" stroke-width="2" fill="none" />
+    <text x="50" y="987" fill="#2d1810" font-family="AnimeAce, serif" font-size="12">Mountains</text>
   </g>
 
 </svg>
