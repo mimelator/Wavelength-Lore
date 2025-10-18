@@ -1,0 +1,50 @@
+# Use a Node.js base image with a supported Debian version
+FROM node:18-bullseye
+
+# Set the working directory
+WORKDIR /app
+
+# Create app user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Copy package.json and package-lock.json first for better caching
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Install Nginx
+RUN apt-get update && apt-get install -y nginx && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copy the application code
+COPY . .
+
+# Copy Nginx configuration
+COPY config/nginx.conf /etc/nginx/nginx.conf
+
+# Create necessary directories and set permissions
+RUN mkdir -p /var/log/nginx && \
+    chown -R appuser:appuser /app && \
+    chown -R appuser:appuser /var/log/nginx
+
+# Expose the ports
+EXPOSE 8080 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:3001/health || exit 1
+
+# Create startup script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo "Starting Nginx..."\n\
+nginx &\n\
+echo "Starting Node.js application..."\n\
+exec node index.js' > /app/start.sh && \
+chmod +x /app/start.sh
+
+# Switch to non-root user
+USER appuser
+
+# Start both services
+CMD ["/app/start.sh"]

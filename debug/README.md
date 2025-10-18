@@ -32,6 +32,7 @@ This directory contains debug and diagnostic scripts for the Wavelength Lore app
 ### UI Structure Validation
 - **validate-ui-structure.js** - Comprehensive validation of UI component structure and integration
 - **test-disambiguation-spacing.js** - Test disambiguation link spacing improvements and text overlap fixes
+- **test-forum-search.js** - Test forum search functionality including page load and API endpoints
 
 ## 📋 Usage
 

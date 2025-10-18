@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/forum.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    
+    <style>
+        .guidelines-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .guidelines-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .guidelines-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .guidelines-header p {
+            margin: 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .guidelines-nav {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .guidelines-nav h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .nav-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #007bff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: block;
+            text-align: center;
+        }
+
+        .nav-link:hover {
+            background: #007bff;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #007bff;
+        }
+
+        .section h2 {
+            color: #333;
+            margin: 0 0 20px 0;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3 {
+            color: #555;
+            margin: 25px 0 15px 0;
+            font-size: 1.3em;
+        }
+
+        .section h4 {
+            color: #666;
+            margin: 20px 0 10px 0;
+            font-size: 1.1em;
+        }
+
+        .section p {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .rules-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .rules-list li {
+            background: #f8f9fa;
+            margin-bottom: 12px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            position: relative;
+        }
+
+        .rules-list li:before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            font-size: 16px;
+            position: absolute;
+            left: -2px;
+            top: 15px;
+        }
+
+        .rules-list li strong {
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-left: 4px solid #f39c12;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .warning-box h4 {
+            color: #b7950b;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .danger-box {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-left: 4px solid #dc3545;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .danger-box h4 {
+            color: #721c24;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .info-box h4 {
+            color: #0c5460;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .category-tag {
+            padding: 6px 12px;
+            background: #e9ecef;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #495057;
+            border: 1px solid #ced4da;
+        }
+
+        .contact-info {
+            background: #e7f3ff;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #bee5eb;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .contact-info h3 {
+            color: #0c5460;
+            margin-bottom: 15px;
+        }
+
+        .contact-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .contact-btn {
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .contact-btn:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .contact-btn.secondary {
+            background: #6c757d;
+        }
+
+        .contact-btn.secondary:hover {
+            background: #545b62;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .guidelines-container {
+                padding: 15px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .guidelines-header h1 {
+                font-size: 2em;
+            }
+
+            .nav-links {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Smooth scrolling for anchor links */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Highlight targeted sections */
+        .section:target {
+            animation: highlight 2s ease-in-out;
+        }
+
+        @keyframes highlight {
+            0% { background-color: #fff3cd; }
+            100% { background-color: white; }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header') %>
+    
+    <div class="forum-container">
+        <div class="guidelines-container">
+            <!-- Header -->
+            <div class="guidelines-header">
+                <h1>📋 Community Guidelines</h1>
+                <p>Building a respectful and engaging community for Wavelength Lore fans</p>
+            </div>
+
+            <!-- Quick Navigation -->
+            <div class="guidelines-nav">
+                <h3>📍 Quick Navigation</h3>
+                <div class="nav-links">
+                    <a href="#core-principles" class="nav-link">Core Principles</a>
+                    <a href="#posting-guidelines" class="nav-link">Posting Guidelines</a>
+                    <a href="#categories" class="nav-link">Forum Categories</a>
+                    <a href="#moderation" class="nav-link">Moderation Policy</a>
+                    <a href="#consequences" class="nav-link">Consequences</a>
+                    <a href="#reporting" class="nav-link">Reporting Issues</a>
+                </div>
+            </div>
+
+            <!-- Core Principles -->
+            <section id="core-principles" class="section">
+                <h2>🎯 Core Principles</h2>
+                <p>Our community is built on these fundamental values that guide all interactions:</p>
+                
+                <ul class="rules-list">
+                    <li>
+                        <strong>Respect and Kindness</strong>
+                        Treat all community members with dignity and courtesy, regardless of their opinions or theories about the Wavelength Lore universe.
+                    </li>
+                    <li>
+                        <strong>Constructive Discussion</strong>
+                        Engage in meaningful conversations that contribute to the community's understanding and enjoyment of the lore.
+                    </li>
+                    <li>
+                        <strong>Inclusive Environment</strong>
+                        Welcome newcomers and create a space where everyone feels comfortable sharing their thoughts and theories.
+                    </li>
+                    <li>
+                        <strong>Quality Content</strong>
+                        Share thoughtful posts, well-researched theories, and creative content that enriches the community experience.
+                    </li>
+                    <li>
+                        <strong>Community Spirit</strong>
+                        Support fellow fans, celebrate discoveries, and help build the collective knowledge of the Wavelength universe.
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Posting Guidelines -->
+            <section id="posting-guidelines" class="section">
+                <h2>✍️ Posting Guidelines</h2>
+                
+                <h3>📝 Creating Posts</h3>
+                <ul class="rules-list">
+                    <li>
+                        <strong>Use Descriptive Titles</strong>
+                        Write clear, specific titles that accurately describe your post content. Avoid vague titles like "Question" or "Theory".
+                    </li>
+                    <li>
+                        <strong>Choose the Right Category</strong>
+                        Select the most appropriate category for your post to help others find and engage with your content.
+                    </li>
+                    <li>
+                        <strong>Provide Context</strong>
+                        Include relevant background information, episode references, or lore connections to help others understand your post.
+                    </li>
+                    <li>
+                        <strong>Use Spoiler Tags</strong>
+                        Mark content that might spoil recent episodes or major plot points for other community members.
+                    </li>
+                </ul>
+
+                <h3>💬 Commenting and Replies</h3>
+                <ul class="rules-list">
+                    <li>
+                        <strong>Stay On Topic</strong>
+                        Keep your comments relevant to the original post and ongoing discussion thread.
+                    </li>
+                    <li>
+                        <strong>Quote Appropriately</strong>
+                        When responding to specific points, use quotes to provide clear context for your replies.
+                    </li>
+                    <li>
+                        <strong>Build on Ideas</strong>
+                        Add to existing theories and discussions rather than simply agreeing or disagreeing without explanation.
+                    </li>
+                    <li>
+                        <strong>Respect Different Opinions</strong>
+                        Acknowledge that there can be multiple valid interpretations of the lore and episodes.
+                    </li>
+                </ul>
+
+                <div class="info-box">
+                    <h4>💡 Pro Tip</h4>
+                    <p>Before posting a theory or question, try using the search function to see if similar topics have been discussed recently. This helps avoid duplicate content and allows you to build on existing conversations.</p>
+                </div>
+            </section>
+
+            <!-- Forum Categories -->
+            <section id="categories" class="section">
+                <h2>📂 Forum Categories</h2>
+                <p>Understanding our forum structure helps you post in the right place and find relevant discussions:</p>
+
+                <h3>Available Categories</h3>
+                <div class="category-tags">
+                    <span class="category-tag">🗣️ General Discussion</span>
+                    <span class="category-tag">📜 Lore & Theories</span>
+                    <span class="category-tag">🎵 Episode Discussions</span>
+                    <span class="category-tag">🎨 Fan Creations</span>
+                </div>
+
+                <h4>🗣️ General Discussion</h4>
+                <p>Open conversations about Wavelength Lore, community topics, introductions, and general fan discussions that don't fit into specialized categories.</p>
+
+                <h4>📜 Lore & Theories</h4>
+                <p>Deep dives into the Wavelength universe, character analysis, world-building discussions, timeline theories, and connections between different story elements.</p>
+
+                <h4>🎵 Episode Discussions</h4>
+                <p>Episode-specific conversations, reactions, analysis of new releases, and discussions about musical elements and storytelling techniques.</p>
+
+                <h4>🎨 Fan Creations</h4>
+                <p>Share your artwork, fan fiction, music covers, videos, and other creative content inspired by the Wavelength Lore universe.</p>
+
+                <div class="warning-box">
+                    <h4>⚠️ Category Guidelines</h4>
+                    <p>Posts in the wrong category may be moved by moderators. If you're unsure which category to use, General Discussion is usually a safe choice, or you can ask a moderator for guidance.</p>
+                </div>
+            </section>
+
+            <!-- Prohibited Content -->
+            <section id="prohibited-content" class="section">
+                <h2>🚫 Prohibited Content</h2>
+                <p>The following content is not allowed anywhere in our community:</p>
+
+                <ul class="rules-list">
+                    <li>
+                        <strong>Harassment and Personal Attacks</strong>
+                        Any form of bullying, harassment, or personal attacks against community members or creators.
+                    </li>
+                    <li>
+                        <strong>Hate Speech and Discrimination</strong>
+                        Content that promotes hatred or discrimination based on race, gender, religion, sexuality, or other personal characteristics.
+                    </li>
+                    <li>
+                        <strong>Spam and Self-Promotion</strong>
+                        Excessive posting, duplicate content, or promotional material unrelated to Wavelength Lore.
+                    </li>
+                    <li>
+                        <strong>Inappropriate Content</strong>
+                        NSFW content, explicit material, or content inappropriate for a general audience.
+                    </li>
+                    <li>
+                        <strong>Leaked or Unauthorized Content</strong>
+                        Sharing unreleased episodes, behind-the-scenes content, or private information without permission.
+                    </li>
+                </ul>
+
+                <div class="danger-box">
+                    <h4>🚨 Zero Tolerance</h4>
+                    <p>Harassment, hate speech, and doxxing will result in immediate permanent bans. We prioritize the safety and comfort of our community members above all else.</p>
+                </div>
+            </section>
+
+            <!-- Moderation Policy -->
+            <section id="moderation" class="section">
+                <h2>🛡️ Moderation Policy</h2>
+                
+                <h3>How We Moderate</h3>
+                <p>Our moderation approach is designed to maintain a positive community while being fair and transparent:</p>
+
+                <ul class="rules-list">
+                    <li>
+                        <strong>Community-First Approach</strong>
+                        Decisions are made based on what's best for the overall community health and member experience.
+                    </li>
+                    <li>
+                        <strong>Proportionate Responses</strong>
+                        Consequences match the severity and frequency of guideline violations.
+                    </li>
+                    <li>
+                        <strong>Educational Focus</strong>
+                        First-time minor violations often result in guidance rather than punishment.
+                    </li>
+                    <li>
+                        <strong>Consistent Application</strong>
+                        Guidelines are applied equally to all members regardless of their status or history in the community.
+                    </li>
+                </ul>
+
+                <h3>Moderator Actions</h3>
+                <p>Moderators may take the following actions when guidelines are violated:</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 20px 0;">
+                    <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; border-left: 4px solid #007bff;">
+                        <h4 style="margin: 0 0 10px 0; color: #0056b3;">🗨️ Warning</h4>
+                        <p style="margin: 0; font-size: 14px;">Private message explaining the issue and providing guidance for future posts.</p>
+                    </div>
+                    <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #f39c12;">
+                        <h4 style="margin: 0 0 10px 0; color: #b7950b;">✏️ Edit Request</h4>
+                        <p style="margin: 0; font-size: 14px;">Request to modify content to comply with guidelines.</p>
+                    </div>
+                    <div style="background: #f8d7da; padding: 15px; border-radius: 8px; border-left: 4px solid #dc3545;">
+                        <h4 style="margin: 0 0 10px 0; color: #721c24;">🗑️ Content Removal</h4>
+                        <p style="margin: 0; font-size: 14px;">Removal of posts or comments that violate guidelines.</p>
+                    </div>
+                    <div style="background: #d4edda; padding: 15px; border-radius: 8px; border-left: 4px solid #28a745;">
+                        <h4 style="margin: 0 0 10px 0; color: #155724;">⏸️ Temporary Suspension</h4>
+                        <p style="margin: 0; font-size: 14px;">Temporary restriction from posting for repeated violations.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Consequences -->
+            <section id="consequences" class="section">
+                <h2>⚖️ Consequences for Violations</h2>
+                
+                <h3>Progressive Enforcement</h3>
+                <p>Most violations follow this progression, though serious violations may skip steps:</p>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div style="width: 30px; height: 30px; background: #28a745; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold;">1</div>
+                        <div>
+                            <strong>First Violation:</strong> Friendly warning and guidance
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div style="width: 30px; height: 30px; background: #ffc107; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold;">2</div>
+                        <div>
+                            <strong>Second Violation:</strong> Formal warning and content removal
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div style="width: 30px; height: 30px; background: #fd7e14; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold;">3</div>
+                        <div>
+                            <strong>Third Violation:</strong> 24-48 hour posting suspension
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <div style="width: 30px; height: 30px; background: #dc3545; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold;">4</div>
+                        <div>
+                            <strong>Continued Violations:</strong> Extended suspension or permanent ban
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Serious Violations</h3>
+                <p>The following may result in immediate suspension or permanent ban:</p>
+                <ul>
+                    <li>Harassment or doxxing of community members</li>
+                    <li>Hate speech or discriminatory content</li>
+                    <li>Sharing private or leaked content</li>
+                    <li>Evading previous bans or suspensions</li>
+                    <li>Coordinated attacks or brigading</li>
+                </ul>
+
+                <div class="info-box">
+                    <h4>📞 Appeals Process</h4>
+                    <p>If you believe a moderation action was taken in error, you can appeal by contacting the moderation team through the channels listed below. Appeals should be respectful and include specific information about why you believe the action was incorrect.</p>
+                </div>
+            </section>
+
+            <!-- Reporting Issues -->
+            <section id="reporting" class="section">
+                <h2>🚨 Reporting Issues</h2>
+                
+                <h3>When to Report</h3>
+                <p>Please report content or behavior that:</p>
+                <ul>
+                    <li>Violates any of the community guidelines</li>
+                    <li>Makes you or others feel unsafe or unwelcome</li>
+                    <li>Contains spam, inappropriate content, or off-topic material</li>
+                    <li>Involves harassment or personal attacks</li>
+                </ul>
+
+                <h3>How to Report</h3>
+                <p>You can report issues through several channels:</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+                    <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">📧</div>
+                        <strong>Email</strong>
+                        <p style="margin: 5px 0; font-size: 14px;">moderators@wavelengthlore.com</p>
+                    </div>
+                    <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">💬</div>
+                        <strong>Private Message</strong>
+                        <p style="margin: 5px 0; font-size: 14px;">Contact any moderator directly</p>
+                    </div>
+                    <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🔗</div>
+                        <strong>Report Button</strong>
+                        <p style="margin: 5px 0; font-size: 14px;">Use the report function on posts</p>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <h4>⏱️ Response Time</h4>
+                    <p>We aim to respond to reports within 24 hours. Urgent safety issues (harassment, doxxing) are prioritized and typically addressed within a few hours.</p>
+                </div>
+            </section>
+
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <h3>📞 Questions or Concerns?</h3>
+                <p>If you have questions about these guidelines or need clarification on any policy, don't hesitate to reach out to our community team.</p>
+                
+                <div class="contact-buttons">
+                    <a href="/forum" class="contact-btn">Return to Forum</a>
+                    <a href="mailto:community@wavelengthlore.com" class="contact-btn secondary">Contact Moderators</a>
+                </div>
+            </div>
+
+            <!-- Last Updated -->
+            <div class="last-updated">
+                <p>Last updated: October 17, 2025 | Version 2.1</p>
+                <p>These guidelines may be updated periodically to reflect community needs and feedback.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forum Footer -->
+    <footer class="forum-footer">
+        <div class="container">
+            <div class="forum-footer-content">
+                <div class="forum-stats">
+                    <span>Wavelength Community Forum</span>
+                </div>
+                <div class="forum-links">
+                    <a href="/">Return to Wavelength Lore</a>
+                    <a href="/forum/guidelines">Community Guidelines</a>
+                    <a href="/forum/help">Help & Support</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

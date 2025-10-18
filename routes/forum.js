@@ -336,26 +336,190 @@ router.get('/api/post/:postId', async (req, res) => {
 router.get('/api/search', async (req, res) => {
     try {
         const query = req.query.q || '';
+        const category = req.query.category || '';
+        const sort = req.query.sort || 'relevance';
+        const timeFilter = req.query.time || '';
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
         
-        // This would implement search in Firebase
+        // Import Firebase functions for search
+        const { initializeApp } = require('firebase/app');
+        const { getDatabase, ref, get, query: firebaseQuery, orderByChild } = require('firebase/database');
+        
+        // Firebase config from environment
+        const firebaseConfig = {
+            apiKey: process.env.API_KEY,
+            authDomain: process.env.AUTH_DOMAIN,
+            databaseURL: process.env.DATABASE_URL,
+            projectId: process.env.PROJECT_ID,
+            storageBucket: process.env.STORAGE_BUCKET,
+            messagingSenderId: process.env.MESSAGING_SENDER_ID,
+            appId: process.env.APP_ID
+        };
+        
+        // Initialize Firebase app for this request
+        let app;
+        try {
+            app = initializeApp(firebaseConfig, `search-${Date.now()}`);
+        } catch (error) {
+            // App might already exist, get existing instance
+            const { getApps, getApp } = require('firebase/app');
+            app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+        }
+        
+        const database = getDatabase(app);
+        const postsRef = ref(database, 'forum/posts');
+        
+        // Get all posts from Firebase
+        const snapshot = await get(postsRef);
+        const allPosts = snapshot.val() || {};
+        
+        // Convert to array and filter
+        let posts = Object.keys(allPosts).map(key => ({
+            id: key,
+            ...allPosts[key]
+        }));
+        
+        // Filter by query text (search in title and content)
+        if (query.trim()) {
+            const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+            posts = posts.filter(post => {
+                const title = (post.title || '').toLowerCase();
+                const content = (post.content || '').toLowerCase();
+                const author = (post.author || '').toLowerCase();
+                const searchText = `${title} ${content} ${author}`;
+                
+                // Check if all search terms are found
+                return searchTerms.every(term => searchText.includes(term));
+            });
+        }
+        
+        // Filter by category
+        if (category) {
+            posts = posts.filter(post => post.category === category);
+        }
+        
+        // Filter by time range
+        if (timeFilter) {
+            const now = Date.now();
+            let timeThreshold = 0;
+            
+            switch (timeFilter) {
+                case 'day':
+                    timeThreshold = now - (24 * 60 * 60 * 1000);
+                    break;
+                case 'week':
+                    timeThreshold = now - (7 * 24 * 60 * 60 * 1000);
+                    break;
+                case 'month':
+                    timeThreshold = now - (30 * 24 * 60 * 60 * 1000);
+                    break;
+                case 'year':
+                    timeThreshold = now - (365 * 24 * 60 * 60 * 1000);
+                    break;
+            }
+            
+            if (timeThreshold > 0) {
+                posts = posts.filter(post => (post.createdAt || 0) >= timeThreshold);
+            }
+        }
+        
+        // Sort results
+        switch (sort) {
+            case 'date':
+                posts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                break;
+            case 'date-asc':
+                posts.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+                break;
+            case 'replies':
+                posts.sort((a, b) => (b.replyCount || 0) - (a.replyCount || 0));
+                break;
+            case 'views':
+                posts.sort((a, b) => (b.views || 0) - (a.views || 0));
+                break;
+            case 'relevance':
+            default:
+                // For relevance, we could implement a scoring system
+                // For now, just sort by date as fallback
+                posts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                break;
+        }
+        
+        // Calculate pagination
+        const total = posts.length;
+        const totalPages = Math.ceil(total / limit);
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + limit;
+        const resultPosts = posts.slice(startIndex, endIndex);
+        
+        // Add search result highlights
+        const highlightedPosts = resultPosts.map(post => {
+            if (query.trim()) {
+                const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+                let highlightedTitle = post.title || '';
+                let highlightedContent = post.content || '';
+                
+                // Simple highlighting - wrap search terms in highlight tags
+                searchTerms.forEach(term => {
+                    const regex = new RegExp(`(${term})`, 'gi');
+                    highlightedTitle = highlightedTitle.replace(regex, '<mark class="result-highlight">$1</mark>');
+                    highlightedContent = highlightedContent.replace(regex, '<mark class="result-highlight">$1</mark>');
+                });
+                
+                // Truncate content to show relevant excerpts
+                if (highlightedContent.length > 300) {
+                    const index = highlightedContent.toLowerCase().indexOf(searchTerms[0]);
+                    if (index > -1) {
+                        const start = Math.max(0, index - 100);
+                        const end = Math.min(highlightedContent.length, index + 200);
+                        highlightedContent = (start > 0 ? '...' : '') + 
+                                          highlightedContent.slice(start, end) + 
+                                          (end < highlightedContent.length ? '...' : '');
+                    } else {
+                        highlightedContent = highlightedContent.slice(0, 300) + '...';
+                    }
+                }
+                
+                return {
+                    ...post,
+                    highlightedTitle,
+                    highlightedContent: highlightedContent || (post.content || '').slice(0, 300) + '...'
+                };
+            }
+            
+            return {
+                ...post,
+                highlightedTitle: post.title || '',
+                highlightedContent: (post.content || '').slice(0, 300) + (post.content && post.content.length > 300 ? '...' : '')
+            };
+        });
+        
         res.json({
             success: true,
-            results: [],
+            results: highlightedPosts,
             query: query,
+            filters: {
+                category,
+                sort,
+                timeFilter
+            },
             pagination: {
                 page: page,
                 limit: limit,
-                total: 0,
-                totalPages: 0
+                total: total,
+                totalPages: totalPages,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1
             }
         });
+        
     } catch (error) {
         console.error('Error searching posts:', error);
         res.status(500).json({
             success: false,
-            error: 'Search failed'
+            error: 'Search failed',
+            details: error.message
         });
     }
 });

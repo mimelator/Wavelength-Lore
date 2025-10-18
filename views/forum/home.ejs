@@ -57,13 +57,40 @@
             <span class="action-icon">✏️</span>
             <span class="action-text">Create New Post</span>
         </button>
-        <button class="quick-action-btn" onclick="showSearchModal()">
+        <a href="/forum/search" class="quick-action-btn">
             <span class="action-icon">🔍</span>
             <span class="action-text">Search Forum</span>
-        </button>
+        </a>
+        <a href="/forum/guidelines" class="quick-action-btn">
+            <span class="action-icon">�</span>
+            <span class="action-text">Community Guidelines</span>
+        </a>
         <a href="/forum/profile" class="quick-action-btn">
             <span class="action-icon">👤</span>
             <span class="action-text">My Profile</span>
+        </a>
+    </div>
+</div>
+
+<!-- Community Links (visible to all users) -->
+<div class="forum-community-links">
+    <h3>Community</h3>
+    <div class="community-links-grid">
+        <a href="/forum/search" class="community-link">
+            <span class="link-icon">🔍</span>
+            <span class="link-text">Search Posts</span>
+        </a>
+        <a href="/forum/guidelines" class="community-link">
+            <span class="link-icon">📋</span>
+            <span class="link-text">Community Guidelines</span>
+        </a>
+        <a href="/forum/recent" class="community-link">
+            <span class="link-icon">⏰</span>
+            <span class="link-text">Recent Posts</span>
+        </a>
+        <a href="/forum/popular" class="community-link">
+            <span class="link-icon">🔥</span>
+            <span class="link-text">Popular Posts</span>
         </a>
     </div>
 </div>
@@ -435,10 +462,5 @@ function truncateText(text, maxLength) {
 function showCreatePostModal() {
     // Navigate to create post page
     window.location.href = '/forum/create';
-}
-
-function showSearchModal() {
-    // Navigate to forum search (for now, just show an alert with better message)
-    alert('Search functionality will be available soon! For now, browse categories or recent posts.');
 }
 </script>

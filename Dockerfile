@@ -14,13 +14,13 @@ RUN npm install
 COPY . .
 
 # Install Nginx
-RUN apt-get update && apt-get install -y nginx
+RUN apt-get update && apt-get install -y nginx gettext-base
 
-# Copy Nginx configuration
-COPY config/nginx.conf /etc/nginx/nginx.conf
+# Copy Nginx configuration template
+COPY config/nginx.conf.template /etc/nginx/nginx.conf.template
 
 # Expose the ports for Nginx
 EXPOSE 8080
 
 # Start Nginx and your Node.js app
-CMD ["sh", "-c", "nginx && node index.js"]
+CMD ["sh", "-c", "envsubst '${NGINX_PORT} ${NODE_PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx && node index.js"]

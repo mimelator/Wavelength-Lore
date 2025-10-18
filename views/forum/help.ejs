@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/forum.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    
+    <style>
+        .help-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .help-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .help-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .help-header p {
+            margin: 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .help-nav {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .help-nav h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .help-nav-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .help-nav-link {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #28a745;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: block;
+            text-align: center;
+        }
+
+        .help-nav-link:hover {
+            background: #28a745;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .help-section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #28a745;
+        }
+
+        .help-section h2 {
+            color: #333;
+            margin: 0 0 20px 0;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .help-section h3 {
+            color: #555;
+            margin: 25px 0 15px 0;
+            font-size: 1.3em;
+        }
+
+        .help-section h4 {
+            color: #666;
+            margin: 20px 0 10px 0;
+            font-size: 1.1em;
+        }
+
+        .help-section p {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .help-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .help-list li {
+            background: #f8f9fa;
+            margin-bottom: 12px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            position: relative;
+        }
+
+        .help-list li:before {
+            content: "?";
+            color: #28a745;
+            font-weight: bold;
+            font-size: 16px;
+            position: absolute;
+            left: -2px;
+            top: 15px;
+            background: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #28a745;
+        }
+
+        .help-list li strong {
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .faq-item {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: #e9ecef;
+        }
+
+        .faq-answer {
+            padding: 15px 20px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .feature-card h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .contact-section {
+            background: #e7f6ed;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #c3e6cb;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .contact-section h3 {
+            color: #155724;
+            margin-bottom: 15px;
+        }
+
+        .contact-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .contact-btn {
+            padding: 12px 24px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .contact-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .contact-btn.secondary {
+            background: #6c757d;
+        }
+
+        .contact-btn.secondary:hover {
+            background: #545b62;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .help-container {
+                padding: 15px;
+            }
+
+            .help-section {
+                padding: 20px;
+            }
+
+            .help-header h1 {
+                font-size: 2em;
+            }
+
+            .help-nav-links {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header') %>
+    
+    <div class="forum-container">
+        <div class="help-container">
+            <!-- Header -->
+            <div class="help-header">
+                <h1>🆘 Forum Help</h1>
+                <p>Get help using the Wavelength Community Forum</p>
+            </div>
+
+            <!-- Quick Navigation -->
+            <div class="help-nav">
+                <h3>🧭 Quick Help Topics</h3>
+                <div class="help-nav-links">
+                    <a href="#getting-started" class="help-nav-link">Getting Started</a>
+                    <a href="#posting" class="help-nav-link">Creating Posts</a>
+                    <a href="#account" class="help-nav-link">Account & Profile</a>
+                    <a href="#features" class="help-nav-link">Forum Features</a>
+                    <a href="#troubleshooting" class="help-nav-link">Troubleshooting</a>
+                    <a href="#contact" class="help-nav-link">Contact Support</a>
+                </div>
+            </div>
+
+            <!-- Getting Started -->
+            <section id="getting-started" class="help-section">
+                <h2>🚀 Getting Started</h2>
+                
+                <h3>Creating an Account</h3>
+                <p>To participate in discussions, you'll need to sign in with your Google account:</p>
+                <ul class="help-list">
+                    <li>
+                        <strong>Sign In</strong>
+                        Click the "Sign In with Google" button on any forum page to authenticate.
+                    </li>
+                    <li>
+                        <strong>Profile Setup</strong>
+                        Your profile will be automatically created using your Google account information.
+                    </li>
+                    <li>
+                        <strong>Start Participating</strong>
+                        Once signed in, you can create posts, reply to discussions, and interact with the community.
+                    </li>
+                </ul>
+
+                <h3>Forum Navigation</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">🏠</span>
+                        <h4>Home</h4>
+                        <p>Main forum page with categories and recent activity</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🕒</span>
+                        <h4>Recent Posts</h4>
+                        <p>Latest discussions and activity across all categories</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🔥</span>
+                        <h4>Popular</h4>
+                        <p>Most active and engaging discussions</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🔍</span>
+                        <h4>Search</h4>
+                        <p>Find specific posts, topics, or discussions</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Posting Guide -->
+            <section id="posting" class="help-section">
+                <h2>✍️ Creating Posts & Replies</h2>
+                
+                <h3>Creating a New Post</h3>
+                <ul class="help-list">
+                    <li>
+                        <strong>Choose the Right Category</strong>
+                        Select from General Discussion, Lore & Theories, Episode Discussions, or Fan Creations.
+                    </li>
+                    <li>
+                        <strong>Write a Clear Title</strong>
+                        Use descriptive titles that accurately represent your post content.
+                    </li>
+                    <li>
+                        <strong>Add Content</strong>
+                        Write your post content using the rich text editor. You can format text, add links, and include images.
+                    </li>
+                    <li>
+                        <strong>Preview & Submit</strong>
+                        Review your post before submitting to ensure it follows community guidelines.
+                    </li>
+                </ul>
+
+                <h3>Replying to Posts</h3>
+                <p>Engage with existing discussions by:</p>
+                <ul>
+                    <li>Reading the full post and existing replies</li>
+                    <li>Adding meaningful contributions to the conversation</li>
+                    <li>Quoting specific parts when responding to multiple points</li>
+                    <li>Being respectful and constructive in your responses</li>
+                </ul>
+            </section>
+
+            <!-- Account Management -->
+            <section id="account" class="help-section">
+                <h2>👤 Account & Profile</h2>
+                
+                <h3>Profile Information</h3>
+                <p>Your profile displays:</p>
+                <ul>
+                    <li>Your display name (from Google account)</li>
+                    <li>Profile picture (from Google account)</li>
+                    <li>Your post history and activity</li>
+                    <li>Community reputation and engagement metrics</li>
+                </ul>
+
+                <h3>Privacy & Security</h3>
+                <ul class="help-list">
+                    <li>
+                        <strong>Authentication</strong>
+                        We use Google OAuth for secure sign-in. We don't store your password.
+                    </li>
+                    <li>
+                        <strong>Data Privacy</strong>
+                        We only access basic profile information needed for forum participation.
+                    </li>
+                    <li>
+                        <strong>Session Management</strong>
+                        Your login sessions are automatically managed and will expire for security.
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Forum Features -->
+            <section id="features" class="help-section">
+                <h2>🛠️ Forum Features</h2>
+                
+                <h3>Search Functionality</h3>
+                <p>Use the search feature to:</p>
+                <ul>
+                    <li>Find posts by keywords or phrases</li>
+                    <li>Filter results by category or time period</li>
+                    <li>Sort results by relevance, date, or popularity</li>
+                    <li>Search within specific categories</li>
+                </ul>
+
+                <h3>Post Interactions</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">💬</span>
+                        <h4>Replies</h4>
+                        <p>Respond to posts and engage in discussions</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">❤️</span>
+                        <h4>Likes</h4>
+                        <p>Show appreciation for helpful or interesting posts</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">👁️</span>
+                        <h4>Views</h4>
+                        <p>Track how many people have viewed a post</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🔗</span>
+                        <h4>Sharing</h4>
+                        <p>Share interesting posts with others</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Troubleshooting -->
+            <section id="troubleshooting" class="help-section">
+                <h2>🔧 Troubleshooting</h2>
+                
+                <h3>Common Issues</h3>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Can't sign in with Google
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Try these steps:</p>
+                        <ul>
+                            <li>Clear your browser cache and cookies</li>
+                            <li>Disable browser extensions temporarily</li>
+                            <li>Try signing in from an incognito/private window</li>
+                            <li>Ensure pop-ups are allowed for this site</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Posts not loading or showing errors
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>This might be due to:</p>
+                        <ul>
+                            <li>Temporary connectivity issues - try refreshing the page</li>
+                            <li>Browser compatibility - ensure you're using a modern browser</li>
+                            <li>JavaScript being disabled - enable JavaScript for full functionality</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Can't create or submit posts
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Check that:</p>
+                        <ul>
+                            <li>You're signed in to your account</li>
+                            <li>Your post has a title and content</li>
+                            <li>Your post follows community guidelines</li>
+                            <li>You've selected an appropriate category</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Search not returning expected results
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Try:</p>
+                        <ul>
+                            <li>Using different keywords or synonyms</li>
+                            <li>Removing filters to broaden your search</li>
+                            <li>Checking for spelling errors</li>
+                            <li>Using broader search terms</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Support -->
+            <div id="contact" class="contact-section">
+                <h3>💬 Need More Help?</h3>
+                <p>If you can't find the answer to your question here, our community team is here to help!</p>
+                
+                <div class="contact-buttons">
+                    <a href="/forum" class="contact-btn">Return to Forum</a>
+                    <a href="/forum/guidelines" class="contact-btn secondary">Community Guidelines</a>
+                    <a href="mailto:support@wavelengthlore.com" class="contact-btn">Email Support</a>
+                </div>
+                
+                <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                    For urgent issues or community guidelines violations, please email us directly.
+                    We typically respond within 24 hours.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forum Footer -->
+    <footer class="forum-footer">
+        <div class="container">
+            <div class="forum-footer-content">
+                <div class="forum-stats">
+                    <span>Wavelength Community Forum</span>
+                </div>
+                <div class="forum-links">
+                    <a href="/">Return to Wavelength Lore</a>
+                    <a href="/forum/guidelines">Community Guidelines</a>
+                    <a href="/forum/help">Help & Support</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        // FAQ accordion functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                const answer = item.querySelector('.faq-answer');
+                const icon = question.querySelector('span');
+                
+                // Initially hide all answers
+                answer.style.display = 'none';
+                
+                question.addEventListener('click', () => {
+                    const isVisible = answer.style.display === 'block';
+                    
+                    if (isVisible) {
+                        answer.style.display = 'none';
+                        icon.textContent = '+';
+                    } else {
+                        answer.style.display = 'block';
+                        icon.textContent = '−';
+                    }
+                });
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
