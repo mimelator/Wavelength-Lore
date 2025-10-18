@@ -34,6 +34,7 @@ Welcome to the comprehensive documentation for the Wavelength Lore application. 
 ### 🛠️ Development & Debugging
 - **[Node.js v24 Compatibility Fix](NODE_V24_COMPATIBILITY_FIX.md)** - Compatibility fixes for Node.js v24
 - **[GitHub Action Monitor](GITHUB_ACTION_MONITOR.md)** - CI/CD pipeline monitoring and deployment tracking
+- **[Deployment Troubleshooting](DEPLOYMENT_TROUBLESHOOTING.md)** - Comprehensive guide for ECR caching issues and production deployment problems
 - **[Debug Scripts](../debug/README.md)** - Debug and diagnostic scripts for troubleshooting
 
 ## 🚀 Quick Start Guides
@@ -56,6 +57,12 @@ Welcome to the comprehensive documentation for the Wavelength Lore application. 
 3. UI components: [Carousel Usage](CAROUSEL_USAGE.md)
 4. Delete functionality: [Forum Delete Functionality](FORUM_DELETE_FUNCTIONALITY.md)
 5. Admin operations: [Admin Access Guide](ADMIN_ACCESS_GUIDE.md)
+
+### Deployment & Troubleshooting
+1. For deployment issues: [Deployment Troubleshooting](DEPLOYMENT_TROUBLESHOOTING.md)
+2. Monitor GitHub Actions: `node scripts/github-action-monitor.js --watch`
+3. Force ECR deployment: `node scripts/update-ecr-tag.js`
+4. Full pipeline monitoring: `node scripts/deployment-pipeline-monitor.js`
 
 ## 📋 Documentation Standards
 

@@ -1,0 +1,44 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- We can add styling for map elements right here -->
+  <style>
+    .ocean { fill: #a4d4f2; }
+    .land { fill: #f2e2b6; stroke: #a68b44; stroke-width: 2; }
+    .frozen-land { fill: #e0f2f7; stroke: #a7bed3; stroke-width: 2; } /* Colder color for frozen land */
+    .forest { fill: #5a8a5a; opacity: 0.7; }
+    .mountains { fill: none; stroke: #6b6b6b; stroke-width: 4; stroke-linecap: round; }
+    .city-marker { fill: #d44d4d; stroke: #ffffff; stroke-width: 2; }
+    .label { font-family: sans-serif; font-size: 16px; fill: #333333; pointer-events: none; }
+  </style>
+
+  <!-- Background (Ocean) -->
+  <rect class="ocean" width="100%" height="100%" />
+
+  <!-- Frozen Northern Continent -->
+  <path id="continent-frozen-north" class="frozen-land" d="M 0,0 L 800,0 L 800,250 C 700,200 600,280 500,250 S 300,180 200,230 S 100,200 0,250 Z" />
+
+  <!-- Ice Fortress City on the northern continent's coast -->
+  <g id="city-ice-fortress">
+    <circle class="city-marker" cx="150" cy="180" r="8" />
+    <text class="label" x="165" y="185">Ice Fortress</text>
+  </g>
+
+  <!-- Landmass for the island of Aethel's Rest (shifted slightly south) -->
+  <path id="landmass-aethels-rest" class="land" d="M 150,250 C 50,350 100,550 200,600 S 500,700 600,550 S 750,350 650,250 S 300,150 150,250 Z" />
+
+  <!-- The Elderwood (Forest) in the center of Aethel's Rest -->
+  <ellipse id="forest-elderwood" class="forest" cx="400" cy="400" rx="100" ry="80" />
+
+  <!-- Dragon's Tooth Range (Mountains) on the east of Aethel's Rest -->
+  <g id="mountains-dragons-tooth">
+    <path class="mountains" d="M 550,300 L 570,280 L 590,300" />
+    <path class="mountains" d="M 580,350 L 600,330 L 620,350" />
+    <path class="mountains" d="M 560,400 L 580,380 L 600,400" />
+    <path class="mountains" d="M 590,450 L 610,430 L 630,450" />
+  </g>
+
+  <!-- Northport City on the north coast of Aethel's Rest -->
+  <g id="city-northport">
+    <circle class="city-marker" cx="350" cy="240" r="8" />
+    <text class="label" x="365" y="245">Northport</text>
+  </g>
+</svg>

@@ -11,6 +11,9 @@ This directory contains utility scripts, build tools, and maintenance scripts fo
 - **`monitor-pipeline.sh`** - Convenient wrapper for complete pipeline monitoring
 - **`apprunner-env-updater.js`** - Update environment variables and trigger automatic redeploy
 - **`github-action-monitor.js`** - Monitor GitHub Actions deployment status with real-time progress tracking
+- **`update-ecr-tag.js`** - Force App Runner to use specific ECR image tags to bypass caching issues
+- **`force-code-deploy.js`** - Analyze App Runner source configuration and troubleshoot deployment issues
+- **`git-commit-push.js`** - Automated git commit and push with deployment monitoring integration
 - **`production-port-diagnostic.js`** - Diagnose and fix port configuration issues in production
 - **`check-production-env.js`** - Quick check of production environment variables
 
@@ -49,6 +52,17 @@ Advanced CI/CD pipeline monitoring for deployment tracking:
 - **Status Indicators**: Visual status representation (🟡 IN PROGRESS, ✅ SUCCESS, ❌ FAILED)
 - **Completion Detection**: Automatic monitoring termination when actions complete
 - **Error Reporting**: Detailed failure analysis with direct links to action logs
+
+#### ECR Image Management
+Advanced ECR image management for bypassing deployment caching issues:
+
+- **ECR Tag Analysis**: Check current App Runner ECR image configuration and tags
+- **Specific Tag Deployment**: Force App Runner to use commit-specific ECR tags
+- **Cache Bypass**: Resolve deployment issues when `:latest` tag is aggressively cached
+- **Image Verification**: Confirm which ECR image is currently deployed in production
+- **Deployment Troubleshooting**: Analyze ECR vs GitHub deployment pipeline issues
+- **Tag Strategy Management**: Switch between `:latest` and commit-specific tags
+- **Fresh Image Deployment**: Force App Runner to pull updated ECR images
 
 #### Port Configuration Management
 Advanced port configuration system for production deployment reliability:

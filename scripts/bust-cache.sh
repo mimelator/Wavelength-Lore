@@ -99,7 +99,21 @@ if [ "$LOCAL_CACHE" = true ]; then
   
   # Run the Node.js cache busting script
   if command -v node &> /dev/null; then
-    node scripts/bust-cache.js $NODE_ARGS
+    # Get the directory where this script is located
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    
+    # Try running from script directory first, then from parent directory
+    if [ -f "$SCRIPT_DIR/bust-cache.js" ]; then
+      node "$SCRIPT_DIR/bust-cache.js" $NODE_ARGS
+    elif [ -f "$SCRIPT_DIR/../bust-cache.js" ]; then
+      node "$SCRIPT_DIR/../bust-cache.js" $NODE_ARGS
+    elif [ -f "scripts/bust-cache.js" ]; then
+      node scripts/bust-cache.js $NODE_ARGS
+    else
+      echo "❌ Cannot find bust-cache.js script"
+      exit 1
+    fi
+    
     if [ $? -eq 0 ]; then
       echo "✅ Local cache busting completed successfully"
     else
@@ -119,15 +133,32 @@ if [ "$CDN_CACHE" = true ]; then
   
   # Use Node.js script with environment variables instead of AWS CLI
   if command -v node &> /dev/null; then
-    node scripts/cloudfront-cache-bust.js
+    # Get the directory where this script is located
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    
+    # Try running from script directory first, then from parent directory
+    if [ -f "$SCRIPT_DIR/cloudfront-cache-bust.js" ]; then
+      node "$SCRIPT_DIR/cloudfront-cache-bust.js"
+    elif [ -f "$SCRIPT_DIR/../cloudfront-cache-bust.js" ]; then
+      node "$SCRIPT_DIR/../cloudfront-cache-bust.js"
+    elif [ -f "scripts/cloudfront-cache-bust.js" ]; then
+      node scripts/cloudfront-cache-bust.js
+    else
+      echo "❌ Cannot find cloudfront-cache-bust.js script"
+      exit 1
+    fi
     
     if [ $? -eq 0 ]; then
       echo "✅ CloudFront cache invalidation completed successfully"
     else
       echo "❌ CloudFront cache invalidation failed"
       echo "💡 This may be due to missing CloudFront permissions."
-      echo "   Run: node scripts/setup-cloudfront-permissions.js"
-      echo "   Or use local cache only: ./scripts/bust-cache.sh --local"
+      if [ -f "$SCRIPT_DIR/setup-cloudfront-permissions.js" ]; then
+        echo "   Run: node $SCRIPT_DIR/setup-cloudfront-permissions.js"
+      else
+        echo "   Run: node scripts/setup-cloudfront-permissions.js"
+      fi
+      echo "   Or use local cache only: ./bust-cache.sh --local"
       exit 1
     fi
   else

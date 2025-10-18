@@ -100,6 +100,8 @@ Wavelength-Lore/
 - **Deployment Monitoring** - Real-time deployment tracking with health checks
 - **Continuous Deployment** - Automated environment updates and redeployment
 - **Production Diagnostics** - Advanced troubleshooting and configuration tools
+- **ECR Image Management** - Bypass caching issues with specific tag deployment strategies
+- **Deployment Pipeline Resilience** - Multi-layer validation from GitHub to production
 
 ### 🛠️ Development Tools
 - **Test Runner Framework** - Categorized test execution with reporting
@@ -108,6 +110,8 @@ Wavelength-Lore/
 - **Deployment Automation** - Real-time monitoring and environment management
 - **GitHub Actions Monitoring** - CI/CD pipeline tracking with real-time status updates
 - **Production Diagnostics** - Port configuration and health checking tools
+- **ECR Tag Management** - Force specific image tags to bypass aggressive caching
+- **Deployment Pipeline Integration** - Automated git workflows with deployment tracking
 - **Error Handling** - Comprehensive error tracking and reporting
 
 ## 📊 Implementation Status
@@ -168,6 +172,11 @@ node backup-cli.js status
 # Complete end-to-end pipeline monitoring (RECOMMENDED)
 node scripts/deployment-pipeline-monitor.js --reason "Production update"
 ./scripts/monitor-pipeline.sh --reason "Deploy new features"
+
+# ECR Image Management and Cache Bypass
+node scripts/update-ecr-tag.js                      # Force specific ECR tag deployment
+node scripts/force-code-deploy.js                   # Analyze App Runner source config
+node scripts/git-commit-push.js                     # Automated git workflow with deployment
 
 # Individual monitoring tools
 node scripts/apprunner-deploy-monitor.js --reason "App Runner deployment"
