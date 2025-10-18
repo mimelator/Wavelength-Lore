@@ -77,11 +77,24 @@ router.get('/post/:postId', (req, res) => {
  */
 router.get('/create', (req, res) => {
     const categoryId = req.query.category || 'general';
+    const episodeTitle = req.query.episodeTitle || '';
+    const seasonNumber = req.query.seasonNumber || '';
+    const episodeNumber = req.query.episodeNumber || '';
+    
+    // Generate suggested title if episode info is provided
+    let suggestedTitle = '';
+    if (episodeTitle && seasonNumber && episodeNumber) {
+        suggestedTitle = `Discussion: ${episodeTitle} (Season ${seasonNumber}, Episode ${episodeNumber})`;
+    }
     
     res.render('forum/create-post-page', {
         title: 'Create New Post',
         currentPage: 'create',
         defaultCategory: categoryId,
+        episodeTitle: episodeTitle,
+        seasonNumber: seasonNumber,
+        episodeNumber: episodeNumber,
+        suggestedTitle: suggestedTitle,
         breadcrumbs: [
             { name: 'Create New Post', url: null }
         ],

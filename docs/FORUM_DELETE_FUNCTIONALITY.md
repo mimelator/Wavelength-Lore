@@ -1,8 +1,8 @@
-# Forum Delete and Attachment Functionality Documentation
+# Forum Delete and Episode Integration Documentation
 
 ## Overview
 
-The Wavelength Lore forum includes comprehensive delete functionality that allows users to delete their own posts and replies with proper authentication, file attachment cleanup, and cascade deletion support. This document covers the complete implementation including API endpoints, authentication middleware, frontend UI, and file handling.
+The Wavelength Lore forum includes comprehensive delete functionality that allows users to delete their own posts and replies with proper authentication, file attachment cleanup, and cascade deletion support. Additionally, it features seamless integration with episode pages, allowing users to create episode-specific forum posts directly from episode pages. This document covers the complete implementation including API endpoints, authentication middleware, frontend UI, file handling, and episode integration features.
 
 ## Architecture
 
@@ -657,4 +657,172 @@ grep "S3" server.log | tail -n 20
 node -e "console.log(require('./helpers/firebase-admin-utils.js'))"
 ```
 
-This comprehensive delete functionality provides secure, user-friendly content management while maintaining data integrity and proper cleanup of all associated resources.
+## Episode Integration Features
+
+### Episode-to-Forum Integration
+
+The forum now includes seamless integration with episode pages, allowing users to create episode-specific discussion posts directly from any episode page.
+
+#### Create Post Button on Episode Pages
+**Location:** `/season/:seasonNumber/episode/:episodeNumber`
+**Implementation:** `views/episode.ejs`
+
+Each episode page now features a prominent "Create a Post for this Episode" button that:
+
+```html
+<!-- Forum Create Post Section -->
+<section class="episode-forum-section">
+    <a href="/forum/create?category=episodes&episodeTitle=EPISODE_TITLE&seasonNumber=SEASON&episodeNumber=EPISODE" 
+       class="btn btn-primary episode-forum-btn">
+        💬 Create a Post for this Episode
+    </a>
+    <p>Share your thoughts about "EPISODE_TITLE" with the community</p>
+</section>
+```
+
+**Features:**
+- **Visual Integration**: Styled to match the site's AnimeAce theme with proper borders and shadows
+- **Hover Effects**: Interactive button with color changes and subtle animation
+- **Context Awareness**: Button text includes the specific episode title
+- **URL Parameter Passing**: Automatically includes episode metadata in the forum URL
+
+#### URL Parameter Structure
+The button generates URLs with the following parameters:
+```
+/forum/create?category=episodes&episodeTitle=EPISODE_NAME&seasonNumber=X&episodeNumber=Y
+```
+
+**Parameters:**
+- `category=episodes`: Automatically selects "Episode Discussions" category
+- `episodeTitle`: URL-encoded episode title for form prepopulation
+- `seasonNumber`: Current season number
+- `episodeNumber`: Current episode number
+
+#### Forum Create Page Enhancement
+**File:** `routes/forum.js` and `views/forum/create-post-page.ejs`
+
+The forum create page now handles episode-specific parameters for intelligent form prepopulation:
+
+```javascript
+// Route enhancement
+router.get('/create', (req, res) => {
+    const categoryId = req.query.category || 'general';
+    const episodeTitle = req.query.episodeTitle || '';
+    const seasonNumber = req.query.seasonNumber || '';
+    const episodeNumber = req.query.episodeNumber || '';
+    
+    // Generate suggested title if episode info is provided
+    let suggestedTitle = '';
+    if (episodeTitle && seasonNumber && episodeNumber) {
+        suggestedTitle = `Discussion: ${episodeTitle} (Season ${seasonNumber}, Episode ${episodeNumber})`;
+    }
+    
+    res.render('forum/create-post-page', {
+        // ... other parameters
+        episodeTitle,
+        seasonNumber,
+        episodeNumber,
+        suggestedTitle
+    });
+});
+```
+
+#### Automatic Form Prepopulation
+
+When users click the episode button, the forum create form is automatically prepopulated with:
+
+**1. Category Selection**
+```html
+<option value="episodes" selected>🎬 Episode Discussions</option>
+```
+
+**2. Suggested Title**
+```html
+<input type="text" id="post-title" name="title" 
+       value="Discussion: Episode Title (Season X, Episode Y)">
+```
+
+**3. Episode-Specific Tags**
+```html
+<input type="text" id="post-tags" name="tags" 
+       value="seasonX, episodeY, episode-title-slug">
+```
+
+**4. Discussion Template Content**
+```html
+<textarea id="post-content" name="content">
+What did you think about EPISODE_TITLE?
+
+Share your thoughts about this episode:
+- What was your favorite moment?
+- Any theories or observations?
+- How did it connect to the overall Wavelength story?
+
+Season X, Episode Y discussion thread.
+</textarea>
+```
+
+#### Benefits for Users
+
+**Streamlined Workflow:**
+1. User watches episode on episode page
+2. Clicks "Create a Post for this Episode" button
+3. Forum form opens with everything prepopulated
+4. User only needs to customize content and submit
+5. Post automatically tagged and categorized correctly
+
+**Enhanced Discoverability:**
+- Posts are properly tagged with season/episode information
+- Category is automatically set to "Episode Discussions"
+- Title format ensures consistency across episode posts
+- Template content encourages structured discussion
+
+#### Technical Implementation Details
+
+**Episode Route Updates:**
+```javascript
+// Updated episode route to pass season/episode numbers
+res.render('episode', {
+    title: episode.title,
+    // ... other episode data
+    seasonNumber,      // Added for forum integration
+    episodeNumber,     // Added for forum integration
+    // ... other parameters
+});
+```
+
+**CSS Styling:**
+- Button matches site's AnimeAce theme
+- Responsive design for mobile devices
+- Visual hierarchy with proper spacing
+- Hover effects for interactivity
+- Shadow and border effects matching site design
+
+**URL Encoding:**
+- Episode titles are properly URL-encoded
+- Special characters handled correctly
+- Spaces and punctuation converted to safe URL format
+
+#### Cross-Page Integration
+
+This feature creates a seamless connection between:
+- **Episode Pages**: Content consumption and immediate reaction
+- **Forum Pages**: Community discussion and long-term engagement
+- **User Experience**: Reduced friction for creating episode-specific content
+
+#### Future Enhancements
+
+**Planned Features:**
+- **Character Integration**: Add character-specific post creation from character pages
+- **Lore Integration**: Create lore discussion posts from lore pages
+- **Automatic Linking**: Detect and link episode mentions in forum posts
+- **Episode Post Categories**: Sub-categories for different types of episode discussions
+- **Related Posts**: Show related episode discussions on episode pages
+
+**Technical Improvements:**
+- **Template Variations**: Different templates for different episode types
+- **Smart Tagging**: Automatic tag suggestions based on episode content
+- **Rich Content**: Pre-populate with episode metadata (air date, duration, etc.)
+- **Social Features**: Include episode rating or favorite moment prompts
+
+This comprehensive delete functionality provides secure, user-friendly content management while maintaining data integrity and proper cleanup of all associated resources. The episode integration features create a seamless bridge between content consumption and community engagement, encouraging active participation in episode discussions.

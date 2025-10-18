@@ -34,6 +34,20 @@
         
         <h1><%= title %></h1>
 
+        <!-- Forum Create Post Section -->
+        <section class="episode-forum-section" style="text-align: center; margin: 20px 0; background: rgba(255, 255, 255, 0.9); padding: 15px; border-radius: 10px; border: 3px solid #333; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+            <a href="/forum/create?category=episodes&episodeTitle=<%= encodeURIComponent(title) %>&seasonNumber=<%= seasonNumber %>&episodeNumber=<%= episodeNumber %>" 
+               class="btn btn-primary episode-forum-btn"
+               style="background-color: #4a47a3; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; border: 2px solid #333; font-family: 'AnimeAce', Arial, sans-serif; font-size: 14px; display: inline-block; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);"
+               onmouseover="this.style.backgroundColor='#3a3793'; this.style.transform='translateY(-2px)'"
+               onmouseout="this.style.backgroundColor='#4a47a3'; this.style.transform='translateY(0)'">
+                💬 Create a Post for this Episode
+            </a>
+            <p style="font-size: 12px; margin-top: 8px; color: #666; font-family: 'AnimeAce', Arial, sans-serif;">
+                Share your thoughts about "<%= title %>" with the community
+            </p>
+        </section>
+
         <section class="carousel">
             <div class="carousel-container" id="episode-carousel">
                 <% carouselImages.forEach(image => { %>

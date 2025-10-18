@@ -96,7 +96,8 @@
                 <div class="form-group">
                     <label for="post-title">Title *</label>
                     <input type="text" id="post-title" name="title" required 
-                           placeholder="Enter your post title..." maxlength="200">
+                           placeholder="Enter your post title..." maxlength="200"
+                           value="<%= suggestedTitle || '' %>">
                     <small class="form-help">Make it descriptive and engaging!</small>
                 </div>
                 
@@ -104,7 +105,8 @@
                 <div class="form-group">
                     <label for="post-tags">Tags</label>
                     <input type="text" id="post-tags" name="tags" 
-                           placeholder="Enter tags separated by commas (e.g., lucky, goblin king, theory)">
+                           placeholder="Enter tags separated by commas (e.g., lucky, goblin king, theory)"
+                           value="<% if (episodeTitle && seasonNumber && episodeNumber) { %>season<%= seasonNumber %>, episode<%= episodeNumber %>, <%= episodeTitle.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-') %><% } %>">
                     <small class="form-help">Help others find your post with relevant tags</small>
                 </div>
                 
@@ -113,7 +115,16 @@
                     <label for="post-content">Content *</label>
                     <textarea id="post-content" name="content" required 
                               placeholder="Share your thoughts, theories, fan art, or discussion topics..."
-                              rows="12"></textarea>
+                              rows="12"><% if (episodeTitle && seasonNumber && episodeNumber) { %>What did you think about <%= episodeTitle %>?
+
+Share your thoughts about this episode:
+- What was your favorite moment?
+- Any theories or observations?
+- How did it connect to the overall Wavelength story?
+
+Season <%= seasonNumber %>, Episode <%= episodeNumber %> discussion thread.
+
+<% } %></textarea>
                     <small class="form-help">Support for links, mentions, and basic formatting</small>
                 </div>
                 

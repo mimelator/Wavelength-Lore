@@ -342,6 +342,8 @@ app.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
         cdnUrl: process.env.CDN_URL,
         version: `v${Date.now()}`,
         youtubeLink: episode.youtubeLink || '#',
+        seasonNumber,
+        episodeNumber,
         previousLink,
         nextLink
       });
