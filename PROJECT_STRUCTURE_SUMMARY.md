@@ -106,6 +106,7 @@ Wavelength-Lore/
 - **CLI Backup Tools** - `backup-cli.js` for manual backup operations  
 - **Development Scripts** - Enhanced start/stop/sync scripts
 - **Deployment Automation** - Real-time monitoring and environment management
+- **GitHub Actions Monitoring** - CI/CD pipeline tracking with real-time status updates
 - **Production Diagnostics** - Port configuration and health checking tools
 - **Error Handling** - Comprehensive error tracking and reporting
 
@@ -164,11 +165,18 @@ node backup-cli.js status
 
 ### Deployment Management
 ```bash
-# Quick deployment with monitoring
-./scripts/deploy.sh --reason "Production update"
+# Complete end-to-end pipeline monitoring (RECOMMENDED)
+node scripts/deployment-pipeline-monitor.js --reason "Production update"
+./scripts/monitor-pipeline.sh --reason "Deploy new features"
 
-# Advanced deployment tracking
-node scripts/apprunner-deploy-monitor.js --reason "Port configuration fix"
+# Individual monitoring tools
+node scripts/apprunner-deploy-monitor.js --reason "App Runner deployment"
+node scripts/github-action-monitor.js --watch      # GitHub Actions only
+
+# GitHub Actions CI/CD monitoring
+node scripts/github-action-monitor.js              # Check latest action status
+node scripts/github-action-monitor.js --watch      # Real-time monitoring
+node scripts/github-action-monitor.js --repo owner/repo  # Monitor different repo
 
 # Environment variable management
 node scripts/apprunner-env-updater.js --force
@@ -215,8 +223,10 @@ The Wavelength Lore project now features:
 
 ### Production Infrastructure
 - ✅ **AWS App Runner Deployment** - Containerized production hosting
+- ✅ **GitHub Actions CI/CD** - Automated build and deployment pipeline
 - ✅ **Port Configuration** - Advanced port management (NODE_PORT=3001, NGINX_PORT=8080)
 - ✅ **Real-time Monitoring** - Live deployment tracking with health checks
+- ✅ **CI/CD Pipeline Monitoring** - GitHub Actions status tracking and progress reporting
 - ✅ **Environment Automation** - Automatic variable updates and redeployment
 - ✅ **Diagnostic Tools** - Comprehensive troubleshooting and configuration validation
 

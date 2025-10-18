@@ -33,6 +33,7 @@ Welcome to the comprehensive documentation for the Wavelength Lore application. 
 
 ### 🛠️ Development & Debugging
 - **[Node.js v24 Compatibility Fix](NODE_V24_COMPATIBILITY_FIX.md)** - Compatibility fixes for Node.js v24
+- **[GitHub Action Monitor](GITHUB_ACTION_MONITOR.md)** - CI/CD pipeline monitoring and deployment tracking
 - **[Debug Scripts](../debug/README.md)** - Debug and diagnostic scripts for troubleshooting
 
 ## 🚀 Quick Start Guides

@@ -7,7 +7,10 @@ This directory contains utility scripts, build tools, and maintenance scripts fo
 ### 🚀 Deployment & Monitoring Scripts
 - **`apprunner-deploy-monitor.js`** - Force redeploy and monitor AWS App Runner deployment status with real-time progress tracking
 - **`deploy.sh`** - Convenient wrapper script for deployment monitoring
+- **`deployment-pipeline-monitor.js`** - Complete CI/CD pipeline monitoring from GitHub Actions to App Runner deployment
+- **`monitor-pipeline.sh`** - Convenient wrapper for complete pipeline monitoring
 - **`apprunner-env-updater.js`** - Update environment variables and trigger automatic redeploy
+- **`github-action-monitor.js`** - Monitor GitHub Actions deployment status with real-time progress tracking
 - **`production-port-diagnostic.js`** - Diagnose and fix port configuration issues in production
 - **`check-production-env.js`** - Quick check of production environment variables
 
@@ -22,6 +25,30 @@ The deployment monitor provides comprehensive deployment management with enterpr
 - 🔧 **Intelligent troubleshooting guidance** with specific recommendations
 - 🛡️ **Graceful interruption handling** (Ctrl+C safe - deployment continues)
 - 📈 **Production-ready monitoring** with detailed logging and error reporting
+
+#### Complete Pipeline Monitoring
+End-to-end CI/CD pipeline monitoring combining GitHub Actions and App Runner:
+
+- 🔄 **Two-Phase Monitoring**: GitHub Actions CI/CD followed by App Runner deployment
+- 🚀 **Sequential Execution**: Automatically transitions from CI/CD to production deployment
+- 📊 **Comprehensive Reporting**: Pipeline duration, phase completion, and final status
+- 🎯 **Intelligent Waiting**: Automatic pauses between phases for optimal monitoring
+- 🔍 **Health Check Recommendations**: Post-deployment verification guidance
+- ⚠️ **Error Recovery**: Detailed troubleshooting steps for pipeline failures
+- 📝 **Deployment Tracking**: Complete audit trail with reasons and timestamps
+
+#### GitHub Action Monitoring
+Advanced CI/CD pipeline monitoring for deployment tracking:
+
+- **Real-time Status Updates**: Live monitoring of GitHub Actions with 30-second polling intervals
+- **Deployment Progress Tracking**: Comprehensive status reporting from queued to completion
+- **Action Lifecycle Management**: Monitor build, test, and deployment phases
+- **Multiple Repository Support**: Monitor any GitHub repository with `--repo` flag
+- **Interactive Watch Mode**: Continuous monitoring until action completion
+- **Detailed Action Information**: Run ID, duration, commit details, and direct URLs
+- **Status Indicators**: Visual status representation (🟡 IN PROGRESS, ✅ SUCCESS, ❌ FAILED)
+- **Completion Detection**: Automatic monitoring termination when actions complete
+- **Error Reporting**: Detailed failure analysis with direct links to action logs
 
 #### Port Configuration Management
 Advanced port configuration system for production deployment reliability:
@@ -41,20 +68,27 @@ Comprehensive diagnostic tools for production environment troubleshooting:
 
 **Usage Examples:**
 ```bash
-# Quick deployment with monitoring
-./deploy.sh --reason "Fix production bug"
+# Complete end-to-end pipeline monitoring
+node deployment-pipeline-monitor.js
+./monitor-pipeline.sh
 
-# Advanced deployment with custom reason
-node apprunner-deploy-monitor.js --reason "Deploy port configuration fix"
+# Complete pipeline with custom reason
+node deployment-pipeline-monitor.js --reason "Fix production bug"
+./monitor-pipeline.sh --reason "Deploy new features"
 
-# Environment variable updates with automatic redeploy
+# Individual monitoring tools
+node apprunner-deploy-monitor.js --reason "App Runner only"
+node github-action-monitor.js --watch
+
+# GitHub Actions monitoring
+node github-action-monitor.js                    # Check latest action status
+node github-action-monitor.js --watch            # Real-time monitoring
+node github-action-monitor.js --repo owner/repo  # Monitor different repository
+
+# Environment and diagnostics
 node apprunner-env-updater.js --force
-
-# Production diagnostics and troubleshooting
 node production-port-diagnostic.js --fix
 node check-production-env.js
-
-# Preview environment changes
 node apprunner-env-updater.js --dry-run
 ```
 
@@ -97,9 +131,16 @@ Common issues and solutions:
 3. Run diagnostics: `node production-port-diagnostic.js --fix`
 
 **Deployment Failures:**
-1. Monitor deployment: `node apprunner-deploy-monitor.js`
-2. Check service logs in AWS CloudWatch
-3. Verify environment variables: `node apprunner-env-updater.js --dry-run`
+1. Monitor GitHub Actions: `node github-action-monitor.js --watch`
+2. Monitor App Runner deployment: `node apprunner-deploy-monitor.js`
+3. Check service logs in AWS CloudWatch
+4. Verify environment variables: `node apprunner-env-updater.js --dry-run`
+
+**CI/CD Pipeline Issues:**
+1. Check GitHub Actions status: `node github-action-monitor.js`
+2. Monitor real-time deployment: `node github-action-monitor.js --watch`
+3. Review build logs at GitHub Actions URL provided by monitor
+4. Verify repository permissions and secrets configuration
 
 **Environment Variable Issues:**
 1. Update variables: `node apprunner-env-updater.js --force`
