@@ -10,7 +10,6 @@ class FirebaseAuth {
   constructor() {
     // Don't initialize immediately - wait until first use
     this.auth = null;
-    console.log('🔥 Firebase Auth middleware created (lazy initialization)');
   }
 
   getAuth() {
@@ -22,7 +21,6 @@ class FirebaseAuth {
         // Get the admin app instance by name (it's initialized with name 'admin' in firebase-admin-utils.js)
         const adminApp = admin.app('admin');
         this.auth = adminApp.auth();
-        console.log('🔥 Firebase Auth service initialized');
       } catch (error) {
         console.error('❌ Failed to initialize Firebase Auth service:', error.message);
         throw new Error('Firebase Admin not properly initialized');

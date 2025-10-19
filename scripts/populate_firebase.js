@@ -4,12 +4,18 @@ const { getDatabase, ref, set } = require('firebase/database');
 const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
-const serviceAccount = require('../firebaseServiceAccountKey.json');
-require('dotenv').config({ path: '../.env' });
-
 // Determine if we're running from scripts directory or project root
 const isRunningFromScripts = __dirname.endsWith('scripts');
+const rootPath = isRunningFromScripts ? '..' : '.';
 const contentPath = isRunningFromScripts ? '../content' : './content';
+
+const serviceAccount = require(path.join(rootPath, 'firebaseServiceAccountKey.json'));
+// Configure dotenv properly based on run location
+if (isRunningFromScripts) {
+  require('dotenv').config({ path: '../.env' });
+} else {
+  require('dotenv').config({ path: './.env' });
+}
 
 // CLI Usage Documentation
 /*

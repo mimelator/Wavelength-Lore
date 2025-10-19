@@ -1,11 +1,6 @@
 // Load environment variables (safe for production containers)
 require('dotenv').config({ silent: true });
 
-console.log(`🔧 Environment Detection:`);
-console.log(`   .env loaded: ${process.env.NODE_ENV !== 'production' ? 'yes' : 'container-based'}`);
-console.log(`   NODE_PORT from env: ${process.env.NODE_PORT || 'not set'}`);
-console.log(`   PORT from env: ${process.env.PORT || 'not set'}`);
-
 const express = require('express');
 const path = require('path');
 
@@ -32,29 +27,43 @@ const simpleDisambiguation = require('./helpers/simple-disambiguation');
 const app = express();
 
 // Enhanced port configuration with App Runner compatibility
-console.log(`🔧 Raw Environment Variables:`);
-console.log(`   NODE_PORT: ${process.env.NODE_PORT || 'undefined'}`);
-console.log(`   PORT: ${process.env.PORT || 'undefined'}`);
-console.log(`   NGINX_PORT: ${process.env.NGINX_PORT || 'undefined'}`);
-
 // Port selection logic: Always prioritize NODE_PORT over App Runner's PORT
 let port;
 if (process.env.NODE_PORT && process.env.NODE_PORT !== 'undefined') {
   port = parseInt(process.env.NODE_PORT);
-  console.log(`🎯 Using explicit NODE_PORT: ${port}`);
 } else if (process.env.PORT && process.env.PORT !== 'undefined') {
   port = parseInt(process.env.PORT);
-  console.log(`⚠️  Using App Runner PORT: ${port} (NODE_PORT not set)`);
 } else {
   port = 3001;
-  console.log(`🔧 Using default port: ${port} (no env vars set)`);
 }
 
-console.log(`� Final port configuration: ${port}`);
-console.log(`🔗 App will be available at: http://localhost:${port}`);
+// Helper function to redact sensitive information
+function redactSensitive(value) {
+  if (!value || typeof value !== 'string') return value;
+  if (value.length <= 8) return '***';
+  return value.substring(0, 4) + '***' + value.substring(value.length - 4);
+}
+
+// Display clean startup configuration
+console.log(`\n🚀 Wavelength Lore Server Configuration:`);
+console.log(`   📡 Port: ${port}`);
+console.log(`   🌐 CDN: ${process.env.CDN_URL ? new URL(process.env.CDN_URL).hostname : 'localhost'}`);
+console.log(`   � Firebase Project: ${process.env.PROJECT_ID || 'not configured'}`);
+console.log(`   🗄️  Database: ${process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL).hostname : 'not configured'}`);
+console.log(`   🛡️  Backups: ${process.env.ENABLE_BACKUPS === 'true' ? 'enabled' : 'disabled'}`);
+console.log(`   🔐 Security: Rate limiting + Input sanitization enabled`);
+console.log(`   🔗 URL: http://localhost:${port}\n`);
 
 // Configure trust proxy for proper IP detection
-app.set('trust proxy', true);
+// For AWS App Runner/ALB and CloudFront, trust only the first proxy
+// This prevents IP spoofing while allowing proper IP detection
+if (process.env.NODE_ENV === 'production') {
+  // In production (AWS App Runner), trust only 1 hop (ALB)
+  app.set('trust proxy', 1);
+} else {
+  // In development, trust loopback and private networks
+  app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
+}
 
 // Initialize Firebase and database connection
 const database = firebaseUtils.initializeFirebase('wavelength-lore-main');
@@ -77,9 +86,14 @@ async function initializeAllCaches() {
       episodeHelpers.initializeEpisodeCache()
     ]);
     
-    console.log('All caches initialized successfully');
+    // Get counts for summary
+    const characters = characterHelpers.getAllCharactersSync();
+    const lore = loreHelpers.getAllLoreSync();
+    const episodes = episodeHelpers.getAllEpisodesSync();
+    
+    console.log(`🗃️  Content loaded: ${characters.length} characters, ${lore.length} lore items, ${episodes.length} episodes`);
   } catch (error) {
-    console.error('Error initializing caches:', error);
+    console.error('⚠️  Error initializing caches:', error);
   }
 }
 
@@ -95,10 +109,9 @@ simpleDisambiguation.setHelperInstances(characterHelpers, loreHelpers, episodeHe
 // Test Firebase connection
 (async () => {
   try {
-    console.log('Testing Firebase connection...');
     const testData = await firebaseUtils.fetchFromFirebase('videos');
     if (testData) {
-      console.log('✅ Firebase connection successful');
+      console.log('🔥 Firebase connection verified');
     } else {
       console.log('⚠️ No data available at videos path');
     }
@@ -121,12 +134,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Apply rate limiting middleware
-console.log('🛡️ Initializing rate limiting protection...');
 app.use(createSmartRateLimit());
 
 // Apply input sanitization middleware
-console.log('🧹 Initializing input sanitization...');
-app.use(InputSanitizer.createMiddleware({ logging: true }));
+const sanitizer = new InputSanitizer();
 
 // Import and use secure forum routes
 const secureForumRoutes = require('./routes/secureForumRoutes');
@@ -192,7 +203,7 @@ app.use(async (req, res, next) => {
     const currentUrl = req.originalUrl || req.url;
     return simpleDisambiguation.applySmartLinkingSimple(text, currentUrl);
   };
-  res.locals.simpleDisambiguationScript = simpleDisambiguation.getSimpleDisambiguationScript();
+  res.locals.simpleDisambiguationScript = simpleDisambiguation.getSimpleDisambiguationScript(process.env.CDN_URL);
   res.locals.simpleDisambiguationStyles = simpleDisambiguation.getSimpleDisambiguationStyles();
   
   next();
@@ -213,7 +224,7 @@ app.get('/', async (req, res) => {
       pageDescription: 'Explore the Wavelength universe through animated episodes, character stories, and immersive lore. A multimedia project blending music, storytelling, and visual art.',
       pageKeywords: 'wavelength, animation, storytelling, music, episodes, characters, lore, multimedia, visual art, animated series',
       ogType: 'website',
-      ogImage: process.env.CDN_URL + '/images/wavelength-homepage-og.jpg',
+      ogImage: process.env.CDN_URL + '/static/images/wavelength-og-default.webp',
       structuredData: {
         "@context": "https://schema.org",
         "@type": "WebSite",
@@ -384,7 +395,7 @@ app.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
         pageDescription: episode.story ? (episode.story.substring(0, 155) + '...') : `Watch ${episode.title} from Season ${seasonNumber} of the Wavelength animated series.`,
         pageKeywords: `wavelength, season ${seasonNumber}, episode ${episodeNumber}, ${episode.title}, animation, music, storytelling`,
         ogType: 'video.episode',
-        ogImage: episode.image,
+        ogImage: process.env.CDN_URL + episode.image,
         ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl,
         structuredData: {
           "@context": "https://schema.org",
@@ -397,9 +408,9 @@ app.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
             "@type": "TVSeries",
             "name": "Wavelength"
           },
-          "image": episode.image,
+          "image": process.env.CDN_URL + episode.image,
           "url": req.protocol + '://' + req.get('host') + req.originalUrl,
-          "thumbnailUrl": episode.image,
+          "thumbnailUrl": process.env.CDN_URL + episode.image,
           "uploadDate": new Date().toISOString(),
           "genre": ["Animation", "Music", "Fantasy"]
         },
@@ -1179,16 +1190,15 @@ app.get('/debug/episodes/refresh', async (req, res) => {
 async function initializeBackupSystem() {
   try {
     if (process.env.ENABLE_BACKUPS !== 'false') {
-      console.log('🔧 Initializing secure backup system...');
       const backupSystem = new SecureDatabaseBackup();
       await backupSystem.initialize();
       
       // Store reference for access from other parts of the app
       app.locals.backupSystem = backupSystem;
       
-      console.log('✅ Backup system initialized successfully');
+      console.log('💾 Backup system initialized and ready');
     } else {
-      console.log('ℹ️  Backup system disabled via ENABLE_BACKUPS=false');
+      console.log('💾 Backup system disabled');
     }
   } catch (error) {
     console.error('⚠️  Backup system initialization failed:', error.message);
@@ -1197,8 +1207,10 @@ async function initializeBackupSystem() {
 }
 
 app.listen(port, async () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  console.log(`\n🚀 Server started successfully at http://localhost:${port}`);
   
   // Initialize backup system after server starts
   await initializeBackupSystem();
+  
+  console.log(`\n✅ Wavelength Lore server is ready and running!\n`);
 });

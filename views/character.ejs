@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <%- include('partials/head') %>
-    <link rel="stylesheet" href="/css/character_styles.css">
-    <link rel="stylesheet" href="/css/modal_styles.css">
+    <link rel="stylesheet" href="<%= cdnUrl %>/static/css/character_styles.css">
+    <link rel="stylesheet" href="<%= cdnUrl %>/static/css/modal_styles.css">
 </head>
 <body>
     <%- include('partials/header') %>
@@ -11,13 +11,13 @@
     <nav class="character-navigation-top">
         <% if (previousCharacter) { %>
             <a href="/character/<%= previousCharacter.id %>" class="nav-link prev">
-                <img src="<%= cdnUrl %><%= previousCharacter.image %>" alt="<%= previousCharacter.title %>" class="nav-image tiny">
+                <img src="<%= previousCharacter.image.startsWith('http') ? previousCharacter.image : cdnUrl + previousCharacter.image %>" alt="<%= previousCharacter.title %>" class="nav-image tiny">
                 <span class="nav-text">&laquo; <%= previousCharacter.title %></span>
             </a>
         <% } %>
         <% if (nextCharacter) { %>
             <a href="/character/<%= nextCharacter.id %>" class="nav-link next">
-                <img src="<%= cdnUrl %><%= nextCharacter.image %>" alt="<%= nextCharacter.title %>" class="nav-image tiny">
+                <img src="<%= nextCharacter.image.startsWith('http') ? nextCharacter.image : cdnUrl + nextCharacter.image %>" alt="<%= nextCharacter.title %>" class="nav-image tiny">
                 <span class="nav-text"><%= nextCharacter.title %> &raquo;</span>
             </a>
         <% } %>
@@ -40,7 +40,7 @@
             </p>
         </section>
 
-        <section class="character-banner" style="background-image: url('<%= cdnUrl %><%= character.image %>');">"
+        <section class="character-banner" style="background-image: url('<%= character.image.startsWith('http') ? character.image : cdnUrl + character.image %>');">"
             
         </section>
 
@@ -65,7 +65,7 @@
                 <% const shuffledImages = character.image_gallery.sort(() => Math.random() - 0.5); %>
                 <% shuffledImages.forEach((image, index) => { %>
                     <div class="carousel-item" data-index="<%= index %>">
-                        <img src="<%= cdnUrl %><%= image %>" alt="<%= character.title %>" class="gallery-image" data-fullsize="<%= cdnUrl %><%= image %>">
+                        <img src="<%= image.startsWith('http') ? image : cdnUrl + image %>" alt="<%= character.title %>" class="gallery-image" data-fullsize="<%= image.startsWith('http') ? image : cdnUrl + image %>">
                     </div>
                 <% }); %>
             </div>

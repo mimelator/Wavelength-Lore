@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <%- include('partials/head') %>
-    <link rel="stylesheet" href="/css/lore_styles.css">
-    <link rel="stylesheet" href="/css/modal_styles.css">
+    <link rel="stylesheet" href="<%= cdnUrl %>/static/css/lore_styles.css">
+    <link rel="stylesheet" href="<%= cdnUrl %>/static/css/modal_styles.css">
     <%- simpleDisambiguationStyles %>
 </head>
 <body>
@@ -12,13 +12,13 @@
     <nav class="lore-navigation-top">
         <% if (previousLore) { %>
             <a href="/lore/<%= previousLore.id %>" class="nav-link prev">
-                <img src="<%= cdnUrl %><%= previousLore.image %>" alt="<%= previousLore.title %>" class="nav-image tiny">
+                <img src="<%= previousLore.image.startsWith('http') ? previousLore.image : cdnUrl + previousLore.image %>" alt="<%= previousLore.title %>" class="nav-image tiny">
                 <span class="nav-text">&laquo; <%= previousLore.title %></span>
             </a>
         <% } %>
         <% if (nextLore) { %>
             <a href="/lore/<%= nextLore.id %>" class="nav-link next">
-                <img src="<%= cdnUrl %><%= nextLore.image %>" alt="<%= nextLore.title %>" class="nav-image tiny">
+                <img src="<%= nextLore.image.startsWith('http') ? nextLore.image : cdnUrl + nextLore.image %>" alt="<%= nextLore.title %>" class="nav-image tiny">
                 <span class="nav-text"><%= nextLore.title %> &raquo;</span>
             </a>
         <% } %>
@@ -46,7 +46,7 @@
 
         <br>
 
-        <section class="lore-banner" style="background-image: url('<%= cdnUrl %><%= lore.image %>');">
+        <section class="lore-banner" style="background-image: url('<%= lore.image.startsWith('http') ? lore.image : cdnUrl + lore.image %>');">"
             
         </section>
 
@@ -75,7 +75,7 @@
                 <% const shuffledImages = lore.image_gallery.sort(() => Math.random() - 0.5); %>
                 <% shuffledImages.forEach((image, index) => { %>
                     <div class="carousel-item" data-index="<%= index %>">
-                        <img src="<%= cdnUrl %><%= image %>" alt="<%= lore.title %>" class="gallery-image" data-fullsize="<%= cdnUrl %><%= image %>">
+                        <img src="<%= image.startsWith('http') ? image : cdnUrl + image %>" alt="<%= lore.title %>" class="gallery-image" data-fullsize="<%= image.startsWith('http') ? image : cdnUrl + image %>">
                     </div>
                 <% }); %>
             </div>

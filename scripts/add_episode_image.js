@@ -4,7 +4,7 @@ const yaml = require('js-yaml');
 
 const seasonsDir = path.join(__dirname, '../content/seasons');
 const staticImagesDir = path.join(__dirname, '../static/images/seasons');
-const cloudfrontBaseUrl = 'https://df5sj8f594cdx.cloudfront.net/images/seasons';
+const cloudfrontBaseUrl = process.env.CDN_URL + '/images/seasons';
 
 /**
  * Copies the image to the static directory and returns the CloudFront URL.

@@ -47,34 +47,25 @@ const fallbackEpisodes = [
  * @returns {Promise<Array>} Array of episode objects
  */
 async function fetchEpisodesFromDatabase() {
-  console.log('🎬 fetchEpisodesFromDatabase called');
   try {
     if (!firebaseUtils.isFirebaseReady()) {
       firebaseUtils.initializeFirebase('episode-helpers');
     }
 
-    console.log('🔥 Fetching videos data from Firebase...');
     const videosData = await firebaseUtils.fetchFromFirebase('videos');
-    console.log('🔥 Videos data result:', videosData ? 'data received' : 'null/undefined');
-    console.log('Videos data structure:', videosData ? Object.keys(videosData) : 'null');
     
     if (videosData) {
       // Extract all episodes from all seasons
       let allEpisodes = [];
+      let seasonCount = 0;
       
       for (const seasonId in videosData) {
         const seasonData = videosData[seasonId];
-        console.log(`Processing season ${seasonId}:`, seasonData ? Object.keys(seasonData) : 'null');
+        seasonCount++;
         
         if (seasonData.episodes) {
-          console.log(`Episodes in ${seasonId}:`, Object.keys(seasonData.episodes));
           for (const episodeId in seasonData.episodes) {
             const episodeData = seasonData.episodes[episodeId];
-            console.log(`Episode ${episodeId} data:`, episodeData ? {
-              title: episodeData.title,
-              hasKeywords: !!(episodeData.keywords),
-              keywords: episodeData.keywords
-            } : 'null');
             
             if (episodeData.title) {
               // Extract season number from seasonId (e.g., "season1" -> "1")
@@ -99,8 +90,8 @@ async function fetchEpisodesFromDatabase() {
         }
       }
       
-      console.log(`Loaded ${allEpisodes.length} episodes from Firebase`);
-      console.log('Episodes with keywords:', allEpisodes.filter(ep => ep.keywords && ep.keywords.length > 0).length);
+      const episodesWithKeywords = allEpisodes.filter(ep => ep.keywords && ep.keywords.length > 0).length;
+      console.log(`📺 Loaded ${allEpisodes.length} episodes from ${seasonCount} seasons (${episodesWithKeywords} with keywords)`);
       return allEpisodes;
     } else {
       console.warn('No episode data found in database, using fallback');

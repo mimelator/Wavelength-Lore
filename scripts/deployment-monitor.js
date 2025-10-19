@@ -5,10 +5,14 @@
  * Monitors App Runner deployment, Firebase updates, and CDN cache status
  */
 
+const { initScriptEnv } = require('./utils/env-loader');
+
+// Initialize environment with required AWS variables
+initScriptEnv(['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']);
+
 const { AppRunnerClient, DescribeServiceCommand } = require('@aws-sdk/client-apprunner');
 const { CloudFrontClient, CreateInvalidationCommand, GetInvalidationCommand } = require('@aws-sdk/client-cloudfront');
 const axios = require('axios');
-require('dotenv').config();
 
 class DeploymentMonitor {
   constructor() {

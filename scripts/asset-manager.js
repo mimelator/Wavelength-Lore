@@ -37,7 +37,7 @@ class AssetManager {
     this.audioDir = path.join(this.staticDir, 'audio');
     this.videoDir = path.join(this.staticDir, 'video');
     
-    this.cdnBase = 'https://df5sj8f594cdx.cloudfront.net';
+    this.cdnBase = process.env.CDN_URL + '';
     
     // Image optimization settings
     this.imageSettings = {

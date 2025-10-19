@@ -181,7 +181,8 @@ class ProductionPortDiagnostic {
   async execute(options = {}) {
     try {
       // Load environment variables
-      require('dotenv').config();
+      const { initScriptEnv } = require('./utils/env-loader');
+      initScriptEnv(['AWS_ACCESS_KEY_ADMIN', 'AWS_SECRET_ACCESS_KEY_ADMIN']);
 
       console.log('🔍 Production Port Configuration Diagnostic');
       console.log('═══════════════════════════════════════════════════════════════');

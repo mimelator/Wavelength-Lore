@@ -6,8 +6,8 @@
  * being both a place and an episode).
  */
 
-// Store helper instances
-let characterHelpers, loreHelpers, episodeHelpers;
+// Store helper instances and CDN URL
+let characterHelpers, loreHelpers, episodeHelpers, cdnUrl;
 
 /**
  * Set helper instances for use in linking
@@ -19,6 +19,14 @@ function setHelperInstances(charHelpers, loreHelpersInstance, episodeHelpersInst
   characterHelpers = charHelpers;
   loreHelpers = loreHelpersInstance;
   episodeHelpers = episodeHelpersInstance;
+}
+
+/**
+ * Set CDN URL for image paths
+ * @param {string} url - The CDN URL to prepend to image paths
+ */
+function setCdnUrl(url) {
+  cdnUrl = url;
 }
 
 /**
@@ -331,11 +339,15 @@ function applySmartLinkingSimple(text, currentUrl = null) {
 
 /**
  * Get the simple disambiguation script
+ * @param {string} cdnUrlParam - CDN URL to use for images
  * @returns {string} JavaScript for handling disambiguation
  */
-function getSimpleDisambiguationScript() {
+function getSimpleDisambiguationScript(cdnUrlParam = '') {
   return `
     <script>
+      // Set CDN URL for image paths
+      window.cdnUrl = '${cdnUrlParam}';
+      
       function openDisambiguationModal(element) {
         const phrase = element.dataset.phrase;
         const conflicts = JSON.parse(element.dataset.conflicts.replace(/&quot;/g, '"'));
@@ -359,7 +371,7 @@ function getSimpleDisambiguationScript() {
             <div class="disambiguation-modal-body">
               \${conflicts.map(conflict => \`
                 <div class="disambiguation-option" onclick="selectDisambiguationOption('\${conflict.url}')">
-                  <img src="\${conflict.image}" alt="\${conflict.name}" class="disambiguation-option-image">
+                  <img src="\${conflict.image.startsWith('http') ? conflict.image : (window.cdnUrl || '') + conflict.image}" alt="\${conflict.name}" class="disambiguation-option-image">
                   <div class="disambiguation-option-content">
                     <div class="disambiguation-option-title">\${conflict.description}</div>
                     <div class="disambiguation-option-name">\${conflict.name}</div>
@@ -615,6 +627,7 @@ function getSimpleDisambiguationStyles() {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     setHelperInstances,
+    setCdnUrl,
     applySmartLinkingSimple,
     detectConflictsForTerm,
     getSimpleDisambiguationScript,

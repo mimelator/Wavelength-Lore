@@ -33,7 +33,7 @@ function initializeFirebaseAdmin() {
     }, 'admin');
 
     adminDatabase = adminApp.database();
-    console.log('Firebase Admin SDK initialized successfully');
+    console.log('🔥 Firebase Admin SDK initialized');
     return adminDatabase;
   } catch (error) {
     console.error('Firebase Admin initialization failed:', error.message);

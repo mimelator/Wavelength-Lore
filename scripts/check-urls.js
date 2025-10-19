@@ -5,10 +5,14 @@
  * Check what URLs are actually in the database
  */
 
+const { initScriptEnv } = require('./utils/env-loader');
+
+// Initialize environment with required variables
+initScriptEnv(['DATABASE_URL', 'PROJECT_ID', 'API_KEY']);
+
 const admin = require('firebase-admin');
 const { initializeApp } = require('firebase/app');
 const { getDatabase, ref, get } = require('firebase/database');
-require('dotenv').config();
 
 // Initialize Firebase Admin SDK
 const serviceAccount = require('../firebaseServiceAccountKey.json');

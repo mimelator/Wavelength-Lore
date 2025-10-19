@@ -109,7 +109,7 @@ async function fetchLoreFromDatabase() {
         }
       }
       
-      console.log(`Loaded ${allLore.length} lore items from Firebase`);
+      console.log(`📚 Loaded ${allLore.length} lore items from Firebase`);
       return allLore;
     } else {
       console.warn('No lore found in database, using fallback');

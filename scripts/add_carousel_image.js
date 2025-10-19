@@ -7,7 +7,7 @@ const yamlFilePath = path.join(__dirname, '../content/characters/wavelength/wave
 // Path to the static images directory
 const staticImagesDir = path.join(__dirname, '../static/images/characters/wavelength');
 // CloudFront base URL
-const cloudfrontBaseUrl = 'https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength';
+const cloudfrontBaseUrl = process.env.CDN_URL + '/images/characters/wavelength';
 
 /**
  * Copies the image to the static directory and returns the CloudFront URL.

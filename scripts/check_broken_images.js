@@ -1,4 +1,7 @@
-require('dotenv').config({ path: '../.env' }); // Load .env file from the parent directory
+const { initScriptEnv } = require('./utils/env-loader');
+
+// Initialize environment with required variables
+initScriptEnv(['DATABASE_URL', 'PROJECT_ID', 'API_KEY', 'AUTH_DOMAIN']);
 
 const axios = require('axios');
 const cheerio = require('cheerio');
@@ -16,11 +19,6 @@ const firebaseConfig = {
     messagingSenderId: process.env.MESSAGING_SENDER_ID,
     appId: process.env.APP_ID
 };
-
-if (!process.env.DATABASE_URL || !process.env.PROJECT_ID) {
-    console.error('FIREBASE CONFIG ERROR: DATABASE_URL or PROJECT_ID is missing in the .env file.');
-    process.exit(1);
-}
 
 const firebaseApp = initializeApp(firebaseConfig);
 const database = getDatabase(firebaseApp);
@@ -43,6 +41,16 @@ const fetchRoutes = async () => {
             }
         }
 
+        // Fetch all lore
+        const loreRef = ref(database, 'lore');
+        const loreSnapshot = await get(loreRef);
+        if (loreSnapshot.exists()) {
+            const loreData = loreSnapshot.val();
+            for (const loreId in loreData) {
+                routes.push(`/lore/${loreId}`);
+            }
+        }
+
         // Fetch all episodes
         const videosRef = ref(database, 'videos');
         const videosSnapshot = await get(videosRef);
@@ -56,11 +64,51 @@ const fetchRoutes = async () => {
                 }
             }
         }
+
+        // Add gallery pages
+        routes.push('/characters');
+        routes.push('/lore');
+        
     } catch (error) {
         console.error('Error fetching routes:', error);
     }
 
     return routes;
+};
+
+const categorizeImage = (img, $) => {
+    const src = $(img).attr('src');
+    const className = $(img).attr('class') || '';
+    const alt = $(img).attr('alt') || '';
+    const parent = $(img).parent();
+    const parentClass = parent.attr('class') || '';
+    const grandParent = parent.parent();
+    const grandParentClass = grandParent.attr('class') || '';
+
+    // Categorize based on class names, parent elements, and context
+    if (className.includes('nav-image') || parentClass.includes('navigation') || grandParentClass.includes('navigation')) {
+        return 'navigation';
+    }
+    if (className.includes('disambiguation') || parentClass.includes('disambiguation') || src.includes('disambiguation')) {
+        return 'disambiguation';
+    }
+    if (className.includes('gallery-image') || className.includes('carousel') || parentClass.includes('carousel') || grandParentClass.includes('carousel')) {
+        return 'carousel';
+    }
+    if (parentClass.includes('banner') || grandParentClass.includes('banner') || $(img).closest('section[class*="banner"]').length > 0) {
+        return 'banner';
+    }
+    if (className.includes('hero') || alt.toLowerCase().includes('hero') || parentClass.includes('hero')) {
+        return 'hero';
+    }
+    if (src.includes('favicon') || src.includes('icon')) {
+        return 'icon';
+    }
+    if (className.includes('thumb') || className.includes('thumbnail') || alt.toLowerCase().includes('thumb')) {
+        return 'thumbnail';
+    }
+    
+    return 'other';
 };
 
 const checkImages = async (url) => {
@@ -69,44 +117,263 @@ const checkImages = async (url) => {
         const $ = cheerio.load(response.data);
         const images = $('img');
 
-        console.log(`Checking images on ${url}`);
+        console.log(`\n🔍 Checking images on ${url}`);
 
-        const brokenImages = [];
+        const imageResults = {
+            navigation: { broken: [], working: [] },
+            disambiguation: { broken: [], working: [] },
+            carousel: { broken: [], working: [] },
+            banner: { broken: [], working: [] },
+            hero: { broken: [], working: [] },
+            icon: { broken: [], working: [] },
+            thumbnail: { broken: [], working: [] },
+            other: { broken: [], working: [] }
+        };
+
+        let totalImages = 0;
+        let totalBroken = 0;
 
         for (let i = 0; i < images.length; i++) {
             const img = images[i];
             const src = $(img).attr('src');
 
             if (src) {
+                totalImages++;
+                const category = categorizeImage(img, $);
+                
                 try {
                     const imgResponse = await axios.get(src, { validateStatus: null });
                     if (imgResponse.status >= 400) {
-                        brokenImages.push(src);
+                        imageResults[category].broken.push({
+                            src,
+                            status: imgResponse.status,
+                            alt: $(img).attr('alt') || 'No alt text',
+                            class: $(img).attr('class') || 'No class'
+                        });
+                        totalBroken++;
+                    } else {
+                        imageResults[category].working.push(src);
                     }
                 } catch (error) {
-                    brokenImages.push(src);
+                    imageResults[category].broken.push({
+                        src,
+                        error: error.message,
+                        alt: $(img).attr('alt') || 'No alt text',
+                        class: $(img).attr('class') || 'No class'
+                    });
+                    totalBroken++;
                 }
             }
         }
 
-        if (brokenImages.length > 0) {
-            console.log(`Broken images found on ${url}:`, brokenImages);
-        } else {
-            console.log(`No broken images found on ${url}`);
+        // Report results by category
+        console.log(`📊 Total: ${totalImages} images, ${totalBroken} broken, ${totalImages - totalBroken} working`);
+        
+        let hasAnyBroken = false;
+        for (const [category, results] of Object.entries(imageResults)) {
+            if (results.broken.length > 0) {
+                hasAnyBroken = true;
+                console.log(`\n❌ ${category.toUpperCase()} - ${results.broken.length} broken:`);
+                results.broken.forEach((img, index) => {
+                    if (index < 3) { // Limit to first 3 for readability
+                        console.log(`   ${index + 1}. ${img.src}`);
+                        if (img.status) console.log(`      Status: ${img.status}`);
+                        if (img.error) console.log(`      Error: ${img.error}`);
+                        if (img.alt !== 'No alt text') console.log(`      Alt: ${img.alt}`);
+                    }
+                });
+                if (results.broken.length > 3) {
+                    console.log(`   ... and ${results.broken.length - 3} more`);
+                }
+            }
+            
+            if (results.working.length > 0) {
+                console.log(`✅ ${category.toUpperCase()} - ${results.working.length} working`);
+            }
         }
+
+        if (!hasAnyBroken) {
+            console.log(`✅ All images working correctly!`);
+        }
+
+        // Check for background images in CSS
+        const backgroundImages = [];
+        $('*').each((i, element) => {
+            const style = $(element).attr('style');
+            if (style && style.includes('background-image')) {
+                const match = style.match(/background-image:\s*url\(['"]?([^'"]*?)['"]?\)/);
+                if (match && match[1]) {
+                    backgroundImages.push(match[1]);
+                }
+            }
+        });
+
+        if (backgroundImages.length > 0) {
+            console.log(`\n🖼️  Background images found: ${backgroundImages.length}`);
+            for (const bgImg of backgroundImages) {
+                try {
+                    const imgResponse = await axios.get(bgImg, { validateStatus: null });
+                    if (imgResponse.status >= 400) {
+                        console.log(`❌ Background: ${bgImg} (Status: ${imgResponse.status})`);
+                    } else {
+                        console.log(`✅ Background: ${bgImg}`);
+                    }
+                } catch (error) {
+                    console.log(`❌ Background: ${bgImg} (Error: ${error.message})`);
+                }
+            }
+        }
+
     } catch (error) {
-        console.error(`Error checking ${url}:`, error.message);
+        console.error(`❌ Error checking ${url}:`, error.message);
     }
 };
 
 const main = async () => {
+    console.log('🚀 Starting comprehensive image check...\n');
+    
     const routes = await fetchRoutes();
-    console.log('Routes to check:', routes);
+    console.log(`📋 Routes to check (${routes.length}):`, routes.map(r => r.length > 30 ? r.substring(0, 30) + '...' : r));
+
+    const summary = {
+        totalPages: 0,
+        pagesWithIssues: 0,
+        totalImagesByCategory: {
+            navigation: 0,
+            disambiguation: 0,
+            carousel: 0,
+            banner: 0,
+            hero: 0,
+            icon: 0,
+            thumbnail: 0,
+            other: 0
+        },
+        brokenImagesByCategory: {
+            navigation: 0,
+            disambiguation: 0,
+            carousel: 0,
+            banner: 0,
+            hero: 0,
+            icon: 0,
+            thumbnail: 0,
+            other: 0
+        }
+    };
 
     for (const route of routes) {
         const url = `${BASE_URL}${route}`;
-        await checkImages(url);
+        summary.totalPages++;
+        
+        try {
+            const response = await axios.get(url);
+            const $ = cheerio.load(response.data);
+            const images = $('img');
+            
+            let pageHasIssues = false;
+            const pageResults = {
+                navigation: { broken: [], working: [] },
+                disambiguation: { broken: [], working: [] },
+                carousel: { broken: [], working: [] },
+                banner: { broken: [], working: [] },
+                hero: { broken: [], working: [] },
+                icon: { broken: [], working: [] },
+                thumbnail: { broken: [], working: [] },
+                other: { broken: [], working: [] }
+            };
+
+            console.log(`\n🔍 Checking images on ${url}`);
+            
+            for (let i = 0; i < images.length; i++) {
+                const img = images[i];
+                const src = $(img).attr('src');
+
+                if (src) {
+                    const category = categorizeImage(img, $);
+                    summary.totalImagesByCategory[category]++;
+                    
+                    try {
+                        const imgResponse = await axios.get(src, { validateStatus: null });
+                        if (imgResponse.status >= 400) {
+                            pageResults[category].broken.push({
+                                src,
+                                status: imgResponse.status,
+                                alt: $(img).attr('alt') || 'No alt text',
+                                class: $(img).attr('class') || 'No class'
+                            });
+                            summary.brokenImagesByCategory[category]++;
+                            pageHasIssues = true;
+                        } else {
+                            pageResults[category].working.push(src);
+                        }
+                    } catch (error) {
+                        pageResults[category].broken.push({
+                            src,
+                            error: error.message,
+                            alt: $(img).attr('alt') || 'No alt text',
+                            class: $(img).attr('class') || 'No class'
+                        });
+                        summary.brokenImagesByCategory[category]++;
+                        pageHasIssues = true;
+                    }
+                }
+            }
+
+            if (pageHasIssues) {
+                summary.pagesWithIssues++;
+                console.log(`❌ Issues found on this page:`);
+                
+                for (const [category, results] of Object.entries(pageResults)) {
+                    if (results.broken.length > 0) {
+                        console.log(`   ${category.toUpperCase()}: ${results.broken.length} broken`);
+                        results.broken.slice(0, 2).forEach((img, index) => {
+                            console.log(`     ${index + 1}. ${img.src.length > 60 ? img.src.substring(0, 60) + '...' : img.src}`);
+                        });
+                        if (results.broken.length > 2) {
+                            console.log(`     ... and ${results.broken.length - 2} more`);
+                        }
+                    }
+                }
+            } else {
+                console.log(`✅ All images working correctly!`);
+            }
+
+        } catch (error) {
+            console.error(`❌ Error checking ${url}:`, error.message);
+            summary.pagesWithIssues++;
+        }
     }
+
+    // Final summary report
+    console.log('\n' + '='.repeat(60));
+    console.log('📊 FINAL SUMMARY REPORT');
+    console.log('='.repeat(60));
+    console.log(`📄 Pages checked: ${summary.totalPages}`);
+    console.log(`⚠️  Pages with issues: ${summary.pagesWithIssues}`);
+    console.log(`✅ Pages working: ${summary.totalPages - summary.pagesWithIssues}`);
+    
+    console.log('\n📸 Images by category:');
+    const totalImages = Object.values(summary.totalImagesByCategory).reduce((a, b) => a + b, 0);
+    const totalBroken = Object.values(summary.brokenImagesByCategory).reduce((a, b) => a + b, 0);
+    
+    for (const [category, total] of Object.entries(summary.totalImagesByCategory)) {
+        const broken = summary.brokenImagesByCategory[category];
+        const working = total - broken;
+        if (total > 0) {
+            const status = broken > 0 ? '❌' : '✅';
+            console.log(`   ${status} ${category.toUpperCase()}: ${working}/${total} working ${broken > 0 ? `(${broken} broken)` : ''}`);
+        }
+    }
+    
+    console.log(`\n🎯 Overall: ${totalImages - totalBroken}/${totalImages} images working`);
+    console.log(`   Success rate: ${totalImages > 0 ? Math.round(((totalImages - totalBroken) / totalImages) * 100) : 100}%`);
+    
+    if (totalBroken === 0) {
+        console.log('\n🎉 CONGRATULATIONS! All images are working correctly!');
+    } else {
+        console.log(`\n⚠️  ${totalBroken} images need attention.`);
+    }
+    
+    console.log('='.repeat(60));
 };
 
 main();
