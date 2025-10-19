@@ -32,14 +32,20 @@ Welcome to the comprehensive documentation for the Wavelength Lore application. 
 ### ⚡ Performance & Optimization
 - **[Cache Busting](CACHE_BUSTING.md)** - Static asset cache management and optimization
 
-### 🔧 Asset Management & Validation
-- **[Resource Checker Documentation](../scripts/RESOURCE_CHECKER_README.md)** - Comprehensive resource validation suite for images, static files, and route links
-- **[Production Validation Guide](../scripts/PRODUCTION_VALIDATION_README.md)** - Unified production validation system with multiple modes and CI/CD integration
+### 🔧 Asset Management & Scripts
+- **[Resource Checker Documentation](scripts/RESOURCE_CHECKER_README.md)** - Comprehensive resource validation suite for images, static files, and route links
+- **[Production Validation Guide](scripts/PRODUCTION_VALIDATION_README.md)** - Unified production validation system with multiple modes and CI/CD integration
+- **[AI Image Generation Guide](scripts/AI_IMAGE_GENERATION_README.md)** - Complete AI image generation system with Google GenAI integration
+- **[Smart Git Commit System](scripts/SMART_COMMIT_README.md)** - Professional commit message management with ignored message files
+- **[Deployment Scripts](scripts/DEPLOYMENT_README.md)** - Automated deployment workflows and pipeline management
 
 ### 🛠️ Development & Debugging
 - **[Node.js v24 Compatibility Fix](NODE_V24_COMPATIBILITY_FIX.md)** - Compatibility fixes for Node.js v24
 - **[GitHub Action Monitor](GITHUB_ACTION_MONITOR.md)** - CI/CD pipeline monitoring and deployment tracking
 - **[Deployment Troubleshooting](DEPLOYMENT_TROUBLESHOOTING.md)** - Comprehensive guide for ECR caching issues and production deployment problems
+- **[Project Structure Summary](PROJECT_STRUCTURE_SUMMARY.md)** - Overview of project organization and architecture
+- **[Version System](VERSION_SYSTEM_README.md)** - Semantic versioning implementation and management
+- **[Security Refactor Summary](SECURITY_REFACTOR_SUMMARY.md)** - Overview of security improvements and implementations
 - **[Debug Scripts](../debug/README.md)** - Debug and diagnostic scripts for troubleshooting
 
 ### 📋 Implementation Plans
@@ -121,7 +127,8 @@ For questions about documentation or implementation:
 - **v1.1** - Added security enhancement guides
 - **v1.2** - Added backup system documentation
 - **v1.3** - Reorganized into centralized docs folder
+- **v1.4** - Added script documentation consolidation and AI image generation guides
 
 ---
 
-*Last updated: October 17, 2025*
+*Last updated: October 19, 2025*

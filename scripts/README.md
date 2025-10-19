@@ -2,6 +2,8 @@
 
 This directory contains utility scripts, build tools, and maintenance scripts for the Wavelength Lore application.
 
+📚 **For detailed documentation on specific scripts, see [`docs/scripts/`](../docs/scripts/)**
+
 ## 📁 Script Categories
 
 ### 🚀 Deployment & Monitoring Scripts
@@ -369,3 +371,13 @@ if (require.main === module) {
 ---
 
 **Note**: Always test scripts in development before running in production environments.
+
+## 📚 Detailed Documentation
+
+For comprehensive documentation on specific scripts and systems:
+
+- **[Smart Commit System](../docs/scripts/SMART_COMMIT_README.md)** - Professional git commit management
+- **[AI Image Generation](../docs/scripts/AI_IMAGE_GENERATION_README.md)** - Google GenAI SDK integration
+- **[Resource Checker](../docs/scripts/RESOURCE_CHECKER_README.md)** - System resource monitoring
+- **[Production Validation](../docs/scripts/PRODUCTION_VALIDATION_README.md)** - Production environment validation
+- **[Deployment Scripts](../docs/scripts/DEPLOYMENT_README.md)** - Deployment automation documentation

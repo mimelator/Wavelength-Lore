@@ -32,12 +32,12 @@ All project documentation has been organized in the [`docs/`](docs/) folder:
 The site includes a comprehensive asset validation system to ensure all resources are working correctly:
 
 ### 📁 Resource Validation Suite
-- ✅ **[Image Checker](scripts/RESOURCE_CHECKER_README.md#-image-checker-check_broken_imagesjs)**: Validates all images (img tags, backgrounds) with category analysis
-- ✅ **[Static Resource Checker](scripts/RESOURCE_CHECKER_README.md#-static-resource-checker-check_static_resourcesjs)**: Tests CSS, JS, fonts, icons, and CDN resources
-- ✅ **[Route Link Checker](scripts/RESOURCE_CHECKER_README.md#-route-link-checker-check_route_linksjs)**: Scans EJS templates for broken internal links with database validation
+- ✅ **[Image Checker](docs/scripts/RESOURCE_CHECKER_README.md#-image-checker-check_broken_imagesjs)**: Validates all images (img tags, backgrounds) with category analysis
+- ✅ **[Static Resource Checker](docs/scripts/RESOURCE_CHECKER_README.md#-static-resource-checker-check_static_resourcesjs)**: Tests CSS, JS, fonts, icons, and CDN resources
+- ✅ **[Route Link Checker](docs/scripts/RESOURCE_CHECKER_README.md#-route-link-checker-check_route_linksjs)**: Scans EJS templates for broken internal links with database validation
 
 ### 🚀 Production Validation
-- ✅ **[Production Suite](scripts/PRODUCTION_VALIDATION_README.md)**: Unified validation system with Quick/Standard/Full modes
+- ✅ **[Production Suite](docs/scripts/PRODUCTION_VALIDATION_README.md)**: Unified validation system with Quick/Standard/Full modes
 - ✅ **Environment Support**: Automatic detection between local (`localhost:3001`) and production (`wavelengthlore.com`)
 - ✅ **CI/CD Integration**: Proper exit codes and timeout handling for automated pipelines
 - ✅ **Smart Timeouts**: Optimized timeouts for local (5-10s) vs production (15-30s) environments
@@ -56,14 +56,14 @@ node scripts/check_static_resources.js --prod
 node scripts/check_route_links.js --prod
 ```
 
-See [Resource Checker Documentation](scripts/RESOURCE_CHECKER_README.md) and [Production Validation Guide](scripts/PRODUCTION_VALIDATION_README.md) for complete usage details.
+See [Resource Checker Documentation](docs/scripts/RESOURCE_CHECKER_README.md) and [Production Validation Guide](docs/scripts/PRODUCTION_VALIDATION_README.md) for complete usage details.
 
 ## 🎨 AI Image Generation
 
 The site includes an advanced AI image generation system for creating custom artwork:
 
 ### 🤖 AI-Powered Content Creation
-- ✅ **[AI Image Generator](scripts/AI_IMAGE_GENERATION_README.md)**: Generate images from text prompts using Google's Imagen API
+- ✅ **[AI Image Generator](docs/scripts/AI_IMAGE_GENERATION_README.md)**: Generate images from text prompts using Google's Imagen API
 - ✅ **Character Portraits**: Automated character portrait generation with style presets
 - ✅ **Location Scenes**: Epic fantasy landscape and environment generation
 - ✅ **Asset Integration**: Automatic upload and optimization through enhanced asset manager
@@ -88,7 +88,7 @@ The site includes an advanced AI image generation system for creating custom art
 - ✅ **Asset Pipeline**: Seamless integration with asset management system
 - ✅ **URL Flexibility**: Relative, CDN, or absolute URL generation modes
 
-See [AI Image Generation Guide](scripts/AI_IMAGE_GENERATION_README.md) for complete usage and examples.
+See [AI Image Generation Guide](docs/scripts/AI_IMAGE_GENERATION_README.md) for complete usage and examples.
 
 ## � Forum Features
 

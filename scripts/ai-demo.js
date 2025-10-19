@@ -89,7 +89,7 @@ class AIDemo {
    • Run: ./scripts/ai-image-generator.js --help
    • Try: ./scripts/ai-image-generator.js generate "test image" --steps=10
 
-📚 Full Documentation: ./scripts/AI_IMAGE_GENERATION_README.md
+📚 Full Documentation: ../docs/scripts/AI_IMAGE_GENERATION_README.md
 `);
   }
 
@@ -201,7 +201,7 @@ Try your first AI generation:
   ./scripts/ai-image-generator.js character "YourCharacter" "description here"
 
 Or explore the full documentation:
-  ./scripts/AI_IMAGE_GENERATION_README.md
+  ../docs/scripts/AI_IMAGE_GENERATION_README.md
 `);
   }
 }
