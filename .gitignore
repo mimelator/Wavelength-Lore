@@ -7,10 +7,9 @@
 # ===============================
 .accounts
 .sensitve
-.cmds
 .env
-.env.local
-.env.*.local
+.env.bak
+
 
 # AWS and Firebase credentials
 .aws/
@@ -154,6 +153,11 @@ htmlcov/
 # Content files
 wavelength content 2 aws
 content/prompts/wavelength/Wavelength-Lore.code-workspace
+
+# Git commit messages (for smart-commit script)
+commit-message.txt
+.commit-message.txt
+COMMIT_MESSAGE.txt
 
 # Backup files
 *.backup

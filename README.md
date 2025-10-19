@@ -58,6 +58,38 @@ node scripts/check_route_links.js --prod
 
 See [Resource Checker Documentation](scripts/RESOURCE_CHECKER_README.md) and [Production Validation Guide](scripts/PRODUCTION_VALIDATION_README.md) for complete usage details.
 
+## 🎨 AI Image Generation
+
+The site includes an advanced AI image generation system for creating custom artwork:
+
+### 🤖 AI-Powered Content Creation
+- ✅ **[AI Image Generator](scripts/AI_IMAGE_GENERATION_README.md)**: Generate images from text prompts using Google's Imagen API
+- ✅ **Character Portraits**: Automated character portrait generation with style presets
+- ✅ **Location Scenes**: Epic fantasy landscape and environment generation
+- ✅ **Asset Integration**: Automatic upload and optimization through enhanced asset manager
+- ✅ **Multiple Variations**: Generate multiple variations of concepts for selection
+
+### 🚀 Quick AI Generation
+```bash
+# Generate character portrait
+./scripts/ai-image-generator.js character "Lucky" "mischievous leprechaun with green hat"
+
+# Generate location scene  
+./scripts/ai-image-generator.js location "Emerald Grove" "mystical forest with glowing trees"
+
+# Generate and upload to assets automatically
+./scripts/ai-image-generator.js workflow "magical crystal cave" "locations/crystal-cave"
+```
+
+### 🔧 AI Features
+- ✅ **Smart Defaults**: Optimized settings for different content types
+- ✅ **Style Presets**: Fantasy-art, photorealistic, anime, concept-art styles
+- ✅ **Batch Generation**: Create multiple variations with single command
+- ✅ **Asset Pipeline**: Seamless integration with asset management system
+- ✅ **URL Flexibility**: Relative, CDN, or absolute URL generation modes
+
+See [AI Image Generation Guide](scripts/AI_IMAGE_GENERATION_README.md) for complete usage and examples.
+
 ## � Forum Features
 
 The Wavelength Lore site includes a comprehensive community forum with:

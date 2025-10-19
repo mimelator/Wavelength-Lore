@@ -37,7 +37,15 @@ class AssetManager {
     this.audioDir = path.join(this.staticDir, 'audio');
     this.videoDir = path.join(this.staticDir, 'video');
     
-    this.cdnBase = process.env.CDN_URL + '';
+    this.cdnBase = process.env.CDN_URL || '';
+    
+    // URL generation modes
+    this.urlModes = {
+      cdn: 'cdn',          // Full CDN URLs (default)
+      relative: 'relative', // Relative paths from static/
+      local: 'local',      // Local server URLs
+      none: 'none'         // Just filenames, no URL
+    };
     
     // Image optimization settings
     this.imageSettings = {
@@ -51,6 +59,31 @@ class AssetManager {
         hero: { width: 1920, height: 1080 }
       }
     };
+  }
+
+  /**
+   * Generate asset URL based on specified mode
+   * @param {string} assetType - Type of asset (images, audio, video)
+   * @param {string} target - Target path (e.g., season1/episode1)
+   * @param {string} filename - Asset filename
+   * @param {string} mode - URL mode (cdn, relative, local, none)
+   * @returns {string} Generated URL
+   */
+  generateUrl(assetType, target, filename, mode = 'cdn') {
+    switch (mode) {
+      case 'cdn':
+        return this.cdnBase ? `${this.cdnBase}/${assetType}/${target}/${filename}` : 
+               `/static/${assetType}/${target}/${filename}`;
+      case 'relative':
+        return `/${assetType}/${target}/${filename}`;
+      case 'local':
+        return `http://localhost:3001/static/${assetType}/${target}/${filename}`;
+      case 'none':
+        return filename;
+      default:
+        return this.cdnBase ? `${this.cdnBase}/${assetType}/${target}/${filename}` : 
+               `/static/${assetType}/${target}/${filename}`;
+    }
   }
 
   async main() {
@@ -87,6 +120,9 @@ class AssetManager {
         case 'rename':
           await this.renameAsset(flags);
           break;
+        case 'ai-upload':
+          await this.handleAiUpload(flags);
+          break;
         case 'help':
         case '--help':
         case '-h':
@@ -120,7 +156,7 @@ class AssetManager {
   }
 
   async handleUpload(flags) {
-    const { type, path: sourcePath, target, quality } = flags;
+    const { type, path: sourcePath, target, quality, 'url-mode': urlMode } = flags;
     
     if (!type || !sourcePath || !target) {
       throw new Error('Required flags: --type --path --target');
@@ -129,16 +165,22 @@ class AssetManager {
     console.log(`📤 Uploading ${type} assets...`);
     console.log(`Source: ${sourcePath}`);
     console.log(`Target: ${target}`);
+    if (urlMode) console.log(`URL Mode: ${urlMode}`);
+
+    const options = { 
+      quality: parseInt(quality) || 85,
+      urlMode: urlMode || 'cdn'
+    };
 
     switch (type) {
       case 'images':
-        await this.uploadImages(sourcePath, target, { quality: parseInt(quality) || 85 });
+        await this.uploadImages(sourcePath, target, options);
         break;
       case 'audio':
-        await this.uploadAudio(sourcePath, target);
+        await this.uploadAudio(sourcePath, target, options);
         break;
       case 'video':
-        await this.uploadVideo(sourcePath, target);
+        await this.uploadVideo(sourcePath, target, options);
         break;
       default:
         throw new Error(`Unknown asset type: ${type}`);
@@ -150,7 +192,7 @@ class AssetManager {
       console.log('❌ Image processing requires sharp package');
       console.log('   Install with: npm install sharp');
       console.log('   For now, copying images without optimization...');
-      return this.copyImages(sourcePath, target);
+      return this.copyImages(sourcePath, target, options);
     }
 
     console.log('🖼️ Processing images...');
@@ -165,11 +207,12 @@ class AssetManager {
     }
 
     const imageFiles = fs.readdirSync(sourcePath)
-      .filter(file => /\\.(jpg|jpeg|png|gif|bmp|tiff)$/i.test(file));
+      .filter(file => /\.(jpg|jpeg|png|gif|bmp|tiff)$/i.test(file));
 
     console.log(`Found ${imageFiles.length} images to process`);
 
     const results = [];
+    const urlMode = options.urlMode || 'cdn';
 
     for (const file of imageFiles) {
       const sourceFull = path.join(sourcePath, file);
@@ -195,7 +238,7 @@ class AssetManager {
               })
               .toFile(outputPath);
 
-            const url = `${this.cdnBase}/images/${target}/${outputName}`;
+            const url = this.generateUrl('images', target, outputName, urlMode);
             results.push({
               original: file,
               size: sizeName,
@@ -215,7 +258,7 @@ class AssetManager {
       const originalTarget = path.join(targetDir, file);
       fs.copyFileSync(sourceFull, originalTarget);
       
-      const originalUrl = `${this.cdnBase}/images/${target}/${file}`;
+      const originalUrl = this.generateUrl('images', target, file, urlMode);
       results.push({
         original: file,
         size: 'original',
@@ -236,7 +279,7 @@ class AssetManager {
     return results;
   }
 
-  async copyImages(sourcePath, target) {
+  async copyImages(sourcePath, target, options = {}) {
     console.log('📁 Copying images (no optimization)...');
     
     if (!fs.existsSync(sourcePath)) {
@@ -254,6 +297,7 @@ class AssetManager {
     console.log(`Found ${imageFiles.length} images to copy`);
 
     const results = [];
+    const urlMode = options.urlMode || 'cdn';
 
     for (const file of imageFiles) {
       const sourceFull = path.join(sourcePath, file);
@@ -261,7 +305,7 @@ class AssetManager {
       
       fs.copyFileSync(sourceFull, targetFull);
       
-      const url = `${this.cdnBase}/images/${target}/${file}`;
+      const url = this.generateUrl('images', target, file, urlMode);
       results.push({
         original: file,
         size: 'original',
@@ -277,7 +321,7 @@ class AssetManager {
     return results;
   }
 
-  async uploadAudio(sourcePath, target) {
+  async uploadAudio(sourcePath, target, options = {}) {
     console.log('🎵 Processing audio files...');
     
     const targetDir = path.join(this.audioDir, target);
@@ -291,6 +335,7 @@ class AssetManager {
     console.log(`Found ${audioFiles.length} audio files`);
 
     const results = [];
+    const urlMode = options.urlMode || 'cdn';
 
     for (const file of audioFiles) {
       const sourceFull = path.join(sourcePath, file);
@@ -299,7 +344,7 @@ class AssetManager {
       // Copy file (TODO: Add audio optimization with ffmpeg)
       fs.copyFileSync(sourceFull, targetFull);
       
-      const url = `${this.cdnBase}/audio/${target}/${file}`;
+      const url = this.generateUrl('audio', target, file, urlMode);
       results.push({
         original: file,
         path: targetFull,
@@ -313,7 +358,7 @@ class AssetManager {
     return results;
   }
 
-  async uploadVideo(sourcePath, target) {
+  async uploadVideo(sourcePath, target, options = {}) {
     console.log('🎬 Processing video files...');
     
     const targetDir = path.join(this.videoDir, target);
@@ -327,6 +372,7 @@ class AssetManager {
     console.log(`Found ${videoFiles.length} video files`);
 
     const results = [];
+    const urlMode = options.urlMode || 'cdn';
 
     for (const file of videoFiles) {
       const sourceFull = path.join(sourcePath, file);
@@ -335,7 +381,7 @@ class AssetManager {
       // Copy file (TODO: Add video optimization with ffmpeg)
       fs.copyFileSync(sourceFull, targetFull);
       
-      const url = `${this.cdnBase}/video/${target}/${file}`;
+      const url = this.generateUrl('video', target, file, urlMode);
       results.push({
         original: file,
         path: targetFull,
@@ -431,11 +477,12 @@ class AssetManager {
   async generateAssetUrls(flags) {
     console.log('🔗 Generating asset URLs...');
     
-    const { target } = flags;
+    const { target, 'url-mode': urlMode } = flags;
     if (!target) {
       throw new Error('Required flag: --target (e.g., season1/episode1)');
     }
     
+    const mode = urlMode || 'cdn';
     const targetDir = path.join(this.imagesDir, target);
     if (!fs.existsSync(targetDir)) {
       throw new Error(`Target directory does not exist: ${targetDir}`);
@@ -444,16 +491,22 @@ class AssetManager {
     const files = fs.readdirSync(targetDir)
       .filter(file => !file.startsWith('.') && file !== 'asset-manifest.json');
     
-    console.log('Generated URLs:');
+    console.log(`Generated URLs (mode: ${mode}):`);
     console.log('```yaml');
     console.log('carouselImages:');
     
     files.forEach(file => {
-      const url = `${this.cdnBase}/images/${target}/${file}`;
+      const url = this.generateUrl('images', target, file, mode);
       console.log(`  - ${url}`);
     });
     
     console.log('```');
+    
+    console.log('\nAvailable URL modes:');
+    console.log('  --url-mode=cdn       Full CDN URLs (default)');
+    console.log('  --url-mode=relative  Relative paths (/images/...)');
+    console.log('  --url-mode=local     Local server URLs (localhost:3001)');
+    console.log('  --url-mode=none      Just filenames');
   }
 
   findContentFiles() {
@@ -514,6 +567,41 @@ class AssetManager {
     
     searchDir(this.staticDir);
     return assets;
+  }
+
+  /**
+   * Special handler for AI-generated images with sensible defaults
+   */
+  async handleAiUpload(flags) {
+    const { path: sourcePath, target, quality, 'url-mode': urlMode } = flags;
+    
+    if (!sourcePath || !target) {
+      throw new Error('Required flags: --path --target');
+    }
+
+    console.log('🤖 AI Image Upload Mode');
+    console.log(`Source: ${sourcePath}`);
+    console.log(`Target: ai-generated/${target}`);
+    
+    // Use sensible defaults for AI-generated content
+    const options = { 
+      quality: parseInt(quality) || 90, // Higher quality for AI art
+      urlMode: urlMode || 'relative'    // Relative paths by default
+    };
+
+    console.log(`URL Mode: ${options.urlMode} (relative paths for local development)`);
+    console.log(`Quality: ${options.quality}% (high quality for AI art)`);
+
+    // Always prefix with 'ai-generated' for organization
+    const aiTarget = target.startsWith('ai-generated/') ? target : `ai-generated/${target}`;
+    
+    await this.uploadImages(sourcePath, aiTarget, options);
+    
+    console.log('\n🎨 AI Upload Complete!');
+    console.log('💡 Tips for AI-generated content:');
+    console.log('  - Use relative URLs for faster local development');
+    console.log('  - Consider converting to WebP for smaller files');
+    console.log('  - Use descriptive folder names (e.g., ai-generated/portraits/lucky)');
   }
 
   /**
@@ -999,6 +1087,7 @@ Usage:
 
 Commands:
   upload                         Upload and process assets
+  ai-upload                     Upload AI-generated images (with smart defaults)
   optimize                       Optimize existing assets
   sync                          Sync to CloudFront CDN
   validate                      Check for missing/orphaned assets
@@ -1020,7 +1109,14 @@ Options:
   --path=PATH                   Source path for upload
   --target=TARGET               Target path (e.g., season1/episode1)
   --quality=N                   Image quality (1-100, default: 85)
+  --url-mode=MODE               URL generation mode (cdn/relative/local/none)
   --force                       Force sync/overwrite
+  
+  URL Modes:
+  --url-mode=cdn               Full CDN URLs (default)
+  --url-mode=relative          Relative paths (/images/...)
+  --url-mode=local             Local server URLs (localhost:3001)
+  --url-mode=none              Just filenames
   
   Update Options:
   --width=N                     Target width for resize
@@ -1039,7 +1135,9 @@ Options:
   
 Examples:
   ./asset-manager.js upload --type=images --path=./my-images --target=season2/episode3
-  ./asset-manager.js generate-urls --target=season1/episode1
+  ./asset-manager.js upload --type=images --path=./ai-generated --target=characters/lucky --url-mode=relative
+  ./asset-manager.js generate-urls --target=season1/episode1 --url-mode=cdn
+  ./asset-manager.js generate-urls --target=ai-art/portraits --url-mode=local
   ./asset-manager.js validate
   ./asset-manager.js sync --force
   

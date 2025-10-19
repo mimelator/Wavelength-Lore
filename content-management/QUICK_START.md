@@ -127,6 +127,35 @@ Creates:
 ./scripts/asset-manager.js validate
 ```
 
+## 🎨 AI Image Generation
+
+### Generate Character Portraits
+```bash
+# AI-generated character portraits
+./scripts/ai-image-generator.js character "Lucky" "mischievous leprechaun with green hat and twinkling eyes"
+
+# Generate multiple variations
+./scripts/ai-image-generator.js variations "Lucky the leprechaun portrait" --count=5 --style=fantasy-art
+```
+
+### Generate Location Scenes
+```bash
+# AI-generated location artwork
+./scripts/ai-image-generator.js location "Emerald Grove" "mystical forest with glowing trees and fairy lights"
+
+# Generate and upload automatically
+./scripts/ai-image-generator.js workflow "magical crystal cave" "locations/crystal-cave" --count=3
+```
+
+### Custom AI Generation
+```bash
+# Generate any concept from text prompts
+./scripts/ai-image-generator.js generate "magical sword glowing with ancient runes"
+
+# High-quality artwork with custom settings
+./scripts/ai-image-generator.js generate "epic dragon battle scene" --width=1920 --height=1080 --steps=60 --style=concept-art
+```
+
 ## 🚀 Deploying Everything
 
 ### Quick Content-Only Deployment
