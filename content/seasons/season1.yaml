@@ -1,34 +1,40 @@
 title: 'Prelude: Life in the Shire'
 seasonLink: https://youtube.com/playlist?list=PLO3KUVl6gwUb_ZrCoj7-ev92oC9Rvo0aH&si=9wxVs9LrMiCFfu85
-
-image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/image.png
+image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/image.webp
 description: 'Prelude to the Battle of the Shire:  Wavelength is invited to perform at the Shire, and the Goblin King gets angry when he hears what Wavelength has to say about Goblins.'
 episodes:
   episode1:
     title: My Lucky Charm
     description: Everyone needs a little luck sometimes, except for maybe Goblins who need no one
-    keywords: ['lucky', 'leprechaun', 'charm', 'luck', 'goblin', 'shire', 'mascot']
+    keywords:
+      - lucky
+      - leprechaun
+      - charm
+      - luck
+      - goblin
+      - shire
+      - mascot
     youtubeLink: https://youtu.be/ejFr89hKB1M
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/image.png
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/image.webp
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/LuckyCharm_v35.mp3
     carouselImages:
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/IceBlueGreed-19.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-11.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/RebuildTheShire-13.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/LockedAndLoaded-14.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-13.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/TheKingHasFled-07.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-09.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-05.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-14.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-12.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-06.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-16.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-10.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/RebuildTheShire-07.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/IceBlueGreed-19.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-11.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/RebuildTheShire-13.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/LockedAndLoaded-14.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-13.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/TheKingHasFled-07.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-09.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-05.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-14.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-12.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-06.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-16.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-10.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode1/images/RebuildTheShire-07.webp
     story: |
       Wavelength is performing a Shire favorite about their mascot, Lucky the Leprechaun, who brings them good luck and helps them overcome challenges.
       The song celebrates the joy and positivity that Lucky brings to their lives.
@@ -53,31 +59,36 @@ episodes:
   episode2:
     title: Jump Right In!
     description: Life is about choices, so make one and see what happens next!
-    keywords: ['jump', 'choices', 'adventure', 'decision', 'life', 'action']
+    keywords:
+      - jump
+      - choices
+      - adventure
+      - decision
+      - life
+      - action
     youtubeLink: https://youtu.be/UJs0aOb8DlM
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/image.png
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/image.webp
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/JumpRightIn_v25.mp3
     carouselImages:
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-01.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-02.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-03.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-04.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-05.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-06.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-07.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-08.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-09.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-10.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-11.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-13.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-15.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-16.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-17.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-18.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-19.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-20.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/jump_right_in.jpg
-
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-01.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-02.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-03.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-04.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-05.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-06.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-07.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-08.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-09.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-10.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-11.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-13.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-15.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-16.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-17.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-18.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-19.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-20.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode2/images/jump_right_in.webp
     story: |
       Wavelength performs a song about taking chances and embracing new experiences, which is especially
       important to them as they are a touring band and love to explore new places and meet new people, cultures, and ideas.
@@ -107,26 +118,40 @@ episodes:
   episode3:
     title: Dream with Me
     description: What dreams can be made when two are united in destiny?
-    keywords: ['dream', 'destiny', 'unity', 'together', 'hope', 'future']
-    youtubeLink: https://youtu.be/L_gxO-rrTSY
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/image.png
+    keywords:
+      - dream
+      - destiny
+      - unity
+      - together
+      - hope
+      - future
+    youtubeLink: https://youtu.be/H9UYMUMxr1o
+    image: https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/jewel-5.webp
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/DreamWithMe_v5.mp3
     carouselImages:
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-01.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-03.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-04.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-06.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-07.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-08.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-09.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-10.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-13.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-14.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-17.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-18.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-19.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-20.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/concert4-21.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-evening-amphitheater-1.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-evening-amphitheater-2.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-evening-amphitheater-3.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-evening-amphitheater-4.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-evening-amphitheater-5.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-evening-amphitheater-6.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-sanctuary-01.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-sanctuary-02.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-sanctuary-03.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-sanctuary-04.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-sanctuary-05.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-sanctuary-06.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-sanctuary-07.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-sanctuary-08.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-sanctuary-09.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/shire-sanctuary-10.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/TheBattleOfTheShire-002.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/TheBattleOfTheShire-006.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/TheBattleOfTheShire-007.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/TheBattleOfTheShire-010.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode3/images/TheBattleOfTheShire-013.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/jewel-5.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/jewel-6.webp
     story: |
       Wavelength performs a heartfelt song about dreaming together and the power of unity and shared aspirations.
       The song emphasizes the importance of connection and collaboration in achieving dreams and overcoming challenges.
@@ -140,25 +165,31 @@ episodes:
   episode4:
     title: Daphne
     description: The intoxicating Daphne flower calls to both pollinators and humans alike
-    keywords: ['daphne', 'flower', 'intoxicating', 'pollinators', 'nature', 'beauty']
+    keywords:
+      - daphne
+      - flower
+      - intoxicating
+      - pollinators
+      - nature
+      - beauty
     youtubeLink: https://youtu.be/PWYOElJnU0I
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/image.png
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/image.webp
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/Daphne_v21.mp3
     carouselImages:
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-01.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-02.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-03.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-04.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-06.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-08.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-09.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-11.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-12.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-13.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-15.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-16.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-18.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-19.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-01.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-02.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-03.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-04.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-06.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-08.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-09.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-11.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-12.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-13.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-15.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-16.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-18.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode4/images/concert5-19.webp
     story: |
       Wavelength performs a song about the Daphne flower, which is known for its intoxicating fragrance that attracts both pollinators and humans.
       It explores themes of attraction, desire, and the allure of beauty, many of which King David expresses for Daphne.
@@ -172,24 +203,30 @@ episodes:
   episode5:
     title: Falling
     description: When they make your heart go ah-ah-ah-ah
-    keywords: ['falling', 'love', 'heart', 'angel', 'romance', 'emotion']
+    keywords:
+      - falling
+      - love
+      - heart
+      - angel
+      - romance
+      - emotion
     youtubeLink: https://youtu.be/LKDfiCHGeNs
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/image.png
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/image.webp
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/Falling_v32.mp3
     carouselImages:
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-01.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-03.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-04.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-06.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-07.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-08.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-09.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-11.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-12.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-13.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-14.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-16.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-17.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-01.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-03.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-04.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-06.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-07.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-08.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-09.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-11.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-12.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-13.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-14.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-16.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-17.webp
     story: |
       Wavelength performs a song about the exhilarating feeling of falling in love and the joy that comes with it.
       Perhaps foreshadowing what Daphne and her partner might feel for each other as their relationship blossoms.
@@ -205,29 +242,35 @@ episodes:
   episode6:
     title: Once More
     description: In remembrance of dear friends
-    keywords: ['remembrance', 'friends', 'memory', 'nostalgia', 'dear', 'once more']
+    keywords:
+      - remembrance
+      - friends
+      - memory
+      - nostalgia
+      - dear
+      - once more
     youtubeLink: https://youtu.be/_Ml9tKjgTIs
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/image.png
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/image.webp
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/OnceMore_v20.mp3
     carouselImages:
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-01.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-02.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-03.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-04.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-05.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-06.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-07.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-08.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-09.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-10.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-11.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-12.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-14.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-15.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-16.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-17.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-18.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-19.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-01.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-02.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-03.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-04.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-05.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-06.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-07.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-08.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-09.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-10.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-11.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-12.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-14.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-15.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-16.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-17.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-18.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode6/images/concert2-19.webp
     story: |
       Wavelength performs a poignant song about cherishing memories and the importance of remembering loved ones who have passed away.
       The song reflects on the enduring impact that these individuals have on our lives and the comfort that comes from holding onto their memory.
@@ -253,26 +296,34 @@ episodes:
   episode7:
     title: History Lessons
     description: In memory of a precious friend, a jewel that couldn't be outshone
-    keywords: ['history', 'lessons', 'memory', 'jewel', 'precious', 'friend', 'past', 'remember']
+    keywords:
+      - history
+      - lessons
+      - memory
+      - jewel
+      - precious
+      - friend
+      - past
+      - remember
     youtubeLink: https://youtu.be/PTTLo-Oetl4
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/image.png
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/image.webp
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/HistoryLessons_v8.mp3
     carouselImages:
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-01.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-02.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-03.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-04.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-06.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-07.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-09.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-11.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-12.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-13.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-14.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-15.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-16.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-17.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-18.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-01.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-02.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-03.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-04.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-06.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-07.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-09.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-11.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-12.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-13.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-14.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-15.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-16.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-17.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode7/images/concert3-18.webp
     story: |
       Wavelength performs a reflective song about learning from the past and the importance of history in shaping our present and future.
       The song encourages listeners to remember the lessons of history and to use that knowledge to make better choices moving forward.
@@ -291,28 +342,34 @@ episodes:
   episode8:
     title: Life in the Shire
     description: When home is a haven, there's no limit to what can be done
-    keywords: ['shire', 'home', 'haven', 'life', 'peaceful', 'community']
+    keywords:
+      - shire
+      - home
+      - haven
+      - life
+      - peaceful
+      - community
     youtubeLink: https://youtu.be/4wKUohlpnPo
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/image.png
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/image.webp
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/LIfeInTheShire_v19.mp3
     carouselImages:
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-02.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-06.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-07.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-08.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-09.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-11.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-13.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-14.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-15.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-16.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-17.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-18.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-19.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-20.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-21.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-22.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-23.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-02.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-06.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-07.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-08.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-09.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-11.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-13.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-14.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-15.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-16.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-17.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-18.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-19.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-20.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-21.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-22.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-23.webp
     story: |
       Wavelength performs an uplifting song about the joys of living in the Shire, a place of peace, community, and gifted artisanship.
       The song celebrates the simple pleasures of life in the Shire and the sense of belonging that comes from being part of a close-knit community.
@@ -333,29 +390,36 @@ episodes:
   episode9:
     title: Feed the Crows
     description: Living in and Loving Nature can be a great balm for your pain
-    keywords: ['crows', 'nature', 'healing', 'pain', 'comfort', 'solace', 'wildlife']
+    keywords:
+      - crows
+      - nature
+      - healing
+      - pain
+      - comfort
+      - solace
+      - wildlife
     youtubeLink: https://youtu.be/tunZ11NdOQA
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/image.png
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/image.webp
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/FeedTheCrows_v24.mp3
     carouselImages:
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-02.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-03.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-04.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-05.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-06.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-07.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-08.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-09.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-11.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-12.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-13.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-15.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-16.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-17.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-19.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-20.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-21.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-22.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-02.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-03.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-04.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-05.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-06.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-07.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-08.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-09.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-11.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-12.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-13.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-15.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-16.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-17.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-19.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-20.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-21.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-22.webp
     story: |
       Wavelength performs a soulful song about finding solace and healing in nature.
       The song emphasizes the therapeutic power of connecting with the natural world and the comfort that comes from being surrounded by its beauty.
@@ -372,24 +436,30 @@ episodes:
   episode10:
     title: Keep On
     description: There are 3 or 4 little words that I enjoy hearing everyday…
-    keywords: ['keep on', 'perseverance', 'love', 'relationships', 'words', 'searching']
+    keywords:
+      - keep on
+      - perseverance
+      - love
+      - relationships
+      - words
+      - searching
     youtubeLink: https://youtu.be/en9ir6dq7WQ
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/image.png
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/image.webp
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/Keep On_v26.mp3
     carouselImages:
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-01.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-03.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-04.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-06.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-07.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-08.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-09.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-12.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-13.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-14.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-15.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-17.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-19.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-01.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-03.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-04.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-06.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-07.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-08.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-09.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-12.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-13.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-14.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-15.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-17.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-19.webp
     story: |
       Wavelength focuses on the importance of relationships and the power of love and connection.
       The song emphasizes the significance of hearing and expressing love through simple yet meaningful words.
@@ -409,33 +479,40 @@ episodes:
   episode11:
     title: Back to the Shire (Encore)
     description: There's a place where people practice paradise
-    keywords: ['shire', 'paradise', 'encore', 'home', 'practice', 'peace', 'return']
+    keywords:
+      - shire
+      - paradise
+      - encore
+      - home
+      - practice
+      - peace
+      - return
     youtubeLink: https://youtu.be/07ln1YTcOdg?si=TrWzyJkYOZtx1Zrc
-    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/image.png
+    image: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/image.webp
     audio: https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/BackToTheShire_v18.mp3
     carouselImages:
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-02.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-03.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-04.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-05.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-07.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-08.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-09.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-10.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-11.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-12.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-13.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-14.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-15.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-16.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-17.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-18.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-19.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-20.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-21.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-22.png
-      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-23.png
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-02.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-03.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-04.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-05.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-07.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-08.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-09.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-10.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-11.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-12.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-13.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-14.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-15.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-16.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-17.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-18.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-19.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-20.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-21.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-22.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-23.webp
     story: |
       Wavelength makes an annual pilgrimage back to the Shire, a place of peace, community, and gifted artisanship.
       The song celebrates the simple pleasures of life in the Shire and the sense of belonging that comes from being part of a close-knit community.
