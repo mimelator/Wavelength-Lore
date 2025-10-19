@@ -45,7 +45,7 @@ const includeModal = showModal !== false; // Default to true unless explicitly s
                         </a>
                     </h3>
                     <a href="/season/<%= seasonNumber %>/episode/<%= episode.replace('episode', '') %>">
-                        <img src="<%= items[episode].image %>" alt="<%= items[episode].title %>">
+                        <img src="<%= cdnUrl %><%= items[episode].image %>" alt="<%= items[episode].title %>">
                     </a>
                     <p><%= items[episode].description %></p>
                     <a href="<%= items[episode].youtubeLink %>" target="_blank" class="youtube-link">Watch on YouTube</a>

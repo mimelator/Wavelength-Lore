@@ -12,13 +12,13 @@
     <nav class="lore-navigation-top">
         <% if (previousLore) { %>
             <a href="/lore/<%= previousLore.id %>" class="nav-link prev">
-                <img src="<%= previousLore.image %>" alt="<%= previousLore.title %>" class="nav-image tiny">
+                <img src="<%= cdnUrl %><%= previousLore.image %>" alt="<%= previousLore.title %>" class="nav-image tiny">
                 <span class="nav-text">&laquo; <%= previousLore.title %></span>
             </a>
         <% } %>
         <% if (nextLore) { %>
             <a href="/lore/<%= nextLore.id %>" class="nav-link next">
-                <img src="<%= nextLore.image %>" alt="<%= nextLore.title %>" class="nav-image tiny">
+                <img src="<%= cdnUrl %><%= nextLore.image %>" alt="<%= nextLore.title %>" class="nav-image tiny">
                 <span class="nav-text"><%= nextLore.title %> &raquo;</span>
             </a>
         <% } %>
@@ -46,7 +46,7 @@
 
         <br>
 
-        <section class="lore-banner" style="background-image: url('<%= lore.image %>');">
+        <section class="lore-banner" style="background-image: url('<%= cdnUrl %><%= lore.image %>');">
             
         </section>
 
@@ -75,7 +75,7 @@
                 <% const shuffledImages = lore.image_gallery.sort(() => Math.random() - 0.5); %>
                 <% shuffledImages.forEach((image, index) => { %>
                     <div class="carousel-item" data-index="<%= index %>">
-                        <img src="<%= image %>" alt="<%= lore.title %>" class="gallery-image" data-fullsize="<%= image %>">
+                        <img src="<%= cdnUrl %><%= image %>" alt="<%= lore.title %>" class="gallery-image" data-fullsize="<%= cdnUrl %><%= image %>">
                     </div>
                 <% }); %>
             </div>

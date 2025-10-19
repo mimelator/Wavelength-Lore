@@ -11,13 +11,13 @@
     <nav class="character-navigation-top">
         <% if (previousCharacter) { %>
             <a href="/character/<%= previousCharacter.id %>" class="nav-link prev">
-                <img src="<%= previousCharacter.image %>" alt="<%= previousCharacter.title %>" class="nav-image tiny">
+                <img src="<%= cdnUrl %><%= previousCharacter.image %>" alt="<%= previousCharacter.title %>" class="nav-image tiny">
                 <span class="nav-text">&laquo; <%= previousCharacter.title %></span>
             </a>
         <% } %>
         <% if (nextCharacter) { %>
             <a href="/character/<%= nextCharacter.id %>" class="nav-link next">
-                <img src="<%= nextCharacter.image %>" alt="<%= nextCharacter.title %>" class="nav-image tiny">
+                <img src="<%= cdnUrl %><%= nextCharacter.image %>" alt="<%= nextCharacter.title %>" class="nav-image tiny">
                 <span class="nav-text"><%= nextCharacter.title %> &raquo;</span>
             </a>
         <% } %>
@@ -40,7 +40,7 @@
             </p>
         </section>
 
-        <section class="character-banner" style="background-image: url('<%= character.image %>');">"
+        <section class="character-banner" style="background-image: url('<%= cdnUrl %><%= character.image %>');">"
             
         </section>
 
@@ -65,7 +65,7 @@
                 <% const shuffledImages = character.image_gallery.sort(() => Math.random() - 0.5); %>
                 <% shuffledImages.forEach((image, index) => { %>
                     <div class="carousel-item" data-index="<%= index %>">
-                        <img src="<%= image %>" alt="<%= character.title %>" class="gallery-image" data-fullsize="<%= image %>">
+                        <img src="<%= cdnUrl %><%= image %>" alt="<%= character.title %>" class="gallery-image" data-fullsize="<%= cdnUrl %><%= image %>">
                     </div>
                 <% }); %>
             </div>

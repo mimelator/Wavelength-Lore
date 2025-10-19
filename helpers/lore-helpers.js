@@ -15,10 +15,10 @@ const fallbackLore = [
     url: '/lore/the-shire',
     type: 'place',
     description: 'A peaceful realm where music flourishes and the natural world sings in harmony.',
-    image: 'https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-08.png',
+    image: '/images/seasons/season3/episodes/episode5/images/RebuildTheShire-08.webp',
     image_gallery: [
-      'https://df5sj8f594cdx.cloudfront.net/images/seasons/season3/episodes/episode5/images/RebuildTheShire-12.png',
-      'https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-15.png'
+      '/images/seasons/season3/episodes/episode5/images/RebuildTheShire-12.webp',
+      '/images/seasons/season4/episodes/episode2/images/TheKingHasFled-15.webp'
     ]
   },
   {
@@ -28,9 +28,9 @@ const fallbackLore = [
     url: '/lore/ice-castle',
     type: 'place',
     description: 'A majestic fortress of eternal ice located in the far northern reaches.',
-    image: 'https://df5sj8f594cdx.cloudfront.net/images/episodes/IceBlueGreed-08.png',
+    image: '/images/episodes/IceBlueGreed-08.webp',
     image_gallery: [
-      'https://df5sj8f594cdx.cloudfront.net/images/episodes/FrozenPeace-16.png'
+      '/images/episodes/FrozenPeace-16.webp'
     ]
   },
   {
@@ -40,9 +40,9 @@ const fallbackLore = [
     url: '/lore/wavelength-band',
     type: 'concept',
     description: 'More than just a musical group, Wavelength represents the perfect harmony between family bonds and artistic expression.',
-    image: 'https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/wavelength.png',
+    image: '/images/characters/wavelength/wavelength.webp',
     image_gallery: [
-      'https://df5sj8f594cdx.cloudfront.net/images/characters/wavelength/wavelength.png'
+      '/images/characters/wavelength/wavelength.webp'
     ]
   },
   {
@@ -52,9 +52,9 @@ const fallbackLore = [
     url: '/lore/music-magic',
     type: 'concept',
     description: 'The fundamental force that flows through the Wavelength universe.',
-    image: 'https://df5sj8f594cdx.cloudfront.net/images/episodes/TheSongOfMourning-19.png',
+    image: '/images/episodes/TheSongOfMourning-19.webp',
     image_gallery: [
-      'https://df5sj8f594cdx.cloudfront.net/images/episodes/TheSongOfMourning-19.png'
+      '/images/episodes/TheSongOfMourning-19.webp'
     ]
   },
   {
@@ -65,11 +65,11 @@ const fallbackLore = [
     type: 'villain',
     keywords: ['king', 'goblin ruler', 'psychopath', 'villain'],
     description: "The Goblin King is a Psychopath that leads a Misery of Goblins to invade the Shire and begin the Battle of the Shire. He lives by one Rule: Goblin's Rule, which means that the only rule you ever need to know about when dealing with the Goblin King, is that he will Rule all over you. He is tricked by Lucky and the fact that Goblin's Greed is insatiable, into leaving his lair to pursue an Ice Blue Diamond, which Lucky uses to lure him out of hiding during the Battle for the Shire.",
-    image: 'https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png',
+    image: '/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.webp',
     image_gallery: [
-      'https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.png',
-      'https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode2/images/TheKingHasFled-23.png',
-      'https://df5sj8f594cdx.cloudfront.net/images/seasons/season4/episodes/episode3/images/GoblinsRule-25.png'
+      '/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.webp',
+      '/images/seasons/season4/episodes/episode2/images/TheKingHasFled-23.webp',
+      '/images/seasons/season4/episodes/episode3/images/GoblinsRule-25.webp'
     ]
   }
 ];

@@ -54,7 +54,7 @@
                         </a>
                     </h3>
                     <a href="/season/<%= season.replace('season', '') %>/episode/<%= episode.replace('episode', '') %>">
-                        <img src="<%= videos[season].episodes[episode].image %>" alt="<%= videos[season].episodes[episode].title %>">
+                        <img src="<%= cdnUrl %><%= videos[season].episodes[episode].image %>" alt="<%= videos[season].episodes[episode].title %>">
                     </a>
                     <p><%= videos[season].episodes[episode].description %></p>
                     <a href="<%= videos[season].episodes[episode].youtubeLink %>" target="_blank" class="youtube-link">Watch on YouTube</a>

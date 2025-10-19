@@ -17,7 +17,7 @@
                 <% lore.forEach(loreItem => { %>
                     <div class="gallery-item lore-item">
                         <a href="/lore/<%= loreItem.id %>">
-                            <img src="<%= loreItem.image %>" alt="<%= loreItem.title %>">
+                            <img src="<%= cdnUrl %><%= loreItem.image %>" alt="<%= loreItem.title %>">
                             <h2><%= loreItem.title %></h2>
                             <div class="lore-type-badge">
                                 <span class="type-<%= loreItem.type %>"><%= loreItem.type %></span>
