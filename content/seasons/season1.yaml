@@ -1,7 +1,7 @@
-title: 'Prelude: Life in the Shire'
+title: "Prelude: Life in the Shire"
 seasonLink: https://youtube.com/playlist?list=PLO3KUVl6gwUb_ZrCoj7-ev92oC9Rvo0aH&si=9wxVs9LrMiCFfu85
 image: /static/images/seasons/season1/image.webp
-description: 'Prelude to the Battle of the Shire:  Wavelength is invited to perform at the Shire, and the Goblin King gets angry when he hears what Wavelength has to say about Goblins.'
+description: "Prelude to the Battle of the Shire:  Wavelength is invited to perform at the Shire, and the Goblin King gets angry when he hears what Wavelength has to say about Goblins."
 episodes:
   episode1:
     title: My Lucky Charm
@@ -16,7 +16,7 @@ episodes:
       - mascot
     youtubeLink: https://youtu.be/ejFr89hKB1M
     image: /static/images/seasons/season1/episodes/episode1/image.webp
-    audio: /static/images/seasons/season1/episodes/episode1/LuckyCharm_v35.mp3
+    audio: /images/seasons/season1/episodes/episode1/LuckyCharm_v35.mp3
     carouselImages:
       - /static/images/seasons/season1/episodes/episode1/images/IceBlueGreed-19.webp
       - /static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.webp
@@ -68,7 +68,7 @@ episodes:
       - action
     youtubeLink: https://youtu.be/UJs0aOb8DlM
     image: /static/images/seasons/season1/episodes/episode2/image.webp
-    audio: /static/images/seasons/season1/episodes/episode2/JumpRightIn_v25.mp3
+    audio: /images/seasons/season1/episodes/episode2/JumpRightIn_v25.mp3
     carouselImages:
       - /static/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-01.webp
       - /static/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-02.webp
@@ -127,7 +127,7 @@ episodes:
       - future
     youtubeLink: https://youtu.be/H9UYMUMxr1o
     image: /static/images/characters/wavelength/jewel-5.webp
-    audio: /static/images/seasons/season1/episodes/episode3/DreamWithMe_v5.mp3
+    audio: /images/seasons/season1/episodes/episode3/DreamWithMe_v5.mp3
     carouselImages:
       - /static/images/seasons/season1/episodes/episode3/images/shire-evening-amphitheater-1.webp
       - /static/images/seasons/season1/episodes/episode3/images/shire-evening-amphitheater-2.webp
@@ -174,7 +174,7 @@ episodes:
       - beauty
     youtubeLink: https://youtu.be/PWYOElJnU0I
     image: /static/images/seasons/season1/episodes/episode4/image.webp
-    audio: /static/images/seasons/season1/episodes/episode4/Daphne_v21.mp3
+    audio: /images/seasons/season1/episodes/episode4/Daphne_v21.mp3
     carouselImages:
       - /static/images/seasons/season1/episodes/episode4/images/concert5-01.webp
       - /static/images/seasons/season1/episodes/episode4/images/concert5-02.webp
@@ -212,7 +212,7 @@ episodes:
       - emotion
     youtubeLink: https://youtu.be/LKDfiCHGeNs
     image: /static/images/seasons/season1/episodes/episode5/image.webp
-    audio: /static/images/seasons/season1/episodes/episode5/Falling_v32.mp3
+    audio: /images/seasons/season1/episodes/episode5/Falling_v32.mp3
     carouselImages:
       - /static/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-01.webp
       - /static/images/seasons/season1/episodes/episode5/images/concert8_First_Growth-03.webp
@@ -251,7 +251,7 @@ episodes:
       - once more
     youtubeLink: https://youtu.be/_Ml9tKjgTIs
     image: /static/images/seasons/season1/episodes/episode6/image.webp
-    audio: /static/images/seasons/season1/episodes/episode6/OnceMore_v20.mp3
+    audio: /images/seasons/season1/episodes/episode6/OnceMore_v20.mp3
     carouselImages:
       - /static/images/seasons/season1/episodes/episode6/images/concert2-01.webp
       - /static/images/seasons/season1/episodes/episode6/images/concert2-02.webp
@@ -307,7 +307,7 @@ episodes:
       - remember
     youtubeLink: https://youtu.be/PTTLo-Oetl4
     image: /static/images/seasons/season1/episodes/episode7/image.webp
-    audio: /static/images/seasons/season1/episodes/episode7/HistoryLessons_v8.mp3
+    audio: /images/seasons/season1/episodes/episode7/HistoryLessons_v8.mp3
     carouselImages:
       - /static/images/seasons/season1/episodes/episode7/images/concert3-01.webp
       - /static/images/seasons/season1/episodes/episode7/images/concert3-02.webp
@@ -351,7 +351,7 @@ episodes:
       - community
     youtubeLink: https://youtu.be/4wKUohlpnPo
     image: /static/images/seasons/season1/episodes/episode8/image.webp
-    audio: /static/images/seasons/season1/episodes/episode8/LIfeInTheShire_v19.mp3
+    audio: /images/seasons/season1/episodes/episode8/LIfeInTheShire_v19.mp3
     carouselImages:
       - /static/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-02.webp
       - /static/images/seasons/season1/episodes/episode8/images/concert6_life_in_the_shire-06.webp
@@ -400,7 +400,7 @@ episodes:
       - wildlife
     youtubeLink: https://youtu.be/tunZ11NdOQA
     image: /static/images/seasons/season1/episodes/episode9/image.webp
-    audio: /static/images/seasons/season1/episodes/episode9/FeedTheCrows_v24.mp3
+    audio: /images/seasons/season1/episodes/episode9/FeedTheCrows_v24.mp3
     carouselImages:
       - /static/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-02.webp
       - /static/images/seasons/season1/episodes/episode9/images/concert7_feed_the_crows-03.webp
@@ -445,7 +445,7 @@ episodes:
       - searching
     youtubeLink: https://youtu.be/en9ir6dq7WQ
     image: /static/images/seasons/season1/episodes/episode10/image.webp
-    audio: /static/images/seasons/season1/episodes/episode10/Keep On_v26.mp3
+    audio: /images/seasons/season1/episodes/episode10/Keep On_v26.mp3
     carouselImages:
       - /static/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-01.webp
       - /static/images/seasons/season1/episodes/episode10/images/concert9_Keep_Lookin-03.webp
@@ -489,7 +489,7 @@ episodes:
       - return
     youtubeLink: https://youtu.be/07ln1YTcOdg?si=TrWzyJkYOZtx1Zrc
     image: /static/images/seasons/season1/episodes/episode11/image.webp
-    audio: /static/images/seasons/season1/episodes/episode11/BackToTheShire_v18.mp3
+    audio: /images/seasons/season1/episodes/episode11/BackToTheShire_v18.mp3
     carouselImages:
       - /static/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.webp
       - /static/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-02.webp

@@ -1,6 +1,6 @@
 title: Battle of the Shire
 seasonLink: https://www.youtube.com/playlist?list=PLO3KUVl6gwUaXP0a6Gd8F2yt8zBpDNszV
-description: 'Act 3 of the Battle of the Shire: The Shire Folk are determined to reclaim the Shire and their dear homes from the Goblin King.'
+description: "Act 3 of the Battle of the Shire: The Shire Folk are determined to reclaim the Shire and their dear homes from the Goblin King."
 episodes:
   episode1:
     title: Locked And Loaded
@@ -14,7 +14,7 @@ episodes:
       - preparation
     youtubeLink: https://youtu.be/9dUMX2KhR54
     image: /static/images/seasons/season4/episodes/episode1/image.webp
-    audio: /static/images/seasons/season4/episodes/episode1/LockedAndLoaded_v3.mp3
+    audio: /images/seasons/season4/episodes/episode1/LockedAndLoaded_v3.mp3
     carouselImages:
       - /static/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-1.webp
       - /static/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-2.webp
@@ -59,7 +59,7 @@ episodes:
       - lies
     youtubeLink: https://youtu.be/SMqrc-2wdAA
     image: /static/images/seasons/season4/episodes/episode2/image.webp
-    audio: /static/images/seasons/season4/episodes/episode2/TheKingHasFled_v1.mp3
+    audio: /images/seasons/season4/episodes/episode2/TheKingHasFled_v1.mp3
     carouselImages:
       - /static/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-1.webp
       - /static/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-2.webp
@@ -99,7 +99,7 @@ episodes:
       - goblin king
     youtubeLink: https://youtu.be/UcTy2Wf4kUg
     image: /static/images/seasons/season4/episodes/episode3/image.webp
-    audio: /static/images/seasons/season4/episodes/episode3/GoblinsRule_v2.mp3
+    audio: /images/seasons/season4/episodes/episode3/GoblinsRule_v2.mp3
     carouselImages:
       - /static/images/seasons/season4/episodes/episode3/images/GoblinsRule-17.webp
       - /static/images/seasons/season4/episodes/episode3/images/GoblinsRule-18.webp
@@ -149,7 +149,7 @@ episodes:
       - ice blue diamond
     youtubeLink: https://youtu.be/LlhYGbc2xXM
     image: /static/images/seasons/season4/episodes/episode4/image.webp
-    audio: /static/images/seasons/season4/episodes/episode4/IceBlueGreed_v2.mp3
+    audio: /images/seasons/season4/episodes/episode4/IceBlueGreed_v2.mp3
     carouselImages:
       - /static/images/seasons/season4/episodes/episode4/images/IceBlueGreed-12.webp
       - /static/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.webp
@@ -196,7 +196,7 @@ episodes:
       - cruel
     youtubeLink: https://youtu.be/YsREhnlW8B8
     image: /static/images/seasons/season4/episodes/episode5/image.webp
-    audio: /static/images/seasons/season4/episodes/episode5/TheShireFortress_v2.mp3
+    audio: /images/seasons/season4/episodes/episode5/TheShireFortress_v2.mp3
     carouselImages:
       - /static/images/seasons/season4/episodes/episode5/images/GoblinsRule-21.webp
       - /static/images/seasons/season4/episodes/episode5/images/GoblinsRule-22.webp
@@ -248,7 +248,7 @@ episodes:
       - defeated
     youtubeLink: https://youtu.be/GIpZ5yX6qn8
     image: /static/images/seasons/season4/episodes/episode6/image.webp
-    audio: /static/images/seasons/season4/episodes/episode6/BattleOfTheShire_v4.mp3
+    audio: /images/seasons/season4/episodes/episode6/BattleOfTheShire_v4.mp3
     carouselImages:
       - /static/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-01.webp
       - /static/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-02.webp
@@ -346,7 +346,7 @@ episodes:
       - loss
     youtubeLink: https://youtu.be/JLSTXP3ipnQ
     image: /static/images/seasons/season4/episodes/episode7/image.webp
-    audio: /static/images/seasons/season4/episodes/episode7/SongOfMourning_v1.mp3
+    audio: /images/seasons/season4/episodes/episode7/SongOfMourning_v1.mp3
     carouselImages:
       - /static/images/seasons/season4/episodes/episode7/images/TheBattleOfTheShire-027.webp
       - /static/images/seasons/season4/episodes/episode7/images/TheBattleOfTheShire-031.webp
@@ -387,7 +387,7 @@ episodes:
       - daylight
     youtubeLink: https://youtu.be/iVerMZpk4dM
     image: /static/images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.webp
-    audio: /static/images/seasons/season4/episodes/episode8/TheShireDream_v1.mp3
+    audio: /images/seasons/season4/episodes/episode8/TheShireDream_v1.mp3
     carouselImages:
       - /static/images/seasons/season4/episodes/episode8/images/FrozenPeace-17.webp
       - /static/images/seasons/season4/episodes/episode8/images/GoblinsRule-17.webp

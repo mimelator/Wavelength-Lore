@@ -1,21 +1,39 @@
-const admin = require('firebase-admin');
-const { initializeApp } = require('firebase/app');
-const { getDatabase, ref, set } = require('firebase/database');
+#!/usr/bin/env node
+
+/**
+ * Firebase Population Script for Wavelength Lore
+ * 
+ * Populates Firebase Realtime Database with content from YAML files
+ * Uses the existing Firebase Admin utilities for reliable database operations
+ */
+
 const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
+
+// Use environment utilities for proper .env loading
+const { initScriptEnv } = require('./utils/env-loader');
+
+// Use existing Firebase admin utilities
+const { 
+  initializeFirebaseAdmin, 
+  writeDataAsAdmin, 
+  isFirebaseAdminReady 
+} = require('../helpers/firebase-admin-utils');
+
+// Initialize environment with required Firebase variables
+const requiredEnvVars = [
+  'DATABASE_URL',
+  'PROJECT_ID'
+];
+
+// Load environment variables
+initScriptEnv(requiredEnvVars);
+
 // Determine if we're running from scripts directory or project root
 const isRunningFromScripts = __dirname.endsWith('scripts');
-const rootPath = isRunningFromScripts ? '..' : '.';
-const contentPath = isRunningFromScripts ? '../content' : './content';
-
-const serviceAccount = require(path.join(rootPath, 'firebaseServiceAccountKey.json'));
-// Configure dotenv properly based on run location
-if (isRunningFromScripts) {
-  require('dotenv').config({ path: '../.env' });
-} else {
-  require('dotenv').config({ path: './.env' });
-}
+const rootPath = isRunningFromScripts ? path.join(__dirname, '..') : __dirname;
+const contentPath = path.join(rootPath, 'content');
 
 // CLI Usage Documentation
 /*
@@ -38,39 +56,23 @@ Examples:
   node populate_firebase.js --characters --lore # Import characters and lore only
 */
 
-// Initialize Firebase Admin SDK
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: process.env.DATABASE_URL
-});
-
-// Generate a custom token
-async function getCustomToken() {
-  const customToken = await admin.auth().createCustomToken('populate_firebase_script', {
-    isScript: true
-  });
-  return customToken;
+// Helper function to convert multi-line values to single-line strings
+function processYamlData(data) {
+  if (typeof data === 'object' && data !== null) {
+    for (const key in data) {
+      if (typeof data[key] === 'string') {
+        data[key] = data[key].replace(/\n/g, ' ');
+      } else if (typeof data[key] === 'object') {
+        processYamlData(data[key]);
+      }
+    }
+  }
+  return data;
 }
 
-// Initialize Firebase App with the custom token
-async function initializeFirebaseWithToken() {
-  const customToken = await getCustomToken();
-  const firebaseApp = initializeApp({
-    apiKey: process.env.API_KEY,
-    authDomain: process.env.AUTH_DOMAIN,
-    databaseURL: process.env.DATABASE_URL,
-    projectId: process.env.PROJECT_ID,
-    storageBucket: process.env.STORAGE_BUCKET,
-    messagingSenderId: process.env.MESSAGING_SENDER_ID,
-    appId: process.env.APP_ID
-  });
-
-  const auth = require('firebase/auth');
-  const { getAuth, signInWithCustomToken } = auth;
-  const firebaseAuth = getAuth(firebaseApp);
-
-  await signInWithCustomToken(firebaseAuth, customToken);
-  return getDatabase(firebaseApp);
+// Get database reference using Admin SDK
+function getDatabase() {
+  return admin.database();
 }
 
 // Helper function to convert multi-line values to single-line strings
@@ -90,10 +92,16 @@ function processYamlData(data) {
 // Updated to read all character files from subfolders
 async function populateCharacters() {
   try {
-    const database = await initializeFirebaseWithToken();
+    console.log('📺 Initializing Firebase Admin for characters...');
+    const db = initializeFirebaseAdmin();
+    if (!db) {
+      throw new Error('Failed to initialize Firebase Admin');
+    }
 
     // Iterate through all subfolders in content/characters
     const characterFolders = fs.readdirSync(`${contentPath}/characters`, { withFileTypes: true });
+    let totalProcessed = 0;
+    let totalSuccessful = 0;
 
     for (const folder of characterFolders) {
       const folderPath = `${contentPath}/characters/${folder.name}`;
@@ -103,91 +111,142 @@ async function populateCharacters() {
 
         for (const file of characterFiles) {
           if (file.endsWith('.yaml')) {
+            totalProcessed++;
             const characterId = file.replace('.yaml', '');
-            const characterRef = ref(database, `characters/${characterId}`);
 
-            // Load and process YAML file
-            const yamlContent = fs.readFileSync(`${folderPath}/${file}`, 'utf8');
-            let data = yaml.load(yamlContent);
-            data = processYamlData(data);
+            try {
+              // Load and process YAML file
+              const yamlContent = fs.readFileSync(`${folderPath}/${file}`, 'utf8');
+              let data = yaml.load(yamlContent);
+              data = processYamlData(data);
 
-            await set(characterRef, data);
-            console.log(`Firebase populated successfully for character: ${characterId}`);
+              // Write to Firebase using admin utilities
+              const success = await writeDataAsAdmin(`characters/${characterId}`, data);
+              if (success) {
+                totalSuccessful++;
+                console.log(`✅ Character imported: ${characterId}`);
+              } else {
+                console.error(`❌ Failed to import character: ${characterId}`);
+              }
+            } catch (error) {
+              console.error(`❌ Error processing character ${characterId}:`, error.message);
+            }
           }
         }
       }
     }
+
+    console.log(`📊 Characters: ${totalSuccessful}/${totalProcessed} imported successfully`);
   } catch (error) {
-    console.error('Error populating characters in Firebase:', error);
+    console.error('❌ Error populating characters in Firebase:', error.message);
+    throw error;
   }
 }
 
 // Updated to read one season at a time from separate files
 async function populateSeasons() {
   try {
-    const database = await initializeFirebaseWithToken();
+    console.log('📺 Initializing Firebase Admin for seasons...');
+    const db = initializeFirebaseAdmin();
+    if (!db) {
+      throw new Error('Failed to initialize Firebase Admin');
+    }
 
     // Iterate through season files
     const seasonFiles = fs.readdirSync(`${contentPath}/seasons`);
+    let totalProcessed = 0;
+    let totalSuccessful = 0;
+
     for (const file of seasonFiles) {
       if (file.endsWith('.yaml')) {
+        totalProcessed++;
         const seasonName = file.replace('.yaml', '');
-        const seasonRef = ref(database, `videos/${seasonName}`);
 
-        // Load and process YAML file
-        const yamlContent = fs.readFileSync(`${contentPath}/seasons/${file}`, 'utf8');
-        let data = yaml.load(yamlContent);
-        data = processYamlData(data);
+        try {
+          // Load and process YAML file
+          const yamlContent = fs.readFileSync(`${contentPath}/seasons/${file}`, 'utf8');
+          let data = yaml.load(yamlContent);
+          data = processYamlData(data);
 
-        await set(seasonRef, data);
-        console.log(`Firebase populated successfully for ${seasonName}!`);
+          // Write to Firebase using admin utilities
+          const success = await writeDataAsAdmin(`videos/${seasonName}`, data);
+          if (success) {
+            totalSuccessful++;
+            console.log(`✅ Season imported: ${seasonName} (${Object.keys(data.episodes || {}).length} episodes)`);
+          } else {
+            console.error(`❌ Failed to import season: ${seasonName}`);
+          }
+        } catch (error) {
+          console.error(`❌ Error processing season ${seasonName}:`, error.message);
+        }
       }
     }
+
+    console.log(`📊 Seasons: ${totalSuccessful}/${totalProcessed} imported successfully`);
   } catch (error) {
-    console.error('Error populating seasons in Firebase:', error);
+    console.error('❌ Error populating seasons in Firebase:', error.message);
+    throw error;
   }
 }
 
 // Read all lore YAML files and populate Firebase
 async function populateLore() {
   try {
-    const database = await initializeFirebaseWithToken();
+    console.log('📚 Initializing Firebase Admin for lore...');
+    const db = initializeFirebaseAdmin();
+    if (!db) {
+      throw new Error('Failed to initialize Firebase Admin');
+    }
 
     // Iterate through all lore files in content/lore
     const loreFiles = fs.readdirSync(`${contentPath}/lore`);
+    let totalProcessed = 0;
+    let totalSuccessful = 0;
 
     for (const file of loreFiles) {
       if (file.endsWith('.yaml')) {
-        console.log(`Processing lore file: ${file}`);
+        console.log(`📖 Processing lore file: ${file}`);
         
-        // Load and process YAML file
-        const yamlContent = fs.readFileSync(`${contentPath}/lore/${file}`, 'utf8');
-        let data = yaml.load(yamlContent);
-        data = processYamlData(data);
+        try {
+          // Load and process YAML file
+          const yamlContent = fs.readFileSync(`${contentPath}/lore/${file}`, 'utf8');
+          let data = yaml.load(yamlContent);
+          data = processYamlData(data);
 
-        // Process each category in the lore file
-        for (const category in data) {
-          if (Array.isArray(data[category])) {
-            console.log(`  Processing ${category}: ${data[category].length} items`);
-            
-            // Store each lore item individually by ID
-            for (const item of data[category]) {
-              if (item.id) {
-                const loreRef = ref(database, `lore/${item.id}`);
-                await set(loreRef, item);
-                console.log(`    Imported lore item: ${item.id} (${item.title})`);
-              } else {
-                console.warn(`    Skipping item without ID in category ${category}`);
+          // Process each category in the lore file
+          for (const category in data) {
+            if (Array.isArray(data[category])) {
+              console.log(`  📂 Processing ${category}: ${data[category].length} items`);
+              
+              // Store each lore item individually by ID
+              for (const item of data[category]) {
+                if (item.id) {
+                  totalProcessed++;
+                  const success = await writeDataAsAdmin(`lore/${item.id}`, item);
+                  if (success) {
+                    totalSuccessful++;
+                    console.log(`    ✅ ${item.id}: "${item.title}"`);
+                  } else {
+                    console.error(`    ❌ Failed to import: ${item.id}`);
+                  }
+                } else {
+                  console.warn(`    ⚠️  Skipping item without ID in category ${category}`);
+                }
               }
             }
           }
+          
+          console.log(`✅ Lore file processed: ${file}`);
+        } catch (error) {
+          console.error(`❌ Error processing lore file ${file}:`, error.message);
         }
-        
-        console.log(`Firebase populated successfully for lore file: ${file}`);
       }
     }
+
+    console.log(`📊 Lore: ${totalSuccessful}/${totalProcessed} items imported successfully`);
   } catch (error) {
-    console.error('Error populating lore in Firebase:', error);
+    console.error('❌ Error populating lore in Firebase:', error.message);
+    throw error;
   }
 }
 
@@ -209,8 +268,13 @@ const shouldDeployLore = loreOnly || deployAll || deployLore;
 
 // Call population functions based on flags
 async function populateFirebase() {
+  const startTime = Date.now();
+  
   try {
     console.log('🚀 Starting Firebase population...');
+    console.log(`📍 Running from: ${__dirname}`);
+    console.log(`📂 Content path: ${path.resolve(contentPath)}`);
+    console.log(`🔑 Database URL: ${process.env.DATABASE_URL}\n`);
     
     if (loreOnly) {
       console.log('📚 Lore-only mode: importing lore content only');
@@ -224,22 +288,50 @@ async function populateFirebase() {
       console.log(`📦 Importing: ${importing.join(', ')}`);
     }
     
+    let hasErrors = false;
+    
     if (shouldDeploySeasons) {
       console.log('\n📺 Populating seasons...');
-      await populateSeasons();
-    }
-    if (shouldDeployCharacters) {
-      console.log('\n👥 Populating characters...');
-      await populateCharacters();
-    }
-    if (shouldDeployLore) {
-      console.log('\n📚 Populating lore...');
-      await populateLore();
+      try {
+        await populateSeasons();
+      } catch (error) {
+        console.error('❌ Failed to populate seasons');
+        hasErrors = true;
+      }
     }
     
-    console.log('\n✅ Firebase population completed successfully!');
+    if (shouldDeployCharacters) {
+      console.log('\n👥 Populating characters...');
+      try {
+        await populateCharacters();
+      } catch (error) {
+        console.error('❌ Failed to populate characters');
+        hasErrors = true;
+      }
+    }
+    
+    if (shouldDeployLore) {
+      console.log('\n📚 Populating lore...');
+      try {
+        await populateLore();
+      } catch (error) {
+        console.error('❌ Failed to populate lore');
+        hasErrors = true;
+      }
+    }
+    
+    const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+    
+    if (hasErrors) {
+      console.log(`\n⚠️  Firebase population completed with errors (${duration}s)`);
+      process.exit(1);
+    } else {
+      console.log(`\n✅ Firebase population completed successfully! (${duration}s)`);
+      process.exit(0);
+    }
   } catch (error) {
-    console.error('❌ Error populating Firebase:', error);
+    console.error('❌ Critical error during Firebase population:', error.message);
+    process.exit(1);
   }
 }
 

@@ -1,6 +1,6 @@
 title: Ice Fortress
 seasonLink: https://www.youtube.com/playlist?list=PLO3KUVl6gwUaRA8O0JcRsouEzE-L5tr_W
-description: 'Act 2 of the Battle of the Shire: The Shire Folk have escaped the Goblin Invasion, and are now at the Ice Fortress in the far, frozen North.'
+description: "Act 2 of the Battle of the Shire: The Shire Folk have escaped the Goblin Invasion, and are now at the Ice Fortress in the far, frozen North."
 episodes:
   episode1:
     title: Ice Fortress
@@ -15,7 +15,7 @@ episodes:
       - care
     youtubeLink: https://youtu.be/qGoBqL0QlNo
     image: /static/images/seasons/season3/episodes/episode1/image.webp
-    audio: /static/images/seasons/season3/episodes/episode1/Ice Fortress_v5.mp3
+    audio: /images/seasons/season3/episodes/episode1/Ice Fortress_v5.mp3
     carouselImages:
       - /static/images/seasons/season3/episodes/episode1/images/IceFortress-04.webp
       - /static/images/seasons/season3/episodes/episode1/images/IceFortress-05.webp
@@ -63,7 +63,7 @@ episodes:
       - evil creatures
     youtubeLink: https://youtu.be/nDP2w0vsU5o
     image: /static/images/seasons/season3/episodes/episode2/image.webp
-    audio: /static/images/seasons/season3/episodes/episode2/The Ice Whales_v5.mp3
+    audio: /images/seasons/season3/episodes/episode2/The Ice Whales_v5.mp3
     carouselImages:
       - /static/images/seasons/season3/episodes/episode2/images/Ice_Whale-13.webp
       - /static/images/seasons/season3/episodes/episode2/images/Ice_Whale-14.webp
@@ -111,7 +111,7 @@ episodes:
       - line
     youtubeLink: https://youtu.be/2rCpEm1a9sM
     image: /static/images/seasons/season3/episodes/episode3/image.webp
-    audio: /static/images/seasons/season3/episodes/episode3/Sneak Attack_v6.mp3
+    audio: /images/seasons/season3/episodes/episode3/Sneak Attack_v6.mp3
     carouselImages:
       - /static/images/seasons/season3/episodes/episode3/images/Sneak_Attack-12.webp
       - /static/images/seasons/season3/episodes/episode3/images/Sneak_Attack-13.webp
@@ -175,7 +175,7 @@ episodes:
       - chains
     youtubeLink: https://youtu.be/i24FrJ32Ito
     image: /static/images/seasons/season3/episodes/episode4/image.webp
-    audio: /static/images/seasons/season3/episodes/episode4/FrozenPeace_v5.mp3
+    audio: /images/seasons/season3/episodes/episode4/FrozenPeace_v5.mp3
     carouselImages:
       - /static/images/seasons/season3/episodes/episode4/images/FrozenPeace-02.webp
       - /static/images/seasons/season3/episodes/episode4/images/FrozenPeace-03.webp
@@ -227,7 +227,7 @@ episodes:
       - better world
     youtubeLink: https://youtu.be/fnMN0UIKk30
     image: /static/images/seasons/season3/episodes/episode5/image.webp
-    audio: /static/images/seasons/season3/episodes/episode5/RebuildTheShire_v5.mp3
+    audio: /images/seasons/season3/episodes/episode5/RebuildTheShire_v5.mp3
     carouselImages:
       - /static/images/seasons/season3/episodes/episode5/images/FallOfTheShire_take1-05.webp
       - /static/images/seasons/season3/episodes/episode5/images/RebuildTheShire-03.webp
@@ -271,7 +271,7 @@ episodes:
       - intentions
     youtubeLink: https://youtu.be/yoWQuAZEncA
     image: /static/images/seasons/season3/episodes/episode6/image.webp
-    audio: /static/images/seasons/season3/episodes/episode6/We're Coming For You_v5.mp3
+    audio: /images/seasons/season3/episodes/episode6/We're Coming For You_v5.mp3
     carouselImages:
       - /static/images/seasons/season3/episodes/episode6/images/RebuildTheShire-08.webp
       - /static/images/seasons/season3/episodes/episode6/images/RebuildTheShire-13.webp
@@ -320,7 +320,7 @@ episodes:
       - reclaim
     youtubeLink: https://youtu.be/gd-OyObns_k
     image: /static/images/seasons/season3/episodes/episode7/image.webp
-    audio: /static/images/seasons/season3/episodes/episode7/PrepareForBattle_v6.mp3
+    audio: /images/seasons/season3/episodes/episode7/PrepareForBattle_v6.mp3
     carouselImages:
       - /static/images/seasons/season3/episodes/episode7/images/PrepareForBattle-01.webp
       - /static/images/seasons/season3/episodes/episode7/images/PrepareForBattle-04.webp
