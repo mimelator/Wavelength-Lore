@@ -13,7 +13,7 @@ ENABLE_BACKUPS=true
 # AWS S3 Configuration
 AWS_ACCESS_KEY_ID=your-aws-access-key-id
 AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
-BACKUP_S3_BUCKET=wavelength-lore-backups
+BACKUP_S3_BUCKET=your-backup-bucket-name
 BACKUP_S3_REGION=us-east-1
 
 # Backup Settings
@@ -55,7 +55,7 @@ BACKUP_TEMP_DIR=./temp/backups
                 "s3:GetBucketLifecycleConfiguration",
                 "s3:PutBucketLifecycleConfiguration"
             ],
-            "Resource": "arn:aws:s3:::wavelength-lore-backups"
+            "Resource": "arn:aws:s3:::your-backup-bucket-name"
         },
         {
             "Effect": "Allow",
@@ -66,7 +66,7 @@ BACKUP_TEMP_DIR=./temp/backups
                 "s3:ListMultipartUploadParts",
                 "s3:AbortMultipartUpload"
             ],
-            "Resource": "arn:aws:s3:::wavelength-lore-backups/*"
+            "Resource": "arn:aws:s3:::your-backup-bucket-name/*"
         }
     ]
 }

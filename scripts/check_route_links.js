@@ -42,6 +42,21 @@ const { getDatabase, ref, get } = require('firebase/database');
 const isProduction = args.includes('--prod') || args.includes('--production');
 const BASE_URL = isProduction ? 'https://wavelengthlore.com' : 'http://localhost:3001';
 
+// Admin authentication headers for bypassing rate limits
+const getAuthHeaders = () => {
+    const headers = {
+        'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-RouteChecker/1.0)'
+    };
+    
+    // Add admin key for production to bypass rate limiting
+    if (isProduction && process.env.ADMIN_SECRET_KEY) {
+        headers['X-Admin-Key'] = process.env.ADMIN_SECRET_KEY;
+        console.log('🔑 Using admin authentication to bypass rate limits');
+    }
+    
+    return headers;
+};
+
 const firebaseConfig = {
     apiKey: process.env.API_KEY,
     authDomain: process.env.AUTH_DOMAIN,
@@ -154,9 +169,7 @@ const checkRouteExists = async (route) => {
         const response = await axios.get(url, {
             validateStatus: null,
             timeout: isProduction ? 15000 : 5000,
-            headers: isProduction ? {
-                'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-RouteChecker/1.0)'
-            } : {}
+            headers: getAuthHeaders()
         });
         
         return {

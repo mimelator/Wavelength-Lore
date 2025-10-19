@@ -48,11 +48,11 @@ node scripts/apprunner-env-updater.js --force
 ./scripts/bust-cache.sh
 ```
 
-## 🆘 **Critical Service Info**
+## 🚨 **Emergency Contact Information**
 
-- **AWS Account**: `170023515523`
-- **Firebase Project**: `wavelength-lore`
-- **S3 Backup Bucket**: `wavelength-lore-backups`
+- **AWS Account**: `YOUR_AWS_ACCOUNT_ID`
+- **Primary Region**: `us-east-1`
+- **S3 Backup Bucket**: `your-backup-bucket-name`
 - **CloudFront Distribution**: `E2QFR8E7I4A6ZT`
 - **App Runner Service**: `wavelength-lore-service`
 - **Production Domain**: `wavelengthlore.com`

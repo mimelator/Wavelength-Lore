@@ -32,6 +32,10 @@ Welcome to the comprehensive documentation for the Wavelength Lore application. 
 ### ⚡ Performance & Optimization
 - **[Cache Busting](CACHE_BUSTING.md)** - Static asset cache management and optimization
 
+### 🔧 Asset Management & Validation
+- **[Resource Checker Documentation](../scripts/RESOURCE_CHECKER_README.md)** - Comprehensive resource validation suite for images, static files, and route links
+- **[Production Validation Guide](../scripts/PRODUCTION_VALIDATION_README.md)** - Unified production validation system with multiple modes and CI/CD integration
+
 ### 🛠️ Development & Debugging
 - **[Node.js v24 Compatibility Fix](NODE_V24_COMPATIBILITY_FIX.md)** - Compatibility fixes for Node.js v24
 - **[GitHub Action Monitor](GITHUB_ACTION_MONITOR.md)** - CI/CD pipeline monitoring and deployment tracking

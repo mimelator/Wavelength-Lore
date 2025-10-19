@@ -77,13 +77,18 @@ node check_route_links.js --help
 - ✅ Database validation for dynamic IDs (characters, lore, episodes)
 - ✅ Template variable filtering (ignores EJS `<%= %>` expressions)
 
-## �🔧 Common Features
+## 🔧 Common Features
 
 All three scripts share these features:
 
 ### Environment Support:
 - **Local Development**: `http://localhost:3001`
 - **Production**: `https://wavelengthlore.com`
+
+### Admin Authentication & Rate Limit Bypass:
+- **Automatic Admin Auth**: Scripts automatically use `ADMIN_SECRET_KEY` environment variable for production
+- **Rate Limit Bypass**: Admin authentication bypasses all rate limiting for testing
+- **No Delays Needed**: Fast, efficient testing without artificial delays
 
 ### Smart Timeout Handling:
 - Local: 5-10 second timeouts

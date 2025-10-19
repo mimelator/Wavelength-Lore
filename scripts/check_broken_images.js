@@ -32,6 +32,21 @@ Examples:
 
 const BASE_URL = isProduction ? 'https://wavelengthlore.com' : 'http://localhost:3001';
 
+// Admin authentication headers for bypassing rate limits
+const getAuthHeaders = () => {
+    const headers = {
+        'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-ImageChecker/1.0)'
+    };
+    
+    // Add admin key for production to bypass rate limiting
+    if (isProduction && process.env.ADMIN_SECRET_KEY) {
+        headers['X-Admin-Key'] = process.env.ADMIN_SECRET_KEY;
+        console.log('🔑 Using admin authentication to bypass rate limits');
+    }
+    
+    return headers;
+};
+
 const firebaseConfig = {
     apiKey: process.env.API_KEY,
     authDomain: process.env.AUTH_DOMAIN,
@@ -137,9 +152,7 @@ const checkImages = async (url) => {
     try {
         const response = await axios.get(url, {
             timeout: isProduction ? 30000 : 10000,
-            headers: isProduction ? {
-                'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-ImageChecker/1.0)'
-            } : {}
+            headers: getAuthHeaders()
         });
         const $ = cheerio.load(response.data);
         const images = $('img');
@@ -172,9 +185,7 @@ const checkImages = async (url) => {
                     const imgResponse = await axios.get(src, { 
                         validateStatus: null,
                         timeout: isProduction ? 15000 : 5000, // Longer timeout for production
-                        headers: isProduction ? {
-                            'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-ImageChecker/1.0)'
-                        } : {}
+                        headers: getAuthHeaders()
                     });
                     if (imgResponse.status >= 400) {
                         imageResults[category].broken.push({
@@ -248,9 +259,7 @@ const checkImages = async (url) => {
                     const imgResponse = await axios.get(bgImg, { 
                         validateStatus: null,
                         timeout: isProduction ? 15000 : 5000,
-                        headers: isProduction ? {
-                            'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-ImageChecker/1.0)'
-                        } : {}
+                        headers: getAuthHeaders()
                     });
                     if (imgResponse.status >= 400) {
                         console.log(`❌ Background: ${bgImg} (Status: ${imgResponse.status})`);
@@ -307,9 +316,7 @@ const main = async () => {
         try {
             const response = await axios.get(url, {
                 timeout: isProduction ? 30000 : 10000,
-                headers: isProduction ? {
-                    'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-ImageChecker/1.0)'
-                } : {}
+                headers: getAuthHeaders()
             });
             const $ = cheerio.load(response.data);
             const images = $('img');
@@ -340,9 +347,7 @@ const main = async () => {
                     const imgResponse = await axios.get(src, { 
                         validateStatus: null,
                         timeout: isProduction ? 15000 : 5000, // Longer timeout for production  
-                        headers: isProduction ? {
-                            'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-ImageChecker/1.0)'
-                        } : {}
+                        headers: getAuthHeaders()
                     });
                     if (imgResponse.status >= 400) {
                             pageResults[category].broken.push({

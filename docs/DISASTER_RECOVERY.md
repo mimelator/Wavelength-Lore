@@ -8,18 +8,18 @@
 
 ### **What You Need:**
 - [ ] GitHub repository access (`mimelator/Wavelength-Lore`)
-- [ ] AWS account access (Account ID: `170023515523`)
-- [ ] Firebase project access (`wavelength-lore`)
-- [ ] Domain control (`wavelengthlore.com`)
-- [ ] Latest database backup (from S3 bucket: `wavelength-lore-backups`)
+- [ ] AWS account access (Account ID: `YOUR_AWS_ACCOUNT_ID`)
+- [ ] Firebase project access (`your-firebase-project`)
+- [ ] Domain control (`yourdomain.com`)
+- [ ] Latest database backup (from S3 bucket: `your-backup-bucket-name`)
 - [ ] Service account key backup (`firebaseServiceAccountKey.json`)
 
 ### **Critical Information to Gather:**
 - [ ] AWS Access Keys (if not backed up)
 - [ ] Firebase configuration values
 - [ ] YouTube API key
-- [ ] CloudFront distribution ID: `E2QFR8E7I4A6ZT`
-- [ ] App Runner service ARN: `arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa`
+- [ ] CloudFront distribution ID: `YOUR_CLOUDFRONT_DISTRIBUTION_ID`
+- [ ] App Runner service ARN: `arn:aws:apprunner:us-east-1:YOUR_ACCOUNT_ID:service/your-service-name/SERVICE_ID`
 
 ---
 
@@ -114,7 +114,7 @@ API_KEY="YOUR_FIREBASE_API_KEY"
 AUTH_DOMAIN="wavelength-lore.firebaseapp.com"
 DATABASE_URL="https://wavelength-lore-default-rtdb.firebaseio.com"
 PROJECT_ID="wavelength-lore"
-STORAGE_BUCKET="wavelength-lore.firebasestorage.app"
+STORAGE_BUCKET="your-firebase-project.firebasestorage.app"
 MESSAGING_SENDER_ID="YOUR_MESSAGING_SENDER_ID"
 APP_ID="YOUR_FIREBASE_APP_ID"
 MEASUREMENT_ID="YOUR_GA_MEASUREMENT_ID"
@@ -131,10 +131,10 @@ AWS_SECRET_ACCESS_KEY="YOUR_BACKUP_AWS_SECRET_KEY"
 YOUTUBE_API_KEY="YOUR_YOUTUBE_API_KEY"
 
 # Production CDN
-CDN_URL="https://df5sj8f594cdx.cloudfront.net"
+CDN_URL="https://YOUR_CLOUDFRONT_DISTRIBUTION.cloudfront.net"
 
 # Backup System
-BACKUP_S3_BUCKET="wavelength-lore-backups"
+BACKUP_S3_BUCKET="your-backup-bucket-name"
 BACKUP_S3_REGION="us-east-1"
 BACKUP_ENCRYPTION_KEY="YOUR_64_CHAR_ENCRYPTION_KEY"
 ```
@@ -197,7 +197,7 @@ admin.database().ref('/characters').once('value').then(snapshot => {
 ```bash
 # Verify App Runner service exists
 aws apprunner describe-service \
-  --service-arn "arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa"
+  --service-arn "arn:aws:apprunner:us-east-1:YOUR_ACCOUNT_ID:service/your-service-name/SERVICE_ID"
 ```
 
 #### **Update Environment Variables**
@@ -221,7 +221,7 @@ aws cloudfront get-distribution --id E2QFR8E7I4A6ZT
 ### **Step 4.3: S3 Backup Bucket**
 ```bash
 # Verify backup bucket exists and is accessible
-aws s3 ls s3://wavelength-lore-backups/
+aws s3 ls s3://your-backup-bucket-name/
 
 # Test backup functionality
 node scripts/backup-cli.js test
@@ -322,7 +322,7 @@ node scripts/setup-cloudfront-permissions.js
 ```
 
 #### **S3 Backup Permissions**
-- Verify backup user has S3 access to `wavelength-lore-backups`
+- Verify backup user has S3 access to `your-backup-bucket-name`
 - Test with: `node scripts/backup-cli.js test`
 
 ### **Step 7.2: Firebase Security Rules**
@@ -403,7 +403,7 @@ All deployment procedures are documented in:
 
 ### **If AWS Account is Compromised:**
 1. **Immediately rotate all AWS credentials**
-2. **Check S3 bucket `wavelength-lore-backups` integrity**
+2. **Check S3 bucket `your-backup-bucket-name` integrity**
 3. **Verify App Runner service configuration**
 4. **Monitor CloudFront distribution for unauthorized changes**
 

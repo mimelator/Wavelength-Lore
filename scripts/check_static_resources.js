@@ -44,6 +44,21 @@ const isProduction = args.includes('--prod') || args.includes('--production');
 
 const BASE_URL = isProduction ? 'https://wavelengthlore.com' : 'http://localhost:3001';
 
+// Admin authentication headers for bypassing rate limits
+const getAuthHeaders = () => {
+    const headers = {
+        'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-StaticChecker/1.0)'
+    };
+    
+    // Add admin key for production to bypass rate limiting
+    if (isProduction && process.env.ADMIN_SECRET_KEY) {
+        headers['X-Admin-Key'] = process.env.ADMIN_SECRET_KEY;
+        console.log('🔑 Using admin authentication to bypass rate limits');
+    }
+    
+    return headers;
+};
+
 const firebaseConfig = {
     apiKey: process.env.API_KEY,
     authDomain: process.env.AUTH_DOMAIN,
@@ -110,16 +125,18 @@ const normalizeUrl = (url, baseUrl) => {
 
 const checkResource = async (url, category) => {
     try {
+        const headers = getAuthHeaders();
+        
+        // Add specific accept headers based on resource type
+        if (category === 'css') headers['Accept'] = 'text/css,*/*;q=0.1';
+        else if (category === 'js') headers['Accept'] = 'application/javascript,*/*;q=0.8';
+        else if (category === 'font') headers['Accept'] = 'font/woff2,font/woff,*/*;q=0.1';
+        else headers['Accept'] = '*/*';
+        
         const response = await axios.get(url, {
             validateStatus: null,
             timeout: isProduction ? 15000 : 5000,
-            headers: isProduction ? {
-                'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-StaticChecker/1.0)',
-                'Accept': category === 'css' ? 'text/css,*/*;q=0.1' :
-                         category === 'js' ? 'application/javascript,*/*;q=0.8' :
-                         category === 'font' ? 'font/woff2,font/woff,*/*;q=0.1' :
-                         '*/*'
-            } : {}
+            headers
         });
         
         return {
@@ -141,9 +158,7 @@ const checkPageResources = async (url) => {
     try {
         const response = await axios.get(url, {
             timeout: isProduction ? 30000 : 10000,
-            headers: isProduction ? {
-                'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-StaticChecker/1.0)'
-            } : {}
+            headers: getAuthHeaders()
         });
         
         const $ = cheerio.load(response.data);

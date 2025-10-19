@@ -38,7 +38,7 @@ Create a custom policy with the following permissions:
                 "s3:GetBucketPolicy",
                 "s3:PutBucketPolicy"
             ],
-            "Resource": "arn:aws:s3:::wavelength-lore-backups"
+            "Resource": "arn:aws:s3:::your-backup-bucket-name"
         },
         {
             "Effect": "Allow",
@@ -52,7 +52,7 @@ Create a custom policy with the following permissions:
                 "s3:AbortMultipartUpload",
                 "s3:GetObjectAttributes"
             ],
-            "Resource": "arn:aws:s3:::wavelength-lore-backups/*"
+            "Resource": "arn:aws:s3:::your-backup-bucket-name/*"
         }
     ]
 }
@@ -78,7 +78,7 @@ ENABLE_BACKUPS=true
 # AWS S3 Configuration for backups
 AWS_ACCESS_KEY_ID=your-aws-access-key-id-here
 AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key-here
-BACKUP_S3_BUCKET=wavelength-lore-backups
+BACKUP_S3_BUCKET=your-backup-bucket-name
 BACKUP_S3_REGION=us-east-1
 
 # Backup Settings
@@ -127,7 +127,7 @@ node scripts/backup-cli.js test
 **Successful Status Check:**
 ```
 ✅ AWS S3 Access: Connected
-✅ Backup Bucket: wavelength-lore-backups (exists)
+✅ Backup Bucket: your-backup-bucket-name (exists)
 ✅ Encryption: Enabled (AES-256-GCM)
 ✅ Scheduled Backups: Active
 📊 Total Backups: 0 daily, 0 weekly, 0 manual
@@ -136,7 +136,7 @@ node scripts/backup-cli.js test
 **Successful Initialization:**
 ```
 🔧 Initializing Secure Database Backup System...
-✅ S3 bucket created: wavelength-lore-backups
+✅ S3 bucket created: your-backup-bucket-name
 ✅ Bucket encryption enabled (AES-256)
 ✅ Bucket versioning enabled
 ✅ Lifecycle policy configured

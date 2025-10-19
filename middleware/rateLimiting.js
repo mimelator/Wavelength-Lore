@@ -174,6 +174,15 @@ function createSmartRateLimit() {
     const path = req.path.toLowerCase();
     const method = req.method.toLowerCase();
 
+    // Check for admin authentication to bypass rate limiting
+    const adminKey = req.headers['x-admin-key'] || req.query.adminKey;
+    const validAdminKey = process.env.ADMIN_SECRET_KEY;
+    
+    if (adminKey && validAdminKey && adminKey === validAdminKey) {
+      console.log(`🔓 Admin bypass: Rate limiting skipped for ${req.ip} on ${req.originalUrl}`);
+      return next(); // Skip rate limiting for admin requests
+    }
+
     // Determine which rate limit to apply based on the request
     let rateLimit;
 

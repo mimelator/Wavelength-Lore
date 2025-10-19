@@ -27,6 +27,37 @@ All project documentation has been organized in the [`docs/`](docs/) folder:
 - ✅ User authentication with Firebase ID tokens
 - ✅ Secure delete functionality with ownership verification
 
+## 🔧 Asset Management & Validation
+
+The site includes a comprehensive asset validation system to ensure all resources are working correctly:
+
+### 📁 Resource Validation Suite
+- ✅ **[Image Checker](scripts/RESOURCE_CHECKER_README.md#-image-checker-check_broken_imagesjs)**: Validates all images (img tags, backgrounds) with category analysis
+- ✅ **[Static Resource Checker](scripts/RESOURCE_CHECKER_README.md#-static-resource-checker-check_static_resourcesjs)**: Tests CSS, JS, fonts, icons, and CDN resources
+- ✅ **[Route Link Checker](scripts/RESOURCE_CHECKER_README.md#-route-link-checker-check_route_linksjs)**: Scans EJS templates for broken internal links with database validation
+
+### 🚀 Production Validation
+- ✅ **[Production Suite](scripts/PRODUCTION_VALIDATION_README.md)**: Unified validation system with Quick/Standard/Full modes
+- ✅ **Environment Support**: Automatic detection between local (`localhost:3001`) and production (`wavelengthlore.com`)
+- ✅ **CI/CD Integration**: Proper exit codes and timeout handling for automated pipelines
+- ✅ **Smart Timeouts**: Optimized timeouts for local (5-10s) vs production (15-30s) environments
+
+### 📊 Usage Examples
+```bash
+# Quick production health check (1-2 min)
+./scripts/validate-production.sh quick
+
+# Full comprehensive validation (5-10 min)  
+./scripts/validate-production.sh full
+
+# Individual component testing
+node scripts/check_broken_images.js --prod
+node scripts/check_static_resources.js --prod
+node scripts/check_route_links.js --prod
+```
+
+See [Resource Checker Documentation](scripts/RESOURCE_CHECKER_README.md) and [Production Validation Guide](scripts/PRODUCTION_VALIDATION_README.md) for complete usage details.
+
 ## � Forum Features
 
 The Wavelength Lore site includes a comprehensive community forum with:
