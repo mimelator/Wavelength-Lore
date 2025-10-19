@@ -737,9 +737,8 @@
             opacity="0.4" />
     
     <!-- Sacred sanctuary marker -->
-    <circle class="sanctuary clickable" cx="275" cy="320" r="6.2" data-location="shire-sanctuary" />
-    <!-- Larger invisible click target for better UX -->
-    <circle class="click-target" cx="275" cy="320" r="18" fill="transparent" stroke="transparent" stroke-width="0" data-location="shire-sanctuary" style="cursor: pointer;" />
+    <circle class="sanctuary clickable" cx="275" cy="320" r="6.2" data-location="shire-sanctuary" style="pointer-events: none;" />
+    <!-- Click target moved to overlay section for proper z-order -->
     
     <!-- Sacred grove markers -->
     <circle cx="271" cy="316" r="1.0" fill="#e65100" opacity="0.3" />
@@ -986,5 +985,8 @@
   <!-- CLICKABLE OVERLAYS (rendered on top of ALL content including text labels) -->
   <!-- Shire click target positioned at absolute end for highest z-order -->
   <circle class="click-target clickable" cx="336" cy="372" r="20" fill="transparent" stroke="transparent" stroke-width="0" data-location="the-shire" style="cursor: pointer;" />
+  
+  <!-- Shire Sanctuary click target positioned for highest z-order -->
+  <circle class="click-target clickable" cx="275" cy="320" r="18" fill="transparent" stroke="transparent" stroke-width="0" data-location="shire-sanctuary" style="cursor: pointer;" />
 
 </svg>
