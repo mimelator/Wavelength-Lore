@@ -12,12 +12,13 @@ const yaml = require('js-yaml');
 
 // Define YAML files to update
 const YAML_FILES = [
-  'content/seasons/season1.yaml',
-  'content/seasons/season2.yaml', 
-  'content/seasons/season3.yaml',
-  'content/seasons/season4.yaml',
-  'content/characters/characters.yaml',
-  'content/lore/lore.yaml'
+  '../content/seasons/season1.yaml',
+  '../content/seasons/season2.yaml', 
+  '../content/seasons/season3.yaml',
+  '../content/seasons/season4.yaml',
+  '../content/characters/character-schema.yaml',
+  '../content/characters/wavelength/wavelength.yaml',
+  '../content/lore/wavelength-lore.yaml'
 ];
 
 function addStaticPrefixToYamlFiles() {
