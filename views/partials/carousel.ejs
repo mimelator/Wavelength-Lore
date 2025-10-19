@@ -27,13 +27,13 @@ const includeModal = showModal !== false; // Default to true unless explicitly s
         <% if (type === 'character' && items) { %>
             <% items.forEach(image => { %>
                 <div>
-                    <img src="<%= image %>" alt="Character Image" <%= includeModal ? 'class="carousel-image"' : '' %>>
+                    <img src="<%= cdnUrl %><%= image %>" alt="Character Image" <%= includeModal ? 'class="carousel-image"' : '' %>>
                 </div>
             <% }); %>
         <% } else if (type === 'episode' && items) { %>
             <% items.forEach(image => { %>
                 <div>
-                    <img src="<%= image %>" alt="Episode Image" <%= includeModal ? 'class="carousel-image"' : '' %>>
+                    <img src="<%= cdnUrl %><%= image %>" alt="Episode Image" <%= includeModal ? 'class="carousel-image"' : '' %>>
                 </div>
             <% }); %>
         <% } else if (type === 'season' && items) { %>
