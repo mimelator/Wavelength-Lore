@@ -1,0 +1,14 @@
+id: ''
+title: ''
+description: ''
+type: 'hero'  # hero, villain, neutral, creature, spirit
+keywords: []
+primary_image: ''
+image_gallery: []
+episodes: []
+relationships:
+  allies: []
+  enemies: []
+  family: []
+abilities: []
+locations: []

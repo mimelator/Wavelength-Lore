@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Season Schema",
+  "description": "Schema for Wavelength Lore season data",
+  "type": "object",
+  "required": ["title", "description", "episodes"],
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The title of the season"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "description": "A detailed description of the season"
+    },
+    "seasonLink": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://youtube\\.com/playlist",
+      "description": "YouTube playlist link for the season"
+    },
+    "image": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the season's main image"
+    },
+    "episodes": {
+      "type": "object",
+      "patternProperties": {
+        "^episode\\d+$": {
+          "$ref": "#/definitions/episode"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "episode": {
+      "type": "object",
+      "required": ["title", "description", "keywords", "youtubeLink", "story", "lyrics"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 3,
+          "maxItems": 20
+        },
+        "youtubeLink": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://youtu\\.be/"
+        },
+        "image": {
+          "type": "string",
+          "format": "uri"
+        },
+        "audio": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "\\.(mp3|wav|m4a)$"
+        },
+        "carouselImages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "story": {
+          "type": "string",
+          "minLength": 50
+        },
+        "lyrics": {
+          "type": "string",
+          "minLength": 20
+        }
+      }
+    }
+  }
+}

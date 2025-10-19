@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Character Schema",
+  "description": "Schema for Wavelength Lore character data",
+  "type": "object",
+  "required": ["id", "title", "description", "type"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Unique identifier (lowercase, hyphens only)"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Character name"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 20,
+      "description": "Character biography or description"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["hero", "villain", "neutral", "creature", "spirit"],
+      "description": "Character type/role"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "description": "Search keywords for the character"
+    },
+    "primary_image": {
+      "type": "string",
+      "format": "uri",
+      "description": "Main character image URL"
+    },
+    "image_gallery": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      },
+      "description": "Additional character images"
+    },
+    "episodes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^season\\d+/episode\\d+$"
+      },
+      "description": "Episodes where character appears"
+    },
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "allies": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "enemies": {
+          "type": "array", 
+          "items": { "type": "string" }
+        },
+        "family": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "abilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Character abilities or powers"
+    },
+    "locations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Associated locations"
+    }
+  }
+}
