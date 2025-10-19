@@ -5,12 +5,16 @@ on:
     branches: [ main ]
     # Don't run on version bump commits to avoid infinite loops
 
+permissions:
+  contents: write  # Required to push commits and create tags
+  actions: read    # Required to read workflow information
+
 jobs:
   increment-version:
     runs-on: ubuntu-latest
     
     # Skip if this is already a version bump commit
-    if: "!contains(github.event.head_commit.message, '[skip version]')"
+    if: ${{ !contains(github.event.head_commit.message, '[skip version]') }}
     
     steps:
       - name: Checkout code
@@ -71,14 +75,12 @@ jobs:
           git add package.json version.json
           git commit -m "🔖 Auto-increment version to ${{ steps.increment_version.outputs.new }} [skip version]"
 
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
-
-      - name: Create Git Tag
+      - name: Push changes and create tag
         run: |
+          # Push the commit
+          git push origin main
+          
+          # Create and push tag
           NEW_VERSION="${{ steps.increment_version.outputs.new }}"
           git tag "v$NEW_VERSION"
           git push origin "v$NEW_VERSION"
