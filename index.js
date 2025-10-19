@@ -162,6 +162,10 @@ app.use('/api/admin/backup', adminAuthStrict, adminRateLimit, adminBackupRoutes)
 const adminApiRoutes = require('./routes/adminApi');
 app.use('/api/admin', adminRateLimit, adminApiRoutes);
 
+// Import and use group management API routes with authentication and rate limiting
+const groupApiRoutes = require('./routes/groupApi');
+app.use('/api/groups', adminRateLimit, groupApiRoutes);
+
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'static')));
 
@@ -961,6 +965,18 @@ app.get('/cache-management', (req, res) => {
 
 // Import admin authentication middleware
 const { adminAuth, adminHealthCheck, getSecurityLog } = require('./middleware/adminAuth');
+
+// Route for Group Management Admin Panel
+app.get('/admin/groups', adminAuth, (req, res) => {
+  res.render('admin/group-management', {
+    title: 'Group Management - Wavelength Admin',
+    pageTitle: 'Group Management - Wavelength Admin Panel',
+    pageDescription: 'Manage user groups and permissions in the Wavelength system',
+    cdnUrl: process.env.CDN_URL,
+    version: `v${Date.now()}`,
+    req: req
+  });
+});
 
 // Security monitoring endpoints
 app.get('/api/admin/security/health', adminHealthCheck);
