@@ -5,6 +5,11 @@
  * Check current environment variables in production to diagnose port issues
  */
 
+const { AppRunnerClient, DescribeServiceCommand } = require('@aws-sdk/client-apprunner');
+
+// Load AWS resource configuration
+const awsConfig = require('../config/aws-resources');
+
 const AppRunnerEnvUpdater = require('./apprunner-env-updater');
 
 async function main() {
@@ -14,7 +19,18 @@ async function main() {
     console.log('🔍 Checking Production Environment Variables');
     console.log('═══════════════════════════════════════════════════════════════');
     
-    const serviceArn = 'arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa';
+    await checkProductionEnvironment();
+    
+  } catch (error) {
+    console.error('❌ Error:', error.message);
+    process.exit(1);
+  }
+}
+
+async function checkProductionEnvironment() {
+    console.log('🔍 Checking Production Environment Configuration...\n');
+    
+    const serviceArn = awsConfig.appRunner.serviceArn;
     const updater = new AppRunnerEnvUpdater(serviceArn);
     
     // Get current service configuration
@@ -78,11 +94,6 @@ async function main() {
       console.log('  ✅ Configuration appears correct');
       console.log('  🤔 Check if there are other issues (Docker, Nginx config, etc.)');
     }
-    
-  } catch (error) {
-    console.error('❌ Error:', error.message);
-    process.exit(1);
-  }
 }
 
 main();

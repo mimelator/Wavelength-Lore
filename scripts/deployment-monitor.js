@@ -14,10 +14,13 @@ const { AppRunnerClient, DescribeServiceCommand } = require('@aws-sdk/client-app
 const { CloudFrontClient, CreateInvalidationCommand, GetInvalidationCommand } = require('@aws-sdk/client-cloudfront');
 const axios = require('axios');
 
+// Load AWS resource configuration
+const awsConfig = require('../config/aws-resources');
+
 class DeploymentMonitor {
   constructor() {
     this.appRunnerClient = new AppRunnerClient({
-      region: 'us-east-1',
+      region: awsConfig.aws.region,
       credentials: {
         accessKeyId: process.env.ACCESS_KEY_ID,
         secretAccessKey: process.env.SECRET_ACCESS_KEY
@@ -25,15 +28,15 @@ class DeploymentMonitor {
     });
     
     this.cloudFrontClient = new CloudFrontClient({
-      region: 'us-east-1',
+      region: awsConfig.aws.region,
       credentials: {
         accessKeyId: process.env.ACCESS_KEY_ID,
         secretAccessKey: process.env.SECRET_ACCESS_KEY
       }
     });
     
-    this.serviceArn = process.env.APPRUNNER_SERVICE_ARN || 'arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa';
-    this.distributionId = process.env.CLOUDFRONT_DISTRIBUTION_ID;
+    this.serviceArn = process.env.APPRUNNER_SERVICE_ARN || awsConfig.appRunner.serviceArn;
+    this.distributionId = process.env.CLOUDFRONT_DISTRIBUTION_ID || awsConfig.cloudFront.distributionId;
     this.siteUrl = process.env.SITE_URL || 'https://8z7bz9qgwb.us-east-1.awsapprunner.com';
   }
 

@@ -8,16 +8,19 @@
 const envHelper = require('./env-helper');
 const { AppRunnerClient, DescribeServiceCommand, UpdateServiceCommand } = require('@aws-sdk/client-apprunner');
 
-class AppRunnerImageUpdater {
+// Load AWS resource configuration
+const awsConfig = require('../config/aws-resources');
+
+class ECRTagUpdater {
   constructor() {
     this.apprunner = new AppRunnerClient({
-      region: 'us-east-1',
+      region: awsConfig.aws.region,
       credentials: {
         accessKeyId: process.env.ACCESS_KEY_ID,
         secretAccessKey: process.env.SECRET_ACCESS_KEY
       }
     });
-    this.serviceArn = 'arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa';
+    this.serviceArn = awsConfig.appRunner.serviceArn;
   }
 
   async getCurrentService() {
@@ -93,7 +96,7 @@ class AppRunnerImageUpdater {
         console.log('   1. Go to AWS App Runner console');
         console.log('   2. Select wavelength-lore-service');
         console.log('   3. Click "Deploy" → "Configure"');
-        console.log(`   4. Update image to: 170023515523.dkr.ecr.us-east-1.amazonaws.com/wavelength-lore:${newTag}`);
+        console.log(`   4. Update image to: ${awsConfig.ecr.repositoryUri}:${newTag}`);
         console.log('   5. Deploy the updated configuration');
       }
       

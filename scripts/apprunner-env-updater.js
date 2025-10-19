@@ -7,6 +7,10 @@
 
 const envHelper = require('./env-helper');
 const { AppRunnerClient, DescribeServiceCommand, UpdateServiceCommand } = require('@aws-sdk/client-apprunner');
+
+// Load AWS resource configuration
+const awsConfig = require('../config/aws-resources');
+
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -374,7 +378,7 @@ class AppRunnerEnvUpdater {
 // CLI Interface
 async function main() {
   const args = process.argv.slice(2);
-  const serviceArn = 'arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa';
+  const serviceArn = awsConfig.appRunner.serviceArn;
   
   const options = {
     force: args.includes('--force'),

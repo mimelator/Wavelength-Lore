@@ -6,6 +6,10 @@
  */
 
 const { AppRunnerClient, UpdateServiceCommand, DescribeServiceCommand } = require('@aws-sdk/client-apprunner');
+
+// Load AWS resource configuration
+const awsConfig = require('../config/aws-resources');
+
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -326,7 +330,7 @@ async function main() {
   require('dotenv').config({ path: path.join(__dirname, '../.env') });
   
   const args = process.argv.slice(2);
-  const serviceArn = 'arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa';
+  const serviceArn = awsConfig.appRunner.serviceArn;
   
   if (args.includes('--help') || args.includes('-h')) {
     console.log('🚀 AWS App Runner Deployment Monitor');

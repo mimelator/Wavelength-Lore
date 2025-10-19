@@ -7,9 +7,12 @@
 
 const { AppRunnerClient, DescribeServiceCommand, UpdateServiceCommand } = require('@aws-sdk/client-apprunner');
 
+// Load AWS resource configuration
+const awsConfig = require('../config/aws-resources');
+
 class ProductionPortDiagnostic {
   constructor(serviceArn) {
-    this.serviceArn = serviceArn;
+    this.serviceArn = serviceArn || awsConfig.appRunner.serviceArn;
     this.appRunnerClient = new AppRunnerClient({
       region: 'us-east-1',
       credentials: {
@@ -228,7 +231,8 @@ class ProductionPortDiagnostic {
 // CLI Interface
 async function main() {
   const args = process.argv.slice(2);
-  const serviceArn = 'arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa';
+  // Use centralized config instead of hardcoded ARN
+  const awsConfig = require('../config/aws-resources');
 
   if (args.includes('--help') || args.includes('-h')) {
     console.log('🔍 Production Port Configuration Diagnostic');
@@ -249,7 +253,7 @@ async function main() {
     fix: args.includes('--fix')
   };
 
-  const diagnostic = new ProductionPortDiagnostic(serviceArn);
+  const diagnostic = new ProductionPortDiagnostic();
 
   try {
     const result = await diagnostic.execute(options);

@@ -4,6 +4,9 @@ require('dotenv').config({ silent: true });
 const express = require('express');
 const path = require('path');
 
+// Import version management
+const versionManager = require('./utils/version');
+
 // Import shared utilities
 const firebaseUtils = require('./helpers/firebase-utils');
 const firebaseAdminUtils = require('./helpers/firebase-admin-utils');
@@ -53,6 +56,9 @@ console.log(`   🗄️  Database: ${process.env.DATABASE_URL ? new URL(process.
 console.log(`   🛡️  Backups: ${process.env.ENABLE_BACKUPS === 'true' ? 'enabled' : 'disabled'}`);
 console.log(`   🔐 Security: Rate limiting + Input sanitization enabled`);
 console.log(`   🔗 URL: http://localhost:${port}\n`);
+
+// Store version info for use in views
+app.locals.versionInfo = versionManager.getVersionInfo();
 
 // Configure trust proxy for proper IP detection
 // For AWS App Runner/ALB and CloudFront, trust only the first proxy
@@ -1207,6 +1213,9 @@ async function initializeBackupSystem() {
 }
 
 app.listen(port, async () => {
+  // Display version information at startup
+  versionManager.logStartupVersion();
+  
   console.log(`\n🚀 Server started successfully at http://localhost:${port}`);
   
   // Initialize backup system after server starts

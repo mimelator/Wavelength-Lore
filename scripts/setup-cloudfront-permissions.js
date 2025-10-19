@@ -5,11 +5,14 @@
  * Generates the required IAM policy for CloudFront cache invalidation
  */
 
+// Load AWS resource configuration
+const awsConfig = require('../config/aws-resources');
+
 console.log('🔐 AWS IAM Policy for CloudFront Cache Invalidation');
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 console.log('');
 
-const distributionId = 'E2QFR8E7I4A6ZT';
+const distributionId = awsConfig.cloudFront.distributionId;
 
 const iamPolicy = {
   "Version": "2012-10-17",
@@ -22,7 +25,7 @@ const iamPolicy = {
         "cloudfront:GetInvalidation",
         "cloudfront:ListInvalidations"
       ],
-      "Resource": `arn:aws:cloudfront::170023515523:distribution/${distributionId}`
+      "Resource": `arn:aws:cloudfront::${awsConfig.aws.accountId}:distribution/${distributionId}`
     },
     {
       "Sid": "CloudFrontListDistributions",

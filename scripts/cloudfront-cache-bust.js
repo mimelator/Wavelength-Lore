@@ -8,9 +8,12 @@
 const envHelper = require('./env-helper');
 const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client-cloudfront');
 
+// Load AWS resource configuration
+const awsConfig = require('../config/aws-resources');
+
 class CloudFrontCacheBuster {
   constructor() {
-    this.distributionId = 'E2QFR8E7I4A6ZT';
+    this.distributionId = awsConfig.cloudFront.distributionId;
     this.cloudFrontClient = new CloudFrontClient({
       region: 'us-east-1',
       credentials: {

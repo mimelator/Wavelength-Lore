@@ -1,0 +1,91 @@
+name: Auto-increment Version
+
+on:
+  push:
+    branches: [ main ]
+    # Don't run on version bump commits to avoid infinite loops
+
+jobs:
+  increment-version:
+    runs-on: ubuntu-latest
+    
+    # Skip if this is already a version bump commit
+    if: "!contains(github.event.head_commit.message, '[skip version]')"
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Get current version
+        id: current_version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
+
+      - name: Increment patch version
+        id: increment_version
+        run: |
+          # Use npm to increment the patch version
+          npm version patch --no-git-tag-version
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "new=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION"
+
+      - name: Update version.json
+        run: |
+          NEW_VERSION="${{ steps.increment_version.outputs.new }}"
+          COMMIT_HASH="${{ github.sha }}"
+          COMMIT_SHORT="${COMMIT_HASH:0:7}"
+          BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          cat > version.json << EOF
+          {
+            "version": "$NEW_VERSION",
+            "buildDate": "$BUILD_DATE",
+            "commitHash": "$COMMIT_HASH",
+            "commitShort": "$COMMIT_SHORT",
+            "buildNumber": "${{ github.run_number }}",
+            "environment": "production"
+          }
+          EOF
+          
+          echo "Created version.json:"
+          cat version.json
+
+      - name: Commit version changes
+        run: |
+          git add package.json version.json
+          git commit -m "🔖 Auto-increment version to ${{ steps.increment_version.outputs.new }} [skip version]"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+
+      - name: Create Git Tag
+        run: |
+          NEW_VERSION="${{ steps.increment_version.outputs.new }}"
+          git tag "v$NEW_VERSION"
+          git push origin "v$NEW_VERSION"
+
+      - name: Summary
+        run: |
+          echo "✅ Version incremented from ${{ steps.current_version.outputs.current }} to ${{ steps.increment_version.outputs.new }}"
+          echo "✅ Git tag v${{ steps.increment_version.outputs.new }} created"
+          echo "✅ Commit: ${{ github.sha }}"
+          echo "✅ Build #${{ github.run_number }}"

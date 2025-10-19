@@ -8,14 +8,14 @@
 const AppRunnerEnvUpdater = require('./apprunner-env-updater');
 const AppRunnerDeploymentMonitor = require('./apprunner-deploy-monitor');
 
-async function main() {
-  try {
-    require('dotenv').config();
+// Load AWS resource configuration
+const awsConfig = require('../config/aws-resources');
+
+async function fixProductionPort() {
+    console.log('🔧 Fixing Production Port Configuration');
+    console.log('════════════════════════════════════════════════════════════════');
     
-    console.log('🔧 Production Port Configuration Fix');
-    console.log('═══════════════════════════════════════════════════════════════');
-    
-    const serviceArn = 'arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa';
+    const serviceArn = awsConfig.appRunner.serviceArn;
     const updater = new AppRunnerEnvUpdater(serviceArn);
     
     // Get current service configuration

@@ -10,10 +10,10 @@ if [ -f .env ]; then
     set +a
 fi
 
-# Define variables
-BUCKET_NAME="wavelength-lore-bucket"
+# Define variables - Use environment variables with fallbacks
+BUCKET_NAME="${S3_BUCKET_NAME:-wavelength-lore-bucket}"
 STATIC_DIR="static"
-AWS_REGION="us-east-1"
+AWS_REGION="${AWS_REGION:-us-east-1}"
 
 # Use app user credentials for main bucket access
 if [ -n "$ACCESS_KEY_ID" ] && [ -n "$SECRET_ACCESS_KEY" ]; then

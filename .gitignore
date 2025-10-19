@@ -15,6 +15,7 @@
 # AWS and Firebase credentials
 .aws/
 firebaseServiceAccountKey.json
+config/aws-resources.js
 *.pem
 *.key
 *.p12

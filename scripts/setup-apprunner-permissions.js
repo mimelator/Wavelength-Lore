@@ -9,7 +9,10 @@ console.log('🔐 AWS IAM Policy for App Runner Environment Updates');
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 console.log('');
 
-const serviceArn = 'arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa';
+// Load AWS resource configuration
+const awsConfig = require('../config/aws-resources');
+
+const serviceArn = awsConfig.appRunner.serviceArn;
 
 const iamPolicy = {
   "Version": "2012-10-17",
