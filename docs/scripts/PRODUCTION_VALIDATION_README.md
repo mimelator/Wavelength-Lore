@@ -50,7 +50,7 @@ node check_route_links.js --prod
 
 ## �📋 Components
 
-The production validation suite consists of **four main scripts**:
+The production validation suite consists of **five main scripts**:
 
 ### 1. 🔍 **Production Validation Suite** (`production_validation.js`)
 - **Main orchestrator** that runs all checkers
@@ -73,6 +73,12 @@ The production validation suite consists of **four main scripts**:
 - Tests route availability and HTTP responses
 - Validates dynamic routes against database content
 
+### 5. 🎵 **Audio File Checker** (`check_audio_files.js --prod`)
+- Tests MP3 audio files for all episodes
+- Validates audio URLs stored in Firebase database
+- Checks file accessibility and content type validation
+- Reports on missing or broken audio files
+
 ## 🎯 Usage Modes
 
 ### ⚡ **Quick Mode** (1-2 minutes)
@@ -82,7 +88,7 @@ The production validation suite consists of **four main scripts**:
 node production_validation.js --quick --skip-images --skip-static
 ```
 - **Best for**: CI/CD pipelines, rapid feedback
-- **Checks**: Route links only
+- **Checks**: Route links and audio files only
 - **Timeout**: 60 seconds per checker
 - **Rate Limiting**: Automatically bypassed with admin authentication
 - **Use case**: Pre-deployment validation
@@ -94,7 +100,7 @@ node production_validation.js --quick --skip-images --skip-static
 node production_validation.js
 ```
 - **Best for**: Regular production health checks
-- **Checks**: Images, static resources, and routes
+- **Checks**: Images, static resources, routes, and audio files
 - **Timeout**: 120 seconds per checker
 - **Rate Limiting**: Automatically bypassed with admin authentication
 - **Use case**: Scheduled monitoring, manual testing
@@ -239,10 +245,13 @@ fi
 ./check_route_links.js --prod           # For broken links
 ./check_broken_images.js --prod         # For image issues  
 ./check_static_resources.js --prod      # For asset problems
+./check_audio_files.js --prod           # For audio file issues
 
 # Compare local vs production
 ./check_route_links.js                  # Local
 ./check_route_links.js --prod           # Production
+./check_audio_files.js                  # Local audio
+./check_audio_files.js --prod           # Production audio
 ```
 
 ### **Performance Optimization**

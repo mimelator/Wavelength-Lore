@@ -36,6 +36,7 @@ if [[ "$1" == "--help" || "$1" == "-h" || $# -eq 0 ]]; then
     echo "  --skip-images    - Skip image checking"
     echo "  --skip-static    - Skip static resource checking" 
     echo "  --skip-routes    - Skip route link checking"
+    echo "  --skip-audio     - Skip audio file checking"
     echo ""
     print_color $YELLOW "Examples:"
     echo "  $0 quick                    # Quick validation"
@@ -47,6 +48,7 @@ if [[ "$1" == "--help" || "$1" == "-h" || $# -eq 0 ]]; then
     echo "  ./check_broken_images.js --prod      # Images only"
     echo "  ./check_static_resources.js --prod   # Static resources only"
     echo "  ./check_route_links.js --prod        # Routes only"
+    echo "  ./check_audio_files.js --prod        # Audio files only"
     exit 0
 fi
 
@@ -60,7 +62,7 @@ echo ""
 
 case "$MODE" in
     "quick")
-        print_color $YELLOW "⚡ Quick Mode: Running route validation only"
+        print_color $YELLOW "⚡ Quick Mode: Running route and audio validation only"
         node production_validation.js --quick --skip-images --skip-static "$@"
         ;;
     "standard")

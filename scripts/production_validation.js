@@ -16,6 +16,7 @@ Options:
   --skip-images          Skip image checking (faster)
   --skip-static          Skip static resource checking
   --skip-routes          Skip route link checking
+  --skip-audio           Skip audio file checking
   --help, -h             Show this help message
 
 Examples:
@@ -27,6 +28,7 @@ This suite runs:
   🖼️  Image Checker (check_broken_images.js --prod)
   📁 Static Resource Checker (check_static_resources.js --prod) 
   🔗 Route Link Checker (check_route_links.js --prod)
+  🎵 Audio File Checker (check_audio_files.js --prod)
 `);
     process.exit(0);
 }
@@ -40,6 +42,7 @@ const isFull = args.includes('--full');
 const skipImages = args.includes('--skip-images');
 const skipStatic = args.includes('--skip-static');
 const skipRoutes = args.includes('--skip-routes');
+const skipAudio = args.includes('--skip-audio');
 
 const PROD_URL = 'https://wavelengthlore.com';
 
@@ -199,6 +202,29 @@ const parseResults = (output, scriptName) => {
                     }
                 });
             }
+        } else if (scriptName.includes('audio')) {
+            // Parse audio file checker results
+            const successMatch = output.match(/Overall: (\d+)\/(\d+) audio files working/);
+            if (successMatch) {
+                const working = parseInt(successMatch[1]);
+                const total = parseInt(successMatch[2]);
+                results.totalChecked = total;
+                results.totalBroken = total - working;
+                results.successRate = total > 0 ? Math.round((working / total) * 100) : 100;
+            }
+            
+            // Extract broken audio files (from issues)
+            const brokenAudioMatches = output.match(/Season \d+, Episode \d+.*❌ ([^\n]+)/g);
+            if (brokenAudioMatches) {
+                brokenAudioMatches.slice(0, 5).forEach(match => { // Limit to first 5
+                    const parts = match.split('❌ ');
+                    if (parts.length > 1) {
+                        const episode = parts[0].trim();
+                        const error = parts[1].trim();
+                        results.issues.push(`${episode}: ${error}`);
+                    }
+                });
+            }
         }
     } catch (error) {
         console.error('Error parsing results:', error.message);
@@ -216,7 +242,8 @@ const main = async () => {
     log(`📊 Checks: ${[
         !skipImages ? '🖼️ Images' : null,
         !skipStatic ? '📁 Static' : null, 
-        !skipRoutes ? '🔗 Routes' : null
+        !skipRoutes ? '🔗 Routes' : null,
+        !skipAudio ? '🎵 Audio' : null
     ].filter(Boolean).join(', ')}`, 'cyan');
     
     const results = {};
@@ -243,6 +270,14 @@ const main = async () => {
             script: 'check_route_links.js',
             name: 'Route Link Checker', 
             key: 'routes'
+        });
+    }
+    
+    if (!skipAudio) {
+        checkers.push({
+            script: 'check_audio_files.js',
+            name: 'Audio File Checker',
+            key: 'audio'
         });
     }
     
