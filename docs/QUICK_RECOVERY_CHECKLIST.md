@@ -53,7 +53,7 @@ node scripts/apprunner-env-updater.js --force
 - **AWS Account**: `YOUR_AWS_ACCOUNT_ID`
 - **Primary Region**: `us-east-1`
 - **S3 Backup Bucket**: `your-backup-bucket-name`
-- **CloudFront Distribution**: `E2QFR8E7I4A6ZT`
+- **CloudFront Distribution**: `your-cloudfront-distribution-id`
 - **App Runner Service**: `wavelength-lore-service`
 - **Production Domain**: `wavelengthlore.com`
 

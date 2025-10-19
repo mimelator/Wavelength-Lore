@@ -165,6 +165,16 @@ app.use('/api/admin', adminRateLimit, adminApiRoutes);
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'static')));
 
+// Also serve static files under /static/ path for CDN compatibility in local development
+app.use('/static', express.static(path.join(__dirname, 'static')));
+
+// Map clean URLs to static files (for YAML path compatibility)
+app.use('/images', express.static(path.join(__dirname, 'static/images')));
+app.use('/css', express.static(path.join(__dirname, 'static/css')));
+app.use('/js', express.static(path.join(__dirname, 'static/js')));
+app.use('/fonts', express.static(path.join(__dirname, 'static/fonts')));
+app.use('/icons', express.static(path.join(__dirname, 'static/icons')));
+
 // Middleware to add character, lore, and episode helpers to all templates
 app.use(async (req, res, next) => {
   // Character helpers
@@ -230,7 +240,7 @@ app.get('/', async (req, res) => {
       pageDescription: 'Explore the Wavelength universe through animated episodes, character stories, and immersive lore. A multimedia project blending music, storytelling, and visual art.',
       pageKeywords: 'wavelength, animation, storytelling, music, episodes, characters, lore, multimedia, visual art, animated series',
       ogType: 'website',
-      ogImage: process.env.CDN_URL + '/static/images/wavelength-og-default.webp',
+      ogImage: process.env.CDN_URL + '/images/wavelength-og-default.webp',
       structuredData: {
         "@context": "https://schema.org",
         "@type": "WebSite",

@@ -11,6 +11,8 @@ const { getDatabase, ref, get } = require('firebase/database');
 // Check command line arguments for production flag
 const args = process.argv.slice(2);
 const isProduction = args.includes('--prod') || args.includes('--production');
+const checkModals = args.includes('--modals') || args.includes('--modal');
+const modalOnly = args.includes('--modal-only');
 
 // Show help if requested
 if (args.includes('--help') || args.includes('-h')) {
@@ -21,11 +23,19 @@ Usage: node check_broken_images.js [options]
 
 Options:
   --prod, --production    Check production images (wavelengthlore.com)
+  --modals, --modal      Also check modal dialog images (disambiguation)
+  --modal-only           Check ONLY modal dialog images
   --help, -h             Show this help message
 
 Examples:
   node check_broken_images.js           # Check local development (localhost:3001)
   node check_broken_images.js --prod    # Check production (wavelengthlore.com)
+  node check_broken_images.js --modals  # Check regular + modal images
+  node check_broken_images.js --modal-only # Check only modal images
+
+Modal Image Testing:
+  Tests images that appear in disambiguation modals (e.g., map location modals)
+  by fetching all character, lore, and episode data and validating their image URLs
 `);
     process.exit(0);
 }
@@ -106,11 +116,222 @@ const fetchRoutes = async () => {
         routes.push('/characters');
         routes.push('/lore');
         
+        // Add map page if we're checking modals
+        if (checkModals || modalOnly) {
+            routes.push('/map');
+        }
+        
     } catch (error) {
         console.error('Error fetching routes:', error);
     }
 
     return routes;
+};
+
+/**
+ * Check modal dialog images by fetching content data and testing their image URLs
+ */
+const checkModalImages = async () => {
+    console.log('\n🎭 Checking Modal Dialog Images...\n');
+    
+    const modalResults = {
+        character: { broken: [], working: [] },
+        lore: { broken: [], working: [] },
+        episode: { broken: [], working: [] }
+    };
+    
+    let totalModalImages = 0;
+    let totalModalBroken = 0;
+    
+    try {
+        // Fetch all character data and check their images
+        console.log('🔍 Checking character images for modal dialogs...');
+        const charactersRef = ref(database, 'characters');
+        const charactersSnapshot = await get(charactersRef);
+        if (charactersSnapshot.exists()) {
+            const charactersData = charactersSnapshot.val();
+            
+            for (const characterId in charactersData) {
+                const character = charactersData[characterId];
+                if (character && character.image) {
+                    totalModalImages++;
+                    const imageUrl = character.image.startsWith('http') ? character.image : `${BASE_URL}${character.image}`;
+                    
+                    try {
+                        const imgResponse = await axios.get(imageUrl, {
+                            validateStatus: null,
+                            timeout: isProduction ? 15000 : 5000,
+                            headers: getAuthHeaders()
+                        });
+                        
+                        if (imgResponse.status >= 400) {
+                            modalResults.character.broken.push({
+                                name: character.name || characterId,
+                                src: imageUrl,
+                                status: imgResponse.status,
+                                type: 'Character Modal Image'
+                            });
+                            totalModalBroken++;
+                        } else {
+                            modalResults.character.working.push({
+                                name: character.name || characterId,
+                                src: imageUrl
+                            });
+                        }
+                    } catch (error) {
+                        modalResults.character.broken.push({
+                            name: character.name || characterId,
+                            src: imageUrl,
+                            error: error.message,
+                            type: 'Character Modal Image'
+                        });
+                        totalModalBroken++;
+                    }
+                }
+            }
+        }
+        
+        // Fetch all lore data and check their images
+        console.log('🔍 Checking lore images for modal dialogs...');
+        const loreRef = ref(database, 'lore');
+        const loreSnapshot = await get(loreRef);
+        if (loreSnapshot.exists()) {
+            const loreData = loreSnapshot.val();
+            
+            for (const loreId in loreData) {
+                const loreItem = loreData[loreId];
+                if (loreItem && loreItem.image) {
+                    totalModalImages++;
+                    const imageUrl = loreItem.image.startsWith('http') ? loreItem.image : `${BASE_URL}${loreItem.image}`;
+                    
+                    try {
+                        const imgResponse = await axios.get(imageUrl, {
+                            validateStatus: null,
+                            timeout: isProduction ? 15000 : 5000,
+                            headers: getAuthHeaders()
+                        });
+                        
+                        if (imgResponse.status >= 400) {
+                            modalResults.lore.broken.push({
+                                name: loreItem.title || loreItem.name || loreId,
+                                src: imageUrl,
+                                status: imgResponse.status,
+                                type: 'Lore Modal Image'
+                            });
+                            totalModalBroken++;
+                        } else {
+                            modalResults.lore.working.push({
+                                name: loreItem.title || loreItem.name || loreId,
+                                src: imageUrl
+                            });
+                        }
+                    } catch (error) {
+                        modalResults.lore.broken.push({
+                            name: loreItem.title || loreItem.name || loreId,
+                            src: imageUrl,
+                            error: error.message,
+                            type: 'Lore Modal Image'
+                        });
+                        totalModalBroken++;
+                    }
+                }
+            }
+        }
+        
+        // Fetch all episode data and check their images
+        console.log('🔍 Checking episode images for modal dialogs...');
+        const videosRef = ref(database, 'videos');
+        const videosSnapshot = await get(videosRef);
+        if (videosSnapshot.exists()) {
+            const videosData = videosSnapshot.val();
+            
+            for (const seasonKey in videosData) {
+                const season = videosData[seasonKey];
+                if (season.episodes) {
+                    for (const episodeKey in season.episodes) {
+                        const episode = season.episodes[episodeKey];
+                        if (episode && episode.image) {
+                            totalModalImages++;
+                            const imageUrl = episode.image.startsWith('http') ? episode.image : `${BASE_URL}${episode.image}`;
+                            
+                            try {
+                                const imgResponse = await axios.get(imageUrl, {
+                                    validateStatus: null,
+                                    timeout: isProduction ? 15000 : 5000,
+                                    headers: getAuthHeaders()
+                                });
+                                
+                                if (imgResponse.status >= 400) {
+                                    modalResults.episode.broken.push({
+                                        name: episode.title || `${seasonKey} ${episodeKey}`,
+                                        src: imageUrl,
+                                        status: imgResponse.status,
+                                        type: 'Episode Modal Image'
+                                    });
+                                    totalModalBroken++;
+                                } else {
+                                    modalResults.episode.working.push({
+                                        name: episode.title || `${seasonKey} ${episodeKey}`,
+                                        src: imageUrl
+                                    });
+                                }
+                            } catch (error) {
+                                modalResults.episode.broken.push({
+                                    name: episode.title || `${seasonKey} ${episodeKey}`,
+                                    src: imageUrl,
+                                    error: error.message,
+                                    type: 'Episode Modal Image'
+                                });
+                                totalModalBroken++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Error checking modal images:', error.message);
+    }
+    
+    // Report modal image results
+    console.log(`\n📊 Modal Images Summary: ${totalModalImages} total, ${totalModalBroken} broken, ${totalModalImages - totalModalBroken} working\n`);
+    
+    let hasModalIssues = false;
+    for (const [category, results] of Object.entries(modalResults)) {
+        if (results.broken.length > 0) {
+            hasModalIssues = true;
+            console.log(`❌ ${category.toUpperCase()} MODAL IMAGES - ${results.broken.length} broken:`);
+            results.broken.forEach((img, index) => {
+                if (index < 5) { // Show first 5 for readability
+                    console.log(`   ${index + 1}. ${img.name}`);
+                    console.log(`      URL: ${img.src}`);
+                    if (img.status) console.log(`      Status: ${img.status}`);
+                    if (img.error) console.log(`      Error: ${img.error}`);
+                }
+            });
+            if (results.broken.length > 5) {
+                console.log(`   ... and ${results.broken.length - 5} more`);
+            }
+        }
+        
+        if (results.working.length > 0) {
+            console.log(`✅ ${category.toUpperCase()} MODAL IMAGES - ${results.working.length} working`);
+        }
+    }
+    
+    if (!hasModalIssues && totalModalImages > 0) {
+        console.log('✅ All modal dialog images working correctly!');
+    } else if (totalModalImages === 0) {
+        console.log('⚠️  No modal images found to check');
+    }
+    
+    return {
+        total: totalModalImages,
+        broken: totalModalBroken,
+        working: totalModalImages - totalModalBroken,
+        results: modalResults
+    };
 };
 
 const categorizeImage = (img, $) => {
@@ -126,8 +347,9 @@ const categorizeImage = (img, $) => {
     if (className.includes('nav-image') || parentClass.includes('navigation') || grandParentClass.includes('navigation')) {
         return 'navigation';
     }
-    if (className.includes('disambiguation') || parentClass.includes('disambiguation') || src.includes('disambiguation')) {
-        return 'disambiguation';
+    if (className.includes('disambiguation') || parentClass.includes('disambiguation') || src.includes('disambiguation') || 
+        className.includes('disambiguation-option-image') || parentClass.includes('disambiguation-option')) {
+        return 'modal';
     }
     if (className.includes('gallery-image') || className.includes('carousel') || parentClass.includes('carousel') || grandParentClass.includes('carousel')) {
         return 'carousel';
@@ -161,7 +383,7 @@ const checkImages = async (url) => {
 
         const imageResults = {
             navigation: { broken: [], working: [] },
-            disambiguation: { broken: [], working: [] },
+            modal: { broken: [], working: [] },
             carousel: { broken: [], working: [] },
             banner: { broken: [], working: [] },
             hero: { broken: [], working: [] },
@@ -279,7 +501,47 @@ const checkImages = async (url) => {
 
 const main = async () => {
     console.log('🚀 Starting comprehensive image check...\n');
-    console.log(`🌐 Environment: ${isProduction ? 'PRODUCTION' : 'LOCAL'} (${BASE_URL})\n`);
+    console.log(`🌐 Environment: ${isProduction ? 'PRODUCTION' : 'LOCAL'} (${BASE_URL})`);
+    
+    if (checkModals) {
+        console.log('🎭 Modal checking: ENABLED');
+    } else if (modalOnly) {
+        console.log('🎭 Modal checking: MODAL-ONLY MODE');
+    } else {
+        console.log('🎭 Modal checking: DISABLED (use --modals to enable)');
+    }
+    console.log('');
+    
+    let modalSummary = null;
+    
+    // Check modal images if requested
+    if (checkModals || modalOnly) {
+        modalSummary = await checkModalImages();
+    }
+    
+    // Skip regular page checking if modal-only
+    if (modalOnly) {
+        console.log('\n' + '='.repeat(60));
+        console.log('📊 MODAL-ONLY SUMMARY REPORT');
+        console.log('='.repeat(60));
+        
+        if (modalSummary) {
+            console.log(`🎭 Modal images checked: ${modalSummary.total}`);
+            console.log(`❌ Modal images broken: ${modalSummary.broken}`);
+            console.log(`✅ Modal images working: ${modalSummary.working}`);
+            
+            if (modalSummary.broken === 0 && modalSummary.total > 0) {
+                console.log('\n🎉 CONGRATULATIONS! All modal images are working correctly!');
+            } else if (modalSummary.broken > 0) {
+                console.log(`\n⚠️  ${modalSummary.broken} modal images need attention.`);
+            } else {
+                console.log('\n⚠️  No modal images found to check.');
+            }
+        }
+        
+        console.log('='.repeat(60));
+        return;
+    }
     
     const routes = await fetchRoutes();
     console.log(`📋 Routes to check (${routes.length}):`, routes.map(r => r.length > 30 ? r.substring(0, 30) + '...' : r));
@@ -289,7 +551,7 @@ const main = async () => {
         pagesWithIssues: 0,
         totalImagesByCategory: {
             navigation: 0,
-            disambiguation: 0,
+            modal: 0,
             carousel: 0,
             banner: 0,
             hero: 0,
@@ -299,7 +561,7 @@ const main = async () => {
         },
         brokenImagesByCategory: {
             navigation: 0,
-            disambiguation: 0,
+            modal: 0,
             carousel: 0,
             banner: 0,
             hero: 0,
@@ -324,7 +586,7 @@ const main = async () => {
             let pageHasIssues = false;
             const pageResults = {
                 navigation: { broken: [], working: [] },
-                disambiguation: { broken: [], working: [] },
+                modal: { broken: [], working: [] },
                 carousel: { broken: [], working: [] },
                 banner: { broken: [], working: [] },
                 hero: { broken: [], working: [] },
@@ -420,13 +682,24 @@ const main = async () => {
         }
     }
     
-    console.log(`\n🎯 Overall: ${totalImages - totalBroken}/${totalImages} images working`);
-    console.log(`   Success rate: ${totalImages > 0 ? Math.round(((totalImages - totalBroken) / totalImages) * 100) : 100}%`);
+    // Include modal summary if available
+    if (modalSummary) {
+        console.log('\n🎭 Modal Images:');
+        console.log(`   📊 Total: ${modalSummary.total}`);
+        console.log(`   ❌ Broken: ${modalSummary.broken}`);
+        console.log(`   ✅ Working: ${modalSummary.working}`);
+    }
     
-    if (totalBroken === 0) {
+    const totalAllImages = totalImages + (modalSummary ? modalSummary.total : 0);
+    const totalAllBroken = totalBroken + (modalSummary ? modalSummary.broken : 0);
+    
+    console.log(`\n🎯 Overall: ${totalAllImages - totalAllBroken}/${totalAllImages} images working`);
+    console.log(`   Success rate: ${totalAllImages > 0 ? Math.round(((totalAllImages - totalAllBroken) / totalAllImages) * 100) : 100}%`);
+    
+    if (totalAllBroken === 0) {
         console.log('\n🎉 CONGRATULATIONS! All images are working correctly!');
     } else {
-        console.log(`\n⚠️  ${totalBroken} images need attention.`);
+        console.log(`\n⚠️  ${totalAllBroken} images need attention.`);
     }
     
     console.log('='.repeat(60));

@@ -1,6 +1,6 @@
 title: Fall of the Shire
 seasonLink: https://www.youtube.com/playlist?list=PLO3KUVl6gwUbaay8aPoO6JZsBEjqQx-5y
-description: "Act 1 of the Battle of the Shire: The Goblin King has invaded the Shire"
+description: 'Act 1 of the Battle of the Shire: The Goblin King has invaded the Shire'
 episodes:
   episode1:
     title: Goblin King
@@ -13,25 +13,25 @@ episodes:
       - battle
       - fall
     youtubeLink: https://youtu.be/kGpLCx63Fh8
-    image: /static/images/seasons/season2/episodes/episode1/image.webp
+    image: /images/seasons/season2/episodes/episode1/image.webp
     audio: /images/seasons/season2/episodes/episode1/GoblinKing_v8.mp3
     carouselImages:
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-02.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-03.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-04.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-05.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-06.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-07.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-08.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-09.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-10.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-11.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-12.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-13.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-14.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-15.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-06.webp
-      - /static/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-20.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-02.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-03.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-04.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-05.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-06.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-07.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-08.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-09.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-10.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-11.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-12.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-13.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-14.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-15.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-06.webp
+      - /images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-20.webp
     story: |
       After the Goblin King found out about the insult at the Shire, he decided to invade with his Misery of Goblins.
       Wavelength didn't realize what was happening until it was too late. The Goblins took over the Shire and Wavelength was forced to perform a Concert for the Goblin King.
@@ -61,23 +61,23 @@ episodes:
       - escape
       - deception
     youtubeLink: https://youtu.be/9RzdPJPTXR4
-    image: /static/images/seasons/season2/episodes/episode2/image.webp
+    image: /images/seasons/season2/episodes/episode2/image.webp
     audio: /images/seasons/season2/episodes/episode2/Psychopath_v9.mp3
     carouselImages:
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-01.webp
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-02.webp
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-03.webp
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-04.webp
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-08.webp
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-09.webp
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-11.webp
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-13.webp
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-14.webp
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-15.webp
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-17.webp
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-18.webp
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-19.webp
-      - /static/images/seasons/season2/episodes/episode2/images/Psychopath-20.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-01.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-02.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-03.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-04.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-08.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-09.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-11.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-13.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-14.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-15.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-17.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-18.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-19.webp
+      - /images/seasons/season2/episodes/episode2/images/Psychopath-20.webp
     story: |
       Wavelength is forced to perform for the Goblin King. So thinking quickly on the spot, 
         Wavelength writes a song about being a Psychopath, hoping to impress the Goblin King with Worldview
@@ -109,21 +109,21 @@ episodes:
       - time
       - terror
     youtubeLink: https://youtu.be/rSff1_C8fxU
-    image: /static/images/seasons/season2/episodes/episode3/image.webp
+    image: /images/seasons/season2/episodes/episode3/image.webp
     audio: /images/seasons/season2/episodes/episode3/Countdown_v6.mp3
     carouselImages:
-      - /static/images/seasons/season2/episodes/episode3/images/Countdown-02.webp
-      - /static/images/seasons/season2/episodes/episode3/images/Countdown-03.webp
-      - /static/images/seasons/season2/episodes/episode3/images/Countdown-04.webp
-      - /static/images/seasons/season2/episodes/episode3/images/Countdown-05.webp
-      - /static/images/seasons/season2/episodes/episode3/images/Countdown-06.webp
-      - /static/images/seasons/season2/episodes/episode3/images/Countdown-08.webp
-      - /static/images/seasons/season2/episodes/episode3/images/Countdown-10.webp
-      - /static/images/seasons/season2/episodes/episode3/images/Countdown-14.webp
-      - /static/images/seasons/season2/episodes/episode3/images/Countdown-15.webp
-      - /static/images/seasons/season2/episodes/episode3/images/Countdown-17.webp
-      - /static/images/seasons/season2/episodes/episode3/images/Countdown-18.webp
-      - /static/images/seasons/season2/episodes/episode3/images/Countdown-20.webp
+      - /images/seasons/season2/episodes/episode3/images/Countdown-02.webp
+      - /images/seasons/season2/episodes/episode3/images/Countdown-03.webp
+      - /images/seasons/season2/episodes/episode3/images/Countdown-04.webp
+      - /images/seasons/season2/episodes/episode3/images/Countdown-05.webp
+      - /images/seasons/season2/episodes/episode3/images/Countdown-06.webp
+      - /images/seasons/season2/episodes/episode3/images/Countdown-08.webp
+      - /images/seasons/season2/episodes/episode3/images/Countdown-10.webp
+      - /images/seasons/season2/episodes/episode3/images/Countdown-14.webp
+      - /images/seasons/season2/episodes/episode3/images/Countdown-15.webp
+      - /images/seasons/season2/episodes/episode3/images/Countdown-17.webp
+      - /images/seasons/season2/episodes/episode3/images/Countdown-18.webp
+      - /images/seasons/season2/episodes/episode3/images/Countdown-20.webp
     story: |
       Wavelength is struck by the realization that the Goblins mean to kill and rule the Shire Forever.
       They realize that in times of crisis, people come together to help each other, and the most important
@@ -142,7 +142,7 @@ episodes:
       Give your loved ones a kiss!
   episode4:
     title: A Misery of Goblins
-    description: "Hey everybody look what I've found: Misery is our Dream"
+    description: 'Hey everybody look what I''ve found: Misery is our Dream'
     keywords:
       - misery
       - goblins
@@ -153,26 +153,26 @@ episodes:
       - celebrate
       - freedom
     youtubeLink: https://youtu.be/OINvOo93z64
-    image: /static/images/seasons/season2/episodes/episode4/image.webp
+    image: /images/seasons/season2/episodes/episode4/image.webp
     audio: /images/seasons/season2/episodes/episode4/A Misery of Goblins_v4.mp3
     carouselImages:
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-01.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-02.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-03.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-04.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-05.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-06.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-07.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-10.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-11.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-12.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-13.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-14.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-15.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-16.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-17.webp
-      - /static/images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-18.webp
-      - /static/images/seasons/season2/episodes/episode4/images/Psychopath-20.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-01.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-02.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-03.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-04.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-05.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-06.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-07.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-10.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-11.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-12.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-13.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-14.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-15.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-16.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-17.webp
+      - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-18.webp
+      - /images/seasons/season2/episodes/episode4/images/Psychopath-20.webp
     story: |
       In order to understand how to escape the Goblins, Wavelength tries to understand their worldview.
       Wavelength realizes that Goblins are driven by Misery, and that they want to spread Misery to everyone.
@@ -210,26 +210,26 @@ episodes:
       - dream
       - rescue
     youtubeLink: https://youtu.be/J3_gkKZuTQI
-    image: /static/images/seasons/season2/episodes/episode5/image.webp
+    image: /images/seasons/season2/episodes/episode5/image.webp
     audio: /images/seasons/season2/episodes/episode5/SlowTime_v4.mp3
     carouselImages:
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-01.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-02.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-03.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-06.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-07.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-10.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-11.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-12.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-13.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-14.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-15.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-16.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-17.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-18.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-21.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-22.webp
-      - /static/images/seasons/season2/episodes/episode5/images/SlowTime-23.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-01.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-02.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-03.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-06.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-07.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-10.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-11.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-12.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-13.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-14.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-15.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-16.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-17.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-18.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-21.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-22.webp
+      - /images/seasons/season2/episodes/episode5/images/SlowTime-23.webp
     story: |
       Wavelength is about to make a large decision that will affect the future of the Shire.  They could either
       save themselves by giving in to the Goblins, or they could try to fight back and save the Shire.
@@ -269,26 +269,26 @@ episodes:
       - machine
       - distraction
     youtubeLink: https://youtu.be/jkH6suRlFGI
-    image: /static/images/seasons/season2/episodes/episode6/image.webp
+    image: /images/seasons/season2/episodes/episode6/image.webp
     audio: /images/seasons/season2/episodes/episode6/YouWontSeeItComing_v7.mp3
     carouselImages:
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-01.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-02.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-04.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-06.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-07.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-08.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-09.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-10.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-11.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-12.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-13.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-14.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-15.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-16.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-17.webp
-      - /static/images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-18.webp
-      - /static/images/seasons/season2/episodes/episode6/images/SlowTime-22.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-01.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-02.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-04.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-06.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-07.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-08.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-09.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-10.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-11.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-12.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-13.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-14.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-15.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-16.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-17.webp
+      - /images/seasons/season2/episodes/episode6/images/Won_t_See_it_Coming-18.webp
+      - /images/seasons/season2/episodes/episode6/images/SlowTime-22.webp
     story: |
       Wavelength realizes that the Goblins are not able to understand science because they are not able to learn.
       Wavelength uses this knowledge to create a plan to escape the Goblins by using science to create a distraction.
@@ -328,30 +328,30 @@ episodes:
       - frozen north
       - rebuild
     youtubeLink: https://youtu.be/A8yY4pPYzVY
-    image: /static/images/seasons/season2/episodes/episode7/image.webp
+    image: /images/seasons/season2/episodes/episode7/image.webp
     audio: /images/seasons/season2/episodes/episode7/SayGoodbyeToTheShire_v4.mp3
     carouselImages:
-      - /static/images/seasons/season2/episodes/episode7/images/Countdown-20.webp
-      - /static/images/seasons/season2/episodes/episode7/images/FallOfTheShire_take1-16.webp
-      - /static/images/seasons/season2/episodes/episode7/images/Final_Race-03.webp
-      - /static/images/seasons/season2/episodes/episode7/images/Final_Race-09.webp
-      - /static/images/seasons/season2/episodes/episode7/images/Final_Race-13.webp
-      - /static/images/seasons/season2/episodes/episode7/images/Final_Race-15.webp
-      - /static/images/seasons/season2/episodes/episode7/images/Final_Race-18.webp
-      - /static/images/seasons/season2/episodes/episode7/images/Final_Race-19.webp
-      - /static/images/seasons/season2/episodes/episode7/images/Final_Race-22.webp
-      - /static/images/seasons/season2/episodes/episode7/images/Final_Race-23.webp
-      - /static/images/seasons/season2/episodes/episode7/images/Final_Race-09.webp
-      - /static/images/seasons/season2/episodes/episode7/images/FrozenPeace-24.webp
-      - /static/images/seasons/season2/episodes/episode7/images/RebuildTheShire-08.webp
-      - /static/images/seasons/season2/episodes/episode7/images/RebuildTheShire-10.webp
-      - /static/images/seasons/season2/episodes/episode7/images/SlowTime-07.webp
-      - /static/images/seasons/season2/episodes/episode7/images/SlowTime-22.webp
-      - /static/images/seasons/season2/episodes/episode7/images/WereComingForYou-03.webp
-      - /static/images/seasons/season2/episodes/episode7/images/WereComingForYou-09.webp
-      - /static/images/seasons/season2/episodes/episode7/images/WereComingForYou-13.webp
-      - /static/images/seasons/season2/episodes/episode7/images/WereComingForYou-18.webp
-      - /static/images/seasons/season2/episodes/episode7/images/Won_t_See_it_Coming-16.webp
+      - /images/seasons/season2/episodes/episode7/images/Countdown-20.webp
+      - /images/seasons/season2/episodes/episode7/images/FallOfTheShire_take1-16.webp
+      - /images/seasons/season2/episodes/episode7/images/Final_Race-03.webp
+      - /images/seasons/season2/episodes/episode7/images/Final_Race-09.webp
+      - /images/seasons/season2/episodes/episode7/images/Final_Race-13.webp
+      - /images/seasons/season2/episodes/episode7/images/Final_Race-15.webp
+      - /images/seasons/season2/episodes/episode7/images/Final_Race-18.webp
+      - /images/seasons/season2/episodes/episode7/images/Final_Race-19.webp
+      - /images/seasons/season2/episodes/episode7/images/Final_Race-22.webp
+      - /images/seasons/season2/episodes/episode7/images/Final_Race-23.webp
+      - /images/seasons/season2/episodes/episode7/images/Final_Race-09.webp
+      - /images/seasons/season2/episodes/episode7/images/FrozenPeace-24.webp
+      - /images/seasons/season2/episodes/episode7/images/RebuildTheShire-08.webp
+      - /images/seasons/season2/episodes/episode7/images/RebuildTheShire-10.webp
+      - /images/seasons/season2/episodes/episode7/images/SlowTime-07.webp
+      - /images/seasons/season2/episodes/episode7/images/SlowTime-22.webp
+      - /images/seasons/season2/episodes/episode7/images/WereComingForYou-03.webp
+      - /images/seasons/season2/episodes/episode7/images/WereComingForYou-09.webp
+      - /images/seasons/season2/episodes/episode7/images/WereComingForYou-13.webp
+      - /images/seasons/season2/episodes/episode7/images/WereComingForYou-18.webp
+      - /images/seasons/season2/episodes/episode7/images/Won_t_See_it_Coming-16.webp
     story: |
       Wavelength springs the trap that put the Goblins to sleep.  Wavelength and the Shire Folk escape the Goblins and 
       begin their long journey to the far, frozen North, where their adventure continues in Season 3: The Ice Fortress.

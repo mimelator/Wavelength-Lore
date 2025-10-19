@@ -171,6 +171,12 @@ const rateLimitConfigs = {
 // Middleware function to apply rate limiting based on request type
 function createSmartRateLimit() {
   return (req, res, next) => {
+    // Bypass rate limiting for localhost development (::1 is IPv6 localhost, 127.0.0.1 is IPv4)
+    if (req.ip === '::1' || req.ip === '127.0.0.1' || req.ip === '::ffff:127.0.0.1') {
+      console.log(`🔓 Localhost bypass: Rate limiting skipped for ${req.ip} on ${req.originalUrl}`);
+      return next(); // Skip rate limiting for localhost requests
+    }
+
     const path = req.path.toLowerCase();
     const method = req.method.toLowerCase();
 
@@ -198,8 +204,9 @@ function createSmartRateLimit() {
       rateLimit = rateLimitConfigs.forumLikes;
     } else if (path.startsWith('/api/')) {
       rateLimit = rateLimitConfigs.api;
-    } else if (path.includes('.css') || path.includes('.js') || path.includes('.png') || 
-               path.includes('.jpg') || path.includes('.svg') || path.includes('.ico')) {
+    } else if (path.includes('.ttf') || path.includes('.otf') || path.includes('.css') || path.includes('.js') || path.includes('.png') || 
+               path.includes('.jpg') || path.includes('.jpeg') || path.includes('.webp') || 
+               path.includes('.svg') || path.includes('.ico') || path.includes('.gif')) {
       rateLimit = rateLimitConfigs.static;
     } else {
       rateLimit = rateLimitConfigs.general;

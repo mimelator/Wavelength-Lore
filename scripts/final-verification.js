@@ -60,7 +60,7 @@ async function main() {
   const imageUrls = [
     'http://localhost:3001/images/seasons/season3/episodes/episode5/images/RebuildTheShire-08.webp',
     'http://localhost:3001/images/seasons/season3/episodes/episode3/images/Sneak_Attack-16.webp',
-    'http://localhost:3001/images/characters/lucky/lucky.webp'
+    'http://localhost:3001/images/characters/wavelength/lucky_closeup.webp'
   ];
   
   for (const url of imageUrls) {

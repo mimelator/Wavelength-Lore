@@ -1,6 +1,6 @@
 title: Battle of the Shire
 seasonLink: https://www.youtube.com/playlist?list=PLO3KUVl6gwUaXP0a6Gd8F2yt8zBpDNszV
-description: "Act 3 of the Battle of the Shire: The Shire Folk are determined to reclaim the Shire and their dear homes from the Goblin King."
+description: 'Act 3 of the Battle of the Shire: The Shire Folk are determined to reclaim the Shire and their dear homes from the Goblin King.'
 episodes:
   episode1:
     title: Locked And Loaded
@@ -13,31 +13,31 @@ episodes:
       - battle
       - preparation
     youtubeLink: https://youtu.be/9dUMX2KhR54
-    image: /static/images/seasons/season4/episodes/episode1/image.webp
+    image: /images/seasons/season4/episodes/episode1/image.webp
     audio: /images/seasons/season4/episodes/episode1/LockedAndLoaded_v3.mp3
     carouselImages:
-      - /static/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-1.webp
-      - /static/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-2.webp
-      - /static/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-3.webp
-      - /static/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-4.webp
-      - /static/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-5.webp
-      - /static/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-6.webp
-      - /static/images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-7.webp
-      - /static/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-02.webp
-      - /static/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-03.webp
-      - /static/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-05.webp
-      - /static/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-06.webp
-      - /static/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-07.webp
-      - /static/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-10.webp
-      - /static/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-13.webp
-      - /static/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-14.webp
-      - /static/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-16.webp
-      - /static/images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-18.webp
-      - /static/images/seasons/season4/episodes/episode1/images/RebuildTheShire-08.webp
-      - /static/images/seasons/season4/episodes/episode1/images/RebuildTheShire-10.webp
-      - /static/images/seasons/season4/episodes/episode1/images/RebuildTheShire-12.webp
-      - /static/images/seasons/season4/episodes/episode1/images/RebuildTheShire-15.webp
-      - /static/images/seasons/season4/episodes/episode1/images/WereComingForYou-10.webp
+      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-1.webp
+      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-2.webp
+      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-3.webp
+      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-4.webp
+      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-5.webp
+      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-6.webp
+      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-7.webp
+      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-02.webp
+      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-03.webp
+      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-05.webp
+      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-06.webp
+      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-07.webp
+      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-10.webp
+      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-13.webp
+      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-14.webp
+      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-16.webp
+      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-18.webp
+      - /images/seasons/season4/episodes/episode1/images/RebuildTheShire-08.webp
+      - /images/seasons/season4/episodes/episode1/images/RebuildTheShire-10.webp
+      - /images/seasons/season4/episodes/episode1/images/RebuildTheShire-12.webp
+      - /images/seasons/season4/episodes/episode1/images/RebuildTheShire-15.webp
+      - /images/seasons/season4/episodes/episode1/images/WereComingForYou-10.webp
     story: |
       Wavelength and the Shire Folk escape the Goblin Invasion of the dear Shire, and flee to the far, frozen North. 
       There they find a place to recover and plan at the Ice Fortress.
@@ -58,24 +58,24 @@ episodes:
       - lair
       - lies
     youtubeLink: https://youtu.be/SMqrc-2wdAA
-    image: /static/images/seasons/season4/episodes/episode2/image.webp
+    image: /images/seasons/season4/episodes/episode2/image.webp
     audio: /images/seasons/season4/episodes/episode2/TheKingHasFled_v1.mp3
     carouselImages:
-      - /static/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-1.webp
-      - /static/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-2.webp
-      - /static/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-3.webp
-      - /static/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-4.webp
-      - /static/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-5.webp
-      - /static/images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-6.webp
-      - /static/images/seasons/season4/episodes/episode2/images/TheKingHasFled-10.webp
-      - /static/images/seasons/season4/episodes/episode2/images/TheKingHasFled-13.webp
-      - /static/images/seasons/season4/episodes/episode2/images/TheKingHasFled-14.webp
-      - /static/images/seasons/season4/episodes/episode2/images/TheKingHasFled-15.webp
-      - /static/images/seasons/season4/episodes/episode2/images/TheKingHasFled-17.webp
-      - /static/images/seasons/season4/episodes/episode2/images/TheKingHasFled-18.webp
-      - /static/images/seasons/season4/episodes/episode2/images/TheKingHasFled-20.webp
-      - /static/images/seasons/season4/episodes/episode2/images/TheKingHasFled-22.webp
-      - /static/images/seasons/season4/episodes/episode2/images/TheKingHasFled-23.webp
+      - /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-1.webp
+      - /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-2.webp
+      - /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-3.webp
+      - /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-4.webp
+      - /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-5.webp
+      - /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-6.webp
+      - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-10.webp
+      - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-13.webp
+      - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-14.webp
+      - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-15.webp
+      - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-17.webp
+      - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-18.webp
+      - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-20.webp
+      - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-22.webp
+      - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-23.webp
     story: |
       The Goblin king being a coward at heart, fled the battle before it began, fleeing with his main GOblin Misery back
       to his swampy lair.  He took with him captives from the Shire, including the Royal Family.  Behind the GOblin King
@@ -98,26 +98,26 @@ episodes:
       - mystery
       - goblin king
     youtubeLink: https://youtu.be/UcTy2Wf4kUg
-    image: /static/images/seasons/season4/episodes/episode3/image.webp
+    image: /images/seasons/season4/episodes/episode3/image.webp
     audio: /images/seasons/season4/episodes/episode3/GoblinsRule_v2.mp3
     carouselImages:
-      - /static/images/seasons/season4/episodes/episode3/images/GoblinsRule-17.webp
-      - /static/images/seasons/season4/episodes/episode3/images/GoblinsRule-18.webp
-      - /static/images/seasons/season4/episodes/episode3/images/GoblinsRule-20.webp
-      - /static/images/seasons/season4/episodes/episode3/images/GoblinsRule-21.webp
-      - /static/images/seasons/season4/episodes/episode3/images/GoblinsRule-22.webp
-      - /static/images/seasons/season4/episodes/episode3/images/GoblinsRule-24.webp
-      - /static/images/seasons/season4/episodes/episode3/images/GoblinsRule-25.webp
-      - /static/images/seasons/season4/episodes/episode3/images/GoblinsRule-26.webp
-      - /static/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-1.webp
-      - /static/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-2.webp
-      - /static/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-3.webp
-      - /static/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-4.webp
-      - /static/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-5.webp
-      - /static/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-6.webp
-      - /static/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-7.webp
-      - /static/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-8.webp
-      - /static/images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-9.webp
+      - /images/seasons/season4/episodes/episode3/images/GoblinsRule-17.webp
+      - /images/seasons/season4/episodes/episode3/images/GoblinsRule-18.webp
+      - /images/seasons/season4/episodes/episode3/images/GoblinsRule-20.webp
+      - /images/seasons/season4/episodes/episode3/images/GoblinsRule-21.webp
+      - /images/seasons/season4/episodes/episode3/images/GoblinsRule-22.webp
+      - /images/seasons/season4/episodes/episode3/images/GoblinsRule-24.webp
+      - /images/seasons/season4/episodes/episode3/images/GoblinsRule-25.webp
+      - /images/seasons/season4/episodes/episode3/images/GoblinsRule-26.webp
+      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-1.webp
+      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-2.webp
+      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-3.webp
+      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-4.webp
+      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-5.webp
+      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-6.webp
+      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-7.webp
+      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-8.webp
+      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-9.webp
     story: |
       There is only one motivation for a Goblin, and that is to rule over others.  This is the case for all Goblins,
       from the lowliest grunt to the Goblin King himself.  The Goblin King rules by lying, cheating, and stealing.  He
@@ -148,25 +148,25 @@ episodes:
       - lure
       - ice blue diamond
     youtubeLink: https://youtu.be/LlhYGbc2xXM
-    image: /static/images/seasons/season4/episodes/episode4/image.webp
+    image: /images/seasons/season4/episodes/episode4/image.webp
     audio: /images/seasons/season4/episodes/episode4/IceBlueGreed_v2.mp3
     carouselImages:
-      - /static/images/seasons/season4/episodes/episode4/images/IceBlueGreed-12.webp
-      - /static/images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.webp
-      - /static/images/seasons/season4/episodes/episode4/images/IceBlueGreed-22.webp
-      - /static/images/seasons/season4/episodes/episode4/images/IceBlueGreed-23.webp
-      - /static/images/seasons/season4/episodes/episode4/images/IceBlueGreed-25.webp
-      - /static/images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.webp
-      - /static/images/seasons/season4/episodes/episode4/images/IceBlueGreed-28.webp
-      - /static/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-1.webp
-      - /static/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-2.webp
-      - /static/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-3.webp
-      - /static/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-4.webp
-      - /static/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-5.webp
-      - /static/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-6.webp
-      - /static/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-7.webp
-      - /static/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-8.webp
-      - /static/images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-9.webp
+      - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-12.webp
+      - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.webp
+      - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-22.webp
+      - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-23.webp
+      - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-25.webp
+      - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.webp
+      - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-28.webp
+      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-1.webp
+      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-2.webp
+      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-3.webp
+      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-4.webp
+      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-5.webp
+      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-6.webp
+      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-7.webp
+      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-8.webp
+      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-9.webp
     story: |
       The Shire FOlk know that the Goblin King is a coward, and that he won't openly attack a fortified shire
       without a good reason.  Lucky sets a trap for the Goblin King, using an irresistible Ice Blue Diamond as bait.
@@ -195,28 +195,28 @@ episodes:
       - hateful
       - cruel
     youtubeLink: https://youtu.be/YsREhnlW8B8
-    image: /static/images/seasons/season4/episodes/episode5/image.webp
+    image: /images/seasons/season4/episodes/episode5/image.webp
     audio: /images/seasons/season4/episodes/episode5/TheShireFortress_v2.mp3
     carouselImages:
-      - /static/images/seasons/season4/episodes/episode5/images/GoblinsRule-21.webp
-      - /static/images/seasons/season4/episodes/episode5/images/GoblinsRule-22.webp
-      - /static/images/seasons/season4/episodes/episode5/images/GoblinsRule-25.webp
-      - /static/images/seasons/season4/episodes/episode5/images/GoblinsRule-26.webp
-      - /static/images/seasons/season4/episodes/episode5/images/TheShireFortress-13.webp
-      - /static/images/seasons/season4/episodes/episode5/images/TheShireFortress-15.webp
-      - /static/images/seasons/season4/episodes/episode5/images/TheShireFortress-16.webp
-      - /static/images/seasons/season4/episodes/episode5/images/TheShireFortress-18.webp
-      - /static/images/seasons/season4/episodes/episode5/images/TheShireFortress-19.webp
-      - /static/images/seasons/season4/episodes/episode5/images/TheShireFortress-20.webp
-      - /static/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-1.webp
-      - /static/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-2.webp
-      - /static/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-3.webp
-      - /static/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-4.webp
-      - /static/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-5.webp
-      - /static/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-6.webp
-      - /static/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-7.webp
-      - /static/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-8.webp
-      - /static/images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-9.webp
+      - /images/seasons/season4/episodes/episode5/images/GoblinsRule-21.webp
+      - /images/seasons/season4/episodes/episode5/images/GoblinsRule-22.webp
+      - /images/seasons/season4/episodes/episode5/images/GoblinsRule-25.webp
+      - /images/seasons/season4/episodes/episode5/images/GoblinsRule-26.webp
+      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-13.webp
+      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-15.webp
+      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-16.webp
+      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-18.webp
+      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-19.webp
+      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-20.webp
+      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-1.webp
+      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-2.webp
+      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-3.webp
+      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-4.webp
+      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-5.webp
+      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-6.webp
+      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-7.webp
+      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-8.webp
+      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-9.webp
     story: |
       Knowing that Lucky's trap was set, the Shire Folk set about fortifying the Shire to withstand the coming Goblin attack.
       They know that the Goblin's will be relentless in their attack, and that they will stop at nothing to reclaim the Shire
@@ -247,54 +247,54 @@ episodes:
       - victory
       - defeated
     youtubeLink: https://youtu.be/GIpZ5yX6qn8
-    image: /static/images/seasons/season4/episodes/episode6/image.webp
+    image: /images/seasons/season4/episodes/episode6/image.webp
     audio: /images/seasons/season4/episodes/episode6/BattleOfTheShire_v4.mp3
     carouselImages:
-      - /static/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-01.webp
-      - /static/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-02.webp
-      - /static/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-03.webp
-      - /static/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-04.webp
-      - /static/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-05.webp
-      - /static/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-06.webp
-      - /static/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-07.webp
-      - /static/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-08.webp
-      - /static/images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-09.webp
-      - /static/images/seasons/season4/episodes/episode6/images/death-of-the-goblin-king-1.webp
-      - /static/images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-1.webp
-      - /static/images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-2.webp
-      - /static/images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-3.webp
-      - /static/images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-4.webp
-      - /static/images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-5.webp
-      - /static/images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-6.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-007.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-010.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-013.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-017.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-018.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-019.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-020.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-021.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-028.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-030.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-031.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-039.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-047.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-049.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-051.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-052.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-053.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-056.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-057.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-058.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-059.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-060.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-061.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-063.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-064.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-065.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-066.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-068.webp
-      - /static/images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.webp
+      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-01.webp
+      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-02.webp
+      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-03.webp
+      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-04.webp
+      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-05.webp
+      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-06.webp
+      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-07.webp
+      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-08.webp
+      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-09.webp
+      - /images/seasons/season4/episodes/episode6/images/death-of-the-goblin-king-1.webp
+      - /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-1.webp
+      - /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-2.webp
+      - /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-3.webp
+      - /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-4.webp
+      - /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-5.webp
+      - /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-6.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-007.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-010.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-013.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-017.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-018.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-019.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-020.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-021.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-028.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-030.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-031.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-039.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-047.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-049.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-051.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-052.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-053.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-056.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-057.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-058.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-059.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-060.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-061.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-063.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-064.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-065.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-066.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-068.webp
+      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.webp
     story: |
       The Goblin King, driven by his insatiable greed for the Ice Blue Diamond, leads his goblin horde to attack the fortified Shire.
       The Shire Folk, prepared and determined, stand united to defend their home and freedom. The battle is fierce, with both sides showing great courage and resilience.
@@ -345,20 +345,20 @@ episodes:
       - orphans
       - loss
     youtubeLink: https://youtu.be/JLSTXP3ipnQ
-    image: /static/images/seasons/season4/episodes/episode7/image.webp
+    image: /images/seasons/season4/episodes/episode7/image.webp
     audio: /images/seasons/season4/episodes/episode7/SongOfMourning_v1.mp3
     carouselImages:
-      - /static/images/seasons/season4/episodes/episode7/images/TheBattleOfTheShire-027.webp
-      - /static/images/seasons/season4/episodes/episode7/images/TheBattleOfTheShire-031.webp
-      - /static/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-02.webp
-      - /static/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-09.webp
-      - /static/images/seasons/season4/episodes/episode7/images/TheSongOfMourning-22.webp
-      - /static/images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-1.webp
-      - /static/images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-2.webp
-      - /static/images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-3.webp
-      - /static/images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-4.webp
-      - /static/images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-5.webp
-      - /static/images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-7.webp
+      - /images/seasons/season4/episodes/episode7/images/TheBattleOfTheShire-027.webp
+      - /images/seasons/season4/episodes/episode7/images/TheBattleOfTheShire-031.webp
+      - /images/seasons/season4/episodes/episode7/images/TheSongOfMourning-02.webp
+      - /images/seasons/season4/episodes/episode7/images/TheSongOfMourning-09.webp
+      - /images/seasons/season4/episodes/episode7/images/TheSongOfMourning-22.webp
+      - /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-1.webp
+      - /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-2.webp
+      - /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-3.webp
+      - /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-4.webp
+      - /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-5.webp
+      - /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-7.webp
     story: |
       After the battle, the Shire Folk take time to mourn their losses and honor the memories of those who have passed.
       Wavelength didn't escape unscathed, as Wavelength's Drummer: Magical Maurice was lost in the battle.  
@@ -386,33 +386,33 @@ episodes:
       - darkness
       - daylight
     youtubeLink: https://youtu.be/iVerMZpk4dM
-    image: /static/images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.webp
+    image: /images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.webp
     audio: /images/seasons/season4/episodes/episode8/TheShireDream_v1.mp3
     carouselImages:
-      - /static/images/seasons/season4/episodes/episode8/images/FrozenPeace-17.webp
-      - /static/images/seasons/season4/episodes/episode8/images/GoblinsRule-17.webp
-      - /static/images/seasons/season4/episodes/episode8/images/GoblinsRule-18.webp
-      - /static/images/seasons/season4/episodes/episode8/images/GoblinsRule-26.webp
-      - /static/images/seasons/season4/episodes/episode8/images/IceBlueGreed-22.webp
-      - /static/images/seasons/season4/episodes/episode8/images/IceFortress-20.webp
-      - /static/images/seasons/season4/episodes/episode8/images/RebuildTheShire-02.webp
-      - /static/images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-017.webp
-      - /static/images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-018.webp
-      - /static/images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-020.webp
-      - /static/images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-051.webp
-      - /static/images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-062.webp
-      - /static/images/seasons/season4/episodes/episode8/images/TheKingHasFled-23.webp
-      - /static/images/seasons/season4/episodes/episode8/images/TheSongOfMourning-22.webp
-      - /static/images/seasons/season4/episodes/episode8/images/shire-sanctuary-01.webp
-      - /static/images/seasons/season4/episodes/episode8/images/shire-sanctuary-02.webp
-      - /static/images/seasons/season4/episodes/episode8/images/shire-sanctuary-03.webp
-      - /static/images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.webp
-      - /static/images/seasons/season4/episodes/episode8/images/shire-sanctuary-05.webp
-      - /static/images/seasons/season4/episodes/episode8/images/shire-sanctuary-06.webp
-      - /static/images/seasons/season4/episodes/episode8/images/shire-sanctuary-07.webp
-      - /static/images/seasons/season4/episodes/episode8/images/shire-sanctuary-08.webp
-      - /static/images/seasons/season4/episodes/episode8/images/shire-sanctuary-09.webp
-      - /static/images/seasons/season4/episodes/episode8/images/shire-sanctuary-10.webp
+      - /images/seasons/season4/episodes/episode8/images/FrozenPeace-17.webp
+      - /images/seasons/season4/episodes/episode8/images/GoblinsRule-17.webp
+      - /images/seasons/season4/episodes/episode8/images/GoblinsRule-18.webp
+      - /images/seasons/season4/episodes/episode8/images/GoblinsRule-26.webp
+      - /images/seasons/season4/episodes/episode8/images/IceBlueGreed-22.webp
+      - /images/seasons/season4/episodes/episode8/images/IceFortress-20.webp
+      - /images/seasons/season4/episodes/episode8/images/RebuildTheShire-02.webp
+      - /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-017.webp
+      - /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-018.webp
+      - /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-020.webp
+      - /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-051.webp
+      - /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-062.webp
+      - /images/seasons/season4/episodes/episode8/images/TheKingHasFled-23.webp
+      - /images/seasons/season4/episodes/episode8/images/TheSongOfMourning-22.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-01.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-02.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-03.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-05.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-06.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-07.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-08.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-09.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-10.webp
     story: |
       The Goblin King can no longer spread his lies in the Shire, and the Shire Folk can finally live in peace.
       Wavelength has lost a member, but they have gained a new one in Daphne, who has proven herself to be a worthy drummer.
