@@ -544,58 +544,131 @@
   <!-- FOREST BIOMES - Layer 2 (positioned to avoid overlaps) -->
   <g id="forest-biomes">
     <!-- Western rainforest areas - moved inland to avoid ocean overlap -->
-    <ellipse class="forest" cx="450" cy="520" rx="55" ry="35" />
-    <ellipse class="forest" cx="420" cy="580" rx="45" ry="25" />
-    <ellipse class="forest" cx="460" cy="630" rx="45" ry="25" />
-    <ellipse class="forest" cx="430" cy="460" rx="50" ry="20" />
+    <path class="forest" d="M 410,505 
+                            C 450,495 485,510 490,535
+                            C 485,550 470,555 450,550
+                            C 425,545 405,530 400,515
+                            C 405,505 410,505 410,505 Z" />
+    <path class="forest" d="M 385,565 
+                            C 420,560 450,570 455,590
+                            C 450,605 430,600 410,595
+                            C 390,590 380,575 385,565 Z" />
+    <path class="forest" d="M 425,615 
+                            C 460,610 485,620 480,640
+                            C 475,655 455,650 440,645
+                            C 420,640 415,625 425,615 Z" />
+    <path class="forest" d="M 395,445 
+                            C 435,440 465,450 460,465
+                            C 455,480 435,475 415,470
+                            C 395,465 390,450 395,445 Z" />
     
     <!-- Temperate rain forest - redistributed across western continent -->
-    <ellipse class="forest" cx="520" cy="680" rx="35" ry="20" opacity="0.8" />
+    <path class="forest" d="M 505,670 
+                            C 530,665 545,675 540,685
+                            C 535,695 520,690 505,685
+                            C 495,680 500,670 505,670 Z" opacity="0.8" />
 
     <!-- Eastern forests - positioned east of mountain spine, respecting boundaries -->
-    <ellipse class="forest" cx="800" cy="480" rx="45" ry="30" />
-    <ellipse class="forest" cx="840" cy="550" rx="35" ry="20" />
-    <ellipse class="forest" cx="820" cy="600" rx="35" ry="25" />
+    <path class="forest" d="M 770,465 
+                            C 810,460 835,470 830,490
+                            C 825,505 805,500 785,495
+                            C 765,490 760,475 770,465 Z" />
+    <path class="forest" d="M 815,535 
+                            C 850,530 865,540 860,555
+                            C 855,570 835,565 815,560
+                            C 805,555 810,540 815,535 Z" />
+    <path class="forest" d="M 795,585 
+                            C 830,580 845,590 840,605
+                            C 835,620 815,615 795,610
+                            C 785,605 790,590 795,585 Z" />
 
     <!-- Southern extension forests - contained within land boundaries -->
-    <ellipse class="forest" cx="440" cy="800" rx="60" ry="35" />
+    <path class="forest" d="M 395,785 
+                            C 445,780 470,790 475,810
+                            C 470,825 450,820 425,815
+                            C 400,810 385,795 395,785 Z" />
 
     <!-- Additional western rainforest - better distributed -->
-    <ellipse class="forest" cx="500" cy="720" rx="35" ry="18" />
-    <ellipse class="forest" cx="380" cy="550" rx="25" ry="15" />
+    <path class="forest" d="M 480,710 
+                            C 510,705 525,715 520,725
+                            C 515,735 495,730 480,725
+                            C 470,720 475,710 480,710 Z" />
+    <path class="forest" d="M 365,540 
+                            C 385,535 400,545 395,555
+                            C 390,565 375,560 365,555
+                            C 355,550 360,540 365,540 Z" />
     
     <!-- Shire forests - include in masked group -->
-    <ellipse class="forest" cx="394" cy="372" rx="21" ry="12" opacity="0.6" />
-    <ellipse class="forest" cx="360" cy="345" rx="16" ry="10" opacity="0.6" />
+    <path class="forest" d="M 380,365 
+                            C 405,360 415,370 410,378
+                            C 405,386 390,381 380,378
+                            C 370,375 375,365 380,365 Z" opacity="0.6" />
+    <path class="forest" d="M 350,338 
+                            C 370,333 380,343 375,350
+                            C 370,357 355,352 350,350
+                            C 340,347 345,338 350,338 Z" opacity="0.6" />
   </g>
 
   <!-- SWAMP BIOMES - Layer 3 (positioned to avoid forests and mountains) -->
   <g id="swamp-biomes">
-    <!-- Large swamp beneath Goblin King's Lair -->
-    <ellipse class="swamp" cx="720" cy="650" rx="70" ry="45" />
+    <!-- Large swamp beneath Goblin King's Lair - organic shape -->
+    <path class="swamp" d="M 650,620 
+                          C 680,615 720,608 760,625
+                          C 780,635 795,660 785,685
+                          C 770,695 750,700 720,695
+                          C 690,690 670,685 655,670
+                          C 640,655 645,635 650,620 Z" />
     
     <!-- Eastern swamplands - contained within landmass boundaries -->
-    <ellipse class="swamp" cx="820" cy="720" rx="40" ry="25" />
-    <ellipse class="swamp" cx="880" cy="680" rx="35" ry="20" />
+    <path class="swamp" d="M 800,710 
+                          C 830,705 850,715 845,735
+                          C 840,745 825,750 810,745
+                          C 795,740 785,725 800,710 Z" />
+    <path class="swamp" d="M 865,670 
+                          C 885,665 900,675 895,690
+                          C 890,700 875,695 865,690
+                          C 855,685 860,675 865,670 Z" />
     
     <!-- Southern swamplands - well within southern landmass -->
-    <ellipse class="swamp" cx="600" cy="850" rx="35" ry="25" />
+    <path class="swamp" d="M 585,840 
+                          C 610,835 625,845 620,865
+                          C 615,875 595,870 585,865
+                          C 575,860 580,845 585,840 Z" />
   </g>
 
   <!-- GRASSLAND BIOMES - Layer 4 (fill remaining open areas) -->
   <g id="grassland-biomes">
     <!-- Eastern grasslands - well-defined dry ecosystem areas -->
-    <ellipse class="grassland" cx="900" cy="540" rx="25" ry="18" opacity="0.6" />
-    <ellipse class="grassland" cx="810" cy="900" rx="45" ry="30" opacity="0.6" />
+    <path class="grassland" d="M 885,530 
+                              C 915,525 925,540 920,555
+                              C 915,565 895,560 885,555
+                              C 875,550 880,535 885,530 Z" opacity="0.6" />
+    <path class="grassland" d="M 780,885 
+                              C 820,880 845,890 850,915
+                              C 845,930 825,935 805,930
+                              C 785,925 770,915 775,900
+                              C 780,890 785,885 780,885 Z" opacity="0.6" />
   </g>
 
   <!-- FARMING BIOMES - Agricultural areas around settlements -->
   <g id="farming-biomes">
     <!-- Northern Crossroads farming area -->
-    <ellipse class="farmland" cx="620" cy="890" rx="30" ry="20" />
-    <ellipse class="farmland" cx="680" cy="910" rx="25" ry="18" />
-    <ellipse class="farmland" cx="640" cy="930" rx="20" ry="15" />
-    <ellipse class="farmland" cx="670" cy="880" rx="18" ry="12" />
+    <path class="farmland" d="M 600,880 
+                              C 640,875 650,885 645,905
+                              C 640,915 620,910 600,905
+                              C 590,900 595,885 600,880 Z" />
+    <path class="farmland" d="M 665,900 
+                              C 695,895 705,905 700,920
+                              C 695,930 675,925 665,920
+                              C 655,915 660,905 665,900 Z" />
+    <path class="farmland" d="M 625,925 
+                              C 650,920 660,930 655,945
+                              C 650,955 630,950 625,945
+                              C 615,940 620,930 625,925 Z" />
+    <path class="farmland" d="M 655,870 
+                              C 680,865 690,875 685,885
+                              C 680,895 660,890 655,885
+                              C 645,880 650,870 655,870 Z" />
   </g>
 
   <!-- DESOLATE ISLAND - Remote island west of Port Gamble -->
