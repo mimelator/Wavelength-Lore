@@ -297,11 +297,44 @@ class AppRunnerDeploymentMonitor {
   async execute(options = {}) {
     try {
       const reason = options.reason || 'Manual redeploy via deployment monitor';
+      const monitorOnly = options.monitorOnly || false;
       
-      // Force redeploy
-      const deployResult = await this.forceRedeploy(reason);
+      let deployResult;
       
-      if (!deployResult.isNewDeployment) {
+      if (monitorOnly) {
+        console.log('📊 Monitor-Only Mode: Checking current deployment status...');
+        console.log('   (Auto-deployment is enabled - use --force for manual deployment)');
+        console.log('');
+        
+        // Just get current status, don't force redeploy
+        const currentService = await this.getServiceStatus();
+        deployResult = { 
+          isNewDeployment: false, 
+          service: currentService,
+          monitorOnly: true 
+        };
+        
+        if (currentService.Status === 'RUNNING') {
+          console.log('✅ Service is currently running');
+          console.log('   No active deployment to monitor');
+          
+          // Still show summary for current state
+          const result = {
+            success: true,
+            status: currentService.Status,
+            service: currentService,
+            elapsedTime: 0
+          };
+          await this.displayDeploymentSummary(result);
+          return result;
+        }
+      } else {
+        console.log('🚀 Manual Deployment Mode: Forcing redeploy...');
+        // Force redeploy
+        deployResult = await this.forceRedeploy(reason);
+      }
+      
+      if (!deployResult.isNewDeployment && !deployResult.monitorOnly) {
         console.log('\n📊 Monitoring existing deployment...');
       }
       
@@ -335,22 +368,35 @@ async function main() {
   if (args.includes('--help') || args.includes('-h')) {
     console.log('🚀 AWS App Runner Deployment Monitor');
     console.log('');
+    console.log('NOTE: Auto-deployment is now enabled! This tool is primarily for monitoring.');
+    console.log('');
     console.log('Usage: node apprunner-deploy-monitor.js [options]');
     console.log('');
     console.log('Options:');
+    console.log('  --monitor-only   Only monitor, do not force deployment (default)');
+    console.log('  --force          Force manual deployment (emergency use)');
+    console.log('  --manual         Same as --force');
     console.log('  --reason "text"  Custom reason for deployment');
     console.log('  --help           Show this help message');
     console.log('');
     console.log('Examples:');
-    console.log('  node apprunner-deploy-monitor.js');
-    console.log('  node apprunner-deploy-monitor.js --reason "Fix production bug"');
+    console.log('  node apprunner-deploy-monitor.js                    # Monitor only');
+    console.log('  node apprunner-deploy-monitor.js --monitor-only     # Monitor only');
+    console.log('  node apprunner-deploy-monitor.js --force --reason "Emergency fix"');
     return;
   }
   
   const reasonIndex = args.indexOf('--reason');
   const reason = reasonIndex !== -1 && args[reasonIndex + 1] ? args[reasonIndex + 1] : undefined;
   
-  const options = { reason };
+  // Check for monitor-only mode (default behavior now)
+  const isMonitorOnly = args.includes('--monitor-only') || 
+                        (!args.includes('--force') && !args.includes('--manual'));
+  
+  const options = { 
+    reason,
+    monitorOnly: isMonitorOnly
+  };
   
   const monitor = new AppRunnerDeploymentMonitor(serviceArn);
   

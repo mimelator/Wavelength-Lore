@@ -8,7 +8,29 @@ const cheerio = require('cheerio');
 const { initializeApp } = require('firebase/app');
 const { getDatabase, ref, get } = require('firebase/database');
 
-const BASE_URL = 'http://localhost:3001'; // Update this to your server's base URL
+// Check command line arguments for production flag
+const args = process.argv.slice(2);
+const isProduction = args.includes('--prod') || args.includes('--production');
+
+// Show help if requested
+if (args.includes('--help') || args.includes('-h')) {
+    console.log(`
+🔍 Image Checker Tool
+
+Usage: node check_broken_images.js [options]
+
+Options:
+  --prod, --production    Check production images (wavelengthlore.com)
+  --help, -h             Show this help message
+
+Examples:
+  node check_broken_images.js           # Check local development (localhost:3001)
+  node check_broken_images.js --prod    # Check production (wavelengthlore.com)
+`);
+    process.exit(0);
+}
+
+const BASE_URL = isProduction ? 'https://wavelengthlore.com' : 'http://localhost:3001';
 
 const firebaseConfig = {
     apiKey: process.env.API_KEY,
@@ -113,7 +135,12 @@ const categorizeImage = (img, $) => {
 
 const checkImages = async (url) => {
     try {
-        const response = await axios.get(url);
+        const response = await axios.get(url, {
+            timeout: isProduction ? 30000 : 10000,
+            headers: isProduction ? {
+                'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-ImageChecker/1.0)'
+            } : {}
+        });
         const $ = cheerio.load(response.data);
         const images = $('img');
 
@@ -142,7 +169,13 @@ const checkImages = async (url) => {
                 const category = categorizeImage(img, $);
                 
                 try {
-                    const imgResponse = await axios.get(src, { validateStatus: null });
+                    const imgResponse = await axios.get(src, { 
+                        validateStatus: null,
+                        timeout: isProduction ? 15000 : 5000, // Longer timeout for production
+                        headers: isProduction ? {
+                            'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-ImageChecker/1.0)'
+                        } : {}
+                    });
                     if (imgResponse.status >= 400) {
                         imageResults[category].broken.push({
                             src,
@@ -212,7 +245,13 @@ const checkImages = async (url) => {
             console.log(`\n🖼️  Background images found: ${backgroundImages.length}`);
             for (const bgImg of backgroundImages) {
                 try {
-                    const imgResponse = await axios.get(bgImg, { validateStatus: null });
+                    const imgResponse = await axios.get(bgImg, { 
+                        validateStatus: null,
+                        timeout: isProduction ? 15000 : 5000,
+                        headers: isProduction ? {
+                            'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-ImageChecker/1.0)'
+                        } : {}
+                    });
                     if (imgResponse.status >= 400) {
                         console.log(`❌ Background: ${bgImg} (Status: ${imgResponse.status})`);
                     } else {
@@ -231,6 +270,7 @@ const checkImages = async (url) => {
 
 const main = async () => {
     console.log('🚀 Starting comprehensive image check...\n');
+    console.log(`🌐 Environment: ${isProduction ? 'PRODUCTION' : 'LOCAL'} (${BASE_URL})\n`);
     
     const routes = await fetchRoutes();
     console.log(`📋 Routes to check (${routes.length}):`, routes.map(r => r.length > 30 ? r.substring(0, 30) + '...' : r));
@@ -265,7 +305,12 @@ const main = async () => {
         summary.totalPages++;
         
         try {
-            const response = await axios.get(url);
+            const response = await axios.get(url, {
+                timeout: isProduction ? 30000 : 10000,
+                headers: isProduction ? {
+                    'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-ImageChecker/1.0)'
+                } : {}
+            });
             const $ = cheerio.load(response.data);
             const images = $('img');
             
@@ -291,9 +336,15 @@ const main = async () => {
                     const category = categorizeImage(img, $);
                     summary.totalImagesByCategory[category]++;
                     
-                    try {
-                        const imgResponse = await axios.get(src, { validateStatus: null });
-                        if (imgResponse.status >= 400) {
+                try {
+                    const imgResponse = await axios.get(src, { 
+                        validateStatus: null,
+                        timeout: isProduction ? 15000 : 5000, // Longer timeout for production  
+                        headers: isProduction ? {
+                            'User-Agent': 'Mozilla/5.0 (compatible; Wavelength-Lore-ImageChecker/1.0)'
+                        } : {}
+                    });
+                    if (imgResponse.status >= 400) {
                             pageResults[category].broken.push({
                                 src,
                                 status: imgResponse.status,
