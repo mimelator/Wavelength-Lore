@@ -6,7 +6,7 @@
 # Sensitive & Security Files
 # ===============================
 .accounts
-.sensitve
+.current-notes.md
 .env
 .env.bak
 
