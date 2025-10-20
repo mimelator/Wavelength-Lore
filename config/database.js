@@ -8,6 +8,7 @@ const firebaseAdminUtils = require('../helpers/firebase-admin-utils');
 const characterHelpers = require('../helpers/character-helpers');
 const loreHelpers = require('../helpers/lore-helpers');
 const episodeHelpers = require('../helpers/episode-helpers');
+const promptHelpers = require('../helpers/prompt-helpers');
 const disambiguationHelpers = require('../helpers/disambiguation-helpers');
 const simpleDisambiguation = require('../helpers/simple-disambiguation');
 
@@ -47,21 +48,24 @@ async function initializeAllCaches(database) {
     characterHelpers.setDatabaseInstance(database);
     loreHelpers.setDatabaseInstance(database);
     episodeHelpers.setDatabaseInstance(database);
-    
+    promptHelpers.setDatabaseInstance(database);
+
     // Initialize caches
     await Promise.all([
       characterHelpers.initializeCharacterCache(),
       loreHelpers.initializeLoreCache(),
-      episodeHelpers.initializeEpisodeCache()
+      episodeHelpers.initializeEpisodeCache(),
+      promptHelpers.initializePromptCache()
     ]);
-    
+
     // Get counts for summary
     const characters = characterHelpers.getAllCharactersSync();
     const lore = loreHelpers.getAllLoreSync();
     const episodes = episodeHelpers.getAllEpisodesSync();
-    
-    console.log(`🗃️  Content loaded: ${characters.length} characters, ${lore.length} lore items, ${episodes.length} episodes`);
-    
+    const prompts = promptHelpers.getAllPromptsSync();
+
+    console.log(`🗃️  Content loaded: ${characters.length} characters, ${lore.length} lore items, ${episodes.length} episodes, ${prompts.length} prompts`);
+
     // Initialize disambiguation helpers with references to other helpers
     disambiguationHelpers.setHelperModules(characterHelpers, loreHelpers, episodeHelpers);
 
