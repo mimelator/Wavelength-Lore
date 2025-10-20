@@ -1,23 +1,24 @@
-# Use a Node.js base image with a supported Debian version
-FROM node:20-bullseye
+# Use a Node.js base image with latest security patches
+FROM node:20-bookworm-slim
 
 # Set the working directory
 WORKDIR /app
+
+# Install Nginx first (separate layer for better caching)
+RUN apt-get update && apt-get install -y nginx gettext-base && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install dependencies with clean install
-RUN npm ci || npm install --no-cache
-
-# Copy the application code
-COPY . .
-
-# Install Nginx
-RUN apt-get update && apt-get install -y nginx gettext-base
+RUN npm ci --only=production || npm install --no-cache --only=production
 
 # Copy Nginx configuration template
 COPY config/nginx.conf.template /etc/nginx/nginx.conf.template
+
+# Copy the application code
+COPY . .
 
 # Expose the ports for Nginx
 EXPOSE 8080

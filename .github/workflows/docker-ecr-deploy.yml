@@ -27,6 +27,9 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            network=host
 
       - name: Build and Push Docker Image
         env:
@@ -42,11 +45,15 @@ jobs:
 
           # Build with buildx and push with multiple tags
           # Using --push flag pushes directly to registry with proper tags
+          # Added cache options and increased timeout settings
           docker buildx build \
             --platform linux/amd64 \
             --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
             --tag $ECR_REGISTRY/$ECR_REPOSITORY:$SHORT_SHA \
+            --cache-from type=registry,ref=$ECR_REGISTRY/$ECR_REPOSITORY:buildcache \
+            --cache-to type=registry,ref=$ECR_REGISTRY/$ECR_REPOSITORY:buildcache,mode=max \
             --push \
+            --progress=plain \
             .
 
           echo "::notice::Successfully pushed images with tags: $IMAGE_TAG, $SHORT_SHA"
