@@ -331,7 +331,17 @@ class GroupAuthentication {
         return defaultGroups;
       }
 
-      const groups = userData.groups || userData.role ? [userData.role] : ['user'];
+      // Get groups with proper fallback logic
+      let groups;
+      if (userData.groups && Array.isArray(userData.groups)) {
+        groups = userData.groups;
+      } else if (userData.role) {
+        groups = [userData.role];
+      } else {
+        groups = ['user'];
+      }
+      
+      console.log(`🔍 User ${uid} groups:`, groups, '(from userData.groups:', userData.groups, ', userData.role:', userData.role, ')');
       
       // Cache the result
       this.userGroupCache.set(cacheKey, {

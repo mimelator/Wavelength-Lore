@@ -15,36 +15,30 @@ admin.initializeApp({
 
 const db = admin.database();
 
-// Define security rules for the forum
+// Define security rules for the forum - Updated to support all necessary fields
 const forumRules = {
     "rules": {
-        // Existing lore data - read only for now
         "lore": {
             ".read": true,
-            ".write": false
+            ".write": "auth != null && auth.token.isScript == true"
         },
         "characters": {
             ".read": true,
-            ".write": false
+            ".write": "auth != null && auth.token.isScript == true"
         },
         "episodes": {
             ".read": true,
-            ".write": false
+            ".write": "auth != null && auth.token.isScript == true"
         },
         "videos": {
             ".read": true,
-            ".write": false
+            ".write": "auth != null && auth.token.isScript == true"
         },
-        
-        // Forum data - allow authenticated users to read and write
         "forum": {
-            // Categories - read only (managed by admin)
             "categories": {
                 ".read": true,
-                ".write": false
+                ".write": "auth != null && auth.token.isScript == true"
             },
-            
-            // Posts - authenticated users can create and read
             "posts": {
                 ".read": true,
                 "$postId": {
@@ -76,11 +70,24 @@ const forumRules = {
                     },
                     "updatedAt": {
                         ".validate": "newData.val() <= now"
+                    },
+                    "likes": {
+                        "$userId": {
+                            ".write": "auth != null && $userId == auth.uid",
+                            ".validate": "newData.val() == true"
+                        }
+                    },
+                    "likeCount": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0"
+                    },
+                    "replyCount": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0"
+                    },
+                    "viewCount": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0"
                     }
                 }
             },
-            
-            // Replies - authenticated users can create and read
             "replies": {
                 ".read": true,
                 "$replyId": {
@@ -100,24 +107,81 @@ const forumRules = {
                     },
                     "createdAt": {
                         ".validate": "newData.val() <= now"
+                    },
+                    "likes": {
+                        "$userId": {
+                            ".write": "auth != null && $userId == auth.uid",
+                            ".validate": "newData.val() == true"
+                        }
+                    },
+                    "likeCount": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0"
                     }
                 }
             },
-            
-            // User data - users can read and write their own data
             "users": {
                 "$userId": {
-                    ".read": "auth != null",
-                    ".write": "auth != null && auth.uid == $userId",
-                    ".validate": "newData.hasChildren(['displayName', 'email', 'joinedAt'])"
+                    ".read": "auth != null && (auth.uid == $userId || auth.token.isScript == true)",
+                    ".write": "auth != null && (auth.uid == $userId || auth.token.isScript == true)",
+                    "displayName": {
+                        ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50"
+                    },
+                    "name": {
+                        ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+                    },
+                    "email": {
+                        ".validate": "newData.isString() && newData.val().matches(/^[^@]+@[^@]+\\.[^@]+$/)"
+                    },
+                    "avatar": {
+                        ".validate": "newData.isString()"
+                    },
+                    "bio": {
+                        ".validate": "newData.isString() && newData.val().length <= 500"
+                    },
+                    "joinedAt": {
+                        ".validate": "newData.val() <= now"
+                    },
+                    "joinDate": {
+                        ".validate": "newData.val() <= now"
+                    },
+                    "lastActive": {
+                        ".validate": "newData.val() <= now"
+                    },
+                    "lastSeen": {
+                        ".validate": "newData.val() <= now"
+                    },
+                    "lastLogin": {
+                        ".validate": "newData.isString()"
+                    },
+                    "groups": {
+                        ".validate": "newData.hasChildren()"
+                    },
+                    "postCount": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0"
+                    },
+                    "replyCount": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0"
+                    },
+                    "updatedAt": {
+                        ".validate": "newData.isString()"
+                    },
+                    "lastUpdatedBy": {
+                        ".validate": "newData.isString()"
+                    }
                 }
             },
-            
-            // Forum settings - read only
             "settings": {
                 ".read": true,
-                ".write": false
+                ".write": "auth != null && auth.token.isScript == true"
+            },
+            "moderation": {
+                ".read": "auth != null && auth.token.isScript == true",
+                ".write": "auth != null && auth.token.isScript == true"
             }
+        },
+        "analytics": {
+            ".read": "auth != null && auth.token.isScript == true",
+            ".write": "auth != null && auth.token.isScript == true"
         }
     }
 };

@@ -7,12 +7,12 @@
 
 const express = require('express');
 const { fetchDataAsAdmin, writeDataAsAdmin, updateDataAsAdmin, deleteDataAsAdmin } = require('../helpers/firebase-admin-utils');
-const { adminAuth } = require('../middleware/adminAuth');
+const { requireGroup } = require('../middleware/groupAuth');
 
 const router = express.Router();
 
-// Apply admin authentication to all routes
-router.use(adminAuth);
+// Apply group-based admin authentication to all routes
+router.use(requireGroup('admin'));
 
 /**
  * GET /api/admin/users
@@ -30,15 +30,40 @@ router.get('/users', async (req, res) => {
     }
 
     // Transform the data into an array with additional metadata
-    const userArray = Object.entries(users).map(([uid, userData]) => ({
-      uid,
-      ...userData,
-      createdAt: userData.createdAt || new Date().toISOString(),
-      lastActive: userData.lastActive || userData.createdAt || new Date().toISOString(),
-      postCount: userData.postCount || 0,
-      isActive: userData.isActive !== false,
-      role: userData.role || 'user'
-    }));
+    const userArray = Object.entries(users).map(([uid, userData]) => {
+      // Determine role based on groups
+      let role = userData.role || 'user';
+      console.log(`🔍 Processing user ${uid}:`, {
+        email: userData.email,
+        groups: userData.groups,
+        originalRole: userData.role
+      });
+      
+      if (userData.groups) {
+        if (userData.groups.includes('super_admin')) {
+          role = 'super_admin';
+          console.log(`👑 User ${uid} assigned super_admin role`);
+        } else if (userData.groups.includes('admin')) {
+          role = 'admin';
+          console.log(`👑 User ${uid} assigned admin role`);
+        } else if (userData.groups.includes('moderator')) {
+          role = 'moderator';
+          console.log(`🛡️ User ${uid} assigned moderator role`);
+        }
+      } else {
+        console.log(`👤 User ${uid} has no groups, defaulting to user role`);
+      }
+      
+      return {
+        uid,
+        ...userData,
+        createdAt: userData.createdAt || new Date().toISOString(),
+        lastActive: userData.lastActive || userData.createdAt || new Date().toISOString(),
+        postCount: userData.postCount || 0,
+        isActive: userData.isActive !== false,
+        role: role
+      };
+    });
 
     // Sort by creation date (newest first)
     userArray.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));

@@ -17,6 +17,9 @@ const { createSmartRateLimit, admin: adminRateLimit } = require('./middleware/ra
 // Import input sanitization middleware
 const InputSanitizer = require('./middleware/inputSanitization');
 
+// Import group authentication middleware
+const { GroupAuthentication } = require('./middleware/groupAuth');
+
 // Import secure backup system
 const SecureDatabaseBackup = require('./utils/secureBackup');
 
@@ -126,6 +129,9 @@ simpleDisambiguation.setHelperInstances(characterHelpers, loreHelpers, episodeHe
   }
 })();
 
+// Initialize group authentication
+const groupAuth = new GroupAuthentication();
+
 // Generate a custom version number
 const version = `v${Date.now()}`;
 
@@ -138,6 +144,45 @@ app.set('views', path.join(__dirname, 'views'));
 // Body parser middleware for JSON requests
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// CORS middleware for Firebase authentication
+app.use((req, res, next) => {
+  // Allow requests from Firebase OAuth redirects and localhost
+  const allowedOrigins = [
+    'http://localhost:3001',
+    `https://${process.env.AUTH_DOMAIN}`,
+    'https://accounts.google.com',
+    'https://www.googleapis.com',
+    'https://firebase.googleapis.com',
+    'https://www.gstatic.com',
+    'https://identitytoolkit.googleapis.com',
+    'https://securetoken.googleapis.com'
+  ].filter(origin => origin !== 'https://undefined'); // Filter out undefined env vars
+  
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  
+  // Enhanced headers for Firebase compatibility
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Client-Data, X-Client-Version, X-Firebase-AppCheck');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight for 24 hours
+  
+  // Additional headers to prevent CORB issues
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  res.setHeader('Referrer-Policy', 'no-referrer-when-downgrade');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
+  next();
+});
 
 // Apply rate limiting middleware
 app.use(createSmartRateLimit());
@@ -162,6 +207,10 @@ app.use('/api/admin/backup', adminAuthStrict, adminRateLimit, adminBackupRoutes)
 const adminApiRoutes = require('./routes/adminApi');
 app.use('/api/admin', adminRateLimit, adminApiRoutes);
 
+// Import and use user API routes
+const userApiRoutes = require('./routes/userApi');
+app.use('/api/user', userApiRoutes);
+
 // Import and use group management API routes with authentication and rate limiting
 const groupApiRoutes = require('./routes/groupApi');
 app.use('/api/groups', adminRateLimit, groupApiRoutes);
@@ -175,7 +224,16 @@ app.use('/static', express.static(path.join(__dirname, 'static')));
 // Map clean URLs to static files (for YAML path compatibility)
 app.use('/images', express.static(path.join(__dirname, 'static/images')));
 app.use('/css', express.static(path.join(__dirname, 'static/css')));
-app.use('/js', express.static(path.join(__dirname, 'static/js')));
+
+// Special handling for JavaScript files to prevent CORB issues
+app.use('/js', (req, res, next) => {
+  // Set proper headers for JavaScript files to prevent CORB blocking
+  res.setHeader('Content-Type', 'application/javascript');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.join(__dirname, 'static/js')));
+
 app.use('/fonts', express.static(path.join(__dirname, 'static/fonts')));
 app.use('/icons', express.static(path.join(__dirname, 'static/icons')));
 
@@ -232,6 +290,13 @@ app.use(async (req, res, next) => {
 // Import and setup forum routes
 const forumRoutes = require('./routes/forum');
 app.use('/forum', forumRoutes);
+
+// Firebase Debug Route - for debugging authentication issues
+app.get('/firebase-debug', (req, res) => {
+  res.render('firebase-debug', {
+    title: 'Firebase Debug Console'
+  });
+});
 
 // Render the index.ejs file with gallery data
 app.get('/', async (req, res) => {

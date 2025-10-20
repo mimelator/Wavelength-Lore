@@ -13,7 +13,7 @@
     <!-- Firebase SDK - Direct imports for better compatibility -->
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+      import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
       import { getDatabase, ref, push, set, onValue, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
       
       // Initialize Firebase with your existing config
@@ -108,6 +108,8 @@
       window.firebaseDB = database;
       window.firebaseUtils = { 
         signInWithPopup, 
+        signInWithRedirect,
+        getRedirectResult,
         GoogleAuthProvider, 
         signOut, 
         onAuthStateChanged, 

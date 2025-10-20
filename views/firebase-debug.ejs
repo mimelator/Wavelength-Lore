@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Debug - Wavelength Lore</title>
+    <style>
+        body { 
+            font-family: 'Courier New', monospace; 
+            background: #1a1a1a; 
+            color: #00ff00; 
+            padding: 20px; 
+            margin: 0;
+        }
+        .debug-section { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border: 1px solid #333; 
+            background: #0a0a0a;
+        }
+        .error { color: #ff4444; }
+        .success { color: #44ff44; }
+        .warning { color: #ffaa44; }
+        pre { 
+            background: #000; 
+            padding: 10px; 
+            border-left: 3px solid #00ff00;
+            overflow-x: auto;
+        }
+        button {
+            background: #333;
+            color: #00ff00;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #555; }
+    </style>
+</head>
+<body>
+    <h1>🔥 Firebase Authentication Debug Console</h1>
+    
+    <div class="debug-section">
+        <h2>📋 Current Configuration</h2>
+        <pre id="config-display">Loading...</pre>
+    </div>
+    
+    <div class="debug-section">
+        <h2>� Authentication Status</h2>
+        <div id="auth-status">Checking...</div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>�🔧 Loading Status</h2>
+        <div id="loading-status">Initializing...</div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🚨 Error Log</h2>
+        <pre id="error-log">No errors yet...</pre>
+    </div>
+    
+    <div class="debug-section">
+        <h2>⚡ Actions</h2>
+        <button onclick="testSignIn()">Test Sign-In (Redirect)</button>
+        <button onclick="testPopupSignIn()">Test Sign-In (Popup)</button>
+        <button onclick="checkFirebaseStatus()">Check Firebase Status</button>
+        <button onclick="testRedirectResult()">Check Redirect Result</button>
+        <button onclick="checkCurrentUser()">Check Current User</button>
+        <button onclick="checkDomainAuth()">Check Domain Authorization</button>
+        <button onclick="signOutUser()">Sign Out</button>
+        <button onclick="clearErrors()">Clear Errors</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>📝 Debug Log</h2>
+        <pre id="debug-log">Starting debug session...\n</pre>
+    </div>
+
+    <script type="module">
+        const debugLog = document.getElementById('debug-log');
+        const errorLog = document.getElementById('error-log');
+        const loadingStatus = document.getElementById('loading-status');
+        const configDisplay = document.getElementById('config-display');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            debugLog.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            debugLog.scrollTop = debugLog.scrollHeight;
+            
+            if (type === 'error') {
+                errorLog.textContent += `[${timestamp}] ${message}\n`;
+                errorLog.scrollTop = errorLog.scrollHeight;
+            }
+            
+            console.log(`[DEBUG] ${message}`, type);
+        }
+        
+        // Display configuration
+        const firebaseConfig = {
+            apiKey: "<%= process.env.API_KEY %>",
+            authDomain: "<%= process.env.AUTH_DOMAIN %>",
+            databaseURL: "<%= process.env.DATABASE_URL %>",
+            projectId: "<%= process.env.PROJECT_ID %>",
+            storageBucket: "<%= process.env.STORAGE_BUCKET %>",
+            messagingSenderId: "<%= process.env.MESSAGING_SENDER_ID %>",
+            appId: "<%= process.env.APP_ID %>"
+        };
+        
+        configDisplay.textContent = JSON.stringify(firebaseConfig, null, 2);
+        
+        // Test Firebase loading
+        let app, auth, database;
+        
+        log('Starting Firebase initialization...');
+        loadingStatus.innerHTML = '<span class="warning">Loading Firebase SDK...</span>';
+        
+        try {
+            // Step 1: Load Firebase App
+            log('Loading Firebase App module...');
+            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
+            log('Firebase App module loaded successfully', 'success');
+            
+            // Step 2: Load Firebase Auth
+            log('Loading Firebase Auth module...');
+            const authModule = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+            const { 
+                getAuth, 
+                signInWithPopup, 
+                signInWithRedirect,
+                getRedirectResult,
+                GoogleAuthProvider, 
+                signOut, 
+                onAuthStateChanged, 
+                setPersistence, 
+                browserLocalPersistence 
+            } = authModule;
+            log('Firebase Auth module loaded successfully', 'success');
+            
+            // Step 3: Load Firebase Database
+            log('Loading Firebase Database module...');
+            const dbModule = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
+            const { getDatabase, ref, push, set, onValue, query, orderByChild } = dbModule;
+            log('Firebase Database module loaded successfully', 'success');
+            
+            // Step 4: Initialize Firebase
+            log('Initializing Firebase app...');
+            app = initializeApp(firebaseConfig);
+            log('Firebase app initialized successfully', 'success');
+            
+            // Step 5: Initialize Auth
+            log('Initializing Firebase Auth...');
+            auth = getAuth(app);
+            log('Firebase Auth initialized successfully', 'success');
+            
+            // Step 6: Initialize Database
+            log('Initializing Firebase Database...');
+            database = getDatabase(app);
+            log('Firebase Database initialized successfully', 'success');
+            
+            // Step 7: Set Persistence
+            log('Setting Auth persistence...');
+            await setPersistence(auth, browserLocalPersistence);
+            log('Auth persistence set successfully', 'success');
+            
+            // Step 8: Check redirect result
+            log('Checking for redirect result...');
+            const redirectResult = await getRedirectResult(auth);
+            if (redirectResult && redirectResult.user) {
+                log(`Redirect sign-in successful: ${redirectResult.user.email}`, 'success');
+                log(`User ID: ${redirectResult.user.uid}`, 'success');
+                log(`Display Name: ${redirectResult.user.displayName}`, 'success');
+                log(`Photo URL: ${redirectResult.user.photoURL}`, 'success');
+                
+                // Store in localStorage for debugging
+                localStorage.setItem('debug_last_signin', JSON.stringify({
+                    timestamp: new Date().toISOString(),
+                    method: 'redirect',
+                    user: {
+                        uid: redirectResult.user.uid,
+                        email: redirectResult.user.email,
+                        displayName: redirectResult.user.displayName
+                    }
+                }));
+            } else {
+                log('No redirect result found');
+                
+                // Check if there was a previous sign-in attempt
+                const lastSignIn = localStorage.getItem('debug_last_signin');
+                if (lastSignIn) {
+                    log(`Previous sign-in found: ${lastSignIn}`);
+                } else {
+                    log('No previous sign-in attempts recorded');
+                }
+            }
+            
+            // Step 9: Set up auth state listener
+            log('Setting up auth state listener...');
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    log(`🎉 Auth state changed - User authenticated: ${user.email}`, 'success');
+                    log(`User details: ${JSON.stringify({
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName,
+                        emailVerified: user.emailVerified,
+                        isAnonymous: user.isAnonymous
+                    }, null, 2)}`);
+                    loadingStatus.innerHTML = '<span class="success">✅ Firebase ready - User signed in</span>';
+                    
+                    // Update auth container if it exists
+                    const authContainer = document.getElementById('auth-status');
+                    if (authContainer) {
+                        authContainer.innerHTML = `<span class="success">Signed in as: ${user.email}</span>`;
+                    }
+                } else {
+                    log('Auth state changed - No user authenticated');
+                    loadingStatus.innerHTML = '<span class="success">✅ Firebase ready - No user signed in</span>';
+                    
+                    // Update auth container if it exists
+                    const authContainer = document.getElementById('auth-status');
+                    if (authContainer) {
+                        authContainer.innerHTML = '<span class="warning">Not signed in</span>';
+                    }
+                }
+            });
+            
+            // Make available globally
+            window.firebaseAuth = auth;
+            window.firebaseDB = database;
+            window.firebaseUtils = { 
+                signInWithPopup, 
+                signInWithRedirect,
+                getRedirectResult,
+                GoogleAuthProvider, 
+                signOut, 
+                onAuthStateChanged, 
+                setPersistence, 
+                browserLocalPersistence, 
+                ref, 
+                push, 
+                set, 
+                onValue, 
+                query, 
+                orderByChild 
+            };
+            
+            log('Firebase initialization completed successfully!', 'success');
+            
+        } catch (error) {
+            log(`Firebase initialization failed: ${error.message}`, 'error');
+            log(`Error code: ${error.code || 'N/A'}`, 'error');
+            log(`Full error: ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}`, 'error');
+            loadingStatus.innerHTML = '<span class="error">❌ Firebase initialization failed</span>';
+            console.error('Firebase initialization error:', error);
+        }
+        
+        // Global test functions
+        window.testSignIn = async function() {
+            log('🔐 Testing sign-in...');
+            try {
+                if (!window.firebaseAuth || !window.firebaseUtils) {
+                    throw new Error('Firebase not initialized');
+                }
+                
+                const provider = new window.firebaseUtils.GoogleAuthProvider();
+                provider.addScope('profile');
+                provider.addScope('email');
+                
+                log('Creating Google Auth provider...');
+                log(`Current URL before redirect: ${window.location.href}`);
+                log(`Auth domain from config: <%= process.env.AUTH_DOMAIN %>`);
+                log('Attempting sign-in with redirect...');
+                
+                // Store redirect attempt info
+                localStorage.setItem('debug_redirect_attempt', JSON.stringify({
+                    timestamp: new Date().toISOString(),
+                    url: window.location.href,
+                    authDomain: '<%= process.env.AUTH_DOMAIN %>'
+                }));
+                
+                await window.firebaseUtils.signInWithRedirect(window.firebaseAuth, provider);
+                log('Redirect initiated successfully', 'success');
+                
+            } catch (error) {
+                log(`Sign-in failed: ${error.message}`, 'error');
+                log(`Error code: ${error.code || 'N/A'}`, 'error');
+                if (error.code === 'auth/unauthorized-domain') {
+                    log('SOLUTION: Add "localhost:3001" to authorized domains in Firebase Console:', 'warning');
+                    log('1. Go to https://console.firebase.google.com/', 'warning');
+                    log('2. Select your project: wavelength-lore', 'warning');
+                    log('3. Go to Authentication > Settings > Authorized domains', 'warning');
+                    log('4. Add: localhost:3001', 'warning');
+                }
+                console.error('Sign-in error:', error);
+            }
+        };
+        
+        window.testPopupSignIn = async function() {
+            log('🪟 Testing popup sign-in (as fallback)...');
+            try {
+                if (!window.firebaseAuth || !window.firebaseUtils) {
+                    throw new Error('Firebase not initialized');
+                }
+                
+                const provider = new window.firebaseUtils.GoogleAuthProvider();
+                provider.addScope('profile');
+                provider.addScope('email');
+                
+                log('Attempting popup sign-in...');
+                const result = await window.firebaseUtils.signInWithPopup(window.firebaseAuth, provider);
+                
+                if (result && result.user) {
+                    log(`Popup sign-in successful: ${result.user.email}`, 'success');
+                    log(`User ID: ${result.user.uid}`, 'success');
+                } else {
+                    log('Popup sign-in returned no result', 'warning');
+                }
+                
+            } catch (error) {
+                log(`Popup sign-in failed: ${error.message}`, 'error');
+                log(`Error code: ${error.code || 'N/A'}`, 'error');
+                console.error('Popup sign-in error:', error);
+            }
+        };
+        
+        window.checkFirebaseStatus = function() {
+            log('🔍 Checking Firebase status...');
+            
+            if (window.firebaseAuth) {
+                log('Firebase Auth: Available', 'success');
+                log(`Current user: ${window.firebaseAuth.currentUser ? window.firebaseAuth.currentUser.email : 'None'}`);
+            } else {
+                log('Firebase Auth: Not available', 'error');
+            }
+            
+            if (window.firebaseDB) {
+                log('Firebase Database: Available', 'success');
+            } else {
+                log('Firebase Database: Not available', 'error');
+            }
+            
+            if (window.firebaseUtils) {
+                log('Firebase Utils: Available', 'success');
+                log(`Available methods: ${Object.keys(window.firebaseUtils).join(', ')}`);
+            } else {
+                log('Firebase Utils: Not available', 'error');
+            }
+        };
+        
+        window.testRedirectResult = async function() {
+            log('🔄 Testing redirect result...');
+            try {
+                if (!window.firebaseAuth || !window.firebaseUtils) {
+                    throw new Error('Firebase not initialized');
+                }
+                
+                const result = await window.firebaseUtils.getRedirectResult(window.firebaseAuth);
+                if (result && result.user) {
+                    log(`Redirect result found: ${result.user.email}`, 'success');
+                    log(`User details: ${JSON.stringify({
+                        uid: result.user.uid,
+                        email: result.user.email,
+                        displayName: result.user.displayName
+                    }, null, 2)}`);
+                } else {
+                    log('No redirect result found (normal if no recent redirect)');
+                }
+                
+                // Check stored redirect attempt
+                const redirectAttempt = localStorage.getItem('debug_redirect_attempt');
+                if (redirectAttempt) {
+                    log(`Previous redirect attempt: ${redirectAttempt}`);
+                }
+                
+            } catch (error) {
+                log(`Redirect result check failed: ${error.message}`, 'error');
+                console.error('Redirect result error:', error);
+            }
+        };
+        
+        window.checkCurrentUser = function() {
+            log('👤 Checking current user...');
+            try {
+                if (!window.firebaseAuth) {
+                    throw new Error('Firebase Auth not initialized');
+                }
+                
+                const currentUser = window.firebaseAuth.currentUser;
+                if (currentUser) {
+                    log(`Current user found: ${currentUser.email}`, 'success');
+                    log(`User details: ${JSON.stringify({
+                        uid: currentUser.uid,
+                        email: currentUser.email,
+                        displayName: currentUser.displayName,
+                        emailVerified: currentUser.emailVerified,
+                        isAnonymous: currentUser.isAnonymous,
+                        providerData: currentUser.providerData.map(p => ({
+                            providerId: p.providerId,
+                            uid: p.uid,
+                            email: p.email
+                        }))
+                    }, null, 2)}`);
+                } else {
+                    log('No current user found');
+                }
+                
+                // Check persistence
+                log(`Auth persistence: ${window.firebaseAuth.config?.persistence || 'Unknown'}`);
+                
+            } catch (error) {
+                log(`Current user check failed: ${error.message}`, 'error');
+                console.error('Current user error:', error);
+            }
+        };
+        
+        window.signOutUser = async function() {
+            log('🚪 Signing out user...');
+            try {
+                if (!window.firebaseAuth || !window.firebaseUtils) {
+                    throw new Error('Firebase not initialized');
+                }
+                
+                await window.firebaseUtils.signOut(window.firebaseAuth);
+                log('User signed out successfully', 'success');
+                
+                // Clear debug data
+                localStorage.removeItem('debug_last_signin');
+                localStorage.removeItem('debug_redirect_attempt');
+                
+            } catch (error) {
+                log(`Sign out failed: ${error.message}`, 'error');
+                console.error('Sign out error:', error);
+            }
+        };
+        
+        window.checkDomainAuth = async function() {
+            log('🌐 Checking domain authorization...');
+            
+            const currentDomain = window.location.origin;
+            const authDomain = '<%= process.env.AUTH_DOMAIN %>';
+            
+            log(`Current domain: ${currentDomain}`);
+            log(`Auth domain: ${authDomain}`);
+            
+            if (currentDomain.includes('localhost')) {
+                log('🚨 LOCALHOST DETECTED - This might be the issue!', 'warning');
+                log('For Firebase redirect authentication to work on localhost, you need to:', 'warning');
+                log('1. Go to Firebase Console: https://console.firebase.google.com/', 'warning');
+                log('2. Select project: wavelength-lore', 'warning');
+                log('3. Go to Authentication > Settings > Authorized domains', 'warning');
+                log('4. Add: localhost', 'warning');
+                log('5. Also add: localhost:3001 (if not already there)', 'warning');
+                log('', 'info');
+                log('Alternative: Try the popup sign-in method which is more tolerant of localhost', 'info');
+            }
+            
+            // Test if we can reach the auth domain
+            try {
+                log('Testing auth domain connectivity...');
+                const response = await fetch(`https://${authDomain}/.well-known/security/security.txt`, {
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                log('Auth domain is reachable', 'success');
+            } catch (error) {
+                log(`Auth domain test failed: ${error.message}`, 'warning');
+            }
+        };
+        
+        window.clearErrors = function() {
+            errorLog.textContent = 'Errors cleared...\n';
+            log('Error log cleared');
+        };
+        
+        // Catch all unhandled errors
+        window.addEventListener('error', (event) => {
+            log(`Unhandled error: ${event.error?.message || event.message}`, 'error');
+            console.error('Unhandled error:', event.error || event);
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            log(`Unhandled promise rejection: ${event.reason?.message || event.reason}`, 'error');
+            console.error('Unhandled promise rejection:', event.reason);
+        });
+    </script>
+</body>
+</html>

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
     <title><%= title %> - Wavelength Community Forum</title>
     
     <!-- Favicon -->
@@ -16,7 +17,7 @@
     <!-- Firebase SDK - Direct imports for better compatibility -->
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+      import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
       import { getDatabase, ref, push, set, onValue, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
       
       // Initialize Firebase with environment config
@@ -52,19 +53,31 @@
               return timeSinceActivity < this.SESSION_DURATION;
             },
             updateActivity: function() {
+              console.log('📝 Session activity updated');
               localStorage.setItem('wavelength_last_activity', Date.now().toString());
             },
             clearExpiredSession: function() {
+              const lastActivity = localStorage.getItem('wavelength_last_activity');
+              if (!lastActivity) {
+                console.log('📝 No previous session found');
+                return false;
+              }
+              
               if (!this.isSessionValid()) {
+                console.log('📝 Session expired, clearing...');
                 localStorage.removeItem('wavelength_last_activity');
-                auth.signOut();
+                // Don't automatically sign out here - let the auth state listener handle it
                 return true;
               }
+              
+              console.log('📝 Session is still valid');
               return false;
             }
           };
         }
         
+        // Check session validity but don't aggressively clear active users
+        console.log('📝 Checking session on page load...');
         window.sessionManager.clearExpiredSession();
       }).catch((error) => {
         console.error('❌ Failed to set Firebase persistence:', error);
@@ -73,7 +86,22 @@
       // Make Firebase available globally for forum components
       window.firebaseAuth = auth;
       window.firebaseDB = database;
-      window.firebaseUtils = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, ref, push, set, onValue, query, orderByChild };
+      window.firebaseUtils = { 
+        signInWithPopup, 
+        signInWithRedirect,
+        getRedirectResult,
+        GoogleAuthProvider, 
+        signOut, 
+        onAuthStateChanged, 
+        setPersistence, 
+        browserLocalPersistence, 
+        ref, 
+        push, 
+        set, 
+        onValue, 
+        query, 
+        orderByChild 
+      };
       
       console.log('✅ Firebase initialized successfully for forum home');
     </script>

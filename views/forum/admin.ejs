@@ -8,7 +8,9 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="<%= cdnUrl %>/icons/favicon.svg">
     
-    <link rel="stylesheet" href="/css/forum.css">
+    <!-- CSS Imports - Match forum pages -->
+    <link rel="stylesheet" href="<%= cdnUrl %>/css/styles.css">
+    <link rel="stylesheet" href="<%= cdnUrl %>/css/forum.css">
     <style>
         /* Admin Panel Custom Styles - Match main site styling */
         :root {
@@ -139,11 +141,47 @@
             color: white;
             border-color: #333;
         }
+
+        /* Fix for user avatar display issues */
+        .user-avatar, .avatar {
+            border-radius: 50%;
+            object-fit: cover;
+            display: inline-block;
+        }
+
+        /* Ensure navigation styling works in admin */
+        nav .user-info img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        /* Fix admin table display issues */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .admin-table img {
+            max-width: 40px;
+            max-height: 40px;
+            border-radius: 50%;
+        }
+
+        /* Fix container layout */
+        .main-wrapper {
+            min-height: calc(100vh - 80px);
+        }
     </style>
 </head>
 
 <body>
     <%- include('../partials/header') %>
+    
+    <!-- Forum Auth Container for User Avatar -->
+    <div id="forum-auth-container" style="text-align: right; padding: 10px; background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+        <!-- User authentication info will be populated here by forum.js -->
+    </div>
 
     <div class="main-wrapper">
         <div class="container">
@@ -362,11 +400,49 @@
         });
     </script>
 
-    <!-- Firebase Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
-    <script src="/js/firebase-config.js"></script>
+    <!-- Firebase SDK - Use same imports as forum pages -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+      import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+      import { getDatabase, ref, push, set, onValue, query, orderByChild, get } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+      
+      const firebaseConfig = {
+        apiKey: "<%= process.env.API_KEY %>",
+        authDomain: "<%= process.env.AUTH_DOMAIN %>",
+        databaseURL: "<%= process.env.DATABASE_URL %>",
+        projectId: "<%= process.env.PROJECT_ID %>",
+        storageBucket: "<%= process.env.STORAGE_BUCKET %>",
+        messagingSenderId: "<%= process.env.MESSAGING_SENDER_ID %>",
+        appId: "<%= process.env.APP_ID %>"
+      };
+      
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const database = getDatabase(app);
+      
+      // Make Firebase available globally for admin panel
+      window.firebaseAuth = auth;
+      window.firebaseDB = database;
+      window.firebaseUtils = { 
+        signInWithPopup, 
+        signInWithRedirect,
+        getRedirectResult,
+        GoogleAuthProvider, 
+        signOut, 
+        onAuthStateChanged, 
+        setPersistence, 
+        browserLocalPersistence, 
+        ref, 
+        push, 
+        set, 
+        onValue, 
+        query, 
+        orderByChild,
+        get
+      };
+      
+      console.log('✅ Firebase initialized for admin panel');
+    </script>
     <script src="/js/forum.js"></script>
     <script src="/js/admin.js"></script>
     

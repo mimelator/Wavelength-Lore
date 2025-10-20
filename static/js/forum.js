@@ -97,6 +97,43 @@ function initializeForumAuth() {
         return;
     }
 
+    // Enhanced error handling for CORS issues
+    const handleAuthError = (error) => {
+        console.error('Firebase Auth Error:', error);
+        
+        if (error.code === 'auth/operation-not-allowed') {
+            showNotification('Authentication not enabled. Please contact admin.', 'error');
+        } else if (error.code === 'auth/unauthorized-domain') {
+            showNotification('This domain is not authorized for authentication.', 'error');
+        } else if (error.message && error.message.includes('CORS')) {
+            showNotification('Authentication temporarily unavailable. Please try again.', 'error');
+        } else {
+            showNotification('Sign-in failed. Please try again.', 'error');
+        }
+    };
+
+    // Handle redirect result from Google OAuth (for when popup is blocked)
+    window.firebaseUtils.getRedirectResult(window.firebaseAuth)
+        .then((result) => {
+            console.log('Checking redirect result...');
+            if (result && result.user) {
+                console.log('Sign-in via redirect successful:', result.user);
+                // Initialize session tracking after successful sign-in
+                if (window.sessionManager) {
+                    window.sessionManager.updateActivity();
+                }
+                showNotification('Welcome to Wavelength Forum!', 'success');
+            } else {
+                console.log('No redirect result found (user likely did not come from redirect)');
+            }
+        })
+        .catch((error) => {
+            console.error('Redirect result error:', error);
+            if (error.code !== 'auth/no-redirect-result') {
+                handleAuthError(error);
+            }
+        });
+
     // Check for expired sessions before setting up auth listener
     if (window.sessionManager && window.sessionManager.clearExpiredSession()) {
         console.log('Expired session cleared');
@@ -104,15 +141,25 @@ function initializeForumAuth() {
 
     // Listen for auth state changes
     window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
+        console.log('🔄 Auth state changed:', user ? `User: ${user.email}` : 'No user');
+        
         if (user) {
-            // Verify session is still valid when user is detected
-            if (window.sessionManager && !window.sessionManager.isSessionValid()) {
-                console.log('Session expired, signing out user');
-                window.firebaseUtils.signOut(window.firebaseAuth);
-                return;
+            // When user signs in, update session BEFORE checking validity
+            if (window.sessionManager) {
+                console.log('📝 Updating session activity for new sign-in...');
+                window.sessionManager.updateActivity();
             }
+            
+            // Now handle the user sign-in
             handleUserSignIn(user);
         } else {
+            // Only clear session if this wasn't caused by our own session cleanup
+            if (window.forumState.isAuthenticated) {
+                console.log('🔄 User signed out externally');
+                if (window.sessionManager) {
+                    localStorage.removeItem('wavelength_last_activity');
+                }
+            }
             handleUserSignOut();
         }
         updateAuthUI();
@@ -123,27 +170,61 @@ function initializeForumAuth() {
  * Handle user sign in
  */
 function handleUserSignIn(user) {
+    // Process avatar URL to ensure it's accessible
+    let avatarUrl = user.photoURL;
+    
+    console.log('🔍 Processing user sign-in:', {
+        uid: user.uid,
+        name: user.displayName,
+        email: user.email,
+        rawPhotoURL: user.photoURL
+    });
+    
+    // Clean up and validate avatar URL
+    if (avatarUrl) {
+        // Ensure the avatar URL is properly formatted
+        try {
+            new URL(avatarUrl); // Test if it's a valid URL
+            console.log('✅ Valid avatar URL:', avatarUrl);
+        } catch (error) {
+            console.log('❌ Invalid avatar URL, using fallback:', avatarUrl);
+            avatarUrl = '/icons/hero-icon.svg';
+        }
+    } else {
+        console.log('⚠️ No avatar URL provided, using fallback');
+        avatarUrl = '/icons/hero-icon.svg';
+    }
+    
     window.forumState.currentUser = {
         uid: user.uid,
         name: user.displayName || 'Anonymous',
         email: user.email,
-        avatar: user.photoURL || '/icons/hero-icon.svg',
+        avatar: avatarUrl,
         signInTime: Date.now()
     };
     window.forumState.isAuthenticated = true;
     
-    console.log('User signed in:', user.displayName);
+    console.log('✅ User signed in successfully:', {
+        name: user.displayName,
+        avatar: avatarUrl
+    });
     
     // Update session activity for 2-week persistence
     if (window.sessionManager) {
         window.sessionManager.updateActivity();
     }
     
-    // Update user data in database
+    // Update user profile in database
     updateUserProfile(window.forumState.currentUser);
     
     // Start activity tracking
     setupActivityTracking();
+    
+    // Force UI update after a brief delay to ensure DOM is ready
+    setTimeout(() => {
+        console.log('🔄 Forcing auth UI update...');
+        updateAuthUI();
+    }, 100);
 }
 
 /**
@@ -160,17 +241,47 @@ function handleUserSignOut() {
  */
 function updateAuthUI() {
     const authContainer = document.getElementById('forum-auth-container');
-    if (!authContainer) return;
+    console.log('🔄 updateAuthUI called, container found:', !!authContainer);
+    console.log('🔄 Auth state:', window.forumState.isAuthenticated);
+    console.log('🔄 Current user:', window.forumState.currentUser);
+    
+    if (!authContainer) {
+        console.log('❌ No auth container found!');
+        return;
+    }
 
     if (window.forumState.isAuthenticated && window.forumState.currentUser) {
-        authContainer.innerHTML = `
+        // Ensure avatar URL is properly formatted and accessible
+        let avatarUrl = window.forumState.currentUser.avatar;
+        
+        // Debug logging for avatar
+        console.log('🖼️ Avatar URL in updateAuthUI:', avatarUrl);
+        
+        // Ensure we have a fallback avatar
+        if (!avatarUrl || avatarUrl === 'null' || avatarUrl === 'undefined') {
+            avatarUrl = '/icons/hero-icon.svg';
+            console.log('🖼️ Using fallback avatar:', avatarUrl);
+        }
+        
+        const userHTML = `
             <div class="user-info">
-                <img src="${window.forumState.currentUser.avatar}" alt="${window.forumState.currentUser.name}" class="user-avatar">
+                <img src="${avatarUrl}" 
+                     alt="${window.forumState.currentUser.name}" 
+                     class="user-avatar"
+                     crossorigin="anonymous"
+                     referrerpolicy="no-referrer-when-downgrade"
+                     onerror="this.src='/icons/hero-icon.svg'; console.log('🖼️ Avatar failed to load, using fallback:', this.src);"
+                     onload="console.log('🖼️ Avatar loaded successfully:', this.src);">
                 <span class="user-name">${window.forumState.currentUser.name}</span>
                 <button class="auth-btn" onclick="signOutUser()">Sign Out</button>
             </div>
         `;
+        
+        console.log('🔄 Setting auth container HTML to:', userHTML);
+        authContainer.innerHTML = userHTML;
+        
     } else {
+        console.log('🔄 User not authenticated, showing sign-in button');
         authContainer.innerHTML = `
             <button class="auth-btn" onclick="signInWithGoogle()">
                 🔐 Sign In with Google
@@ -183,23 +294,101 @@ function updateAuthUI() {
  * Sign in with Google
  */
 async function signInWithGoogle() {
+    console.log('🔐 signInWithGoogle() called');
+    
     try {
+        if (!window.firebaseAuth || !window.firebaseUtils) {
+            const error = 'Firebase not initialized';
+            console.error('❌', error);
+            showNotification('Authentication system not ready. Please refresh the page.', 'error');
+            return;
+        }
+
         const provider = new window.firebaseUtils.GoogleAuthProvider();
         provider.addScope('profile');
         provider.addScope('email');
         
-        const result = await window.firebaseUtils.signInWithPopup(window.firebaseAuth, provider);
-        console.log('Google sign-in successful:', result.user);
+        // Check if we're in a development environment
+        const isLocalhost = window.location.hostname === 'localhost' || 
+                           window.location.hostname === '127.0.0.1';
         
-        // Initialize session tracking after successful sign-in
-        if (window.sessionManager) {
-            window.sessionManager.updateActivity();
+        console.log('🌍 Starting Google sign-in process...');
+        console.log('🏠 Environment:', isLocalhost ? 'localhost' : 'production');
+        console.log('🔗 Current URL:', window.location.href);
+        console.log('🔧 Provider configured with scopes:', ['profile', 'email']);
+        
+        // Use popup for localhost (since Firebase doesn't allow ports in authorized domains)
+        // Use redirect for production
+        if (isLocalhost) {
+            console.log('🪟 Using popup authentication for localhost (Firebase doesn\'t support ports in authorized domains)...');
+            showNotification('Opening Google sign-in...', 'info');
+            
+            try {
+                console.log('🚀 Calling signInWithPopup...');
+                const authResult = await window.firebaseUtils.signInWithPopup(window.firebaseAuth, provider);
+                console.log('✅ Popup sign-in successful:', authResult.user);
+                
+                if (authResult && authResult.user) {
+                    console.log('🎉 Authentication successful!');
+                    // Initialize session tracking after successful sign-in
+                    if (window.sessionManager) {
+                        window.sessionManager.updateActivity();
+                    }
+                    showNotification('Welcome to Wavelength Forum!', 'success');
+                }
+                return;
+                
+            } catch (popupError) {
+                console.error('❌ Popup sign-in failed:', popupError);
+                console.error('Error code:', popupError.code);
+                console.error('Error message:', popupError.message);
+                
+                if (popupError.code === 'auth/popup-blocked') {
+                    showNotification('Popup was blocked by your browser. Please allow popups for this site and try again.', 'error');
+                } else if (popupError.code === 'auth/popup-closed-by-user') {
+                    showNotification('Sign-in was cancelled.', 'warning');
+                } else {
+                    throw popupError;
+                }
+                return;
+            }
         }
         
-        showNotification('Welcome to Wavelength Forum!', 'success');
+        // For production, use redirect authentication
+        console.log('🔄 Using redirect authentication for production...');
+        showNotification('Redirecting to Google sign-in...', 'info');
+        
+        try {
+            console.log('🚀 Calling signInWithRedirect...');
+            await window.firebaseUtils.signInWithRedirect(window.firebaseAuth, provider);
+            console.log('✅ signInWithRedirect call completed (redirect in progress)');
+            // Note: After redirect, the user will return and initializeForumAuth() will handle the result
+            return;
+        } catch (redirectError) {
+            console.error('❌ signInWithRedirect failed:', redirectError);
+            console.error('Error code:', redirectError.code);
+            console.error('Error message:', redirectError.message);
+            throw redirectError;
+        }
+        
     } catch (error) {
-        console.error('Sign-in error:', error);
-        showNotification('Sign-in failed. Please try again.', 'error');
+        console.error('💥 Sign-in error:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        console.error('Full error object:', error);
+        
+        // Provide specific error messages for common issues
+        if (error.code === 'auth/operation-not-allowed') {
+            showNotification('Google sign-in is not enabled. Please contact support.', 'error');
+        } else if (error.code === 'auth/unauthorized-domain') {
+            showNotification('This domain is not authorized. Please contact support.', 'error');
+        } else if (error.code === 'auth/configuration-not-found') {
+            showNotification('Authentication not configured. Please contact support.', 'error');
+        } else if (error.message && error.message.includes('CORS')) {
+            showNotification('Authentication temporarily unavailable due to browser security. Please try refreshing the page.', 'error');
+        } else {
+            showNotification(`Sign-in failed: ${error.message || 'Unknown error'}. Please try again or contact support.`, 'error');
+        }
     }
 }
 
@@ -239,7 +428,7 @@ async function updateUserProfile(user) {
             role: 'member'
         };
         
-        // Check if user already exists to preserve join date and counts
+        // Check if user already exists to preserve join date, counts, and groups
         window.firebaseUtils.onValue(userRef, (snapshot) => {
             const existingData = snapshot.val();
             if (existingData) {
@@ -247,6 +436,10 @@ async function updateUserProfile(user) {
                 userData.postCount = existingData.postCount || 0;
                 userData.replyCount = existingData.replyCount || 0;
                 userData.role = existingData.role || 'member';
+                // Preserve groups field - CRITICAL for admin access
+                if (existingData.groups) {
+                    userData.groups = existingData.groups;
+                }
             }
             
             window.firebaseUtils.set(userRef, userData);

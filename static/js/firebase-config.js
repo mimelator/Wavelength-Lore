@@ -14,6 +14,8 @@ window.initializeWavelengthFirebase = function(firebaseConfig) {
                 const { 
                     getAuth, 
                     signInWithPopup, 
+                    signInWithRedirect,
+                    getRedirectResult,
                     GoogleAuthProvider, 
                     signOut, 
                     onAuthStateChanged, 
@@ -105,6 +107,8 @@ window.initializeWavelengthFirebase = function(firebaseConfig) {
                     window.firebaseDB = database;
                     window.firebaseUtils = { 
                         signInWithPopup, 
+                        signInWithRedirect,
+                        getRedirectResult,
                         GoogleAuthProvider, 
                         signOut, 
                         onAuthStateChanged, 

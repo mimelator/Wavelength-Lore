@@ -194,9 +194,9 @@ router.get('/user/:userId', (req, res) => {
 });
 
 /**
- * Admin Panel Page - Protected with authentication
+ * Admin Panel Page - Authentication handled client-side
  */
-router.get('/admin', require('../middleware/adminAuth').adminAuth, (req, res) => {
+router.get('/admin', (req, res) => {
     res.render('forum/admin', {
         title: 'Forum Administration',
         cdnUrl: process.env.CDN_URL || '',

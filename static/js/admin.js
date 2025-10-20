@@ -17,12 +17,20 @@ class AdminManager {
      * Initialize admin manager
      */
     async initialize() {
+        console.log('🚀 Initializing admin manager...');
         await this.checkAdminAccess();
+        console.log('🏁 Admin check result:', this.isAdmin);
+        
         if (!this.isAdmin) {
-            this.redirectToForum();
+            // Give time to see console output before redirect
+            console.log('❌ Access denied - waiting 5 seconds before redirect...');
+            setTimeout(() => {
+                this.redirectToForum();
+            }, 5000);
             return;
         }
 
+        console.log('✅ Admin access confirmed, setting up admin interface...');
         this.setupEventListeners();
         await this.loadUsers();
         await this.loadPosts();
@@ -34,59 +42,119 @@ class AdminManager {
      * Now checks for admin key in URL params
      */
     async checkAdminAccess() {
-        // Check if admin key is provided in URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const adminKey = urlParams.get('adminKey');
-        
-        if (adminKey) {
-            // Verify admin key with backend
-            try {
-                const response = await this.makeAuthenticatedRequest('/stats');
-                this.isAdmin = response.success;
-            } catch (error) {
-                console.error('Admin key verification failed:', error);
+        // Check Firebase authentication and group membership via API
+        console.log('🔍 Starting admin access check...');
+        try {
+            // Wait for Firebase auth to initialize
+            if (typeof window.firebaseAuth !== 'undefined') {
+                console.log('✅ Firebase auth object available');
+                const user = window.firebaseAuth.currentUser;
+                console.log('👤 Current user:', user ? user.email : 'none');
+                
+                if (!user) {
+                    console.log('⏳ Waiting for auth state...');
+                    // Wait for auth state to load
+                    await new Promise(resolve => {
+                        window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (authUser) => {
+                            console.log('🔄 Auth state changed:', authUser ? authUser.email : 'none');
+                            resolve(authUser);
+                        });
+                    });
+                }
+                
+                const currentUser = window.firebaseAuth.currentUser;
+                if (currentUser) {
+                    console.log('👤 Authenticated user found:', currentUser.email);
+                    // Get admin status from API
+                    const idToken = await currentUser.getIdToken();
+                    console.log('� Got ID token, checking admin status via API...');
+                    
+                    const response = await fetch('/api/user/admin-status', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${idToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('📊 API response:', data);
+                        this.isAdmin = data.isAdmin;
+                        
+                        if (this.isAdmin) {
+                            console.log('✅ Admin access granted via API. Groups:', data.groups);
+                        } else {
+                            console.log('❌ Admin access denied via API. Groups:', data.groups);
+                        }
+                    } else {
+                        console.log('❌ API request failed:', response.status, response.statusText);
+                        this.isAdmin = false;
+                    }
+                } else {
+                    console.log('❌ No authenticated user found after waiting');
+                    this.isAdmin = false;
+                }
+            } else {
+                console.log('❌ Firebase auth object not available');
                 this.isAdmin = false;
             }
-        } else {
+        } catch (error) {
+            console.error('💥 Admin access check failed:', error);
             this.isAdmin = false;
         }
+        
+        console.log('🏁 Admin check complete. isAdmin:', this.isAdmin);
     }
 
     /**
      * Make authenticated request to admin API
      */
     async makeAuthenticatedRequest(endpoint, options = {}) {
-        // Include admin key from URL if present
-        const urlParams = new URLSearchParams(window.location.search);
-        const adminKey = urlParams.get('adminKey');
-        
-        const url = new URL(this.apiBaseUrl + endpoint, window.location.origin);
-        if (adminKey) {
-            url.searchParams.append('adminKey', adminKey);
+        try {
+            // Get Firebase ID token for authentication
+            const user = window.firebaseAuth.currentUser;
+            if (!user) {
+                throw new Error('User not authenticated');
+            }
+            
+            const idToken = await user.getIdToken();
+            const url = new URL(this.apiBaseUrl + endpoint, window.location.origin);
+            
+            const defaultOptions = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                ...options
+            };
+
+            const response = await fetch(url.toString(), defaultOptions);
+            
+            if (!response.ok) {
+                throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Authenticated request failed:', error);
+            throw error;
         }
-
-        const defaultOptions = {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            ...options
-        };
-
-        const response = await fetch(url.toString(), defaultOptions);
-        
-        if (!response.ok) {
-            throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-        }
-
-        return await response.json();
     }
 
     /**
      * Redirect to forum if not admin
      */
     redirectToForum() {
-        alert('Access denied. Admin privileges required.');
+        console.log('🚫 REDIRECT: Access denied. Admin privileges required.');
+        console.log('📊 Debug summary:');
+        console.log('  - Firebase Auth available:', typeof window.firebaseAuth !== 'undefined');
+        console.log('  - Current user:', window.firebaseAuth?.currentUser?.email || 'none');
+        console.log('  - Is admin:', this.isAdmin);
+        
+        // Show alert and redirect
+        alert('Access denied. Admin privileges required. Check console for details.');
         window.location.href = '/forum';
     }
 
@@ -201,14 +269,23 @@ class AdminManager {
             return;
         }
 
-        tbody.innerHTML = this.users.map(user => `
+        tbody.innerHTML = this.users.map(user => {
+            // Handle avatar URL with fallbacks
+            const avatarUrl = user.avatar || user.photoURL || '/icons/hero-icon.svg';
+            const userName = user.displayName || user.name || 'Unknown';
+            const userEmail = user.email || 'No email';
+            
+            return `
             <tr>
                 <td>
                     <div class="user-info">
-                        <img src="${user.avatar || '/icons/hero-icon.svg'}" alt="${user.displayName || user.name || 'User'}" class="user-avatar-small">
+                        <img src="${avatarUrl}" 
+                             alt="${userName}" 
+                             class="user-avatar-small"
+                             onerror="this.src='/icons/hero-icon.svg'; this.onerror=null;">
                         <div>
-                            <div class="user-name">${this.escapeHtml(user.displayName || user.name || 'Unknown')}</div>
-                            <div class="user-email">${this.escapeHtml(user.email || 'No email')}</div>
+                            <div class="user-name">${this.escapeHtml(userName)}</div>
+                            <div class="user-email">${this.escapeHtml(userEmail)}</div>
                         </div>
                     </div>
                 </td>
@@ -231,7 +308,8 @@ class AdminManager {
                     </div>
                 </td>
             </tr>
-        `).join('');
+            `;
+        }).join('');
     }
 
     /**
@@ -614,6 +692,7 @@ class AdminManager {
      */
     getRoleIcon(role) {
         const icons = {
+            super_admin: '👑',
             admin: '👑',
             moderator: '🛡️',
             user: '👤',
@@ -678,7 +757,21 @@ class AdminManager {
 // Initialize admin manager
 window.adminManager = new AdminManager();
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize when both DOM and Firebase are ready
+document.addEventListener('DOMContentLoaded', async () => {
+    // Wait for Firebase to be available
+    let attempts = 0;
+    while (typeof window.firebaseAuth === 'undefined' && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+    }
+    
+    if (typeof window.firebaseAuth === 'undefined') {
+        console.error('❌ Firebase not loaded after waiting');
+        alert('System initialization failed. Please refresh the page.');
+        return;
+    }
+    
+    console.log('🔥 Firebase ready, initializing admin manager...');
     window.adminManager.initialize();
 });
