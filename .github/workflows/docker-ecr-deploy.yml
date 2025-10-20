@@ -45,13 +45,13 @@ jobs:
 
           # Build with buildx and push with multiple tags
           # Using --push flag pushes directly to registry with proper tags
-          # Added cache options and increased timeout settings
+          # Use GitHub Actions cache instead of registry cache (more reliable)
           docker buildx build \
             --platform linux/amd64 \
             --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
             --tag $ECR_REGISTRY/$ECR_REPOSITORY:$SHORT_SHA \
-            --cache-from type=registry,ref=$ECR_REGISTRY/$ECR_REPOSITORY:buildcache \
-            --cache-to type=registry,ref=$ECR_REGISTRY/$ECR_REPOSITORY:buildcache,mode=max \
+            --cache-from type=gha \
+            --cache-to type=gha,mode=max \
             --push \
             --progress=plain \
             .
