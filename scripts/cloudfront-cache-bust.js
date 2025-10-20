@@ -28,7 +28,22 @@ class CloudFrontCacheBuster {
       console.log('☁️  Creating CloudFront cache invalidation...');
       console.log(`📋 Distribution ID: ${this.distributionId}`);
       console.log(`🎯 Paths: ${paths.join(', ')}`);
-      
+
+      // Check if distribution ID is set
+      if (!this.distributionId || this.distributionId === '') {
+        throw new Error(
+          'CLOUDFRONT_DISTRIBUTION_ID is not set in environment variables.\n' +
+          '  Please add it to your .env file:\n' +
+          '  CLOUDFRONT_DISTRIBUTION_ID=E1234567890ABC\n\n' +
+          '  To find your distribution ID:\n' +
+          '  1. Go to AWS Console → CloudFront\n' +
+          '  2. Find distribution with domain: ' + awsConfig.cloudFront.distributionDomain + '\n' +
+          '  3. Copy the ID (format: E1234567890ABC)\n' +
+          '  4. Add to .env: CLOUDFRONT_DISTRIBUTION_ID=<your-id>\n\n' +
+          '  Or skip CloudFront cache busting: ./bust-cache.sh --local'
+        );
+      }
+
       const command = new CreateInvalidationCommand({
         DistributionId: this.distributionId,
         InvalidationBatch: {
@@ -41,14 +56,14 @@ class CloudFrontCacheBuster {
       });
 
       const response = await this.cloudFrontClient.send(command);
-      
+
       console.log('✅ CloudFront cache invalidation created successfully!');
       console.log(`📋 Invalidation ID: ${response.Invalidation.Id}`);
       console.log(`⏰ Status: ${response.Invalidation.Status}`);
       console.log(`🔗 Distribution: ${this.distributionId}`);
-      
+
       return response;
-      
+
     } catch (error) {
       console.error('❌ Failed to create CloudFront cache invalidation:', error.message);
       throw error;
