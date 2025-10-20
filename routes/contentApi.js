@@ -36,6 +36,9 @@ router.put('/api/content/episode/:contentId', requireGroup('content_manager'), a
             });
         }
 
+        console.log('📝 Updating episode at:', firebasePath);
+        console.log('🎵 Audio URL in request:', data.audio);
+
         // Update in Firebase using Admin SDK
         const success = await updateDataAsAdmin(firebasePath, data);
 

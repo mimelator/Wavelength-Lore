@@ -1014,9 +1014,12 @@
                 formData.lyrics = document.getElementById('lyrics')?.value.trim() || '';
                 // Use new uploaded audio URL if available, otherwise keep existing
                 <% if (typeof contentData !== 'undefined') { %>
-                formData.audio = audioUrl || '<%= contentData.audioUrl || contentData.audio || '' %>';
+                const existingAudio = '<%= contentData.audioUrl || contentData.audio || '' %>';
+                formData.audio = audioUrl || existingAudio;
+                console.log('🎵 Audio URL being saved:', formData.audio, '(uploaded:', audioUrl, ', existing:', existingAudio, ')');
                 <% } else { %>
                 formData.audio = audioUrl || '';
+                console.log('🎵 Audio URL being saved:', formData.audio);
                 <% } %>
                 formData.youtubeLink = document.getElementById('youtubeLink')?.value.trim() || '';
                 formData.carouselImages = getArrayValues('carouselImages');

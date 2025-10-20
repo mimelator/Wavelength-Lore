@@ -75,7 +75,7 @@ router.post('/api/upload/audio', requireGroup('content_manager'), upload.single(
       CacheControl: 'max-age=31536000', // 1 year cache
       Metadata: {
         'original-filename': req.file.originalname,
-        'uploaded-by': req.user.email || 'unknown',
+        'uploaded-by': req.groupAuth?.user?.email || 'unknown',
         'uploaded-at': new Date().toISOString()
       }
     };
