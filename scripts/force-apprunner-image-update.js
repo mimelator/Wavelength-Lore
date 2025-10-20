@@ -50,9 +50,10 @@ async function forceImageUpdate() {
     
     console.log(`   Current Status: ${service.Status}`);
     console.log(`   Current Image: ${service.SourceConfiguration.ImageRepository.ImageIdentifier}`);
-    
-    // Construct the image identifier
-    const ecrRegistry = '170023515523.dkr.ecr.us-east-1.amazonaws.com';
+
+    // Extract registry from current image identifier
+    const currentImageId = service.SourceConfiguration.ImageRepository.ImageIdentifier;
+    const ecrRegistry = currentImageId.split('/')[0];
     const repository = 'wavelength-lore';
     
     let newImageIdentifier;
