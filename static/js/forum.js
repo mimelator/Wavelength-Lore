@@ -437,12 +437,15 @@ async function updateUserProfile(user) {
                 userData.replyCount = existingData.replyCount || 0;
                 userData.role = existingData.role || 'member';
                 // Preserve groups field - CRITICAL for admin access
-                if (existingData.groups) {
-                    userData.groups = existingData.groups;
-                }
+                // ALWAYS preserve groups if they exist, default to empty array if not
+                userData.groups = existingData.groups || [];
+            } else {
+                // New user - initialize with empty groups array
+                userData.groups = [];
             }
-            
-            window.firebaseUtils.set(userRef, userData);
+
+            // Use update() instead of set() to preserve any fields we're not explicitly setting
+            window.firebaseUtils.update(userRef, userData);
         }, { onlyOnce: true });
         
     } catch (error) {
