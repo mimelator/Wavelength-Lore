@@ -39,10 +39,34 @@ main {
     transform: translateY(-2px);
 }
 
-.lore-forum-btn:not(.lore-type-place):not(.lore-type-thing):not(.lore-type-concept):not(.lore-type-idea) {
+.lore-forum-btn.lore-type-nature {
+    background-color: #66BB6A;
+}
+.lore-forum-btn.lore-type-nature:hover {
+    background-color: #4CAF50;
+    transform: translateY(-2px);
+}
+
+.lore-forum-btn.lore-type-artifact {
+    background-color: #FFB74D;
+}
+.lore-forum-btn.lore-type-artifact:hover {
+    background-color: #FFA726;
+    transform: translateY(-2px);
+}
+
+.lore-forum-btn.lore-type-event {
+    background-color: #EF5350;
+}
+.lore-forum-btn.lore-type-event:hover {
+    background-color: #E53935;
+    transform: translateY(-2px);
+}
+
+.lore-forum-btn:not(.lore-type-place):not(.lore-type-thing):not(.lore-type-concept):not(.lore-type-idea):not(.lore-type-nature):not(.lore-type-artifact):not(.lore-type-event) {
     background-color: #5a5a5a;
 }
-.lore-forum-btn:not(.lore-type-place):not(.lore-type-thing):not(.lore-type-concept):not(.lore-type-idea):hover {
+.lore-forum-btn:not(.lore-type-place):not(.lore-type-thing):not(.lore-type-concept):not(.lore-type-idea):not(.lore-type-nature):not(.lore-type-artifact):not(.lore-type-event):hover {
     background-color: #4a4a4a;
     transform: translateY(-2px);
 }
@@ -65,81 +89,7 @@ main {
     line-height: 1.6;
 }
 
-.lore-carousel {
-    margin: 20px 0;
-    position: relative;
-}
-
-.lore-carousel .carousel {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.lore-carousel .carousel-item {
-    display: none;
-    width: 100%;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-.lore-carousel .carousel-item.active {
-    display: block;
-}
-
-.lore-carousel .carousel-item img {
-    width: 100%;
-    height: auto;
-    max-height: 500px;
-    object-fit: contain;
-    display: block;
-    background: #000;
-    cursor: pointer;
-}
-
-/* Carousel Dots */
-.carousel-dots {
-    text-align: center;
-    padding: 15px 0;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 0 0 10px 10px;
-}
-
-.carousel-dots .dot {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    margin: 0 6px;
-    background-color: #bbb;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-}
-
-.carousel-dots .dot:hover {
-    background-color: #717171;
-    transform: scale(1.2);
-}
-
-.carousel-dots .dot.active {
-    background-color: #333;
-    width: 14px;
-    height: 14px;
-    border: 2px solid #007BFF;
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
-}
-
-/* Carousel animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
+/* Lore carousel uses the standard carousel.css styles */
 
 .lore-navigation-top {
     display: flex;
@@ -254,6 +204,18 @@ main {
 
 .type-magic {
     background: linear-gradient(135deg, #9C27B0, #4A148C);
+}
+
+.type-nature {
+    background: linear-gradient(135deg, #66BB6A, #2E7D32);
+}
+
+.type-artifact {
+    background: linear-gradient(135deg, #FFB74D, #E65100);
+}
+
+.type-event {
+    background: linear-gradient(135deg, #EF5350, #C62828);
 }
 
 .type-other {

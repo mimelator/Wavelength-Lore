@@ -572,4 +572,156 @@ router.get('/map', async (req, res) => {
   }
 });
 
+/**
+ * Search page route
+ */
+router.get('/search', async (req, res) => {
+  try {
+    const query = req.query.q || '';
+
+    res.render('search', {
+      title: 'Search Wavelength Lore',
+      pageTitle: query ? `Search results for "${query}"` : 'Search Wavelength Lore',
+      pageDescription: 'Search for characters, lore, and episodes in the Wavelength universe.',
+      searchQuery: query,
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`,
+      req: req
+    });
+  } catch (error) {
+    console.error('Error rendering search page:', error);
+    res.status(500).send('Error loading search page');
+  }
+});
+
+/**
+ * Search API endpoint
+ */
+router.get('/api/search', async (req, res) => {
+  try {
+    const query = (req.query.q || '').toLowerCase().trim();
+    const type = req.query.type || 'all'; // all, characters, lore, episodes
+    const limit = parseInt(req.query.limit) || 50;
+
+    if (!query) {
+      return res.json({
+        success: true,
+        results: {
+          characters: [],
+          lore: [],
+          episodes: []
+        },
+        total: 0
+      });
+    }
+
+    const results = {
+      characters: [],
+      lore: [],
+      episodes: []
+    };
+
+    // Search characters
+    if (type === 'all' || type === 'characters') {
+      const allCharacters = characterHelpers.getAllCharactersSync();
+      const charactersArray = Array.isArray(allCharacters) ? allCharacters : Object.values(allCharacters || {});
+      results.characters = charactersArray
+        .filter(char => {
+          const searchableText = [
+            char.name || '',
+            char.title || '',
+            char.description || '',
+            char.role || '',
+            ...(char.keywords || [])
+          ].join(' ').toLowerCase();
+
+          return searchableText.includes(query);
+        })
+        .map(char => ({
+          type: 'character',
+          id: char.id,
+          title: char.title || char.name,
+          name: char.name,
+          description: char.description ? char.description.substring(0, 200) + '...' : '',
+          image: char.image,
+          url: char.url || `/character/${char.id}`,
+          role: char.role
+        }))
+        .slice(0, limit);
+    }
+
+    // Search lore
+    if (type === 'all' || type === 'lore') {
+      const allLore = loreHelpers.getAllLoreSync();
+      const loreArray = Array.isArray(allLore) ? allLore : Object.values(allLore || {});
+      results.lore = loreArray
+        .filter(loreItem => {
+          const searchableText = [
+            loreItem.name || '',
+            loreItem.title || '',
+            loreItem.description || '',
+            loreItem.type || '',
+            ...(loreItem.keywords || [])
+          ].join(' ').toLowerCase();
+
+          return searchableText.includes(query);
+        })
+        .map(loreItem => ({
+          type: 'lore',
+          id: loreItem.id,
+          title: loreItem.title || loreItem.name,
+          name: loreItem.name,
+          description: loreItem.description ? loreItem.description.substring(0, 200) + '...' : '',
+          image: loreItem.image,
+          url: loreItem.url || `/lore/${loreItem.id}`,
+          loreType: loreItem.type
+        }))
+        .slice(0, limit);
+    }
+
+    // Search episodes
+    if (type === 'all' || type === 'episodes') {
+      const allEpisodes = episodeHelpers.getAllEpisodesSync();
+      const episodesArray = Array.isArray(allEpisodes) ? allEpisodes : Object.values(allEpisodes || {});
+      results.episodes = episodesArray
+        .filter(episode => {
+          const searchableText = [
+            episode.title || '',
+            episode.summary || '',
+            episode.lyrics || '',
+            ...(episode.keywords || [])
+          ].join(' ').toLowerCase();
+
+          return searchableText.includes(query);
+        })
+        .map(episode => ({
+          type: 'episode',
+          id: episode.id,
+          title: episode.title,
+          description: episode.summary ? episode.summary.substring(0, 200) + '...' : '',
+          image: episode.image,
+          url: episode.url || `/season/${episode.season}/episode/${episode.episode}`,
+          season: episode.season,
+          episode: episode.episode
+        }))
+        .slice(0, limit);
+    }
+
+    const total = results.characters.length + results.lore.length + results.episodes.length;
+
+    res.json({
+      success: true,
+      query: query,
+      results: results,
+      total: total
+    });
+  } catch (error) {
+    console.error('Error performing search:', error);
+    res.status(500).json({
+      success: false,
+      error: 'An error occurred while searching'
+    });
+  }
+});
+
 module.exports = router;

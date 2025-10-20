@@ -189,9 +189,9 @@ episodes:
       - pollinators
       - nature
       - beauty
-    youtubeLink: https://youtu.be/PWYOElJnU0I
+    youtubeLink: https://youtu.be/mw5RMTFXHlo
     image: /images/seasons/season1/episodes/episode4/image.webp
-    audio: /images/seasons/season1/episodes/episode4/Daphne_v21.mp3
+    audio: https://df5sj8f594cdx.cloudfront.net/audio/season1/episode4.mp3
     carouselImages:
       - /images/seasons/season1/episodes/episode4/images/concert5-01.webp
       - /images/seasons/season1/episodes/episode4/images/concert5-02.webp
@@ -208,7 +208,7 @@ episodes:
       - /images/seasons/season1/episodes/episode4/images/concert5-18.webp
       - /images/seasons/season1/episodes/episode4/images/concert5-19.webp
     story: 'Wavelength performs a song about the Daphne flower, which is known for its intoxicating fragrance that attracts both pollinators and humans. It explores themes of attraction, desire, and the allure of beauty, many of which King David expresses for Daphne. '
-    lyrics: 'You''re irresistible, You''re irresistible to me  Why do you always leave me Looking for another flower?  For some pollen power?  Why do you always roam the garden Looking for another source of that golden golden pollen? '
+    lyrics: You're irresistible, You're irresistible to me  Why do you always leave me Looking for another flower?  For some pollen power?  Why do you always roam the garden Looking for another source of that golden golden pollen?
   episode5:
     title: Falling
     description: When they make your heart go ah-ah-ah-ah

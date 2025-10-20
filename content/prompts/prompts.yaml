@@ -1,3 +1,52 @@
+- id: daphne-flower
+  title: daphne-flower
+  content: |-
+    A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field.
+
+    a few daphne flowers are scattered around the halfling's settlement.  It seems to be emitting a visible fragrance that is attracting bees and other magical pollinators.  A halfling walks up to a daphne and inhales deeply with a dreamy expression on his face.
+
+    At another group of daphne flowers, a group of halflings are busy investigating and enjoying the intoxicating scent of the daphne blossoms.  There should be little radiant power lines oscillating away from the daphne flowers in all different colors and directions.
+
+    The surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.
+    There is streaming golden light rays cast through the towering oaks
+  category: general
+  keywords:
+    - daphne-flower
+    - flower
+    - plant
+  tags:
+    - outdoor
+    - daphne
+    - plants
+    - golden hour
+  active: true
+  createdAt: '2025-10-20T18:43:14.320Z'
+  updatedAt: '2025-10-20T19:42:12.700Z'
+- id: jewel-singing
+  title: jewel-singing
+  content: |-
+    A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a regal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.  She is singing softly but intently and there are waves of soft energy showing as a neon oscillating glow emanating from her.
+
+    The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.
+
+    She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.
+
+    The surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.
+    There is streaming golden light rays cast through the towering oaks
+  category: character
+  keywords:
+    - jewel
+    - jewel-singing
+    - harp
+    - singing
+  tags:
+    - performance
+    - outdoor
+    - harp
+    - singing
+  active: true
+  createdAt: '2025-10-20T19:52:42.814Z'
+  updatedAt: '2025-10-20T19:58:38.692Z'
 - id: locations-burial-bonfire-at-the-shire
   title: Burial Bonfire At The Shire
   content: |-
@@ -47,7 +96,7 @@
     - shire
   active: true
   createdAt: '2025-10-20T09:39:21.045Z'
-  updatedAt: '2025-10-20T09:39:21.045Z'
+  updatedAt: '2025-10-20T18:32:36.590Z'
 - id: locations-campsite-towards-the-shire
   title: Campsite Towards The Shire
   content: |-
@@ -610,7 +659,7 @@
     - realistic
   active: true
   createdAt: '2025-10-20T09:39:21.048Z'
-  updatedAt: '2025-10-20T09:39:21.048Z'
+  updatedAt: '2025-10-20T18:32:33.468Z'
 - id: wavelength-eloquence
   title: Eloquence
   content: |-

@@ -1,7 +1,7 @@
-place:
+nature:
   - id: daphne-flower
-    title: Daphne (Flower)
-    type: place
+    title: 🌸 Daphne 🌸
+    type: nature
     keywords:
       - sweet
       - floral
@@ -18,59 +18,13 @@ place:
     description: The Daphne flower is renowned for its incredibly fragrant blossoms, which are often described as having a sweet, heady, and sometimes spicy scent. The intensity and specific nuances can vary slightly between species and even individual plants, but generally, you can expect a truly delightful aroma.  Some people say that it has peculiar properties that can captivate people like an enchantment spell.
     image: https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760986251316-43b560650f46c03e.png
     image_gallery:
-      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760986190233-c12896907232363e.png
-      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760986251319-384c2d94bb1cae10.png
+      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760988441604-8c397d464dd02a6d.png
+      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760989393441-07b0d406748b6074.png
       - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760986251316-43b560650f46c03e.png
-  - id: ice-fortress
-    title: Ice Fortress
-    type: place
-    keywords:
-      - ice fortress
-      - fortress
-      - ice castle
-      - frostborne home
-    description: A majestic fortress made of ice, standing tall against the backdrop of a frozen landscape. The Ice Fortress is home to the Frostborne, a community of denizens who welcome all strangers, no matter wealth or looks or race. Here, the beauty of winter is celebrated, and the power of ice magic is harnessed to protect the realm from external threats.
-    image: /images/seasons/season3/episodes/episode6/images/icefortress-fiery-3.webp
-    image_gallery:
-      - /images/seasons/season3/episodes/episode1/images/IceFortress-22.webp
-      - /images/seasons/season3/episodes/episode1/images/IceFortress-20.webp
-      - /images/seasons/season3/episodes/episode4/images/FrozenPeace-16.webp
-      - /images/seasons/season3/episodes/episode4/images/FrozenPeace-12.webp
-      - /images/seasons/season3/episodes/episode5/images/Sneak_Attack-09.webp
-      - /images/seasons/season3/episodes/episode4/images/FrozenPeace-24.webp
-      - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-19.webp
-      - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-15.webp
-  - id: shire-sanctuary
-    title: Shire Sanctuary
-    type: place
-    keywords:
-      - shire sanctuary
-      - sanctuary
-      - healing place
-      - concert venue
-    description: A serene and peaceful sanctuary located in the heart of the Shire. The Shire Sanctuary is a place of healing and tranquility, where the weary can find rest and solace. Surrounded by lush greenery and vibrant flowers, it is tended by the kind-hearted Shire Folk who call this place home.  Occasionally Wavelength will perform impromptu concerts here to lift the spirits of the Shire Folk, as was the case after the Battle for the Shire.
-    image: /images/seasons/season4/episodes/episode8/images/shire-sanctuary-05.webp
-    image_gallery:
-      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.webp
-      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-03.webp
-      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-07.webp
-      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.webp
-      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-08.webp
-  - id: the-shire
-    title: The Shire
-    type: place
-    keywords:
-      - shire
-      - shire folk
-      - homeland
-    description: A quiet realm where peace is abundant, and nature thrives alongside the residents of the Shire who are known as The Shire Folk. The Shire is known for its rolling green hills, crystal-clear streams, and the famous Shire Sanctuary where Wavelength first performed their legendary concerts. The Shire Folk are deeply connected to nature, their fellow Shire Folk community and artisian crafts.  Often times, you will find Lucky, their resident Wise Elder, fishing in local streams.
-    image: /images/seasons/season3/episodes/episode5/images/RebuildTheShire-08.webp
-    image_gallery:
-      - /images/seasons/season3/episodes/episode5/images/RebuildTheShire-12.webp
-      - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-15.webp
-      - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-10.webp
-      - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.webp
-      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-19.webp
+      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760986251319-384c2d94bb1cae10.png
+      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760989393442-5fba7a9094a34495.png
+      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760989393439-30c00f45a891f6a6.png
+      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760986190233-c12896907232363e.png
 villain:
   - id: goblin
     title: Goblins
@@ -193,6 +147,57 @@ thing:
       - /images/seasons/season3/episodes/episode2/images/Ice_Whale-17.webp
       - /images/seasons/season3/episodes/episode2/images/Ice_Whale-18.webp
       - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-01.webp
+place:
+  - id: ice-fortress
+    title: Ice Fortress
+    type: place
+    keywords:
+      - ice fortress
+      - fortress
+      - ice castle
+      - frostborne home
+    description: A majestic fortress made of ice, standing tall against the backdrop of a frozen landscape. The Ice Fortress is home to the Frostborne, a community of denizens who welcome all strangers, no matter wealth or looks or race. Here, the beauty of winter is celebrated, and the power of ice magic is harnessed to protect the realm from external threats.
+    image: /images/seasons/season3/episodes/episode6/images/icefortress-fiery-3.webp
+    image_gallery:
+      - /images/seasons/season3/episodes/episode1/images/IceFortress-22.webp
+      - /images/seasons/season3/episodes/episode1/images/IceFortress-20.webp
+      - /images/seasons/season3/episodes/episode4/images/FrozenPeace-16.webp
+      - /images/seasons/season3/episodes/episode4/images/FrozenPeace-12.webp
+      - /images/seasons/season3/episodes/episode5/images/Sneak_Attack-09.webp
+      - /images/seasons/season3/episodes/episode4/images/FrozenPeace-24.webp
+      - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-19.webp
+      - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-15.webp
+  - id: shire-sanctuary
+    title: Shire Sanctuary
+    type: place
+    keywords:
+      - shire sanctuary
+      - sanctuary
+      - healing place
+      - concert venue
+    description: A serene and peaceful sanctuary located in the heart of the Shire. The Shire Sanctuary is a place of healing and tranquility, where the weary can find rest and solace. Surrounded by lush greenery and vibrant flowers, it is tended by the kind-hearted Shire Folk who call this place home.  Occasionally Wavelength will perform impromptu concerts here to lift the spirits of the Shire Folk, as was the case after the Battle for the Shire.
+    image: /images/seasons/season4/episodes/episode8/images/shire-sanctuary-05.webp
+    image_gallery:
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-03.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-07.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.webp
+      - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-08.webp
+  - id: the-shire
+    title: The Shire
+    type: place
+    keywords:
+      - shire
+      - shire folk
+      - homeland
+    description: A quiet realm where peace is abundant, and nature thrives alongside the residents of the Shire who are known as The Shire Folk. The Shire is known for its rolling green hills, crystal-clear streams, and the famous Shire Sanctuary where Wavelength first performed their legendary concerts. The Shire Folk are deeply connected to nature, their fellow Shire Folk community and artisian crafts.  Often times, you will find Lucky, their resident Wise Elder, fishing in local streams.
+    image: /images/seasons/season3/episodes/episode5/images/RebuildTheShire-08.webp
+    image_gallery:
+      - /images/seasons/season3/episodes/episode5/images/RebuildTheShire-12.webp
+      - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-15.webp
+      - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-10.webp
+      - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.webp
+      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-19.webp
 band:
   - id: wavelength
     title: Wavelength

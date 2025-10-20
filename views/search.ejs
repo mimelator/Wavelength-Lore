@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+    <style>
+        .search-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .search-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .search-box input[type="text"] {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            font-family: 'AnimeAce', Arial, sans-serif;
+        }
+
+        .search-box button {
+            padding: 12px 30px;
+            background-color: #6a4c93;
+            color: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+            font-family: 'AnimeAce', Arial, sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-box button:hover {
+            background-color: #5a3c83;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            background-color: #f0f0f0;
+            border: 2px solid #333;
+            border-radius: 20px;
+            font-family: 'AnimeAce', Arial, sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background-color: #6a4c93;
+            color: white;
+        }
+
+        .filter-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .filter-btn.active:hover {
+            background-color: #5a3c83;
+        }
+
+        .search-results {
+            margin-top: 30px;
+        }
+
+        .results-summary {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .results-section {
+            margin-bottom: 40px;
+        }
+
+        .results-section h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #333;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: white;
+            border: 3px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .result-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .result-card-content {
+            padding: 15px;
+        }
+
+        .result-card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .result-card-type {
+            display: inline-block;
+            padding: 4px 10px;
+            background-color: #6a4c93;
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .result-card-type.character {
+            background-color: #6a4c93;
+        }
+
+        .result-card-type.lore {
+            background-color: #2e7b32;
+        }
+
+        .result-card-type.episode {
+            background-color: #1976d2;
+        }
+
+        .result-card-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .no-results h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 20px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-box button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main>
+        <div class="search-container">
+            <div class="search-header">
+                <h1>Search Wavelength Lore</h1>
+                <p>Find characters, lore, and episodes from the Wavelength universe</p>
+            </div>
+
+            <form class="search-box" id="searchForm">
+                <input
+                    type="text"
+                    id="searchInput"
+                    name="q"
+                    placeholder="Search for characters, lore, or episodes..."
+                    value="<%= searchQuery %>"
+                    autocomplete="off"
+                >
+                <button type="submit">Search</button>
+            </form>
+
+            <div class="search-filters">
+                <button class="filter-btn active" data-type="all">All</button>
+                <button class="filter-btn" data-type="characters">Characters</button>
+                <button class="filter-btn" data-type="lore">Lore</button>
+                <button class="filter-btn" data-type="episodes">Episodes</button>
+            </div>
+
+            <div id="searchResults" class="search-results">
+                <% if (!searchQuery) { %>
+                    <div class="no-results">
+                        <h2>Start your search</h2>
+                        <p>Enter a search term above to find characters, lore, and episodes</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+
+    <script>
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        let currentFilter = 'all';
+        let currentQuery = '<%= searchQuery %>';
+
+        // Handle form submission
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            performSearch();
+        });
+
+        // Handle filter button clicks
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.type;
+
+                if (currentQuery) {
+                    performSearch();
+                }
+            });
+        });
+
+        // Perform search via API
+        async function performSearch() {
+            const query = searchInput.value.trim();
+
+            if (!query) {
+                searchResults.innerHTML = `
+                    <div class="no-results">
+                        <h2>Start your search</h2>
+                        <p>Enter a search term above to find characters, lore, and episodes</p>
+                    </div>
+                `;
+                return;
+            }
+
+            currentQuery = query;
+
+            // Update URL without reloading
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set('q', query);
+            window.history.pushState({}, '', newUrl);
+
+            // Show loading state
+            searchResults.innerHTML = '<div class="loading">Searching...</div>';
+
+            try {
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&type=${currentFilter}`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Search failed');
+                }
+
+                displayResults(data);
+            } catch (error) {
+                console.error('Search error:', error);
+                searchResults.innerHTML = `
+                    <div class="no-results">
+                        <h2>Search Error</h2>
+                        <p>An error occurred while searching. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Display search results
+        function displayResults(data) {
+            const { results, total, query } = data;
+
+            if (total === 0) {
+                searchResults.innerHTML = `
+                    <div class="no-results">
+                        <h2>No results found</h2>
+                        <p>No results found for "${query}". Try different keywords.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `<div class="results-summary">Found ${total} result${total !== 1 ? 's' : ''} for "${query}"</div>`;
+
+            // Display characters
+            if (results.characters && results.characters.length > 0) {
+                html += `
+                    <div class="results-section">
+                        <h2>Characters (${results.characters.length})</h2>
+                        <div class="results-grid">
+                            ${results.characters.map(char => `
+                                <a href="${char.url}" class="result-card">
+                                    <img src="${char.image.startsWith('http') ? char.image : '<%= cdnUrl %>' + char.image}" alt="${char.title}">
+                                    <div class="result-card-content">
+                                        <div class="result-card-type character">Character</div>
+                                        <div class="result-card-title">${char.title}</div>
+                                        <div class="result-card-description">${char.description}</div>
+                                    </div>
+                                </a>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Display lore
+            if (results.lore && results.lore.length > 0) {
+                html += `
+                    <div class="results-section">
+                        <h2>Lore (${results.lore.length})</h2>
+                        <div class="results-grid">
+                            ${results.lore.map(loreItem => `
+                                <a href="${loreItem.url}" class="result-card">
+                                    <img src="${loreItem.image.startsWith('http') ? loreItem.image : '<%= cdnUrl %>' + loreItem.image}" alt="${loreItem.title}">
+                                    <div class="result-card-content">
+                                        <div class="result-card-type lore">${loreItem.loreType || 'Lore'}</div>
+                                        <div class="result-card-title">${loreItem.title}</div>
+                                        <div class="result-card-description">${loreItem.description}</div>
+                                    </div>
+                                </a>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Display episodes
+            if (results.episodes && results.episodes.length > 0) {
+                html += `
+                    <div class="results-section">
+                        <h2>Episodes (${results.episodes.length})</h2>
+                        <div class="results-grid">
+                            ${results.episodes.map(episode => `
+                                <a href="${episode.url}" class="result-card">
+                                    <img src="${episode.image.startsWith('http') ? episode.image : '<%= cdnUrl %>' + episode.image}" alt="${episode.title}">
+                                    <div class="result-card-content">
+                                        <div class="result-card-type episode">Episode</div>
+                                        <div class="result-card-title">${episode.title}</div>
+                                        <div class="result-card-description">${episode.description}</div>
+                                    </div>
+                                </a>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            searchResults.innerHTML = html;
+        }
+
+        // If there's a query in the URL, perform search on page load
+        if (currentQuery) {
+            performSearch();
+        }
+    </script>
+</body>
+</html>
