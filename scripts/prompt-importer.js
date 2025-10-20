@@ -7,7 +7,7 @@
 
 const fs = require('fs').promises;
 const path = require('path');
-const firebaseUtils = require('../helpers/firebase-utils');
+const { writeDataAsAdmin, fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
 
 class PromptImporter {
   constructor() {
@@ -267,7 +267,7 @@ class PromptImporter {
 
         // Check if prompt already exists
         if (!overwrite && !dryRun) {
-          const existing = await firebaseUtils.fetchFromFirebase(`prompts/${prompt.id}`);
+          const existing = await fetchDataAsAdmin(`prompts/${prompt.id}`);
           if (existing) {
             console.log(`⏭️  Skipping ${prompt.id} (already exists)`);
             this.stats.skipped++;
@@ -284,8 +284,8 @@ class PromptImporter {
           console.log(`  Tags: ${prompt.tags.join(', ') || 'none'}`);
           console.log('');
         } else {
-          // Write to Firebase
-          await firebaseUtils.writeToFirebase(`prompts/${prompt.id}`, prompt);
+          // Write to Firebase using Admin SDK
+          await writeDataAsAdmin(`prompts/${prompt.id}`, prompt);
           console.log(`✅ Imported: ${prompt.id} - ${prompt.title}`);
         }
 
@@ -320,10 +320,8 @@ class PromptImporter {
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       console.log(`Source: ${this.promptsDir}\n`);
 
-      // Initialize Firebase
-      if (!options.dryRun) {
-        firebaseUtils.initializeFirebase('prompt-importer');
-      }
+      // Firebase Admin SDK is initialized automatically
+      // No need to explicitly initialize
 
       // Find all markdown files
       console.log('🔍 Scanning for markdown files...');

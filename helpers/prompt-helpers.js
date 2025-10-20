@@ -1,6 +1,7 @@
 // Prompt helper functions for managing AI generation prompts
 const linkingUtils = require('./linking-utils');
 const firebaseUtils = require('./firebase-utils');
+const { fetchDataAsAdmin } = require('./firebase-admin-utils');
 const cacheUtils = require('./cache-utils');
 
 // Create cache manager for prompts
@@ -31,11 +32,8 @@ const fallbackPrompts = [
  */
 async function fetchPromptsFromDatabase() {
   try {
-    if (!firebaseUtils.isFirebaseReady()) {
-      firebaseUtils.initializeFirebase('prompt-helpers');
-    }
-
-    const promptsData = await firebaseUtils.fetchFromFirebase('prompts');
+    // Use Admin SDK to fetch prompts (bypasses security rules)
+    const promptsData = await fetchDataAsAdmin('prompts');
 
     if (promptsData) {
       // Transform database prompts to helper format
