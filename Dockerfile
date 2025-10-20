@@ -35,7 +35,7 @@ echo "=== Container Starting ==="\n\
 echo "Environment: NODE_ENV=${NODE_ENV}"\n\
 echo "Ports: NODE_PORT=${NODE_PORT} NGINX_PORT=${NGINX_PORT} PORT=${PORT}"\n\
 echo "Generating nginx config..."\n\
-envsubst "${NGINX_PORT} ${NODE_PORT}" < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf\n\
+envsubst '"'"'$NGINX_PORT $NODE_PORT'"'"' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf\n\
 echo "Starting Node.js application in background..."\n\
 node index.js &\n\
 NODE_PID=$!\n\
