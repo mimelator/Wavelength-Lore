@@ -363,6 +363,99 @@
             background: #f0f4ff;
             transform: translateX(5px);
         }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-header h2 {
+            font-family: 'AnimeAce', Arial, sans-serif;
+            color: #667eea;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .prompt-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            padding: 6px 10px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-view {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #138496;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-edit:hover {
+            background: #e0a800;
+        }
     </style>
 </head>
 <body>
@@ -562,7 +655,12 @@
 
                 <!-- Linked Prompts List -->
                 <div id="linkedPromptsContainer">
-                    <div class="form-label">Linked Prompts</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div class="form-label">Linked Prompts</div>
+                        <button type="button" class="btn btn-success btn-small" onclick="showCreatePromptModal()">
+                            ➕ Create New Prompt
+                        </button>
+                    </div>
                     <div id="linkedPromptsList" style="margin-bottom: 20px;">
                         <div class="no-prompts" style="padding: 20px; text-align: center; background: #f8f9fa; border-radius: 8px; color: #999;">
                             Loading prompts...
@@ -572,7 +670,7 @@
 
                 <!-- Add New Prompt -->
                 <div class="form-group">
-                    <label class="form-label">Add Prompt</label>
+                    <label class="form-label">Add Existing Prompt</label>
                     <div style="display: flex; gap: 10px;">
                         <input type="text" id="promptSearch" class="form-input"
                                placeholder="Search prompts by title, keywords, or tags..."
@@ -583,6 +681,86 @@
                 </div>
             </div>
         </form>
+    </div>
+
+    <!-- Prompt Create/Edit Modal -->
+    <div id="promptModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="promptModalTitle">Create New Prompt</h2>
+                <button class="modal-close" onclick="closePromptModal()">&times;</button>
+            </div>
+            <form id="promptForm">
+                <input type="hidden" id="promptId" name="id">
+                
+                <div class="form-group">
+                    <label class="form-label" for="promptTitle">Title *</label>
+                    <input type="text" id="promptTitle" name="title" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="promptContent">Prompt Content *</label>
+                    <textarea id="promptContent" name="content" class="form-textarea large" rows="8" required
+                              placeholder="Enter the AI generation prompt text..."></textarea>
+                    <div class="form-hint">The full text prompt for AI image/content generation</div>
+                </div>
+
+                <div class="two-column">
+                    <div class="form-group">
+                        <label class="form-label" for="promptCategory">Category</label>
+                        <select id="promptCategory" name="category" class="form-select">
+                            <option value="general">General</option>
+                            <option value="character">Character</option>
+                            <option value="location">Location</option>
+                            <option value="scene">Scene</option>
+                            <option value="villain">Villain</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="promptKeywords">Keywords</label>
+                        <input type="text" id="promptKeywords" name="keywords" class="form-input"
+                               placeholder="Comma-separated keywords">
+                        <div class="form-hint">e.g., andrew, shire, golden hour</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="promptTags">Tags</label>
+                    <input type="text" id="promptTags" name="tags" class="form-input"
+                           placeholder="Comma-separated tags">
+                    <div class="form-hint">e.g., performance, magical, outdoor</div>
+                </div>
+
+                <div class="form-group" style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
+                    <button type="submit" class="btn btn-primary" id="promptSubmitBtn">
+                        💾 Save Prompt
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closePromptModal()">
+                        Cancel
+                    </button>
+                    <span id="promptSaveStatus" class="save-status"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Prompt View Modal -->
+    <div id="promptViewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="promptViewTitle">Prompt Details</h2>
+                <button class="modal-close" onclick="closePromptViewModal()">&times;</button>
+            </div>
+            <div id="promptViewContent" style="padding: 20px 0;">
+                <!-- Content populated by JavaScript -->
+            </div>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
+                <button type="button" class="btn btn-secondary" onclick="closePromptViewModal()">
+                    Close
+                </button>
+            </div>
+        </div>
     </div>
 
     <%- include('partials/footer') %>
@@ -868,12 +1046,15 @@
         try {
             const response = await fetch('/api/prompts');
             if (response.ok) {
-                allPrompts = await response.json();
+                const result = await response.json();
+                // API returns { success: true, data: [...], count: n }
+                allPrompts = result.data || result || [];
                 console.log('📝 Loaded', allPrompts.length, 'prompts');
                 await loadLinkedPrompts();
             }
         } catch (error) {
             console.error('Error loading prompts:', error);
+            allPrompts = []; // Ensure it's always an array
         }
     }
 
@@ -912,7 +1093,20 @@
                         ${prompt.tags.slice(0, 3).map(tag => `<span class="prompt-tag">${tag}</span>`).join('')}
                     </div>
                 </div>
-                <button type="button" class="btn btn-danger btn-small" onclick="unlinkPrompt('${prompt.id}')">Unlink</button>
+                <div class="prompt-actions">
+                    <button type="button" class="btn-icon btn-view" onclick="viewPrompt('${prompt.id}')" title="View Details">
+                        👁️ View
+                    </button>
+                    <button type="button" class="btn-icon btn-edit" onclick="editPrompt('${prompt.id}')" title="Edit Prompt">
+                        ✏️ Edit
+                    </button>
+                    <button type="button" class="btn btn-danger btn-small" onclick="unlinkPrompt('${prompt.id}')" title="Unlink from this content">
+                        Unlink
+                    </button>
+                    <button type="button" class="btn btn-danger btn-small" onclick="deletePrompt('${prompt.id}')" title="Delete prompt permanently">
+                        🗑️ Delete
+                    </button>
+                </div>
             </div>
         `).join('');
     }
@@ -1026,6 +1220,229 @@
             alert('Error unlinking prompt');
         }
     }
+
+    // Show create prompt modal
+    function showCreatePromptModal() {
+        document.getElementById('promptModalTitle').textContent = 'Create New Prompt';
+        document.getElementById('promptForm').reset();
+        document.getElementById('promptId').value = '';
+        document.getElementById('promptModal').classList.add('active');
+    }
+
+    // Close prompt modal
+    function closePromptModal() {
+        document.getElementById('promptModal').classList.remove('active');
+    }
+
+    // View prompt details
+    async function viewPrompt(promptId) {
+        try {
+            const prompt = allPrompts.find(p => p.id === promptId);
+            if (!prompt) {
+                alert('Prompt not found');
+                return;
+            }
+
+            const viewContent = document.getElementById('promptViewContent');
+            viewContent.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: #667eea; margin-bottom: 10px;">${prompt.title}</h3>
+                    <div style="margin-bottom: 15px;">
+                        <span class="prompt-tag" style="margin-right: 8px;">${prompt.category}</span>
+                        ${prompt.tags.map(tag => `<span class="prompt-tag" style="margin-right: 5px;">${tag}</span>`).join('')}
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <strong style="color: #666;">Prompt Content:</strong>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 8px; white-space: pre-wrap; font-family: monospace; font-size: 13px;">${prompt.content}</div>
+                </div>
+                
+                ${prompt.keywords.length > 0 ? `
+                <div style="margin-bottom: 20px;">
+                    <strong style="color: #666;">Keywords:</strong>
+                    <div style="margin-top: 8px;">${prompt.keywords.map(kw => `<span class="prompt-tag" style="margin-right: 5px;">${kw}</span>`).join('')}</div>
+                </div>
+                ` : ''}
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 20px;">
+                    <div>
+                        <strong style="color: #666;">Linked Characters:</strong>
+                        <div style="margin-top: 5px;">${prompt.linkedCharacters.length > 0 ? prompt.linkedCharacters.join(', ') : '<em style="color: #999;">None</em>'}</div>
+                    </div>
+                    <div>
+                        <strong style="color: #666;">Linked Episodes:</strong>
+                        <div style="margin-top: 5px;">${prompt.linkedEpisodes.length > 0 ? prompt.linkedEpisodes.join(', ') : '<em style="color: #999;">None</em>'}</div>
+                    </div>
+                    <div>
+                        <strong style="color: #666;">Linked Lore:</strong>
+                        <div style="margin-top: 5px;">${prompt.linkedLore.length > 0 ? prompt.linkedLore.join(', ') : '<em style="color: #999;">None</em>'}</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #999;">
+                    <div>ID: ${prompt.id}</div>
+                    <div>Version: ${prompt.version || 1}</div>
+                    ${prompt.createdAt ? `<div>Created: ${new Date(prompt.createdAt).toLocaleString()}</div>` : ''}
+                    ${prompt.updatedAt ? `<div>Updated: ${new Date(prompt.updatedAt).toLocaleString()}</div>` : ''}
+                </div>
+            `;
+
+            document.getElementById('promptViewModal').classList.add('active');
+        } catch (error) {
+            console.error('Error viewing prompt:', error);
+            alert('Error loading prompt details');
+        }
+    }
+
+    // Close view modal
+    function closePromptViewModal() {
+        document.getElementById('promptViewModal').classList.remove('active');
+    }
+
+    // Edit prompt
+    async function editPrompt(promptId) {
+        try {
+            const prompt = allPrompts.find(p => p.id === promptId);
+            if (!prompt) {
+                alert('Prompt not found');
+                return;
+            }
+
+            document.getElementById('promptModalTitle').textContent = 'Edit Prompt';
+            document.getElementById('promptId').value = prompt.id;
+            document.getElementById('promptTitle').value = prompt.title;
+            document.getElementById('promptContent').value = prompt.content;
+            document.getElementById('promptCategory').value = prompt.category || 'general';
+            document.getElementById('promptKeywords').value = prompt.keywords.join(', ');
+            document.getElementById('promptTags').value = prompt.tags.join(', ');
+
+            document.getElementById('promptModal').classList.add('active');
+        } catch (error) {
+            console.error('Error loading prompt for edit:', error);
+            alert('Error loading prompt');
+        }
+    }
+
+    // Delete prompt
+    async function deletePrompt(promptId) {
+        if (!confirm('Are you sure you want to delete this prompt? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const idToken = await window.firebaseAuth.currentUser.getIdToken();
+
+            const response = await fetch(`/api/prompts/${promptId}?hard=true`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${idToken}`
+                }
+            });
+
+            if (response.ok) {
+                console.log('✅ Prompt deleted successfully');
+                await loadPrompts(); // Reload to update UI
+                alert('Prompt deleted successfully');
+            } else {
+                const error = await response.json();
+                alert('Failed to delete prompt: ' + error.message);
+            }
+        } catch (error) {
+            console.error('Error deleting prompt:', error);
+            alert('Error deleting prompt');
+        }
+    }
+
+    // Handle prompt form submission
+    document.getElementById('promptForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const statusEl = document.getElementById('promptSaveStatus');
+        statusEl.className = 'save-status saving';
+        statusEl.textContent = '⏳ Saving...';
+
+        try {
+            const promptId = document.getElementById('promptId').value;
+            const isEdit = promptId !== '';
+
+            const formData = {
+                title: document.getElementById('promptTitle').value.trim(),
+                content: document.getElementById('promptContent').value.trim(),
+                category: document.getElementById('promptCategory').value,
+                keywords: document.getElementById('promptKeywords').value.split(',').map(k => k.trim()).filter(k => k),
+                tags: document.getElementById('promptTags').value.split(',').map(t => t.trim()).filter(t => t)
+            };
+
+            // Generate ID from title if creating new
+            if (!isEdit) {
+                formData.id = formData.title.toLowerCase()
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+
+                // Add current content as linked
+                if (contentType === 'character') {
+                    formData.linkedCharacters = [contentId];
+                    formData.linkedEpisodes = [];
+                    formData.linkedLore = [];
+                } else if (contentType === 'episode') {
+                    formData.linkedCharacters = [];
+                    formData.linkedEpisodes = [contentId];
+                    formData.linkedLore = [];
+                } else if (contentType === 'lore') {
+                    formData.linkedCharacters = [];
+                    formData.linkedEpisodes = [];
+                    formData.linkedLore = [contentId];
+                }
+            }
+
+            const idToken = await window.firebaseAuth.currentUser.getIdToken();
+
+            const url = isEdit ? `/api/prompts/${promptId}` : '/api/prompts';
+            const method = isEdit ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                statusEl.className = 'save-status success';
+                statusEl.textContent = '✅ Saved!';
+
+                setTimeout(() => {
+                    closePromptModal();
+                    loadPrompts(); // Reload prompts
+                }, 1000);
+            } else {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to save prompt');
+            }
+        } catch (error) {
+            console.error('Error saving prompt:', error);
+            statusEl.className = 'save-status error';
+            statusEl.textContent = '❌ Error: ' + error.message;
+        }
+    });
+
+    // Close modals when clicking outside
+    document.getElementById('promptModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closePromptModal();
+        }
+    });
+
+    document.getElementById('promptViewModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closePromptViewModal();
+        }
+    });
 
     // Load prompts when page is ready
     window.addEventListener('DOMContentLoaded', loadPrompts);

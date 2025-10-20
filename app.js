@@ -20,6 +20,7 @@ const contentRoutes = require('./routes/content');
 const adminRoutes = require('./routes/admin');
 const contentEditRoutes = require('./routes/contentEdit');
 const contentApiRoutes = require('./routes/contentApi');
+const promptApiRoutes = require('./routes/promptApi');
 const uploadAudioRoutes = require('./routes/uploadAudio');
 
 // Import secure backup system
@@ -48,6 +49,9 @@ async function createApp() {
 
   // Configure API routes
   configureAPIRoutes(app, adminRateLimit, adminAuthStrict);
+
+  // Mount prompt API routes (protected by authentication)
+  app.use('/api/prompts', promptApiRoutes);
 
   // Mount content API routes (protected by authentication)
   app.use('/', contentApiRoutes);

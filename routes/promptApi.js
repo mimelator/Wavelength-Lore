@@ -495,9 +495,9 @@ router.post('/:id/restore', requireGroup('admin'), async (req, res) => {
 router.post('/:id/link', requireGroup(['admin', 'moderator']), async (req, res) => {
   try {
     const { id } = req.params;
-    const { characters = [], episodes = [], lore = [] } = req.body;
+    const { characters = [], episodes = [], lore = [], contentType, contentId } = req.body;
 
-    console.log('Prompt API: Adding links to prompt', { id, characters, episodes, lore });
+    console.log('Prompt API: Adding links to prompt', { id, characters, episodes, lore, contentType, contentId });
 
     // Check if prompt exists
     const existing = await promptHelpers.getPromptById(id);
@@ -509,12 +509,27 @@ router.post('/:id/link', requireGroup(['admin', 'moderator']), async (req, res) 
       });
     }
 
+    // If contentType and contentId are provided, add to appropriate array
+    let charsToAdd = characters;
+    let episodesToAdd = episodes;
+    let loreToAdd = lore;
+
+    if (contentType && contentId) {
+      if (contentType === 'character') {
+        charsToAdd = [...characters, contentId];
+      } else if (contentType === 'episode') {
+        episodesToAdd = [...episodes, contentId];
+      } else if (contentType === 'lore') {
+        loreToAdd = [...lore, contentId];
+      }
+    }
+
     // Add new links (avoid duplicates)
     const updatedPrompt = {
       ...existing,
-      linkedCharacters: [...new Set([...existing.linkedCharacters, ...characters])],
-      linkedEpisodes: [...new Set([...existing.linkedEpisodes, ...episodes])],
-      linkedLore: [...new Set([...existing.linkedLore, ...lore])],
+      linkedCharacters: [...new Set([...existing.linkedCharacters, ...charsToAdd])],
+      linkedEpisodes: [...new Set([...existing.linkedEpisodes, ...episodesToAdd])],
+      linkedLore: [...new Set([...existing.linkedLore, ...loreToAdd])],
       updatedAt: new Date().toISOString(),
       updatedBy: req.user?.uid || 'system'
     };
@@ -536,6 +551,77 @@ router.post('/:id/link', requireGroup(['admin', 'moderator']), async (req, res) 
     res.status(500).json({
       success: false,
       error: 'Failed to add links',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/prompts/:id/unlink
+ * Remove a single content link (used by edit UI)
+ * Requires: admin or moderator role
+ *
+ * Request body:
+ * {
+ *   contentType: 'character' | 'episode' | 'lore',
+ *   contentId: string
+ * }
+ */
+router.post('/:id/unlink', requireGroup(['admin', 'moderator']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { contentType, contentId } = req.body;
+
+    console.log('Prompt API: Unlinking content from prompt', { id, contentType, contentId });
+
+    if (!contentType || !contentId) {
+      return res.status(400).json({
+        success: false,
+        error: 'contentType and contentId are required'
+      });
+    }
+
+    // Check if prompt exists
+    const existing = await promptHelpers.getPromptById(id);
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        error: 'Prompt not found',
+        id
+      });
+    }
+
+    // Remove link based on content type
+    const updatedPrompt = { ...existing };
+
+    if (contentType === 'character') {
+      updatedPrompt.linkedCharacters = existing.linkedCharacters.filter(c => c !== contentId);
+    } else if (contentType === 'episode') {
+      updatedPrompt.linkedEpisodes = existing.linkedEpisodes.filter(e => e !== contentId);
+    } else if (contentType === 'lore') {
+      updatedPrompt.linkedLore = existing.linkedLore.filter(l => l !== contentId);
+    }
+
+    updatedPrompt.updatedAt = new Date().toISOString();
+    updatedPrompt.updatedBy = req.user?.uid || 'system';
+
+    await writeDataAsAdmin(`prompts/${id}`, updatedPrompt);
+
+    // Clear cache
+    promptHelpers.clearPromptCache();
+
+    res.json({
+      success: true,
+      data: updatedPrompt,
+      message: 'Link removed successfully',
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Prompt API Error unlinking:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to unlink',
       message: error.message
     });
   }
