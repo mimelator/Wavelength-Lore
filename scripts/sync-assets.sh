@@ -25,13 +25,20 @@ else
     echo "Using default AWS credentials for asset sync..."
 fi
 
-# Sync the public directory to the S3 bucket, ignoring '.DS_Store' files
+# Sync the static directory contents to the S3 bucket root, ignoring '.DS_Store' files
+# This uploads css/, images/, js/, icons/, etc. directly to bucket root (not under /static/)
 # Using cp --recursive instead of sync to avoid ListBucket requirement
-aws s3 cp $STATIC_DIR s3://$BUCKET_NAME/static/ --region $AWS_REGION --recursive --exclude ".DS_Store"
+aws s3 cp $STATIC_DIR s3://$BUCKET_NAME/ --region $AWS_REGION --recursive --exclude ".DS_Store"
 
 # Confirm the sync
 if [ $? -eq 0 ]; then
-  echo "Assets successfully synchronized to S3 bucket: $BUCKET_NAME/static/"
+  echo "Assets successfully synchronized to S3 bucket root: $BUCKET_NAME/"
+  echo "Files uploaded:"
+  echo "  - css/ → s3://$BUCKET_NAME/css/"
+  echo "  - images/ → s3://$BUCKET_NAME/images/"
+  echo "  - js/ → s3://$BUCKET_NAME/js/"
+  echo "  - icons/ → s3://$BUCKET_NAME/icons/"
+  echo "  - fonts/ → s3://$BUCKET_NAME/fonts/"
 else
   echo "Failed to synchronize assets to S3 bucket."
 fi

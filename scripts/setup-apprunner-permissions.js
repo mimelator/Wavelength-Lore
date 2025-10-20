@@ -57,7 +57,7 @@ console.log('━━━━━━━━━━━━━━━━━━━━━━�
 console.log('If you have AWS CLI configured with admin access:');
 console.log('');
 console.log('# Save policy to file');
-console.log('cat > apprunner-policy.json << \'EOF\'');
+console.log('cat > aws-policies/apprunner-policy.json << \'EOF\'');
 console.log(JSON.stringify(iamPolicy, null, 2));
 console.log('EOF');
 console.log('');
@@ -65,7 +65,7 @@ console.log('# Attach policy to user');
 console.log('aws iam put-user-policy \\');
 console.log('  --user-name wavelength-lore-app-user \\');
 console.log('  --policy-name AppRunnerEnvironmentUpdate \\');
-console.log('  --policy-document file://apprunner-policy.json');
+console.log('  --policy-document file://aws-policies/apprunner-policy.json');
 console.log('');
 
 console.log('✅ After adding permissions, run:');

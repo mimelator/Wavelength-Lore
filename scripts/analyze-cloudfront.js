@@ -186,9 +186,9 @@ async function analyzeCloudFrontConfig() {
             config: newConfig
         };
 
-        require('fs').writeFileSync('./temp/cloudfront-config-update.json', JSON.stringify(configData, null, 2));
+        require('fs').writeFileSync('./aws-policies/cloudfront-config-update.json', JSON.stringify(configData, null, 2));
         
-        console.log('📁 Configuration saved to: ./temp/cloudfront-config-update.json');
+        console.log('📁 Configuration saved to: ./aws-policies/cloudfront-config-update.json');
         console.log('');
 
         console.log('✅ NEXT STEPS:');
