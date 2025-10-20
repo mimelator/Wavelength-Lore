@@ -88,54 +88,22 @@ jobs:
 
           echo "::notice::Updating App Runner to image: $IMAGE_IDENTIFIER"
 
-          # Get current service configuration including auto-deployments setting
-          SERVICE_INFO=$(aws apprunner describe-service \
+          # Since App Runner is configured with AutoDeploymentsEnabled and uses :latest,
+          # we need to trigger a deployment by updating the service
+          # The key is: App Runner will pull the CURRENT :latest from ECR during deployment
+
+          echo "::notice::Triggering App Runner deployment to pull latest image from ECR"
+          echo "::notice::Target image digest in ECR: $IMAGE_DIGEST"
+
+          # Start deployment operation - this forces App Runner to pull :latest from ECR
+          OPERATION_ID=$(aws apprunner start-deployment \
             --service-arn $APPRUNNER_SERVICE_ARN \
-            --query 'Service.SourceConfiguration' \
-            --output json)
-
-          CURRENT_CONFIG=$(echo "$SERVICE_INFO" | jq -r '.ImageRepository.ImageConfiguration.RuntimeEnvironmentVariables')
-          AUTO_DEPLOY=$(echo "$SERVICE_INFO" | jq -r '.AutoDeploymentsEnabled')
-
-          echo "Current AutoDeploymentsEnabled: $AUTO_DEPLOY"
-
-          # If AutoDeploymentsEnabled is true, App Runner will automatically pull :latest
-          # We need to disable it first to use specific digests
-          if [ "$AUTO_DEPLOY" = "true" ]; then
-            echo "::warning::AutoDeploymentsEnabled is currently true. Disabling to control deployments via workflow."
-          fi
-
-          # Create temporary config file for update
-          cat > /tmp/apprunner-config.json <<CONFIGEOF
-          {
-            "ImageRepository": {
-              "ImageIdentifier": "$IMAGE_IDENTIFIER",
-              "ImageRepositoryType": "ECR",
-              "ImageConfiguration": {
-                "Port": "8080",
-                "RuntimeEnvironmentVariables": $CURRENT_CONFIG
-              }
-            },
-            "AutoDeploymentsEnabled": false
-          }
-          CONFIGEOF
-
-          # DO NOT echo the config file - it contains secrets!
-          echo "✓ Source configuration created with $(echo $CURRENT_CONFIG | jq 'length') environment variables"
-          echo "Image identifier: $IMAGE_IDENTIFIER"
-
-          # Update App Runner service with new image
-          UPDATE_RESULT=$(aws apprunner update-service \
-            --service-arn $APPRUNNER_SERVICE_ARN \
-            --source-configuration file:///tmp/apprunner-config.json \
-            --output json)
-
-          OPERATION_ID=$(echo "$UPDATE_RESULT" | jq -r '.OperationId')
-          NEW_IMAGE=$(echo "$UPDATE_RESULT" | jq -r '.Service.SourceConfiguration.ImageRepository.ImageIdentifier')
+            --query 'OperationId' \
+            --output text)
 
           echo "::notice::App Runner deployment initiated with Operation ID: $OPERATION_ID"
-          echo "::notice::Requested image: $IMAGE_IDENTIFIER"
-          echo "::notice::Service will deploy: $NEW_IMAGE"
+          echo "::notice::App Runner will pull: :latest tag from ECR"
+          echo "::notice::Expected digest: $IMAGE_DIGEST"
           echo "operation_id=$OPERATION_ID" >> $GITHUB_OUTPUT
           echo "image_digest=$IMAGE_DIGEST" >> $GITHUB_OUTPUT
           echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
