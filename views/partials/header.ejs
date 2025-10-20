@@ -21,9 +21,11 @@
       try {
         // Wait for Firebase to be available
         if (window.firebaseAuth && window.firebaseUtils) {
+          console.log('🔥 Firebase available, checking auth state...');
           window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, async (user) => {
             if (user) {
               try {
+                console.log('👤 User authenticated, fetching groups...');
                 // Get ID token to check admin status
                 const idToken = await user.getIdToken();
 
@@ -36,6 +38,7 @@
 
                 if (response.ok) {
                   const data = await response.json();
+                  console.log('✅ User groups loaded:', data.groups);
 
                   // Expose user groups globally
                   window.wavelengthUserGroups = data.groups || [];
@@ -47,24 +50,31 @@
 
                   // Trigger custom event for other scripts to listen to
                   window.dispatchEvent(new CustomEvent('wavelengthUserLoaded', { detail: data }));
+                } else {
+                  console.warn('⚠️ Failed to fetch admin status:', response.status);
                 }
               } catch (error) {
-                console.log('Error checking admin status:', error);
+                console.error('❌ Error checking admin status:', error);
               }
             } else {
               // User not authenticated
+              console.log('👤 No user authenticated');
               window.wavelengthUserGroups = null;
               window.dispatchEvent(new CustomEvent('wavelengthUserLoaded', { detail: null }));
             }
           });
         } else {
           // Firebase not available, try again in a moment
-          setTimeout(checkAdminStatus, 1000);
+          console.log('⏳ Firebase not ready yet, retrying in 500ms...');
+          setTimeout(checkAdminStatus, 500);
         }
       } catch (error) {
-        console.log('Error setting up admin status check:', error);
+        console.error('❌ Error setting up admin status check:', error);
       }
     };
+
+    // Expose function globally so footer can trigger it
+    window.checkAdminStatusNow = checkAdminStatus;
 
     // Start checking when DOM is ready
     if (document.readyState === 'loading') {
