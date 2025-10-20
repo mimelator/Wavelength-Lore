@@ -23,20 +23,46 @@ function initializeFirebaseAdmin() {
       return adminDatabase;
     }
 
-    // Initialize with service account
-    const serviceAccountPath = path.join(__dirname, '../firebaseServiceAccountKey.json');
-    
+    let credential;
+
+    // Check if service account is provided via environment variables (production)
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+      try {
+        const serviceAccountJson = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+        credential = admin.credential.cert(serviceAccountJson);
+        console.log('🔥 Using Firebase service account from environment variable');
+      } catch (parseError) {
+        throw new Error('Failed to parse FIREBASE_SERVICE_ACCOUNT environment variable: ' + parseError.message);
+      }
+    }
+    // Fall back to file-based authentication (local development)
+    else {
+      const serviceAccountPath = path.join(__dirname, '../firebaseServiceAccountKey.json');
+      const fs = require('fs');
+
+      if (!fs.existsSync(serviceAccountPath)) {
+        throw new Error(
+          'Firebase service account not found. Either:\n' +
+          '  1. Add FIREBASE_SERVICE_ACCOUNT environment variable (production), or\n' +
+          '  2. Place firebaseServiceAccountKey.json in project root (local dev)'
+        );
+      }
+
+      credential = admin.credential.cert(serviceAccountPath);
+      console.log('🔥 Using Firebase service account from file');
+    }
+
     adminApp = admin.initializeApp({
-      credential: admin.credential.cert(serviceAccountPath),
+      credential: credential,
       databaseURL: process.env.DATABASE_URL,
       storageBucket: process.env.STORAGE_BUCKET
     }, 'admin');
 
     adminDatabase = adminApp.database();
-    console.log('🔥 Firebase Admin SDK initialized');
+    console.log('✅ Firebase Admin SDK initialized successfully');
     return adminDatabase;
   } catch (error) {
-    console.error('Firebase Admin initialization failed:', error.message);
+    console.error('❌ Firebase Admin initialization failed:', error.message);
     return null;
   }
 }

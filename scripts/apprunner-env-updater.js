@@ -73,14 +73,15 @@ class AppRunnerEnvUpdater {
     const productionVarNames = [
       // Firebase Configuration
       'API_KEY',
-      'AUTH_DOMAIN', 
+      'AUTH_DOMAIN',
       'DATABASE_URL',
       'PROJECT_ID',
       'STORAGE_BUCKET',
       'MESSAGING_SENDER_ID',
       'APP_ID',
       'MEASUREMENT_ID',
-      
+      'FIREBASE_SERVICE_ACCOUNT', // Firebase Admin SDK service account JSON
+
       // AWS Configuration
       'ACCESS_KEY_ID',
       'SECRET_ACCESS_KEY',

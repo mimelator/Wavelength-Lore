@@ -124,6 +124,35 @@ function configureStaticFiles(app) {
  * Configure template locals middleware
  */
 function configureTemplateLocals(app) {
+  // Middleware to add user group information to templates
+  app.use(async (req, res, next) => {
+    // Initialize user group data
+    res.locals.userGroups = [];
+    res.locals.userPermissions = [];
+    res.locals.userActions = [];
+    res.locals.isContentCreator = false;
+
+    // Check if user is authenticated and get their groups
+    if (req.user && req.user.uid) {
+      try {
+        const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
+        const userData = await fetchDataAsAdmin(`forum/users/${req.user.uid}`);
+
+        if (userData && userData.groups) {
+          res.locals.userGroups = userData.groups;
+          // Check if user has content_manager role or higher
+          res.locals.isContentCreator = userData.groups.includes('content_manager') ||
+                                       userData.groups.includes('admin') ||
+                                       userData.groups.includes('super_admin');
+        }
+      } catch (error) {
+        console.error('Error loading user groups:', error);
+      }
+    }
+
+    next();
+  });
+
   // Middleware to add character, lore, and episode helpers to all templates
   app.use(async (req, res, next) => {
     // Character helpers
@@ -131,19 +160,19 @@ function configureTemplateLocals(app) {
     res.locals.characterLink = characterHelpers.generateCharacterLinkSync;
     res.locals.linkifyCharacters = characterHelpers.linkifyCharacterMentionsSync;
     res.locals.allCharacters = characterHelpers.getAllCharactersSync();
-    
+
     // Lore helpers
     res.locals.loreHelpers = loreHelpers;
     res.locals.loreLink = loreHelpers.generateLoreLinkSync;
     res.locals.linkifyLore = loreHelpers.linkifyLoreMentionsSync;
     res.locals.allLore = loreHelpers.getAllLoreSync();
-    
+
     // Episode helpers
     res.locals.episodeHelpers = episodeHelpers;
     res.locals.episodeLink = episodeHelpers.generateEpisodeLinkSync;
     res.locals.linkifyEpisodes = episodeHelpers.linkifyEpisodeMentionsSync;
     res.locals.allEpisodes = episodeHelpers.getAllEpisodesSync();
-    
+
     // Also provide async versions for routes that can use them
     res.locals.characterLinkAsync = characterHelpers.generateCharacterLink;
     res.locals.linkifyCharactersAsync = characterHelpers.linkifyCharacterMentions;
@@ -154,7 +183,7 @@ function configureTemplateLocals(app) {
     res.locals.episodeLinkAsync = episodeHelpers.generateEpisodeLink;
     res.locals.linkifyEpisodesAsync = episodeHelpers.linkifyEpisodeMentions;
     res.locals.getAllEpisodesAsync = episodeHelpers.getAllEpisodes;
-    
+
     // Disambiguation helpers
     res.locals.disambiguationHelpers = disambiguationHelpers;
     res.locals.smartLinking = disambiguationHelpers.applySmartLinking;
@@ -162,7 +191,7 @@ function configureTemplateLocals(app) {
     res.locals.findConflicts = disambiguationHelpers.findConflicts;
     res.locals.disambiguationScript = disambiguationHelpers.getDisambiguationScript();
     res.locals.disambiguationStyles = disambiguationHelpers.getDisambiguationStyles();
-    
+
     // Simple disambiguation (cleaner approach)
     res.locals.simpleSmartLinking = (text) => {
       const currentUrl = req.originalUrl || req.url;
@@ -170,7 +199,7 @@ function configureTemplateLocals(app) {
     };
     res.locals.simpleDisambiguationScript = simpleDisambiguation.getSimpleDisambiguationScript(process.env.CDN_URL);
     res.locals.simpleDisambiguationStyles = simpleDisambiguation.getSimpleDisambiguationStyles();
-    
+
     next();
   });
 }

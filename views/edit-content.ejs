@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+    <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css">
+    <style>
+        .edit-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .edit-header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .edit-header h1 {
+            font-family: 'AnimeAce', Arial, sans-serif;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .edit-header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-type-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: 'AnimeAce', Arial, sans-serif;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .content-type-badge.episode {
+            background: linear-gradient(135deg, #4a47a3, #6a67d3);
+            color: white;
+        }
+
+        .content-type-badge.character {
+            background: linear-gradient(135deg, #6a4c93, #8a6cb3);
+            color: white;
+        }
+
+        .content-type-badge.lore {
+            background: linear-gradient(135deg, #3498db, #5dade2);
+            color: white;
+        }
+
+        .content-info {
+            margin-bottom: 30px;
+        }
+
+        .content-info h2 {
+            font-family: 'AnimeAce', Arial, sans-serif;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            font-weight: bold;
+            min-width: 120px;
+            color: #667eea;
+            font-family: 'AnimeAce', Arial, sans-serif;
+        }
+
+        .info-value {
+            color: #555;
+            flex: 1;
+        }
+
+        .placeholder-message {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .placeholder-message h3 {
+            font-family: 'AnimeAce', Arial, sans-serif;
+            margin-bottom: 15px;
+            font-size: 1.6em;
+        }
+
+        .placeholder-message p {
+            font-size: 1.1em;
+            margin: 10px 0;
+            opacity: 0.95;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 10px;
+            border: 2px solid #333;
+            font-family: 'AnimeAce', Arial, sans-serif;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-list {
+            background: #fff3cd;
+            border: 2px dashed #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-list h4 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-family: 'AnimeAce', Arial, sans-serif;
+        }
+
+        .feature-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            color: #856404;
+        }
+
+        .feature-list li:before {
+            content: "🎯 ";
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <div class="edit-container">
+        <div class="edit-header">
+            <h1>✏️ Content Editor</h1>
+            <p>Prompt Management & Content Editing</p>
+        </div>
+
+        <div class="content-card">
+            <span class="content-type-badge <%= contentType %>">
+                <%= contentType.toUpperCase() %>
+            </span>
+
+            <div class="content-info">
+                <h2><%= contentTitle %></h2>
+
+                <% if (contentType === 'episode') { %>
+                <div class="info-row">
+                    <span class="info-label">Season:</span>
+                    <span class="info-value"><%= seasonNumber %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Episode:</span>
+                    <span class="info-value"><%= episodeNumber %></span>
+                </div>
+                <% } %>
+
+                <div class="info-row">
+                    <span class="info-label">ID:</span>
+                    <span class="info-value"><%= contentId %></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Edit Mode:</span>
+                    <span class="info-value">Prompt Management</span>
+                </div>
+            </div>
+
+            <div class="placeholder-message">
+                <h3>🚧 Under Construction</h3>
+                <p>The content editing interface is currently being developed.</p>
+                <p>This page will soon provide:</p>
+
+                <div class="feature-list">
+                    <h4>Planned Features:</h4>
+                    <ul>
+                        <li>Link and manage AI generation prompts</li>
+                        <li>Associate prompts with characters, lore, and episodes</li>
+                        <li>Preview and test prompts</li>
+                        <li>Version control for prompt changes</li>
+                        <li>Quick access to related content</li>
+                    </ul>
+                </div>
+
+                <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
+                    Thank you for your patience as we build this feature!
+                </p>
+            </div>
+
+            <div class="action-buttons">
+                <a href="<%= backUrl %>" class="btn btn-secondary">
+                    ← Back to <%= contentType.charAt(0).toUpperCase() + contentType.slice(1) %>
+                </a>
+                <a href="/" class="btn btn-primary">
+                    Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <!-- Client-side permission check -->
+    <script>
+    let permissionVerified = false;
+
+    function checkPagePermission() {
+        const userGroups = window.wavelengthUserGroups;
+
+        if (userGroups && Array.isArray(userGroups)) {
+            const hasPermission = userGroups.includes('content_manager') ||
+                                userGroups.includes('admin') ||
+                                userGroups.includes('super_admin');
+
+            if (hasPermission) {
+                permissionVerified = true;
+            } else {
+                alert('Access denied. You need content_manager role or higher.');
+                window.location.href = '<%= backUrl %>';
+            }
+        }
+    }
+
+    // Listen for user authentication
+    window.addEventListener('wavelengthUserLoaded', checkPagePermission);
+
+    // Fallback: redirect if permission not verified after 3 seconds
+    setTimeout(() => {
+        if (!permissionVerified) {
+            alert('Please sign in via the Forum to access this page.');
+            window.location.href = '/forum';
+        }
+    }, 3000);
+    </script>
+</body>
+</html>

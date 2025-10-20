@@ -12,7 +12,10 @@
 </header>
 <script>
   // Show admin link if user is authenticated as admin
+  // Also expose user groups globally for content edit links
   if (typeof window !== 'undefined') {
+    window.wavelengthUserGroups = null; // Will be populated if user is authenticated
+
     // Check for Firebase authentication state
     const checkAdminStatus = async () => {
       try {
@@ -23,23 +26,35 @@
               try {
                 // Get ID token to check admin status
                 const idToken = await user.getIdToken();
-                
+
                 // Check admin status via API
                 const response = await fetch('/api/user/admin-status', {
                   headers: {
                     'Authorization': `Bearer ${idToken}`
                   }
                 });
-                
+
                 if (response.ok) {
                   const data = await response.json();
+
+                  // Expose user groups globally
+                  window.wavelengthUserGroups = data.groups || [];
+
+                  // Show admin link if user is admin
                   if (data.isAdmin) {
                     document.getElementById('admin-nav-item').style.display = 'block';
                   }
+
+                  // Trigger custom event for other scripts to listen to
+                  window.dispatchEvent(new CustomEvent('wavelengthUserLoaded', { detail: data }));
                 }
               } catch (error) {
                 console.log('Error checking admin status:', error);
               }
+            } else {
+              // User not authenticated
+              window.wavelengthUserGroups = null;
+              window.dispatchEvent(new CustomEvent('wavelengthUserLoaded', { detail: null }));
             }
           });
         } else {
@@ -58,8 +73,7 @@
       checkAdminStatus();
     }
   }
-</script>
-<style>
+</script><style>
   header {
     background-color: #333;
     color: #fff;

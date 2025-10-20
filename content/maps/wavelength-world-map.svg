@@ -701,9 +701,9 @@
            S 262,378 267,340 Z" />
 
   <!-- Mountain range between Shire and Eastern Expanse -->
-    <!-- The Shire settlement with mystical hobbit architecture -->
+    <!-- The Shire settlement with mystical shire folk architecture -->
 
-  <!-- The Shire settlement with mystical hobbit architecture -->
+  <!-- The Shire settlement with mystical shire folk architecture -->
   <g id="shire-village">
     <!-- Subtle ley line convergence -->
     <circle cx="336" cy="372" r="10" fill="none" stroke="#7cb342" stroke-width="1" 
