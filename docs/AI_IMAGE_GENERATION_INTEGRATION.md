@@ -113,7 +113,7 @@ Add generated images to content gallery.
 
 Uses existing `.env` configuration:
 ```properties
-GEMINI_API_KEY=AIzaSyAn-APRlT9H8rr4ocM2J1G6BR2e25CXlJY
+GEMINI_API_KEY=<GEMINI_API_KEY>
 AI_MODEL_KEY=gemini-2.5-flash-image
 AI_PROVIDER=google-genai
 ```

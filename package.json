@@ -9,7 +9,12 @@
     "dev": "nodemon index.js",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:live": "jest tests/live-integration.test.js"
+    "test:live": "jest tests/live-integration.test.js",
+    "export:yaml": "node scripts/export-firebase-to-yaml.js",
+    "export:seasons": "node scripts/export-firebase-to-yaml.js --type=seasons",
+    "export:characters": "node scripts/export-firebase-to-yaml.js --type=characters",
+    "export:lore": "node scripts/export-firebase-to-yaml.js --type=lore",
+    "export:prompts": "node scripts/export-firebase-to-yaml.js --type=prompts"
   },
   "keywords": [],
   "author": "",
