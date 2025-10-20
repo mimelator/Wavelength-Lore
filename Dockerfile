@@ -29,14 +29,21 @@ ENV NODE_PORT=3001
 ENV NGINX_PORT=8080
 ENV NODE_ENV=production
 
-# Start Nginx and your Node.js app
-CMD ["sh", "-c", "echo '=== Container Starting ===' && \
-echo 'Environment: NODE_ENV=${NODE_ENV}' && \
-echo 'Ports: NODE_PORT=${NODE_PORT} NGINX_PORT=${NGINX_PORT} PORT=${PORT}' && \
-echo 'Generating nginx config...' && \
-envsubst '${NGINX_PORT} ${NODE_PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && \
-echo 'Starting Nginx...' && \
-nginx && \
-echo 'Nginx started successfully' && \
-echo 'Starting Node.js application...' && \
-node index.js"]
+# Create startup script that starts Node.js in background, then Nginx in foreground
+RUN echo '#!/bin/sh\n\
+echo "=== Container Starting ==="\n\
+echo "Environment: NODE_ENV=${NODE_ENV}"\n\
+echo "Ports: NODE_PORT=${NODE_PORT} NGINX_PORT=${NGINX_PORT} PORT=${PORT}"\n\
+echo "Generating nginx config..."\n\
+envsubst "${NGINX_PORT} ${NODE_PORT}" < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf\n\
+echo "Starting Node.js application in background..."\n\
+node index.js &\n\
+NODE_PID=$!\n\
+echo "Node.js started with PID: $NODE_PID"\n\
+echo "Waiting 3 seconds for Node.js to be ready..."\n\
+sleep 3\n\
+echo "Starting Nginx..."\n\
+nginx -g "daemon off;"\n\
+' > /app/start.sh && chmod +x /app/start.sh
+
+CMD ["/app/start.sh"]
