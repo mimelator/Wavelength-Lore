@@ -41,6 +41,12 @@ function configureMiddleware(app) {
   // Set the views directory
   app.set('views', path.join(__dirname, '../views'));
 
+  // Disable view caching in development for immediate template updates
+  if (process.env.NODE_ENV !== 'production') {
+    app.set('view cache', false);
+    console.log('📝 View caching disabled for development');
+  }
+
   // Body parser middleware for JSON requests
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
