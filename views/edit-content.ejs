@@ -3,6 +3,7 @@
 <head>
     <%- include('partials/head') %>
     <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css">
+    <link rel="stylesheet" href="/css/lightbox.css">
     <style>
         body {
             background: #f5f7fa;
@@ -194,8 +195,15 @@
             align-items: center;
         }
 
-        .array-list-item input {
+        .array-list-item input[type="text"] {
             flex: 1;
+        }
+
+        .array-list-item input[type="checkbox"] {
+            flex: 0 0 auto;
+            width: 20px;
+            height: 20px;
+            margin: 0;
         }
 
         .image-preview {
@@ -461,6 +469,13 @@
 <body>
     <%- include('partials/header') %>
 
+    <!-- Lightbox for image viewing -->
+    <div id="imageLightbox" class="lightbox" onclick="closeLightbox(event)">
+        <div class="lightbox-close" onclick="closeLightbox(event)">×</div>
+        <img id="lightboxImage" class="lightbox-image" alt="Enlarged view">
+        <div id="lightboxInfo" class="lightbox-info"></div>
+    </div>
+
     <div class="edit-container">
         <div class="edit-header">
             <h1>
@@ -554,15 +569,16 @@
                         <input type="text" id="image" name="image" class="form-input"
                                value="<%= contentData.image || '' %>"
                                onchange="updateMainImagePreview()">
-                        <div class="form-hint">URL to the main banner/profile image</div>
+                        <div class="form-hint">URL to the main banner/profile image • Click image to view full size</div>
                         <% if (contentData.image) { %>
                         <img src="<%= contentData.image %>"
                              alt="Main image preview"
                              class="image-preview-large"
                              id="mainImagePreview"
+                             onclick="openLightbox(this.src, 'Main Image')"
                              onerror="this.style.display='none'">
                         <% } else { %>
-                        <img id="mainImagePreview" class="image-preview-large" style="display: none;">
+                        <img id="mainImagePreview" class="image-preview-large" style="display: none;" onclick="openLightbox(this.src, 'Main Image')">
                         <% } %>
                     </div>
 
@@ -624,16 +640,28 @@
 
                 <% if (contentType === 'character' || contentType === 'lore') { %>
                 <div class="form-group">
-                    <label class="form-label">Image Gallery</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label class="form-label" style="margin-bottom: 0;">Image Gallery</label>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="button" class="btn btn-small" style="background: #667eea; color: white;" onclick="selectAllGalleryImages()">
+                                ☑️ Select All
+                            </button>
+                            <button type="button" class="btn btn-small" style="background: #17a2b8; color: white;" onclick="downloadSelectedImages()" id="downloadBtn">
+                                📥 Download Selected (<span id="selectedCount">0</span>)
+                            </button>
+                        </div>
+                    </div>
                     <div id="imageGalleryContainer">
                         <% if (contentData.image_gallery && Array.isArray(contentData.image_gallery)) { %>
                             <% contentData.image_gallery.forEach((img, index) => { %>
                                 <div class="array-list-item">
+                                    <input type="checkbox" class="gallery-checkbox" data-image-url="<%= img %>" onchange="updateSelectedCount()" style="width: 20px; height: 20px; cursor: pointer;">
                                     <img src="<%= img %>"
                                          alt="Gallery image <%= index + 1 %>"
                                          class="image-preview"
+                                         onclick="openLightbox('<%= img %>', 'Gallery Image <%= index + 1 %>')"
                                          onerror="this.className='no-image'; this.alt='Failed to load';"
-                                         title="Click to zoom">
+                                         title="Click to view full size">
                                     <input type="text" class="form-input" value="<%= img %>" data-array="image_gallery" onchange="updateImagePreview(this)">
                                     <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
                                 </div>
@@ -641,7 +669,7 @@
                         <% } %>
                     </div>
                     <button type="button" class="btn btn-success btn-small" onclick="addImageGalleryItem()">+ Add Image</button>
-                    <div class="form-hint">URLs to gallery images (hover to zoom)</div>
+                    <div class="form-hint">URLs to gallery images • Click images to view full size • Select and download multiple images</div>
                 </div>
                 <% } %>
             </div>
@@ -801,6 +829,9 @@
 
     <%- include('partials/footer') %>
 
+    <!-- Lightbox Component -->
+    <script src="/js/lightbox.js"></script>
+
     <script>
     // Store original data and Firebase path
     const contentType = '<%= contentType %>';
@@ -857,11 +888,106 @@
         const div = document.createElement('div');
         div.className = 'array-list-item';
         div.innerHTML = `
+            <input type="checkbox" class="gallery-checkbox" data-image-url="" onchange="updateSelectedCount()" style="width: 20px; height: 20px; cursor: pointer;">
             <div class="no-image">No image</div>
-            <input type="text" class="form-input" placeholder="Enter image URL" data-array="image_gallery" onchange="updateImagePreview(this)">
+            <input type="text" class="form-input" placeholder="Enter image URL" data-array="image_gallery" onchange="updateImagePreview(this); this.previousElementSibling.previousElementSibling.dataset.imageUrl = this.value;">
             <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
         `;
         container.appendChild(div);
+    }
+
+    // ===========================
+    // BULK IMAGE DOWNLOAD
+    // ===========================
+    // Note: Lightbox functions (openLightbox, closeLightbox) are loaded from lightbox.js
+
+    // Update selected count display
+    function updateSelectedCount() {
+        const checkboxes = document.querySelectorAll('.gallery-checkbox:checked');
+        document.getElementById('selectedCount').textContent = checkboxes.length;
+    }
+
+    // Select all gallery images
+    function selectAllGalleryImages() {
+        const checkboxes = document.querySelectorAll('.gallery-checkbox');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        
+        checkboxes.forEach(cb => {
+            cb.checked = !allChecked;
+        });
+        
+        updateSelectedCount();
+    }
+
+    // Download selected images as ZIP (using server proxy to avoid CORS)
+    async function downloadSelectedImages() {
+        const checkboxes = document.querySelectorAll('.gallery-checkbox:checked');
+        
+        if (checkboxes.length === 0) {
+            alert('Please select at least one image to download');
+            return;
+        }
+
+        const downloadBtn = document.getElementById('downloadBtn');
+        const originalText = downloadBtn.innerHTML;
+        
+        downloadBtn.disabled = true;
+        downloadBtn.innerHTML = '⏳ Preparing download...';
+
+        try {
+            // Get selected image URLs
+            const imageUrls = Array.from(checkboxes).map(cb => cb.dataset.imageUrl).filter(url => url);
+
+            if (imageUrls.length === 0) {
+                alert('No valid image URLs selected');
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+                return;
+            }
+
+            downloadBtn.innerHTML = `⏳ Downloading ${imageUrls.length} image(s) from server...`;
+
+            // Use server proxy to download images (avoids CORS issues)
+            const response = await fetch('/api/download/images', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    imageUrls: imageUrls,
+                    filename: `${contentType}-${contentId}-gallery-${Date.now()}.zip`
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Download failed');
+            }
+
+            // Get the ZIP file as blob
+            const blob = await response.blob();
+
+            // Trigger download
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${contentType}-${contentId}-gallery-${Date.now()}.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+
+            downloadBtn.innerHTML = '✅ Downloaded!';
+            setTimeout(() => {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            }, 2000);
+
+        } catch (error) {
+            console.error('Error downloading images:', error);
+            alert('Failed to download images: ' + error.message);
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+        }
     }
 
     // Update image preview when URL changes
@@ -1133,7 +1259,7 @@
                     </div>
                 </div>
                 <div class="prompt-actions">
-                    <button type="button" class="btn-icon btn-view" onclick="viewPrompt('${prompt.id}')" title="View Details">
+                    <button type="button" class="btn-icon btn-view" onclick="viewPrompt('${prompt.id}')" title="View Details / Generate Images">
                         👁️ View
                     </button>
                     <button type="button" class="btn-icon btn-edit" onclick="editPrompt('${prompt.id}')" title="Edit Prompt">
@@ -1582,7 +1708,7 @@
         const grid = document.getElementById('generatedImagesGrid');
         
         grid.innerHTML = images.map((img, index) => `
-            <div style="position: relative; border: 2px solid #e0e0e0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s ease;"
+            <div style="position: relative; border: 2px solid #e0e0e0; border-radius: 8px; overflow: hidden; transition: all 0.2s ease;"
                  onmouseover="this.style.borderColor='#667eea'; this.style.transform='scale(1.05)'"
                  onmouseout="this.style.borderColor='#e0e0e0'; this.style.transform='scale(1)'">
                 <input type="checkbox" 
@@ -1592,10 +1718,11 @@
                        checked>
                 <img src="${img.dataUrl}" 
                      alt="Generated image ${index + 1}"
-                     style="width: 100%; height: 200px; object-fit: cover; display: block;"
+                     style="width: 100%; height: 200px; object-fit: cover; display: block; cursor: zoom-in;"
+                     onclick="event.stopPropagation(); openLightbox('${img.dataUrl}', 'AI Generated Image ${index + 1}')">
+                <div style="padding: 8px; background: #f8f9fa; font-size: 12px; color: #666; cursor: pointer;"
                      onclick="document.getElementById('img-${index}').checked = !document.getElementById('img-${index}').checked">
-                <div style="padding: 8px; background: #f8f9fa; font-size: 12px; color: #666;">
-                    Image ${index + 1}
+                    Image ${index + 1} • Click to view full size
                 </div>
             </div>
         `).join('');
