@@ -416,10 +416,26 @@
 
                     <% if (contentType === 'episode') { %>
                     <div class="form-group">
-                        <label class="form-label" for="audioUrl">Audio URL</label>
-                        <input type="text" id="audioUrl" name="audioUrl" class="form-input"
-                               value="<%= contentData.audioUrl || '' %>">
-                        <div class="form-hint">URL to the audio/music file</div>
+                        <label class="form-label" for="audioFile">Audio File (MP3)</label>
+                        <input type="file" id="audioFile" name="audioFile" class="form-input"
+                               accept=".mp3,audio/mpeg"
+                               onchange="handleAudioFileSelect(this)">
+                        <div class="form-hint">Upload a new MP3 file (max 50MB) or keep current audio</div>
+
+                        <% if (contentData.audioUrl || contentData.audio) { %>
+                        <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                            <strong>Current Audio:</strong><br>
+                            <audio controls style="width: 100%; margin-top: 10px;">
+                                <source src="<%= contentData.audioUrl || contentData.audio %>" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                            <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                <%= contentData.audioUrl || contentData.audio %>
+                            </div>
+                        </div>
+                        <% } %>
+
+                        <div id="audioUploadStatus" style="display: none; margin-top: 10px; padding: 10px; border-radius: 6px;"></div>
                     </div>
                     <% } %>
                 </div>
@@ -592,6 +608,75 @@
         return Array.from(inputs).map(input => input.value.trim()).filter(val => val !== '');
     }
 
+    // Handle audio file selection
+    let selectedAudioFile = null;
+    function handleAudioFileSelect(input) {
+        if (input.files && input.files[0]) {
+            selectedAudioFile = input.files[0];
+            const fileSize = (selectedAudioFile.size / 1024 / 1024).toFixed(2);
+            console.log(`🎵 Audio file selected: ${selectedAudioFile.name} (${fileSize} MB)`);
+
+            // Show file info
+            const statusDiv = document.getElementById('audioUploadStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = '#e3f2fd';
+            statusDiv.style.color = '#1976d2';
+            statusDiv.innerHTML = `📎 Selected: ${selectedAudioFile.name} (${fileSize} MB)`;
+        }
+    }
+
+    // Upload audio file to S3
+    async function uploadAudioFile() {
+        if (!selectedAudioFile) {
+            return null;
+        }
+
+        console.log('📤 Uploading audio file...');
+        const statusDiv = document.getElementById('audioUploadStatus');
+        statusDiv.style.display = 'block';
+        statusDiv.style.background = '#fff3cd';
+        statusDiv.style.color = '#856404';
+        statusDiv.innerHTML = '⏳ Uploading audio file...';
+
+        const formData = new FormData();
+        formData.append('audioFile', selectedAudioFile);
+        formData.append('seasonNumber', '<%= seasonNumber %>');
+        formData.append('episodeNumber', '<%= episodeNumber %>');
+
+        try {
+            const idToken = await window.firebaseAuth.currentUser.getIdToken();
+
+            const response = await fetch('/api/upload/audio', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to upload audio');
+            }
+
+            const result = await response.json();
+            console.log('✅ Audio uploaded:', result.audioUrl);
+
+            statusDiv.style.background = '#d4edda';
+            statusDiv.style.color = '#155724';
+            statusDiv.innerHTML = `✅ Audio uploaded successfully!`;
+
+            return result.audioUrl;
+
+        } catch (error) {
+            console.error('❌ Audio upload failed:', error);
+            statusDiv.style.background = '#f8d7da';
+            statusDiv.style.color = '#721c24';
+            statusDiv.innerHTML = `❌ Upload failed: ${error.message}`;
+            throw error;
+        }
+    }
+
     // Save content function
     async function saveContent() {
         const saveBtn = document.getElementById('saveBtn');
@@ -603,6 +688,13 @@
         saveStatus.textContent = 'Saving...';
 
         try {
+            // Upload audio file first if one was selected (episodes only)
+            let audioUrl = null;
+            if (contentType === 'episode' && selectedAudioFile) {
+                saveStatus.textContent = 'Uploading audio...';
+                audioUrl = await uploadAudioFile();
+            }
+
             // Collect form data
             const formData = {
                 title: document.getElementById('title').value.trim(),
@@ -615,7 +707,8 @@
             if (contentType === 'episode') {
                 formData.summary = document.getElementById('summary')?.value.trim() || '';
                 formData.lyrics = document.getElementById('lyrics')?.value.trim() || '';
-                formData.audioUrl = document.getElementById('audioUrl')?.value.trim() || '';
+                // Use new uploaded audio URL if available, otherwise keep existing
+                formData.audio = audioUrl || '<%= contentData.audioUrl || contentData.audio || '' %>';
                 formData.youtubeLink = document.getElementById('youtubeLink')?.value.trim() || '';
                 formData.carouselImages = getArrayValues('carouselImages');
             } else if (contentType === 'character' || contentType === 'lore') {
