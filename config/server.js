@@ -3,8 +3,14 @@
  * Handles port selection, environment setup, and server configuration
  */
 
-// Load environment variables (safe for production containers)
-require('dotenv').config({ silent: true });
+// Load environment variables only if .env exists (development mode)
+// In production (App Runner), environment variables are injected directly
+try {
+  require('dotenv').config({ override: false });
+} catch (error) {
+  // .env file not found - this is expected in production
+  // Environment variables are provided by App Runner
+}
 
 const versionManager = require('../utils/version');
 
