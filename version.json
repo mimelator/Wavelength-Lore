@@ -1,8 +1,8 @@
 {
-  "version": "1.0.25",
-  "buildDate": "2025-10-20T15:37:36Z",
-  "commitHash": "114d0b74fd3061e73422a8ed8bf66d4e33d7711a",
-  "commitShort": "114d0b7",
-  "buildNumber": "27",
+  "version": "1.0.26",
+  "buildDate": "2025-10-20T15:38:27Z",
+  "commitHash": "c72d7491d7fca50ee3ed7aec7306fd1446a402e9",
+  "commitShort": "c72d749",
+  "buildNumber": "28",
   "environment": "production"
 }
