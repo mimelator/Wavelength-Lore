@@ -190,11 +190,58 @@
         .array-list-item {
             display: flex;
             gap: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            align-items: center;
         }
 
         .array-list-item input {
             flex: 1;
+        }
+
+        .image-preview {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .image-preview:hover {
+            transform: scale(1.5);
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .image-preview-large {
+            width: 200px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .image-preview-large:hover {
+            transform: scale(1.2);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .no-image {
+            width: 80px;
+            height: 80px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #999;
+            text-align: center;
+            border: 2px dashed #ddd;
         }
 
         .btn-small {
@@ -353,8 +400,18 @@
                     <div class="form-group">
                         <label class="form-label" for="image">Main Image URL</label>
                         <input type="text" id="image" name="image" class="form-input"
-                               value="<%= contentData.image || '' %>">
+                               value="<%= contentData.image || '' %>"
+                               onchange="updateMainImagePreview()">
                         <div class="form-hint">URL to the main banner/profile image</div>
+                        <% if (contentData.image) { %>
+                        <img src="<%= contentData.image %>"
+                             alt="Main image preview"
+                             class="image-preview-large"
+                             id="mainImagePreview"
+                             onerror="this.style.display='none'">
+                        <% } else { %>
+                        <img id="mainImagePreview" class="image-preview-large" style="display: none;">
+                        <% } %>
                     </div>
 
                     <% if (contentType === 'episode') { %>
@@ -381,14 +438,19 @@
                         <% if (contentData.carouselImages && Array.isArray(contentData.carouselImages)) { %>
                             <% contentData.carouselImages.forEach((img, index) => { %>
                                 <div class="array-list-item">
-                                    <input type="text" class="form-input" value="<%= img %>" data-array="carouselImages">
+                                    <img src="<%= img %>"
+                                         alt="Carousel image <%= index + 1 %>"
+                                         class="image-preview"
+                                         onerror="this.className='no-image'; this.alt='Failed to load';"
+                                         title="Click to zoom">
+                                    <input type="text" class="form-input" value="<%= img %>" data-array="carouselImages" onchange="updateImagePreview(this)">
                                     <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
                                 </div>
                             <% }); %>
                         <% } %>
                     </div>
                     <button type="button" class="btn btn-success btn-small" onclick="addCarouselImage()">+ Add Image</button>
-                    <div class="form-hint">URLs to carousel/gallery images</div>
+                    <div class="form-hint">URLs to carousel/gallery images (hover to zoom)</div>
                 </div>
                 <% } %>
 
@@ -399,14 +461,19 @@
                         <% if (contentData.image_gallery && Array.isArray(contentData.image_gallery)) { %>
                             <% contentData.image_gallery.forEach((img, index) => { %>
                                 <div class="array-list-item">
-                                    <input type="text" class="form-input" value="<%= img %>" data-array="image_gallery">
+                                    <img src="<%= img %>"
+                                         alt="Gallery image <%= index + 1 %>"
+                                         class="image-preview"
+                                         onerror="this.className='no-image'; this.alt='Failed to load';"
+                                         title="Click to zoom">
+                                    <input type="text" class="form-input" value="<%= img %>" data-array="image_gallery" onchange="updateImagePreview(this)">
                                     <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
                                 </div>
                             <% }); %>
                         <% } %>
                     </div>
                     <button type="button" class="btn btn-success btn-small" onclick="addImageGalleryItem()">+ Add Image</button>
-                    <div class="form-hint">URLs to gallery images</div>
+                    <div class="form-hint">URLs to gallery images (hover to zoom)</div>
                 </div>
                 <% } %>
             </div>
@@ -459,7 +526,8 @@
         const div = document.createElement('div');
         div.className = 'array-list-item';
         div.innerHTML = `
-            <input type="text" class="form-input" placeholder="Enter image URL" data-array="carouselImages">
+            <div class="no-image">No image</div>
+            <input type="text" class="form-input" placeholder="Enter image URL" data-array="carouselImages" onchange="updateImagePreview(this)">
             <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
         `;
         container.appendChild(div);
@@ -470,10 +538,53 @@
         const div = document.createElement('div');
         div.className = 'array-list-item';
         div.innerHTML = `
-            <input type="text" class="form-input" placeholder="Enter image URL" data-array="image_gallery">
+            <div class="no-image">No image</div>
+            <input type="text" class="form-input" placeholder="Enter image URL" data-array="image_gallery" onchange="updateImagePreview(this)">
             <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
         `;
         container.appendChild(div);
+    }
+
+    // Update image preview when URL changes
+    function updateImagePreview(input) {
+        const url = input.value.trim();
+        const parent = input.parentElement;
+        let preview = parent.querySelector('.image-preview, .no-image');
+
+        if (url) {
+            if (preview.classList.contains('no-image')) {
+                // Replace no-image div with actual image
+                const img = document.createElement('img');
+                img.className = 'image-preview';
+                img.src = url;
+                img.title = 'Click to zoom';
+                img.onerror = function() {
+                    this.className = 'no-image';
+                    this.alt = 'Failed to load';
+                };
+                parent.replaceChild(img, preview);
+            } else {
+                // Update existing image
+                preview.src = url;
+            }
+        }
+    }
+
+    // Update main image preview
+    function updateMainImagePreview() {
+        const input = document.getElementById('image');
+        const preview = document.getElementById('mainImagePreview');
+        const url = input.value.trim();
+
+        if (url) {
+            preview.src = url;
+            preview.style.display = 'block';
+            preview.onerror = function() {
+                this.style.display = 'none';
+            };
+        } else {
+            preview.style.display = 'none';
+        }
     }
 
     function getArrayValues(arrayName) {
