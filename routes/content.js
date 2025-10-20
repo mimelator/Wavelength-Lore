@@ -255,26 +255,15 @@ router.get('/character/:characterId', async (req, res) => {
     const charactersData = await firebaseUtils.fetchFromFirebase('characters');
 
     if (charactersData) {
-      // Search for the character by ID across all categories
-      let character = null;
-      for (const category in charactersData) {
-        if (Array.isArray(charactersData[category])) {
-          character = charactersData[category].find(c => c.id === characterId);
-          if (character) break;
-        }
-      }
+      // Get character directly by ID (new structure)
+      const character = charactersData[characterId];
 
       if (!character) {
         return res.status(404).send('Character not found');
       }
 
-      // Fetch all characters for navigation
-      let allCharacters = [];
-      for (const category in charactersData) {
-        if (Array.isArray(charactersData[category])) {
-          allCharacters = allCharacters.concat(charactersData[category]);
-        }
-      }
+      // Get all characters for navigation
+      const allCharacters = Object.values(charactersData);
 
       const currentIndex = allCharacters.findIndex(c => c.id === characterId);
       // Adjust navigation to wrap around
@@ -341,13 +330,8 @@ router.get('/characters', async (req, res) => {
     const charactersData = await firebaseUtils.fetchFromFirebase('characters');
 
     if (charactersData) {
-      // Extract all characters from the new schema
-      const allCharacters = [];
-      for (const category in charactersData) {
-        if (Array.isArray(charactersData[category])) {
-          allCharacters.push(...charactersData[category]);
-        }
-      }
+      // Convert characters object to array (new structure: each character stored by ID)
+      const allCharacters = Object.values(charactersData);
 
       res.render('character-gallery', {
         title: 'Character Gallery',
@@ -512,15 +496,10 @@ router.get('/about', async (req, res) => {
 
     let characterImages = [];
     if (charactersData) {
-      // Collect images from all character categories
-      for (const category in charactersData) {
-        if (Array.isArray(charactersData[category])) {
-          const categoryImages = charactersData[category]
-            .filter(c => c.image_gallery && c.image_gallery.length > 0)
-            .map(c => c.image_gallery[0]); // Get first image from each character's gallery
-          characterImages = characterImages.concat(categoryImages);
-        }
-      }
+      // Collect images from all characters (new structure: characters stored by ID)
+      characterImages = Object.values(charactersData)
+        .filter(c => c.image_gallery && c.image_gallery.length > 0)
+        .map(c => c.image_gallery[0]); // Get first image from each character's gallery
     }
 
     res.render('about', {

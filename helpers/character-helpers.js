@@ -79,23 +79,16 @@ async function fetchCharactersFromDatabase() {
     const charactersData = await firebaseUtils.fetchFromFirebase('characters');
     
     if (charactersData) {
-      // Extract all characters from all categories
-      let allCharacters = [];
-      for (const category in charactersData) {
-        if (Array.isArray(charactersData[category])) {
-          // Transform database characters to helper format
-          const categoryCharacters = charactersData[category].map(char => ({
-            id: char.id,
-            title: char.title,
-            name: char.title, // Use title as name for consistency
-            keywords: char.keywords || [], // Include keywords for enhanced linking
-            url: `/character/${char.id}`,
-            description: char.description,
-            image: char.image
-          }));
-          allCharacters = allCharacters.concat(categoryCharacters);
-        }
-      }
+      // Convert characters object to array (new structure: each character stored by ID)
+      const allCharacters = Object.values(charactersData).map(char => ({
+        id: char.id,
+        title: char.title,
+        name: char.title, // Use title as name for consistency
+        keywords: char.keywords || [], // Include keywords for enhanced linking
+        url: `/character/${char.id}`,
+        description: char.description,
+        image: char.image
+      }));
       
       return allCharacters;
     } else {
