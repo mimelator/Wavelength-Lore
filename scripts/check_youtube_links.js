@@ -1,8 +1,11 @@
-require('dotenv').config({ path: '.env' }); // Load .env file from the parent directory
+const { initScriptEnv } = require('./utils/env-loader');
+
+// Initialize environment with required variables
+initScriptEnv(['DATABASE_URL', 'PROJECT_ID', 'API_KEY', 'AUTH_DOMAIN']);
 
 const axios = require('axios');
-const { getDatabase, ref, get } = require('firebase/database');
 const { initializeApp } = require('firebase/app');
+const { getDatabase, ref, get } = require('firebase/database');
 
 const firebaseConfig = {
     apiKey: process.env.API_KEY,
