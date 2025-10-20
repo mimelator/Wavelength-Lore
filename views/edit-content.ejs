@@ -767,8 +767,8 @@
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <label for="imageCount" style="font-weight: bold;">Count:</label>
                         <select id="imageCount" class="form-select" style="width: 80px;">
-                            <option value="1">1</option>
-                            <option value="2" selected>2</option>
+                            <option value="1" selected>1</option>
+                            <option value="2">2</option>
                             <option value="3">3</option>
                             <option value="4">4</option>
                         </select>
@@ -1509,9 +1509,18 @@
         const statusEl = document.getElementById('generationStatus');
         const count = parseInt(document.getElementById('imageCount').value);
 
+        // Immediate visual feedback
         generateBtn.disabled = true;
+        generateBtn.style.opacity = '0.6';
+        generateBtn.style.cursor = 'not-allowed';
+        generateBtn.innerHTML = '⏳ Generating...';
+        
+        statusEl.style.display = 'inline-block';
         statusEl.className = 'save-status saving';
-        statusEl.textContent = `⏳ Generating ${count} image(s)...`;
+        statusEl.textContent = `⏳ Generating ${count} image(s)... This may take 10-30 seconds`;
+
+        // Hide previous results if any
+        document.getElementById('generatedImagesContainer').style.display = 'none';
 
         try {
             const idToken = await window.firebaseAuth.currentUser.getIdToken();
@@ -1557,7 +1566,11 @@
             statusEl.className = 'save-status error';
             statusEl.textContent = `❌ Error: ${error.message}`;
         } finally {
+            // Reset button state
             generateBtn.disabled = false;
+            generateBtn.style.opacity = '1';
+            generateBtn.style.cursor = 'pointer';
+            generateBtn.innerHTML = '🎨 Generate Images';
         }
     }
 
@@ -1594,9 +1607,10 @@
             return;
         }
 
-        const selectedImages = Array.from(checkboxes).map(cb => {
+        // Extract only the image IDs - server has the full data cached
+        const selectedImageIds = Array.from(checkboxes).map(cb => {
             const index = parseInt(cb.dataset.index);
-            return generatedImagesData[index];
+            return generatedImagesData[index].id;
         });
 
         const addBtn = document.getElementById('addToGalleryBtn');
@@ -1604,7 +1618,7 @@
 
         addBtn.disabled = true;
         statusEl.className = 'save-status saving';
-        statusEl.textContent = `⏳ Adding ${selectedImages.length} image(s) to gallery...`;
+        statusEl.textContent = `⏳ Adding ${selectedImageIds.length} image(s) to gallery...`;
 
         try {
             const idToken = await window.firebaseAuth.currentUser.getIdToken();
@@ -1619,7 +1633,7 @@
                     contentType: contentType,
                     contentId: contentId,
                     firebasePath: firebasePath,
-                    images: selectedImages
+                    imageIds: selectedImageIds  // Send only IDs, not full data
                 })
             });
 
