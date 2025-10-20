@@ -747,7 +747,7 @@
 
     <!-- Prompt View Modal -->
     <div id="promptViewModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 1000px;">
             <div class="modal-header">
                 <h2 id="promptViewTitle">Prompt Details</h2>
                 <button class="modal-close" onclick="closePromptViewModal()">&times;</button>
@@ -755,6 +755,42 @@
             <div id="promptViewContent" style="padding: 20px 0;">
                 <!-- Content populated by JavaScript -->
             </div>
+            
+            <!-- AI Image Generation Section -->
+            <div id="aiGenerationSection" style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
+                <h3 style="color: #667eea; margin-bottom: 15px;">🎨 AI Image Generation</h3>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center;">
+                    <button type="button" class="btn btn-primary" onclick="generateAIImages()" id="generateBtn">
+                        🎨 Generate Images
+                    </button>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label for="imageCount" style="font-weight: bold;">Count:</label>
+                        <select id="imageCount" class="form-select" style="width: 80px;">
+                            <option value="1">1</option>
+                            <option value="2" selected>2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <span id="generationStatus" class="save-status"></span>
+                </div>
+
+                <!-- Generated Images Grid -->
+                <div id="generatedImagesContainer" style="display: none;">
+                    <h4 style="color: #666; margin-bottom: 15px;">Generated Images:</h4>
+                    <div id="generatedImagesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                        <!-- Images populated by JavaScript -->
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" class="btn btn-success" onclick="addSelectedToGallery()" id="addToGalleryBtn">
+                            ➕ Add Selected to Gallery
+                        </button>
+                        <span id="addToGalleryStatus" class="save-status"></span>
+                    </div>
+                </div>
+            </div>
+
             <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
                 <button type="button" class="btn btn-secondary" onclick="closePromptViewModal()">
                     Close
@@ -1288,6 +1324,15 @@
                 </div>
             `;
 
+            // Store prompt for AI generation
+            currentPromptForGeneration = prompt;
+
+            // Reset generation UI
+            document.getElementById('generatedImagesContainer').style.display = 'none';
+            document.getElementById('generationStatus').style.display = 'none';
+            document.getElementById('addToGalleryStatus').style.display = 'none';
+            generatedImagesData = [];
+
             document.getElementById('promptViewModal').classList.add('active');
         } catch (error) {
             console.error('Error viewing prompt:', error);
@@ -1298,6 +1343,8 @@
     // Close view modal
     function closePromptViewModal() {
         document.getElementById('promptViewModal').classList.remove('active');
+        currentPromptForGeneration = null;
+        generatedImagesData = [];
     }
 
     // Edit prompt
@@ -1443,6 +1490,169 @@
             closePromptViewModal();
         }
     });
+
+    // ===========================
+    // AI IMAGE GENERATION
+    // ===========================
+
+    let currentPromptForGeneration = null;
+    let generatedImagesData = [];
+
+    // Generate AI images
+    async function generateAIImages() {
+        if (!currentPromptForGeneration) {
+            alert('No prompt loaded');
+            return;
+        }
+
+        const generateBtn = document.getElementById('generateBtn');
+        const statusEl = document.getElementById('generationStatus');
+        const count = parseInt(document.getElementById('imageCount').value);
+
+        generateBtn.disabled = true;
+        statusEl.className = 'save-status saving';
+        statusEl.textContent = `⏳ Generating ${count} image(s)...`;
+
+        try {
+            const idToken = await window.firebaseAuth.currentUser.getIdToken();
+
+            const response = await fetch('/api/generate/image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    promptId: currentPromptForGeneration.id,
+                    promptText: currentPromptForGeneration.content,
+                    count: count,
+                    width: 1024,
+                    height: 1024,
+                    style: currentPromptForGeneration.category || 'photorealistic'
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Generation failed');
+            }
+
+            const result = await response.json();
+
+            if (result.success && result.images && result.images.length > 0) {
+                generatedImagesData = result.images;
+                displayGeneratedImages(result.images);
+                
+                statusEl.className = 'save-status success';
+                statusEl.textContent = `✅ Generated ${result.images.length} image(s)!`;
+
+                // Show the images container
+                document.getElementById('generatedImagesContainer').style.display = 'block';
+            } else {
+                throw new Error('No images generated');
+            }
+
+        } catch (error) {
+            console.error('Error generating images:', error);
+            statusEl.className = 'save-status error';
+            statusEl.textContent = `❌ Error: ${error.message}`;
+        } finally {
+            generateBtn.disabled = false;
+        }
+    }
+
+    // Display generated images in grid
+    function displayGeneratedImages(images) {
+        const grid = document.getElementById('generatedImagesGrid');
+        
+        grid.innerHTML = images.map((img, index) => `
+            <div style="position: relative; border: 2px solid #e0e0e0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s ease;"
+                 onmouseover="this.style.borderColor='#667eea'; this.style.transform='scale(1.05)'"
+                 onmouseout="this.style.borderColor='#e0e0e0'; this.style.transform='scale(1)'">
+                <input type="checkbox" 
+                       id="img-${index}" 
+                       data-index="${index}"
+                       style="position: absolute; top: 10px; left: 10px; width: 20px; height: 20px; cursor: pointer; z-index: 10;"
+                       checked>
+                <img src="${img.dataUrl}" 
+                     alt="Generated image ${index + 1}"
+                     style="width: 100%; height: 200px; object-fit: cover; display: block;"
+                     onclick="document.getElementById('img-${index}').checked = !document.getElementById('img-${index}').checked">
+                <div style="padding: 8px; background: #f8f9fa; font-size: 12px; color: #666;">
+                    Image ${index + 1}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Add selected images to content gallery
+    async function addSelectedToGallery() {
+        const checkboxes = document.querySelectorAll('#generatedImagesGrid input[type="checkbox"]:checked');
+        
+        if (checkboxes.length === 0) {
+            alert('Please select at least one image to add');
+            return;
+        }
+
+        const selectedImages = Array.from(checkboxes).map(cb => {
+            const index = parseInt(cb.dataset.index);
+            return generatedImagesData[index];
+        });
+
+        const addBtn = document.getElementById('addToGalleryBtn');
+        const statusEl = document.getElementById('addToGalleryStatus');
+
+        addBtn.disabled = true;
+        statusEl.className = 'save-status saving';
+        statusEl.textContent = `⏳ Adding ${selectedImages.length} image(s) to gallery...`;
+
+        try {
+            const idToken = await window.firebaseAuth.currentUser.getIdToken();
+
+            const response = await fetch('/api/generate/add-to-gallery', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    contentType: contentType,
+                    contentId: contentId,
+                    firebasePath: firebasePath,
+                    images: selectedImages
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to add images');
+            }
+
+            const result = await response.json();
+
+            statusEl.className = 'save-status success';
+            statusEl.textContent = `✅ Added ${result.imagesAdded} image(s) to gallery!`;
+
+            // Clear selected images after adding
+            setTimeout(() => {
+                document.getElementById('generatedImagesContainer').style.display = 'none';
+                generatedImagesData = [];
+                statusEl.style.display = 'none';
+                
+                // Suggest refreshing the page to see new images
+                if (confirm('Images added successfully! Would you like to refresh the page to see them in the gallery?')) {
+                    location.reload();
+                }
+            }, 2000);
+
+        } catch (error) {
+            console.error('Error adding to gallery:', error);
+            statusEl.className = 'save-status error';
+            statusEl.textContent = `❌ Error: ${error.message}`;
+        } finally {
+            addBtn.disabled = false;
+        }
+    }
 
     // Load prompts when page is ready
     window.addEventListener('DOMContentLoaded', loadPrompts);

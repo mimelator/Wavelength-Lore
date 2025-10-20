@@ -1,0 +1,282 @@
+/**
+ * AI Image Generation API Routes
+ * Handles AI-powered image generation using Google Gemini
+ */
+
+const express = require('express');
+const router = express.Router();
+const { requireGroup } = require('../middleware/groupAuth');
+const { GoogleGenAI } = require('@google/genai');
+const { writeDataAsAdmin } = require('../helpers/firebase-admin-utils');
+const promptHelpers = require('../helpers/prompt-helpers');
+const crypto = require('crypto');
+const mime = require('mime');
+
+/**
+ * POST /api/generate/image
+ * Generate image from prompt using Google Gemini
+ * Requires: content_manager role or higher
+ * 
+ * Body: {
+ *   promptId: string,
+ *   promptText: string,
+ *   count: number (1-4, default 1),
+ *   width: number (default 1024),
+ *   height: number (default 1024),
+ *   style: string (optional)
+ * }
+ */
+router.post('/image', requireGroup(['content_manager', 'admin', 'moderator']), async (req, res) => {
+  try {
+    const {
+      promptId,
+      promptText,
+      count = 1,
+      width = 1024,
+      height = 1024,
+      style = 'photorealistic'
+    } = req.body;
+
+    console.log('🎨 AI Image Generation Request:', { promptId, count, width, height, style });
+
+    // Validation
+    if (!promptText) {
+      return res.status(400).json({
+        success: false,
+        error: 'Prompt text is required'
+      });
+    }
+
+    if (count < 1 || count > 4) {
+      return res.status(400).json({
+        success: false,
+        error: 'Count must be between 1 and 4'
+      });
+    }
+
+    // Check API key
+    const apiKey = process.env.GEMINI_API_KEY || process.env.AI_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({
+        success: false,
+        error: 'AI service not configured. Missing GEMINI_API_KEY.'
+      });
+    }
+
+    // Initialize Google GenAI
+    const googleAI = new GoogleGenAI({ apiKey });
+    const modelKey = process.env.AI_MODEL_KEY || 'gemini-2.5-flash-image';
+
+    // Generate images
+    const generatedImages = [];
+    
+    for (let i = 0; i < count; i++) {
+      console.log(`🔮 Generating image ${i + 1}/${count}...`);
+
+      try {
+        // Configure generation
+        const config = {
+          responseModalities: ['IMAGE', 'TEXT'],
+        };
+
+        // Enhanced prompt with style
+        const enhancedPrompt = style && style !== 'photorealistic' 
+          ? `${promptText}, ${style} style`
+          : promptText;
+
+        const contents = [
+          {
+            role: 'user',
+            parts: [
+              {
+                text: enhancedPrompt,
+              },
+            ],
+          },
+        ];
+
+        // Generate with streaming response
+        const response = await googleAI.models.generateContentStream({
+          model: modelKey,
+          config,
+          contents,
+        });
+
+        let imageData = null;
+        let mimeType = 'image/png';
+        let textResponse = '';
+
+        // Process streamed response
+        for await (const chunk of response) {
+          if (!chunk.candidates || !chunk.candidates[0].content || !chunk.candidates[0].content.parts) {
+            continue;
+          }
+
+          // Extract image data
+          if (chunk.candidates?.[0]?.content?.parts?.[0]?.inlineData) {
+            const inlineData = chunk.candidates[0].content.parts[0].inlineData;
+            imageData = inlineData.data;
+            mimeType = inlineData.mimeType || 'image/png';
+            console.log(`🖼️ Image ${i + 1} received (${mimeType})`);
+          }
+          
+          // Extract text response
+          if (chunk.text) {
+            textResponse += chunk.text;
+          }
+        }
+
+        if (imageData) {
+          // Generate unique ID for this image
+          const imageId = crypto.randomBytes(16).toString('hex');
+          
+          generatedImages.push({
+            id: imageId,
+            data: imageData,
+            mimeType,
+            metadata: {
+              promptId,
+              prompt: enhancedPrompt,
+              originalPrompt: promptText,
+              style,
+              width,
+              height,
+              model: modelKey,
+              generatedAt: new Date().toISOString(),
+              provider: 'google-genai',
+              textResponse: textResponse || undefined,
+              generatedBy: req.user?.uid || 'system'
+            }
+          });
+        } else {
+          console.warn(`⚠️ No image data for generation ${i + 1}`);
+        }
+
+      } catch (genError) {
+        console.error(`❌ Generation ${i + 1} failed:`, genError.message);
+        // Continue with other generations
+      }
+    }
+
+    if (generatedImages.length === 0) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to generate any images. Response may have been filtered.'
+      });
+    }
+
+    // Return base64 data URLs for immediate preview
+    const imageResults = generatedImages.map(img => ({
+      id: img.id,
+      dataUrl: `data:${img.mimeType};base64,${img.data}`,
+      mimeType: img.mimeType,
+      metadata: img.metadata
+    }));
+
+    console.log(`✅ Generated ${generatedImages.length}/${count} images successfully`);
+
+    res.json({
+      success: true,
+      images: imageResults,
+      count: generatedImages.length,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ AI Generation API Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Image generation failed',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/generate/add-to-gallery
+ * Add generated images to content gallery
+ * Requires: content_manager role or higher
+ * 
+ * Body: {
+ *   contentType: 'character' | 'episode' | 'lore',
+ *   contentId: string,
+ *   firebasePath: string,
+ *   images: Array<{id: string, dataUrl: string}>
+ * }
+ */
+router.post('/add-to-gallery', requireGroup(['content_manager', 'admin', 'moderator']), async (req, res) => {
+  try {
+    const {
+      contentType,
+      contentId,
+      firebasePath,
+      images
+    } = req.body;
+
+    console.log('🖼️ Adding generated images to gallery:', { contentType, contentId, count: images.length });
+
+    if (!contentType || !contentId || !firebasePath || !images || !Array.isArray(images)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields'
+      });
+    }
+
+    // For now, we'll store the data URLs directly in the gallery
+    // In production, you might want to upload to S3/CDN first
+    const imageUrls = images.map(img => img.dataUrl);
+
+    // Fetch current content data
+    const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
+    const currentData = await fetchDataAsAdmin(firebasePath);
+
+    if (!currentData) {
+      return res.status(404).json({
+        success: false,
+        error: 'Content not found'
+      });
+    }
+
+    // Add to appropriate gallery field
+    let updatedData;
+    if (contentType === 'episode') {
+      updatedData = {
+        ...currentData,
+        carouselImages: [
+          ...(currentData.carouselImages || []),
+          ...imageUrls
+        ]
+      };
+    } else {
+      updatedData = {
+        ...currentData,
+        image_gallery: [
+          ...(currentData.image_gallery || []),
+          ...imageUrls
+        ]
+      };
+    }
+
+    // Update in Firebase
+    await writeDataAsAdmin(firebasePath, updatedData);
+
+    console.log(`✅ Added ${imageUrls.length} images to ${contentType} gallery`);
+
+    res.json({
+      success: true,
+      message: `Added ${imageUrls.length} images to gallery`,
+      imagesAdded: imageUrls.length,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ Add to Gallery Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to add images to gallery',
+      message: error.message
+    });
+  }
+});
+
+module.exports = router;
