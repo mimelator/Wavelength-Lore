@@ -130,6 +130,33 @@ function configureStaticFiles(app) {
  * Configure template locals middleware
  */
 function configureTemplateLocals(app) {
+  // Middleware to verify Firebase ID token and set req.user
+  app.use(async (req, res, next) => {
+    // Try to get Firebase ID token from Authorization header or cookie
+    const authHeader = req.headers.authorization;
+    let idToken = null;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      idToken = authHeader.substring(7);
+    } else if (req.cookies && req.cookies.__session) {
+      idToken = req.cookies.__session;
+    }
+    
+    if (idToken) {
+      try {
+        const admin = require('firebase-admin');
+        const decodedToken = await admin.app('admin').auth().verifyIdToken(idToken);
+        req.user = { uid: decodedToken.uid };
+        console.log(`✅ User authenticated: ${decodedToken.uid}`);
+      } catch (error) {
+        console.log('⚠️  Invalid or expired Firebase token');
+        req.user = null;
+      }
+    }
+    
+    next();
+  });
+  
   // Middleware to add user group information to templates
   app.use(async (req, res, next) => {
     // Initialize user group data
@@ -150,6 +177,7 @@ function configureTemplateLocals(app) {
           res.locals.isContentCreator = userData.groups.includes('content_manager') ||
                                        userData.groups.includes('admin') ||
                                        userData.groups.includes('super_admin');
+          console.log(`👤 User ${req.user.uid} isContentCreator: ${res.locals.isContentCreator}, groups: ${JSON.stringify(userData.groups)}`);
         }
       } catch (error) {
         console.error('Error loading user groups:', error);
@@ -161,31 +189,34 @@ function configureTemplateLocals(app) {
 
   // Middleware to add character, lore, and episode helpers to all templates
   app.use(async (req, res, next) => {
+    // Get visibility filter based on user role
+    const showHidden = res.locals.isContentCreator;
+
     // Character helpers
     res.locals.characterHelpers = characterHelpers;
     res.locals.characterLink = characterHelpers.generateCharacterLinkSync;
     res.locals.linkifyCharacters = characterHelpers.linkifyCharacterMentionsSync;
-    res.locals.allCharacters = characterHelpers.getAllCharactersSync();
+    res.locals.allCharacters = characterHelpers.getAllCharactersSync(showHidden);
 
     // Lore helpers
     res.locals.loreHelpers = loreHelpers;
     res.locals.loreLink = loreHelpers.generateLoreLinkSync;
     res.locals.linkifyLore = loreHelpers.linkifyLoreMentionsSync;
-    res.locals.allLore = loreHelpers.getAllLoreSync();
+    res.locals.allLore = loreHelpers.getAllLoreSync(showHidden);
 
     // Episode helpers
     res.locals.episodeHelpers = episodeHelpers;
     res.locals.episodeLink = episodeHelpers.generateEpisodeLinkSync;
     res.locals.linkifyEpisodes = episodeHelpers.linkifyEpisodeMentionsSync;
-    res.locals.allEpisodes = episodeHelpers.getAllEpisodesSync();
+    res.locals.allEpisodes = episodeHelpers.getAllEpisodesSync(showHidden);
 
     // Also provide async versions for routes that can use them
     res.locals.characterLinkAsync = characterHelpers.generateCharacterLink;
     res.locals.linkifyCharactersAsync = characterHelpers.linkifyCharacterMentions;
-    res.locals.getAllCharactersAsync = characterHelpers.getAllCharacters;
+    res.locals.getAllCharactersAsync = (showAll) => characterHelpers.getAllCharacters(showAll !== undefined ? showAll : showHidden);
     res.locals.loreLinkAsync = loreHelpers.generateLoreLink;
     res.locals.linkifyLoreAsync = loreHelpers.linkifyLoreMentions;
-    res.locals.getAllLoreAsync = loreHelpers.getAllLore;
+    res.locals.getAllLoreAsync = (showAll) => loreHelpers.getAllLore(showAll !== undefined ? showAll : showHidden);
     res.locals.episodeLinkAsync = episodeHelpers.generateEpisodeLink;
     res.locals.linkifyEpisodesAsync = episodeHelpers.linkifyEpisodeMentions;
     res.locals.getAllEpisodesAsync = episodeHelpers.getAllEpisodes;

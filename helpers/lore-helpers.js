@@ -104,7 +104,8 @@ async function fetchLoreFromDatabase() {
             description: loreItem.description,
             image: loreItem.image,
             image_gallery: loreItem.image_gallery,
-            type: loreItem.type
+            type: loreItem.type,
+            visible: loreItem.visible // Include visibility field for filtering
           });
         }
       }
@@ -170,11 +171,19 @@ async function linkifyLoreMentions(text) {
 }
 
 /**
- * Get all lore list
- * @returns {Promise<Array>} Array of all lore
+ * Get all lore with optional visibility filtering
+ * @param {boolean} showHidden - Whether to include hidden lore (for content creators)
+ * @returns {Promise<Array>} Array of lore objects
  */
-async function getAllLore() {
-  return await getLore();
+async function getAllLore(showHidden = false) {
+  const allLore = await getLore();
+  
+  // Filter out hidden lore for public users
+  if (!showHidden) {
+    return allLore.filter(loreItem => loreItem.visible !== false);
+  }
+  
+  return allLore;
 }
 
 /**
@@ -229,10 +238,18 @@ function linkifyLoreMentionsSync(text) {
 
 /**
  * Get all lore list (sync version)
+ * @param {boolean} showHidden - Whether to include hidden lore (for content creators)
  * @returns {array} Array of all lore
  */
-function getAllLoreSync() {
-  return cacheUtils.getSync(loreCache, fallbackLore);
+function getAllLoreSync(showHidden = false) {
+  const allLore = cacheUtils.getSync(loreCache, fallbackLore);
+  
+  // Filter out hidden lore for public users
+  if (!showHidden) {
+    return allLore.filter(loreItem => loreItem.visible !== false);
+  }
+  
+  return allLore;
 }
 
 /**

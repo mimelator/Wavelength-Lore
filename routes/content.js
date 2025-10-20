@@ -41,6 +41,7 @@ router.get('/', async (req, res) => {
         },
         "genre": ["Animation", "Storytelling", "Music", "Visual Art"]
       },
+      isContentCreator: res.locals.isContentCreator || false, // Pass the flag to template
       cdnUrl: process.env.CDN_URL,
       version: `v${Date.now()}`,
       videos: videos || {},
@@ -159,6 +160,11 @@ router.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
     const episode = await firebaseUtils.fetchFromFirebase(`videos/season${seasonNumber}/episodes/episode${episodeNumber}`);
 
     if (episode) {
+      // Check visibility - if hidden and user is not a content creator, show 404
+      if (episode.visible === false && !res.locals.isContentCreator) {
+        return res.status(404).send('Episode not found');
+      }
+
       const navigation = await getEpisodeNavigation(seasonNumber, episodeNumber);
 
       let previousLink = null;
@@ -262,6 +268,11 @@ router.get('/character/:characterId', async (req, res) => {
         return res.status(404).send('Character not found');
       }
 
+      // Check visibility - if hidden and user is not a content creator, show 404
+      if (character.visible === false && !res.locals.isContentCreator) {
+        return res.status(404).send('Character not found');
+      }
+
       // Get all characters for navigation
       const allCharacters = Object.values(charactersData);
 
@@ -327,13 +338,11 @@ router.get('/character/:characterId', async (req, res) => {
  */
 router.get('/characters', async (req, res) => {
   try {
-    const charactersData = await firebaseUtils.fetchFromFirebase('characters');
+    // Use character helpers with visibility filtering
+    const showHidden = res.locals.isContentCreator || false;
+    const allCharacters = await characterHelpers.getAllCharacters(showHidden);
 
-    if (charactersData) {
-      // Convert characters object to array (new structure: each character stored by ID)
-      const allCharacters = Object.values(charactersData);
-
-      res.render('character-gallery', {
+    res.render('character-gallery', {
         title: 'Character Gallery',
         pageTitle: 'Character Gallery - All Wavelength Heroes',
         pageDescription: 'Browse all characters from the Wavelength universe. Discover heroes, their stories, and connections in this comprehensive character gallery.',
@@ -356,15 +365,14 @@ router.get('/characters', async (req, res) => {
         characters: allCharacters.map(c => ({
           id: c.id,
           title: c.title,
-          image: c.image
+          image: c.image,
+          visible: c.visible
         })),
+        isContentCreator: showHidden, // Pass the flag to template
         cdnUrl: process.env.CDN_URL,
         version: `v${Date.now()}`,
         req: req
       });
-    } else {
-      res.status(404).send('No characters found');
-    }
   } catch (error) {
     console.error('Error fetching characters:', error);
     res.status(500).send('Error fetching characters');
@@ -382,6 +390,11 @@ router.get('/lore/:loreId', async (req, res) => {
     const loreItem = await loreHelpers.getLoreById(loreId);
 
     if (!loreItem) {
+      return res.status(404).send('Lore not found');
+    }
+
+    // Check visibility - if hidden and user is not a content creator, show 404
+    if (loreItem.visible === false && !res.locals.isContentCreator) {
       return res.status(404).send('Lore not found');
     }
 
@@ -448,8 +461,12 @@ router.get('/lore/:loreId', async (req, res) => {
  */
 router.get('/lore', async (req, res) => {
   try {
-    // Use lore helpers to get all lore data
-    const allLore = await loreHelpers.getAllLore();
+    // Use lore helpers with visibility filtering
+    // Pass showHidden based on user role (public users see only visible content)
+    const showHidden = res.locals.isContentCreator || false;
+    console.log(`🔍 Lore Gallery - isContentCreator: ${res.locals.isContentCreator}, showHidden: ${showHidden}, req.user: ${req.user ? req.user.uid : 'none'}`);
+    const allLore = await loreHelpers.getAllLore(showHidden);
+    console.log(`📚 Lore Gallery - Retrieved ${allLore.length} lore items`);
 
     res.render('lore-gallery', {
       title: 'Lore Gallery',
@@ -475,8 +492,10 @@ router.get('/lore', async (req, res) => {
         id: l.id,
         title: l.title,
         image: l.image,
-        type: l.type
+        type: l.type,
+        visible: l.visible
       })),
+      isContentCreator: showHidden, // Pass the flag to template
       cdnUrl: process.env.CDN_URL,
       version: `v${Date.now()}`,
       req: req

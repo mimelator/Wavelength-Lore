@@ -87,7 +87,8 @@ async function fetchCharactersFromDatabase() {
         keywords: char.keywords || [], // Include keywords for enhanced linking
         url: `/character/${char.id}`,
         description: char.description,
-        image: char.image
+        image: char.image,
+        visible: char.visible // Include visibility field for filtering
       }));
       
       return allCharacters;
@@ -102,7 +103,7 @@ async function fetchCharactersFromDatabase() {
 }
 
 /**
- * Get characters with caching
+ * Get characters with caching (internal use)
  * @returns {Promise<Array>} Array of character objects
  */
 async function getCharacters() {
@@ -111,6 +112,22 @@ async function getCharacters() {
     fetchCharactersFromDatabase,
     fallbackCharacters
   );
+}
+
+/**
+ * Get all characters with optional visibility filtering
+ * @param {boolean} showHidden - Whether to include hidden characters (for content creators)
+ * @returns {Promise<Array>} Array of character objects
+ */
+async function getAllCharacters(showHidden = false) {
+  const allCharacters = await getCharacters();
+  
+  // Filter out hidden characters for public users
+  if (!showHidden) {
+    return allCharacters.filter(char => char.visible !== false);
+  }
+  
+  return allCharacters;
 }
 
 /**
@@ -199,10 +216,18 @@ function linkifyCharacterMentionsSync(text) {
 
 /**
  * Get all characters list (sync version)
+ * @param {boolean} showHidden - Whether to include hidden characters (for content creators)
  * @returns {array} Array of all characters
  */
-function getAllCharactersSync() {
-  return cacheUtils.getSync(charactersCache, fallbackCharacters);
+function getAllCharactersSync(showHidden = false) {
+  const allCharacters = cacheUtils.getSync(charactersCache, fallbackCharacters);
+  
+  // Filter out hidden characters for public users
+  if (!showHidden) {
+    return allCharacters.filter(char => char.visible !== false);
+  }
+  
+  return allCharacters;
 }
 
 /**
@@ -240,6 +265,7 @@ module.exports = {
   // Cache management
   initializeCharacterCache,
   clearCharacterCache,
+  clearCache: clearCharacterCache, // Alias for API compatibility
   setDatabaseInstance: firebaseUtils.setDatabaseInstance,
   
   // Backward compatibility aliases

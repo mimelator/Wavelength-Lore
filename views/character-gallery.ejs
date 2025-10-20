@@ -4,6 +4,38 @@
     <%- include('partials/head') %>
     <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css">
     <link rel="stylesheet" href="/css/lore_styles.css">
+    <style>
+        /* Visibility indicator styles */
+        .visibility-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #f1c40f;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .gallery-item {
+            position: relative;
+        }
+        
+        .gallery-item.hidden-content {
+            opacity: 0.7;
+            border: 2px dashed #f1c40f;
+        }
+        
+        .gallery-item.hidden-content:hover {
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
     <%- include('partials/header') %>
@@ -15,7 +47,12 @@
         <section class="lore-gallery">
             <div class="gallery">
                 <% characters.forEach(hero => { %>
-                    <div class="gallery-item lore-item">
+                    <div class="gallery-item lore-item <%= hero.visible === false ? 'hidden-content' : '' %>">
+                        <% if (isContentCreator && hero.visible === false) { %>
+                            <div class="visibility-indicator" title="This character is hidden from public view">
+                                🔒 <span>HIDDEN</span>
+                            </div>
+                        <% } %>
                         <a href="/character/<%= hero.id %>">
                             <img src="<%= cdnUrl %><%= hero.image %>" alt="<%= hero.title %>">
                             <h2><%= hero.title %></h2>

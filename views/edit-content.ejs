@@ -77,6 +77,45 @@
             background: #5a6268;
         }
 
+        .btn-visibility {
+            background: #f39c12;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-visibility:hover {
+            background: #e67e22;
+        }
+
+        .btn-visibility.hidden {
+            background: #95a5a6;
+        }
+
+        .btn-visibility.hidden:hover {
+            background: #7f8c8d;
+        }
+
+        .visibility-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .visibility-badge.visible {
+            background: rgba(76, 175, 80, 0.3);
+            color: #2e7d32;
+        }
+
+        .visibility-badge.hidden {
+            background: rgba(158, 158, 158, 0.3);
+            color: #616161;
+        }
+
         .edit-form {
             background: white;
             border-radius: 15px;
@@ -481,10 +520,17 @@
             <h1>
                 ✏️ Edit <%= contentType.charAt(0).toUpperCase() + contentType.slice(1) %>
                 <span class="content-type-badge"><%= contentType.toUpperCase() %></span>
+                <span id="visibilityBadge" class="visibility-badge <%= contentData.visible !== false ? 'visible' : 'hidden' %>">
+                    <%= contentData.visible !== false ? '👁️ VISIBLE' : '🔒 HIDDEN' %>
+                </span>
             </h1>
             <p><strong><%= contentTitle %></strong></p>
             <div class="edit-actions">
                 <button id="saveBtn" class="btn btn-primary" onclick="saveContent()">💾 Save Changes</button>
+                <button id="toggleVisibilityBtn" class="btn btn-visibility <%= contentData.visible !== false ? '' : 'hidden' %>" onclick="toggleVisibility()">
+                    <span id="visibilityIcon"><%= contentData.visible !== false ? '🔓' : '🔒' %></span>
+                    <span id="visibilityText"><%= contentData.visible !== false ? 'Hide Content' : 'Reveal Content' %></span>
+                </button>
                 <a href="<%= backUrl %>" class="btn btn-secondary">← Back to <%= contentType.charAt(0).toUpperCase() + contentType.slice(1) %></a>
                 <a href="/create" class="btn btn-secondary" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">✨ Create New</a>
                 <span id="saveStatus" class="save-status"></span>
@@ -1142,6 +1188,90 @@
             statusDiv.style.color = '#721c24';
             statusDiv.innerHTML = `❌ Upload failed: ${error.message}`;
             throw error;
+        }
+    }
+
+    // Toggle visibility function
+    async function toggleVisibility() {
+        const toggleBtn = document.getElementById('toggleVisibilityBtn');
+        const visibilityBadge = document.getElementById('visibilityBadge');
+        const visibilityIcon = document.getElementById('visibilityIcon');
+        const visibilityText = document.getElementById('visibilityText');
+
+        // The button has class 'hidden' when content is hidden
+        // So if button has 'hidden' class, content is currently hidden (visible=false)
+        // If button doesn't have 'hidden' class, content is currently visible (visible=true)
+        const currentlyVisible = !toggleBtn.classList.contains('hidden');
+        const newVisibility = !currentlyVisible;
+
+        // Disable button during request
+        toggleBtn.disabled = true;
+
+        try {
+            // Get Firebase ID token for authentication
+            if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+                throw new Error('Please sign in via the Forum first');
+            }
+
+            const idToken = await window.firebaseAuth.currentUser.getIdToken();
+
+            // Build the appropriate API endpoint based on content type
+            let endpoint;
+            <% if (typeof seasonNumber !== 'undefined' && typeof episodeNumber !== 'undefined') { %>
+            endpoint = `/api/content/episode/<%= seasonNumber %>/<%= episodeNumber %>/visibility`;
+            <% } else { %>
+            endpoint = `/api/content/${contentType}/${contentId}/visibility`;
+            <% } %>
+
+            // Send visibility toggle request
+            const response = await fetch(endpoint, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    visible: newVisibility
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to update visibility');
+            }
+
+            const result = await response.json();
+
+            // Update UI to reflect new visibility state
+            if (newVisibility) {
+                // Now visible
+                toggleBtn.classList.remove('hidden');
+                visibilityIcon.textContent = '🔓';
+                visibilityText.textContent = 'Hide Content';
+                visibilityBadge.className = 'visibility-badge visible';
+                visibilityBadge.textContent = '👁️ VISIBLE';
+            } else {
+                // Now hidden
+                toggleBtn.classList.add('hidden');
+                visibilityIcon.textContent = '🔒';
+                visibilityText.textContent = 'Reveal Content';
+                visibilityBadge.className = 'visibility-badge hidden';
+                visibilityBadge.textContent = '🔒 HIDDEN';
+            }
+
+            // Show temporary success message
+            const saveStatus = document.getElementById('saveStatus');
+            saveStatus.className = 'save-status success';
+            saveStatus.textContent = result.message;
+            setTimeout(() => {
+                saveStatus.style.display = 'none';
+            }, 3000);
+
+        } catch (error) {
+            console.error('Error toggling visibility:', error);
+            alert('Error: ' + error.message);
+        } finally {
+            toggleBtn.disabled = false;
         }
     }
 

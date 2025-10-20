@@ -153,6 +153,27 @@
             margin-top: 5px;
         }
 
+        .form-group .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .form-group input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .form-group .checkbox-container label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
         .form-actions {
             display: flex;
             gap: 15px;
@@ -385,6 +406,18 @@
                             <label>Primary Image URL <span class="hint">(optional)</span></label>
                             <input type="text" id="episodeImage" placeholder="/images/seasons/season1/episodes/episode1/image.webp">
                         </div>
+
+                        <div class="form-group">
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="episodeVisible">
+                                <label for="episodeVisible">
+                                    <strong>👁️ Make visible immediately</strong>
+                                    <span class="helper-text" style="display: block; margin-top: 5px;">
+                                        By default, new episodes are hidden until you reveal them. Check this to make it visible right away.
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-actions">
@@ -424,6 +457,18 @@
                         <div class="form-group">
                             <label>Primary Image URL <span class="hint">(optional)</span></label>
                             <input type="text" id="characterPrimaryImage" placeholder="/images/characters/goblin-king/primary.webp">
+                        </div>
+
+                        <div class="form-group">
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="characterVisible">
+                                <label for="characterVisible">
+                                    <strong>👁️ Make visible immediately</strong>
+                                    <span class="helper-text" style="display: block; margin-top: 5px;">
+                                        By default, new characters are hidden until you reveal them. Check this to make it visible right away.
+                                    </span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -477,6 +522,18 @@
                         <div class="form-group">
                             <label>Primary Image URL <span class="hint">(optional)</span></label>
                             <input type="text" id="lorePrimaryImage" placeholder="/images/lore/ice-fortress/primary.webp">
+                        </div>
+
+                        <div class="form-group">
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="loreVisible">
+                                <label for="loreVisible">
+                                    <strong>👁️ Make visible immediately</strong>
+                                    <span class="helper-text" style="display: block; margin-top: 5px;">
+                                        By default, new lore is hidden until you reveal it. Check this to make it visible right away.
+                                    </span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -615,7 +672,8 @@
                 youtubeLink: document.getElementById('episodeYoutubeLink').value,
                 audio: document.getElementById('episodeAudio').value,
                 image: document.getElementById('episodeImage').value,
-                carouselImages: []
+                carouselImages: [],
+                visible: document.getElementById('episodeVisible').checked
             };
 
             await createContent('episode', { seasonNumber, episodeNumber, data });
@@ -630,7 +688,8 @@
                 description: document.getElementById('characterDescription').value,
                 primary_image: document.getElementById('characterPrimaryImage').value,
                 image_gallery: [],
-                episodes: []
+                episodes: [],
+                visible: document.getElementById('characterVisible').checked
             };
 
             await createContent('character', { characterId, data });
@@ -646,6 +705,10 @@
                 category: document.getElementById('loreCategory').value,
                 primary_image: document.getElementById('lorePrimaryImage').value,
                 image_gallery: [],
+                related_episodes: [],
+                related_characters: [],
+                visible: document.getElementById('loreVisible').checked
+            };
                 related_episodes: [],
                 related_characters: []
             };

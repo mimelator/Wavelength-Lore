@@ -83,7 +83,8 @@ async function fetchEpisodesFromDatabase() {
                 description: episodeData.description,
                 youtubeLink: episodeData.youtubeLink,
                 image: episodeData.image,
-                keywords: episodeData.keywords || [] // Include keywords field
+                keywords: episodeData.keywords || [], // Include keywords field
+                visible: episodeData.visible // Include visibility field for filtering
               });
             }
           }
@@ -189,11 +190,19 @@ async function linkifyEpisodeMentions(text) {
 }
 
 /**
- * Get all episodes list
+ * Get all episodes with optional visibility filtering
+ * @param {boolean} showHidden - Whether to include hidden episodes (for content creators)
  * @returns {Promise<Array>} Array of all episodes
  */
-async function getAllEpisodes() {
-  return await getEpisodes();
+async function getAllEpisodes(showHidden = false) {
+  const allEpisodes = await getEpisodes();
+  
+  // Filter out hidden episodes for public users
+  if (!showHidden) {
+    return allEpisodes.filter(episode => episode.visible !== false);
+  }
+  
+  return allEpisodes;
 }
 
 /**
@@ -245,10 +254,18 @@ function linkifyEpisodeMentionsSync(text) {
 
 /**
  * Get all episodes (sync version using cache)
+ * @param {boolean} showHidden - Whether to include hidden episodes (for content creators)
  * @returns {Array} Array of all episodes
  */
-function getAllEpisodesSync() {
-  return cacheUtils.getSync(episodeCache, fallbackEpisodes);
+function getAllEpisodesSync(showHidden = false) {
+  const allEpisodes = cacheUtils.getSync(episodeCache, fallbackEpisodes);
+  
+  // Filter out hidden episodes for public users
+  if (!showHidden) {
+    return allEpisodes.filter(episode => episode.visible !== false);
+  }
+  
+  return allEpisodes;
 }
 
 /**
@@ -288,6 +305,7 @@ module.exports = {
   linkifyEpisodeMentions,
   initializeEpisodeCache,
   clearEpisodeCache,
+  clearCache: clearEpisodeCache, // Alias for API compatibility
   
   // Sync versions
   getEpisodeByIdSync,

@@ -122,6 +122,53 @@ window.initializeWavelengthFirebase = function(firebaseConfig) {
                         orderByChild 
                     };
                     
+                    // Store Firebase ID token in cookie for server-side authentication
+                    const storeToken = async (user) => {
+                        console.log('🔐 storeToken called with user:', user ? user.uid : 'null');
+                        if (user) {
+                            try {
+                                const idToken = await user.getIdToken();
+                                console.log('📝 Got ID token, length:', idToken.length);
+                                // Store token in cookie (expires in 1 hour, refreshed automatically)
+                                document.cookie = `__session=${idToken}; path=/; max-age=3600; SameSite=Lax`;
+                                console.log('✅ Firebase ID token stored in cookie');
+                                
+                                // Dispatch event so other scripts know the token is ready
+                                window.dispatchEvent(new CustomEvent('wavelengthTokenReady', { 
+                                    detail: { uid: user.uid } 
+                                }));
+                            } catch (error) {
+                                console.error('❌ Failed to get ID token:', error);
+                            }
+                        } else {
+                            // Clear cookie on sign out
+                            document.cookie = '__session=; path=/; max-age=0';
+                            console.log('🔓 Cleared authentication cookie (no user)');
+                        }
+                    };
+                    
+                    // Listen for auth state changes and store token
+                    // This fires when auth state is restored from localStorage or when user signs in
+                    console.log('🎯 Setting up onAuthStateChanged listener in firebase-config.js...');
+                    onAuthStateChanged(auth, async (user) => {
+                        console.log('� Auth state changed in firebase-config.js:', user ? `User: ${user.uid}` : 'No user');
+                        await storeToken(user);
+                    });
+                    
+                    // Refresh token periodically (every 55 minutes)
+                    setInterval(async () => {
+                        const user = auth.currentUser;
+                        if (user) {
+                            try {
+                                const idToken = await user.getIdToken(true); // Force refresh
+                                document.cookie = `__session=${idToken}; path=/; max-age=3600; SameSite=Lax`;
+                                console.log('🔄 Firebase ID token refreshed');
+                            } catch (error) {
+                                console.error('Failed to refresh ID token:', error);
+                            }
+                        }
+                    }, 55 * 60 * 1000); // 55 minutes
+                    
                     // Setup periodic session checking
                     setInterval(() => {
                         if (window.sessionManager.clearExpiredSession()) {

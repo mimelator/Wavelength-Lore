@@ -239,7 +239,8 @@ router.post('/api/content/episode', requireGroup('content_manager'), async (req,
             youtubeLink: data.youtubeLink || '',
             audio: data.audio || '',
             image: data.image || '',
-            carouselImages: data.carouselImages || []
+            carouselImages: data.carouselImages || [],
+            visible: data.visible !== undefined ? data.visible : false // Default to hidden
         };
 
         console.log('📝 Creating new episode at:', firebasePath);
@@ -327,7 +328,8 @@ router.post('/api/content/character', requireGroup('content_manager'), async (re
             description: data.description,
             primary_image: data.primary_image || '',
             image_gallery: data.image_gallery || [],
-            episodes: data.episodes || []
+            episodes: data.episodes || [],
+            visible: data.visible !== undefined ? data.visible : false // Default to hidden
         };
 
         console.log(`📝 Creating new character at: ${firebasePath}`);
@@ -417,7 +419,8 @@ router.post('/api/content/lore', requireGroup('content_manager'), async (req, re
             primary_image: data.primary_image || '',
             image_gallery: data.image_gallery || [],
             related_episodes: data.related_episodes || [],
-            related_characters: data.related_characters || []
+            related_characters: data.related_characters || [],
+            visible: data.visible !== undefined ? data.visible : false // Default to hidden
         };
 
         console.log(`📝 Creating new lore at: ${firebasePath}`);
@@ -446,6 +449,198 @@ router.post('/api/content/lore', requireGroup('content_manager'), async (req, re
 
     } catch (error) {
         console.error('Error creating lore:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Internal server error',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * Toggle Episode Visibility
+ * PUT /api/content/episode/:seasonNumber/:episodeNumber/visibility
+ */
+router.put('/api/content/episode/:seasonNumber/:episodeNumber/visibility', requireGroup('content_manager'), async (req, res) => {
+    try {
+        const { seasonNumber, episodeNumber } = req.params;
+        const { visible } = req.body;
+
+        if (visible === undefined) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing required field: visible'
+            });
+        }
+
+        const firebasePath = `videos/season${seasonNumber}/episodes/episode${episodeNumber}`;
+
+        // Get current episode data
+        const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
+        const episodeData = await fetchDataAsAdmin(firebasePath);
+
+        if (!episodeData) {
+            return res.status(404).json({
+                success: false,
+                error: `Episode ${episodeNumber} in Season ${seasonNumber} not found`
+            });
+        }
+
+        // Update visibility
+        const updatedData = {
+            ...episodeData,
+            visible: visible
+        };
+
+        const success = await updateDataAsAdmin(firebasePath, updatedData);
+
+        if (success) {
+            // Clear episode cache
+            const episodeHelpers = require('../helpers/episode-helpers');
+            if (episodeHelpers.clearCache) {
+                episodeHelpers.clearCache();
+            }
+
+            res.json({
+                success: true,
+                message: `Episode ${visible ? 'revealed' : 'hidden'} successfully`,
+                visible: visible,
+                timestamp: new Date().toISOString()
+            });
+        } else {
+            throw new Error('Failed to update episode visibility');
+        }
+
+    } catch (error) {
+        console.error('Error toggling episode visibility:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Internal server error',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * Toggle Character Visibility
+ * PUT /api/content/character/:characterId/visibility
+ */
+router.put('/api/content/character/:characterId/visibility', requireGroup('content_manager'), async (req, res) => {
+    try {
+        const { characterId } = req.params;
+        const { visible } = req.body;
+
+        if (visible === undefined) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing required field: visible'
+            });
+        }
+
+        const firebasePath = `characters/${characterId}`;
+
+        // Get current character data
+        const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
+        const characterData = await fetchDataAsAdmin(firebasePath);
+
+        if (!characterData) {
+            return res.status(404).json({
+                success: false,
+                error: `Character ${characterId} not found`
+            });
+        }
+
+        // Update visibility
+        const updatedData = {
+            ...characterData,
+            visible: visible
+        };
+
+        const success = await updateDataAsAdmin(firebasePath, updatedData);
+
+        if (success) {
+            // Clear character cache
+            const characterHelpers = require('../helpers/character-helpers');
+            if (characterHelpers.clearCache) {
+                characterHelpers.clearCache();
+            }
+
+            res.json({
+                success: true,
+                message: `Character ${visible ? 'revealed' : 'hidden'} successfully`,
+                visible: visible,
+                timestamp: new Date().toISOString()
+            });
+        } else {
+            throw new Error('Failed to update character visibility');
+        }
+
+    } catch (error) {
+        console.error('Error toggling character visibility:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Internal server error',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * Toggle Lore Visibility
+ * PUT /api/content/lore/:loreId/visibility
+ */
+router.put('/api/content/lore/:loreId/visibility', requireGroup('content_manager'), async (req, res) => {
+    try {
+        const { loreId } = req.params;
+        const { visible } = req.body;
+
+        if (visible === undefined) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing required field: visible'
+            });
+        }
+
+        const firebasePath = `lore/${loreId}`;
+
+        // Get current lore data
+        const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
+        const loreData = await fetchDataAsAdmin(firebasePath);
+
+        if (!loreData) {
+            return res.status(404).json({
+                success: false,
+                error: `Lore ${loreId} not found`
+            });
+        }
+
+        // Update visibility
+        const updatedData = {
+            ...loreData,
+            visible: visible
+        };
+
+        const success = await updateDataAsAdmin(firebasePath, updatedData);
+
+        if (success) {
+            // Clear lore cache
+            const loreHelpers = require('../helpers/lore-helpers');
+            if (loreHelpers.clearLoreCache) {
+                loreHelpers.clearLoreCache();
+            }
+
+            res.json({
+                success: true,
+                message: `Lore ${visible ? 'revealed' : 'hidden'} successfully`,
+                visible: visible,
+                timestamp: new Date().toISOString()
+            });
+        } else {
+            throw new Error('Failed to update lore visibility');
+        }
+
+    } catch (error) {
+        console.error('Error toggling lore visibility:', error);
         res.status(500).json({
             success: false,
             error: 'Internal server error',

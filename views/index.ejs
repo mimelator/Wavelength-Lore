@@ -19,8 +19,44 @@
         .season-description {
             font-size: 0.33em; /* Shrink text size by 3x */
             color: #666; /* Subtle color for better readability */
-            margin-top: -10px; /* Adjust spacing */
-            margin-bottom: 10px;
+        }
+        
+        /* Visibility indicator styles */
+        .episode-visibility-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #f1c40f;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        .carousel .slick-slide {
+            position: relative;
+        }
+        
+        .carousel .slick-slide > div {
+            position: relative;
+        }
+        
+        .carousel .hidden-episode {
+            opacity: 0.7;
+        }
+        
+        .carousel .hidden-episode img {
+            border: 2px dashed #f1c40f;
+        }
+        
+        .carousel .hidden-episode:hover {
+            opacity: 1;
         }
     </style>
     
@@ -53,19 +89,29 @@
                 const numB = parseInt(b.replace('episode', ''));
                 return numA - numB;
             });
-            episodeKeys.forEach(episode => { 
+            episodeKeys.forEach(episode => {
+                const episodeData = videos[season].episodes[episode];
+                // Skip hidden episodes for non-content creators
+                if (episodeData.visible === false && !isContentCreator) {
+                    return;
+                }
             %>
-                <div>
+                <div class="<%= episodeData.visible === false ? 'hidden-episode' : '' %>">
+                    <% if (isContentCreator && episodeData.visible === false) { %>
+                        <div class="episode-visibility-indicator" title="This episode is hidden from public view">
+                            🔒 <span>HIDDEN</span>
+                        </div>
+                    <% } %>
                     <h3 class="episode-title">
                         <a href="/season/<%= season.replace('season', '') %>/episode/<%= episode.replace('episode', '') %>">
-                            <%= videos[season].episodes[episode].title %>
+                            <%= episodeData.title %>
                         </a>
                     </h3>
                     <a href="/season/<%= season.replace('season', '') %>/episode/<%= episode.replace('episode', '') %>">
-                        <img src="<%= cdnUrl %><%= videos[season].episodes[episode].image %>" alt="<%= videos[season].episodes[episode].title %>">
+                        <img src="<%= cdnUrl %><%= episodeData.image %>" alt="<%= episodeData.title %>">
                     </a>
-                    <p><%= videos[season].episodes[episode].description %></p>
-                    <a href="<%= videos[season].episodes[episode].youtubeLink %>" target="_blank" class="youtube-link">Watch on YouTube</a>
+                    <p><%= episodeData.description %></p>
+                    <a href="<%= episodeData.youtubeLink %>" target="_blank" class="youtube-link">Watch on YouTube</a>
                 </div>
             <% }); %>
         </div>
