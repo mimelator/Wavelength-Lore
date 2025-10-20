@@ -25,6 +25,7 @@ EXPOSE 8080
 # Set default environment variables for port configuration
 ENV NODE_PORT=3001
 ENV NGINX_PORT=8080
+ENV NODE_ENV=production
 
 # Start Nginx and your Node.js app
-CMD ["sh", "-c", "echo 'Container starting with NODE_PORT=${NODE_PORT} NGINX_PORT=${NGINX_PORT} PORT=${PORT}' && envsubst '${NGINX_PORT} ${NODE_PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && echo 'Generated nginx.conf:' && cat /etc/nginx/nginx.conf && nginx && node index.js"]
+CMD ["sh", "-c", "echo 'Container starting with NODE_ENV=${NODE_ENV} NODE_PORT=${NODE_PORT} NGINX_PORT=${NGINX_PORT} PORT=${PORT}' && envsubst '${NGINX_PORT} ${NODE_PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && echo 'Generated nginx.conf:' && cat /etc/nginx/nginx.conf && nginx && node index.js"]

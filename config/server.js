@@ -3,13 +3,35 @@
  * Handles port selection, environment setup, and server configuration
  */
 
-// Load environment variables only if .env exists (development mode)
-// In production (App Runner), environment variables are injected directly
-try {
-  require('dotenv').config({ override: false });
-} catch (error) {
-  // .env file not found - this is expected in production
-  // Environment variables are provided by App Runner
+// Load environment variables only in development
+// In production (App Runner), environment variables are injected directly by AWS
+// We check if we're NOT in production before attempting to load .env
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    // Only attempt to load dotenv in development
+    const dotenv = require('dotenv');
+    const fs = require('fs');
+    const path = require('path');
+
+    // Check if .env file actually exists before attempting to load
+    const envPath = path.resolve(process.cwd(), '.env');
+    if (fs.existsSync(envPath)) {
+      const result = dotenv.config({ override: false });
+      if (result.error) {
+        console.log('⚠️  Error loading .env file:', result.error.message);
+      } else {
+        console.log('✅ Loaded environment variables from .env file');
+      }
+    } else {
+      console.log('ℹ️  No .env file found - using system environment variables');
+    }
+  } catch (error) {
+    // dotenv module not found or other error - not critical
+    console.log('ℹ️  dotenv not available - using system environment variables');
+  }
+} else {
+  // Production mode - App Runner injects environment variables directly
+  console.log('🚀 Production mode - using App Runner environment variables');
 }
 
 const versionManager = require('../utils/version');
