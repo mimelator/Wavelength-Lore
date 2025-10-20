@@ -304,6 +304,65 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Prompt-specific styles */
+        .prompt-card {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s ease;
+        }
+
+        .prompt-card:hover {
+            background: #e9ecef;
+        }
+
+        .prompt-info {
+            flex: 1;
+        }
+
+        .prompt-title {
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .prompt-meta {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .prompt-tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-right: 5px;
+        }
+
+        .search-result-card {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-result-card:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateX(5px);
+        }
     </style>
 </head>
 <body>
@@ -492,6 +551,36 @@
                     <div class="form-hint">URLs to gallery images (hover to zoom)</div>
                 </div>
                 <% } %>
+            </div>
+
+            <!-- AI Prompts Section -->
+            <div class="form-section">
+                <h2>🤖 AI Generation Prompts</h2>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Link AI generation prompts to this <%= contentType %> for image and content generation.
+                </p>
+
+                <!-- Linked Prompts List -->
+                <div id="linkedPromptsContainer">
+                    <div class="form-label">Linked Prompts</div>
+                    <div id="linkedPromptsList" style="margin-bottom: 20px;">
+                        <div class="no-prompts" style="padding: 20px; text-align: center; background: #f8f9fa; border-radius: 8px; color: #999;">
+                            Loading prompts...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add New Prompt -->
+                <div class="form-group">
+                    <label class="form-label">Add Prompt</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="promptSearch" class="form-input"
+                               placeholder="Search prompts by title, keywords, or tags..."
+                               oninput="searchPrompts(this.value)">
+                        <button type="button" class="btn btn-success" onclick="showAllPrompts()">Browse All</button>
+                    </div>
+                    <div id="promptSearchResults" style="margin-top: 10px; max-height: 300px; overflow-y: auto;"></div>
+                </div>
             </div>
         </form>
     </div>
@@ -766,6 +855,180 @@
             saveBtn.disabled = false;
         }
     }
+
+    // ===========================
+    // PROMPTS MANAGEMENT
+    // ===========================
+
+    let allPrompts = [];
+    let linkedPrompts = [];
+
+    // Load prompts on page load
+    async function loadPrompts() {
+        try {
+            const response = await fetch('/api/prompts');
+            if (response.ok) {
+                allPrompts = await response.json();
+                console.log('📝 Loaded', allPrompts.length, 'prompts');
+                await loadLinkedPrompts();
+            }
+        } catch (error) {
+            console.error('Error loading prompts:', error);
+        }
+    }
+
+    // Load prompts linked to this content
+    async function loadLinkedPrompts() {
+        try {
+            const linkField = contentType === 'episode' ? 'linkedEpisodes' :
+                            contentType === 'character' ? 'linkedCharacters' :
+                            'linkedLore';
+
+            linkedPrompts = allPrompts.filter(p =>
+                p[linkField] && p[linkField].includes(contentId)
+            );
+
+            displayLinkedPrompts();
+        } catch (error) {
+            console.error('Error loading linked prompts:', error);
+        }
+    }
+
+    // Display linked prompts
+    function displayLinkedPrompts() {
+        const container = document.getElementById('linkedPromptsList');
+
+        if (linkedPrompts.length === 0) {
+            container.innerHTML = '<div class="no-prompts" style="padding: 20px; text-align: center; background: #f8f9fa; border-radius: 8px; color: #999;">No prompts linked yet. Search and add prompts below.</div>';
+            return;
+        }
+
+        container.innerHTML = linkedPrompts.map(prompt => `
+            <div class="prompt-card">
+                <div class="prompt-info">
+                    <div class="prompt-title">${prompt.title}</div>
+                    <div class="prompt-meta">
+                        <span class="prompt-tag">${prompt.category}</span>
+                        ${prompt.tags.slice(0, 3).map(tag => `<span class="prompt-tag">${tag}</span>`).join('')}
+                    </div>
+                </div>
+                <button type="button" class="btn btn-danger btn-small" onclick="unlinkPrompt('${prompt.id}')">Unlink</button>
+            </div>
+        `).join('');
+    }
+
+    // Search prompts
+    function searchPrompts(query) {
+        const searchResults = document.getElementById('promptSearchResults');
+
+        if (!query || query.length < 2) {
+            searchResults.innerHTML = '';
+            return;
+        }
+
+        const results = allPrompts.filter(p => {
+            const searchText = (p.title + ' ' + p.keywords.join(' ') + ' ' + p.tags.join(' ')).toLowerCase();
+            return searchText.includes(query.toLowerCase()) && !linkedPrompts.find(lp => lp.id === p.id);
+        });
+
+        if (results.length === 0) {
+            searchResults.innerHTML = '<div style="padding: 10px; color: #999;">No prompts found</div>';
+            return;
+        }
+
+        searchResults.innerHTML = results.slice(0, 10).map(prompt => `
+            <div class="search-result-card" onclick="linkPrompt('${prompt.id}')">
+                <div class="prompt-title">${prompt.title}</div>
+                <div class="prompt-meta">
+                    <span class="prompt-tag">${prompt.category}</span>
+                    ${prompt.tags.slice(0, 3).map(tag => `<span class="prompt-tag">${tag}</span>`).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Show all prompts
+    function showAllPrompts() {
+        const searchResults = document.getElementById('promptSearchResults');
+        const unlinked = allPrompts.filter(p => !linkedPrompts.find(lp => lp.id === p.id));
+
+        searchResults.innerHTML = unlinked.slice(0, 20).map(prompt => `
+            <div class="search-result-card" onclick="linkPrompt('${prompt.id}')">
+                <div class="prompt-title">${prompt.title}</div>
+                <div class="prompt-meta">
+                    <span class="prompt-tag">${prompt.category}</span>
+                    ${prompt.tags.slice(0, 3).map(tag => `<span class="prompt-tag">${tag}</span>`).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Link prompt to this content
+    async function linkPrompt(promptId) {
+        try {
+            const idToken = await window.firebaseAuth.currentUser.getIdToken();
+
+            const response = await fetch(`/api/prompts/${promptId}/link`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    contentType: contentType,
+                    contentId: contentId
+                })
+            });
+
+            if (response.ok) {
+                console.log('✅ Prompt linked successfully');
+                await loadPrompts(); // Reload to update UI
+                document.getElementById('promptSearch').value = '';
+                document.getElementById('promptSearchResults').innerHTML = '';
+            } else {
+                const error = await response.json();
+                alert('Failed to link prompt: ' + error.message);
+            }
+        } catch (error) {
+            console.error('Error linking prompt:', error);
+            alert('Error linking prompt');
+        }
+    }
+
+    // Unlink prompt from this content
+    async function unlinkPrompt(promptId) {
+        if (!confirm('Remove this prompt link?')) return;
+
+        try {
+            const idToken = await window.firebaseAuth.currentUser.getIdToken();
+
+            const response = await fetch(`/api/prompts/${promptId}/unlink`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    contentType: contentType,
+                    contentId: contentId
+                })
+            });
+
+            if (response.ok) {
+                console.log('✅ Prompt unlinked successfully');
+                await loadPrompts(); // Reload to update UI
+            } else {
+                const error = await response.json();
+                alert('Failed to unlink prompt: ' + error.message);
+            }
+        } catch (error) {
+            console.error('Error unlinking prompt:', error);
+            alert('Error unlinking prompt');
+        }
+    }
+
+    // Load prompts when page is ready
+    window.addEventListener('DOMContentLoaded', loadPrompts);
 
     // Client-side permission check
     let permissionVerified = false;
