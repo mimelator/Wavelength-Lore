@@ -92,6 +92,22 @@ async function fetchEpisodesFromDatabase() {
       
       const episodesWithKeywords = allEpisodes.filter(ep => ep.keywords && ep.keywords.length > 0).length;
       console.log(`📺 Loaded ${allEpisodes.length} episodes from ${seasonCount} seasons (${episodesWithKeywords} with keywords)`);
+      
+      // Sort episodes by season and episode number
+      allEpisodes.sort((a, b) => {
+        // Extract numeric values from season and episode IDs
+        const seasonA = parseInt(a.season.replace('season', ''));
+        const seasonB = parseInt(b.season.replace('season', ''));
+        
+        if (seasonA !== seasonB) {
+          return seasonA - seasonB;
+        }
+        
+        const episodeA = parseInt(a.episode.replace('episode', ''));
+        const episodeB = parseInt(b.episode.replace('episode', ''));
+        return episodeA - episodeB;
+      });
+      
       return allEpisodes;
     } else {
       console.warn('No episode data found in database, using fallback');

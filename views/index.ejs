@@ -46,7 +46,15 @@
         </div>
         <br /><br />
         <div class="carousel" id="carousel-<%= season %>">
-            <% for (var episode in videos[season].episodes) { %>
+            <% 
+            // Sort episodes numerically by episode number
+            const episodeKeys = Object.keys(videos[season].episodes).sort((a, b) => {
+                const numA = parseInt(a.replace('episode', ''));
+                const numB = parseInt(b.replace('episode', ''));
+                return numA - numB;
+            });
+            episodeKeys.forEach(episode => { 
+            %>
                 <div>
                     <h3 class="episode-title">
                         <a href="/season/<%= season.replace('season', '') %>/episode/<%= episode.replace('episode', '') %>">
@@ -59,7 +67,7 @@
                     <p><%= videos[season].episodes[episode].description %></p>
                     <a href="<%= videos[season].episodes[episode].youtubeLink %>" target="_blank" class="youtube-link">Watch on YouTube</a>
                 </div>
-            <% } %>
+            <% }); %>
         </div>
         <br /><br />
         <br /><hr /><br />
