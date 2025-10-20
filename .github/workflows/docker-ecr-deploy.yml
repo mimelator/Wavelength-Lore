@@ -61,6 +61,168 @@ jobs:
           echo "::notice::Short SHA: $SHORT_SHA"
           echo "::notice::Image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
+      - name: Deploy to App Runner
+        id: deploy-apprunner
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: wavelength-lore
+          COMMIT_SHA: ${{ github.sha }}
+          APPRUNNER_SERVICE_ARN: ${{ secrets.APPRUNNER_SERVICE_ARN }}
+        run: |
+          # Extract short commit SHA
+          SHORT_SHA=${COMMIT_SHA:0:8}
+
+          echo "::notice::Deploying commit $SHORT_SHA to App Runner"
+
+          # Get the image digest for the commit-tagged image
+          IMAGE_DIGEST=$(aws ecr describe-images \
+            --repository-name $ECR_REPOSITORY \
+            --image-ids imageTag=$SHORT_SHA \
+            --query 'imageDetails[0].imageDigest' \
+            --output text)
+
+          echo "Image digest: $IMAGE_DIGEST"
+
+          # Construct the image identifier using digest for immutability
+          IMAGE_IDENTIFIER="$ECR_REGISTRY/$ECR_REPOSITORY@$IMAGE_DIGEST"
+
+          echo "::notice::Updating App Runner to image: $IMAGE_IDENTIFIER"
+
+          # Get current service configuration
+          CURRENT_CONFIG=$(aws apprunner describe-service \
+            --service-arn $APPRUNNER_SERVICE_ARN \
+            --query 'Service.SourceConfiguration.ImageRepository.ImageConfiguration.RuntimeEnvironmentVariables' \
+            --output json)
+
+          # Update App Runner service with new image
+          OPERATION_ID=$(aws apprunner update-service \
+            --service-arn $APPRUNNER_SERVICE_ARN \
+            --source-configuration "{
+              \"ImageRepository\": {
+                \"ImageIdentifier\": \"$IMAGE_IDENTIFIER\",
+                \"ImageRepositoryType\": \"ECR\",
+                \"ImageConfiguration\": {
+                  \"Port\": \"8080\",
+                  \"RuntimeEnvironmentVariables\": $CURRENT_CONFIG
+                }
+              },
+              \"AutoDeploymentsEnabled\": true
+            }" \
+            --query 'OperationId' \
+            --output text)
+
+          echo "::notice::App Runner deployment initiated with Operation ID: $OPERATION_ID"
+          echo "operation_id=$OPERATION_ID" >> $GITHUB_OUTPUT
+          echo "image_digest=$IMAGE_DIGEST" >> $GITHUB_OUTPUT
+          echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+
+      - name: Wait for App Runner Deployment
+        env:
+          APPRUNNER_SERVICE_ARN: ${{ secrets.APPRUNNER_SERVICE_ARN }}
+        run: |
+          echo "::notice::Waiting for App Runner deployment to complete..."
+
+          # Maximum wait time: 10 minutes (600 seconds)
+          MAX_WAIT=600
+          ELAPSED=0
+          INTERVAL=15
+
+          while [ $ELAPSED -lt $MAX_WAIT ]; do
+            STATUS=$(aws apprunner describe-service \
+              --service-arn $APPRUNNER_SERVICE_ARN \
+              --query 'Service.Status' \
+              --output text)
+
+            echo "Current status: $STATUS (${ELAPSED}s elapsed)"
+
+            if [ "$STATUS" = "RUNNING" ]; then
+              echo "::notice::✅ App Runner service is now RUNNING"
+              break
+            elif [ "$STATUS" = "OPERATION_IN_PROGRESS" ]; then
+              echo "Deployment in progress, waiting ${INTERVAL}s..."
+              sleep $INTERVAL
+              ELAPSED=$((ELAPSED + INTERVAL))
+            else
+              echo "::error::❌ Unexpected status: $STATUS"
+              exit 1
+            fi
+          done
+
+          if [ $ELAPSED -ge $MAX_WAIT ]; then
+            echo "::error::❌ Deployment timed out after ${MAX_WAIT}s"
+            exit 1
+          fi
+
+      - name: Health Check
+        env:
+          APPRUNNER_SERVICE_ARN: ${{ secrets.APPRUNNER_SERVICE_ARN }}
+        run: |
+          echo "::notice::Running health checks on deployed service..."
+
+          # Get the service URL
+          SERVICE_URL=$(aws apprunner describe-service \
+            --service-arn $APPRUNNER_SERVICE_ARN \
+            --query 'Service.ServiceUrl' \
+            --output text)
+
+          HEALTH_URL="https://$SERVICE_URL"
+
+          echo "Testing URL: $HEALTH_URL"
+
+          # Wait a bit for the service to fully start
+          sleep 10
+
+          # Try health check up to 5 times
+          MAX_ATTEMPTS=5
+          ATTEMPT=1
+
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            echo "Health check attempt $ATTEMPT/$MAX_ATTEMPTS..."
+
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$HEALTH_URL" || echo "000")
+
+            if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "302" ]; then
+              echo "::notice::✅ Health check passed! HTTP $HTTP_CODE"
+              exit 0
+            else
+              echo "::warning::Health check returned HTTP $HTTP_CODE"
+
+              if [ $ATTEMPT -lt $MAX_ATTEMPTS ]; then
+                echo "Waiting 15s before retry..."
+                sleep 15
+              fi
+            fi
+
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+
+          echo "::error::❌ Health checks failed after $MAX_ATTEMPTS attempts"
+          exit 1
+
+      - name: Verify Deployment
+        env:
+          APPRUNNER_SERVICE_ARN: ${{ secrets.APPRUNNER_SERVICE_ARN }}
+          EXPECTED_DIGEST: ${{ steps.deploy-apprunner.outputs.image_digest }}
+        run: |
+          echo "::notice::Verifying deployed image matches expected digest..."
+
+          # Get the currently running image identifier
+          CURRENT_IMAGE=$(aws apprunner describe-service \
+            --service-arn $APPRUNNER_SERVICE_ARN \
+            --query 'Service.SourceConfiguration.ImageRepository.ImageIdentifier' \
+            --output text)
+
+          echo "Expected digest: $EXPECTED_DIGEST"
+          echo "Current image: $CURRENT_IMAGE"
+
+          if echo "$CURRENT_IMAGE" | grep -q "$EXPECTED_DIGEST"; then
+            echo "::notice::✅ Deployment verified! Running correct image."
+          else
+            echo "::error::❌ Deployment verification failed! Image mismatch."
+            echo "::error::This may indicate a rollback occurred."
+            exit 1
+          fi
+
       - name: Invalidate CloudFront Cache (Optional)
         env:
           CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
@@ -71,3 +233,16 @@ jobs:
           else
             echo "::warning::CLOUDFRONT_DISTRIBUTION_ID not set, skipping cache invalidation"
           fi
+
+      - name: Deployment Summary
+        if: success()
+        env:
+          SHORT_SHA: ${{ steps.deploy-apprunner.outputs.short_sha }}
+        run: |
+          echo "::notice::========================================="
+          echo "::notice::🚀 Deployment Successful!"
+          echo "::notice::========================================="
+          echo "::notice::Commit: $SHORT_SHA"
+          echo "::notice::Image Digest: ${{ steps.deploy-apprunner.outputs.image_digest }}"
+          echo "::notice::Status: Running and healthy"
+          echo "::notice::========================================="
