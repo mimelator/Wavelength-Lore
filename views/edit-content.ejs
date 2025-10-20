@@ -4,187 +4,258 @@
     <%- include('partials/head') %>
     <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css">
     <style>
+        body {
+            background: #f5f7fa;
+        }
+
         .edit-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 40px auto;
             padding: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
 
         .edit-header {
-            text-align: center;
-            margin-bottom: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
             color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
         }
 
         .edit-header h1 {
             font-family: 'AnimeAce', Arial, sans-serif;
-            font-size: 2.5em;
+            font-size: 2.2em;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .edit-header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-
-        .content-card {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
         }
 
         .content-type-badge {
             display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-family: 'AnimeAce', Arial, sans-serif;
-            font-size: 0.9em;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .content-type-badge.episode {
-            background: linear-gradient(135deg, #4a47a3, #6a67d3);
-            color: white;
-        }
-
-        .content-type-badge.character {
-            background: linear-gradient(135deg, #6a4c93, #8a6cb3);
-            color: white;
-        }
-
-        .content-type-badge.lore {
-            background: linear-gradient(135deg, #3498db, #5dade2);
-            color: white;
-        }
-
-        .content-info {
-            margin-bottom: 30px;
-        }
-
-        .content-info h2 {
-            font-family: 'AnimeAce', Arial, sans-serif;
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.8em;
-        }
-
-        .info-row {
-            display: flex;
-            margin-bottom: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-
-        .info-label {
-            font-weight: bold;
-            min-width: 120px;
-            color: #667eea;
-            font-family: 'AnimeAce', Arial, sans-serif;
-        }
-
-        .info-value {
-            color: #555;
-            flex: 1;
-        }
-
-        .placeholder-message {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 30px;
+            padding: 6px 14px;
             border-radius: 15px;
-            text-align: center;
-            margin: 30px 0;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 15px;
+            background: rgba(255, 255, 255, 0.3);
         }
 
-        .placeholder-message h3 {
-            font-family: 'AnimeAce', Arial, sans-serif;
-            margin-bottom: 15px;
-            font-size: 1.6em;
-        }
-
-        .placeholder-message p {
-            font-size: 1.1em;
-            margin: 10px 0;
-            opacity: 0.95;
-        }
-
-        .action-buttons {
+        .edit-actions {
             display: flex;
             gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         .btn {
-            padding: 12px 30px;
-            border-radius: 10px;
-            border: 2px solid #333;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
             font-family: 'AnimeAce', Arial, sans-serif;
             font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: #4CAF50;
             color: white;
         }
 
         .btn-primary:hover {
+            background: #45a049;
             transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
         }
 
         .btn-secondary {
-            background: white;
-            color: #667eea;
+            background: #6c757d;
+            color: white;
         }
 
         .btn-secondary:hover {
-            background: #f8f9fa;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+            background: #5a6268;
         }
 
-        .feature-list {
-            background: #fff3cd;
-            border: 2px dashed #ffc107;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
+        .edit-form {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .feature-list h4 {
-            color: #856404;
-            margin-bottom: 15px;
+        .form-section {
+            margin-bottom: 35px;
+            padding-bottom: 35px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .form-section h2 {
             font-family: 'AnimeAce', Arial, sans-serif;
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 20px;
         }
 
-        .feature-list ul {
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            font-family: 'AnimeAce', Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-textarea.large {
+            min-height: 250px;
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .keywords-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            min-height: 50px;
+        }
+
+        .keyword-tag {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .keyword-remove {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .keyword-add-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            min-width: 150px;
+            font-size: 14px;
+        }
+
+        .array-list {
             list-style: none;
             padding: 0;
         }
 
-        .feature-list li {
-            padding: 8px 0;
-            color: #856404;
+        .array-list-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
-        .feature-list li:before {
-            content: "🎯 ";
-            margin-right: 8px;
+        .array-list-item input {
+            flex: 1;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .save-status {
+            margin-left: 15px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .save-status.saving {
+            background: #ffc107;
+            color: #000;
+            display: inline-block;
+        }
+
+        .save-status.success {
+            background: #28a745;
+            color: white;
+            display: inline-block;
+        }
+
+        .save-status.error {
+            background: #dc3545;
+            color: white;
+            display: inline-block;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -193,76 +264,300 @@
 
     <div class="edit-container">
         <div class="edit-header">
-            <h1>✏️ Content Editor</h1>
-            <p>Prompt Management & Content Editing</p>
+            <h1>
+                ✏️ Edit <%= contentType.charAt(0).toUpperCase() + contentType.slice(1) %>
+                <span class="content-type-badge"><%= contentType.toUpperCase() %></span>
+            </h1>
+            <p><strong><%= contentTitle %></strong></p>
+            <div class="edit-actions">
+                <button id="saveBtn" class="btn btn-primary" onclick="saveContent()">💾 Save Changes</button>
+                <a href="<%= backUrl %>" class="btn btn-secondary">← Back to <%= contentType.charAt(0).toUpperCase() + contentType.slice(1) %></a>
+                <span id="saveStatus" class="save-status"></span>
+            </div>
         </div>
 
-        <div class="content-card">
-            <span class="content-type-badge <%= contentType %>">
-                <%= contentType.toUpperCase() %>
-            </span>
+        <form id="editForm" class="edit-form">
+            <!-- Basic Information Section -->
+            <div class="form-section">
+                <h2>📝 Basic Information</h2>
 
-            <div class="content-info">
-                <h2><%= contentTitle %></h2>
+                <div class="form-group">
+                    <label class="form-label" for="title">Title *</label>
+                    <input type="text" id="title" name="title" class="form-input"
+                           value="<%= contentData.title || '' %>" required>
+                    <div class="form-hint">The main title/name displayed on the page</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="description">Description *</label>
+                    <textarea id="description" name="description" class="form-textarea large" required><%= contentData.description || '' %></textarea>
+                    <div class="form-hint">Main content description (supports smart linking)</div>
+                </div>
 
                 <% if (contentType === 'episode') { %>
-                <div class="info-row">
-                    <span class="info-label">Season:</span>
-                    <span class="info-value"><%= seasonNumber %></span>
+                <div class="form-group">
+                    <label class="form-label" for="summary">Summary</label>
+                    <textarea id="summary" name="summary" class="form-textarea"><%= contentData.summary || '' %></textarea>
+                    <div class="form-hint">Brief summary of the episode</div>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">Episode:</span>
-                    <span class="info-value"><%= episodeNumber %></span>
+
+                <div class="form-group">
+                    <label class="form-label" for="lyrics">Lyrics</label>
+                    <textarea id="lyrics" name="lyrics" class="form-textarea large"><%= contentData.lyrics || '' %></textarea>
+                    <div class="form-hint">Song lyrics for this episode</div>
                 </div>
                 <% } %>
 
-                <div class="info-row">
-                    <span class="info-label">ID:</span>
-                    <span class="info-value"><%= contentId %></span>
+                <% if (contentType === 'lore') { %>
+                <div class="form-group">
+                    <label class="form-label" for="type">Lore Type</label>
+                    <select id="type" name="type" class="form-select">
+                        <option value="place" <%= contentData.type === 'place' ? 'selected' : '' %>>Place</option>
+                        <option value="artifact" <%= contentData.type === 'artifact' ? 'selected' : '' %>>Artifact</option>
+                        <option value="concept" <%= contentData.type === 'concept' ? 'selected' : '' %>>Concept</option>
+                        <option value="event" <%= contentData.type === 'event' ? 'selected' : '' %>>Event</option>
+                    </select>
+                    <div class="form-hint">Category of this lore item</div>
                 </div>
+                <% } %>
+            </div>
 
-                <div class="info-row">
-                    <span class="info-label">Edit Mode:</span>
-                    <span class="info-value">Prompt Management</span>
+            <!-- Keywords Section -->
+            <div class="form-section">
+                <h2>🏷️ Keywords & Tags</h2>
+
+                <div class="form-group">
+                    <label class="form-label">Keywords</label>
+                    <div class="keywords-input" id="keywordsContainer">
+                        <% if (contentData.keywords && Array.isArray(contentData.keywords)) { %>
+                            <% contentData.keywords.forEach(keyword => { %>
+                                <span class="keyword-tag">
+                                    <%= keyword %>
+                                    <span class="keyword-remove" onclick="removeKeyword(this)">×</span>
+                                </span>
+                            <% }); %>
+                        <% } %>
+                        <input type="text" class="keyword-add-input" id="keywordInput"
+                               placeholder="Type keyword and press Enter"
+                               onkeypress="addKeyword(event)">
+                    </div>
+                    <div class="form-hint">Press Enter to add keywords (used for search and linking)</div>
                 </div>
             </div>
 
-            <div class="placeholder-message">
-                <h3>🚧 Under Construction</h3>
-                <p>The content editing interface is currently being developed.</p>
-                <p>This page will soon provide:</p>
+            <!-- Media Section -->
+            <div class="form-section">
+                <h2>🖼️ Media & Images</h2>
 
-                <div class="feature-list">
-                    <h4>Planned Features:</h4>
-                    <ul>
-                        <li>Link and manage AI generation prompts</li>
-                        <li>Associate prompts with characters, lore, and episodes</li>
-                        <li>Preview and test prompts</li>
-                        <li>Version control for prompt changes</li>
-                        <li>Quick access to related content</li>
-                    </ul>
+                <div class="two-column">
+                    <div class="form-group">
+                        <label class="form-label" for="image">Main Image URL</label>
+                        <input type="text" id="image" name="image" class="form-input"
+                               value="<%= contentData.image || '' %>">
+                        <div class="form-hint">URL to the main banner/profile image</div>
+                    </div>
+
+                    <% if (contentType === 'episode') { %>
+                    <div class="form-group">
+                        <label class="form-label" for="audioUrl">Audio URL</label>
+                        <input type="text" id="audioUrl" name="audioUrl" class="form-input"
+                               value="<%= contentData.audioUrl || '' %>">
+                        <div class="form-hint">URL to the audio/music file</div>
+                    </div>
+                    <% } %>
                 </div>
 
-                <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
-                    Thank you for your patience as we build this feature!
-                </p>
-            </div>
+                <% if (contentType === 'episode') { %>
+                <div class="form-group">
+                    <label class="form-label" for="youtubeLink">YouTube Link</label>
+                    <input type="text" id="youtubeLink" name="youtubeLink" class="form-input"
+                           value="<%= contentData.youtubeLink || '' %>">
+                    <div class="form-hint">Full YouTube video URL</div>
+                </div>
 
-            <div class="action-buttons">
-                <a href="<%= backUrl %>" class="btn btn-secondary">
-                    ← Back to <%= contentType.charAt(0).toUpperCase() + contentType.slice(1) %>
-                </a>
-                <a href="/" class="btn btn-primary">
-                    Home
-                </a>
+                <div class="form-group">
+                    <label class="form-label">Carousel Images</label>
+                    <div id="carouselImagesContainer">
+                        <% if (contentData.carouselImages && Array.isArray(contentData.carouselImages)) { %>
+                            <% contentData.carouselImages.forEach((img, index) => { %>
+                                <div class="array-list-item">
+                                    <input type="text" class="form-input" value="<%= img %>" data-array="carouselImages">
+                                    <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
+                                </div>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                    <button type="button" class="btn btn-success btn-small" onclick="addCarouselImage()">+ Add Image</button>
+                    <div class="form-hint">URLs to carousel/gallery images</div>
+                </div>
+                <% } %>
+
+                <% if (contentType === 'character' || contentType === 'lore') { %>
+                <div class="form-group">
+                    <label class="form-label">Image Gallery</label>
+                    <div id="imageGalleryContainer">
+                        <% if (contentData.image_gallery && Array.isArray(contentData.image_gallery)) { %>
+                            <% contentData.image_gallery.forEach((img, index) => { %>
+                                <div class="array-list-item">
+                                    <input type="text" class="form-input" value="<%= img %>" data-array="image_gallery">
+                                    <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
+                                </div>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                    <button type="button" class="btn btn-success btn-small" onclick="addImageGalleryItem()">+ Add Image</button>
+                    <div class="form-hint">URLs to gallery images</div>
+                </div>
+                <% } %>
             </div>
-        </div>
+        </form>
     </div>
 
     <%- include('partials/footer') %>
 
-    <!-- Client-side permission check -->
     <script>
+    // Store original data and Firebase path
+    const contentType = '<%= contentType %>';
+    const firebasePath = '<%= firebasePath %>';
+    const contentId = '<%= contentId %>';
+
+    // Keyword management
+    function addKeyword(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            const input = event.target;
+            const keyword = input.value.trim();
+
+            if (keyword) {
+                const tag = document.createElement('span');
+                tag.className = 'keyword-tag';
+                tag.innerHTML = `${keyword} <span class="keyword-remove" onclick="removeKeyword(this)">×</span>`;
+
+                input.parentElement.insertBefore(tag, input);
+                input.value = '';
+            }
+        }
+    }
+
+    function removeKeyword(element) {
+        element.parentElement.remove();
+    }
+
+    function getKeywords() {
+        const container = document.getElementById('keywordsContainer');
+        const tags = container.querySelectorAll('.keyword-tag');
+        return Array.from(tags).map(tag => tag.textContent.trim().replace('×', '').trim());
+    }
+
+    // Array management functions
+    function removeArrayItem(button) {
+        button.parentElement.remove();
+    }
+
+    function addCarouselImage() {
+        const container = document.getElementById('carouselImagesContainer');
+        const div = document.createElement('div');
+        div.className = 'array-list-item';
+        div.innerHTML = `
+            <input type="text" class="form-input" placeholder="Enter image URL" data-array="carouselImages">
+            <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
+        `;
+        container.appendChild(div);
+    }
+
+    function addImageGalleryItem() {
+        const container = document.getElementById('imageGalleryContainer');
+        const div = document.createElement('div');
+        div.className = 'array-list-item';
+        div.innerHTML = `
+            <input type="text" class="form-input" placeholder="Enter image URL" data-array="image_gallery">
+            <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
+        `;
+        container.appendChild(div);
+    }
+
+    function getArrayValues(arrayName) {
+        const inputs = document.querySelectorAll(`input[data-array="${arrayName}"]`);
+        return Array.from(inputs).map(input => input.value.trim()).filter(val => val !== '');
+    }
+
+    // Save content function
+    async function saveContent() {
+        const saveBtn = document.getElementById('saveBtn');
+        const saveStatus = document.getElementById('saveStatus');
+
+        // Show saving status
+        saveBtn.disabled = true;
+        saveStatus.className = 'save-status saving';
+        saveStatus.textContent = 'Saving...';
+
+        try {
+            // Collect form data
+            const formData = {
+                title: document.getElementById('title').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                keywords: getKeywords(),
+                image: document.getElementById('image').value.trim()
+            };
+
+            // Add type-specific fields
+            if (contentType === 'episode') {
+                formData.summary = document.getElementById('summary')?.value.trim() || '';
+                formData.lyrics = document.getElementById('lyrics')?.value.trim() || '';
+                formData.audioUrl = document.getElementById('audioUrl')?.value.trim() || '';
+                formData.youtubeLink = document.getElementById('youtubeLink')?.value.trim() || '';
+                formData.carouselImages = getArrayValues('carouselImages');
+            } else if (contentType === 'character' || contentType === 'lore') {
+                formData.image_gallery = getArrayValues('image_gallery');
+            }
+
+            if (contentType === 'lore') {
+                formData.type = document.getElementById('type').value;
+            }
+
+            // Get Firebase ID token for authentication
+            if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+                throw new Error('Please sign in via the Forum first');
+            }
+
+            const idToken = await window.firebaseAuth.currentUser.getIdToken();
+
+            // Send to API endpoint (you'll need to create this)
+            const response = await fetch(`/api/content/${contentType}/${contentId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    firebasePath: firebasePath,
+                    data: formData
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to save changes');
+            }
+
+            // Show success
+            saveStatus.className = 'save-status success';
+            saveStatus.textContent = '✓ Saved successfully!';
+
+            setTimeout(() => {
+                saveStatus.style.display = 'none';
+            }, 3000);
+
+        } catch (error) {
+            console.error('Save error:', error);
+            saveStatus.className = 'save-status error';
+            saveStatus.textContent = `✗ Error: ${error.message}`;
+        } finally {
+            saveBtn.disabled = false;
+        }
+    }
+
+    // Client-side permission check
     let permissionVerified = false;
 
     function checkPagePermission() {

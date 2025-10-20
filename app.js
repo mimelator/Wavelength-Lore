@@ -19,6 +19,7 @@ const {
 const contentRoutes = require('./routes/content');
 const adminRoutes = require('./routes/admin');
 const contentEditRoutes = require('./routes/contentEdit');
+const contentApiRoutes = require('./routes/contentApi');
 
 // Import secure backup system
 const SecureDatabaseBackup = require('./utils/secureBackup');
@@ -46,6 +47,9 @@ async function createApp() {
 
   // Configure API routes
   configureAPIRoutes(app, adminRateLimit, adminAuthStrict);
+
+  // Mount content API routes (protected by authentication)
+  app.use('/', contentApiRoutes);
 
   // Mount content edit routes (protected by authentication)
   app.use('/', contentEditRoutes);
