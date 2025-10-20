@@ -1,5 +1,5 @@
 # Use a Node.js base image with a supported Debian version
-FROM node:18-bullseye
+FROM node:20-bullseye
 
 # Set the working directory
 WORKDIR /app
@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies with clean install
+RUN npm ci || npm install --no-cache
 
 # Copy the application code
 COPY . .

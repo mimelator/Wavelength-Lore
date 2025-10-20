@@ -67,6 +67,21 @@ router.get('/cache-management', (req, res) => {
 });
 
 /**
+ * Main admin panel route - redirects to forum admin
+ */
+router.get('/admin', adminAuth, (_req, res) => {
+  res.redirect('/forum/admin');
+});
+
+/**
+ * Admin users management route - redirects to forum admin for now
+ * TODO: Create dedicated user management page
+ */
+router.get('/admin/users', adminAuth, (_req, res) => {
+  res.redirect('/forum/admin');
+});
+
+/**
  * Group management admin panel route
  */
 router.get('/admin/groups', adminAuth, (req, res) => {

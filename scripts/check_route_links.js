@@ -171,10 +171,15 @@ const checkRouteExists = async (route) => {
             timeout: isProduction ? 15000 : 5000,
             headers: getAuthHeaders()
         });
-        
+
+        // 401/403 means route exists but requires auth - that's valid
+        const isAuthRequired = response.status === 401 || response.status === 403;
+        const isSuccess = response.status >= 200 && response.status < 400;
+
         return {
             status: response.status,
-            exists: response.status >= 200 && response.status < 400,
+            exists: isSuccess || isAuthRequired,
+            authRequired: isAuthRequired,
             redirect: response.status >= 300 && response.status < 400 ? response.headers.location : null
         };
     } catch (error) {
@@ -403,7 +408,8 @@ const main = async () => {
         static: [],
         dynamic: [],
         broken: [],
-        redirects: []
+        redirects: [],
+        authRequired: []
     };
     
     const routeDetails = {};
@@ -433,12 +439,15 @@ const main = async () => {
         // Test the actual route
         const result = await checkRouteExists(route);
         routeDetails[route].testResult = result;
-        
+
         if (!result.exists) {
             if (!routeCategories.broken.includes(route)) {
                 routeCategories.broken.push(route);
             }
             console.log(`     ❌ ${result.status} ${result.error || ''}`);
+        } else if (result.authRequired) {
+            routeCategories.authRequired.push(route);
+            console.log(`     🔒 ${result.status} (auth required)`);
         } else if (result.redirect) {
             routeCategories.redirects.push(route);
             console.log(`     🔄 ${result.status} → ${result.redirect}`);
@@ -456,6 +465,7 @@ const main = async () => {
     console.log(`✅ Static routes: ${routeCategories.static.length}`);
     console.log(`🔗 Dynamic routes: ${routeCategories.dynamic.length}`);
     console.log(`🔄 Redirects: ${routeCategories.redirects.length}`);
+    console.log(`🔒 Auth-required routes: ${routeCategories.authRequired.length}`);
     console.log(`❌ Broken routes: ${routeCategories.broken.length}`);
     
     if (routeCategories.broken.length > 0) {
@@ -484,6 +494,14 @@ const main = async () => {
         });
     }
     
+    if (routeCategories.authRequired.length > 0) {
+        console.log('\n🔒 AUTH-REQUIRED ROUTES:');
+        routeCategories.authRequired.forEach(route => {
+            const details = routeDetails[route];
+            console.log(`🔒 ${route} (HTTP ${details.testResult.status})`);
+        });
+    }
+
     if (routeCategories.redirects.length > 0) {
         console.log('\n🔄 REDIRECTS FOUND:');
         routeCategories.redirects.forEach(route => {
