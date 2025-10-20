@@ -486,6 +486,7 @@
             <div class="edit-actions">
                 <button id="saveBtn" class="btn btn-primary" onclick="saveContent()">💾 Save Changes</button>
                 <a href="<%= backUrl %>" class="btn btn-secondary">← Back to <%= contentType.charAt(0).toUpperCase() + contentType.slice(1) %></a>
+                <a href="/create" class="btn btn-secondary" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">✨ Create New</a>
                 <span id="saveStatus" class="save-status"></span>
             </div>
         </div>
@@ -1295,11 +1296,14 @@
                     </div>
                 </div>
                 <div class="prompt-actions">
-                    <button type="button" class="btn-icon btn-view" onclick="viewPrompt('${prompt.id}')" title="View Details / Generate Images">
-                        👁️ View
+                    <button type="button" class="btn-icon btn-view" onclick="viewPrompt('${prompt.id}')" title="Edit & Generate Images">
+                        🎨 Generate
                     </button>
                     <button type="button" class="btn-icon btn-edit" onclick="editPrompt('${prompt.id}')" title="Edit Prompt">
                         ✏️ Edit
+                    </button>
+                    <button type="button" class="btn-icon" style="background: #17a2b8; color: white;" onclick="clonePrompt('${prompt.id}')" title="Clone prompt for experimentation">
+                        📋 Clone
                     </button>
                     <button type="button" class="btn btn-danger btn-small" onclick="unlinkPrompt('${prompt.id}')" title="Unlink from this content">
                         Unlink
@@ -1455,8 +1459,19 @@
                 </div>
                 
                 <div style="margin-bottom: 20px;">
-                    <strong style="color: #666;">Prompt Content:</strong>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 8px; white-space: pre-wrap; font-family: monospace; font-size: 13px;">${prompt.content}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <strong style="color: #666;">Prompt Content:</strong>
+                        <button type="button" class="btn btn-small btn-primary" onclick="savePromptContent()" id="savePromptBtn" style="display: none;">
+                            💾 Save Changes
+                        </button>
+                    </div>
+                    <textarea id="editablePromptContent" 
+                              class="form-textarea" 
+                              rows="8"
+                              style="width: 100%; padding: 15px; border-radius: 8px; border: 2px solid #e0e0e0; font-family: monospace; font-size: 13px; background: #f8f9fa;"
+                              oninput="document.getElementById('savePromptBtn').style.display = 'inline-block'; document.getElementById('promptSaveStatus').style.display = 'none';">${prompt.content}</textarea>
+                    <div class="form-hint" style="margin-top: 5px;">Edit the prompt above and click Save to update it before generating images</div>
+                    <span id="promptSaveStatus" class="save-status" style="margin-top: 10px;"></span>
                 </div>
                 
                 ${prompt.keywords.length > 0 ? `
@@ -1489,7 +1504,7 @@
                 </div>
             `;
 
-            // Store prompt for AI generation
+            // Store prompt for AI generation and editing
             currentPromptForGeneration = prompt;
 
             // Reset generation UI
@@ -1502,6 +1517,80 @@
         } catch (error) {
             console.error('Error viewing prompt:', error);
             alert('Error loading prompt details');
+        }
+    }
+
+    // Save edited prompt content
+    async function savePromptContent() {
+        if (!currentPromptForGeneration) {
+            alert('No prompt loaded');
+            return;
+        }
+
+        const newContent = document.getElementById('editablePromptContent').value.trim();
+        
+        if (!newContent) {
+            alert('Prompt content cannot be empty');
+            return;
+        }
+
+        const saveBtn = document.getElementById('savePromptBtn');
+        const statusEl = document.getElementById('promptSaveStatus');
+
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '⏳ Saving...';
+        statusEl.style.display = 'inline-block';
+        statusEl.className = 'save-status saving';
+        statusEl.textContent = '⏳ Saving prompt...';
+
+        try {
+            const idToken = await window.firebaseAuth.currentUser.getIdToken();
+
+            const response = await fetch(`/api/prompts/${currentPromptForGeneration.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    content: newContent,
+                    // Keep other fields the same
+                    title: currentPromptForGeneration.title,
+                    category: currentPromptForGeneration.category,
+                    keywords: currentPromptForGeneration.keywords,
+                    tags: currentPromptForGeneration.tags
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Save failed');
+            }
+
+            const result = await response.json();
+
+            // Update the stored prompt
+            currentPromptForGeneration.content = newContent;
+
+            // Update in the allPrompts array
+            const promptIndex = allPrompts.findIndex(p => p.id === currentPromptForGeneration.id);
+            if (promptIndex !== -1) {
+                allPrompts[promptIndex].content = newContent;
+            }
+
+            statusEl.className = 'save-status success';
+            statusEl.textContent = '✅ Prompt saved successfully!';
+            saveBtn.style.display = 'none';
+            saveBtn.innerHTML = '💾 Save Changes';
+
+            console.log('✅ Prompt content updated successfully');
+
+        } catch (error) {
+            console.error('Error saving prompt:', error);
+            statusEl.className = 'save-status error';
+            statusEl.textContent = `❌ Error: ${error.message}`;
+        } finally {
+            saveBtn.disabled = false;
         }
     }
 
@@ -1533,6 +1622,39 @@
         } catch (error) {
             console.error('Error loading prompt for edit:', error);
             alert('Error loading prompt');
+        }
+    }
+
+    // Clone prompt for experimentation
+    async function clonePrompt(promptId) {
+        try {
+            const prompt = allPrompts.find(p => p.id === promptId);
+            if (!prompt) {
+                alert('Prompt not found');
+                return;
+            }
+
+            // Open create modal with cloned data
+            document.getElementById('promptModalTitle').textContent = 'Clone Prompt';
+            document.getElementById('promptId').value = ''; // Empty ID = create new
+            document.getElementById('promptTitle').value = `${prompt.title} (Copy)`;
+            document.getElementById('promptContent').value = prompt.content;
+            document.getElementById('promptCategory').value = prompt.category || 'general';
+            document.getElementById('promptKeywords').value = prompt.keywords.join(', ');
+            document.getElementById('promptTags').value = prompt.tags.join(', ');
+
+            document.getElementById('promptModal').classList.add('active');
+            
+            // Focus on title so user can rename
+            setTimeout(() => {
+                const titleInput = document.getElementById('promptTitle');
+                titleInput.focus();
+                titleInput.select(); // Select the text so they can easily rename
+            }, 100);
+
+        } catch (error) {
+            console.error('Error cloning prompt:', error);
+            alert('Error cloning prompt');
         }
     }
 
@@ -1670,6 +1792,15 @@
             return;
         }
 
+        // Get the current prompt content from the editable textarea
+        const promptTextarea = document.getElementById('editablePromptContent');
+        const promptText = promptTextarea ? promptTextarea.value.trim() : currentPromptForGeneration.content;
+
+        if (!promptText) {
+            alert('Prompt content is empty');
+            return;
+        }
+
         const generateBtn = document.getElementById('generateBtn');
         const statusEl = document.getElementById('generationStatus');
         const count = parseInt(document.getElementById('imageCount').value);
@@ -1698,7 +1829,7 @@
                 },
                 body: JSON.stringify({
                     promptId: currentPromptForGeneration.id,
-                    promptText: currentPromptForGeneration.content,
+                    promptText: promptText,  // Use the current textarea value
                     count: count,
                     width: 1024,
                     height: 1024,
@@ -1833,6 +1964,8 @@
             addBtn.disabled = false;
         }
     }
+
+    // ===== End Generation Functions =====
 
     // Load prompts when page is ready
     window.addEventListener('DOMContentLoaded', loadPrompts);

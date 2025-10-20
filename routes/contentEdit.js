@@ -128,4 +128,35 @@ router.get('/edit/lore/:loreId', async (req, res) => {
   }
 });
 
+/**
+ * Content Creation Page
+ * Protected client-side - requires content_manager role or higher
+ */
+router.get('/create', async (req, res) => {
+  try {
+    // Get all episodes to help user pick next episode number
+    const allEpisodes = await episodeHelpers.getAllEpisodes();
+    
+    // Count episodes per season to suggest next episode number
+    const seasonCounts = {};
+    for (let i = 1; i <= 4; i++) {
+      const seasonEpisodes = allEpisodes.filter(ep => ep.seasonNumber === i);
+      seasonCounts[i] = seasonEpisodes.length;
+    }
+
+    res.render('create-content', {
+      title: 'Create New Content',
+      pageTitle: 'Create New Content | Wavelength Lore',
+      pageDescription: 'Create new episodes, characters, and lore entries',
+      seasonCounts: seasonCounts,
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`,
+      req: req
+    });
+  } catch (error) {
+    console.error('Error loading create page:', error);
+    res.status(500).send('Error loading create page');
+  }
+});
+
 module.exports = router;

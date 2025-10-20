@@ -7,6 +7,7 @@
       <li><a href="/map">World Map</a></li>
       <li><a href="/search">Search</a></li>
       <li><a href="/forum">Forum</a></li>
+      <li id="content-creator-nav-item" style="display: none;"><a href="/create" class="content-creator-link">✨ Create Content</a></li>
       <li id="admin-nav-item" style="display: none;"><a href="/forum/admin" class="admin-link">⚙️ Admin</a></li>
     </ul>
   </nav>
@@ -47,6 +48,16 @@
                   // Show admin link if user is admin
                   if (data.isAdmin) {
                     document.getElementById('admin-nav-item').style.display = 'block';
+                  }
+
+                  // Show create content link if user is content_manager or higher
+                  const hasContentAccess = data.groups && (
+                    data.groups.includes('content_manager') ||
+                    data.groups.includes('admin') ||
+                    data.groups.includes('super_admin')
+                  );
+                  if (hasContentAccess) {
+                    document.getElementById('content-creator-nav-item').style.display = 'block';
                   }
 
                   // Trigger custom event for other scripts to listen to
@@ -126,6 +137,24 @@
   
   nav ul li a.admin-link:hover {
     background: linear-gradient(135deg, #ee5a52, #ff6b6b);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    text-decoration: none;
+  }
+
+  /* Content Creator link styling */
+  nav ul li a.content-creator-link {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 4px 12px;
+    border-radius: 15px;
+    color: white !important;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  
+  nav ul li a.content-creator-link:hover {
+    background: linear-gradient(135deg, #764ba2, #667eea);
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     text-decoration: none;
