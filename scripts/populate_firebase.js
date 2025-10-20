@@ -111,8 +111,7 @@ async function populateCharacters() {
 
         for (const file of characterFiles) {
           if (file.endsWith('.yaml')) {
-            totalProcessed++;
-            const characterId = file.replace('.yaml', '');
+            console.log(`📖 Processing character file: ${file}`);
 
             try {
               // Load and process YAML file
@@ -120,16 +119,39 @@ async function populateCharacters() {
               let data = yaml.load(yamlContent);
               data = processYamlData(data);
 
-              // Write to Firebase using admin utilities
-              const success = await writeDataAsAdmin(`characters/${characterId}`, data);
-              if (success) {
-                totalSuccessful++;
-                console.log(`✅ Character imported: ${characterId}`);
+              // Check if data is an array (multiple characters in one file)
+              if (Array.isArray(data)) {
+                console.log(`  📂 Found ${data.length} characters in file`);
+                
+                // Process each character individually
+                for (const character of data) {
+                  if (character.id) {
+                    totalProcessed++;
+                    const success = await writeDataAsAdmin(`characters/${character.id}`, character);
+                    if (success) {
+                      totalSuccessful++;
+                      console.log(`    ✅ ${character.id}: "${character.title}"`);
+                    } else {
+                      console.error(`    ❌ Failed to import: ${character.id}`);
+                    }
+                  } else {
+                    console.warn(`    ⚠️  Skipping character without ID`);
+                  }
+                }
               } else {
-                console.error(`❌ Failed to import character: ${characterId}`);
+                // Single character object (legacy format)
+                totalProcessed++;
+                const characterId = file.replace('.yaml', '');
+                const success = await writeDataAsAdmin(`characters/${characterId}`, data);
+                if (success) {
+                  totalSuccessful++;
+                  console.log(`✅ Character imported: ${characterId}`);
+                } else {
+                  console.error(`❌ Failed to import character: ${characterId}`);
+                }
               }
             } catch (error) {
-              console.error(`❌ Error processing character ${characterId}:`, error.message);
+              console.error(`❌ Error processing character file ${file}:`, error.message);
             }
           }
         }
@@ -222,10 +244,14 @@ async function populateLore() {
               for (const item of data[category]) {
                 if (item.id) {
                   totalProcessed++;
+                  // Add category field if not already present
+                  if (!item.category) {
+                    item.category = category;
+                  }
                   const success = await writeDataAsAdmin(`lore/${item.id}`, item);
                   if (success) {
                     totalSuccessful++;
-                    console.log(`    ✅ ${item.id}: "${item.title}"`);
+                    console.log(`    ✅ ${item.id}: "${item.title}" (${category})`);
                   } else {
                     console.error(`    ❌ Failed to import: ${item.id}`);
                   }
