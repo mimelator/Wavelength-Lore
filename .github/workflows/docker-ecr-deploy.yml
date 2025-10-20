@@ -109,8 +109,8 @@ jobs:
           }
           CONFIGEOF
 
-          echo "Source configuration:"
-          cat /tmp/apprunner-config.json
+          # DO NOT echo the config file - it contains secrets!
+          echo "✓ Source configuration created with $(echo $CURRENT_CONFIG | jq 'length') environment variables"
 
           # Update App Runner service with new image
           OPERATION_ID=$(aws apprunner update-service \
