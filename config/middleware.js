@@ -203,6 +203,10 @@ function configureAPIRoutes(app, adminRateLimit, adminAuthStrict) {
   const groupApiRoutes = require('../routes/groupApi');
   app.use('/api/groups', adminRateLimit, groupApiRoutes);
 
+  // Import and use prompt API routes with rate limiting
+  const promptApiRoutes = require('../routes/promptApi');
+  app.use('/api/prompts', promptApiRoutes);
+
   // Import and setup forum routes
   const forumRoutes = require('../routes/forum');
   app.use('/forum', forumRoutes);
