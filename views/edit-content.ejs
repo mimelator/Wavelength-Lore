@@ -640,8 +640,10 @@
 
         const formData = new FormData();
         formData.append('audioFile', selectedAudioFile);
+        <% if (typeof seasonNumber !== 'undefined' && typeof episodeNumber !== 'undefined') { %>
         formData.append('seasonNumber', '<%= seasonNumber %>');
         formData.append('episodeNumber', '<%= episodeNumber %>');
+        <% } %>
 
         try {
             const idToken = await window.firebaseAuth.currentUser.getIdToken();
@@ -708,7 +710,11 @@
                 formData.summary = document.getElementById('summary')?.value.trim() || '';
                 formData.lyrics = document.getElementById('lyrics')?.value.trim() || '';
                 // Use new uploaded audio URL if available, otherwise keep existing
+                <% if (typeof contentData !== 'undefined') { %>
                 formData.audio = audioUrl || '<%= contentData.audioUrl || contentData.audio || '' %>';
+                <% } else { %>
+                formData.audio = audioUrl || '';
+                <% } %>
                 formData.youtubeLink = document.getElementById('youtubeLink')?.value.trim() || '';
                 formData.carouselImages = getArrayValues('carouselImages');
             } else if (contentType === 'character' || contentType === 'lore') {
