@@ -43,6 +43,13 @@ router.put('/api/content/episode/:contentId', requireGroup('content_manager'), a
         const success = await updateDataAsAdmin(firebasePath, data);
 
         if (success) {
+            // Clear episode cache to force refresh
+            const episodeHelpers = require('../helpers/episode-helpers');
+            if (episodeHelpers.clearCache) {
+                episodeHelpers.clearCache();
+                console.log('✅ Episode cache cleared after update');
+            }
+            
             res.json({
                 success: true,
                 message: 'Episode updated successfully',
@@ -86,47 +93,26 @@ router.put('/api/content/character/:contentId', requireGroup('content_manager'),
             });
         }
 
-        // Characters are stored in categories as arrays, need to find and update the right one
-        const firebaseUtils = require('../helpers/firebase-utils');
-        const charactersData = await firebaseUtils.fetchFromFirebase('characters');
+        // Characters are now stored directly by ID (new structure)
+        const updatePath = `characters/${contentId}`;
         
-        if (!charactersData) {
-            return res.status(404).json({
-                success: false,
-                error: 'Characters data not found'
-            });
-        }
+        // Get current character data from Firebase
+        const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
+        const currentData = await fetchDataAsAdmin(updatePath);
         
-        // Find the character in all categories
-        let foundCategory = null;
-        let characterIndex = -1;
-        
-        for (const category in charactersData) {
-            if (Array.isArray(charactersData[category])) {
-                characterIndex = charactersData[category].findIndex(c => c.id === contentId);
-                if (characterIndex !== -1) {
-                    foundCategory = category;
-                    break;
-                }
-            }
-        }
-        
-        if (foundCategory === null || characterIndex === -1) {
+        if (!currentData) {
             return res.status(404).json({
                 success: false,
                 error: `Character ${contentId} not found`
             });
         }
         
-        // Get current character data and merge with updates
-        const currentData = charactersData[foundCategory][characterIndex];
+        // Merge current data with updates
         const updatedData = {
             ...currentData,
             ...data,
             id: contentId // Ensure ID doesn't change
         };
-        
-        const updatePath = `characters/${foundCategory}/${characterIndex}`;
         console.log(`📝 Updating character at: ${updatePath}`);
 
         // Update in Firebase using Admin SDK
@@ -185,6 +171,11 @@ router.put('/api/content/lore/:contentId', requireGroup('content_manager'), asyn
         const success = await updateDataAsAdmin(firebasePath, data);
 
         if (success) {
+            // Clear lore cache to force refresh
+            const loreHelpers = require('../helpers/lore-helpers');
+            loreHelpers.clearLoreCache();
+            console.log('✅ Lore cache cleared after update');
+            
             res.json({
                 success: true,
                 message: 'Lore updated successfully',

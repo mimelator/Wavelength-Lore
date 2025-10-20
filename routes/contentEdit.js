@@ -59,39 +59,34 @@ router.get('/edit/character/:characterId', async (req, res) => {
   const { characterId } = req.params;
 
   try {
+    // Characters are now stored directly by ID (new structure)
     const charactersData = await firebaseUtils.fetchFromFirebase('characters');
 
-    if (charactersData) {
-      // Search for the character by ID across all categories
-      let character = null;
-      for (const category in charactersData) {
-        if (Array.isArray(charactersData[category])) {
-          character = charactersData[category].find(c => c.id === characterId);
-          if (character) break;
-        }
-      }
-
-      if (!character) {
-        return res.status(404).send('Character not found');
-      }
-
-      res.render('edit-content', {
-        title: `Edit: ${character.title}`,
-        pageTitle: `Edit Character - ${character.title} | Wavelength Lore`,
-        pageDescription: 'Content editor for managing prompts and character content',
-        contentType: 'character',
-        contentTitle: character.title,
-        contentId: characterId,
-        contentData: character,
-        firebasePath: `characters/${characterId}`,
-        backUrl: `/character/${characterId}`,
-        cdnUrl: process.env.CDN_URL,
-        version: `v${Date.now()}`,
-        req: req
-      });
-    } else {
-      res.status(404).send('Character not found');
+    if (!charactersData) {
+      return res.status(404).send('Characters data not found');
     }
+
+    // Fetch character directly by ID
+    const character = charactersData[characterId];
+
+    if (!character) {
+      return res.status(404).send('Character not found');
+    }
+
+    res.render('edit-content', {
+      title: `Edit: ${character.title}`,
+      pageTitle: `Edit Character - ${character.title} | Wavelength Lore`,
+      pageDescription: 'Content editor for managing prompts and character content',
+      contentType: 'character',
+      contentTitle: character.title,
+      contentId: characterId,
+      contentData: character,
+      firebasePath: `characters/${characterId}`,
+      backUrl: `/character/${characterId}`,
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`,
+      req: req
+    });
   } catch (error) {
     console.error('Error fetching character for edit:', error);
     res.status(500).send('Error loading edit page');

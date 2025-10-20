@@ -354,29 +354,9 @@ router.post('/add-to-gallery', requireGroup(['content_manager', 'admin', 'modera
     
     // Handle different content types with different Firebase structures
     if (contentType === 'character') {
-      // Characters are stored in categories as arrays, need to find and update the right one
-      const charactersData = await firebaseUtils.fetchFromFirebase('characters');
-      if (!charactersData) {
-        return res.status(404).json({
-          success: false,
-          error: 'Characters data not found'
-        });
-      }
-      
-      // Find the character in all categories
-      let foundCategory = null;
-      let characterIndex = -1;
-      
-      for (const category in charactersData) {
-        if (Array.isArray(charactersData[category])) {
-          characterIndex = charactersData[category].findIndex(c => c.id === contentId);
-          if (characterIndex !== -1) {
-            foundCategory = category;
-            currentData = charactersData[category][characterIndex];
-            break;
-          }
-        }
-      }
+      // Characters are stored directly by ID (new structure)
+      updatePath = `characters/${contentId}`;
+      currentData = await fetchDataAsAdmin(updatePath);
       
       if (!currentData) {
         return res.status(404).json({
@@ -385,10 +365,20 @@ router.post('/add-to-gallery', requireGroup(['content_manager', 'admin', 'modera
         });
       }
       
-      updatePath = `characters/${foundCategory}/${characterIndex}`;
+    } else if (contentType === 'lore') {
+      // Lore items are stored directly by ID
+      updatePath = `lore/${contentId}`;
+      currentData = await fetchDataAsAdmin(updatePath);
+      
+      if (!currentData) {
+        return res.status(404).json({
+          success: false,
+          error: `Lore ${contentId} not found`
+        });
+      }
       
     } else {
-      // Episodes and lore use direct paths
+      // Episodes use direct paths
       currentData = await fetchDataAsAdmin(firebasePath);
       
       if (!currentData) {
