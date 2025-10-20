@@ -5,6 +5,7 @@
 
 const express = require('express');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 
 // Import rate limiting middleware
 const { createSmartRateLimit, admin: adminRateLimit } = require('../middleware/rateLimiting');
@@ -50,6 +51,9 @@ function configureMiddleware(app) {
   // Body parser middleware for JSON requests
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  
+  // Cookie parser middleware to read cookies from requests
+  app.use(cookieParser());
 
   // CORS middleware for Firebase authentication
   app.use((req, res, next) => {
