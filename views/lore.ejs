@@ -126,6 +126,7 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', () => {
+                // Modal functionality
                 const modal = document.getElementById('imageModal');
                 const modalImg = document.getElementById('fullSizeImage');
                 const closeModal = document.querySelector('.modal-close');
@@ -146,6 +147,62 @@
                         modal.style.display = 'none';
                     }
                 });
+
+                // Carousel functionality
+                const carouselItems = document.querySelectorAll('.carousel-item');
+                const dots = document.querySelectorAll('.carousel-dots .dot');
+                let currentIndex = 0;
+
+                if (carouselItems.length > 0) {
+                    // Show first slide
+                    showSlide(0);
+
+                    // Dot click handlers
+                    dots.forEach((dot, index) => {
+                        dot.addEventListener('click', () => {
+                            showSlide(index);
+                        });
+                    });
+
+                    // Auto-advance every 5 seconds (optional - can be removed if not desired)
+                    setInterval(() => {
+                        currentIndex = (currentIndex + 1) % carouselItems.length;
+                        showSlide(currentIndex);
+                    }, 5000);
+
+                    // Keyboard navigation
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'ArrowLeft') {
+                            currentIndex = (currentIndex - 1 + carouselItems.length) % carouselItems.length;
+                            showSlide(currentIndex);
+                        } else if (e.key === 'ArrowRight') {
+                            currentIndex = (currentIndex + 1) % carouselItems.length;
+                            showSlide(currentIndex);
+                        }
+                    });
+                }
+
+                function showSlide(index) {
+                    currentIndex = index;
+
+                    // Hide all slides
+                    carouselItems.forEach(item => {
+                        item.classList.remove('active');
+                    });
+
+                    // Remove active from all dots
+                    dots.forEach(dot => {
+                        dot.classList.remove('active');
+                    });
+
+                    // Show current slide and activate dot
+                    if (carouselItems[index]) {
+                        carouselItems[index].classList.add('active');
+                    }
+                    if (dots[index]) {
+                        dots[index].classList.add('active');
+                    }
+                }
             });
         </script>
     </main>

@@ -67,26 +67,78 @@ main {
 
 .lore-carousel {
     margin: 20px 0;
+    position: relative;
 }
 
 .lore-carousel .carousel {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .lore-carousel .carousel-item {
-    flex: 0 0 auto;
-    width: 150px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: none;
+    width: 100%;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.lore-carousel .carousel-item.active {
+    display: block;
 }
 
 .lore-carousel .carousel-item img {
     width: 100%;
     height: auto;
+    max-height: 500px;
+    object-fit: contain;
     display: block;
+    background: #000;
+    cursor: pointer;
+}
+
+/* Carousel Dots */
+.carousel-dots {
+    text-align: center;
+    padding: 15px 0;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 0 0 10px 10px;
+}
+
+.carousel-dots .dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin: 0 6px;
+    background-color: #bbb;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.carousel-dots .dot:hover {
+    background-color: #717171;
+    transform: scale(1.2);
+}
+
+.carousel-dots .dot.active {
+    background-color: #333;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #007BFF;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+}
+
+/* Carousel animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .lore-navigation-top {
