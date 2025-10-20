@@ -15,6 +15,27 @@ async function checkImages() {
   try {
     console.log('🔍 Checking ECR Repository...\n');
 
+    // Get images with "latest" tag specifically
+    const latestCommand = new DescribeImagesCommand({
+      repositoryName: 'wavelength-lore',
+      imageIds: [{ imageTag: 'latest' }]
+    });
+
+    try {
+      const latestResponse = await client.send(latestCommand);
+      if (latestResponse.imageDetails.length > 0) {
+        const latestImg = latestResponse.imageDetails[0];
+        console.log('✅ "latest" tag found:');
+        console.log(`   Pushed: ${latestImg.imagePushedAt}`);
+        console.log(`   Digest: ${latestImg.imageDigest.substring(0, 20)}...`);
+        console.log(`   Size: ${(latestImg.imageSizeInBytes / 1024 / 1024).toFixed(2)} MB`);
+        console.log('');
+      }
+    } catch (error) {
+      console.log('❌ No "latest" tag found!\n');
+    }
+
+    // Get all recent images
     const command = new DescribeImagesCommand({
       repositoryName: 'wavelength-lore',
       maxResults: 5
