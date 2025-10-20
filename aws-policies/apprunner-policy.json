@@ -6,7 +6,8 @@
       "Effect": "Allow",
       "Action": [
         "apprunner:DescribeService",
-        "apprunner:UpdateService"
+        "apprunner:UpdateService",
+        "apprunner:StartDeployment"
       ],
       "Resource": "arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa"
     },
@@ -17,6 +18,14 @@
         "apprunner:ListServices"
       ],
       "Resource": "*"
+    },
+    {
+      "Sid": "ECRDescribeImages",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:DescribeImages"
+      ],
+      "Resource": "arn:aws:ecr:us-east-1:170023515523:repository/wavelength-lore"
     }
   ]
 }
