@@ -662,7 +662,7 @@
                                          onclick="openLightbox('<%= img %>', 'Gallery Image <%= index + 1 %>')"
                                          onerror="this.className='no-image'; this.alt='Failed to load';"
                                          title="Click to view full size">
-                                    <input type="text" class="form-input" value="<%= img %>" data-array="image_gallery" onchange="updateImagePreview(this)">
+                                    <input type="text" class="form-input" value="<%= img %>" data-array="image_gallery" onchange="updateGalleryImagePreview(this)">
                                     <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
                                 </div>
                             <% }); %>
@@ -890,7 +890,7 @@
         div.innerHTML = `
             <input type="checkbox" class="gallery-checkbox" data-image-url="" onchange="updateSelectedCount()" style="width: 20px; height: 20px; cursor: pointer;">
             <div class="no-image">No image</div>
-            <input type="text" class="form-input" placeholder="Enter image URL" data-array="image_gallery" onchange="updateImagePreview(this); this.previousElementSibling.previousElementSibling.dataset.imageUrl = this.value;">
+            <input type="text" class="form-input" placeholder="Enter image URL" data-array="image_gallery" onchange="updateGalleryImagePreview(this)">
             <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
         `;
         container.appendChild(div);
@@ -1011,6 +1011,41 @@
             } else {
                 // Update existing image
                 preview.src = url;
+            }
+        }
+    }
+
+    // Update gallery image preview and checkbox data-image-url
+    function updateGalleryImagePreview(input) {
+        const url = input.value.trim();
+        const parent = input.parentElement;
+        
+        // Find the checkbox and update its data-image-url
+        const checkbox = parent.querySelector('.gallery-checkbox');
+        if (checkbox) {
+            checkbox.dataset.imageUrl = url;
+        }
+        
+        // Find and update the image preview
+        let preview = parent.querySelector('.image-preview, .no-image');
+        
+        if (url) {
+            if (preview && preview.classList.contains('no-image')) {
+                // Replace no-image div with actual image
+                const img = document.createElement('img');
+                img.className = 'image-preview';
+                img.src = url;
+                img.title = 'Click to view full size';
+                img.onclick = function() { openLightbox(url, 'Gallery Image'); };
+                img.onerror = function() {
+                    this.className = 'no-image';
+                    this.alt = 'Failed to load';
+                };
+                parent.replaceChild(img, preview);
+            } else if (preview) {
+                // Update existing image
+                preview.src = url;
+                preview.onclick = function() { openLightbox(url, 'Gallery Image'); };
             }
         }
     }
