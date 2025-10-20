@@ -20,6 +20,7 @@ const contentRoutes = require('./routes/content');
 const adminRoutes = require('./routes/admin');
 const contentEditRoutes = require('./routes/contentEdit');
 const contentApiRoutes = require('./routes/contentApi');
+const uploadAudioRoutes = require('./routes/uploadAudio');
 
 // Import secure backup system
 const SecureDatabaseBackup = require('./utils/secureBackup');
@@ -50,6 +51,9 @@ async function createApp() {
 
   // Mount content API routes (protected by authentication)
   app.use('/', contentApiRoutes);
+
+  // Mount audio upload routes (protected by authentication)
+  app.use('/', uploadAudioRoutes);
 
   // Mount content edit routes (protected by authentication)
   app.use('/', contentEditRoutes);
