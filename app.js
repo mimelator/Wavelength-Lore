@@ -51,6 +51,15 @@ async function createApp() {
   // Configure API routes
   configureAPIRoutes(app, adminRateLimit, adminAuthStrict);
 
+  // Add simple health check endpoint for App Runner (no authentication required)
+  app.get('/health', (_req, res) => {
+    res.status(200).json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  });
+
   // Mount prompt API routes (protected by authentication)
   app.use('/api/prompts', promptApiRoutes);
 

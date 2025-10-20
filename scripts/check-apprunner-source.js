@@ -7,8 +7,8 @@ const awsConfig = require('../config/aws-resources');
 const client = new AppRunnerClient({
   region: 'us-east-1',
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    accessKeyId: process.env.aws_wavelength_dev_access_key_id,
+    secretAccessKey: process.env.aws_wavelength_dev_secret_access_key
   }
 });
 
