@@ -140,6 +140,7 @@ class GlobalRadioGame {
             this.audio.play();
             this.isPlaying = true;
             this.updatePlayButton();
+            this.startSpawning(); // Start spawning collectibles when music plays
         }
     }
 
@@ -148,6 +149,7 @@ class GlobalRadioGame {
             this.audio.pause();
             this.isPlaying = false;
             this.updatePlayButton();
+            this.stopSpawning(); // Stop spawning when music pauses
         }
     }
 
@@ -177,6 +179,7 @@ class GlobalRadioGame {
             this.isPlaying = true;
             this.updatePlayButton();
             this.savePlaybackState();
+            this.startSpawning(); // Start spawning when track plays
         }).catch(err => {
             console.error('Error playing audio:', err);
         });
@@ -290,7 +293,10 @@ class GlobalRadioGame {
             widget.classList.add('active');
             this.isActive = true;
             localStorage.setItem('global_radio_game_active', 'true');
-            this.startSpawning();
+            // Start spawning if music is playing
+            if (this.isPlaying) {
+                this.startSpawning();
+            }
         }
     }
 
@@ -300,7 +306,8 @@ class GlobalRadioGame {
             widget.classList.remove('active');
             this.isActive = false;
             localStorage.setItem('global_radio_game_active', 'false');
-            this.stopSpawning();
+            // Keep spawning if music is playing! Don't stop spawning when minimizing
+            // this.stopSpawning(); // REMOVED - we want collectibles even when minimized
         }
     }
 
