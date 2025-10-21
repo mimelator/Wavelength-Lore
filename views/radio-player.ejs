@@ -165,7 +165,7 @@
                      data-title="<%= track.title %>"
                      data-file="<%= track.file %>"
                      data-duration="<%= track.duration %>"
-                     data-carousel-images="<%= track.carouselImages ? JSON.stringify(track.carouselImages) : '[]' %>"
+                     data-episode-image="<%= track.episodeImage || '' %>"
                      data-episode-url="<%= track.episodeUrl || '' %>"
                      data-characters="<%= track.characters ? JSON.stringify(track.characters) : '[]' %>">
                     <div class="playlist-item-number"><%= index + 1 %></div>

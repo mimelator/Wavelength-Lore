@@ -60,7 +60,7 @@ async function getEnhancedPlaylist() {
       if (episodeData) {
         return {
           ...track,
-          carouselImages: episodeData.carouselImages || [],
+          episodeImage: episodeData.image || '',
           episodeUrl: `/season/${track.season}/episode/${track.episode}`,
           characters: allCharacters.filter(char =>
             episodeData.keywords?.some(keyword =>

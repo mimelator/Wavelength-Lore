@@ -426,46 +426,28 @@ class WavelengthRadio {
         });
     }
 
-    // Update background gallery with episode images
+    // Update background gallery with episode image
     updateBackgroundGallery(playlistItem) {
-        const carouselImages = JSON.parse(playlistItem.dataset.carouselImages || '[]');
+        const episodeImage = playlistItem.dataset.episodeImage;
         const gallery = document.getElementById('background-gallery');
 
         // Clear existing images
         gallery.innerHTML = '';
 
-        if (carouselImages.length > 0) {
-            // Select 5-8 random images from carousel
-            const numImages = Math.min(Math.floor(Math.random() * 4) + 5, carouselImages.length);
-            const selectedImages = [];
+        if (episodeImage) {
+            // Create single large background image
+            const img = document.createElement('img');
+            img.src = this.cdnUrl + episodeImage;
+            img.classList.add('background-gallery-image');
 
-            for (let i = 0; i < numImages; i++) {
-                const randomIndex = Math.floor(Math.random() * carouselImages.length);
-                if (!selectedImages.includes(carouselImages[randomIndex])) {
-                    selectedImages.push(carouselImages[randomIndex]);
-                }
-            }
+            // Center and fill the screen
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.left = '0';
+            img.style.top = '0';
+            img.style.objectFit = 'cover';
 
-            // Create and position images
-            selectedImages.forEach((imagePath, index) => {
-                const img = document.createElement('img');
-                img.src = this.cdnUrl + imagePath;
-                img.classList.add('background-gallery-image');
-
-                // Random size - 125% to 175% larger (250-875px, was 200-500px)
-                const size = Math.floor(Math.random() * 625) + 250; // 250-875px
-                img.style.width = `${size}px`;
-                img.style.height = `${size}px`;
-
-                // Random position
-                img.style.left = `${Math.random() * 100}%`;
-                img.style.top = `${Math.random() * 100}%`;
-
-                // Random animation delay
-                img.style.animationDelay = `${index * 2}s`;
-
-                gallery.appendChild(img);
-            });
+            gallery.appendChild(img);
 
             // Show gallery
             gallery.classList.add('active');
