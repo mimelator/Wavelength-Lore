@@ -1,7 +1,8 @@
-// Global Radio Game - Appears on all non-forum pages for authenticated users
+// Global Radio Game - Full-page collectibles with functional mini radio player
 
 class GlobalRadioGame {
     constructor() {
+        // Game stats
         this.stats = {
             mushrooms: parseInt(localStorage.getItem('mushroom_count') || '0'),
             stars: parseInt(localStorage.getItem('star_count') || '0'),
@@ -12,8 +13,11 @@ class GlobalRadioGame {
             goblins: parseInt(localStorage.getItem('goblin_count') || '0')
         };
 
+        // Widget state
         this.isActive = localStorage.getItem('global_radio_game_active') === 'true';
-        this.isEnabled = localStorage.getItem('global_radio_game_enabled') !== 'false'; // Enabled by default
+        this.isEnabled = localStorage.getItem('global_radio_game_enabled') !== 'false';
+
+        // Game state
         this.spawnInterval = null;
         this.activeElements = [];
 
@@ -21,11 +25,16 @@ class GlobalRadioGame {
         this.soundEnabled = localStorage.getItem('radio_sound_enabled') !== 'false';
         this.audioContext = null;
 
+        // Radio player state
+        this.audio = null;
+        this.playlist = [];
+        this.currentTrackIndex = -1;
+        this.isPlaying = false;
+
         this.init();
     }
 
-    init() {
-        // Check if game is enabled
+    async init() {
         if (!this.isEnabled) {
             this.hideGame();
             return;
@@ -34,11 +43,27 @@ class GlobalRadioGame {
         this.bindControls();
         this.updateStats();
         this.initSoundSystem();
+        await this.loadPlaylist();
+        this.bindRadioControls();
 
         // Restore previous active state
         if (this.isActive) {
             this.showWidget();
             this.startSpawning();
+        }
+    }
+
+    async loadPlaylist() {
+        try {
+            const response = await fetch('/api/radio/playlist');
+            if (response.ok) {
+                this.playlist = await response.json();
+                console.log(`📻 Loaded ${this.playlist.length} tracks`);
+            }
+        } catch (error) {
+            console.error('Error loading playlist:', error);
+            // Fallback: Use empty playlist
+            this.playlist = [];
         }
     }
 
@@ -52,6 +77,129 @@ class GlobalRadioGame {
 
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this.hideWidget());
+        }
+    }
+
+    bindRadioControls() {
+        this.audio = document.getElementById('globalRadioAudio');
+
+        const playBtn = document.getElementById('globalPlayBtn');
+        const prevBtn = document.getElementById('globalPrevBtn');
+        const nextBtn = document.getElementById('globalNextBtn');
+        const volumeSlider = document.getElementById('globalVolumeSlider');
+
+        if (playBtn) {
+            playBtn.addEventListener('click', () => this.togglePlay());
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => this.previous());
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => this.next());
+        }
+
+        if (volumeSlider) {
+            volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
+            this.setVolume(volumeSlider.value);
+        }
+
+        if (this.audio) {
+            this.audio.addEventListener('ended', () => this.next());
+        }
+    }
+
+    togglePlay() {
+        if (this.isPlaying) {
+            this.pause();
+        } else {
+            this.play();
+        }
+    }
+
+    play() {
+        if (this.currentTrackIndex === -1 && this.playlist.length > 0) {
+            this.playTrack(0);
+        } else if (this.audio) {
+            this.audio.play();
+            this.isPlaying = true;
+            this.updatePlayButton();
+        }
+    }
+
+    pause() {
+        if (this.audio) {
+            this.audio.pause();
+            this.isPlaying = false;
+            this.updatePlayButton();
+        }
+    }
+
+    playTrack(index) {
+        if (index < 0 || index >= this.playlist.length) return;
+
+        this.currentTrackIndex = index;
+        const track = this.playlist[index];
+
+        // Build CDN path
+        const cdnUrl = window.CDN_URL || '';
+        const audioPath = `${cdnUrl}/images/seasons/season${track.season}/episodes/episode${track.episode}/${track.file}`;
+
+        this.audio.src = audioPath;
+        this.audio.load();
+
+        // Update UI
+        this.updateNowPlaying(track);
+
+        // Play
+        this.audio.play().then(() => {
+            this.isPlaying = true;
+            this.updatePlayButton();
+        }).catch(err => {
+            console.error('Error playing audio:', err);
+        });
+    }
+
+    updateNowPlaying(track) {
+        const titleEl = document.getElementById('globalTrackTitle');
+        const metaEl = document.getElementById('globalTrackMeta');
+
+        if (titleEl) {
+            titleEl.textContent = track.title;
+        }
+
+        if (metaEl) {
+            metaEl.textContent = `Season ${track.season}, Episode ${track.episode}`;
+        }
+    }
+
+    updatePlayButton() {
+        const playBtn = document.getElementById('globalPlayBtn');
+        if (playBtn) {
+            playBtn.textContent = this.isPlaying ? '⏸' : '▶';
+            playBtn.title = this.isPlaying ? 'Pause' : 'Play';
+        }
+    }
+
+    previous() {
+        if (this.currentTrackIndex > 0) {
+            this.playTrack(this.currentTrackIndex - 1);
+        }
+    }
+
+    next() {
+        if (this.currentTrackIndex < this.playlist.length - 1) {
+            this.playTrack(this.currentTrackIndex + 1);
+        } else {
+            // Loop back to start
+            this.playTrack(0);
+        }
+    }
+
+    setVolume(value) {
+        if (this.audio) {
+            this.audio.volume = value / 100;
         }
     }
 
@@ -85,24 +233,32 @@ class GlobalRadioGame {
 
     hideGame() {
         const gameContainer = document.getElementById('globalRadioGame');
+        const canvas = document.getElementById('globalGameCanvas');
         if (gameContainer) {
             gameContainer.classList.add('disabled');
+        }
+        if (canvas) {
+            canvas.style.display = 'none';
         }
     }
 
     showGame() {
         const gameContainer = document.getElementById('globalRadioGame');
+        const canvas = document.getElementById('globalGameCanvas');
         if (gameContainer) {
             gameContainer.classList.remove('disabled');
+        }
+        if (canvas) {
+            canvas.style.display = 'block';
         }
     }
 
     startSpawning() {
-        if (this.spawnInterval) return; // Already spawning
+        if (this.spawnInterval) return;
 
         this.spawnInterval = setInterval(() => {
             this.spawnCollectible();
-        }, 3000); // Spawn every 3 seconds
+        }, 3000);
     }
 
     stopSpawning() {
@@ -111,7 +267,6 @@ class GlobalRadioGame {
             this.spawnInterval = null;
         }
 
-        // Clear all active elements
         this.activeElements.forEach(el => el.element.remove());
         this.activeElements = [];
     }
@@ -120,7 +275,6 @@ class GlobalRadioGame {
         const canvas = document.getElementById('globalGameCanvas');
         if (!canvas) return;
 
-        // Random collectible type
         const types = [
             { class: 'mushroom', emoji: '🍄', points: 10 },
             { class: 'star', emoji: '⭐', points: 5 },
@@ -130,7 +284,6 @@ class GlobalRadioGame {
             { class: 'moon', emoji: '🌙', points: 7 }
         ];
 
-        // Rare goblin (5% chance)
         if (Math.random() < 0.05) {
             types.push({ class: 'goblin', emoji: '👺', points: 25 });
         }
@@ -141,15 +294,13 @@ class GlobalRadioGame {
         element.className = `mystical-element ${type.class}`;
         element.textContent = type.emoji;
         element.style.position = 'absolute';
-        element.style.left = `${Math.random() * 80 + 10}%`;
-        element.style.top = `${Math.random() * 70 + 10}%`;
-        element.style.fontSize = '2rem';
+        element.style.left = `${Math.random() * 90 + 5}%`;
+        element.style.top = `${Math.random() * 80 + 10}%`;
+        element.style.fontSize = '2.5rem';
         element.style.cursor = 'pointer';
         element.style.animation = 'float 3s ease-in-out infinite, fadeIn 0.3s ease';
         element.style.transition = 'all 0.3s ease';
-        element.style.zIndex = '10';
 
-        // Apply horseshoe neon green effect
         if (type.class === 'horseshoe') {
             element.style.filter = 'drop-shadow(0 0 8px #00ff00) drop-shadow(0 0 15px #39ff14) brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg)';
         }
@@ -161,7 +312,6 @@ class GlobalRadioGame {
         const elementData = { element, type, timestamp: Date.now() };
         this.activeElements.push(elementData);
 
-        // Remove after 5 seconds if not clicked
         setTimeout(() => {
             if (element.parentNode) {
                 element.style.opacity = '0';
@@ -174,22 +324,16 @@ class GlobalRadioGame {
     }
 
     collectItem(element, type) {
-        // Play sound
         this.playCollectSound(type);
 
-        // Animate collection
         element.style.transform = 'scale(1.5) rotate(360deg)';
         element.style.opacity = '0';
 
-        // Update stats
         this.stats[type.class + 's']++;
         localStorage.setItem(`${type.class}_count`, this.stats[type.class + 's']);
         this.updateStats();
-
-        // Sync to Firebase if available
         this.syncToFirebase();
 
-        // Remove element
         setTimeout(() => {
             element.remove();
             this.activeElements = this.activeElements.filter(e => e.element !== element);
@@ -197,7 +341,6 @@ class GlobalRadioGame {
     }
 
     updateStats() {
-        // Update all stat displays
         document.getElementById('globalMushrooms').textContent = this.stats.mushrooms;
         document.getElementById('globalStars').textContent = this.stats.stars;
         document.getElementById('globalHorseshoes').textContent = this.stats.horseshoes;
@@ -206,7 +349,6 @@ class GlobalRadioGame {
         document.getElementById('globalMoons').textContent = this.stats.moons;
         document.getElementById('globalGoblins').textContent = this.stats.goblins;
 
-        // Calculate total score
         const totalScore = (this.stats.mushrooms * 10) +
                           (this.stats.stars * 5) +
                           (this.stats.horseshoes * 15) +
@@ -219,7 +361,6 @@ class GlobalRadioGame {
     }
 
     async syncToFirebase() {
-        // Only sync if Firebase is available and user is logged in
         if (!window.firebaseDB || !window.firebaseAuth || !window.firebaseAuth.currentUser) {
             return;
         }
@@ -244,7 +385,6 @@ class GlobalRadioGame {
         }
     }
 
-    // Initialize Web Audio API
     initSoundSystem() {
         if (!this.soundEnabled) return;
 
@@ -256,7 +396,6 @@ class GlobalRadioGame {
         }
     }
 
-    // Play collect sound based on collectible type
     playCollectSound(type) {
         if (!this.soundEnabled || !this.audioContext) return;
 
@@ -269,7 +408,6 @@ class GlobalRadioGame {
         oscillator.connect(gainNode);
         gainNode.connect(ctx.destination);
 
-        // Different sounds for each type (same as radio-player.js)
         switch (type.class) {
             case 'mushroom':
                 oscillator.type = 'sine';
@@ -315,7 +453,6 @@ class GlobalRadioGame {
         oscillator.stop(now + 0.3);
     }
 
-    // Public methods for enabling/disabling the game
     enableGame() {
         this.isEnabled = true;
         localStorage.setItem('global_radio_game_enabled', 'true');
@@ -330,6 +467,20 @@ class GlobalRadioGame {
         this.hideGame();
     }
 }
+
+// Floating animation for collectibles
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0); }
+        to { opacity: 1; transform: scale(1); }
+    }
+`;
+document.head.appendChild(style);
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
