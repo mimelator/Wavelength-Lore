@@ -602,8 +602,18 @@ if (window.globalRadioGame) {
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             window.globalRadioGame = new GlobalRadioGame();
+
+            // Disable collectibles spawning on game pages (but keep radio player visible)
+            if (window.location.pathname.startsWith('/games')) {
+                window.globalRadioGame.disableGame();
+            }
         });
     } else {
         window.globalRadioGame = new GlobalRadioGame();
+
+        // Disable collectibles spawning on game pages (but keep radio player visible)
+        if (window.location.pathname.startsWith('/games')) {
+            window.globalRadioGame.disableGame();
+        }
     }
 }

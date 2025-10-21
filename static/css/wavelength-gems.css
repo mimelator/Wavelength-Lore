@@ -1,7 +1,6 @@
 /* Wavelength Gems - Game Styling */
 
-/* Disable global radio game on game pages */
-.global-radio-game,
+/* Hide collectibles canvas on game pages (but keep radio player visible) */
 .global-game-canvas {
     display: none !important;
     visibility: hidden !important;

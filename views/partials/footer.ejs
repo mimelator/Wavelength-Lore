@@ -18,8 +18,8 @@
 </script>
 <% } %>
 
-<!-- Global Radio Game Widget (appears on non-forum, non-radio, and non-game pages for authenticated users) -->
-<% if (typeof currentPage !== 'undefined' && !currentPage.startsWith('/forum') && currentPage !== '/radio' && !currentPage.startsWith('/games') && typeof user !== 'undefined' && user) { %>
+<!-- Global Radio Game Widget (appears on non-forum and non-radio pages for authenticated users) -->
+<% if (typeof currentPage !== 'undefined' && !currentPage.startsWith('/forum') && currentPage !== '/radio' && typeof user !== 'undefined' && user) { %>
 <script src="/js/global-radio-game.js?v=<%= Date.now() %>"></script>
 
 <!-- Full-page collectible overlay -->
