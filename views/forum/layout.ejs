@@ -155,18 +155,8 @@
             </div>
         </header>
         
-        <!-- Forum Navigation -->
-        <nav class="forum-nav">
-            <div class="container">
-                <ul class="forum-nav-list">
-                    <li><a href="/forum" class="<%= currentPage === 'home' ? 'active' : '' %>">🏠 Home</a></li>
-                    <li><a href="/forum/recent" class="<%= currentPage === 'recent' ? 'active' : '' %>">🕒 Recent Posts</a></li>
-                    <li><a href="/forum/popular" class="<%= currentPage === 'popular' ? 'active' : '' %>">🔥 Popular</a></li>
-                    <li><a href="/forum/search" class="<%= currentPage === 'search' ? 'active' : '' %>">🔍 Search</a></li>
-                    <li><a href="/" class="forum-nav-back">← Back to Wavelength Lore</a></li>
-                </ul>
-            </div>
-        </nav>
+        <!-- Forum Navigation - Matching main site structure -->
+        <%- include('../partials/header') %>
         
         <!-- Main Forum Content -->
         <main class="forum-main">

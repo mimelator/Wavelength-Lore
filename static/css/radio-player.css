@@ -786,25 +786,34 @@ html {
     border-left: 2px solid rgba(255, 215, 0, 0.5);
     margin-left: 10px;
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 165, 0, 0.15));
-    padding: 8px 12px;
+    padding: 8px 16px;
     border-radius: 15px;
     border: 2px solid rgba(255, 215, 0, 0.4);
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    min-width: 140px; /* Prevent truncation */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .stat-item.total-points .stat-label {
     font-weight: 600;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    white-space: nowrap;
+    font-size: 0.85rem;
 }
 
 .stat-item.total-points .stat-value {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: bold;
     background: linear-gradient(135deg, #ffd700, #ffa500);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    white-space: nowrap;
+    overflow: visible;
+    min-width: fit-content;
 }
 
 .stat-item.rare-item {
@@ -1069,6 +1078,20 @@ html {
 
     .stat-value {
         font-size: 0.9rem;
+    }
+
+    /* Adjust total points on mobile */
+    .stat-item.total-points {
+        min-width: 110px;
+        padding: 6px 10px;
+    }
+
+    .stat-item.total-points .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .stat-item.total-points .stat-value {
+        font-size: 1.3rem;
     }
 
     /* Hide magic level stat on mobile to save space */

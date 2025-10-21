@@ -19,7 +19,7 @@
         <a href="#" onclick="return false;">Community</a>
         <ul class="dropdown">
           <li><a href="/forum">💬 Forum</a></li>
-          <li><a href="/leaderboard">🏆 Leaderboard</a></li>
+          <li id="leaderboard-dropdown-item" style="display: none;"><a href="/leaderboard">🏆 Leaderboard</a></li>
           <li id="profile-dropdown-item" style="display: none;"><a href="/forum/profile">👤 My Profile</a></li>
         </ul>
       </li>
@@ -65,7 +65,12 @@
                   // Expose user groups globally
                   window.wavelengthUserGroups = data.groups || [];
 
-                  // Show profile link in dropdown for all authenticated users
+                  // Show leaderboard and profile links for all authenticated users
+                  const leaderboardDropdownItem = document.getElementById('leaderboard-dropdown-item');
+                  if (leaderboardDropdownItem) {
+                    leaderboardDropdownItem.style.display = 'block';
+                  }
+                  
                   const profileDropdownItem = document.getElementById('profile-dropdown-item');
                   if (profileDropdownItem) {
                     profileDropdownItem.style.display = 'block';
