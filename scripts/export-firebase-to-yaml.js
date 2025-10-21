@@ -10,7 +10,16 @@
 const yaml = require('js-yaml');
 const fs = require('fs').promises;
 const path = require('path');
-require('dotenv').config();
+
+// Use shared environment loader utility
+const { initScriptEnv } = require('./utils/env-loader');
+
+// Initialize environment with required Firebase variables
+initScriptEnv([
+  'DATABASE_URL',
+  'PROJECT_ID',
+  'FIREBASE_SERVICE_ACCOUNT'
+]);
 
 // Use existing Firebase utilities
 const firebaseUtils = require('../helpers/firebase-utils');
@@ -63,7 +72,8 @@ async function exportSeasons() {
         carouselImages: episode.carouselImages || [],
         story: episode.story || '',
         lyrics: episode.lyrics || '',
-        summary: episode.summary || ''
+        summary: episode.summary || '',
+        hidden: episode.hidden || false
       };
       
       // Remove empty fields
@@ -114,7 +124,8 @@ async function exportCharacters() {
       description: char.description,
       keywords: char.keywords || [],
       image: char.image || '',
-      image_gallery: char.image_gallery || []
+      image_gallery: char.image_gallery || [],
+      hidden: char.hidden || false
     }));
     
     // Remove empty fields
@@ -171,7 +182,8 @@ async function exportLore() {
       keywords: lore.keywords || [],
       description: lore.description,
       image: lore.image || '',
-      image_gallery: lore.image_gallery || []
+      image_gallery: lore.image_gallery || [],
+      hidden: lore.hidden || false
     };
     
     // Remove empty fields

@@ -18,13 +18,13 @@ nature:
     description: The Daphne flower is renowned for its incredibly fragrant blossoms, which are often described as having a sweet, heady, and sometimes spicy scent. The intensity and specific nuances can vary slightly between species and even individual plants, but generally, you can expect a truly delightful aroma.  Some people say that it has peculiar properties that can captivate people like an enchantment spell.
     image: https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760986251316-43b560650f46c03e.png
     image_gallery:
-      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760988441604-8c397d464dd02a6d.png
-      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760989393441-07b0d406748b6074.png
       - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760986251316-43b560650f46c03e.png
       - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760986251319-384c2d94bb1cae10.png
-      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760989393442-5fba7a9094a34495.png
-      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760989393439-30c00f45a891f6a6.png
       - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760986190233-c12896907232363e.png
+      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760989393439-30c00f45a891f6a6.png
+      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760989393441-07b0d406748b6074.png
+      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760989393442-5fba7a9094a34495.png
+      - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760988441604-8c397d464dd02a6d.png
 villain:
   - id: goblin
     title: Goblins
@@ -33,7 +33,7 @@ villain:
       - goblin
       - villains
       - evil creatures
-    description: A Goblin can be nearly anyone in disguise.  They often hate others without reason, and leave only to spread fear and hatred.  They live to rule, and their lust for power is insatiable.  They are nothing more than a Virus in the form of person.  Since Misery loves Company, Goblins often travel in groups called a Misery of Goblins, spreading fear and terror wherever they go.
+    description: "A Goblin can be nearly anyone in disguise.  They often hate others without reason, and are only vaguely happy when they are spreading fear and hatred.  They live to rule, and their lust for power is insatiable.  Goblins can be thought of as a person who has been consumed by a Virus of Hatred, Fear and Greed.  Since Misery loves Company, Goblins often travel in groups called: Misery of Goblins, and they do their best to spread Misery wherever they go."
     image: /images/seasons/season3/episodes/episode3/images/Sneak_Attack-16.webp
     image_gallery:
       - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-14.webp
