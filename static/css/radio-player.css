@@ -850,59 +850,121 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    /* Maximize game canvas space on mobile */
+    .radio-container {
+        padding: 5px;
+        gap: 5px;
+    }
+
+    /* Make radio player compact and stick to bottom */
     .radio-player {
-        padding: 25px;
-        width: 95%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: 100%;
+        padding: 10px;
+        margin: 0;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        z-index: 100;
+        max-height: 30vh;
+        overflow-y: auto;
     }
 
     .radio-title {
-        font-size: 2rem;
+        font-size: 1.2rem;
+        margin-bottom: 5px;
     }
 
+    /* Hide album art on mobile to save space */
     .album-art {
-        width: 200px;
-        height: 200px;
+        display: none;
     }
 
+    /* Make controls more compact */
     .controls {
-        gap: 15px;
+        gap: 8px;
+        margin: 5px 0;
     }
 
     .control-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 1rem;
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
     }
 
     .play-btn {
-        width: 60px;
-        height: 60px;
-        font-size: 1.5rem;
+        width: 50px;
+        height: 50px;
+        font-size: 1.3rem;
     }
 
+    /* Hide mode selector on mobile - too much space */
     .playlist-mode {
-        flex-direction: column;
+        display: none;
     }
 
-    .mode-btn {
-        width: 100%;
-    }
-
+    /* Hide full playlist on mobile - show only current track */
     .playlist-panel {
-        width: 95%;
-        padding: 20px;
+        display: none;
     }
 
+    /* Hide volume control to save space */
+    .volume-control {
+        display: none;
+    }
+
+    /* Show current track info compactly */
+    .track-info {
+        font-size: 0.85rem;
+        padding: 5px;
+        max-height: 40px;
+        overflow: hidden;
+    }
+
+    .progress-bar-container {
+        margin: 5px 0;
+    }
+
+    /* Compact game stats at top of screen */
     .game-stats {
-        flex-wrap: wrap;
-        gap: 10px;
-        width: 95%;
-        justify-content: center;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 8px 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 5px;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
     }
 
     .stat-item {
         flex: 0 0 auto;
-        min-width: 60px;
+        min-width: 45px;
+        padding: 4px 6px;
+        font-size: 0.75rem;
+    }
+
+    .stat-icon {
+        font-size: 1.3rem;
+    }
+
+    .stat-value {
+        font-size: 0.9rem;
+    }
+
+    /* Hide magic level stat on mobile to save space */
+    .stat-item.magic-level {
+        display: none;
     }
 
     /* Make collectibles MUCH larger and easier to tap on mobile */
@@ -949,18 +1011,20 @@
         gap: 10px;
     }
 
-    /* Make episode info section more compact */
+    /* Hide episode info section on mobile to maximize game space */
     .episode-info-section {
-        padding: 15px;
+        display: none;
     }
 
-    .character-badges {
-        gap: 8px;
+    /* Add padding to bottom of canvas so collectibles don't hide behind player */
+    .mystical-canvas {
+        padding-bottom: 35vh;
+        padding-top: 120px;
     }
 
-    .character-badge {
-        width: 50px;
-        height: 50px;
+    /* Add padding to body for fixed elements */
+    .radio-player-body {
+        padding-top: 120px;
     }
 }
 
