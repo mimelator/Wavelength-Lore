@@ -423,3 +423,115 @@ function updateUI() {
     document.getElementById('levelDisplay').textContent = gameState.level;
     document.getElementById('movesDisplay').textContent = gameState.moves === Infinity ? '∞' : gameState.moves;
 }
+
+/**
+ * Submit score to Firebase
+ */
+async function submitScoreToFirebase() {
+    try {
+        const token = await getFirebaseToken();
+        if (!token) {
+            console.log('No auth token available, skipping score submission');
+            return;
+        }
+
+        const response = await fetch('/api/games/scores/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                gameId: 'wavelength-gems',
+                score: gameState.score,
+                level: gameState.level,
+                combo: gameState.combo,
+                timestamp: new Date().toISOString()
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            console.log('Score submitted successfully', data);
+            if (data.newHighScore) {
+                showNotification('🎉 New high score!');
+            }
+        } else {
+            console.error('Failed to submit score:', data.error);
+        }
+    } catch (error) {
+        console.error('Error submitting score:', error);
+    }
+}
+
+/**
+ * Get Firebase ID token
+ */
+async function getFirebaseToken() {
+    try {
+        if (window.firebaseAuth && window.firebaseAuth.currentUser) {
+            return await window.firebaseAuth.currentUser.getIdToken();
+        }
+    } catch (error) {
+        console.error('Error getting Firebase token:', error);
+    }
+    return null;
+}
+
+/**
+ * Load user stats from Firebase
+ */
+async function loadUserStats() {
+    try {
+        const token = await getFirebaseToken();
+        if (!token) return;
+
+        const response = await fetch('/api/games/wavelength-gems/user-stats', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            gameState.userStats = data.stats;
+            console.log('User stats loaded:', data.stats);
+        }
+    } catch (error) {
+        console.error('Error loading user stats:', error);
+    }
+}
+
+/**
+ * Show notification
+ */
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-weight: bold;
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-out forwards';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+/**
+ * End game and submit score
+ */
+function endGame() {
+    gameState.isPaused = true;
+    submitScoreToFirebase();
+}

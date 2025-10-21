@@ -218,7 +218,19 @@
                 <button class="btn btn-primary" id="newGameBtn" onclick="initGame()">New Game</button>
                 <button class="btn btn-secondary" id="pauseBtn" onclick="togglePause()">Pause</button>
                 <button class="btn btn-secondary" id="soundBtn" onclick="toggleSound()">🔊 Sound On</button>
+                <button class="btn btn-secondary" onclick="toggleLeaderboard()">🏆 Leaderboard</button>
                 <button class="btn btn-secondary" onclick="window.location.href = '/games'">← Back to Games</button>
+            </div>
+
+            <!-- Leaderboard Widget -->
+            <div id="leaderboardWidget" class="leaderboard-widget" style="display: none;">
+                <div class="leaderboard-header">
+                    <h3>🏆 Top Scores</h3>
+                    <button class="close-btn" onclick="toggleLeaderboard()">&times;</button>
+                </div>
+                <div id="leaderboardList" class="leaderboard-list">
+                    <p style="text-align: center; color: rgba(255,255,255,0.6);">Loading leaderboard...</p>
+                </div>
             </div>
 
             <!-- Game Info -->
@@ -233,9 +245,59 @@
     <script src="/js/games/wavelength-gems/engine.js"></script>
     <script src="/js/games/wavelength-gems/ui.js"></script>
     <script>
+        // Toggle leaderboard visibility
+        function toggleLeaderboard() {
+            const widget = document.getElementById('leaderboardWidget');
+            if (widget.style.display === 'none') {
+                widget.style.display = 'block';
+                loadLeaderboard();
+            } else {
+                widget.style.display = 'none';
+            }
+        }
+
+        // Load leaderboard data
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch('/api/games/wavelength-gems/top-scores?limit=20');
+                const data = await response.json();
+
+                if (!data.success) {
+                    document.getElementById('leaderboardList').innerHTML = '<p style="color: red;">Failed to load leaderboard</p>';
+                    return;
+                }
+
+                const html = data.topScores.map(score => `
+                    <div class="leaderboard-entry">
+                        <span class="rank">#${score.rank}</span>
+                        <span class="name">${escapeHtml(score.userName)}</span>
+                        <span class="score">${score.score.toLocaleString()}</span>
+                    </div>
+                `).join('');
+
+                document.getElementById('leaderboardList').innerHTML = html || '<p style="color: rgba(255,255,255,0.6);">No scores yet</p>';
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+                document.getElementById('leaderboardList').innerHTML = '<p style="color: red;">Error loading leaderboard</p>';
+            }
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
         // Initialize game on page load
         document.addEventListener('DOMContentLoaded', () => {
             initGame();
+            loadUserStats();
         });
     </script>
 </body>

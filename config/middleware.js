@@ -297,6 +297,10 @@ function configureAPIRoutes(app, adminRateLimit, adminAuthStrict) {
   const userApiRoutes = require('../routes/userApi');
   app.use('/api/user', userApiRoutes);
 
+  // Import and use game API routes
+  const gameApiRoutes = require('../routes/gameApi');
+  app.use('/api/games', gameApiRoutes);
+
   // Import and use group management API routes with authentication and rate limiting
   const groupApiRoutes = require('../routes/groupApi');
   app.use('/api/groups', adminRateLimit, groupApiRoutes);

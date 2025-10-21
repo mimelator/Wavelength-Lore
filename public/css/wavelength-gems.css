@@ -202,6 +202,113 @@
     }
 }
 
+/* Leaderboard Widget */
+.leaderboard-widget {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(20, 20, 40, 0.95);
+    border: 2px solid rgba(138, 43, 226, 0.5);
+    border-radius: 20px;
+    padding: 25px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.leaderboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid rgba(138, 43, 226, 0.3);
+    padding-bottom: 15px;
+}
+
+.leaderboard-header h3 {
+    margin: 0;
+    color: #a78bfa;
+    font-size: 1.5rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+}
+
+.close-btn:hover {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.leaderboard-entry {
+    display: grid;
+    grid-template-columns: 50px 1fr 120px;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    background: rgba(138, 43, 226, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(138, 43, 226, 0.2);
+    transition: all 0.3s ease;
+}
+
+.leaderboard-entry:hover {
+    background: rgba(138, 43, 226, 0.2);
+    border-color: rgba(138, 43, 226, 0.4);
+    transform: translateX(5px);
+}
+
+.leaderboard-entry .rank {
+    font-weight: bold;
+    color: #ffd700;
+    font-size: 1.1rem;
+}
+
+.leaderboard-entry .name {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.leaderboard-entry .score {
+    text-align: right;
+    font-weight: bold;
+    color: #a78bfa;
+    font-size: 1rem;
+}
+
 /* Dark theme support */
 @media (prefers-color-scheme: dark) {
     #gameBoard {
