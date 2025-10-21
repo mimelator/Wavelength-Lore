@@ -653,11 +653,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Add level up animation
-const style = document.createElement('style');
-style.textContent = `
+const levelUpAnimationStyle = document.createElement('style');
+levelUpAnimationStyle.textContent = `
     @keyframes levelUpPulse {
         0%, 100% { transform: translate(-50%, -50%) scale(1); }
         50% { transform: translate(-50%, -50%) scale(1.2); }
     }
 `;
-document.head.appendChild(style);
+document.head.appendChild(levelUpAnimationStyle);
