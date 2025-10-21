@@ -179,6 +179,7 @@ function onGemClick(row, col) {
         if (dist === 1) {
             // Adjacent gem - swap
             console.log('🔄 Swapping gems:', gameState.selectedGem, 'with', {row, col});
+            unhighlightGem(gameState.selectedGem.row, gameState.selectedGem.col);
             swapGems(gameState.selectedGem.row, gameState.selectedGem.col, row, col);
             gameState.selectedGem = null;
         } else if (dist === 0) {
@@ -264,6 +265,7 @@ function swapGems(row1, col1, row2, col2) {
             gameState.combo = 1;
             gameState.currentCascadeDepth = 0; // Reset cascade depth on new player move
             console.log('🎮 Match found! Combo reset to:', gameState.combo, 'Matches:', matches.length);
+            clearAllHighlights(); // Clear highlights before animating matches
             playSound('match');
             animateMatches(matches);
         } else {
@@ -294,6 +296,9 @@ function swapGems(row1, col1, row2, col2) {
                     clearTimeout(gameState.animationTimeout);
                     gameState.animationTimeout = null;
                 }
+                
+                // Clear all visual highlights since swap failed
+                clearAllHighlights();
                 
                 // Verify board consistency
                 setTimeout(() => {
@@ -410,7 +415,9 @@ function showComboIndicator() {
  * Animate gravity - gems falling down
  */
 function animateGravity() {
-    // Track gem movements: oldPos -> newPos with fall distance
+    console.log('🎬 animateGravity() called');
+    
+    // Track gem movements BEFORE modifying the board
     const movements = []; // Array of {oldRow, oldCol, newRow, newCol, gemType, fallDistance}
 
     // Calculate gravity and track movement
@@ -428,7 +435,7 @@ function animateGravity() {
         for (let row = GAME_CONFIG.ROWS - 1; row >= 0; row--) {
             if (gameState.board[row][col] !== null) {
                 const gemType = gameState.board[row][col];
-                const fallDistance = writePos - row; // Fixed: should be writePos - row, not row - writePos
+                const fallDistance = writePos - row;
 
                 if (fallDistance > 0) {
                     // Track this gem's movement
@@ -448,26 +455,44 @@ function animateGravity() {
         }
     }
 
-    // Update board state
-    gameState.board = newBoard;
-
-    // Render the board with updated positions
-    // This ensures DOM data attributes match the internal board state
-    renderBoard();
-
-    // Apply falling animation to moved gems
-    movements.forEach(({newRow, newCol, fallDistance}) => {
-        const gem = document.querySelector(`[data-row="${newRow}"][data-col="${newCol}"]`);
+    if (movements.length === 0) {
+        console.log('📊 No gems need to fall');
+        gameState.board = newBoard;
+        renderBoard();
+        return;
+    }
+    
+    console.log(`📊 ${movements.length} gems will fall`);
+    
+    // Apply CSS transforms to gems BEFORE updating board state
+    movements.forEach(({oldRow, oldCol, newRow, fallDistance}) => {
+        const gem = document.querySelector(`[data-row="${oldRow}"][data-col="${oldCol}"]`);
         if (gem) {
-            gem.classList.add('falling');
-            // Adjust animation timing based on distance
-            const duration = Math.min(150 + (fallDistance * 40), 450);
-            gem.style.animationDuration = (duration / 1000) + 's';
+            const fallPixels = fallDistance * 60; // 60px per row
+            gem.style.transition = 'transform 0.3s ease-out';
+            gem.style.transform = `translateY(${fallPixels}px)`;
+            console.log(`💫 Gem [${oldRow}][${oldCol}] falling ${fallDistance} rows to [${newRow}][${oldCol}]`);
         }
     });
 
-    // Fill empty spaces with new gems
+    // After animation, update board state and data attributes
     setTimeout(() => {
+        // Update board state
+        gameState.board = newBoard;
+        
+        // Update DOM data attributes to match new positions
+        movements.forEach(({oldRow, oldCol, newRow, newCol}) => {
+            const gem = document.querySelector(`[data-row="${oldRow}"][data-col="${oldCol}"]`);
+            if (gem) {
+                gem.dataset.row = newRow;
+                gem.style.transform = '';
+                gem.style.transition = '';
+            }
+        });
+        
+        console.log('✅ Gravity animation complete');
+        
+        // Fill empty spaces with new gems
         try {
             fillEmpty();
         } catch (error) {
@@ -479,8 +504,8 @@ function animateGravity() {
             updateUI();
             return;
         }
-
-        // Check for cascade matches after animation
+        
+        // Check for cascade matches after filling
         setTimeout(() => {
             // Increment cascade depth
             gameState.currentCascadeDepth++;
@@ -520,6 +545,9 @@ function animateGravity() {
                     gameState.animationTimeout = null;
                 }
                 
+                // Clear all highlights now that cascades are complete
+                clearAllHighlights();
+                
                 // Verify board consistency after all animations complete
                 setTimeout(() => {
                     verifyBoardConsistency();
@@ -528,7 +556,7 @@ function animateGravity() {
                 updateUI();
             }
         }, GAME_CONFIG.ANIMATION_DURATION);
-    }, GAME_CONFIG.ANIMATION_DURATION);
+    }, 300);
 }
 
 /**
@@ -538,6 +566,7 @@ function animateGravity() {
 function fillEmpty() {
     let filledCount = 0;
     let nullCount = 0;
+    const newlyFilledPositions = []; // Track which positions we fill
     
     // First, count how many null positions we have
     for (let row = 0; row < GAME_CONFIG.ROWS; row++) {
@@ -577,6 +606,7 @@ function fillEmpty() {
                 } while (createMatchAt(row, col, gemType));
                 
                 gameState.board[row][col] = gemType;
+                newlyFilledPositions.push({ row, col });
                 filledCount++;
             }
         }
@@ -584,17 +614,23 @@ function fillEmpty() {
     
     console.log('📦 Filled:', filledCount, 'empty spaces (expected:', nullCount + ') at cascade depth:', gameState.currentCascadeDepth);
 
+    // Update the board rendering to show new gems
     renderBoard();
 
-    // Add spawn animation to new gems
-    for (let col = 0; col < GAME_CONFIG.COLS; col++) {
-        for (let row = 0; row < GAME_CONFIG.ROWS; row++) {
+    // Add spawn animation only to newly filled gems
+    // Wait a frame to ensure gems are rendered first
+    requestAnimationFrame(() => {
+        newlyFilledPositions.forEach(({ row, col }) => {
             const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-            if (gem && !gem.classList.contains('falling')) {
+            if (gem) {
                 gem.classList.add('spawning');
+                // Remove the class after animation completes
+                setTimeout(() => {
+                    gem.classList.remove('spawning');
+                }, 400);
             }
-        }
-    }
+        });
+    });
 }
 
 /**
@@ -649,30 +685,100 @@ function findMatches() {
 
 /**
  * Render the game board
+ * Intelligently updates only what changed to preserve animations
+ */
+/**
+ * Render the game board
+ * Reorders existing gems and adds/removes as needed without flashing
  */
 function renderBoard() {
     console.log('🎨 renderBoard() called');
     const boardElement = document.getElementById('gameBoard');
     boardElement.style.gridTemplateColumns = `repeat(${GAME_CONFIG.COLS}, 60px)`;
 
-    // Clear the entire board and rebuild in correct order
-    // This ensures CSS Grid displays gems in the right visual positions
-    boardElement.innerHTML = '';
-    
-    let gemCount = 0;
+    // Build target state
+    const targetGems = []; // Array of {row, col, type} in correct order
     for (let row = 0; row < GAME_CONFIG.ROWS; row++) {
         for (let col = 0; col < GAME_CONFIG.COLS; col++) {
             const gemType = gameState.board[row][col];
             if (gemType) {
-                const gem = createGemElement(row, col, gemType);
-                boardElement.appendChild(gem);
-                gemCount++;
+                targetGems.push({ row, col, type: gemType });
             }
         }
     }
     
-    console.log(`📊 Rendered ${gemCount} gems in correct grid order`);
+    // Get current gems
+    const currentGems = Array.from(boardElement.querySelectorAll('.gem'));
+    
+    // Create a map of existing gems by position
+    const existingGemsMap = new Map();
+    currentGems.forEach(gem => {
+        const key = `${gem.dataset.row},${gem.dataset.col}`;
+        existingGemsMap.set(key, gem);
+    });
+    
+    // Remove gems that shouldn't exist
+    currentGems.forEach(gem => {
+        const key = `${gem.dataset.row},${gem.dataset.col}`;
+        if (!targetGems.find(t => `${t.row},${t.col}` === key)) {
+            gem.remove();
+        }
+    });
+    
+    // Now add/reorder gems in correct order
+    let addedCount = 0;
+    let reorderedCount = 0;
+    
+    targetGems.forEach((target, targetIndex) => {
+        const key = `${target.row},${target.col}`;
+        let gem = existingGemsMap.get(key);
+        
+        if (!gem) {
+            // Gem doesn't exist - create it
+            gem = createGemElement(target.row, target.col, target.type);
+            addedCount++;
+        } else if (gem.dataset.type !== target.type) {
+            // Gem exists but wrong type - update it
+            gem.dataset.type = target.type;
+            gem.textContent = getGemEmoji(target.type);
+            gem.className = `gem gem-${target.type}`;
+            gem.onclick = function() {
+                const clickedRow = parseInt(this.dataset.row);
+                const clickedCol = parseInt(this.dataset.col);
+                onGemClick(clickedRow, clickedCol);
+            };
+        }
+        
+        // Insert gem at correct position
+        const currentDOMIndex = Array.from(boardElement.children).indexOf(gem);
+        
+        if (currentDOMIndex === -1) {
+            // New gem - insert at target position
+            if (targetIndex < boardElement.children.length) {
+                boardElement.insertBefore(gem, boardElement.children[targetIndex]);
+            } else {
+                boardElement.appendChild(gem);
+            }
+        } else if (currentDOMIndex !== targetIndex) {
+            // Gem exists but in wrong position - move it
+            if (targetIndex < boardElement.children.length) {
+                boardElement.insertBefore(gem, boardElement.children[targetIndex]);
+            } else {
+                boardElement.appendChild(gem);
+            }
+            reorderedCount++;
+        }
+    });
+    
+    if (addedCount > 0) console.log(`➕ Added ${addedCount} gems`);
+    if (reorderedCount > 0) console.log(`🔄 Reordered ${reorderedCount} gems`);
+    console.log(`📊 Rendered ${targetGems.length} gems in correct row-major order`);
     console.log('✅ renderBoard() complete');
+    
+    // Validate board after rendering
+    if (window.validateGame && !gameState.isAnimating) {
+        setTimeout(() => window.validateGame(), 50);
+    }
 }
 
 /**
@@ -713,6 +819,11 @@ function getGemEmoji(gemType) {
  * Highlight selected gem
  */
 function highlightGem(row, col) {
+    // First, clear any existing selections
+    document.querySelectorAll('.gem.selected').forEach(gem => {
+        gem.classList.remove('selected');
+    });
+    
     const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
     if (gem) {
         gem.classList.add('selected');
@@ -772,6 +883,11 @@ function highlightValidTargets(row, col) {
     // Final verification: count how many .valid-target elements exist
     const validTargets = document.querySelectorAll('.valid-target');
     console.log(`✅ Total .valid-target elements in DOM: ${validTargets.length}`);
+    
+    // Validate highlights after applying
+    if (window.validateGame) {
+        setTimeout(() => window.validateGame(), 50);
+    }
 }
 
 /**
@@ -785,6 +901,19 @@ function unhighlightGem(row, col) {
     
     // Clear valid targets
     document.querySelectorAll('.valid-target').forEach(gem => {
+        gem.classList.remove('valid-target');
+    });
+}
+
+/**
+ * Clear all highlights and selections
+ */
+function clearAllHighlights() {
+    console.log('🧹 Clearing all highlights');
+    document.querySelectorAll('.gem.selected').forEach(gem => {
+        gem.classList.remove('selected');
+    });
+    document.querySelectorAll('.gem.valid-target').forEach(gem => {
         gem.classList.remove('valid-target');
     });
 }

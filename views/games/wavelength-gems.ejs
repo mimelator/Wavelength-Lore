@@ -245,9 +245,14 @@
 
     <%- include('../partials/footer') %>
 
+    <script src="/js/games/wavelength-gems/validator.js"></script>
     <script src="/js/games/wavelength-gems/engine.js"></script>
     <script src="/js/games/wavelength-gems/ui.js"></script>
     <script>
+        // Validator available but disabled by default (major bugs fixed!)
+        // To enable validation: startValidation(1000) in console
+        // Manual commands: validateGame(), diagnoseStuckGame(), visualizePositionMismatches()
+        
         // Toggle leaderboard visibility
         function toggleLeaderboard() {
             const widget = document.getElementById('leaderboardWidget');
