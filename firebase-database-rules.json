@@ -105,6 +105,9 @@
         "$userId": {
           ".read": "auth != null && (auth.uid == $userId || auth.token.isScript == true)",
           ".write": "auth != null && (auth.uid == $userId || auth.token.isScript == true)",
+          "radioPlayerStats": {
+            ".read": "auth != null"
+          },
           "displayName": {
             ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50"
           },
@@ -164,6 +167,22 @@
     "analytics": {
       ".read": "auth != null && auth.token.isScript == true",
       ".write": "auth != null && auth.token.isScript == true"
+    },
+    "users": {
+      "$userId": {
+        ".read": "auth != null && (auth.uid == $userId || auth.token.isScript == true)",
+        ".write": "auth != null && (auth.uid == $userId || auth.token.isScript == true)",
+        "radioPlayerStats": {
+          ".read": "auth != null",
+          ".write": "auth != null && auth.uid == $userId"
+        },
+        "name": {
+          ".read": "auth != null"
+        },
+        "displayName": {
+          ".read": "auth != null"
+        }
+      }
     }
   }
 }
