@@ -149,6 +149,9 @@ htmlcov/
 # ===============================
 # Project Specific
 # ===============================
+# Public directory - use /static instead
+public/
+
 # Firebase config (already in config/)
 .firebase.rules.json
 
