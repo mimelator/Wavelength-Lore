@@ -527,7 +527,7 @@ class WavelengthRadio {
 
         if (goblinChance < 0.1) {
             // 10% chance for a goblin - they're rare and valuable!
-            type = { emoji: '👺', class: 'goblin', points: 25, stat: 'goblins', name: 'Goblin' };
+            type = { emoji: '🧌', class: 'goblin', points: 25, stat: 'goblins', name: 'Goblin' };
         } else {
             // 90% chance for regular collectibles
             const types = [
