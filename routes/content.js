@@ -20,6 +20,11 @@ const episodeHelpers = require('../helpers/episode-helpers');
  */
 router.get('/', async (req, res) => {
   try {
+    // Prevent browser caching to ensure logged-out users see updated content
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    
     const videos = await firebaseUtils.fetchFromFirebase('videos');
     
     res.render('index', {
@@ -338,6 +343,11 @@ router.get('/character/:characterId', async (req, res) => {
  */
 router.get('/characters', async (req, res) => {
   try {
+    // Prevent browser caching to ensure logged-out users see updated content
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    
     // Use character helpers with visibility filtering
     const showHidden = res.locals.isContentCreator || false;
     const allCharacters = await characterHelpers.getAllCharacters(showHidden);
@@ -469,12 +479,29 @@ router.get('/lore/:loreId', async (req, res) => {
  */
 router.get('/lore', async (req, res) => {
   try {
+    // Prevent browser caching to ensure logged-out users see updated content
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    
     // Use lore helpers with visibility filtering
     // Pass showHidden based on user role (public users see only visible content)
     const showHidden = res.locals.isContentCreator || false;
-    console.log(`🔍 Lore Gallery - isContentCreator: ${res.locals.isContentCreator}, showHidden: ${showHidden}, req.user: ${req.user ? req.user.uid : 'none'}`);
+    console.log(`🔍 Lore Gallery Request:`, {
+      isContentCreator: res.locals.isContentCreator,
+      showHidden,
+      hasUser: !!req.user,
+      userId: req.user ? req.user.uid : 'anonymous',
+      userGroups: res.locals.userGroups || []
+    });
     const allLore = await loreHelpers.getAllLore(showHidden);
-    console.log(`📚 Lore Gallery - Retrieved ${allLore.length} lore items`);
+    console.log(`📚 Lore Gallery - Retrieved ${allLore.length} lore items (showHidden: ${showHidden})`);
+    
+    // Log which lore items are hidden
+    const hiddenLore = allLore.filter(l => l.hidden);
+    if (hiddenLore.length > 0) {
+      console.log(`🔒 Hidden lore being shown to content creator: ${hiddenLore.map(l => l.id).join(', ')}`);
+    }
 
     res.render('lore-gallery', {
       title: 'Lore Gallery',
