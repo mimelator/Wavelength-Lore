@@ -1966,6 +1966,8 @@
     word-wrap: break-word;
     overflow-wrap: break-word;
     hyphens: auto;
+    pointer-events: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .summary-content::-webkit-scrollbar {
