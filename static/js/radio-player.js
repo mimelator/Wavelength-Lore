@@ -227,22 +227,36 @@ class WavelengthRadio {
         // Wait for Firebase to be ready
         if (window.firebaseAuth && window.firebaseUtils) {
             console.log('✅ Firebase ready, setting up auth listener');
-            window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
-                console.log('👤 Radio Player auth state changed:', user ? user.uid : 'No user');
-                if (user) {
-                    this.currentUserId = user.uid;
-                    console.log('✅ Set currentUserId:', this.currentUserId);
-                    this.loadStatsFromFirebase();
-                    this.loadFavoritesFromFirebase();
-                } else {
-                    console.log('⚠️ No authenticated user');
-                }
-            });
+            this.setupFirebaseAuth();
         } else {
-            console.log('⏳ Firebase not ready, retrying in 500ms...');
-            // Retry after a delay if Firebase isn't ready yet
-            setTimeout(() => this.initFirebaseSync(), 500);
+            console.log('⏳ Firebase not ready, waiting for initialization...');
+            // Listen for Firebase ready event
+            const checkFirebase = () => {
+                if (window.firebaseAuth && window.firebaseUtils) {
+                    console.log('✅ Firebase became ready, setting up auth listener');
+                    this.setupFirebaseAuth();
+                } else {
+                    console.log('⏳ Still waiting for Firebase, retrying in 500ms...');
+                    setTimeout(checkFirebase, 500);
+                }
+            };
+            checkFirebase();
         }
+    }
+
+    // Setup Firebase authentication listener
+    setupFirebaseAuth() {
+        window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
+            console.log('👤 Radio Player auth state changed:', user ? user.uid : 'No user');
+            if (user) {
+                this.currentUserId = user.uid;
+                console.log('✅ Set currentUserId:', this.currentUserId);
+                this.loadStatsFromFirebase();
+                this.loadFavoritesFromFirebase();
+            } else {
+                console.log('⚠️ No authenticated user');
+            }
+        });
     }
 
     // Load stats from Firebase and merge with localStorage
