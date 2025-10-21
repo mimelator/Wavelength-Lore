@@ -12,15 +12,17 @@ const SecureDatabaseBackup = require('../utils/secureBackup');
 const admin = require('firebase-admin');
 const path = require('path');
 
-// Initialize Firebase Admin
+// Initialize Firebase Admin (using environment variables)
 if (!admin.apps.length) {
-  const serviceAccount = require('../firebaseServiceAccountKey.json');
-  const firebaseConfig = envHelper.getFirebaseConfig();
-  
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: firebaseConfig.databaseURL
+    credential: admin.credential.cert({
+      projectId: process.env.PROJECT_ID,
+      clientEmail: process.env.CLIENT_EMAIL,
+      privateKey: process.env.PRIVATE_KEY?.replace(/\\n/g, '\n')
+    }),
+    databaseURL: process.env.DATABASE_URL
   });
+  console.log('🔥 Firebase Admin initialized for backup CLI');
 }
 
 const backup = new SecureDatabaseBackup();
