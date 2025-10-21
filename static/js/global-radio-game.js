@@ -35,9 +35,17 @@ class GlobalRadioGame {
     }
 
     async init() {
-        if (!this.isEnabled) {
-            this.hideGame();
-            return;
+        // Always ensure the game is enabled on non-game pages
+        // (disableCollectiblesOnly() hides canvas but doesn't disable the whole widget)
+        if (this.isEnabled === false) {
+            // Re-enable if it was disabled (e.g., from previous game session)
+            // but only hide the collectibles canvas, not the radio widget itself
+            localStorage.removeItem('global_radio_game_enabled');
+            this.isEnabled = true;
+            const canvas = document.getElementById('globalGameCanvas');
+            if (canvas) {
+                canvas.style.display = 'none';
+            }
         }
 
         this.bindControls();
