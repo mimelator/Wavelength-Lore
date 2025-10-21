@@ -2119,21 +2119,21 @@
 
 /* Neon green horseshoe in profile stats */
 .game-stat-item:nth-child(3) .game-stat-icon {
-    filter: drop-shadow(0 0 10px #00ff00)
-            drop-shadow(0 0 20px #39ff14)
+    filter: drop-shadow(0 0 6px #00ff00)
+            drop-shadow(0 0 12px #39ff14)
             brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg) !important;
     animation: neonGreenPulse 2s ease-in-out infinite;
 }
 
 @keyframes neonGreenPulse {
     0%, 100% {
-        filter: drop-shadow(0 0 10px #00ff00)
-                drop-shadow(0 0 20px #39ff14)
+        filter: drop-shadow(0 0 6px #00ff00)
+                drop-shadow(0 0 12px #39ff14)
                 brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg);
     }
     50% {
-        filter: drop-shadow(0 0 15px #00ff00)
-                drop-shadow(0 0 30px #39ff14)
+        filter: drop-shadow(0 0 8px #00ff00)
+                drop-shadow(0 0 15px #39ff14)
                 brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg);
     }
 }
