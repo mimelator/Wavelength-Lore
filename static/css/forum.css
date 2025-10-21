@@ -2172,6 +2172,47 @@
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
 
+/* Radio Game Settings */
+.radio-game-settings {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.radio-game-settings h4 {
+    color: #fff;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.setting-row {
+    margin-bottom: 10px;
+}
+
+.setting-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: 600;
+}
+
+.setting-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.setting-description {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+    margin: 5px 0 0 30px;
+}
+
 /* Favorite Songs Section */
 .favorite-songs-section {
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);

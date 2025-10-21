@@ -359,6 +359,57 @@
             loadFavoriteSongs();
         }
 
+        function initGlobalGameToggle() {
+            const toggle = document.getElementById('globalGameToggle');
+            if (!toggle) return;
+
+            // Load current setting
+            const isEnabled = localStorage.getItem('global_radio_game_enabled') !== 'false';
+            toggle.checked = isEnabled;
+
+            // Add event listener
+            toggle.addEventListener('change', (e) => {
+                const enabled = e.target.checked;
+                localStorage.setItem('global_radio_game_enabled', enabled);
+
+                // Update global game if it exists on this page
+                if (window.globalRadioGame) {
+                    if (enabled) {
+                        window.globalRadioGame.enableGame();
+                    } else {
+                        window.globalRadioGame.disableGame();
+                    }
+                }
+
+                // Show feedback
+                const message = enabled ?
+                    '✅ Radio Game enabled on all pages!' :
+                    '❌ Radio Game disabled. You can re-enable it here anytime.';
+
+                // Create temporary notification
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                    z-index: 10000;
+                    animation: slideInRight 0.3s ease;
+                `;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            });
+        }
+
         function loadFavoriteSongs() {
             const favorites = JSON.parse(localStorage.getItem('wavelength_favorites') || '[]');
             const favoritesList = document.getElementById('favorite-songs-list');
@@ -515,6 +566,20 @@
                             <div class="radio-stats-note">
                                 <small>💡 Play the <a href="/radio">Radio Player</a> to collect items and level up!</small>
                             </div>
+
+                            <% if (isOwnProfile) { %>
+                            <!-- Global Game Settings -->
+                            <div class="radio-game-settings">
+                                <h4>🎮 Global Game Settings</h4>
+                                <div class="setting-row">
+                                    <label class="setting-label">
+                                        <input type="checkbox" id="globalGameToggle" checked>
+                                        <span class="setting-text">Show Radio Game on all pages</span>
+                                    </label>
+                                    <p class="setting-description">When enabled, the Radio Game widget appears in the footer on all non-forum pages.</p>
+                                </div>
+                            </div>
+                            <% } %>
                         </div>
 
                         <!-- Favorite Songs Section -->
@@ -584,6 +649,7 @@
             // Always load radio player stats (they're always visible now)
             setTimeout(() => {
                 loadRadioPlayerStats();
+                initGlobalGameToggle();
             }, 100);
         }
         

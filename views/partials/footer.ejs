@@ -18,6 +18,63 @@
 </script>
 <% } %>
 
+<!-- Global Radio Game Widget (appears on non-forum pages for authenticated users) -->
+<% if (typeof currentPage !== 'undefined' && !currentPage.startsWith('/forum') && typeof user !== 'undefined' && user) { %>
+<script src="/js/global-radio-game.js?v=<%= Date.now() %>"></script>
+<div id="globalRadioGame" class="global-radio-game">
+  <div class="radio-game-toggle" id="radioGameToggle" title="Show/Hide Radio Game">
+    <span class="toggle-icon">🎮</span>
+    <span class="toggle-text">Radio Game</span>
+  </div>
+
+  <div class="radio-game-widget" id="radioGameWidget">
+    <div class="radio-game-header">
+      <h3>✨ Wavelength Radio Game ✨</h3>
+      <button class="close-game-btn" id="closeGameBtn" title="Close">✕</button>
+    </div>
+
+    <div class="radio-game-stats">
+      <div class="game-stat-mini">
+        <span class="stat-icon">🍄</span>
+        <span class="stat-value" id="globalMushrooms">0</span>
+      </div>
+      <div class="game-stat-mini">
+        <span class="stat-icon">⭐</span>
+        <span class="stat-value" id="globalStars">0</span>
+      </div>
+      <div class="game-stat-mini">
+        <span class="stat-icon">🧲</span>
+        <span class="stat-value" id="globalHorseshoes">0</span>
+      </div>
+      <div class="game-stat-mini">
+        <span class="stat-icon">✨</span>
+        <span class="stat-value" id="globalSparkles">0</span>
+      </div>
+      <div class="game-stat-mini">
+        <span class="stat-icon">💎</span>
+        <span class="stat-value" id="globalCrystals">0</span>
+      </div>
+      <div class="game-stat-mini">
+        <span class="stat-icon">🌙</span>
+        <span class="stat-value" id="globalMoons">0</span>
+      </div>
+      <div class="game-stat-mini">
+        <span class="stat-icon">👺</span>
+        <span class="stat-value" id="globalGoblins">0</span>
+      </div>
+      <div class="game-stat-mini total-score">
+        <span class="stat-icon">🏆</span>
+        <span class="stat-value" id="globalTotalScore">0</span>
+      </div>
+    </div>
+
+    <div class="radio-game-canvas-container">
+      <div class="radio-game-canvas" id="globalGameCanvas"></div>
+    </div>
+  </div>
+</div>
+<% } %>
+
 <footer>
   <div class="footer-content">
     <p>&copy; 2025 Wavelength Lore. All rights reserved.</p>
@@ -76,5 +133,191 @@
   .version-badge:hover {
     opacity: 1;
     background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Global Radio Game Widget */
+  .global-radio-game {
+    position: fixed;
+    bottom: 0;
+    right: 20px;
+    z-index: 9999;
+    transition: all 0.3s ease;
+  }
+
+  .radio-game-toggle {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 25px 25px 0 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 -4px 15px rgba(102, 126, 234, 0.4);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .radio-game-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 -6px 20px rgba(102, 126, 234, 0.6);
+  }
+
+  .radio-game-toggle .toggle-icon {
+    font-size: 1.2rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .radio-game-widget {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.98) 0%, rgba(43, 43, 66, 0.98) 100%);
+    backdrop-filter: blur(10px);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.3);
+    width: 400px;
+    max-height: 500px;
+    display: none;
+    overflow: hidden;
+    border: 2px solid rgba(102, 126, 234, 0.3);
+  }
+
+  .radio-game-widget.active {
+    display: block;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .radio-game-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .radio-game-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 1.1rem;
+  }
+
+  .close-game-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .close-game-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+  }
+
+  .radio-game-stats {
+    padding: 15px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .game-stat-mini {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(102, 126, 234, 0.1);
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+  }
+
+  .game-stat-mini .stat-icon {
+    font-size: 1.2rem;
+  }
+
+  .game-stat-mini .stat-value {
+    color: white;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .game-stat-mini.total-score {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.2) 100%);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    flex: 1 0 100%;
+  }
+
+  .game-stat-mini.total-score .stat-value {
+    color: #ffd700;
+    font-size: 1.1rem;
+  }
+
+  .radio-game-canvas-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+  }
+
+  .radio-game-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+  }
+
+  /* Neon green horseshoe styling */
+  .game-stat-mini:nth-child(3) .stat-icon {
+    filter: drop-shadow(0 0 6px #00ff00)
+            drop-shadow(0 0 12px #39ff14)
+            brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg);
+    animation: neonGreenPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes neonGreenPulse {
+    0%, 100% { filter: drop-shadow(0 0 6px #00ff00) drop-shadow(0 0 12px #39ff14) brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg); }
+    50% { filter: drop-shadow(0 0 10px #00ff00) drop-shadow(0 0 20px #39ff14) brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg); }
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .radio-game-widget {
+      width: calc(100vw - 40px);
+      right: 20px;
+    }
+
+    .global-radio-game {
+      right: 20px;
+      left: 20px;
+    }
+  }
+
+  /* Hidden state when disabled */
+  .global-radio-game.disabled {
+    display: none;
   }
 </style>
