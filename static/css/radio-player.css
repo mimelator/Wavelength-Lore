@@ -1922,6 +1922,66 @@
     backdrop-filter: blur(10px);
 }
 
+/* Episode Summary Overlay */
+.screensaver-summary-overlay {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 900px;
+    text-align: left;
+    z-index: 16;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.screensaver-summary-overlay.visible {
+    opacity: 1;
+}
+
+.screensaver-summary-overlay.fade-out {
+    opacity: 0;
+}
+
+.summary-content {
+    font-family: 'AnimeAce', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95),
+                 0 0 20px rgba(0, 0, 0, 0.8);
+    padding: 25px 30px;
+    background: linear-gradient(135deg,
+                rgba(0, 0, 0, 0.75) 0%,
+                rgba(30, 30, 60, 0.7) 50%,
+                rgba(0, 0, 0, 0.75) 100%);
+    border: 2px solid rgba(138, 43, 226, 0.4);
+    border-radius: 15px;
+    backdrop-filter: blur(15px);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.summary-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.summary-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.summary-content::-webkit-scrollbar-thumb {
+    background: rgba(138, 43, 226, 0.5);
+    border-radius: 10px;
+}
+
+.summary-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(138, 43, 226, 0.7);
+}
+
 /* Game HUD Overlay */
 .game-hud {
     position: absolute;

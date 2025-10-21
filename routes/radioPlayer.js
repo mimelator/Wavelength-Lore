@@ -58,12 +58,21 @@ async function getEnhancedPlaylist() {
       const episodeData = await firebaseUtils.fetchFromFirebase(`videos/season${track.season}/episodes/episode${track.episode}`);
 
       if (episodeData) {
+        // Debug logging for summary field
+        if (track.season === 1 && track.episode === 1) {
+          console.log('📖 Episode data fields:', Object.keys(episodeData));
+          console.log('📖 Story field:', episodeData.story);
+          console.log('📖 Summary field:', episodeData.summary);
+        }
+
         return {
           ...track,
           episodeImage: episodeData.image || '',
           episodeUrl: `/season/${track.season}/episode/${track.episode}`,
           images: episodeData.carouselImages || episodeData.image_gallery || episodeData.images || [],
           lyrics: episodeData.lyrics || '',
+          summary: episodeData.story || episodeData.summary || '',
+          episodeTitle: episodeData.title || track.title,
           characters: allCharacters.filter(char =>
             episodeData.keywords?.some(keyword =>
               char.keywords?.some(ck => ck.toLowerCase() === keyword.toLowerCase())

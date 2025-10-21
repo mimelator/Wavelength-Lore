@@ -1138,6 +1138,12 @@ class WavelengthRadio {
                 preferences.transition = activeTransitionBtn.dataset.transition;
             }
 
+            // Save summary preference
+            const activeSummaryBtn = document.querySelector('.summary-btn.active');
+            if (activeSummaryBtn) {
+                preferences.summary = activeSummaryBtn.dataset.summary;
+            }
+
             localStorage.setItem('wavelength_screensaver_prefs', JSON.stringify(preferences));
             console.log('💾 Saved screen saver preferences:', preferences);
         } catch (error) {
@@ -1207,6 +1213,17 @@ class WavelengthRadio {
             if (preferences.transition) {
                 document.querySelectorAll('.transition-btn').forEach(btn => {
                     if (btn.dataset.transition === preferences.transition) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+
+            // Restore summary preference
+            if (preferences.summary) {
+                document.querySelectorAll('.summary-btn').forEach(btn => {
+                    if (btn.dataset.summary === preferences.summary) {
                         btn.classList.add('active');
                     } else {
                         btn.classList.remove('active');
@@ -1370,6 +1387,21 @@ class WavelengthRadio {
                 const transition = btn.dataset.transition;
                 localStorage.setItem('wavelength_screensaver_transitions', transition);
                 console.log(`🎞️ Image transitions: ${transition}`);
+                this.saveScreenSaverPreferences();
+            });
+        });
+
+        // Bind summary buttons
+        const summaryBtns = document.querySelectorAll('.summary-btn');
+        summaryBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Remove active class from all summary buttons
+                summaryBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                // Update summary display
+                this.updateEpisodeSummary();
                 this.saveScreenSaverPreferences();
             });
         });
@@ -1629,6 +1661,9 @@ class WavelengthRadio {
 
         // Show song title
         this.showSongTitle();
+
+        // Show episode summary
+        this.updateEpisodeSummary();
 
         // Start game if active
         this.updateGameMode();
@@ -1935,6 +1970,48 @@ class WavelengthRadio {
         console.log(`🎼 Showing song title: "${title}"`);
     }
 
+    updateEpisodeSummary() {
+        const summaryOverlay = document.querySelector('.screensaver-summary-overlay');
+        const summaryContent = summaryOverlay?.querySelector('.summary-content');
+        if (!summaryOverlay || !summaryContent) return;
+
+        const activeSummaryBtn = document.querySelector('.summary-btn.active');
+        const showSummary = activeSummaryBtn ? activeSummaryBtn.dataset.summary === 'on' : false;
+
+        if (!showSummary) {
+            summaryOverlay.classList.remove('visible');
+            summaryContent.innerHTML = '';
+            return;
+        }
+
+        // Get current track summary
+        const currentTrack = this.playlist[this.currentTrackIndex];
+        const summary = currentTrack?.summary || 'No summary available for this episode';
+        const episodeTitle = currentTrack?.episodeTitle || currentTrack?.title || 'Unknown Episode';
+        const season = currentTrack?.season || '?';
+        const episode = currentTrack?.episode || '?';
+
+        // Debug logging
+        console.log(`📖 Current track data:`, {
+            season,
+            episode,
+            title: currentTrack?.title,
+            episodeTitle: currentTrack?.episodeTitle,
+            hasSummary: !!currentTrack?.summary,
+            summaryLength: currentTrack?.summary?.length || 0,
+            summaryPreview: currentTrack?.summary?.substring(0, 100),
+            allTrackKeys: Object.keys(currentTrack || {})
+        });
+        console.log(`📖 Showing episode summary for S${season}E${episode}: "${episodeTitle}"`);
+
+        // Set summary text with season, episode number, and title
+        summaryContent.innerHTML = `<strong>Season ${season}, Episode ${episode}: ${episodeTitle}</strong><br><br>${summary}`;
+
+        // Show summary
+        summaryOverlay.classList.remove('fade-out');
+        summaryOverlay.classList.add('visible');
+    }
+
     updateLyricsDisplay() {
         const lyricsContainer = document.querySelector('.screensaver-lyrics');
         if (!lyricsContainer) return;
@@ -2046,9 +2123,12 @@ class WavelengthRadio {
             
             // Update lyrics for new track
             this.updateLyricsDisplay();
-            
+
             // Show new song title
             this.showSongTitle();
+
+            // Update episode summary
+            this.updateEpisodeSummary();
             
             console.log(`✅ Updated screen saver with ${this.screensaverImages.length} images from new episode`);
         }
@@ -2069,27 +2149,16 @@ class WavelengthRadio {
     }
 
     rotateScreenSaverImage() {
-        console.log('🔄 === TRANSITION DEBUG START ===');
-
         const gallery = document.querySelector('.screensaver-gallery');
-        if (!gallery) {
-            console.warn('❌ Gallery not found');
-            return;
-        }
+        if (!gallery) return;
 
         const images = gallery.querySelectorAll('img');
-        console.log(`📸 Total images: ${images.length}`);
-        if (images.length <= 1) {
-            console.warn('❌ Not enough images for rotation');
-            return;
-        }
+        if (images.length <= 1) return;
 
         // Get current and next indices
         const currentImg = images[this.currentScreensaverIndex];
         this.currentScreensaverIndex = (this.currentScreensaverIndex + 1) % images.length;
         const nextImg = images[this.currentScreensaverIndex];
-
-        console.log(`🔢 Current index: ${this.currentScreensaverIndex - 1 < 0 ? images.length - 1 : this.currentScreensaverIndex - 1} -> Next index: ${this.currentScreensaverIndex}`);
 
         // Available transitions
         const transitions = [
@@ -2107,28 +2176,16 @@ class WavelengthRadio {
             'transition-diagonal-br'
         ];
 
-        // Log current classes before removal
-        console.log('📋 Current image classes BEFORE:', Array.from(currentImg.classList));
-        console.log('📋 Next image classes BEFORE:', Array.from(nextImg.classList));
-
         // Remove old transition classes from all images
-        images.forEach((img, idx) => {
-            const removedClasses = [];
+        images.forEach(img => {
             transitions.forEach(t => {
-                if (img.classList.contains(t)) {
-                    removedClasses.push(t);
-                    img.classList.remove(t);
-                }
+                img.classList.remove(t);
             });
-            if (removedClasses.length > 0) {
-                console.log(`🧹 Removed from image ${idx}:`, removedClasses);
-            }
         });
 
         // Check if transitions are enabled (default: true)
         const transitionsSetting = localStorage.getItem('wavelength_screensaver_transitions');
         const transitionsEnabled = transitionsSetting !== 'off';
-        console.log(`⚙️ Transitions setting: "${transitionsSetting}" (enabled: ${transitionsEnabled})`);
 
         // Apply random transition if enabled
         if (transitionsEnabled) {
@@ -2137,46 +2194,18 @@ class WavelengthRadio {
 
             currentImg.classList.add(randomTransition);
             nextImg.classList.add(randomTransition);
-
-            console.log(`🎞️ Selected transition [${randomIndex}/${transitions.length - 1}]: ${randomTransition}`);
-            console.log(`✅ Added "${randomTransition}" to current image`);
-            console.log(`✅ Added "${randomTransition}" to next image`);
-        } else {
-            console.log(`🚫 Transitions disabled - using default fade`);
         }
 
         // Fade out current, fade in next
         currentImg.classList.remove('active');
         currentImg.classList.add('fading-out');
-        console.log(`🔴 Removed "active" from current, added "fading-out"`);
 
         nextImg.classList.remove('fading-out');
         nextImg.classList.add('active');
-        console.log(`🟢 Removed "fading-out" from next, added "active"`);
-
-        // Log final classes
-        console.log('📋 Current image classes AFTER:', Array.from(currentImg.classList));
-        console.log('📋 Next image classes AFTER:', Array.from(nextImg.classList));
-
-        // Check computed styles to debug CSS application
-        setTimeout(() => {
-            const nextComputedStyle = window.getComputedStyle(nextImg);
-            console.log('🎨 Next image computed transform:', nextComputedStyle.transform);
-            console.log('🎨 Next image computed opacity:', nextComputedStyle.opacity);
-            console.log('🎨 Next image computed transition:', nextComputedStyle.transition);
-            console.log('🎨 Next image computed animation:', nextComputedStyle.animation);
-
-            const currentComputedStyle = window.getComputedStyle(currentImg);
-            console.log('🎨 Current image computed transform:', currentComputedStyle.transform);
-            console.log('🎨 Current image computed opacity:', currentComputedStyle.opacity);
-        }, 100);
-
-        console.log('🔄 === TRANSITION DEBUG END ===\n');
 
         // Clean up fading-out class after transition
         setTimeout(() => {
             currentImg.classList.remove('fading-out');
-            console.log(`🧹 Cleaned up "fading-out" class from previous image`);
         }, 3000); // Increased to 3s to match transition duration
     }
 
