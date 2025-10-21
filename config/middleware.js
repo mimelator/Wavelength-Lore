@@ -308,6 +308,10 @@ function configureAPIRoutes(app, adminRateLimit, adminAuthStrict) {
   // Import and setup forum routes
   const forumRoutes = require('../routes/forum');
   app.use('/forum', forumRoutes);
+
+  // Import and setup games routes (VIP-only access)
+  const gamesRoutes = require('../routes/games');
+  app.use('/games', gamesRoutes);
 }
 
 module.exports = {

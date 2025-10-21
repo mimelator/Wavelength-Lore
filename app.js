@@ -27,7 +27,6 @@ const uploadAudioRoutes = require('./routes/uploadAudio');
 const uploadMediaRoutes = require('./routes/uploadMedia');
 const downloadImagesRoutes = require('./routes/downloadImages');
 const radioPlayerRoutes = require('./routes/radioPlayer');
-const gamesRoutes = require('./routes/games');
 
 // Import secure backup system
 const SecureDatabaseBackup = require('./utils/secureBackup');
@@ -92,9 +91,6 @@ async function createApp() {
 
   // Mount content edit routes (protected by authentication)
   app.use('/', contentEditRoutes);
-
-  // Mount games routes (VIP-only access) - Must be before catch-all routes
-  app.use('/games', gamesRoutes);
 
   // Mount radio player routes (public)
   app.use('/', radioPlayerRoutes);
