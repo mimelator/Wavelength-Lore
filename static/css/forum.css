@@ -19,7 +19,33 @@
     padding: 20px 0;
 }
 
-/* Forum Header - Match main site h1 style */
+/* Forum Title Section - Simple, matches main site h1 */
+.forum-title-section {
+    text-align: center;
+    margin: 30px 0 40px 0;
+}
+
+.forum-page-title {
+    font-size: 4rem;
+    margin: 20px 0 10px 0;
+    color: #333;
+    font-family: 'AnimeAce', Arial, sans-serif;
+    text-align: center;
+}
+
+.forum-icon {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.forum-tagline {
+    font-size: 1.2rem;
+    color: #666;
+    margin: 10px 0;
+    font-family: 'AnimeAce', Arial, sans-serif;
+}
+
+/* Legacy Forum Header - Keep for backward compatibility */
 .forum-header {
     text-align: center;
     margin-bottom: 20px;

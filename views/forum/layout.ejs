@@ -130,33 +130,18 @@
     <script src="/js/forum.js" defer></script>
 </head>
 <body>
-    <!-- Include existing navigation -->
-    <%- include('../partials/head') %>
+    <!-- Include main site navigation -->
+    <%- include('../partials/header') %>
     
     <div class="forum-container">
-        <!-- Forum Header -->
-        <header class="forum-header">
-            <div class="container">
-                <div class="forum-header-content">
-                    <div class="forum-branding">
-                        <h1>
-                            <span class="forum-icon">🎵</span>
-                            Wavelength Community Forum
-                        </h1>
-                        <p class="forum-tagline">Connect with fellow Wavelength fans</p>
-                    </div>
-                    
-                    <div class="forum-auth">
-                        <div id="forum-auth-container">
-                            <!-- Auth buttons will be inserted here by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-        
-        <!-- Forum Navigation - Matching main site structure -->
-        <%- include('../partials/header') %>
+        <!-- Forum Title Section -->
+        <div class="forum-title-section">
+            <h1 class="forum-page-title">
+                <span class="forum-icon">💬</span>
+                Wavelength Community Forum
+            </h1>
+            <p class="forum-tagline">Connect with fellow Wavelength fans</p>
+        </div>
         
         <!-- Main Forum Content -->
         <main class="forum-main">
