@@ -126,6 +126,17 @@
     animation: float 8s ease-in-out infinite, glow 3s ease-in-out infinite;
 }
 
+.mystical-element.goblin {
+    font-size: 3.5rem;
+    animation: float 5s ease-in-out infinite, pulse 1s ease-in-out infinite, spin 6s linear infinite;
+    filter: drop-shadow(0 0 15px rgba(255, 69, 0, 0.8));
+}
+
+.mystical-element.goblin:hover {
+    filter: drop-shadow(0 0 30px rgba(255, 0, 0, 1));
+    transform: scale(1.4) rotate(5deg);
+}
+
 .mystical-element.character {
     width: 80px;
     height: 80px;
@@ -692,6 +703,25 @@
 
 .stat-item.magic-level .stat-value {
     font-size: 1.8rem;
+}
+
+.stat-item.rare-item {
+    background: linear-gradient(135deg, rgba(255, 69, 0, 0.1), rgba(255, 0, 0, 0.1));
+    padding: 8px 12px;
+    border-radius: 15px;
+    border: 2px solid rgba(255, 69, 0, 0.3);
+    box-shadow: 0 0 10px rgba(255, 69, 0, 0.2);
+}
+
+.stat-item.rare-item .stat-icon {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.stat-item.rare-item .stat-value {
+    background: linear-gradient(135deg, #ff4500, #ff0000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 /* Episode Info Section */

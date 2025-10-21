@@ -23,6 +23,7 @@ class WavelengthRadio {
             sparkles: parseInt(localStorage.getItem('sparkle_count') || '0'),
             crystals: parseInt(localStorage.getItem('crystal_count') || '0'),
             moons: parseInt(localStorage.getItem('moon_count') || '0'),
+            goblins: parseInt(localStorage.getItem('goblin_count') || '0'),
             magicLevel: parseInt(localStorage.getItem('magic_level') || '1')
         };
 
@@ -538,17 +539,25 @@ class WavelengthRadio {
         const element = document.createElement('div');
         element.classList.add('mystical-element', 'appearing');
 
-        // Random type
-        const types = [
-            { emoji: '🍄', class: 'mushroom', points: 10, stat: 'mushrooms', name: 'Mushroom' },
-            { emoji: '🌟', class: 'star', points: 5, stat: 'stars', name: 'Star' },
-            { emoji: '🧲', class: 'horseshoe', points: 15, stat: 'horseshoes', name: 'Horseshoe' },
-            { emoji: '✨', class: 'sparkle', points: 5, stat: 'sparkles', name: 'Sparkle' },
-            { emoji: '🔮', class: 'crystal', points: 8, stat: 'crystals', name: 'Crystal' },
-            { emoji: '🌙', class: 'moon', points: 7, stat: 'moons', name: 'Moon' }
-        ];
+        // Random type - goblins are rare (10% chance)
+        let type;
+        const goblinChance = Math.random();
 
-        const type = types[Math.floor(Math.random() * types.length)];
+        if (goblinChance < 0.1) {
+            // 10% chance for a goblin - they're rare and valuable!
+            type = { emoji: '👺', class: 'goblin', points: 25, stat: 'goblins', name: 'Goblin' };
+        } else {
+            // 90% chance for regular collectibles
+            const types = [
+                { emoji: '🍄', class: 'mushroom', points: 10, stat: 'mushrooms', name: 'Mushroom' },
+                { emoji: '🌟', class: 'star', points: 5, stat: 'stars', name: 'Star' },
+                { emoji: '🧲', class: 'horseshoe', points: 15, stat: 'horseshoes', name: 'Horseshoe' },
+                { emoji: '✨', class: 'sparkle', points: 5, stat: 'sparkles', name: 'Sparkle' },
+                { emoji: '🔮', class: 'crystal', points: 8, stat: 'crystals', name: 'Crystal' },
+                { emoji: '🌙', class: 'moon', points: 7, stat: 'moons', name: 'Moon' }
+            ];
+            type = types[Math.floor(Math.random() * types.length)];
+        }
         element.classList.add(type.class);
         element.textContent = type.emoji;
         element.dataset.points = type.points;
@@ -593,7 +602,8 @@ class WavelengthRadio {
         // Level up every 50 items (total across all types)
         const totalCollected = this.stats.mushrooms + this.stats.stars +
                                this.stats.horseshoes + this.stats.sparkles +
-                               this.stats.crystals + this.stats.moons;
+                               this.stats.crystals + this.stats.moons +
+                               this.stats.goblins;
         const newLevel = Math.floor(totalCollected / 50) + 1;
         if (newLevel > this.stats.magicLevel) {
             this.stats.magicLevel = newLevel;
@@ -618,6 +628,7 @@ class WavelengthRadio {
         document.getElementById('sparkleCount').textContent = this.stats.sparkles;
         document.getElementById('crystalCount').textContent = this.stats.crystals;
         document.getElementById('moonCount').textContent = this.stats.moons;
+        document.getElementById('goblinCount').textContent = this.stats.goblins;
         document.getElementById('magicLevel').textContent = this.stats.magicLevel;
     }
 
