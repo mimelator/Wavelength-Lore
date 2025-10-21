@@ -23,14 +23,15 @@ window.initializeWavelengthFirebase = function(firebaseConfig) {
                     browserLocalPersistence 
                 } = authModule;
                 
-                const { 
-                    getDatabase, 
-                    ref, 
-                    push, 
-                    set, 
-                    onValue, 
-                    query, 
-                    orderByChild 
+                const {
+                    getDatabase,
+                    ref,
+                    push,
+                    set,
+                    update,
+                    onValue,
+                    query,
+                    orderByChild
                 } = dbModule;
 
                 // Initialize Firebase
@@ -105,21 +106,22 @@ window.initializeWavelengthFirebase = function(firebaseConfig) {
                     // Make Firebase available globally for forum components
                     window.firebaseAuth = auth;
                     window.firebaseDB = database;
-                    window.firebaseUtils = { 
-                        signInWithPopup, 
+                    window.firebaseUtils = {
+                        signInWithPopup,
                         signInWithRedirect,
                         getRedirectResult,
-                        GoogleAuthProvider, 
-                        signOut, 
-                        onAuthStateChanged, 
-                        setPersistence, 
-                        browserLocalPersistence, 
-                        ref, 
-                        push, 
-                        set, 
-                        onValue, 
-                        query, 
-                        orderByChild 
+                        GoogleAuthProvider,
+                        signOut,
+                        onAuthStateChanged,
+                        setPersistence,
+                        browserLocalPersistence,
+                        ref,
+                        push,
+                        set,
+                        update,
+                        onValue,
+                        query,
+                        orderByChild
                     };
                     
                     // Store Firebase ID token in cookie for server-side authentication
