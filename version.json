@@ -1,10 +1,10 @@
 {
-  "version": "1.0.71",
-  "buildDate": "2025-10-21T11:10:15Z",
-  "commitHash": "43e15870291cb8b22a23a689bf094c3849a14a5f",
-  "commitShort": "43e1587",
-  "buildNumber": "81",
+  "version": "1.0.72",
+  "buildDate": "2025-10-21T11:11:15Z",
+  "commitHash": "897594b7e14698521511475b3084a0faae9b7736",
+  "commitShort": "897594b",
+  "buildNumber": "82",
   "environment": "production",
-  "deploymentWorkflowId": "18681574537",
+  "deploymentWorkflowId": "18681827183",
   "deploymentStatus": "verified"
 }
