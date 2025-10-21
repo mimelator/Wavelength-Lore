@@ -111,17 +111,22 @@
     animation: float 7s ease-in-out infinite, spin 10s linear infinite, neonGreenPulse 2s ease-in-out infinite;
     filter: drop-shadow(0 0 20px #00ff00)
             drop-shadow(0 0 40px #39ff14)
-            drop-shadow(0 0 60px #00ff00);
+            drop-shadow(0 0 60px #00ff00)
+            brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg);
     text-shadow: 0 0 20px #00ff00,
                  0 0 40px #39ff14,
                  0 0 60px #00ff00,
                  0 0 80px #00ff00;
+    background: radial-gradient(circle, rgba(0, 255, 0, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    padding: 10px;
 }
 
 .mystical-element.horseshoe:hover {
     filter: drop-shadow(0 0 30px #00ff00)
             drop-shadow(0 0 50px #39ff14)
-            drop-shadow(0 0 80px #00ff00);
+            drop-shadow(0 0 80px #00ff00)
+            brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg);
     text-shadow: 0 0 30px #00ff00,
                  0 0 50px #39ff14,
                  0 0 70px #00ff00,
@@ -133,12 +138,14 @@
     0%, 100% {
         filter: drop-shadow(0 0 20px #00ff00)
                 drop-shadow(0 0 40px #39ff14)
-                drop-shadow(0 0 60px #00ff00);
+                drop-shadow(0 0 60px #00ff00)
+                brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg);
     }
     50% {
         filter: drop-shadow(0 0 30px #00ff00)
                 drop-shadow(0 0 60px #39ff14)
-                drop-shadow(0 0 90px #00ff00);
+                drop-shadow(0 0 90px #00ff00)
+                brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg);
     }
 }
 
