@@ -1132,6 +1132,12 @@ class WavelengthRadio {
                 preferences.title = activeTitleBtn.dataset.title;
             }
 
+            // Save transition preference
+            const activeTransitionBtn = document.querySelector('.transition-btn.active');
+            if (activeTransitionBtn) {
+                preferences.transition = activeTransitionBtn.dataset.transition;
+            }
+
             localStorage.setItem('wavelength_screensaver_prefs', JSON.stringify(preferences));
             console.log('💾 Saved screen saver preferences:', preferences);
         } catch (error) {
@@ -1196,6 +1202,17 @@ class WavelengthRadio {
                     btn.classList.remove('active');
                 }
             });
+
+            // Restore transition preference
+            if (preferences.transition) {
+                document.querySelectorAll('.transition-btn').forEach(btn => {
+                    if (btn.dataset.transition === preferences.transition) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
 
             console.log('✅ Screen saver preferences restored');
         } catch (error) {
@@ -1336,6 +1353,23 @@ class WavelengthRadio {
                 titleBtns.forEach(b => b.classList.remove('active'));
                 // Add active class to clicked button
                 btn.classList.add('active');
+                this.saveScreenSaverPreferences();
+            });
+        });
+
+        // Bind transition buttons
+        const transitionBtns = document.querySelectorAll('.transition-btn');
+        transitionBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Remove active class from all transition buttons
+                transitionBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                // Save transition preference
+                const transition = btn.dataset.transition;
+                localStorage.setItem('wavelength_screensaver_transitions', transition);
+                console.log(`🎞️ Image transitions: ${transition}`);
                 this.saveScreenSaverPreferences();
             });
         });
@@ -2035,28 +2069,115 @@ class WavelengthRadio {
     }
 
     rotateScreenSaverImage() {
+        console.log('🔄 === TRANSITION DEBUG START ===');
+
         const gallery = document.querySelector('.screensaver-gallery');
-        if (!gallery) return;
+        if (!gallery) {
+            console.warn('❌ Gallery not found');
+            return;
+        }
 
         const images = gallery.querySelectorAll('img');
-        if (images.length <= 1) return;
+        console.log(`📸 Total images: ${images.length}`);
+        if (images.length <= 1) {
+            console.warn('❌ Not enough images for rotation');
+            return;
+        }
 
         // Get current and next indices
         const currentImg = images[this.currentScreensaverIndex];
         this.currentScreensaverIndex = (this.currentScreensaverIndex + 1) % images.length;
         const nextImg = images[this.currentScreensaverIndex];
 
+        console.log(`🔢 Current index: ${this.currentScreensaverIndex - 1 < 0 ? images.length - 1 : this.currentScreensaverIndex - 1} -> Next index: ${this.currentScreensaverIndex}`);
+
+        // Available transitions
+        const transitions = [
+            'transition-fade',
+            'transition-slide-left',
+            'transition-slide-right',
+            'transition-slide-up',
+            'transition-slide-down',
+            'transition-zoom-in',
+            'transition-zoom-out',
+            'transition-rotate-left',
+            'transition-rotate-right',
+            'transition-blur',
+            'transition-diagonal-tl',
+            'transition-diagonal-br'
+        ];
+
+        // Log current classes before removal
+        console.log('📋 Current image classes BEFORE:', Array.from(currentImg.classList));
+        console.log('📋 Next image classes BEFORE:', Array.from(nextImg.classList));
+
+        // Remove old transition classes from all images
+        images.forEach((img, idx) => {
+            const removedClasses = [];
+            transitions.forEach(t => {
+                if (img.classList.contains(t)) {
+                    removedClasses.push(t);
+                    img.classList.remove(t);
+                }
+            });
+            if (removedClasses.length > 0) {
+                console.log(`🧹 Removed from image ${idx}:`, removedClasses);
+            }
+        });
+
+        // Check if transitions are enabled (default: true)
+        const transitionsSetting = localStorage.getItem('wavelength_screensaver_transitions');
+        const transitionsEnabled = transitionsSetting !== 'off';
+        console.log(`⚙️ Transitions setting: "${transitionsSetting}" (enabled: ${transitionsEnabled})`);
+
+        // Apply random transition if enabled
+        if (transitionsEnabled) {
+            const randomIndex = Math.floor(Math.random() * transitions.length);
+            const randomTransition = transitions[randomIndex];
+
+            currentImg.classList.add(randomTransition);
+            nextImg.classList.add(randomTransition);
+
+            console.log(`🎞️ Selected transition [${randomIndex}/${transitions.length - 1}]: ${randomTransition}`);
+            console.log(`✅ Added "${randomTransition}" to current image`);
+            console.log(`✅ Added "${randomTransition}" to next image`);
+        } else {
+            console.log(`🚫 Transitions disabled - using default fade`);
+        }
+
         // Fade out current, fade in next
         currentImg.classList.remove('active');
         currentImg.classList.add('fading-out');
+        console.log(`🔴 Removed "active" from current, added "fading-out"`);
 
         nextImg.classList.remove('fading-out');
         nextImg.classList.add('active');
+        console.log(`🟢 Removed "fading-out" from next, added "active"`);
+
+        // Log final classes
+        console.log('📋 Current image classes AFTER:', Array.from(currentImg.classList));
+        console.log('📋 Next image classes AFTER:', Array.from(nextImg.classList));
+
+        // Check computed styles to debug CSS application
+        setTimeout(() => {
+            const nextComputedStyle = window.getComputedStyle(nextImg);
+            console.log('🎨 Next image computed transform:', nextComputedStyle.transform);
+            console.log('🎨 Next image computed opacity:', nextComputedStyle.opacity);
+            console.log('🎨 Next image computed transition:', nextComputedStyle.transition);
+            console.log('🎨 Next image computed animation:', nextComputedStyle.animation);
+
+            const currentComputedStyle = window.getComputedStyle(currentImg);
+            console.log('🎨 Current image computed transform:', currentComputedStyle.transform);
+            console.log('🎨 Current image computed opacity:', currentComputedStyle.opacity);
+        }, 100);
+
+        console.log('🔄 === TRANSITION DEBUG END ===\n');
 
         // Clean up fading-out class after transition
         setTimeout(() => {
             currentImg.classList.remove('fading-out');
-        }, 2000);
+            console.log(`🧹 Cleaned up "fading-out" class from previous image`);
+        }, 3000); // Increased to 3s to match transition duration
     }
 
     // Weather Effects System

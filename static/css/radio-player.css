@@ -1278,8 +1278,8 @@
     height: 100%;
     object-fit: cover;
     opacity: 0;
-    transition: opacity 3s ease-in-out;
-    animation: warpFilter 45s ease-in-out infinite;
+    transition: opacity 3s ease-in-out, transform 3s ease-in-out;
+    animation: warpFilterNoTransform 45s ease-in-out infinite;
 }
 
 /* Exit hint styling */
@@ -1292,6 +1292,202 @@
 .screensaver-gallery img.fading-out {
     opacity: 0;
     z-index: 1;
+}
+
+/* Transition Effects - Disable animation when using transitions */
+.screensaver-gallery img[class*="transition-"] {
+    animation: none !important;
+}
+
+.screensaver-gallery img.transition-fade {
+    transition: opacity 3s ease-in-out, transform 3s ease-in-out !important;
+}
+
+/* Slide Left: Current slides left, Next enters from right */
+.screensaver-gallery img.transition-slide-left {
+    transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out !important;
+}
+
+.screensaver-gallery img.transition-slide-left:not(.active):not(.fading-out) {
+    transform: translateX(100%);
+}
+
+.screensaver-gallery img.transition-slide-left.active {
+    transform: translateX(0) !important;
+}
+
+.screensaver-gallery img.transition-slide-left.fading-out {
+    transform: translateX(-100%) !important;
+}
+
+/* Slide Right: Current slides right, Next enters from left */
+.screensaver-gallery img.transition-slide-right {
+    transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out;
+}
+
+.screensaver-gallery img.transition-slide-right:not(.active):not(.fading-out) {
+    transform: translateX(-100%);
+}
+
+.screensaver-gallery img.transition-slide-right.active {
+    transform: translateX(0) !important;
+}
+
+.screensaver-gallery img.transition-slide-right.fading-out {
+    transform: translateX(100%) !important;
+}
+
+/* Slide Up: Current slides up, Next enters from bottom */
+.screensaver-gallery img.transition-slide-up {
+    transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out;
+}
+
+.screensaver-gallery img.transition-slide-up:not(.active):not(.fading-out) {
+    transform: translateY(100%);
+}
+
+.screensaver-gallery img.transition-slide-up.active {
+    transform: translateY(0) !important;
+}
+
+.screensaver-gallery img.transition-slide-up.fading-out {
+    transform: translateY(-100%) !important;
+}
+
+/* Slide Down: Current slides down, Next enters from top */
+.screensaver-gallery img.transition-slide-down {
+    transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out;
+}
+
+.screensaver-gallery img.transition-slide-down:not(.active):not(.fading-out) {
+    transform: translateY(-100%);
+}
+
+.screensaver-gallery img.transition-slide-down.active {
+    transform: translateY(0) !important;
+}
+
+.screensaver-gallery img.transition-slide-down.fading-out {
+    transform: translateY(100%) !important;
+}
+
+/* Zoom In: Next zooms in from small */
+.screensaver-gallery img.transition-zoom-in {
+    transition: opacity 3s ease-in-out, transform 3s ease-in-out;
+}
+
+.screensaver-gallery img.transition-zoom-in:not(.active):not(.fading-out) {
+    transform: scale(0.5);
+}
+
+.screensaver-gallery img.transition-zoom-in.active {
+    transform: scale(1) !important;
+}
+
+.screensaver-gallery img.transition-zoom-in.fading-out {
+    transform: scale(1.5) !important;
+}
+
+/* Zoom Out: Next zooms out from large */
+.screensaver-gallery img.transition-zoom-out {
+    transition: opacity 3s ease-in-out, transform 3s ease-in-out;
+}
+
+.screensaver-gallery img.transition-zoom-out:not(.active):not(.fading-out) {
+    transform: scale(1.5);
+}
+
+.screensaver-gallery img.transition-zoom-out.active {
+    transform: scale(1) !important;
+}
+
+.screensaver-gallery img.transition-zoom-out.fading-out {
+    transform: scale(0.5) !important;
+}
+
+/* Rotate Left */
+.screensaver-gallery img.transition-rotate-left {
+    transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out;
+}
+
+.screensaver-gallery img.transition-rotate-left:not(.active):not(.fading-out) {
+    transform: rotate(90deg) scale(0.5);
+}
+
+.screensaver-gallery img.transition-rotate-left.active {
+    transform: rotate(0deg) scale(1) !important;
+}
+
+.screensaver-gallery img.transition-rotate-left.fading-out {
+    transform: rotate(-90deg) scale(0.5) !important;
+}
+
+/* Rotate Right */
+.screensaver-gallery img.transition-rotate-right {
+    transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out;
+}
+
+.screensaver-gallery img.transition-rotate-right:not(.active):not(.fading-out) {
+    transform: rotate(-90deg) scale(0.5);
+}
+
+.screensaver-gallery img.transition-rotate-right.active {
+    transform: rotate(0deg) scale(1) !important;
+}
+
+.screensaver-gallery img.transition-rotate-right.fading-out {
+    transform: rotate(90deg) scale(0.5) !important;
+}
+
+/* Blur transition */
+.screensaver-gallery img.transition-blur {
+    transition: opacity 2.5s ease-in-out, filter 2.5s ease-in-out;
+}
+
+.screensaver-gallery img.transition-blur:not(.active):not(.fading-out) {
+    filter: blur(20px);
+}
+
+.screensaver-gallery img.transition-blur.active {
+    filter: blur(0px) !important;
+}
+
+.screensaver-gallery img.transition-blur.fading-out {
+    filter: blur(20px) !important;
+}
+
+/* Diagonal Top-Left */
+.screensaver-gallery img.transition-diagonal-tl {
+    transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out;
+}
+
+.screensaver-gallery img.transition-diagonal-tl:not(.active):not(.fading-out) {
+    transform: translate(100%, 100%);
+}
+
+.screensaver-gallery img.transition-diagonal-tl.active {
+    transform: translate(0, 0) !important;
+}
+
+.screensaver-gallery img.transition-diagonal-tl.fading-out {
+    transform: translate(-100%, -100%) !important;
+}
+
+/* Diagonal Bottom-Right */
+.screensaver-gallery img.transition-diagonal-br {
+    transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out;
+}
+
+.screensaver-gallery img.transition-diagonal-br:not(.active):not(.fading-out) {
+    transform: translate(-100%, -100%);
+}
+
+.screensaver-gallery img.transition-diagonal-br.active {
+    transform: translate(0, 0) !important;
+}
+
+.screensaver-gallery img.transition-diagonal-br.fading-out {
+    transform: translate(100%, 100%) !important;
 }
 
 /* Warping CSS Filter Animation - Very slow, gentle zooms for image quality */
@@ -1331,6 +1527,37 @@
     100% {
         filter: hue-rotate(360deg) saturate(1) brightness(1) contrast(1);
         transform: scale(1) rotate(0deg);
+    }
+}
+
+/* Warping Filter Animation - No Transform (for use with transitions) */
+@keyframes warpFilterNoTransform {
+    0% {
+        filter: hue-rotate(0deg) saturate(1) brightness(1) contrast(1);
+    }
+    12.5% {
+        filter: hue-rotate(45deg) saturate(1.3) brightness(1.1) contrast(1.1);
+    }
+    25% {
+        filter: hue-rotate(90deg) saturate(1.6) brightness(1.2) contrast(1.2);
+    }
+    37.5% {
+        filter: hue-rotate(135deg) saturate(1.8) brightness(1.15) contrast(1.3);
+    }
+    50% {
+        filter: hue-rotate(180deg) saturate(2) brightness(0.95) contrast(1.35);
+    }
+    62.5% {
+        filter: hue-rotate(225deg) saturate(1.8) brightness(0.9) contrast(1.3);
+    }
+    75% {
+        filter: hue-rotate(270deg) saturate(1.6) brightness(1.1) contrast(1.2);
+    }
+    87.5% {
+        filter: hue-rotate(315deg) saturate(1.3) brightness(1.15) contrast(1.1);
+    }
+    100% {
+        filter: hue-rotate(360deg) saturate(1) brightness(1) contrast(1);
     }
 }
 
@@ -1446,9 +1673,31 @@
 }
 
 .customization-panel.expanded {
-    max-height: 600px;
+    max-height: 70vh;
     opacity: 1;
     margin-top: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Custom scrollbar for customization panel */
+.customization-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.customization-panel::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.customization-panel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.customization-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .customization-section {
