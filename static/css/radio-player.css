@@ -1962,6 +1962,10 @@
     backdrop-filter: blur(15px);
     max-height: 200px;
     overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 .summary-content::-webkit-scrollbar {
@@ -2197,5 +2201,25 @@ body.screensaver-active .mystical-canvas {
     .screensaver-toggle-btn {
         font-size: 0.9rem;
         padding: 10px 20px;
+    }
+
+    .screensaver-summary-overlay {
+        top: 60px;
+        width: 95%;
+        padding: 0 5px;
+    }
+
+    .summary-content {
+        font-size: 13px;
+        line-height: 1.5;
+        padding: 15px 18px;
+        max-height: 150px;
+        border-radius: 10px;
+    }
+
+    .summary-content strong {
+        font-size: 14px;
+        display: block;
+        margin-bottom: 8px;
     }
 }
