@@ -909,7 +909,7 @@ class WavelengthRadio {
 
                 // Link to character page
                 badge.addEventListener('click', () => {
-                    window.open(`/character/${character.id}`, '_blank');
+                    window.open(`/character/${character.id}`);
                 });
 
                 badgesContainer.appendChild(badge);

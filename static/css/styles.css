@@ -1,6 +1,10 @@
 /* styles.css */
 :root {
   --carousel-width: 80%;
+  --primary-color: #ffd700;
+  --text-color: #e0e0e0;
+  --display-font: 'AnimeAce', sans-serif;
+  --accent-color: #ff9a8b;
 }
 @font-face {
   font-family: 'AnimeAce';
