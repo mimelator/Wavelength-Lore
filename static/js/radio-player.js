@@ -287,9 +287,19 @@ class WavelengthRadio {
 
     // Save stats to Firebase
     async saveStatsToFirebase() {
-        if (!this.currentUserId || !window.firebaseDB) return;
+        if (!this.currentUserId || !window.firebaseDB) {
+            console.log('🚫 Cannot save stats - missing userId or firebaseDB:', {
+                userId: this.currentUserId,
+                hasDB: !!window.firebaseDB
+            });
+            return;
+        }
 
         try {
+            console.log('💾 Saving stats to Firebase for user:', this.currentUserId, {
+                totalPoints: this.stats.totalPoints,
+                magicLevel: this.stats.magicLevel
+            });
             const userStatsRef = window.firebaseUtils.ref(window.firebaseDB, `users/${this.currentUserId}/radioPlayerStats`);
             await window.firebaseUtils.set(userStatsRef, {
                 mushrooms: this.stats.mushrooms,
@@ -304,8 +314,9 @@ class WavelengthRadio {
                 gameModePoints: this.stats.gameModePoints,
                 lastUpdated: Date.now()
             });
+            console.log('✅ Stats saved to Firebase successfully');
         } catch (error) {
-            console.error('Error saving stats to Firebase:', error);
+            console.error('❌ Error saving stats to Firebase:', error);
         }
     }
 
