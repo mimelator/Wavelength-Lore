@@ -907,9 +907,10 @@ class WavelengthRadio {
                 badge.title = character.title;
                 badge.classList.add('character-badge');
 
-                // Link to character page
+                // Link to character or lore page based on type
                 badge.addEventListener('click', () => {
-                    window.open(`/character/${character.id}`);
+                    const url = character.url || (character.type === 'lore' ? `/lore/${character.id}` : `/character/${character.id}`);
+                    window.location.href = url;
                 });
 
                 badgesContainer.appendChild(badge);

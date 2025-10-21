@@ -567,7 +567,7 @@ class AdminManager {
      * View post
      */
     viewPost(postId) {
-        window.open(`/forum/post/${postId}`);
+        window.location.href = `/forum/post/${postId}`;
     }
 
     /**
