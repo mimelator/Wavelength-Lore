@@ -243,19 +243,21 @@
                     </div>
                 </div>
                 
-                <!-- Game Icons controls -->
+                <!-- Game Mode controls -->
                 <div class="customization-section">
                     <div class="customization-section-header">
                         <span class="section-icon">🎮</span>
-                        <span class="section-title">Game Icons</span>
+                        <span class="section-title">Game Mode</span>
                     </div>
                     <div class="customization-buttons">
-                        <button class="custom-btn icon-btn" data-icon="mushroom" title="Mushrooms">🍄</button>
-                        <button class="custom-btn icon-btn" data-icon="star" title="Stars">⭐</button>
-                        <button class="custom-btn icon-btn" data-icon="horseshoe" title="Horseshoes">🧲</button>
-                        <button class="custom-btn icon-btn" data-icon="sparkle" title="Sparkles">✨</button>
-                        <button class="custom-btn icon-btn" data-icon="crystal" title="Crystals">💎</button>
-                        <button class="custom-btn icon-btn" data-icon="moon" title="Moons">🌙</button>
+                        <button class="custom-btn game-btn active" data-game="off" title="Game off">🚫 Off</button>
+                        <button class="custom-btn game-btn" data-game="easy" title="Easy mode">😊 Easy</button>
+                        <button class="custom-btn game-btn" data-game="medium" title="Medium mode">😎 Medium</button>
+                        <button class="custom-btn game-btn" data-game="hard" title="Hard mode">😈 Hard</button>
+                    </div>
+                    <div class="game-stats">
+                        <span class="game-score">Score: <span id="gameScore">0</span></span>
+                        <span class="game-timer">Time: <span id="gameTimer">0:00</span></span>
                     </div>
                 </div>
                 
@@ -297,6 +299,21 @@
             <div class="title-content"></div>
         </div>
         
+        <!-- Game HUD overlay -->
+        <div class="game-hud">
+            <div class="hud-score">
+                <span class="hud-label">SCORE</span>
+                <span class="hud-value" id="hudScore">0</span>
+            </div>
+            <div class="hud-timer">
+                <span class="hud-label">TIME</span>
+                <span class="hud-value" id="hudTimer">0:00</span>
+            </div>
+            <div class="hud-combo">
+                <span class="combo-text" id="comboText"></span>
+            </div>
+        </div>
+        
         <!-- Minimal playback controls -->
         <div class="screensaver-minimal-controls">
             <button class="screensaver-control" id="screensaverPrev" title="Previous">⏮</button>
@@ -307,7 +324,12 @@
 
     <script>
         // Pass playlist data to JavaScript
-        window.WAVELENGTH_PLAYLIST = <%- JSON.stringify(playlist) %>;
+        try {
+            window.WAVELENGTH_PLAYLIST = <%- JSON.stringify(playlist).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') %>;
+        } catch(e) {
+            console.error('Failed to parse playlist:', e);
+            window.WAVELENGTH_PLAYLIST = [];
+        }
         window.CDN_URL = '<%= cdnUrl %>';
     </script>
     <script src="<%= cdnUrl %>/js/radio-player.js?<%= version %>"></script>

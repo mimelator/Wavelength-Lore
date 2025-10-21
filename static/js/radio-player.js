@@ -1005,7 +1005,7 @@ class WavelengthRadio {
             const preferences = {
                 weather: [],
                 imageEffects: [],
-                icons: [],
+                gameMode: 'off',
                 lyrics: 'off',
                 title: 'on'
             };
@@ -1020,10 +1020,11 @@ class WavelengthRadio {
                 preferences.imageEffects.push(btn.dataset.effect);
             });
 
-            // Save active game icons
-            document.querySelectorAll('.icon-btn.active').forEach(btn => {
-                preferences.icons.push(btn.textContent.trim());
-            });
+            // Save game mode
+            const activeGameBtn = document.querySelector('.game-btn.active');
+            if (activeGameBtn) {
+                preferences.gameMode = activeGameBtn.dataset.game;
+            }
 
             // Save lyrics mode
             const activeLyricsBtn = document.querySelector('.lyrics-btn.active');
@@ -1075,10 +1076,9 @@ class WavelengthRadio {
                 }
             });
 
-            // Restore game icons
-            document.querySelectorAll('.icon-btn').forEach(btn => {
-                const icon = btn.textContent.trim();
-                if (preferences.icons.includes(icon)) {
+            // Restore game mode
+            document.querySelectorAll('.game-btn').forEach(btn => {
+                if (btn.dataset.game === preferences.gameMode) {
                     btn.classList.add('active');
                 } else {
                     btn.classList.remove('active');
@@ -1203,13 +1203,17 @@ class WavelengthRadio {
             });
         });
 
-        // Bind game icon buttons
-        const iconBtns = document.querySelectorAll('.icon-btn');
-        iconBtns.forEach(btn => {
+        // Bind game mode buttons
+        const gameBtns = document.querySelectorAll('.game-btn');
+        gameBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                btn.classList.toggle('active');
-                this.updateFloatingIcons();
+                // Remove active class from all game buttons
+                gameBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                // Update game mode
+                this.updateGameMode();
                 this.saveScreenSaverPreferences();
             });
         });
@@ -1492,6 +1496,9 @@ class WavelengthRadio {
         // Show song title
         this.showSongTitle();
 
+        // Start game if active
+        this.updateGameMode();
+
         console.log(`🎨 Screen saver mode activated with ${this.screensaverImages.length} images from current episode`);
     }
 
@@ -1509,8 +1516,8 @@ class WavelengthRadio {
         // Stop weather effects
         this.stopWeatherEffects();
 
-        // Clear floating icons
-        this.clearFloatingIcons();
+        // Stop game
+        this.stopGame();
 
         // Clear lyrics display
         const lyricsContainer = document.querySelector('.screensaver-lyrics');
@@ -1532,47 +1539,215 @@ class WavelengthRadio {
         console.log('🎨 Screen saver mode exited');
     }
 
-    updateFloatingIcons() {
-        const activeIconBtns = document.querySelectorAll('.icon-btn.active');
-        const activeIcons = Array.from(activeIconBtns).map(btn => btn.textContent.trim());
+    updateGameMode() {
+        const activeGameBtn = document.querySelector('.game-btn.active');
+        const gameMode = activeGameBtn ? activeGameBtn.dataset.game : 'off';
         
-        console.log(`🎮 Active game icons:`, activeIcons);
+        console.log(`🎮 Game mode:`, gameMode);
         
-        // Clear existing icons
-        this.clearFloatingIcons();
+        // Clear existing game
+        this.stopGame();
         
-        if (activeIcons.length > 0) {
-            this.createFloatingIcons(activeIcons);
+        if (gameMode !== 'off') {
+            this.startGame(gameMode);
         }
     }
 
-    createFloatingIcons(icons) {
+    startGame(difficulty) {
+        this.gameActive = true;
+        this.gameScore = 0;
+        this.gameStartTime = Date.now();
+        this.gameCombo = 0;
+        this.lastCollectTime = 0;
+        
+        // Set difficulty parameters
+        const difficultySettings = {
+            easy: { iconCount: 3, spawnInterval: 4000, speed: '10s' },
+            medium: { iconCount: 5, spawnInterval: 3000, speed: '7s' },
+            hard: { iconCount: 8, spawnInterval: 2000, speed: '5s' }
+        };
+        
+        this.gameDifficulty = difficultySettings[difficulty] || difficultySettings.easy;
+        
+        // Available collectible icons
+        this.gameIcons = ['🍄', '⭐', '🧲', '✨', '💎', '🌙'];
+        
+        // Show HUD
+        const hud = document.querySelector('.game-hud');
+        if (hud) {
+            hud.classList.add('visible');
+        }
+        
+        // Start spawning icons
+        this.spawnGameIcons();
+        this.gameSpawnInterval = setInterval(() => this.spawnGameIcons(), this.gameDifficulty.spawnInterval);
+        
+        // Start timer
+        this.gameTimerInterval = setInterval(() => this.updateGameTimer(), 1000);
+        
+        console.log(`🎮 Game started in ${difficulty} mode`);
+    }
+
+    spawnGameIcons() {
+        if (!this.gameActive) return;
+        
         const container = document.querySelector('.floating-game-icons');
         if (!container) return;
         
         const w = window.innerWidth;
         const h = window.innerHeight;
         
-        // Create 3-4 floating icons total (reduced from 8-12)
-        const iconCount = 3 + Math.floor(Math.random() * 2);
+        // Create icons up to the difficulty count
+        const currentIcons = container.querySelectorAll('.floating-icon').length;
+        const iconsToSpawn = Math.min(this.gameDifficulty.iconCount - currentIcons, 2);
         
-        for (let i = 0; i < iconCount; i++) {
+        for (let i = 0; i < iconsToSpawn; i++) {
             const icon = document.createElement('div');
-            icon.className = 'floating-icon';
+            icon.className = 'floating-icon clickable';
             
-            // Pick random icon from active ones
-            const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+            // Pick random icon
+            const randomIcon = this.gameIcons[Math.floor(Math.random() * this.gameIcons.length)];
             icon.textContent = randomIcon;
             
             // Random starting position
             icon.style.left = Math.random() * (w - 100) + 'px';
             icon.style.top = Math.random() * (h - 100) + 'px';
             
-            // Random animation duration and delay for variety
-            icon.style.animationDuration = (8 + Math.random() * 4) + 's';
-            icon.style.animationDelay = -(Math.random() * 8) + 's';
+            // Set animation speed based on difficulty
+            icon.style.animationDuration = this.gameDifficulty.speed;
+            icon.style.animationDelay = -(Math.random() * 2) + 's';
+            
+            // Add click handler for collecting
+            icon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.collectGameIcon(icon, randomIcon);
+            });
             
             container.appendChild(icon);
+        }
+    }
+
+    collectGameIcon(icon, iconType) {
+        if (!this.gameActive) return;
+        
+        // Add collecting animation
+        icon.classList.add('collecting');
+        
+        // Check for combo (collected within 2 seconds)
+        const now = Date.now();
+        if (now - this.lastCollectTime < 2000) {
+            this.gameCombo++;
+        } else {
+            this.gameCombo = 1;
+        }
+        this.lastCollectTime = now;
+        
+        // Calculate points with combo multiplier
+        let points = 10;
+        if (this.gameCombo >= 5) {
+            points = 50;
+            this.showComboMessage('🔥 FIRE! x5');
+        } else if (this.gameCombo >= 3) {
+            points = 30;
+            this.showComboMessage('⚡ COMBO x3');
+        } else if (this.gameCombo >= 2) {
+            points = 20;
+            this.showComboMessage('✨ NICE x2');
+        }
+        
+        // Increment score
+        this.gameScore += points;
+        document.getElementById('gameScore').textContent = this.gameScore;
+        document.getElementById('hudScore').textContent = this.gameScore;
+        
+        // Also update main stats if they exist
+        const iconMap = {
+            '🍄': 'mushrooms',
+            '⭐': 'stars',
+            '🧲': 'horseshoes',
+            '✨': 'sparkles',
+            '💎': 'crystals',
+            '🌙': 'moons'
+        };
+        
+        const statName = iconMap[iconType];
+        if (statName && this.stats && this.stats.hasOwnProperty(statName)) {
+            this.stats[statName]++;
+            this.updateStats();
+        }
+        
+        // Remove icon
+        setTimeout(() => {
+            icon.remove();
+        }, 300);
+        
+        console.log(`🎮 Collected ${iconType}! Score: ${this.gameScore} (${points} pts, combo: ${this.gameCombo})`);
+    }
+
+    showComboMessage(message) {
+        const comboText = document.getElementById('comboText');
+        if (!comboText) return;
+        
+        comboText.textContent = message;
+        comboText.classList.remove('show');
+        
+        // Force reflow
+        void comboText.offsetWidth;
+        
+        comboText.classList.add('show');
+        
+        // Hide after 1 second
+        setTimeout(() => {
+            comboText.classList.remove('show');
+        }, 1000);
+    }
+
+    updateGameTimer() {
+        if (!this.gameActive) return;
+        
+        const elapsed = Math.floor((Date.now() - this.gameStartTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        document.getElementById('gameTimer').textContent = timeString;
+        document.getElementById('hudTimer').textContent = timeString;
+    }
+
+    stopGame() {
+        this.gameActive = false;
+        
+        if (this.gameSpawnInterval) {
+            clearInterval(this.gameSpawnInterval);
+            this.gameSpawnInterval = null;
+        }
+        
+        if (this.gameTimerInterval) {
+            clearInterval(this.gameTimerInterval);
+            this.gameTimerInterval = null;
+        }
+        
+        // Hide HUD
+        const hud = document.querySelector('.game-hud');
+        if (hud) {
+            hud.classList.remove('visible');
+        }
+        
+        // Clear floating icons
+        this.clearFloatingIcons();
+        
+        // Reset display
+        if (document.getElementById('gameScore')) {
+            document.getElementById('gameScore').textContent = '0';
+        }
+        if (document.getElementById('gameTimer')) {
+            document.getElementById('gameTimer').textContent = '0:00';
+        }
+        if (document.getElementById('hudScore')) {
+            document.getElementById('hudScore').textContent = '0';
+        }
+        if (document.getElementById('hudTimer')) {
+            document.getElementById('hudTimer').textContent = '0:00';
         }
     }
 
