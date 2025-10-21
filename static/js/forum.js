@@ -315,60 +315,44 @@ async function signInWithGoogle() {
         console.log('🌍 Starting Google sign-in process...');
         console.log('🏠 Environment:', isLocalhost ? 'localhost' : 'production');
         console.log('🔗 Current URL:', window.location.href);
-        console.log('🔧 Provider configured with scopes:', ['profile', 'email']);
+        console.log('� Hostname:', window.location.hostname);
+        console.log('�🔧 Provider configured with scopes:', ['profile', 'email']);
         
-        // Use popup for localhost (since Firebase doesn't allow ports in authorized domains)
-        // Use redirect for production
-        if (isLocalhost) {
-            console.log('🪟 Using popup authentication for localhost (Firebase doesn\'t support ports in authorized domains)...');
-            showNotification('Opening Google sign-in...', 'info');
-            
-            try {
-                console.log('🚀 Calling signInWithPopup...');
-                const authResult = await window.firebaseUtils.signInWithPopup(window.firebaseAuth, provider);
-                console.log('✅ Popup sign-in successful:', authResult.user);
-                
-                if (authResult && authResult.user) {
-                    console.log('🎉 Authentication successful!');
-                    // Initialize session tracking after successful sign-in
-                    if (window.sessionManager) {
-                        window.sessionManager.updateActivity();
-                    }
-                    showNotification('Welcome to Wavelength Forum!', 'success');
-                }
-                return;
-                
-            } catch (popupError) {
-                console.error('❌ Popup sign-in failed:', popupError);
-                console.error('Error code:', popupError.code);
-                console.error('Error message:', popupError.message);
-                
-                if (popupError.code === 'auth/popup-blocked') {
-                    showNotification('Popup was blocked by your browser. Please allow popups for this site and try again.', 'error');
-                } else if (popupError.code === 'auth/popup-closed-by-user') {
-                    showNotification('Sign-in was cancelled.', 'warning');
-                } else {
-                    throw popupError;
-                }
-                return;
-            }
-        }
-        
-        // For production, use redirect authentication
-        console.log('🔄 Using redirect authentication for production...');
-        showNotification('Redirecting to Google sign-in...', 'info');
+        // Use popup authentication for all environments (more reliable and gives better error feedback)
+        console.log('🪟 Using popup authentication...');
+        showNotification('Opening Google sign-in...', 'info');
         
         try {
-            console.log('🚀 Calling signInWithRedirect...');
-            await window.firebaseUtils.signInWithRedirect(window.firebaseAuth, provider);
-            console.log('✅ signInWithRedirect call completed (redirect in progress)');
-            // Note: After redirect, the user will return and initializeForumAuth() will handle the result
+            console.log('🚀 Calling signInWithPopup...');
+            const authResult = await window.firebaseUtils.signInWithPopup(window.firebaseAuth, provider);
+            console.log('✅ Popup sign-in successful:', authResult.user);
+            
+            if (authResult && authResult.user) {
+                console.log('🎉 Authentication successful!');
+                // Initialize session tracking after successful sign-in
+                if (window.sessionManager) {
+                    window.sessionManager.updateActivity();
+                }
+                showNotification('Welcome to Wavelength Forum!', 'success');
+            }
             return;
-        } catch (redirectError) {
-            console.error('❌ signInWithRedirect failed:', redirectError);
-            console.error('Error code:', redirectError.code);
-            console.error('Error message:', redirectError.message);
-            throw redirectError;
+            
+        } catch (popupError) {
+            console.error('❌ Popup sign-in failed:', popupError);
+            console.error('Error code:', popupError.code);
+            console.error('Error message:', popupError.message);
+            console.error('Full error:', popupError);
+            
+            if (popupError.code === 'auth/popup-blocked') {
+                showNotification('Popup was blocked by your browser. Please allow popups for this site and try again.', 'error');
+            } else if (popupError.code === 'auth/popup-closed-by-user') {
+                showNotification('Sign-in was cancelled.', 'warning');
+            } else if (popupError.code === 'auth/unauthorized-domain') {
+                showNotification(`Domain not authorized: ${window.location.hostname}. Please contact admin to add this domain to Firebase.`, 'error');
+            } else {
+                throw popupError;
+            }
+            return;
         }
         
     } catch (error) {
