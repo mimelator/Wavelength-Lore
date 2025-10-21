@@ -3,7 +3,7 @@
  * Manages sitewide banners for announcements, alerts, and messages
  */
 
-const { fetchDataAsAdmin, saveDataAsAdmin, deleteDataAsAdmin } = require('./firebase-admin-utils');
+const { fetchDataAsAdmin, writeDataAsAdmin, deleteDataAsAdmin } = require('./firebase-admin-utils');
 
 /**
  * Banner Status Types
@@ -137,7 +137,7 @@ async function createBanner(bannerData) {
       createdBy: bannerData.createdBy || 'system'
     };
     
-    await saveDataAsAdmin(`banners/${bannerId}`, banner);
+    await writeDataAsAdmin(`banners/${bannerId}`, banner);
     
     return {
       id: bannerId,
@@ -172,7 +172,7 @@ async function updateBanner(bannerId, updates) {
     // Remove the id field before saving (it's the key)
     const { id, ...bannerData } = updatedBanner;
     
-    await saveDataAsAdmin(`banners/${bannerId}`, bannerData);
+    await writeDataAsAdmin(`banners/${bannerId}`, bannerData);
     
     return updatedBanner;
   } catch (error) {
