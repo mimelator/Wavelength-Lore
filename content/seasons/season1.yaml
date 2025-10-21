@@ -7,6 +7,7 @@ episodes:
     title: My Lucky Charm
     description: Everyone needs a little luck sometimes, except for maybe Goblins who need no one
     keywords:
+      - wavelength
       - lucky
       - leprechaun
       - charm
@@ -42,6 +43,7 @@ episodes:
     title: Keep On
     description: There are 3 or 4 little words that I enjoy hearing everyday…
     keywords:
+      - wavelength
       - keep on
       - perseverance
       - love
@@ -72,6 +74,7 @@ episodes:
     title: Back to the Shire (Encore)
     description: There's a place where people practice paradise
     keywords:
+      - wavelength
       - shire
       - paradise
       - encore
@@ -112,6 +115,7 @@ episodes:
     title: Jump Right In!
     description: Life is about choices, so make one and see what happens next!
     keywords:
+      - wavelength
       - jump
       - choices
       - adventure
@@ -148,12 +152,14 @@ episodes:
     title: Dream with Me
     description: What dreams can be made when two are united in destiny?
     keywords:
+      - wavelength
       - dream
       - destiny
       - unity
       - together
       - hope
       - future
+      - jewel
     youtubeLink: https://youtu.be/H9UYMUMxr1o
     image: /images/characters/wavelength/jewel-5.webp
     audio: /images/seasons/season1/episodes/episode3/DreamWithMe_v5.mp3
@@ -188,12 +194,14 @@ episodes:
     title: Daphne
     description: The intoxicating Daphne flower calls to both pollinators and humans alike
     keywords:
+      - wavelength
       - daphne
       - flower
       - intoxicating
       - pollinators
       - nature
       - beauty
+      - daphne-flower
     youtubeLink: https://youtu.be/mw5RMTFXHlo
     image: /images/seasons/season1/episodes/episode4/image.webp
     audio: https://df5sj8f594cdx.cloudfront.net/audio/season1/episode4.mp3
@@ -219,12 +227,15 @@ episodes:
     title: Falling
     description: When they make your heart go ah-ah-ah-ah
     keywords:
+      - wavelength
       - falling
       - love
       - heart
       - angel
       - romance
       - emotion
+      - andrew
+      - jewel
     youtubeLink: https://youtu.be/LKDfiCHGeNs
     image: /images/seasons/season1/episodes/episode5/image.webp
     audio: /images/seasons/season1/episodes/episode5/Falling_v32.mp3
@@ -249,12 +260,14 @@ episodes:
     title: Once More
     description: In remembrance of dear friends
     keywords:
+      - wavelength
       - remembrance
       - friends
       - memory
       - nostalgia
       - dear
       - once more
+      - jewel
     youtubeLink: https://youtu.be/_Ml9tKjgTIs
     image: /images/seasons/season1/episodes/episode6/image.webp
     audio: /images/seasons/season1/episodes/episode6/OnceMore_v20.mp3
@@ -284,6 +297,7 @@ episodes:
     title: History Lessons
     description: In memory of a precious friend, a jewel that couldn't be outshone
     keywords:
+      - wavelength
       - history
       - lessons
       - memory
@@ -318,12 +332,14 @@ episodes:
     title: Life in the Shire
     description: When home is a haven, there's no limit to what can be done
     keywords:
+      - wavelength
       - shire
       - home
       - haven
       - life
       - peaceful
       - community
+      - artisanship
     youtubeLink: https://youtu.be/4wKUohlpnPo
     image: /images/seasons/season1/episodes/episode8/image.webp
     audio: /images/seasons/season1/episodes/episode8/LIfeInTheShire_v19.mp3
@@ -352,6 +368,7 @@ episodes:
     title: Feed the Crows
     description: Living in and Loving Nature can be a great balm for your pain
     keywords:
+      - wavelength
       - crows
       - nature
       - healing

@@ -1633,30 +1633,54 @@ html {
     overflow: hidden;
 }
 
-.screensaver-floating-badge {
+.screensaver-floating-badge-wrapper {
     position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    pointer-events: auto;
+    cursor: pointer;
+    animation: floatBadgeIn 2s ease-out forwards;
+}
+
+.screensaver-floating-badge {
     width: 80px;
     height: 80px;
     border-radius: 50%;
     border: 3px solid rgba(255, 255, 255, 0.8);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5),
                 0 0 30px rgba(255, 255, 255, 0.3);
-    opacity: 0;
-    pointer-events: auto;
-    cursor: pointer;
     object-fit: cover;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    animation: floatBadgeIn 2s ease-out forwards;
 }
 
-.screensaver-floating-badge:hover {
-    transform: scale(1.15) !important;
+.screensaver-badge-title {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    transition: background 0.3s ease;
+}
+
+.screensaver-floating-badge-wrapper:hover .screensaver-floating-badge {
+    transform: scale(1.15);
     box-shadow: 0 6px 30px rgba(0, 0, 0, 0.7),
                 0 0 40px rgba(255, 255, 255, 0.5);
     border-color: rgba(255, 255, 255, 1);
 }
 
-.screensaver-floating-badge.fading-out {
+.screensaver-floating-badge-wrapper:hover .screensaver-badge-title {
+    background: rgba(0, 123, 255, 0.9);
+}
+
+.screensaver-floating-badge-wrapper.fading-out {
     animation: floatBadgeOut 2s ease-in forwards;
 }
 
@@ -2176,13 +2200,14 @@ html {
 
 .lyrics-content {
     color: rgba(255, 255, 255, 0.95);
-    font-size: 26px;
+    font-size: 18px;
     font-weight: 500;
     text-shadow: 0 2px 15px rgba(0, 0, 0, 0.9),
                  0 0 25px rgba(255, 255, 255, 0.2);
     white-space: nowrap;
     font-family: 'AnimeAce', Arial, sans-serif;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
 }
 
 .lyrics-content.scrolling {
@@ -2310,5 +2335,16 @@ body.screensaver-active .mystical-canvas {
         font-size: 14px;
         display: block;
         margin-bottom: 8px;
+    }
+
+    .lyrics-content {
+        font-size: 14px;
+        letter-spacing: 0.3px;
+        line-height: 1.3;
+    }
+
+    .screensaver-lyrics {
+        padding: 10px 20px;
+        height: 80px;
     }
 }

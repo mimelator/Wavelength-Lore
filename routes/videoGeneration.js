@@ -195,7 +195,7 @@ router.post('/api/generate/video', async (req, res) => {
 
     // Generate video with Veo 3.1 using the image
     let operation = await ai.models.generateVideos({
-      model: 'veo-3.1-generate-preview',
+      model: process.env.VIDEO_MODEL_KEY || 'veo-3.1-fast-generate-preview',
       prompt: prompt,
       image: {
         imageBytes: imageBase64,

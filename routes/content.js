@@ -208,6 +208,44 @@ router.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
         episode.carouselImages = episode.carouselImages.sort(() => Math.random() - 0.5);
       }
 
+      // Match characters AND lore items by keywords for badge display
+      let episodeCharacters = [];
+      try {
+        // Get all characters
+        const allCharacters = characterHelpers.getAllCharactersSync(false);
+        const matchedCharacters = allCharacters.filter(char =>
+          episode.keywords?.some(keyword =>
+            char.keywords?.some(ck => ck.toLowerCase() === keyword.toLowerCase())
+          )
+        ).map(char => ({
+          id: char.id,
+          title: char.title,
+          image: char.image,
+          type: 'character',
+          url: `/character/${char.id}`
+        }));
+
+        // Get all lore items
+        const allLore = loreHelpers.getAllLoreSync(false);
+        const matchedLore = allLore.filter(lore =>
+          episode.keywords?.some(keyword =>
+            lore.keywords?.some(lk => lk.toLowerCase() === keyword.toLowerCase())
+          )
+        ).map(lore => ({
+          id: lore.id,
+          title: lore.name,
+          image: lore.image,
+          type: 'lore',
+          url: `/lore/${lore.id}`
+        }));
+
+        // Combine characters and lore
+        episodeCharacters = [...matchedCharacters, ...matchedLore];
+      } catch (error) {
+        console.warn('Error loading characters/lore for episode:', error.message);
+        episodeCharacters = [];
+      }
+
       res.render('episode', {
         title: episode.title,
         pageTitle: `${episode.title} - Season ${seasonNumber} Episode ${episodeNumber} | Wavelength Lore`,
@@ -245,6 +283,7 @@ router.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
         episodeNumber,
         previousLink,
         nextLink,
+        characters: episodeCharacters,
         req: req
       });
     } else {

@@ -160,6 +160,19 @@
             </div>
         </section>
 
+        <!-- Related Content Section (Characters & Lore) -->
+        <% if (characters && characters.length > 0) { %>
+        <section class="related-characters">
+            <h2>Related Content</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Explore characters and lore from this episode:</p>
+            <div class="character-badges-grid">
+                <% characters.forEach(character => { %>
+                <a href="<%= character.url || (character.type === 'lore' ? '/lore/' + character.id : '/character/' + character.id) %>" class="character-badge-card"><%= character.title %></a>
+                <% }); %>
+            </div>
+        </section>
+        <% } %>
+
         <section class="lyrics">
             <h2>Lyrics</h2>
             <div class="content-with-links episode-lyrics">
@@ -215,6 +228,7 @@
                 playlistElement.dataset.episode = episodeData.episode;
                 playlistElement.dataset.episodeImage = '<%= cdnUrl %>' + episodeData.episodeImage;
                 playlistElement.dataset.images = JSON.stringify(episodeData.images.map(img => '<%= cdnUrl %>' + img));
+                playlistElement.dataset.characters = '<%- JSON.stringify(characters || []) %>';
                 
                 player.playlist = [playlistElement];
                 player.currentTrackIndex = 0;

@@ -129,7 +129,14 @@ class AppRunnerEnvUpdater {
       'DEPLOYMENT_TIMESTAMP',
       'VERSION',
       'SITE_URL',
-      'PORT'
+      'PORT',
+
+      // AI Generation Support
+      "GEMINI_API_KEY",
+      "GOOGLE_API_KEY",
+      "AI_MODEL_KEY",
+      "AI_PROVIDER",
+      "VIDEO_MODEL_KEY"
     ];
 
     const productionEnvVars = {};

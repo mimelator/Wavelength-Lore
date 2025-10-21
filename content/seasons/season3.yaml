@@ -7,6 +7,7 @@ episodes:
     title: Ice Fortress
     description: When you're here you'll be protected under our care
     keywords:
+      - wavelength
       - ice fortress
       - protection
       - safe haven
@@ -39,6 +40,7 @@ episodes:
     title: Ice Whales
     description: Desperate times call for action
     keywords:
+      - wavelength
       - ice whales
       - hunting
       - desperate times
@@ -70,6 +72,7 @@ episodes:
     title: Sneak Attack
     description: The goblins enjoy spreading terror by sending raiding parties up to the far, frozen North to harass and spy on the Shire Folk.
     keywords:
+      - wavelength
       - sneak attack
       - goblins
       - terror
@@ -105,6 +108,7 @@ episodes:
     title: Frozen Peace
     description: Here we are, on this frozen shore, very far from our dear home
     keywords:
+      - wavelength
       - frozen peace
       - shore
       - home
@@ -141,6 +145,7 @@ episodes:
     title: Rebuild The Shire
     description: Keep the shire dream alive while in the far, frozen north.
     keywords:
+      - wavelength
       - rebuild the shire
       - shire dream
       - freedom
@@ -176,6 +181,7 @@ episodes:
     title: We're Coming For You
     description: We can't rebuild the Shire Dream while Goblins still rule the land. We must take back our home.
     keywords:
+      - wavelength
       - we're coming for you
       - shire dream
       - goblin king
@@ -183,6 +189,8 @@ episodes:
       - victory
       - spies
       - intentions
+      - goblin-king
+      - goblins      
     youtubeLink: https://youtu.be/yoWQuAZEncA
     image: /images/seasons/season3/episodes/episode6/image.webp
     audio: /images/seasons/season3/episodes/episode6/We're Coming For You_v5.mp3
@@ -209,6 +217,7 @@ episodes:
     title: Prepare for Battle
     description: It's time to face the Goblin King and retake the Shire
     keywords:
+      - wavelength
       - prepare for battle
       - goblin king
       - retake
@@ -217,6 +226,7 @@ episodes:
       - marching
       - peace
       - reclaim
+        - goblin-king
     youtubeLink: https://youtu.be/gd-OyObns_k
     image: /images/seasons/season3/episodes/episode7/image.webp
     audio: /images/seasons/season3/episodes/episode7/PrepareForBattle_v6.mp3

@@ -2144,17 +2144,11 @@ class WavelengthRadio {
             const currentTrack = this.playlist[this.currentTrackIndex];
             if (!currentTrack) return;
 
-            // Parse character data from dataset (handle empty/invalid JSON)
-            let characters = [];
-            try {
-                const charactersData = currentTrack.dataset?.characters || '';
-                if (charactersData) {
-                    characters = JSON.parse(charactersData);
-                }
-            } catch (error) {
-                console.warn('👥 Failed to parse character data:', error);
-                return;
-            }
+            // Get character data from the track object (not dataset, this is a plain JS object)
+            const characters = currentTrack.characters || [];
+            
+            console.log('🔍 Debug - Current track:', currentTrack.title, 'S' + currentTrack.season + 'E' + currentTrack.episode);
+            console.log('🔍 Debug - Characters:', characters);
 
             if (!characters || characters.length === 0) {
                 console.log('👥 No characters found for current track, skipping badge spawn');
@@ -2196,37 +2190,51 @@ class WavelengthRadio {
         const badgesContainer = document.getElementById('screensaverBadges');
         if (!badgesContainer) return;
 
-        // Create badge element
+        // Create badge wrapper
+        const badgeWrapper = document.createElement('div');
+        badgeWrapper.classList.add('screensaver-floating-badge-wrapper');
+
+        // Create badge image
         const badge = document.createElement('img');
         badge.src = this.cdnUrl + character.image;
         badge.alt = character.title;
-        badge.title = character.title;
         badge.classList.add('screensaver-floating-badge');
+
+        // Create title label
+        const titleLabel = document.createElement('div');
+        titleLabel.classList.add('screensaver-badge-title');
+        titleLabel.textContent = character.title;
+
+        // Add image and title to wrapper
+        badgeWrapper.appendChild(badge);
+        badgeWrapper.appendChild(titleLabel);
 
         // Random position (avoid edges)
         const left = 10 + Math.random() * 80; // 10-90% from left
         const top = 15 + Math.random() * 70; // 15-85% from top
-        badge.style.left = `${left}%`;
-        badge.style.top = `${top}%`;
+        badgeWrapper.style.left = `${left}%`;
+        badgeWrapper.style.top = `${top}%`;
 
-        // Add click handler to open character page
-        badge.addEventListener('click', (e) => {
+        // Add click handler to open character or lore page in same window
+        badgeWrapper.addEventListener('click', (e) => {
             e.stopPropagation();
-            window.open(`/character/${character.id}`, '_blank');
+            const url = character.url || (character.type === 'lore' ? `/lore/${character.id}` : `/character/${character.id}`);
+            window.location.href = url;
         });
 
         // Add to container
-        badgesContainer.appendChild(badge);
+        badgesContainer.appendChild(badgeWrapper);
 
-        console.log(`👥 Spawned badge for ${character.title} at ${left.toFixed(0)}%, ${top.toFixed(0)}%`);
+        const badgeType = character.type === 'lore' ? '📜' : '👤';
+        console.log(`${badgeType} Spawned ${character.type || 'character'} badge for ${character.title} at ${left.toFixed(0)}%, ${top.toFixed(0)}%`);
 
         // Remove after 6-10 seconds with fade out
         const lifetime = 6000 + Math.random() * 4000;
         setTimeout(() => {
-            badge.classList.add('fading-out');
+            badgeWrapper.classList.add('fading-out');
             // Remove element after animation completes
             setTimeout(() => {
-                badge.remove();
+                badgeWrapper.remove();
             }, 2000);
         }, lifetime);
     }

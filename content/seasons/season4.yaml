@@ -7,6 +7,7 @@ episodes:
     title: Locked And Loaded
     description: Nothing will stop us now from reclaiming our Shire.
     keywords:
+      - wavelength
       - locked and loaded
       - reclaiming
       - determined
@@ -46,6 +47,7 @@ episodes:
     title: The King has Fled
     description: The Goblin King fled the Shire before the battle again and took captives.
     keywords:
+      - wavelength
       - the king has fled
       - goblin king
       - coward
@@ -53,6 +55,7 @@ episodes:
       - royal family
       - lair
       - lies
+      - goblin-king      
     youtubeLink: https://youtu.be/SMqrc-2wdAA
     image: /images/seasons/season4/episodes/episode2/image.webp
     audio: /images/seasons/season4/episodes/episode2/TheKingHasFled_v1.mp3
@@ -79,14 +82,16 @@ episodes:
     title: Goblin's Rule
     description: The only goblin rule for you is that Goblins gonna Rule all over you
     keywords:
+      - wavelength
       - goblin's rule
       - ruling
       - lying
       - cheating
       - stealing
       - honor
-      - mystery
+      - misery
       - goblin king
+      - goblin-king      
     youtubeLink: https://youtu.be/UcTy2Wf4kUg
     image: /images/seasons/season4/episodes/episode3/image.webp
     audio: /images/seasons/season4/episodes/episode3/GoblinsRule_v2.mp3
@@ -115,6 +120,7 @@ episodes:
     title: Ice Blue Greed
     description: There's no way that the King can resist the trap set by Lucky
     keywords:
+      - wavelength
       - ice blue greed
       - goblin greed
       - diamond
@@ -124,6 +130,7 @@ episodes:
       - ice dragons
       - lure
       - ice blue diamond
+      - goblin-king      
     youtubeLink: https://youtu.be/LlhYGbc2xXM
     image: /images/seasons/season4/episodes/episode4/image.webp
     audio: /images/seasons/season4/episodes/episode4/IceBlueGreed_v2.mp3
@@ -151,6 +158,7 @@ episodes:
     title: The Shire Fortress
     description: Do you want to live under the rule of the hateful and Cruel?
     keywords:
+      - wavelength
       - shire fortress
       - fortifying
       - ramparts
@@ -159,6 +167,8 @@ episodes:
       - freedom
       - hateful
       - cruel
+      - lucky
+      - goblin-king      
     youtubeLink: https://youtu.be/YsREhnlW8B8
     image: /images/seasons/season4/episodes/episode5/image.webp
     audio: /images/seasons/season4/episodes/episode5/TheShireFortress_v2.mp3
@@ -189,6 +199,7 @@ episodes:
     title: Battle of the Shire
     description: Shoot for the king; stopping his lies are the key to everything
     keywords:
+      - wavelength
       - battle of the shire
       - shoot for the king
       - lies
@@ -197,6 +208,8 @@ episodes:
       - arrows
       - victory
       - defeated
+      - goblin-king
+      - goblins
     youtubeLink: https://youtu.be/GIpZ5yX6qn8
     image: /images/seasons/season4/episodes/episode6/image.webp
     audio: /images/seasons/season4/episodes/episode6/BattleOfTheShire_v4.mp3
@@ -253,6 +266,7 @@ episodes:
     title: Song of Mourning
     description: There's a time for mourning, when we'll share stories at night about our loved ones passing, and how we hold those memories tight.
     keywords:
+      - wavelength
       - song of mourning
       - mourning
       - maurice
@@ -262,6 +276,7 @@ episodes:
       - drummer
       - orphans
       - loss
+      - eloquence
     youtubeLink: https://youtu.be/JLSTXP3ipnQ
     image: /images/seasons/season4/episodes/episode7/image.webp
     audio: /images/seasons/season4/episodes/episode7/SongOfMourning_v1.mp3
@@ -284,6 +299,7 @@ episodes:
     title: The Shire Dream
     description: I choose to live free and find the shire dream in me.
     keywords:
+      - wavelength
       - shire dream
       - live free
       - money
@@ -292,6 +308,7 @@ episodes:
       - peace
       - darkness
       - daylight
+      - daphne
     youtubeLink: https://youtu.be/iVerMZpk4dM
     image: /images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.webp
     audio: /images/seasons/season4/episodes/episode8/TheShireDream_v1.mp3

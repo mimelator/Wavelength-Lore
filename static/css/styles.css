@@ -748,3 +748,56 @@ div:has(.disambiguation-link) {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
 }
+
+/* Related Characters Section */
+.related-characters {
+    width: 80%;
+    margin: 30px auto;
+    text-align: center;
+}
+
+.related-characters h2 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 2rem;
+}
+
+.character-badges-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.character-badge-card {
+    display: inline-block;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #007BFF, #0056b3);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.character-badge-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+@media (max-width: 768px) {
+    .character-badges-grid {
+        gap: 8px;
+    }
+    
+    .related-characters {
+        width: 90%;
+    }
+    
+    .related-characters h2 {
+        font-size: 1.5rem;
+    }
+}

@@ -179,7 +179,8 @@
                      data-duration="<%= track.duration %>"
                      data-episode-image="<%= track.episodeImage || '' %>"
                      data-episode-url="<%= track.episodeUrl || '' %>"
-                     data-characters="<%= track.characters ? JSON.stringify(track.characters) : '[]' %>">
+                     data-characters='<%- JSON.stringify(track.characters || []) %>'>
+                    <!-- S<%= track.season %>E<%= track.episode %>: <%= track.characters ? track.characters.length : 0 %> characters/lore -->
                     <div class="playlist-item-number"><%= index + 1 %></div>
                     <div class="playlist-item-info">
                         <div class="playlist-item-title"><%= track.title %></div>

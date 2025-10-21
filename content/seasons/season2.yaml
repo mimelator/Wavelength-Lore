@@ -7,12 +7,14 @@ episodes:
     title: Goblin King
     description: You've been punched in the head So many times that you don't know Which is way is left or right
     keywords:
+      - wavelength
       - goblin king
       - invasion
       - psychopath
       - villain
       - battle
       - fall
+      - goblin-king
     youtubeLink: https://youtu.be/kGpLCx63Fh8
     image: /images/seasons/season2/episodes/episode1/image.webp
     audio: /images/seasons/season2/episodes/episode1/GoblinKing_v8.mp3
@@ -40,12 +42,14 @@ episodes:
     title: Psychopath
     description: Everyday I see what's yours and I think about taking it all away
     keywords:
+      - wavelength
       - psychopath
       - taking
       - wizard
       - goblin
       - escape
       - deception
+      - goblin-king
     youtubeLink: https://youtu.be/9RzdPJPTXR4
     image: /images/seasons/season2/episodes/episode2/image.webp
     audio: /images/seasons/season2/episodes/episode2/Psychopath_v9.mp3
@@ -71,6 +75,7 @@ episodes:
     title: Countdown
     description: There's a countdown to living There's a countdown to the end
     keywords:
+      - wavelength
       - countdown
       - living
       - friends
@@ -78,6 +83,8 @@ episodes:
       - crisis
       - time
       - terror
+      - lucky
+      - goblin-king      
     youtubeLink: https://youtu.be/rSff1_C8fxU
     image: /images/seasons/season2/episodes/episode3/image.webp
     audio: /images/seasons/season2/episodes/episode3/Countdown_v6.mp3
@@ -101,6 +108,7 @@ episodes:
     title: A Misery of Goblins
     description: 'Hey everybody look what I''ve found: Misery is our Dream'
     keywords:
+      - wavelength
       - misery
       - goblins
       - company
@@ -109,6 +117,7 @@ episodes:
       - demon
       - celebrate
       - freedom
+      - goblin-king      
     youtubeLink: https://youtu.be/OINvOo93z64
     image: /images/seasons/season2/episodes/episode4/image.webp
     audio: /images/seasons/season2/episodes/episode4/A Misery of Goblins_v4.mp3
@@ -137,6 +146,7 @@ episodes:
     title: Slow Time
     description: And every moment that you give into the greed your soul will drift away
     keywords:
+      - wavelength
       - slow time
       - greed
       - soul
@@ -146,6 +156,7 @@ episodes:
       - team
       - dream
       - rescue
+      - goblin-king      
     youtubeLink: https://youtu.be/J3_gkKZuTQI
     image: /images/seasons/season2/episodes/episode5/image.webp
     audio: /images/seasons/season2/episodes/episode5/SlowTime_v4.mp3
@@ -174,6 +185,7 @@ episodes:
     title: Won't See it Coming
     description: The Goblins don't comprehend science because they aren't able to learn, and won't see the threat right in front of them.
     keywords:
+      - wavelength
       - won't see it coming
       - science
       - virus
@@ -182,6 +194,7 @@ episodes:
       - learning
       - machine
       - distraction
+      - goblin-king      
     youtubeLink: https://youtu.be/jkH6suRlFGI
     image: /images/seasons/season2/episodes/episode6/image.webp
     audio: /images/seasons/season2/episodes/episode6/YouWontSeeItComing_v7.mp3
@@ -210,6 +223,7 @@ episodes:
     title: Say Goodbye to the Shire
     description: You can't coexist with Goblins when they rule the Shire
     keywords:
+      - wavelength
       - goodbye
       - shire
       - escape
@@ -218,6 +232,7 @@ episodes:
       - journey
       - frozen north
       - rebuild
+      - goblin-king      
     youtubeLink: https://youtu.be/A8yY4pPYzVY
     image: /images/seasons/season2/episodes/episode7/image.webp
     audio: /images/seasons/season2/episodes/episode7/SayGoodbyeToTheShire_v4.mp3

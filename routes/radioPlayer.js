@@ -73,22 +73,62 @@ async function getEnhancedPlaylist() {
           lyrics: episodeData.lyrics || '',
           summary: episodeData.story || episodeData.summary || '',
           episodeTitle: episodeData.title || track.title,
-          characters: allCharacters.filter(char =>
-            episodeData.keywords?.some(keyword =>
-              char.keywords?.some(ck => ck.toLowerCase() === keyword.toLowerCase())
-            )
-          ).map(char => ({
-            id: char.id,
-            title: char.title,
-            image: char.image
-          }))
+          characters: (() => {
+            // Get matching characters
+            const matchedCharacters = allCharacters.filter(char =>
+              episodeData.keywords?.some(keyword =>
+                char.keywords?.some(ck => ck.toLowerCase() === keyword.toLowerCase())
+              )
+            ).map(char => ({
+              id: char.id,
+              title: char.title,
+              image: char.image,
+              type: 'character',
+              url: `/character/${char.id}`
+            }));
+
+            // Get matching lore items
+            const loreHelpers = require('../helpers/lore-helpers');
+            const allLore = loreHelpers.getAllLoreSync(false);
+            
+            // Debug: Show all lore for S2E1
+            if (track.season === 2 && track.episode === 1) {
+              console.log('🔍 All lore items:', allLore.map(l => ({ id: l.id, name: l.name, keywords: l.keywords })));
+            }
+            
+            const matchedLore = allLore.filter(lore =>
+              episodeData.keywords?.some(keyword =>
+                lore.keywords?.some(lk => lk.toLowerCase() === keyword.toLowerCase())
+              )
+            ).map(lore => ({
+              id: lore.id,
+              title: lore.name,
+              image: lore.image,
+              type: 'lore',
+              url: `/lore/${lore.id}`
+            }));
+
+            // Combine characters and lore
+            const combined = [...matchedCharacters, ...matchedLore];
+            
+            // Debug logging for Goblin King episode
+            if (track.season === 2 && track.episode === 1) {
+              console.log('🔍 S2E1 Goblin King - Episode keywords:', episodeData.keywords);
+              console.log('🔍 S2E1 Goblin King - Matched characters:', matchedCharacters);
+              console.log('🔍 S2E1 Goblin King - Matched lore:', matchedLore);
+              console.log('🔍 S2E1 Goblin King - Combined:', combined);
+            }
+            
+            return combined;
+          })()
         };
       }
     } catch (error) {
       console.error(`Error fetching episode data for S${track.season}E${track.episode}:`, error.message);
     }
 
-    return track;
+    // Return track with empty characters array if no data was fetched
+    return { ...track, characters: [] };
   }));
 
   return enhancedTracks;
@@ -97,7 +137,9 @@ async function getEnhancedPlaylist() {
 // Radio player page route
 router.get('/radio', async (req, res) => {
   try {
+    console.log('🎵 Loading radio player page...');
     const enhancedPlaylist = await getEnhancedPlaylist();
+    console.log('🎵 Enhanced playlist loaded with', enhancedPlaylist.length, 'tracks');
 
     res.render('radio-player', {
       title: 'Wavelength Radio',
