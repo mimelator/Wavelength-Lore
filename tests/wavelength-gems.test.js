@@ -368,6 +368,71 @@ describe('Wavelength Gems Engine', () => {
             const finalMatches = findMatches(board);
             expect(finalMatches).toHaveLength(0);
         });
+
+        test('REGRESSION: should not create infinite cascades on first user match', () => {
+            // This test reproduces the exact bug:
+            // "every time i play the game when i match my first set of three blocks"
+            // User reported seeing combo increment to 16+ infinitely
+
+            // Step 1: Generate a clean board with no matches
+            let board = generateBoard();
+            let initialMatches = findMatches(board);
+            expect(initialMatches).toHaveLength(0);
+
+            // Step 2: Simulate first user match - create a horizontal line of 4 gems
+            // This is what happens when a user makes their first swap
+            board[3][2] = 'daphne';
+            board[3][3] = 'daphne';
+            board[3][4] = 'daphne';
+            board[3][5] = 'daphne';
+
+            // Step 3: Process the match chain (as game engine would do)
+            let cascadeCount = 0;
+            const maxCascades = 25; // Allow more iterations than normal but still prevent infinite loop
+            let comboCount = 0;
+
+            while (cascadeCount < maxCascades) {
+                const matches = findMatches(board);
+
+                if (matches.length === 0) {
+                    // All cascades complete
+                    break;
+                }
+
+                // Increment combo (simulating game combo counter)
+                comboCount++;
+
+                // Clear matched gems
+                matches.forEach(({row, col}) => {
+                    board[row][col] = null;
+                });
+
+                // Apply gravity
+                applyGravity(board);
+
+                // Fill empty spaces (THIS IS WHERE THE BUG WAS)
+                fillEmpty(board);
+
+                cascadeCount++;
+            }
+
+            // KEY ASSERTION: Cascades should terminate, not go infinite
+            expect(cascadeCount).toBeLessThan(maxCascades);
+
+            // Combo should not reach the 16+ values the user reported
+            expect(comboCount).toBeLessThan(10);
+
+            // Final board should be stable (no matches)
+            const finalMatches = findMatches(board);
+            expect(finalMatches).toHaveLength(0);
+
+            // All positions should be filled (no gaps)
+            for (let row = 0; row < GAME_CONFIG.ROWS; row++) {
+                for (let col = 0; col < GAME_CONFIG.COLS; col++) {
+                    expect(board[row][col]).not.toBeNull();
+                }
+            }
+        });
     });
 
     describe('Edge Cases', () => {
