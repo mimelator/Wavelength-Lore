@@ -31,6 +31,10 @@ class WavelengthRadio {
         this.spawnInterval = null;
         this.activeElements = [];
 
+        // Sound effects
+        this.soundEnabled = localStorage.getItem('radio_sound_enabled') !== 'false'; // Enabled by default
+        this.audioContext = null;
+
         // Initialize
         this.init();
     }
@@ -43,6 +47,124 @@ class WavelengthRadio {
         this.startMysticalSpawner();
         this.loadFavorites();
         this.initFirebaseSync();
+        this.initSoundSystem();
+        this.bindSoundToggle();
+    }
+
+    // Initialize Web Audio API
+    initSoundSystem() {
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+            console.warn('Web Audio API not supported');
+            this.soundEnabled = false;
+        }
+    }
+
+    // Bind sound toggle button
+    bindSoundToggle() {
+        const soundToggle = document.getElementById('soundToggle');
+        if (soundToggle) {
+            soundToggle.addEventListener('click', () => this.toggleSound());
+            this.updateSoundButton();
+        }
+    }
+
+    // Toggle sound on/off
+    toggleSound() {
+        this.soundEnabled = !this.soundEnabled;
+        localStorage.setItem('radio_sound_enabled', this.soundEnabled);
+        this.updateSoundButton();
+
+        // Play a test sound when enabling
+        if (this.soundEnabled) {
+            this.playCollectSound({ class: 'star' });
+        }
+    }
+
+    // Update sound button icon
+    updateSoundButton() {
+        const soundToggle = document.getElementById('soundToggle');
+        if (soundToggle) {
+            soundToggle.textContent = this.soundEnabled ? '🔊' : '🔇';
+            soundToggle.title = this.soundEnabled ? 'Disable Sound Effects' : 'Enable Sound Effects';
+        }
+    }
+
+    // Play collect sound based on collectible type
+    playCollectSound(type) {
+        if (!this.soundEnabled || !this.audioContext) return;
+
+        const ctx = this.audioContext;
+        const now = ctx.currentTime;
+
+        // Create different sounds for different collectibles
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        // Different frequencies and patterns for each type
+        switch (type.class) {
+            case 'mushroom':
+                oscillator.frequency.setValueAtTime(400, now);
+                oscillator.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                oscillator.type = 'sine';
+                break;
+            case 'star':
+                oscillator.frequency.setValueAtTime(800, now);
+                oscillator.frequency.exponentialRampToValueAtTime(1200, now + 0.15);
+                gainNode.gain.setValueAtTime(0.25, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                oscillator.type = 'triangle';
+                break;
+            case 'horseshoe':
+                oscillator.frequency.setValueAtTime(500, now);
+                oscillator.frequency.exponentialRampToValueAtTime(300, now + 0.2);
+                gainNode.gain.setValueAtTime(0.35, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                oscillator.type = 'square';
+                break;
+            case 'sparkle':
+                oscillator.frequency.setValueAtTime(1000, now);
+                oscillator.frequency.exponentialRampToValueAtTime(1500, now + 0.1);
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                oscillator.type = 'sine';
+                break;
+            case 'crystal':
+                oscillator.frequency.setValueAtTime(700, now);
+                oscillator.frequency.exponentialRampToValueAtTime(900, now + 0.18);
+                gainNode.gain.setValueAtTime(0.28, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                oscillator.type = 'triangle';
+                break;
+            case 'moon':
+                oscillator.frequency.setValueAtTime(350, now);
+                oscillator.frequency.exponentialRampToValueAtTime(550, now + 0.25);
+                gainNode.gain.setValueAtTime(0.32, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                oscillator.type = 'sine';
+                break;
+            case 'goblin':
+                // Special sound for rare goblin - more dramatic
+                oscillator.frequency.setValueAtTime(300, now);
+                oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+                gainNode.gain.setValueAtTime(0.4, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                oscillator.type = 'sawtooth';
+                break;
+            default:
+                oscillator.frequency.setValueAtTime(440, now);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        }
+
+        oscillator.start(now);
+        oscillator.stop(now + 0.5);
     }
 
     // Initialize Firebase sync for game stats
@@ -702,6 +824,9 @@ class WavelengthRadio {
 
     // Collect element (game mechanic)
     collectElement(element, type) {
+        // Play sound effect
+        this.playCollectSound(type);
+
         // Add collecting animation
         element.classList.remove('appearing');
         element.classList.add('collecting');
