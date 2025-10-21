@@ -468,25 +468,33 @@ class GlobalRadioGame {
     }
 }
 
-// Floating animation for collectibles
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-20px); }
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: scale(0); }
-        to { opacity: 1; transform: scale(1); }
-    }
-`;
-document.head.appendChild(style);
-
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        window.globalRadioGame = new GlobalRadioGame();
-    });
+// Prevent duplicate initialization
+if (window.globalRadioGame) {
+    console.log('Global Radio Game already initialized');
 } else {
-    window.globalRadioGame = new GlobalRadioGame();
+    // Floating animation for collectibles (only add if not already present)
+    if (!document.getElementById('global-radio-game-animations')) {
+        const styleElement = document.createElement('style');
+        styleElement.id = 'global-radio-game-animations';
+        styleElement.textContent = `
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-20px); }
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: scale(0); }
+                to { opacity: 1; transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(styleElement);
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            window.globalRadioGame = new GlobalRadioGame();
+        });
+    } else {
+        window.globalRadioGame = new GlobalRadioGame();
+    }
 }
