@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+    <link rel="stylesheet" href="<%= cdnUrl %>/css/radio-player.css?<%= version %>">
+    <meta name="description" content="<%= pageDescription %>">
+    <title><%= pageTitle %></title>
+</head>
+<body class="radio-player-body">
+    <%- include('partials/header') %>
+
+    <div class="radio-container">
+        <!-- Floating mystical imagery canvas -->
+        <div id="mystical-canvas" class="mystical-canvas">
+            <!-- Dynamic elements will be spawned here -->
+        </div>
+
+        <!-- Radio player controls -->
+        <div class="radio-player">
+            <div class="player-header">
+                <h1 class="radio-title">✨ Wavelength Radio ✨</h1>
+                <p class="radio-subtitle">Journey through the sounds of the Shire</p>
+            </div>
+
+            <!-- Album art / now playing visual -->
+            <div class="album-art-container">
+                <div class="album-art" id="albumArt">
+                    <div class="vinyl-record"></div>
+                    <div class="album-glow"></div>
+                </div>
+            </div>
+
+            <!-- Now playing info -->
+            <div class="now-playing">
+                <div class="track-info">
+                    <h2 id="trackTitle">Select a song to begin</h2>
+                    <p id="trackEpisode">Season - • Episode -</p>
+                </div>
+                <div class="progress-container">
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span>
+                        <span id="duration">0:00</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                        <div class="progress-handle" id="progressHandle"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio element -->
+            <audio id="audioPlayer" preload="metadata"></audio>
+
+            <!-- Playback controls -->
+            <div class="controls">
+                <button class="control-btn" id="shuffleBtn" title="Shuffle">
+                    <span class="shuffle-icon">🔀</span>
+                </button>
+                <button class="control-btn" id="prevBtn" title="Previous">
+                    <span>⏮</span>
+                </button>
+                <button class="control-btn play-btn" id="playPauseBtn" title="Play">
+                    <span id="playIcon">▶</span>
+                </button>
+                <button class="control-btn" id="nextBtn" title="Next">
+                    <span>⏭</span>
+                </button>
+                <button class="control-btn" id="repeatBtn" title="Repeat Off">
+                    <span class="repeat-icon">🔁</span>
+                </button>
+            </div>
+
+            <!-- Volume control -->
+            <div class="volume-control">
+                <span class="volume-icon">🔊</span>
+                <input type="range" id="volumeSlider" min="0" max="100" value="80" class="volume-slider">
+                <span id="volumeValue">80%</span>
+            </div>
+
+            <!-- Playlist mode selector -->
+            <div class="playlist-mode">
+                <button class="mode-btn active" data-mode="sequential">Sequential</button>
+                <button class="mode-btn" data-mode="random">Random</button>
+                <button class="mode-btn" data-mode="loop">Loop Favorites</button>
+            </div>
+        </div>
+
+        <!-- Playlist panel -->
+        <div class="playlist-panel">
+            <div class="playlist-header">
+                <h3>Playlist <span id="playlistCount">(33 songs)</span></h3>
+                <div class="playlist-filters">
+                    <button class="filter-btn active" data-season="all">All</button>
+                    <button class="filter-btn" data-season="1">Season 1</button>
+                    <button class="filter-btn" data-season="2">Season 2</button>
+                    <button class="filter-btn" data-season="3">Season 3</button>
+                    <button class="filter-btn" data-season="4">Season 4</button>
+                </div>
+            </div>
+            <div class="playlist-items" id="playlistItems">
+                <% playlist.forEach((track, index) => { %>
+                <div class="playlist-item"
+                     data-index="<%= index %>"
+                     data-season="<%= track.season %>"
+                     data-episode="<%= track.episode %>"
+                     data-title="<%= track.title %>"
+                     data-file="<%= track.file %>"
+                     data-duration="<%= track.duration %>">
+                    <div class="playlist-item-number"><%= index + 1 %></div>
+                    <div class="playlist-item-info">
+                        <div class="playlist-item-title"><%= track.title %></div>
+                        <div class="playlist-item-meta">Season <%= track.season %> • Episode <%= track.episode %></div>
+                    </div>
+                    <div class="playlist-item-duration"><%= track.duration %></div>
+                    <button class="playlist-item-favorite" title="Add to favorites">♡</button>
+                </div>
+                <% }); %>
+            </div>
+        </div>
+
+        <!-- Interactive game stats -->
+        <div class="game-stats">
+            <div class="stat-item">
+                <span class="stat-label">Mushrooms Collected:</span>
+                <span class="stat-value" id="mushroomCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Lucky Horseshoes:</span>
+                <span class="stat-value" id="horseshoeCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Magic Level:</span>
+                <span class="stat-value" id="magicLevel">1</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pass playlist data to JavaScript
+        window.WAVELENGTH_PLAYLIST = <%- JSON.stringify(playlist) %>;
+        window.CDN_URL = '<%= cdnUrl %>';
+    </script>
+    <script src="<%= cdnUrl %>/js/radio-player.js?<%= version %>"></script>
+</body>
+</html>

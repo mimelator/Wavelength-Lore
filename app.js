@@ -22,8 +22,11 @@ const contentEditRoutes = require('./routes/contentEdit');
 const contentApiRoutes = require('./routes/contentApi');
 const promptApiRoutes = require('./routes/promptApi');
 const aiGenerationApiRoutes = require('./routes/aiGenerationApi');
+const videoGenerationRoutes = require('./routes/videoGeneration');
 const uploadAudioRoutes = require('./routes/uploadAudio');
+const uploadMediaRoutes = require('./routes/uploadMedia');
 const downloadImagesRoutes = require('./routes/downloadImages');
+const radioPlayerRoutes = require('./routes/radioPlayer');
 
 // Import secure backup system
 const SecureDatabaseBackup = require('./utils/secureBackup');
@@ -67,6 +70,9 @@ async function createApp() {
   // Mount AI generation API routes (protected by authentication)
   app.use('/api/generate', aiGenerationApiRoutes);
 
+  // Mount video generation routes (protected by authentication)
+  app.use('/', videoGenerationRoutes);
+
   // Mount content API routes (protected by authentication)
   app.use('/', contentApiRoutes);
 
@@ -77,11 +83,17 @@ async function createApp() {
   // Mount audio upload routes (protected by authentication)
   app.use('/', uploadAudioRoutes);
 
+  // Mount media upload routes (protected by authentication)
+  app.use('/', uploadMediaRoutes);
+
   // Mount image download routes
   app.use('/', downloadImagesRoutes);
 
   // Mount content edit routes (protected by authentication)
   app.use('/', contentEditRoutes);
+
+  // Mount radio player routes (public)
+  app.use('/', radioPlayerRoutes);
 
   // Mount content routes
   app.use('/', contentRoutes);
