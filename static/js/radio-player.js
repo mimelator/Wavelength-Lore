@@ -338,6 +338,15 @@ class WavelengthRadio {
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.filterBySeason(e.target.dataset.season));
         });
+
+        // Mobile expand button
+        const expandBtn = document.getElementById('mobileExpandBtn');
+        const radioPlayer = document.getElementById('radioPlayer');
+        if (expandBtn && radioPlayer) {
+            expandBtn.addEventListener('click', () => {
+                radioPlayer.classList.toggle('expanded');
+            });
+        }
     }
 
     // Playlist item bindings
