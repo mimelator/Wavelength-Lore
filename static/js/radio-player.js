@@ -49,6 +49,9 @@ class WavelengthRadio {
         this.initFirebaseSync();
         this.initSoundSystem();
         this.bindSoundToggle();
+
+        // Auto-resume from global radio player if it was playing
+        this.restoreGlobalPlayerState();
     }
 
     // Initialize Web Audio API
@@ -88,6 +91,53 @@ class WavelengthRadio {
         if (soundToggle) {
             soundToggle.textContent = this.soundEnabled ? '🔊' : '🔇';
             soundToggle.title = this.soundEnabled ? 'Disable Sound Effects' : 'Enable Sound Effects';
+        }
+    }
+
+    // Restore playback state from global radio player
+    restoreGlobalPlayerState() {
+        try {
+            const savedState = localStorage.getItem('global_radio_playback_state');
+            if (!savedState) return;
+
+            const state = JSON.parse(savedState);
+
+            // Only restore if the state is very recent (within last 10 seconds)
+            // This ensures we only resume when coming from another page with mini player
+            const tenSeconds = 10 * 1000;
+            if (Date.now() - state.timestamp > tenSeconds) {
+                return;
+            }
+
+            // Only restore if it was playing
+            if (state.isPlaying && state.trackIndex >= 0 && state.trackIndex < this.playlist.length) {
+                console.log(`📻 Resuming from global player: Track ${state.trackIndex} at ${Math.floor(state.currentTime)}s`);
+
+                // Set volume to match global player
+                if (state.volume !== undefined) {
+                    const volumeSlider = document.getElementById('volumeSlider');
+                    if (volumeSlider) {
+                        volumeSlider.value = state.volume * 100;
+                        this.setVolume(state.volume * 100);
+                    }
+                }
+
+                // Play the track at the saved position after a small delay
+                setTimeout(() => {
+                    this.playTrack(state.trackIndex);
+                    // Set the current time once metadata is loaded
+                    this.audio.addEventListener('loadedmetadata', () => {
+                        if (state.currentTime > 0 && state.currentTime < this.audio.duration) {
+                            this.audio.currentTime = state.currentTime;
+                        }
+                    }, { once: true });
+                }, 500);
+
+                // Clear the state so we don't resume again on refresh
+                localStorage.removeItem('global_radio_playback_state');
+            }
+        } catch (error) {
+            console.error('Error restoring global player state:', error);
         }
     }
 
