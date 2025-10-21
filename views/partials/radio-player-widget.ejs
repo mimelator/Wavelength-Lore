@@ -1,0 +1,88 @@
+<!-- Global Radio Player Widget -->
+<script>
+  // Set CDN URL for radio player
+  window.CDN_URL = '<%= cdnUrl %>';
+</script>
+<script src="/js/global-radio-game.js?v=<%= Date.now() %>"></script>
+
+<!-- Full-page collectible overlay -->
+<div id="globalGameCanvas" class="global-game-canvas"></div>
+
+<div id="globalRadioGame" class="global-radio-game">
+  <div class="radio-game-toggle" id="radioGameToggle" title="Show/Hide Radio Player">
+    <span class="toggle-icon">📻</span>
+    <span class="toggle-text">Radio Player</span>
+  </div>
+
+  <div class="radio-game-widget" id="radioGameWidget">
+    <div class="radio-game-header">
+      <h3>✨ Wavelength Radio ✨</h3>
+      <button class="close-game-btn" id="closeGameBtn" title="Close">✕</button>
+    </div>
+
+    <!-- Game Stats (Compact) -->
+    <div class="radio-game-stats">
+      <div class="game-stat-mini">
+        <span class="stat-icon">🍄</span>
+        <span class="stat-value" id="globalMushrooms">0</span>
+      </div>
+      <div class="game-stat-mini">
+        <span class="stat-icon">⭐</span>
+        <span class="stat-value" id="globalStars">0</span>
+      </div>
+      <div class="game-stat-mini">
+        <span class="stat-icon">🧲</span>
+        <span class="stat-value" id="globalHorseshoes">0</span>
+      </div>
+      <div class="game-stat-mini">
+        <span class="stat-icon">✨</span>
+        <span class="stat-value" id="globalSparkles">0</span>
+      </div>
+      <div class="game-stat-mini">
+        <span class="stat-icon">💎</span>
+        <span class="stat-value" id="globalCrystals">0</span>
+      </div>
+      <div class="game-stat-mini">
+        <span class="stat-icon">🌙</span>
+        <span class="stat-value" id="globalMoons">0</span>
+      </div>
+      <div class="game-stat-mini">
+        <span class="stat-icon">👺</span>
+        <span class="stat-value" id="globalGoblins">0</span>
+      </div>
+      <div class="game-stat-mini total-score">
+        <span class="stat-icon">🏆</span>
+        <span class="stat-value" id="globalTotalScore">0</span>
+      </div>
+    </div>
+
+    <!-- Mini Radio Player -->
+    <div class="mini-radio-player">
+      <audio id="globalRadioAudio" preload="metadata"></audio>
+
+      <div class="now-playing">
+        <div class="track-info">
+          <div class="track-title" id="globalTrackTitle">Click Play to start</div>
+          <div class="track-meta" id="globalTrackMeta">Wavelength Radio</div>
+        </div>
+      </div>
+
+      <div class="player-controls">
+        <button class="mini-control-btn" id="globalPrevBtn" title="Previous">⏮</button>
+        <button class="mini-control-btn mini-play-btn" id="globalPlayBtn" title="Play">▶</button>
+        <button class="mini-control-btn" id="globalNextBtn" title="Next">⏭</button>
+      </div>
+
+      <div class="mini-volume-control">
+        <span class="volume-icon">🔊</span>
+        <input type="range" id="globalVolumeSlider" min="0" max="100" value="80" class="mini-volume-slider">
+      </div>
+
+      <div class="visit-radio-link">
+        <a href="/radio">🎵 Visit Full Radio Player</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/radio-player-styles') %>

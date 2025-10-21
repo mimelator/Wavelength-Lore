@@ -576,7 +576,7 @@
                                         <input type="checkbox" id="globalGameToggle" checked>
                                         <span class="setting-text">Show Radio Game on all pages</span>
                                     </label>
-                                    <p class="setting-description">When enabled, the Radio Game widget appears in the footer on all non-forum pages.</p>
+                                    <p class="setting-description">When enabled, the Radio Game widget appears in the footer on all pages.</p>
                                 </div>
                             </div>
                             <% } %>
@@ -881,5 +881,7 @@
     <!-- Disambiguation Scripts -->
     <%- simpleDisambiguationScript %>
     <%- simpleDisambiguationStyles %>
+    
+    <%- include('../partials/radio-player-widget') %>
 </body>
 </html>
