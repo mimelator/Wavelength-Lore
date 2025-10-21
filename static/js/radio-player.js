@@ -133,8 +133,8 @@ class WavelengthRadio {
                     }, { once: true });
                 }, 500);
 
-                // Clear the state so we don't resume again on refresh
-                localStorage.removeItem('global_radio_playback_state');
+                // Don't clear the state - keep it so global player can resume when navigating away
+                // localStorage.removeItem('global_radio_playback_state');
             }
         } catch (error) {
             console.error('Error restoring global player state:', error);
@@ -417,11 +417,39 @@ class WavelengthRadio {
         });
     }
 
+    // Save playback state for cross-page continuity
+    savePlaybackState() {
+        if (this.audio && this.currentTrackIndex >= 0) {
+            const state = {
+                trackIndex: this.currentTrackIndex,
+                currentTime: this.audio.currentTime,
+                isPlaying: this.isPlaying,
+                volume: this.audio.volume,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('global_radio_playback_state', JSON.stringify(state));
+        }
+    }
+
     // Audio event bindings
     bindAudioEvents() {
-        this.audio.addEventListener('timeupdate', () => this.updateProgress());
+        this.audio.addEventListener('timeupdate', () => {
+            this.updateProgress();
+            // Save state periodically while playing
+            if (this.isPlaying) {
+                this.savePlaybackState();
+            }
+        });
         this.audio.addEventListener('ended', () => this.onTrackEnd());
         this.audio.addEventListener('loadedmetadata', () => this.updateDuration());
+        this.audio.addEventListener('play', () => {
+            this.isPlaying = true;
+            this.savePlaybackState();
+        });
+        this.audio.addEventListener('pause', () => {
+            this.isPlaying = false;
+            this.savePlaybackState();
+        });
         this.audio.addEventListener('error', (e) => {
             console.error('Audio error:', e);
             // Try next track if current fails

@@ -213,7 +213,7 @@ class GlobalRadioGame {
                 return;
             }
 
-            // Restore track and position
+            // Restore track and position if it was playing
             if (state.isPlaying && this.playlist.length > 0) {
                 console.log(`📻 Resuming playback: Track ${state.trackIndex} at ${Math.floor(state.currentTime)}s`);
 
@@ -230,6 +230,35 @@ class GlobalRadioGame {
                 setTimeout(() => {
                     this.playTrack(state.trackIndex, state.currentTime);
                 }, 500); // Small delay to ensure everything is loaded
+            } else if (!state.isPlaying) {
+                // If it was paused, restore the track and position but don't auto-play
+                console.log(`📻 Restoring paused track: Track ${state.trackIndex} at ${Math.floor(state.currentTime)}s`);
+                
+                if (state.volume !== undefined) {
+                    this.audio.volume = state.volume;
+                    const volumeSlider = document.getElementById('globalVolumeSlider');
+                    if (volumeSlider) {
+                        volumeSlider.value = state.volume * 100;
+                    }
+                }
+
+                // Load the track at the saved position without playing
+                setTimeout(() => {
+                    if (this.playlist.length > 0 && state.trackIndex >= 0 && state.trackIndex < this.playlist.length) {
+                        this.currentTrackIndex = state.trackIndex;
+                        const track = this.playlist[state.trackIndex];
+                        const cdnUrl = window.CDN_URL || '';
+                        const audioPath = `${cdnUrl}/images/seasons/season${track.season}/episodes/episode${track.episode}/${track.file}`;
+                        
+                        this.audio.src = audioPath;
+                        this.audio.load();
+                        this.updateNowPlaying(track);
+                        
+                        this.audio.addEventListener('loadedmetadata', () => {
+                            this.audio.currentTime = state.currentTime;
+                        }, { once: true });
+                    }
+                }, 500);
             }
         } catch (error) {
             console.error('Error restoring playback state:', error);
