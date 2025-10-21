@@ -93,11 +93,11 @@ async function createApp() {
   // Mount content edit routes (protected by authentication)
   app.use('/', contentEditRoutes);
 
+  // Mount games routes (VIP-only access) - Must be before catch-all routes
+  app.use('/games', gamesRoutes);
+
   // Mount radio player routes (public)
   app.use('/', radioPlayerRoutes);
-
-  // Mount games routes (VIP-only access)
-  app.use('/games', gamesRoutes);
 
   // Mount content routes
   app.use('/', contentRoutes);
