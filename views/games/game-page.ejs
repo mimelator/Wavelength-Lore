@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/css/games.css">
+    <style>
+        .game-page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .game-header {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 40px;
+            margin: 40px 0;
+            align-items: start;
+        }
+
+        .game-main {
+            background: rgba(20, 20, 40, 0.6);
+            border: 2px solid rgba(138, 43, 226, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0 0 15px 0;
+            background: linear-gradient(135deg, #a78bfa, #d8b4fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .game-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .game-status {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+
+        .game-status.coming-soon {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+        }
+
+        .game-description {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+
+        .game-content-area {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(75, 0, 130, 0.1));
+            border: 2px dashed rgba(138, 43, 226, 0.3);
+            border-radius: 15px;
+            padding: 60px 40px;
+            text-align: center;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            margin-top: 30px;
+        }
+
+        .game-content-area .placeholder {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .game-content-area h3 {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+        }
+
+        .game-content-area p {
+            color: rgba(255, 255, 255, 0.6);
+            margin: 10px 0 0 0;
+        }
+
+        .game-sidebar {
+            background: rgba(20, 20, 40, 0.6);
+            border: 2px solid rgba(138, 43, 226, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .sidebar-section-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: rgba(167, 139, 250, 1);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-section-content {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .sidebar-section-content a {
+            color: #a78bfa;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(167, 139, 250, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-section-content a:hover {
+            border-bottom-color: #a78bfa;
+        }
+
+        .action-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .action-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #a78bfa, #818cf8);
+            transform: scale(1.02);
+        }
+
+        .action-button:disabled {
+            background: rgba(138, 43, 226, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+        }
+
+        .game-info-panel {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
+            border-left: 4px solid #22c55e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        @media (max-width: 968px) {
+            .game-header {
+                grid-template-columns: 1fr;
+            }
+
+            .game-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-content-area {
+                min-height: 250px;
+                padding: 30px 20px;
+            }
+
+            .game-content-area .placeholder {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header') %>
+
+    <main class="game-page-container">
+        <!-- Breadcrumbs -->
+        <% if (breadcrumbs && breadcrumbs.length) { %>
+            <div class="breadcrumb">
+                <% breadcrumbs.forEach((crumb, index) => { %>
+                    <% if (crumb.url) { %>
+                        <a href="<%= crumb.url %>"><%= crumb.name %></a>
+                    <% } else { %>
+                        <span><%= crumb.name %></span>
+                    <% } %>
+                    <% if (index < breadcrumbs.length - 1) { %>
+                        <span class="separator">→</span>
+                    <% } %>
+                <% }); %>
+            </div>
+        <% } %>
+
+        <div class="game-header">
+            <!-- Main Content -->
+            <div class="game-main">
+                <h1 class="game-title" id="gameTitle">Loading Game...</h1>
+
+                <div class="game-meta">
+                    <span class="game-status coming-soon" id="gameStatus">Coming Soon</span>
+                    <span id="gameReleaseDate" style="color: rgba(255, 255, 255, 0.6); font-size: 0.95rem;"></span>
+                </div>
+
+                <div class="game-info-panel">
+                    <strong>🎮 Sandbox Environment:</strong> This game is being tested in our VIP sandbox environment. Feedback is welcome!
+                </div>
+
+                <p class="game-description" id="gameDescription">
+                    Loading game description...
+                </p>
+
+                <!-- Game Content Placeholder -->
+                <div class="game-content-area">
+                    <div class="placeholder">🎮</div>
+                    <h3>Game Launcher</h3>
+                    <p>The game interface will appear here once it's ready</p>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="game-sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">About This Game</div>
+                    <div class="sidebar-section-content" id="gameSidebarAbout">
+                        Details loading...
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Quick Links</div>
+                    <div class="sidebar-section-content">
+                        <div><a href="/forum/games">← Back to Games Hub</a></div>
+                        <div><a href="/forum">Go to Forum</a></div>
+                    </div>
+                </div>
+
+                <button class="action-button" id="launchBtn" onclick="launchGame()" disabled>
+                    <span id="launchBtnText">Coming Soon</span>
+                </button>
+
+                <button class="action-button" style="background: rgba(138, 43, 226, 0.2); color: rgba(255, 255, 255, 0.7);" onclick="window.location.href = '/forum/games'">
+                    ← Back to Games Hub
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        const gameId = '<%= gameId %>';
+
+        async function loadGameDetails() {
+            try {
+                const response = await fetch(`/forum/games/api/${gameId}`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    showGameError('Game not found');
+                    return;
+                }
+
+                renderGameDetails(data.game);
+            } catch (error) {
+                console.error('Error loading game:', error);
+                showGameError('Error loading game');
+            }
+        }
+
+        function renderGameDetails(game) {
+            document.getElementById('gameTitle').textContent = game.title || 'Game Title';
+            document.getElementById('gameDescription').textContent = game.description || 'Game description';
+            document.getElementById('gameSidebarAbout').innerHTML = `
+                <div><strong>Status:</strong> ${game.status === 'coming-soon' ? 'Coming Soon' : 'Live'}</div>
+                <div style="margin-top: 10px;"><strong>Release:</strong> ${game.releaseDate || 'TBA'}</div>
+            `;
+
+            const status = document.getElementById('gameStatus');
+            if (game.status === 'live') {
+                status.textContent = 'Live';
+                status.className = 'game-status live';
+                document.getElementById('launchBtn').disabled = false;
+                document.getElementById('launchBtnText').textContent = 'Play Now';
+            }
+        }
+
+        function showGameError(message) {
+            document.getElementById('gameTitle').textContent = message;
+            document.getElementById('gameDescription').textContent = '';
+        }
+
+        function launchGame() {
+            // This will launch the actual game
+            // For now, just log it
+            console.log('Launching game:', gameId);
+            alert('Game launcher would open here for game: ' + gameId);
+        }
+
+        // Load game details on page load
+        document.addEventListener('DOMContentLoaded', loadGameDetails);
+    </script>
+</body>
+</html>

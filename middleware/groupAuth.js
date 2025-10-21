@@ -52,6 +52,19 @@ class GroupAuthentication {
         description: 'Content Manager - Lore and content management',
         inherits: ['trusted_user']
       },
+      'vip': {
+        level: 55,
+        permissions: [
+          'game_access',
+          'forum_post',
+          'forum_reply',
+          'profile_edit',
+          'direct_message',
+          'file_upload_small'
+        ],
+        description: 'VIP User - Exclusive game access',
+        inherits: ['trusted_user']
+      },
       'trusted_user': {
         level: 50,
         permissions: [
@@ -97,6 +110,9 @@ class GroupAuthentication {
 
     // Define action-to-permission mappings
     this.actionPermissions = {
+      // Game access
+      'game_access': ['vip', 'content_manager', 'admin', 'super_admin'],
+
       // Admin panel access
       'admin_panel_access': ['admin', 'super_admin'],
       'user_management': ['admin', 'super_admin'],

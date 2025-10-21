@@ -1,0 +1,281 @@
+/* Wavelength Games CSS */
+
+/* Base styling for games pages */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+.breadcrumb a {
+    color: #a78bfa;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+    color: #d8b4fe;
+}
+
+.breadcrumb .separator {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.breadcrumb span {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Games container */
+.games-container {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 1200px) {
+    .games-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .games-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+    .game-card,
+    .game-main,
+    .game-sidebar {
+        background: rgba(10, 10, 20, 0.9);
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* VIP Badge styling */
+.vip-badge {
+    animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    }
+}
+
+/* Game card animations */
+.game-card {
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.game-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.game-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.game-card:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+.game-card:nth-child(n+5) {
+    animation-delay: 0.4s;
+}
+
+/* Button hover effects */
+.game-card-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.game-card-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: left 0.3s ease;
+    z-index: -1;
+}
+
+.game-card-btn:hover::before {
+    left: 100%;
+}
+
+.action-button {
+    position: relative;
+    overflow: hidden;
+}
+
+.action-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: left 0.3s ease;
+    z-index: -1;
+}
+
+.action-button:hover::before:not(:disabled) {
+    left: 100%;
+}
+
+/* Gradient text effect */
+.gradient-text {
+    background: linear-gradient(135deg, #a78bfa, #d8b4fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: bold;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(138, 43, 226, 0.2);
+    border-radius: 50%;
+    border-top-color: #a78bfa;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Status badges */
+.badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge.primary {
+    background: rgba(138, 43, 226, 0.2);
+    color: #a78bfa;
+    border: 1px solid rgba(138, 43, 226, 0.4);
+}
+
+.badge.success {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.badge.warning {
+    background: rgba(255, 215, 0, 0.2);
+    color: #ffd700;
+    border: 1px solid rgba(255, 215, 0, 0.4);
+}
+
+.badge.danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+/* Empty states */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.empty-state h2 {
+    font-size: 1.8rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+/* Info panels */
+.info-panel {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
+    border-left: 4px solid #22c55e;
+    padding: 20px;
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.info-panel strong {
+    color: #22c55e;
+}
+
+/* Scrollbar styling */
+.games-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.games-container::-webkit-scrollbar-track {
+    background: rgba(138, 43, 226, 0.05);
+}
+
+.games-container::-webkit-scrollbar-thumb {
+    background: rgba(138, 43, 226, 0.3);
+    border-radius: 4px;
+}
+
+.games-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(138, 43, 226, 0.5);
+}
