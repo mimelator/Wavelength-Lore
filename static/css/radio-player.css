@@ -768,6 +768,32 @@
     font-size: 1.8rem;
 }
 
+.stat-item.total-points {
+    padding-left: 20px;
+    border-left: 2px solid rgba(255, 215, 0, 0.5);
+    margin-left: 10px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 165, 0, 0.15));
+    padding: 8px 12px;
+    border-radius: 15px;
+    border: 2px solid rgba(255, 215, 0, 0.4);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.stat-item.total-points .stat-label {
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.stat-item.total-points .stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #ffd700, #ffa500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
 .stat-item.rare-item {
     background: linear-gradient(135deg, rgba(255, 69, 0, 0.1), rgba(255, 0, 0, 0.1));
     padding: 8px 12px;

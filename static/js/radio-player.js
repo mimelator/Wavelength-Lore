@@ -24,7 +24,9 @@ class WavelengthRadio {
             crystals: parseInt(localStorage.getItem('crystal_count') || '0'),
             moons: parseInt(localStorage.getItem('moon_count') || '0'),
             goblins: parseInt(localStorage.getItem('goblin_count') || '0'),
-            magicLevel: parseInt(localStorage.getItem('magic_level') || '1')
+            magicLevel: parseInt(localStorage.getItem('magic_level') || '1'),
+            totalPoints: parseInt(localStorage.getItem('total_points') || '0'),
+            gameModePoints: parseInt(localStorage.getItem('game_mode_points') || '0')
         };
 
         // Visual elements spawning
@@ -256,6 +258,8 @@ class WavelengthRadio {
                 this.stats.moons = Math.max(this.stats.moons, firebaseStats.moons || 0);
                 this.stats.goblins = Math.max(this.stats.goblins, firebaseStats.goblins || 0);
                 this.stats.magicLevel = Math.max(this.stats.magicLevel, firebaseStats.magicLevel || 1);
+                this.stats.totalPoints = Math.max(this.stats.totalPoints, firebaseStats.totalPoints || 0);
+                this.stats.gameModePoints = Math.max(this.stats.gameModePoints, firebaseStats.gameModePoints || 0);
 
                 // Update localStorage with merged values
                 localStorage.setItem('mushroom_count', this.stats.mushrooms);
@@ -266,6 +270,8 @@ class WavelengthRadio {
                 localStorage.setItem('moon_count', this.stats.moons);
                 localStorage.setItem('goblin_count', this.stats.goblins);
                 localStorage.setItem('magic_level', this.stats.magicLevel);
+                localStorage.setItem('total_points', this.stats.totalPoints);
+                localStorage.setItem('game_mode_points', this.stats.gameModePoints);
 
                 this.updateStats();
 
@@ -294,6 +300,8 @@ class WavelengthRadio {
                 moons: this.stats.moons,
                 goblins: this.stats.goblins,
                 magicLevel: this.stats.magicLevel,
+                totalPoints: this.stats.totalPoints,
+                gameModePoints: this.stats.gameModePoints,
                 lastUpdated: Date.now()
             });
         } catch (error) {
@@ -969,6 +977,7 @@ class WavelengthRadio {
         document.getElementById('moonCount').textContent = this.stats.moons;
         document.getElementById('goblinCount').textContent = this.stats.goblins;
         document.getElementById('magicLevel').textContent = this.stats.magicLevel;
+        document.getElementById('totalPoints').textContent = this.stats.totalPoints.toLocaleString();
     }
 
     // Show level up notification
@@ -1660,6 +1669,15 @@ class WavelengthRadio {
         document.getElementById('gameScore').textContent = this.gameScore;
         document.getElementById('hudScore').textContent = this.gameScore;
         
+        // Update profile-wide points
+        this.stats.gameModePoints += points;
+        this.stats.totalPoints += points;
+        localStorage.setItem('game_mode_points', this.stats.gameModePoints);
+        localStorage.setItem('total_points', this.stats.totalPoints);
+        
+        // Save to Firebase
+        this.saveStatsToFirebase();
+        
         // Also update main stats if they exist
         const iconMap = {
             '🍄': 'mushrooms',
@@ -1681,7 +1699,7 @@ class WavelengthRadio {
             icon.remove();
         }, 300);
         
-        console.log(`🎮 Collected ${iconType}! Score: ${this.gameScore} (${points} pts, combo: ${this.gameCombo})`);
+        console.log(`🎮 Collected ${iconType}! Score: ${this.gameScore} (+${points} pts, combo: ${this.gameCombo}) | Total Points: ${this.stats.totalPoints.toLocaleString()}`);
     }
 
     showComboMessage(message) {
