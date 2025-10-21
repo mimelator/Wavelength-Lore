@@ -335,13 +335,13 @@
                 magicLevel: parseInt(localStorage.getItem('magic_level') || '1')
             };
 
-            // Calculate total score based on collectible values
-            const totalScore = (stats.mushrooms * 5) +
-                             (stats.stars * 3) +
-                             (stats.horseshoes * 7) +
-                             (stats.sparkles * 4) +
-                             (stats.crystals * 10) +
-                             (stats.moons * 8) +
+            // Calculate total score based on collectible values (must match radio-player.js)
+            const totalScore = (stats.mushrooms * 10) +
+                             (stats.stars * 5) +
+                             (stats.horseshoes * 15) +
+                             (stats.sparkles * 5) +
+                             (stats.crystals * 8) +
+                             (stats.moons * 7) +
                              (stats.goblins * 25);
 
             // Update UI elements
