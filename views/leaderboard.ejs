@@ -299,8 +299,9 @@
                 console.log('✅ Firebase ready, loading leaderboard data...');
 
                 // Use onValue for real-time updates
-                const usersRef = window.firebaseUtils.ref(window.firebaseDB, 'users');
-                console.log('📡 Setting up listener on users path...');
+                // User data with radioPlayerStats is stored under /forum/users
+                const usersRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/users');
+                console.log('📡 Setting up listener on forum/users path...');
                 
                 window.firebaseUtils.onValue(usersRef, (snapshot) => {
                     console.log('📥 onValue callback triggered, snapshot exists:', snapshot.exists());
