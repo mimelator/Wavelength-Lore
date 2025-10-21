@@ -180,7 +180,7 @@ async function getAllLore(showHidden = false) {
   
   // Filter out hidden lore for public users
   if (!showHidden) {
-    return allLore.filter(loreItem => loreItem.visible !== false);
+    return allLore.filter(loreItem => !loreItem.hidden);
   }
   
   return allLore;
@@ -246,7 +246,7 @@ function getAllLoreSync(showHidden = false) {
   
   // Filter out hidden lore for public users
   if (!showHidden) {
-    return allLore.filter(loreItem => loreItem.visible !== false);
+    return allLore.filter(loreItem => !loreItem.hidden);
   }
   
   return allLore;

@@ -199,7 +199,7 @@ async function getAllEpisodes(showHidden = false) {
   
   // Filter out hidden episodes for public users
   if (!showHidden) {
-    return allEpisodes.filter(episode => episode.visible !== false);
+    return allEpisodes.filter(episode => !episode.hidden);
   }
   
   return allEpisodes;
@@ -262,7 +262,7 @@ function getAllEpisodesSync(showHidden = false) {
   
   // Filter out hidden episodes for public users
   if (!showHidden) {
-    return allEpisodes.filter(episode => episode.visible !== false);
+    return allEpisodes.filter(episode => !episode.hidden);
   }
   
   return allEpisodes;

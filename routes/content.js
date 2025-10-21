@@ -161,7 +161,7 @@ router.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
 
     if (episode) {
       // Check visibility - if hidden and user is not a content creator, show 404
-      if (episode.visible === false && !res.locals.isContentCreator) {
+      if (episode.hidden && !res.locals.isContentCreator) {
         return res.status(404).send('Episode not found');
       }
 
@@ -269,7 +269,7 @@ router.get('/character/:characterId', async (req, res) => {
       }
 
       // Check visibility - if hidden and user is not a content creator, show 404
-      if (character.visible === false && !res.locals.isContentCreator) {
+      if (character.hidden && !res.locals.isContentCreator) {
         return res.status(404).send('Character not found');
       }
 
@@ -394,7 +394,7 @@ router.get('/lore/:loreId', async (req, res) => {
     }
 
     // Check visibility - if hidden and user is not a content creator, show 404
-    if (loreItem.visible === false && !res.locals.isContentCreator) {
+    if (loreItem.hidden && !res.locals.isContentCreator) {
       return res.status(404).send('Lore not found');
     }
 

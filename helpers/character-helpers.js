@@ -124,7 +124,7 @@ async function getAllCharacters(showHidden = false) {
   
   // Filter out hidden characters for public users
   if (!showHidden) {
-    return allCharacters.filter(char => char.visible !== false);
+    return allCharacters.filter(char => !char.hidden);
   }
   
   return allCharacters;
@@ -224,7 +224,7 @@ function getAllCharactersSync(showHidden = false) {
   
   // Filter out hidden characters for public users
   if (!showHidden) {
-    return allCharacters.filter(char => char.visible !== false);
+    return allCharacters.filter(char => !char.hidden);
   }
   
   return allCharacters;
