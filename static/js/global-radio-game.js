@@ -575,6 +575,18 @@ class GlobalRadioGame {
         this.stopSpawning();
         this.hideGame();
     }
+
+    /**
+     * Disable collectibles spawning but keep radio visible
+     * Used on game pages to prevent distractions
+     */
+    disableCollectiblesOnly() {
+        const canvas = document.getElementById('globalGameCanvas');
+        if (canvas) {
+            canvas.style.display = 'none';
+        }
+        this.stopSpawning();
+    }
 }
 
 // Prevent duplicate initialization
@@ -605,7 +617,7 @@ if (window.globalRadioGame) {
 
             // Disable collectibles spawning on game pages (but keep radio player visible)
             if (window.location.pathname.startsWith('/games')) {
-                window.globalRadioGame.disableGame();
+                window.globalRadioGame.disableCollectiblesOnly();
             }
         });
     } else {
@@ -613,7 +625,7 @@ if (window.globalRadioGame) {
 
         // Disable collectibles spawning on game pages (but keep radio player visible)
         if (window.location.pathname.startsWith('/games')) {
-            window.globalRadioGame.disableGame();
+            window.globalRadioGame.disableCollectiblesOnly();
         }
     }
 }

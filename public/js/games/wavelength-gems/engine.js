@@ -34,9 +34,9 @@ let gameState = {
  * Initialize a new game
  */
 function initGame() {
-    // Disable global radio game while playing
-    if (window.globalRadioGame) {
-        window.globalRadioGame.disableGame();
+    // Disable collectibles while playing (keep radio visible)
+    if (window.globalRadioGame && window.globalRadioGame.disableCollectiblesOnly) {
+        window.globalRadioGame.disableCollectiblesOnly();
     }
 
     gameState = {
