@@ -283,49 +283,74 @@ function showComboIndicator() {
  * Animate gravity - gems falling down
  */
 function animateGravity() {
-    // Track which gems fall and their distances
-    const fallingGems = new Map(); // Key: "row,col", Value: fallDistance
+    // Track gem movements: oldPos -> newPos with fall distance
+    const movements = []; // Array of {oldRow, oldCol, newRow, newCol, gemType, fallDistance}
 
     // Calculate gravity and track movement
+    const newBoard = [];
+    for (let i = 0; i < GAME_CONFIG.ROWS; i++) {
+        newBoard[i] = [];
+    }
+
     for (let col = 0; col < GAME_CONFIG.COLS; col++) {
         let writePos = GAME_CONFIG.ROWS - 1;
 
         for (let row = GAME_CONFIG.ROWS - 1; row >= 0; row--) {
             if (gameState.board[row][col] !== null) {
+                const gemType = gameState.board[row][col];
                 const fallDistance = row - writePos;
+
                 if (fallDistance > 0) {
-                    // Mark gems that are falling
-                    fallingGems.set(`${writePos},${col}`, fallDistance);
+                    // Track this gem's movement
+                    movements.push({
+                        oldRow: row,
+                        oldCol: col,
+                        newRow: writePos,
+                        newCol: col,
+                        gemType,
+                        fallDistance
+                    });
                 }
-                gameState.board[writePos][col] = gameState.board[row][col];
-                if (writePos !== row) {
-                    gameState.board[row][col] = null;
-                }
+
+                newBoard[writePos][col] = gemType;
                 writePos--;
             }
         }
     }
 
-    // Render with falling animation
+    // Update board state
+    gameState.board = newBoard;
+
+    // First, position all falling gems at their ORIGINAL positions
+    movements.forEach(({oldRow, oldCol, newRow, newCol, gemType, fallDistance}) => {
+        let gem = document.querySelector(`[data-row="${oldRow}"][data-col="${oldCol}"]`);
+        if (!gem) {
+            // Create gem element if it doesn't exist
+            gem = createGemElement(oldRow, oldCol, gemType);
+            document.getElementById('gameBoard').appendChild(gem);
+        }
+        gem.dataset.row = oldRow;
+        gem.dataset.col = oldCol;
+        gem.classList.remove('falling');
+        gem.style.animationDuration = '';
+    });
+
+    // Force a reflow to ensure initial state is rendered
+    void document.getElementById('gameBoard').offsetHeight;
+
+    // Now render the final positions and trigger animations
     renderBoard();
 
-    // Add falling animation class and adjust animation duration based on fall distance
-    for (let col = 0; col < GAME_CONFIG.COLS; col++) {
-        for (let row = 0; row < GAME_CONFIG.ROWS; row++) {
-            if (gameState.board[row][col] !== null) {
-                const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-                if (gem) {
-                    const fallDistance = fallingGems.get(`${row},${col}`) || 0;
-                    if (fallDistance > 0) {
-                        gem.classList.add('falling');
-                        // Adjust animation timing based on distance (max 200ms for far falls)
-                        const duration = Math.min(200 + (fallDistance * 30), 400);
-                        gem.style.animationDuration = (duration / 1000) + 's';
-                    }
-                }
-            }
+    // Apply falling animation to moved gems
+    movements.forEach(({oldRow, oldCol, newRow, newCol, gemType, fallDistance}) => {
+        const gem = document.querySelector(`[data-row="${newRow}"][data-col="${newCol}"]`);
+        if (gem) {
+            gem.classList.add('falling');
+            // Adjust animation timing based on distance
+            const duration = Math.min(150 + (fallDistance * 40), 450);
+            gem.style.animationDuration = (duration / 1000) + 's';
         }
-    }
+    });
 
     // Fill empty spaces with new gems
     setTimeout(() => {
