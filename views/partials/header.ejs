@@ -3,16 +3,32 @@
   <nav>
     <ul>
       <li><a href="/">Home</a></li>
-      <li><a href="/characters">Hero Gallery</a></li>
-      <li><a href="/lore">Lore Gallery</a></li>
-      <li><a href="/map">World Map</a></li>
-      <li><a href="/radio">📻 Radio</a></li>
-      <li><a href="/leaderboard">🏆 Leaderboard</a></li>
-      <li><a href="/search">Search</a></li>
-      <li><a href="/forum">Forum</a></li>
-      <li id="profile-nav-item" style="display: none;"><a href="/forum/profile" class="profile-link">👤 My Profile</a></li>
-      <li id="content-creator-nav-item" style="display: none;"><a href="/create" class="content-creator-link">✨ Create Content</a></li>
-      <li id="admin-nav-item" style="display: none;"><a href="/forum/admin" class="admin-link">⚙️ Admin</a></li>
+      
+      <!-- Browse Dropdown -->
+      <li class="has-dropdown">
+        <a href="#" onclick="return false;">Browse</a>
+        <ul class="dropdown">
+          <li><a href="/characters">🦸 Hero Gallery</a></li>
+          <li><a href="/lore">📖 Lore Gallery</a></li>
+          <li><a href="/map">🗺️ World Map</a></li>
+        </ul>
+      </li>
+      
+      <!-- Community Dropdown -->
+      <li class="has-dropdown">
+        <a href="#" onclick="return false;">Community</a>
+        <ul class="dropdown">
+          <li><a href="/forum">💬 Forum</a></li>
+          <li><a href="/leaderboard">🏆 Leaderboard</a></li>
+          <li id="profile-dropdown-item" style="display: none;"><a href="/forum/profile">👤 My Profile</a></li>
+        </ul>
+      </li>
+      
+      <li><a href="/radio">� Radio</a></li>
+      <li><a href="/search">🔍 Search</a></li>
+      
+      <li id="content-creator-nav-item" style="display: none;"><a href="/create">✨ Create</a></li>
+      <li id="admin-nav-item" style="display: none;"><a href="/forum/admin">⚙️ Admin</a></li>
     </ul>
   </nav>
 </header>
@@ -49,8 +65,11 @@
                   // Expose user groups globally
                   window.wavelengthUserGroups = data.groups || [];
 
-                  // Show profile link for all authenticated users
-                  document.getElementById('profile-nav-item').style.display = 'block';
+                  // Show profile link in dropdown for all authenticated users
+                  const profileDropdownItem = document.getElementById('profile-dropdown-item');
+                  if (profileDropdownItem) {
+                    profileDropdownItem.style.display = 'block';
+                  }
 
                   // Show admin link if user is admin
                   if (data.isAdmin) {
@@ -101,6 +120,29 @@
     } else {
       checkAdminStatus();
     }
+
+    // Mobile dropdown toggle functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      const dropdownToggles = document.querySelectorAll('header nav .has-dropdown > a');
+      
+      dropdownToggles.forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+          // Only prevent default and toggle on mobile
+          if (window.innerWidth <= 768) {
+            e.preventDefault();
+            const parent = toggle.parentElement;
+            parent.classList.toggle('active');
+            
+            // Close other dropdowns
+            document.querySelectorAll('header nav .has-dropdown').forEach(item => {
+              if (item !== parent) {
+                item.classList.remove('active');
+              }
+            });
+          }
+        });
+      });
+    });
   }
 </script><style>
   header {
