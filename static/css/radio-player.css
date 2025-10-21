@@ -1621,6 +1621,70 @@ html {
     100% { opacity: 0; }
 }
 
+/* Floating Character Badges in Screensaver */
+.screensaver-badges-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 14;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.screensaver-floating-badge {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(255, 255, 255, 0.3);
+    opacity: 0;
+    pointer-events: auto;
+    cursor: pointer;
+    object-fit: cover;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: floatBadgeIn 2s ease-out forwards;
+}
+
+.screensaver-floating-badge:hover {
+    transform: scale(1.15) !important;
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.7),
+                0 0 40px rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 1);
+}
+
+.screensaver-floating-badge.fading-out {
+    animation: floatBadgeOut 2s ease-in forwards;
+}
+
+@keyframes floatBadgeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) translateY(50px);
+    }
+    50% {
+        opacity: 0.9;
+    }
+    100% {
+        opacity: 0.85;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes floatBadgeOut {
+    0% {
+        opacity: 0.85;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.5) translateY(-50px);
+    }
+}
+
 /* Exit Hint */
 .screensaver-exit-hint {
     position: absolute;

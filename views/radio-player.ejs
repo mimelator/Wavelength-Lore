@@ -203,6 +203,11 @@
             <canvas class="weather-canvas"></canvas>
             <div class="lightning-flash"></div>
         </div>
+
+        <!-- Floating character badges layer -->
+        <div class="screensaver-badges-container" id="screensaverBadges">
+            <!-- Character badges will appear here randomly -->
+        </div>
         
         <div class="screensaver-exit-hint">Press any key or click to exit screen saver</div>
         
@@ -317,7 +322,19 @@
                 <!-- Episode Summary controls -->
                 <div class="customization-section">
                     <div class="customization-section-header">
-                        <span class="section-icon">📖</span>
+                        <span class="section-icon">�</span>
+                        <span class="section-title">Character Badges</span>
+                    </div>
+                    <div class="customization-buttons">
+                        <button class="custom-btn badges-btn active" data-badges="on" title="Show character badges">✨ Show</button>
+                        <button class="custom-btn badges-btn" data-badges="off" title="Hide character badges">🚫 Hide</button>
+                    </div>
+                </div>
+
+                <!-- Episode Summary controls -->
+                <div class="customization-section">
+                    <div class="customization-section-header">
+                        <span class="section-icon">�📖</span>
                         <span class="section-title">Episode Summary</span>
                     </div>
                     <div class="customization-buttons">

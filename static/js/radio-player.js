@@ -1150,6 +1150,12 @@ class WavelengthRadio {
                 preferences.summary = activeSummaryBtn.dataset.summary;
             }
 
+            // Save badges preference
+            const activeBadgesBtn = document.querySelector('.badges-btn.active');
+            if (activeBadgesBtn) {
+                preferences.badges = activeBadgesBtn.dataset.badges;
+            }
+
             localStorage.setItem('wavelength_screensaver_prefs', JSON.stringify(preferences));
             console.log('💾 Saved screen saver preferences:', preferences);
         } catch (error) {
@@ -1248,6 +1254,16 @@ class WavelengthRadio {
                     }
                 });
             }
+
+            // Restore badges preference (default to 'on')
+            const badgesPref = preferences.badges || 'on';
+            document.querySelectorAll('.badges-btn').forEach(btn => {
+                if (btn.dataset.badges === badgesPref) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
 
             console.log('✅ Screen saver preferences restored');
         } catch (error) {
@@ -1439,6 +1455,21 @@ class WavelengthRadio {
                 btn.classList.add('active');
                 // Update summary display
                 this.updateEpisodeSummary();
+                this.saveScreenSaverPreferences();
+            });
+        });
+
+        // Bind badges buttons
+        const badgesBtns = document.querySelectorAll('.badges-btn');
+        badgesBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Remove active class from all badges buttons
+                badgesBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                // Update badges display
+                this.updateCharacterBadgesDisplay();
                 this.saveScreenSaverPreferences();
             });
         });
@@ -1708,6 +1739,9 @@ class WavelengthRadio {
         // Start game if active
         this.updateGameMode();
 
+        // Start character badges spawning if enabled
+        this.updateCharacterBadgesDisplay();
+
         // Show exit hint for 5 seconds, then hide it
         const exitHint = overlay.querySelector('.screensaver-exit-hint');
         if (exitHint) {
@@ -1747,6 +1781,9 @@ class WavelengthRadio {
 
         // Stop game
         this.stopGame();
+
+        // Stop character badges spawning
+        this.stopBadgeSpawning();
 
         // Clear lyrics display
         const lyricsContainer = document.querySelector('.screensaver-lyrics');
@@ -2076,6 +2113,105 @@ class WavelengthRadio {
         // Show summary
         summaryOverlay.classList.remove('fade-out');
         summaryOverlay.classList.add('visible');
+    }
+
+    updateCharacterBadgesDisplay() {
+        const activeBadgesBtn = document.querySelector('.badges-btn.active');
+        const showBadges = activeBadgesBtn ? activeBadgesBtn.dataset.badges === 'on' : true;
+
+        console.log(`👥 Character badges: ${showBadges ? 'on' : 'off'}`);
+
+        if (showBadges) {
+            // Start spawning badges if not already running
+            if (!this.badgeSpawnInterval) {
+                this.startBadgeSpawning();
+            }
+        } else {
+            // Stop spawning badges and clear existing ones
+            this.stopBadgeSpawning();
+        }
+    }
+
+    startBadgeSpawning() {
+        if (this.badgeSpawnInterval) {
+            clearInterval(this.badgeSpawnInterval);
+        }
+
+        console.log('👥 Starting character badge spawning');
+
+        // Spawn a badge every 5-10 seconds randomly
+        const spawnBadge = () => {
+            const currentTrack = this.playlist[this.currentTrackIndex];
+            if (!currentTrack) return;
+
+            const characters = JSON.parse(currentTrack.dataset?.characters || currentTrack.characters || '[]');
+            if (characters.length === 0) return;
+
+            // Pick a random character
+            const character = characters[Math.floor(Math.random() * characters.length)];
+            this.spawnFloatingBadge(character);
+
+            // Schedule next spawn randomly between 5-10 seconds
+            const nextSpawn = 5000 + Math.random() * 5000;
+            this.badgeSpawnInterval = setTimeout(spawnBadge, nextSpawn);
+        };
+
+        // Start first spawn after 2 seconds
+        this.badgeSpawnInterval = setTimeout(spawnBadge, 2000);
+    }
+
+    stopBadgeSpawning() {
+        if (this.badgeSpawnInterval) {
+            clearTimeout(this.badgeSpawnInterval);
+            this.badgeSpawnInterval = null;
+        }
+
+        // Remove all existing badges
+        const badgesContainer = document.getElementById('screensaverBadges');
+        if (badgesContainer) {
+            badgesContainer.innerHTML = '';
+        }
+
+        console.log('👥 Stopped character badge spawning');
+    }
+
+    spawnFloatingBadge(character) {
+        const badgesContainer = document.getElementById('screensaverBadges');
+        if (!badgesContainer) return;
+
+        // Create badge element
+        const badge = document.createElement('img');
+        badge.src = this.cdnUrl + character.image;
+        badge.alt = character.title;
+        badge.title = character.title;
+        badge.classList.add('screensaver-floating-badge');
+
+        // Random position (avoid edges)
+        const left = 10 + Math.random() * 80; // 10-90% from left
+        const top = 15 + Math.random() * 70; // 15-85% from top
+        badge.style.left = `${left}%`;
+        badge.style.top = `${top}%`;
+
+        // Add click handler to open character page
+        badge.addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.open(`/character/${character.id}`, '_blank');
+        });
+
+        // Add to container
+        badgesContainer.appendChild(badge);
+
+        console.log(`👥 Spawned badge for ${character.title} at ${left.toFixed(0)}%, ${top.toFixed(0)}%`);
+
+        // Remove after 6-10 seconds with fade out
+        const lifetime = 6000 + Math.random() * 4000;
+        setTimeout(() => {
+            badge.classList.add('fading-out');
+            // Remove element after animation completes
+            setTimeout(() => {
+                badge.remove();
+            }, 2000);
+        }, lifetime);
     }
 
     updateLyricsDisplay() {
