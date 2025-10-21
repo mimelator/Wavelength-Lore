@@ -14,6 +14,39 @@ const { requireGroup } = require('../middleware/groupAuth');
 const { updateDataAsAdmin } = require('../helpers/firebase-admin-utils');
 
 /**
+ * Helper function to strip CDN URL from paths
+ * Ensures we only store relative paths in the database
+ */
+function stripCdnUrl(url) {
+    if (!url || typeof url !== 'string') return url;
+    
+    const cdnUrl = process.env.CDN_URL;
+    if (!cdnUrl) return url;
+    
+    // Remove the CDN URL prefix if it exists
+    if (url.startsWith(cdnUrl)) {
+        return url.substring(cdnUrl.length).replace(/^\/+/, '');
+    }
+    
+    // Also handle https:// URLs that might be CDN URLs
+    const cdnDomain = cdnUrl.replace(/^https?:\/\//, '');
+    if (url.includes(cdnDomain)) {
+        const parts = url.split(cdnDomain);
+        return parts[1] ? parts[1].replace(/^\/+/, '') : url;
+    }
+    
+    return url;
+}
+
+/**
+ * Helper function to strip CDN URLs from an array of paths
+ */
+function stripCdnUrlsFromArray(arr) {
+    if (!Array.isArray(arr)) return arr;
+    return arr.map(item => stripCdnUrl(item)).filter(item => item);
+}
+
+/**
  * Update Episode Content
  * PUT /api/content/episode/:contentId
  */
@@ -113,6 +146,17 @@ router.put('/api/content/character/:contentId', requireGroup('content_manager'),
             ...data,
             id: contentId // Ensure ID doesn't change
         };
+        
+        // Strip CDN URLs from image_gallery if present
+        if (updatedData.image_gallery) {
+            updatedData.image_gallery = stripCdnUrlsFromArray(updatedData.image_gallery);
+        }
+        
+        // Strip CDN URL from primary_image if present
+        if (updatedData.primary_image) {
+            updatedData.primary_image = stripCdnUrl(updatedData.primary_image);
+        }
+        
         console.log(`📝 Updating character at: ${updatePath}`);
 
         // Update in Firebase using Admin SDK
@@ -165,6 +209,16 @@ router.put('/api/content/lore/:contentId', requireGroup('content_manager'), asyn
                 success: false,
                 error: 'Title and description are required'
             });
+        }
+
+        // Strip CDN URLs from image_gallery if present
+        if (data.image_gallery) {
+            data.image_gallery = stripCdnUrlsFromArray(data.image_gallery);
+        }
+        
+        // Strip CDN URL from image if present
+        if (data.image) {
+            data.image = stripCdnUrl(data.image);
         }
 
         // Update in Firebase using Admin SDK
@@ -326,8 +380,8 @@ router.post('/api/content/character', requireGroup('content_manager'), async (re
             id: characterId,
             title: data.title,
             description: data.description,
-            primary_image: data.primary_image || '',
-            image_gallery: data.image_gallery || [],
+            primary_image: stripCdnUrl(data.primary_image || ''),
+            image_gallery: stripCdnUrlsFromArray(data.image_gallery || []),
             episodes: data.episodes || [],
             visible: data.visible !== undefined ? data.visible : false // Default to hidden
         };
@@ -416,8 +470,8 @@ router.post('/api/content/lore', requireGroup('content_manager'), async (req, re
             title: data.title,
             description: data.description,
             category: data.category || 'other',
-            primary_image: data.primary_image || '',
-            image_gallery: data.image_gallery || [],
+            primary_image: stripCdnUrl(data.primary_image || ''),
+            image_gallery: stripCdnUrlsFromArray(data.image_gallery || []),
             related_episodes: data.related_episodes || [],
             related_characters: data.related_characters || [],
             visible: data.visible !== undefined ? data.visible : false // Default to hidden

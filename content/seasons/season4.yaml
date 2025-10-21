@@ -41,6 +41,7 @@ episodes:
       - /images/seasons/season4/episodes/episode1/images/WereComingForYou-10.webp
     story: 'Wavelength and the Shire Folk escape the Goblin Invasion of the dear Shire, and flee to the far, frozen North.  There they find a place to recover and plan at the Ice Fortress. THe Ice Fortress is a safe haven for all, where everyone is welcome, no matter wealth or looks or race. '
     lyrics: 'Welcome to the Icy Fortress We''ve got room, and food to Spare When you''re here you''ll be protected under our care at the icy fortress! '
+    hidden: false
   episode2:
     title: The King has Fled
     description: The Goblin King fled the Shire before the battle again and took captives.
@@ -73,6 +74,7 @@ episodes:
       - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-23.webp
     story: 'The Goblin king being a coward at heart, fled the battle before it began, fleeing with his main GOblin Misery back to his swampy lair.  He took with him captives from the Shire, including the Royal Family.  Behind the GOblin King he left a token force to hold the Shire, so that the Shire Folk wouldn''t pursue him. '
     lyrics: 'The Goblin King has fled the battle He can spread no more lies in the Shire No more lying in the shire! No Lies! '
+    hidden: false
   episode3:
     title: Goblin's Rule
     description: The only goblin rule for you is that Goblins gonna Rule all over you
@@ -108,6 +110,7 @@ episodes:
       - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-9.webp
     story: 'There is only one motivation for a Goblin, and that is to rule over others.  This is the case for all Goblins, from the lowliest grunt to the Goblin King himself.  The Goblin King rules by lying, cheating, and stealing.  He has no honor, and no respect for others.  The only rule that the Goblin King has is that Goblins gonna rule all over you. '
     lyrics: 'The Only Goblin Rule for You Is that goblins gonna Rule all over you!  It''s no mystery that i''d lie to you It''s just the way that the Goblin King''s rule!  When I''m speaking you can bet That I''m lying to you It''s just the way that the Goblin King''s rule!  It''s no mystery that i''d lie to you... ...that i''d lie to you, and you, and you... '
+    hidden: false
   episode4:
     title: Ice Blue Greed
     description: There's no way that the King can resist the trap set by Lucky
@@ -143,6 +146,7 @@ episodes:
       - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-9.webp
     story: 'The Shire FOlk know that the Goblin King is a coward, and that he won''t openly attack a fortified shire without a good reason.  Lucky sets a trap for the Goblin King, using an irresistible Ice Blue Diamond as bait. The much coveted Ice Blue Diamonds can only be found in the far, frozen North as they are guarded by the fearsome Ice Dragons.   '
     lyrics: 'Yes, we''ve all heard ''bout the Goblin Greed Now the goblin king has his greed fixed on...    ...an Ice BLue Diamond  Lucky set a trap, trap for Goblin Greed Showed a goblin spy an irresistible diamond... ...stored at the shire  There''s no way that the King can resist The deadly lure that lucky cast '
+    hidden: false
   episode5:
     title: The Shire Fortress
     description: Do you want to live under the rule of the hateful and Cruel?
@@ -180,6 +184,7 @@ episodes:
       - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-9.webp
     story: 'Knowing that Lucky''s trap was set, the Shire Folk set about fortifying the Shire to withstand the coming Goblin attack. They know that the Goblin''s will be relentless in their attack, and that they will stop at nothing to reclaim the Shire in order to satisfy the Goblin King''s greed.  They will do whatever it takes to not have to submit to the rule of the goblin king. '
     lyrics: 'Reinforce those Ramparts Get everything done Got to fortify the shire before they come  Do you want to live under the rule Of the hateful and cruel? Build a Shire FOrtress!  HIgh Towers and Layered Defenses helps us with any attack any attack! We need to train everyday to learn how to keep  the goblins away Build a Shire FOrtress!  Do you want to live a life of freedom? Then Build a Shire FOrtress! '
+    hidden: false
   episode6:
     title: Battle of the Shire
     description: Shoot for the king; stopping his lies are the key to everything
@@ -243,6 +248,7 @@ episodes:
       - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.webp
     story: 'The Goblin King, driven by his insatiable greed for the Ice Blue Diamond, leads his goblin horde to attack the fortified Shire. The Shire Folk, prepared and determined, stand united to defend their home and freedom. The battle is fierce, with both sides showing great courage and resilience. In the end, the Shire Folk''s determination and unity prevail, and they successfully defend their home from the Goblin King''s forces. '
     lyrics: 'You''ve gotta Shoot, Shoot for the King Stopping his lies are the keys to Everything We must destroy, The Mic of the King Stopping his lies are the keys to Everything  There''s a goblin misery, with a goblin war machine  No matter what we try the king''s armor is much to strong Our magic arrows don''t have any affects to stop the king''s battle song  We’ve only got three ballista arrows To stop the Goblin Misery We’ll take out the war machine, the mic then the goblin king   We''re getting Desperate Down to our final option Bring out the mighty Ballista And aim for the throat of the goblin  The Goblin King Is not much more than a lying machine To kill the king Put an arrow his throat to stop his singing  Aim for the throat of the goblin  king Stop his lies  Free your lives  We killed the king The Goblins are defeated The Gobling King is Dead Yes, we''ve won back the shire! We''ll never have to hear him again Or his misery of liars   Yes we''re back to our shire We''re Home Yes we''re back to the shire '
+    hidden: false
   episode7:
     title: Song of Mourning
     description: There's a time for mourning, when we'll share stories at night about our loved ones passing, and how we hold those memories tight.
@@ -273,6 +279,7 @@ episodes:
       - /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-7.webp
     story: 'After the battle, the Shire Folk take time to mourn their losses and honor the memories of those who have passed. Wavelength didn''t escape unscathed, as Wavelength''s Drummer: Magical Maurice was lost in the battle.   Many others were killed, and many orphans were left behind.   One of the orphans is Daphne the daughter of the Shire''s Concert Master, who was also killed in the battle along with her father. Daphne is left to take care of her younger brother, and as she is a prodigy on the drums, she takes up the mantle of Wavelength''s drummer. Meanwhile, Eloquence, Wavelength''s Bass player is devestated by the loss of Magical Maurice, who was his best friend.  He is not impressed with the idea of Daphne taking over as Wavelength''s drummer, especially as Daphne seems to be such a bitter person. The Song of Mourning is a tribute to those who have passed, and a reminder to hold onto the memories of our loved ones. '
     lyrics: 'There is a time for mourning where we share stories at night, ...About a loved one''s passing and how we hold those memories tight.  This is the song of Mourning '
+    hidden: false
   episode8:
     title: The Shire Dream
     description: I choose to live free and find the shire dream in me.
@@ -315,3 +322,4 @@ episodes:
       - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-10.webp
     story: 'The Goblin King can no longer spread his lies in the Shire, and the Shire Folk can finally live in peace. Wavelength has lost a member, but they have gained a new one in Daphne, who has proven herself to be a worthy drummer. What happens next to Daphne and Wavelength will be told over the next many seasons to come.... '
     lyrics: 'Some only live for money, Some only live for power. But we have a different dream  Some only shoot for power, Some only live to kill.  The shire dream, Is a different dream for all humanity We dream the shire dream  We have just one life, one life to live. I''ll choose to be free and find the shire dream in me.  Some goblins live in the darkness, Others like to Rule in daylight.  I''ll choose to be free and find the shire dream in me. '
+    hidden: false

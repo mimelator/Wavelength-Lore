@@ -25,7 +25,7 @@
 - id: jewel-singing
   title: jewel-singing
   content: |-
-    A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a regal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.  She is singing softly but intently and there are waves of soft energy showing as a neon oscillating glow emanating from her.
+    A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a regal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.  She is serenading the crows and there are waves of soft energy showing as a neon oscillating glow emanating from her.
 
     The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.
 
@@ -46,7 +46,7 @@
     - singing
   active: true
   createdAt: '2025-10-20T19:52:42.814Z'
-  updatedAt: '2025-10-20T19:58:38.692Z'
+  updatedAt: '2025-10-21T03:09:36.335Z'
 - id: locations-burial-bonfire-at-the-shire
   title: Burial Bonfire At The Shire
   content: |-

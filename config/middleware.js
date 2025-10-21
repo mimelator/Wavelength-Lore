@@ -114,7 +114,17 @@ function configureStaticFiles(app) {
   app.use('/static', express.static(path.join(__dirname, '../static')));
 
   // Map clean URLs to static files (for YAML path compatibility)
-  app.use('/images', express.static(path.join(__dirname, '../static/images')));
+  // Fallback to CDN for images not found locally (e.g., AI-generated images)
+  app.use('/images', express.static(path.join(__dirname, '../static/images')), (req, res, next) => {
+    // If file not found locally, redirect to real CDN (CloudFront)
+    // Use the actual CloudFront URL as fallback, not localhost
+    const cloudFrontUrl = 'https://df5sj8f594cdx.cloudfront.net';
+    const fullCdnUrl = `${cloudFrontUrl}${req.originalUrl}`;
+    
+    console.log(`🔗 Image not found locally, redirecting to CloudFront: ${fullCdnUrl}`);
+    return res.redirect(fullCdnUrl);
+  });
+  
   app.use('/css', express.static(path.join(__dirname, '../static/css')));
 
   // Special handling for JavaScript files to prevent CORB issues

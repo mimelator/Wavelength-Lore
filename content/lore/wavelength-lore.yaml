@@ -2,7 +2,6 @@ nature:
   - id: daphne-flower
     title: 🌸 Daphne 🌸
     type: nature
-    hidden: true
     keywords:
       - sweet
       - floral
@@ -34,7 +33,7 @@ villain:
       - goblin
       - villains
       - evil creatures
-    description: "A Goblin can be nearly anyone in disguise.  They often hate others without reason, and are only vaguely happy when they are spreading fear and hatred.  They live to rule, and their lust for power is insatiable.  Goblins can be thought of as a person who has been consumed by a Virus of Hatred, Fear and Greed.  Since Misery loves Company, Goblins often travel in groups called: Misery of Goblins, and they do their best to spread Misery wherever they go."
+    description: 'A Goblin can be nearly anyone in disguise.  They often hate others without reason, and are only vaguely happy when they are spreading fear and hatred.  They live to rule, and their lust for power is insatiable.  Goblins can be thought of as a person who has been consumed by a Virus of Hatred, Fear and Greed.  Since Misery loves Company, Goblins often travel in groups called: Misery of Goblins, and they do their best to spread Misery wherever they go.'
     image: /images/seasons/season3/episodes/episode3/images/Sneak_Attack-16.webp
     image_gallery:
       - /images/seasons/season2/episodes/episode4/images/MiseryOfGoblins-14.webp
@@ -47,6 +46,7 @@ villain:
       - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.webp
       - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.webp
       - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-064.webp
+    hidden: false
   - id: goblin-king
     title: Goblin King
     type: villain
@@ -72,6 +72,7 @@ villain:
       - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-064.webp
       - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-039.webp
       - /images/seasons/season2/episodes/episode2/images/Psychopath-13.webp
+    hidden: false
   - id: misery
     title: Misery of Goblins
     type: villain
@@ -93,6 +94,7 @@ villain:
       - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.webp
       - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.webp
       - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-064.webp
+    hidden: false
 thing:
   - id: ice-blue-diamond
     title: Ice Blue Diamond
@@ -112,6 +114,7 @@ thing:
       - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.webp
       - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-28.webp
       - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.webp
+    hidden: false
   - id: ice-dragons
     title: Ice Dragons
     type: thing
@@ -132,6 +135,7 @@ thing:
       - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-01.webp
       - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-15.webp
       - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-14.webp
+    hidden: false
   - id: ice-whales
     title: Ice Whales
     type: thing
@@ -148,6 +152,7 @@ thing:
       - /images/seasons/season3/episodes/episode2/images/Ice_Whale-17.webp
       - /images/seasons/season3/episodes/episode2/images/Ice_Whale-18.webp
       - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-01.webp
+    hidden: false
 place:
   - id: ice-fortress
     title: Ice Fortress
@@ -168,6 +173,7 @@ place:
       - /images/seasons/season3/episodes/episode4/images/FrozenPeace-24.webp
       - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-19.webp
       - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-15.webp
+    hidden: false
   - id: shire-sanctuary
     title: Shire Sanctuary
     type: place
@@ -184,6 +190,7 @@ place:
       - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-07.webp
       - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.webp
       - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-08.webp
+    hidden: false
   - id: the-shire
     title: The Shire
     type: place
@@ -199,6 +206,7 @@ place:
       - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-10.webp
       - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.webp
       - /images/seasons/season4/episodes/episode5/images/TheShireFortress-19.webp
+    hidden: false
 band:
   - id: wavelength
     title: Wavelength
@@ -218,3 +226,4 @@ band:
       - /images/seasons/season3/episodes/episode4/images/ice_fortress-7.webp
       - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-1.webp
       - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-7.webp
+    hidden: false

@@ -515,6 +515,62 @@
         <div id="lightboxInfo" class="lightbox-info"></div>
     </div>
 
+    <!-- Video Generation Modal -->
+    <div id="videoGenModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>🎬 Generate Video from Image</h2>
+                <button class="modal-close" onclick="closeVideoGenModal()">&times;</button>
+            </div>
+            
+            <div style="padding: 20px;">
+                <div class="form-group">
+                    <label class="form-label">Selected Image</label>
+                    <img id="videoGenImagePreview" style="max-width: 100%; max-height: 200px; border-radius: 8px; border: 2px solid #667eea; display: block;">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Base Prompt (Optional)</label>
+                    <select id="videoGenPromptSelect" class="form-select" onchange="updateVideoPromptPreview()">
+                        <option value="">-- No prompt, motion only --</option>
+                    </select>
+                    <div class="form-hint">Select an existing prompt for scene description</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Prompt Preview</label>
+                    <div id="videoPromptPreview" style="padding: 12px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #667eea; min-height: 60px; color: #666; font-style: italic;">
+                        No prompt selected
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Camera Motion / Animation *</label>
+                    <textarea id="videoGenMotion" class="form-textarea" rows="3" placeholder="Describe the camera movement and animation..."></textarea>
+                    <div class="form-hint">
+                        Examples: "Slow forward dolly push, dramatic lighting" • "Gentle pan left revealing the environment" • "Zoom out revealing the full scene"
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Full Combined Prompt</label>
+                    <div id="videoFullPrompt" style="padding: 12px; background: #e8f4f8; border-radius: 6px; border-left: 4px solid #17a2b8; min-height: 60px; font-family: monospace; font-size: 13px;">
+                        Enter motion guidance above
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn btn-primary" onclick="startVideoGeneration()" style="flex: 1;">
+                        🎬 Generate Video
+                    </button>
+                    <button type="button" class="btn" onclick="closeVideoGenModal()" style="background: #6c757d; color: white;">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="edit-container">
         <div class="edit-header">
             <h1>
@@ -697,27 +753,55 @@
                             <button type="button" class="btn btn-small" style="background: #17a2b8; color: white;" onclick="downloadSelectedImages()" id="downloadBtn">
                                 📥 Download Selected (<span id="selectedCount">0</span>)
                             </button>
+                            <button type="button" class="btn btn-small" style="background: #f093fb; color: white;" onclick="generateVideoFromImage()" id="videoGenBtn">
+                                🎬 Generate Video
+                            </button>
                         </div>
                     </div>
                     <div id="imageGalleryContainer">
                         <% if (contentData.image_gallery && Array.isArray(contentData.image_gallery)) { %>
                             <% contentData.image_gallery.forEach((img, index) => { %>
+                                <%
+                                // Ensure display URL has CDN prefix, but store value remains relative
+                                let displayUrl = img;
+                                if (!img.startsWith('http://') && !img.startsWith('https://')) {
+                                    // It's a relative path, prepend CDN URL
+                                    displayUrl = cdnUrl + '/' + img;
+                                }
+                                // Check if it's a video based on extension
+                                const isVideo = /\.(mp4|mov|avi|webm)$/i.test(img);
+                                %>
                                 <div class="array-list-item">
-                                    <input type="checkbox" class="gallery-checkbox" data-image-url="<%= img %>" onchange="updateSelectedCount()" style="width: 20px; height: 20px; cursor: pointer;">
-                                    <img src="<%= img %>"
+                                    <input type="checkbox" class="gallery-checkbox" data-image-url="<%= displayUrl %>" onchange="updateSelectedCount()" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <% if (isVideo) { %>
+                                    <video src="<%= displayUrl %>"
+                                         class="image-preview"
+                                         controls
+                                         style="max-width: 150px; max-height: 100px; cursor: pointer;"
+                                         title="Click to view full size"
+                                         onclick="openLightbox('<%= displayUrl %>', 'Gallery Video <%= index + 1 %>')">
+                                    </video>
+                                    <% } else { %>
+                                    <img src="<%= displayUrl %>"
                                          alt="Gallery image <%= index + 1 %>"
                                          class="image-preview"
-                                         onclick="openLightbox('<%= img %>', 'Gallery Image <%= index + 1 %>')"
+                                         onclick="openLightbox('<%= displayUrl %>', 'Gallery Image <%= index + 1 %>')"
                                          onerror="this.className='no-image'; this.alt='Failed to load';"
                                          title="Click to view full size">
+                                    <% } %>
                                     <input type="text" class="form-input" value="<%= img %>" data-array="image_gallery" onchange="updateGalleryImagePreview(this)">
                                     <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
                                 </div>
                             <% }); %>
                         <% } %>
                     </div>
-                    <button type="button" class="btn btn-success btn-small" onclick="addImageGalleryItem()">+ Add Image</button>
-                    <div class="form-hint">URLs to gallery images • Click images to view full size • Select and download multiple images</div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button type="button" class="btn btn-success btn-small" onclick="addImageGalleryItem()">+ Add Image URL</button>
+                        <button type="button" class="btn btn-primary btn-small" onclick="document.getElementById('mediaUploadInput').click()">📤 Upload Image/Video</button>
+                        <input type="file" id="mediaUploadInput" accept="image/*,video/*" style="display: none;" onchange="handleMediaUpload(event)">
+                        <span id="uploadStatus" style="color: #666; font-size: 14px;"></span>
+                    </div>
+                    <div class="form-hint">Add images/videos by URL or upload directly • Click images to view full size • Select and download multiple</div>
                 </div>
                 <% } %>
             </div>
@@ -945,6 +1029,121 @@
     }
 
     // ===========================
+    // MEDIA UPLOAD
+    // ===========================
+    
+    async function handleMediaUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const uploadStatus = document.getElementById('uploadStatus');
+        const isVideo = file.type.startsWith('video/');
+        const fileType = isVideo ? 'video' : 'image';
+        
+        // Validate file size (100MB max)
+        const maxSize = 100 * 1024 * 1024; // 100MB
+        if (file.size > maxSize) {
+            alert(`File is too large. Maximum size is 100MB. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+            event.target.value = ''; // Clear the input
+            return;
+        }
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 
+                            'video/mp4', 'video/mov', 'video/avi', 'video/webm'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Invalid file type. Please upload an image (jpeg, png, gif, webp) or video (mp4, mov, avi, webm).');
+            event.target.value = '';
+            return;
+        }
+        
+        uploadStatus.textContent = `Uploading ${fileType} (${(file.size / 1024 / 1024).toFixed(2)}MB)...`;
+        uploadStatus.style.color = '#667eea';
+        
+        try {
+            // Create FormData
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('contentType', contentType);
+            formData.append('contentId', contentId);
+            
+            console.log(`📤 Uploading ${fileType}:`, file.name, `(${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+            
+            // Upload to server
+            const response = await fetch('/api/upload/media', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Upload failed');
+            }
+            
+            console.log(`✅ ${fileType} uploaded successfully:`, result.url);
+            console.log(`   Relative path for storage:`, result.relativePath);
+            
+            // Add the uploaded media to the gallery
+            const container = document.getElementById('imageGalleryContainer');
+            const div = document.createElement('div');
+            div.className = 'array-list-item';
+            
+            // Use full URL for display (src, data-image-url) but relative path for storage (input value)
+            const displayUrl = result.url;
+            const storageValue = result.relativePath || result.url; // Fallback to full URL if relativePath not available
+            
+            if (isVideo) {
+                // For videos, show a video preview
+                div.innerHTML = `
+                    <input type="checkbox" class="gallery-checkbox" data-image-url="${displayUrl}" onchange="updateSelectedCount()" style="width: 20px; height: 20px; cursor: pointer;">
+                    <video src="${displayUrl}" 
+                           class="image-preview"
+                           controls
+                           style="max-width: 150px; max-height: 100px; cursor: pointer;"
+                           title="Click to view full size"
+                           onclick="openLightbox('${displayUrl}', 'Uploaded Video')">
+                    </video>
+                    <input type="text" class="form-input" value="${storageValue}" data-array="image_gallery" onchange="updateGalleryImagePreview(this)">
+                    <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
+                `;
+            } else {
+                // For images, show an image preview
+                div.innerHTML = `
+                    <input type="checkbox" class="gallery-checkbox" data-image-url="${displayUrl}" onchange="updateSelectedCount()" style="width: 20px; height: 20px; cursor: pointer;">
+                    <img src="${displayUrl}" 
+                         alt="Uploaded image"
+                         class="image-preview"
+                         onclick="openLightbox('${displayUrl}', 'Uploaded Image')"
+                         onerror="this.className='no-image'; this.alt='Failed to load';"
+                         title="Click to view full size">
+                    <input type="text" class="form-input" value="${storageValue}" data-array="image_gallery" onchange="updateGalleryImagePreview(this)">
+                    <button type="button" class="btn btn-danger btn-small" onclick="removeArrayItem(this)">Remove</button>
+                `;
+            }
+            
+            container.appendChild(div);
+            
+            uploadStatus.textContent = `✅ ${fileType} uploaded successfully!`;
+            uploadStatus.style.color = '#4CAF50';
+            
+            // Clear status after 3 seconds
+            setTimeout(() => {
+                uploadStatus.textContent = '';
+            }, 3000);
+            
+            // Clear the file input
+            event.target.value = '';
+            
+        } catch (error) {
+            console.error('❌ Upload error:', error);
+            uploadStatus.textContent = `❌ Upload failed: ${error.message}`;
+            uploadStatus.style.color = '#f44336';
+            event.target.value = '';
+        }
+    }
+
+    // ===========================
     // BULK IMAGE DOWNLOAD
     // ===========================
     // Note: Lightbox functions (openLightbox, closeLightbox) are loaded from lightbox.js
@@ -1038,6 +1237,313 @@
         }
     }
 
+    // VIDEO GENERATION FROM IMAGE
+    let selectedVideoImageUrl = null;
+
+    async function generateVideoFromImage() {
+        const checkboxes = document.querySelectorAll('.gallery-checkbox:checked');
+        
+        console.log('🎬 generateVideoFromImage called, found', checkboxes.length, 'checked boxes');
+        
+        if (checkboxes.length === 0) {
+            alert('Please select one image to generate a video from');
+            return;
+        }
+
+        if (checkboxes.length > 1) {
+            alert('Please select only one image for video generation');
+            return;
+        }
+
+        const imageUrl = checkboxes[0].dataset.imageUrl;
+        console.log('🎬 Image URL from checkbox:', imageUrl);
+        
+        if (!imageUrl) {
+            alert('No valid image URL selected');
+            return;
+        }
+
+        // Store the selected image URL
+        selectedVideoImageUrl = imageUrl;
+        console.log('🎬 Stored selectedVideoImageUrl:', selectedVideoImageUrl);
+
+        // Show the image preview in modal
+        document.getElementById('videoGenImagePreview').src = imageUrl;
+
+        // Load prompts into dropdown
+        await loadVideoGenPrompts();
+
+        // Reset form
+        document.getElementById('videoGenPromptSelect').value = '';
+        document.getElementById('videoGenMotion').value = '';
+        updateVideoPromptPreview();
+
+        // Open modal
+        document.getElementById('videoGenModal').classList.add('active');
+    }
+
+    async function loadVideoGenPrompts() {
+        try {
+            const response = await fetch('/api/prompts');
+            if (!response.ok) throw new Error('Failed to load prompts');
+            
+            const result = await response.json();
+            const prompts = result.data || [];
+            const select = document.getElementById('videoGenPromptSelect');
+            
+            // Clear existing options except first one
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+
+            // Add prompts as options
+            prompts.forEach(prompt => {
+                const option = document.createElement('option');
+                option.value = prompt.id;
+                option.textContent = prompt.title;
+                option.dataset.content = prompt.content;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading prompts:', error);
+        }
+    }
+
+    function updateVideoPromptPreview() {
+        const select = document.getElementById('videoGenPromptSelect');
+        const promptPreview = document.getElementById('videoPromptPreview');
+        const motionInput = document.getElementById('videoGenMotion');
+        const fullPromptDiv = document.getElementById('videoFullPrompt');
+
+        const selectedOption = select.options[select.selectedIndex];
+        const promptContent = selectedOption.dataset.content || '';
+        const motionGuidance = motionInput.value.trim();
+
+        // Update prompt preview
+        if (promptContent) {
+            promptPreview.textContent = promptContent;
+            promptPreview.style.fontStyle = 'normal';
+            promptPreview.style.color = '#333';
+        } else {
+            promptPreview.textContent = 'No prompt selected';
+            promptPreview.style.fontStyle = 'italic';
+            promptPreview.style.color = '#666';
+        }
+
+        // Update full combined prompt
+        let fullPrompt = '';
+        if (promptContent && motionGuidance) {
+            fullPrompt = `${promptContent}. ${motionGuidance}`;
+        } else if (promptContent) {
+            fullPrompt = promptContent;
+        } else if (motionGuidance) {
+            fullPrompt = motionGuidance;
+        } else {
+            fullPrompt = 'Enter motion guidance above';
+        }
+
+        fullPromptDiv.textContent = fullPrompt;
+        fullPromptDiv.style.color = (promptContent || motionGuidance) ? '#333' : '#999';
+    }
+
+    function closeVideoGenModal() {
+        document.getElementById('videoGenModal').classList.remove('active');
+        selectedVideoImageUrl = null;
+    }
+
+    async function startVideoGeneration() {
+        console.log('🎬 startVideoGeneration called, selectedVideoImageUrl:', selectedVideoImageUrl);
+        
+        const motionInput = document.getElementById('videoGenMotion');
+        const select = document.getElementById('videoGenPromptSelect');
+        
+        // Check if we have an image selected and save it BEFORE closing modal
+        if (!selectedVideoImageUrl) {
+            console.error('❌ No selectedVideoImageUrl! This should have been set by generateVideoFromImage');
+            alert('No image selected. Please close this modal and select an image first.');
+            return;
+        }
+        
+        // Save the image URL before closing modal (which resets it)
+        const imageUrlToUse = selectedVideoImageUrl;
+        
+        const selectedOption = select.options[select.selectedIndex];
+        const promptContent = selectedOption.dataset.content || '';
+        const motionGuidance = motionInput.value.trim();
+
+        if (!motionGuidance && !promptContent) {
+            alert('Please enter camera motion guidance or select a prompt');
+            return;
+        }
+
+        // Combine prompt and motion
+        let fullPrompt = '';
+        if (promptContent && motionGuidance) {
+            fullPrompt = `${promptContent}. ${motionGuidance}`;
+        } else if (promptContent) {
+            fullPrompt = promptContent;
+        } else {
+            fullPrompt = motionGuidance;
+        }
+
+        console.log('🎬 Full video prompt:', fullPrompt);
+
+        // Close modal (this will reset selectedVideoImageUrl, but we saved it above)
+        closeVideoGenModal();
+
+        const videoGenBtn = document.getElementById('videoGenBtn');
+        const originalText = videoGenBtn.innerHTML;
+        
+        videoGenBtn.disabled = true;
+        videoGenBtn.innerHTML = '⏳ Starting Veo 3.1 generation...';
+
+        try {
+            // Convert relative URL to absolute if needed
+            let fullImageUrl = imageUrlToUse;
+            console.log('🎬 Before conversion - imageUrlToUse:', imageUrlToUse);
+            console.log('🎬 window.location.origin:', window.location.origin);
+            
+            if (fullImageUrl && fullImageUrl.startsWith('/')) {
+                fullImageUrl = window.location.origin + fullImageUrl;
+                console.log('🎬 After conversion - fullImageUrl:', fullImageUrl);
+            }
+
+            console.log('🎬 Starting Veo 3.1 video generation from:', fullImageUrl);
+
+            // Start video generation with Google Veo 3.1
+            const response = await fetch('/api/generate/video', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    imageUrl: fullImageUrl,
+                    prompt: fullPrompt,
+                    contentType: contentType,
+                    contentId: contentId
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Video generation failed');
+            }
+
+            const result = await response.json();
+            console.log('✅ Video generation started:', result.operationId);
+
+            videoGenBtn.innerHTML = '⏳ Generating video with Veo 3.1 (2-5 minutes)...';
+
+            // Poll for completion
+            await pollVideoGeneration(result.operationId, videoGenBtn, originalText);
+
+        } catch (error) {
+            console.error('Error generating video:', error);
+            alert('Failed to generate video: ' + error.message);
+            videoGenBtn.innerHTML = originalText;
+            videoGenBtn.disabled = false;
+        }
+    }
+
+    // Add event listener for motion input to update preview
+    document.addEventListener('DOMContentLoaded', function() {
+        const motionInput = document.getElementById('videoGenMotion');
+        if (motionInput) {
+            motionInput.addEventListener('input', updateVideoPromptPreview);
+        }
+    });
+
+    // Poll for video generation completion
+    async function pollVideoGeneration(operationId, button, originalText) {
+        const maxAttempts = 60; // 5 minutes with 5-second intervals
+        let attempts = 0;
+
+        const pollInterval = setInterval(async () => {
+            attempts++;
+
+            try {
+                // URL-encode the operation ID since it contains slashes
+                const encodedOperationId = encodeURIComponent(operationId);
+                const response = await fetch(`/api/generate/video/status/${encodedOperationId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to check video status');
+                }
+
+                const result = await response.json();
+
+                if (result.status === 'succeeded') {
+                    clearInterval(pollInterval);
+                    
+                    button.innerHTML = '💾 Downloading video...';
+                    
+                    // Download the video
+                    try {
+                        const downloadResponse = await fetch(`/api/generate/video/download/${encodedOperationId}`, {
+                            method: 'POST'
+                        });
+                        
+                        if (!downloadResponse.ok) {
+                            throw new Error('Failed to download video');
+                        }
+                        
+                        // Get the video as blob
+                        const blob = await downloadResponse.blob();
+                        
+                        // Trigger download
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = `veo-video-${Date.now()}.mp4`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
+                        
+                        button.innerHTML = '✅ Video generated and downloaded!';
+                        
+                        setTimeout(() => {
+                            button.innerHTML = originalText;
+                            button.disabled = false;
+                        }, 3000);
+                        
+                    } catch (downloadError) {
+                        console.error('Download error:', downloadError);
+                        alert('Video generated but download failed: ' + downloadError.message);
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    }
+                    
+                } else if (result.status === 'failed') {
+                    clearInterval(pollInterval);
+                    alert('Video generation failed: ' + (result.error || 'Unknown error'));
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                    
+                } else {
+                    // Still processing
+                    const elapsed = Math.floor((attempts * 5) / 60);
+                    button.innerHTML = `⏳ Generating with Veo 3.1... (${elapsed}m ${(attempts * 5) % 60}s)`;
+                }
+
+                // Timeout after max attempts
+                if (attempts >= maxAttempts) {
+                    clearInterval(pollInterval);
+                    alert('Video generation is taking longer than expected. Please check back later.');
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+
+            } catch (error) {
+                console.error('Error polling video status:', error);
+                clearInterval(pollInterval);
+                alert('Error checking video status: ' + error.message);
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+
+        }, 5000); // Poll every 5 seconds
+    }
+
     // Update image preview when URL changes
     function updateImagePreview(input) {
         const url = input.value.trim();
@@ -1117,7 +1623,32 @@
 
     function getArrayValues(arrayName) {
         const inputs = document.querySelectorAll(`input[data-array="${arrayName}"]`);
-        return Array.from(inputs).map(input => input.value.trim()).filter(val => val !== '');
+        const cdnUrl = '<%= cdnUrl %>';
+        
+        return Array.from(inputs)
+            .map(input => {
+                let value = input.value.trim();
+                // Strip CDN URL prefix if present to store only relative paths
+                if (value.startsWith(cdnUrl + '/')) {
+                    value = value.substring(cdnUrl.length + 1);
+                }
+                // Also handle cloudfront URLs
+                if (value.includes('.cloudfront.net/')) {
+                    const cloudfrontMatch = value.match(/\.cloudfront\.net\/(.+)$/);
+                    if (cloudfrontMatch) {
+                        value = cloudfrontMatch[1];
+                    }
+                }
+                // Also handle direct S3 URLs
+                if (value.includes('.s3.') && value.includes('.amazonaws.com/')) {
+                    const s3Match = value.match(/\.amazonaws\.com\/(.+)$/);
+                    if (s3Match) {
+                        value = s3Match[1];
+                    }
+                }
+                return value;
+            })
+            .filter(val => val !== '');
     }
 
     // Handle audio file selection

@@ -26,12 +26,25 @@
      * @param {string} imageInfo - Optional description text shown at bottom
      */
     window.openLightbox = function(imageUrl, imageInfo) {
+        console.log('🖼️ openLightbox called:', { imageUrl, imageInfo });
+        
         const lightbox = document.getElementById('imageLightbox');
         const lightboxImage = document.getElementById('lightboxImage');
         const lightboxInfoDiv = document.getElementById('lightboxInfo');
         
+        console.log('📦 Lightbox elements:', { 
+            lightbox: !!lightbox, 
+            lightboxImage: !!lightboxImage, 
+            lightboxInfoDiv: !!lightboxInfoDiv 
+        });
+        
         if (!lightbox || !lightboxImage || !lightboxInfoDiv) {
-            console.error('Lightbox elements not found. Make sure HTML structure is present.');
+            console.error('❌ Lightbox elements not found. Make sure HTML structure is present.');
+            console.error('Missing elements:', {
+                lightbox: !lightbox ? 'imageLightbox' : null,
+                lightboxImage: !lightboxImage ? 'lightboxImage' : null,
+                lightboxInfoDiv: !lightboxInfoDiv ? 'lightboxInfo' : null
+            });
             return;
         }
 
@@ -40,6 +53,8 @@
         
         lightbox.classList.add('active');
         document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        
+        console.log('✅ Lightbox opened successfully');
     };
 
     /**

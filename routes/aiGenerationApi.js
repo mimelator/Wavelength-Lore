@@ -273,13 +273,14 @@ async function uploadImageToS3(imageBuffer, contentType, contentId, mimeType, me
   const command = new PutObjectCommand(uploadParams);
   await s3Client.send(command);
   
-  // Construct the CloudFront/CDN URL
-  const cdnUrl = process.env.CDN_URL || 'https://df5sj8f594cdx.cloudfront.net';
-  const imageUrl = `${cdnUrl}/${s3Key}`;
+  // Return relative path instead of full CDN URL
+  // This makes URLs portable between environments (local/production)
+  const relativePath = `/${s3Key}`;
   
-  console.log(`✅ Image uploaded to S3: ${imageUrl}`);
+  console.log(`✅ Image uploaded to S3: ${s3Key}`);
+  console.log(`📝 Storing relative path: ${relativePath}`);
   
-  return imageUrl;
+  return relativePath;
 }
 
 /**
