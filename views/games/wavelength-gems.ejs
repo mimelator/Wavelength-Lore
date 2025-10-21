@@ -13,6 +13,8 @@
             min-height: 100vh;
             background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(75, 0, 130, 0.1));
             padding: 20px;
+            position: relative;
+            z-index: 10;
         }
 
         .gems-game-container {
@@ -240,10 +242,14 @@
         </div>
     </main>
 
+    <!-- Background Gallery - Images from currently playing radio song -->
+    <div id="game-background-gallery" class="game-background-gallery"></div>
+
     <%- include('../partials/footer') %>
 
     <script src="/js/games/wavelength-gems/engine.js"></script>
     <script src="/js/games/wavelength-gems/ui.js"></script>
+    <script src="/js/games/wavelength-gems/background-gallery.js"></script>
     <script>
         // Toggle leaderboard visibility
         function toggleLeaderboard() {

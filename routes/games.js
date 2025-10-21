@@ -85,17 +85,9 @@ router.get('/api/list', groupAuth.requireAction('game_access'), async (req, res)
                     description: 'Solve puzzles based on Wavelength lore and characters',
                     thumbnail: '/images/games/lore-puzzle.jpg',
                     status: 'coming-soon',
-                    releaseDate: '2024-Q4'
+                    releaseDate: '2026-Q1'
                 },
-                {
-                    id: 'wavelength-quest',
-                    title: 'Wavelength Quest',
-                    description: 'An interactive adventure through the Wavelength universe',
-                    thumbnail: '/images/games/wavelength-quest.jpg',
-                    status: 'coming-soon',
-                    releaseDate: '2024-Q4'
-                }
-            ],
+        ],
             userGroup: req.userGroups[0] || 'user'
         });
     } catch (error) {
