@@ -393,8 +393,16 @@ router.get('/lore/:loreId', async (req, res) => {
       return res.status(404).send('Lore not found');
     }
 
+    // Debug logging
+    console.log(`🔍 Lore access check for ${loreId}:`, {
+      hidden: loreItem.hidden,
+      visible: loreItem.visible,
+      isContentCreator: res.locals.isContentCreator
+    });
+
     // Check visibility - if hidden and user is not a content creator, show 404
     if (loreItem.hidden && !res.locals.isContentCreator) {
+      console.log(`❌ Access denied to hidden lore: ${loreId}`);
       return res.status(404).send('Lore not found');
     }
 

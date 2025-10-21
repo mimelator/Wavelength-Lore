@@ -84,7 +84,8 @@ async function fetchEpisodesFromDatabase() {
                 youtubeLink: episodeData.youtubeLink,
                 image: episodeData.image,
                 keywords: episodeData.keywords || [], // Include keywords field
-                visible: episodeData.visible // Include visibility field for filtering
+                visible: episodeData.visible, // Legacy field (keep for backwards compatibility)
+                hidden: episodeData.hidden // New visibility field
               });
             }
           }

@@ -105,7 +105,8 @@ async function fetchLoreFromDatabase() {
             image: loreItem.image,
             image_gallery: loreItem.image_gallery,
             type: loreItem.type,
-            visible: loreItem.visible // Include visibility field for filtering
+            visible: loreItem.visible, // Legacy field (keep for backwards compatibility)
+            hidden: loreItem.hidden // New visibility field
           });
         }
       }

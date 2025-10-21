@@ -88,7 +88,8 @@ async function fetchCharactersFromDatabase() {
         url: `/character/${char.id}`,
         description: char.description,
         image: char.image,
-        visible: char.visible // Include visibility field for filtering
+        visible: char.visible, // Legacy field (keep for backwards compatibility)
+        hidden: char.hidden // New visibility field
       }));
       
       return allCharacters;
