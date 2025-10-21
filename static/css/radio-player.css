@@ -1294,8 +1294,10 @@
     z-index: 1;
 }
 
-/* Transition Effects - Disable animation when using transitions */
-.screensaver-gallery img[class*="transition-"] {
+/* Transition Effects - Can coexist with filter animation */
+
+/* Disable animation when user turns it off */
+.screensaver-gallery img.no-animation {
     animation: none !important;
 }
 

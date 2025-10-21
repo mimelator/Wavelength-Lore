@@ -1138,6 +1138,12 @@ class WavelengthRadio {
                 preferences.transition = activeTransitionBtn.dataset.transition;
             }
 
+            // Save animation preference
+            const activeAnimationBtn = document.querySelector('.animation-btn.active');
+            if (activeAnimationBtn) {
+                preferences.animation = activeAnimationBtn.dataset.animation;
+            }
+
             // Save summary preference
             const activeSummaryBtn = document.querySelector('.summary-btn.active');
             if (activeSummaryBtn) {
@@ -1219,6 +1225,18 @@ class WavelengthRadio {
                     }
                 });
             }
+
+            // Restore animation preference (default to 'on')
+            const animationPref = preferences.animation || 'on';
+            document.querySelectorAll('.animation-btn').forEach(btn => {
+                if (btn.dataset.animation === animationPref) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            // Apply animation state to images
+            this.updateImageAnimation();
 
             // Restore summary preference
             if (preferences.summary) {
@@ -1387,6 +1405,25 @@ class WavelengthRadio {
                 const transition = btn.dataset.transition;
                 localStorage.setItem('wavelength_screensaver_transitions', transition);
                 console.log(`🎞️ Image transitions: ${transition}`);
+                this.saveScreenSaverPreferences();
+            });
+        });
+
+        // Bind animation buttons
+        const animationBtns = document.querySelectorAll('.animation-btn');
+        animationBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Remove active class from all animation buttons
+                animationBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                // Save animation preference
+                const animation = btn.dataset.animation;
+                localStorage.setItem('wavelength_screensaver_animation', animation);
+                console.log(`🌈 Image animation: ${animation}`);
+                // Apply animation state to all images
+                this.updateImageAnimation();
                 this.saveScreenSaverPreferences();
             });
         });
@@ -1655,6 +1692,9 @@ class WavelengthRadio {
 
         // Initialize image effects (all active by default)
         this.updateActiveImageEffects();
+
+        // Initialize image animation
+        this.updateImageAnimation();
 
         // Initialize lyrics display
         this.updateLyricsDisplay();
@@ -2146,7 +2186,7 @@ class WavelengthRadio {
 
             // Reset rotation to first image
             this.currentScreensaverIndex = 0;
-            
+
             // Update lyrics for new track
             this.updateLyricsDisplay();
 
@@ -2155,7 +2195,10 @@ class WavelengthRadio {
 
             // Update episode summary
             this.updateEpisodeSummary();
-            
+
+            // Apply animation setting to new images
+            this.updateImageAnimation();
+
             console.log(`✅ Updated screen saver with ${this.screensaverImages.length} images from new episode`);
         }
     }
@@ -2233,6 +2276,25 @@ class WavelengthRadio {
         setTimeout(() => {
             currentImg.classList.remove('fading-out');
         }, 3000); // Increased to 3s to match transition duration
+    }
+
+    updateImageAnimation() {
+        // Get animation setting from localStorage or active button (default: 'on')
+        const animationSetting = localStorage.getItem('wavelength_screensaver_animation') || 'on';
+        const gallery = document.querySelector('.screensaver-gallery');
+
+        if (!gallery) return;
+
+        const images = gallery.querySelectorAll('img');
+        images.forEach(img => {
+            if (animationSetting === 'off') {
+                img.classList.add('no-animation');
+            } else {
+                img.classList.remove('no-animation');
+            }
+        });
+
+        console.log(`🌈 Image animation ${animationSetting === 'on' ? 'enabled' : 'disabled'}`);
     }
 
     // Weather Effects System
