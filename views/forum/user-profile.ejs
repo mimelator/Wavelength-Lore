@@ -462,8 +462,8 @@
                         </div>
                     </div>
 
-                    <!-- Radio Player Game Stats & Favorites (Only visible for own profile) -->
                     ${isOwnProfile ? `
+                        <!-- Radio Player Game Stats & Favorites -->
                         <div class="radio-player-stats">
                             <h3>📻 Radio Player Game Stats</h3>
                             <div class="game-stats-grid">
@@ -526,13 +526,13 @@
                             </div>
                         </div>
                     ` : ''}
-                    
+
                     <!-- Profile Bio -->
                     <div class="profile-bio">
                         <h3>About ${escapeHtml(profile.name)}</h3>
                         <div class="bio-content">
-                            ${profile.bio ? escapeHtml(profile.bio) : 
-                              (isOwnProfile ? 'Add a bio to tell the community about yourself!' : 
+                            ${profile.bio ? escapeHtml(profile.bio) :
+                              (isOwnProfile ? 'Add a bio to tell the community about yourself!' :
                                'This user hasn\'t added a bio yet.')}
                         </div>
                         ${isOwnProfile && !profile.bio ? `
