@@ -196,7 +196,6 @@ function configureTemplateLocals(app) {
     try {
       const bannerHelpers = require('../helpers/banner-helpers');
       res.locals.activeBanners = await bannerHelpers.getActiveBanners();
-      console.log(`📢 Banner middleware: Found ${res.locals.activeBanners.length} active banners for ${req.path}`);
     } catch (error) {
       console.error('❌ Error loading banners:', error);
       res.locals.activeBanners = [];
