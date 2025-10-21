@@ -894,13 +894,73 @@
     }
 
     .game-stats {
-        flex-direction: column;
-        gap: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
         width: 95%;
+        justify-content: center;
     }
 
+    .stat-item {
+        flex: 0 0 auto;
+        min-width: 60px;
+    }
+
+    /* Make collectibles MUCH larger and easier to tap on mobile */
     .mystical-element {
-        font-size: 2rem !important;
+        font-size: 4rem !important;
+        min-width: 80px;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        touch-action: manipulation;
+    }
+
+    /* Increase tap target size for better mobile usability */
+    .mystical-element::before {
+        content: '';
+        position: absolute;
+        top: -15px;
+        left: -15px;
+        right: -15px;
+        bottom: -15px;
+        z-index: -1;
+    }
+
+    /* Hide background gallery on mobile to reduce visual clutter */
+    .background-gallery {
+        opacity: 0.3 !important;
+    }
+
+    /* Reduce playlist item height on mobile */
+    .playlist-item {
+        padding: 12px;
+        font-size: 0.85rem;
+    }
+
+    .playlist-item-title {
+        font-size: 0.9rem;
+    }
+
+    /* Stack volume control vertically on very small screens */
+    .volume-control {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* Make episode info section more compact */
+    .episode-info-section {
+        padding: 15px;
+    }
+
+    .character-badges {
+        gap: 8px;
+    }
+
+    .character-badge {
+        width: 50px;
+        height: 50px;
     }
 }
 
