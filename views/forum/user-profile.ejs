@@ -461,8 +461,8 @@
                             <div class="stat-label">Reputation</div>
                         </div>
                     </div>
-                ` + (isOwnProfile ? `
-                    <!-- Radio Player Game Stats & Favorites -->
+
+                    <!-- Radio Player Game Stats & Favorites (Always show) -->
                     <div class="radio-player-stats">
                             <h3>📻 Radio Player Game Stats</h3>
                             <div class="game-stats-grid">
@@ -524,7 +524,7 @@
                                 <p class="no-favorites">No favorite songs yet. Click the heart on any song in the <a href="/radio">Radio Player</a>!</p>
                             </div>
                         </div>
-                ` : '') + `
+
                     <!-- Profile Bio -->
                     <div class="profile-bio">
                         <h3>About ${escapeHtml(profile.name)}</h3>
