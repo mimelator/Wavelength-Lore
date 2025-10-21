@@ -223,16 +223,23 @@ class WavelengthRadio {
 
     // Initialize Firebase sync for game stats
     initFirebaseSync() {
+        console.log('🔄 Initializing Firebase sync...');
         // Wait for Firebase to be ready
         if (window.firebaseAuth && window.firebaseUtils) {
+            console.log('✅ Firebase ready, setting up auth listener');
             window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
+                console.log('👤 Radio Player auth state changed:', user ? user.uid : 'No user');
                 if (user) {
                     this.currentUserId = user.uid;
+                    console.log('✅ Set currentUserId:', this.currentUserId);
                     this.loadStatsFromFirebase();
                     this.loadFavoritesFromFirebase();
+                } else {
+                    console.log('⚠️ No authenticated user');
                 }
             });
         } else {
+            console.log('⏳ Firebase not ready, retrying in 500ms...');
             // Retry after a delay if Firebase isn't ready yet
             setTimeout(() => this.initFirebaseSync(), 500);
         }
@@ -967,8 +974,15 @@ class WavelengthRadio {
         this.updateStats();
 
         // Save to Firebase if user is authenticated
+        console.log('🎮 Checking if should save to Firebase:', {
+            hasUserId: !!this.currentUserId,
+            userId: this.currentUserId,
+            hasFirebaseDB: !!window.firebaseDB
+        });
         if (this.currentUserId) {
             this.saveStatsToFirebase();
+        } else {
+            console.log('⚠️ Not saving - no currentUserId set');
         }
 
         // Remove element
