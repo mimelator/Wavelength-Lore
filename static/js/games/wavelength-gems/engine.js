@@ -168,12 +168,15 @@ function swapGems(row1, col1, row2, col2) {
         if (matches.length > 0) {
             // Found matches - start combo at 1
             gameState.combo = 1;
+            console.log('🎮 Match found! Combo reset to:', gameState.combo, 'Matches:', matches.length);
             playSound('match');
             animateMatches(matches);
         } else {
             // No match - swap back with animation
             [gameState.board[row1][col1], gameState.board[row2][col2]] =
             [gameState.board[row2][col2], gameState.board[row1][col1]];
+            console.log('❌ No match. Combo reset to 0');
+            gameState.combo = 0;
             playSound('invalid');
             animateSwap(row1, col1, row2, col2);
 
@@ -275,8 +278,14 @@ function showComboIndicator() {
 
     document.body.appendChild(indicator);
 
-    // Remove after animation
-    setTimeout(() => indicator.remove(), 400);
+    console.log('🎊 Showing combo indicator:', gameState.combo);
+
+    // Remove after animation (400ms for animation + 100ms display time)
+    setTimeout(() => {
+        if (indicator.parentNode) {
+            indicator.remove();
+        }
+    }, 500);
 }
 
 /**
@@ -361,9 +370,11 @@ function animateGravity() {
             const newMatches = findMatches();
             if (newMatches.length > 0) {
                 gameState.combo++;
+                console.log('🔄 Cascade match! Combo incremented to:', gameState.combo, 'Matches:', newMatches.length);
                 playSound('match');
                 animateMatches(newMatches);
             } else {
+                console.log('✅ No more cascades. Combo final:', gameState.combo);
                 gameState.combo = 0;
                 gameState.isAnimating = false;
                 updateUI();
