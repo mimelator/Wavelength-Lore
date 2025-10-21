@@ -67,6 +67,18 @@ router.get('/cache-management', (req, res) => {
 });
 
 /**
+ * Banner management page route
+ */
+router.get('/admin/banners', (req, res) => {
+  res.render('banner-admin', { 
+    title: 'Banner Management', 
+    cdnUrl: process.env.CDN_URL, 
+    version: `v${Date.now()}`,
+    req: req
+  });
+});
+
+/**
  * Main admin panel route - redirects to forum admin
  */
 router.get('/admin', adminAuth, (_req, res) => {

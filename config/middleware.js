@@ -191,6 +191,18 @@ function configureTemplateLocals(app) {
     next();
   });
 
+  // Middleware to load active banners for all pages
+  app.use(async (req, res, next) => {
+    try {
+      const bannerHelpers = require('../helpers/banner-helpers');
+      res.locals.activeBanners = await bannerHelpers.getActiveBanners();
+    } catch (error) {
+      console.error('Error loading banners:', error);
+      res.locals.activeBanners = [];
+    }
+    next();
+  });
+
   // Middleware to add character, lore, and episode helpers to all templates
   app.use(async (req, res, next) => {
     // Get visibility filter based on user role

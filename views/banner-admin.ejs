@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banner Management - Wavelength Admin</title>
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/styles.css">
+  <style>
+    .banner-admin {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .create-banner-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .create-banner-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .banner-list {
+      display: grid;
+      gap: 20px;
+    }
+
+    .banner-card {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .banner-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .banner-card.inactive {
+      opacity: 0.6;
+      background: #f5f5f5;
+    }
+
+    .banner-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .banner-status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-info { background: #e3f2fd; color: #1565c0; }
+    .status-success { background: #e8f5e9; color: #2e7d32; }
+    .status-warning { background: #fff3e0; color: #e65100; }
+    .status-alert { background: #ffebee; color: #c62828; }
+    .status-announcement { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+
+    .banner-message {
+      font-size: 16px;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+
+    .banner-meta {
+      display: flex;
+      gap: 20px;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .banner-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-toggle {
+      background: #4caf50;
+      color: white;
+    }
+
+    .btn-toggle.inactive {
+      background: #9e9e9e;
+    }
+
+    .btn-edit {
+      background: #2196f3;
+      color: white;
+    }
+
+    .btn-delete {
+      background: #f44336;
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 30px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <%- include('../partials/header') %>
+
+  <div class="banner-admin">
+    <div class="admin-header">
+      <div>
+        <h1>📢 Banner Management</h1>
+        <p>Create and manage sitewide announcements, alerts, and messages</p>
+      </div>
+      <button class="create-banner-btn" onclick="openCreateModal()">
+        ➕ Create Banner
+      </button>
+    </div>
+
+    <div id="banner-list" class="banner-list">
+      <div class="empty-state">
+        <div class="empty-state-icon">⏳</div>
+        <p>Loading banners...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create/Edit Banner Modal -->
+  <div id="banner-modal" class="modal">
+    <div class="modal-content">
+      <h2 id="modal-title">Create New Banner</h2>
+      <form id="banner-form" onsubmit="saveBanner(event)">
+        <input type="hidden" id="banner-id" value="">
+        
+        <div class="form-group">
+          <label for="banner-message">Message *</label>
+          <textarea id="banner-message" required placeholder="Enter your banner message here..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="banner-status">Status Type *</label>
+            <select id="banner-status" required>
+              <option value="info">ℹ️ Info (Blue)</option>
+              <option value="success">✅ Success (Green)</option>
+              <option value="warning">⚠️ Warning (Orange)</option>
+              <option value="alert">🚨 Alert (Red)</option>
+              <option value="announcement">📢 Announcement (Purple)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="banner-priority">Priority</label>
+            <input type="number" id="banner-priority" value="0" min="0" max="100" placeholder="0-100">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="banner-link">Link (optional)</label>
+            <input type="url" id="banner-link" placeholder="https://example.com">
+          </div>
+
+          <div class="form-group">
+            <label for="banner-link-text">Link Text (optional)</label>
+            <input type="text" id="banner-link-text" placeholder="Learn More">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="banner-start-date">Start Date (optional)</label>
+            <input type="datetime-local" id="banner-start-date">
+          </div>
+
+          <div class="form-group">
+            <label for="banner-end-date">End Date (optional)</label>
+            <input type="datetime-local" id="banner-end-date">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="banner-active" checked>
+            <label for="banner-active">Active (visible on site)</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="banner-dismissible" checked>
+            <label for="banner-dismissible">Dismissible (users can close it)</label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn create-banner-btn">Save Banner</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="<%= cdnUrl %>/js/firebase-config.js?v=<%= Date.now() %>"></script>
+  <script>
+    let banners = [];
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      loadBanners();
+    });
+
+    async function checkAuth() {
+      // Wait for Firebase to initialize
+      if (!window.firebaseAuth) {
+        setTimeout(checkAuth, 100);
+        return;
+      }
+
+      const user = window.firebaseAuth.currentUser;
+      if (!user) {
+        window.location.href = '/forum';
+        return;
+      }
+    }
+
+    async function loadBanners() {
+      try {
+        const response = await fetch('/api/banners', {
+          headers: {
+            'Authorization': `Bearer ${await window.firebaseAuth.currentUser.getIdToken()}`
+          }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          banners = data.banners;
+          renderBanners();
+        } else {
+          showError('Failed to load banners');
+        }
+      } catch (error) {
+        console.error('Error loading banners:', error);
+        showError('Failed to load banners');
+      }
+    }
+
+    function renderBanners() {
+      const container = document.getElementById('banner-list');
+      
+      if (banners.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h3>No banners yet</h3>
+            <p>Create your first banner to get started!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = banners.map(banner => `
+        <div class="banner-card ${banner.active === false ? 'inactive' : ''}">
+          <div class="banner-card-header">
+            <span class="banner-status-badge status-${banner.status}">
+              ${getBannerIcon(banner.status)} ${banner.status}
+            </span>
+            <span style="color: ${banner.active === false ? '#999' : '#4caf50'}; font-weight: 600;">
+              ${banner.active === false ? '● Inactive' : '● Active'}
+            </span>
+          </div>
+          
+          <div class="banner-message">${banner.message}</div>
+          
+          <div class="banner-meta">
+            ${banner.link ? `<span>🔗 Has link</span>` : ''}
+            ${banner.dismissible !== false ? `<span>✕ Dismissible</span>` : '<span>🔒 Permanent</span>'}
+            ${banner.priority ? `<span>⭐ Priority: ${banner.priority}</span>` : ''}
+            ${banner.startDate ? `<span>📅 Start: ${new Date(banner.startDate).toLocaleDateString()}</span>` : ''}
+            ${banner.endDate ? `<span>🏁 End: ${new Date(banner.endDate).toLocaleDateString()}</span>` : ''}
+          </div>
+          
+          <div class="banner-actions">
+            <button class="btn btn-toggle ${banner.active === false ? 'inactive' : ''}" onclick="toggleBanner('${banner.id}')">
+              ${banner.active === false ? '▶️ Activate' : '⏸️ Deactivate'}
+            </button>
+            <button class="btn btn-edit" onclick="editBanner('${banner.id}')">
+              ✏️ Edit
+            </button>
+            <button class="btn btn-delete" onclick="deleteBanner('${banner.id}')">
+              🗑️ Delete
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function getBannerIcon(status) {
+      const icons = {
+        info: 'ℹ️',
+        success: '✅',
+        warning: '⚠️',
+        alert: '🚨',
+        announcement: '📢'
+      };
+      return icons[status] || 'ℹ️';
+    }
+
+    function openCreateModal() {
+      document.getElementById('modal-title').textContent = 'Create New Banner';
+      document.getElementById('banner-form').reset();
+      document.getElementById('banner-id').value = '';
+      document.getElementById('banner-modal').classList.add('active');
+    }
+
+    function editBanner(id) {
+      const banner = banners.find(b => b.id === id);
+      if (!banner) return;
+
+      document.getElementById('modal-title').textContent = 'Edit Banner';
+      document.getElementById('banner-id').value = id;
+      document.getElementById('banner-message').value = banner.message;
+      document.getElementById('banner-status').value = banner.status;
+      document.getElementById('banner-priority').value = banner.priority || 0;
+      document.getElementById('banner-link').value = banner.link || '';
+      document.getElementById('banner-link-text').value = banner.linkText || '';
+      document.getElementById('banner-active').checked = banner.active !== false;
+      document.getElementById('banner-dismissible').checked = banner.dismissible !== false;
+      
+      if (banner.startDate) {
+        document.getElementById('banner-start-date').value = new Date(banner.startDate).toISOString().slice(0, 16);
+      }
+      if (banner.endDate) {
+        document.getElementById('banner-end-date').value = new Date(banner.endDate).toISOString().slice(0, 16);
+      }
+
+      document.getElementById('banner-modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('banner-modal').classList.remove('active');
+    }
+
+    async function saveBanner(event) {
+      event.preventDefault();
+
+      const id = document.getElementById('banner-id').value;
+      const bannerData = {
+        message: document.getElementById('banner-message').value,
+        status: document.getElementById('banner-status').value,
+        priority: parseInt(document.getElementById('banner-priority').value) || 0,
+        link: document.getElementById('banner-link').value || null,
+        linkText: document.getElementById('banner-link-text').value || null,
+        active: document.getElementById('banner-active').checked,
+        dismissible: document.getElementById('banner-dismissible').checked,
+        startDate: document.getElementById('banner-start-date').value ? new Date(document.getElementById('banner-start-date').value).getTime() : null,
+        endDate: document.getElementById('banner-end-date').value ? new Date(document.getElementById('banner-end-date').value).getTime() : null
+      };
+
+      try {
+        const token = await window.firebaseAuth.currentUser.getIdToken();
+        const url = id ? `/api/banners/${id}` : '/api/banners';
+        const method = id ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(bannerData)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          closeModal();
+          loadBanners();
+          showSuccess(id ? 'Banner updated!' : 'Banner created!');
+        } else {
+          showError(data.error || 'Failed to save banner');
+        }
+      } catch (error) {
+        console.error('Error saving banner:', error);
+        showError('Failed to save banner');
+      }
+    }
+
+    async function toggleBanner(id) {
+      try {
+        const token = await window.firebaseAuth.currentUser.getIdToken();
+        const response = await fetch(`/api/banners/${id}/toggle`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          loadBanners();
+          showSuccess('Banner status updated!');
+        } else {
+          showError(data.error || 'Failed to toggle banner');
+        }
+      } catch (error) {
+        console.error('Error toggling banner:', error);
+        showError('Failed to toggle banner');
+      }
+    }
+
+    async function deleteBanner(id) {
+      if (!confirm('Are you sure you want to delete this banner? This cannot be undone.')) {
+        return;
+      }
+
+      try {
+        const token = await window.firebaseAuth.currentUser.getIdToken();
+        const response = await fetch(`/api/banners/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          loadBanners();
+          showSuccess('Banner deleted!');
+        } else {
+          showError(data.error || 'Failed to delete banner');
+        }
+      } catch (error) {
+        console.error('Error deleting banner:', error);
+        showError('Failed to delete banner');
+      }
+    }
+
+    function showSuccess(message) {
+      alert(message); // You can replace with a nicer notification
+    }
+
+    function showError(message) {
+      alert('Error: ' + message); // You can replace with a nicer notification
+    }
+
+    // Close modal on outside click
+    document.getElementById('banner-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'banner-modal') {
+        closeModal();
+      }
+    });
+  </script>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

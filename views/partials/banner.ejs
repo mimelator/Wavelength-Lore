@@ -1,0 +1,242 @@
+<!-- Sitewide Banner Component -->
+<% if (typeof activeBanners !== 'undefined' && activeBanners && activeBanners.length > 0) { %>
+  <div id="sitewide-banners">
+    <% activeBanners.forEach((banner, index) => { %>
+      <div class="sitewide-banner banner-<%= banner.status %> <%= banner.dismissible ? 'dismissible' : '' %>" 
+           data-banner-id="<%= banner.id %>"
+           id="banner-<%= banner.id %>">
+        <div class="banner-content">
+          <div class="banner-icon">
+            <% if (banner.status === 'info') { %>
+              ℹ️
+            <% } else if (banner.status === 'success') { %>
+              ✅
+            <% } else if (banner.status === 'warning') { %>
+              ⚠️
+            <% } else if (banner.status === 'alert') { %>
+              🚨
+            <% } else if (banner.status === 'announcement') { %>
+              📢
+            <% } %>
+          </div>
+          
+          <div class="banner-message">
+            <%= banner.message %>
+            
+            <% if (banner.link && banner.linkText) { %>
+              <a href="<%= banner.link %>" class="banner-link"><%= banner.linkText %> →</a>
+            <% } %>
+          </div>
+          
+          <% if (banner.dismissible) { %>
+            <button class="banner-dismiss" onclick="dismissBanner('<%= banner.id %>')" aria-label="Dismiss banner">
+              ✕
+            </button>
+          <% } %>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+
+  <style>
+    #sitewide-banners {
+      position: relative;
+      z-index: 1000;
+    }
+
+    .sitewide-banner {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 14px;
+      line-height: 1.5;
+      position: relative;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .banner-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .banner-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .banner-message {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .banner-link {
+      margin-left: 8px;
+      text-decoration: underline;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .banner-dismiss {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px 8px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .banner-dismiss:hover {
+      opacity: 1;
+    }
+
+    /* Status-specific styling */
+    .banner-info {
+      background-color: #e3f2fd;
+      color: #1565c0;
+      border-bottom: 2px solid #1976d2;
+    }
+
+    .banner-info .banner-link {
+      color: #0d47a1;
+    }
+
+    .banner-success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      border-bottom: 2px solid #43a047;
+    }
+
+    .banner-success .banner-link {
+      color: #1b5e20;
+    }
+
+    .banner-warning {
+      background-color: #fff3e0;
+      color: #e65100;
+      border-bottom: 2px solid #f57c00;
+    }
+
+    .banner-warning .banner-link {
+      color: #bf360c;
+    }
+
+    .banner-alert {
+      background-color: #ffebee;
+      color: #c62828;
+      border-bottom: 2px solid #e53935;
+    }
+
+    .banner-alert .banner-link {
+      color: #b71c1c;
+    }
+
+    .banner-announcement {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #ffffff;
+      border-bottom: 2px solid #5a67d8;
+    }
+
+    .banner-announcement .banner-link {
+      color: #ffffff;
+      text-decoration-color: rgba(255, 255, 255, 0.7);
+    }
+
+    .banner-announcement .banner-dismiss {
+      color: #ffffff;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sitewide-banner {
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+
+      .banner-icon {
+        font-size: 18px;
+      }
+
+      .banner-link {
+        display: block;
+        margin-top: 4px;
+        margin-left: 0;
+      }
+    }
+  </style>
+
+  <script>
+    // Dismiss banner and remember choice
+    function dismissBanner(bannerId) {
+      const banner = document.getElementById('banner-' + bannerId);
+      if (banner) {
+        banner.style.animation = 'slideUp 0.3s ease-out';
+        banner.style.animationFillMode = 'forwards';
+        
+        setTimeout(() => {
+          banner.remove();
+          
+          // Check if no more banners
+          const container = document.getElementById('sitewide-banners');
+          if (container && container.children.length === 0) {
+            container.remove();
+          }
+        }, 300);
+        
+        // Remember dismissal in localStorage
+        const dismissedBanners = JSON.parse(localStorage.getItem('dismissedBanners') || '[]');
+        if (!dismissedBanners.includes(bannerId)) {
+          dismissedBanners.push(bannerId);
+          localStorage.setItem('dismissedBanners', JSON.stringify(dismissedBanners));
+        }
+      }
+    }
+
+    // Check for previously dismissed banners
+    (function() {
+      const dismissedBanners = JSON.parse(localStorage.getItem('dismissedBanners') || '[]');
+      dismissedBanners.forEach(bannerId => {
+        const banner = document.getElementById('banner-' + bannerId);
+        if (banner) {
+          banner.remove();
+        }
+      });
+      
+      // Clean up container if empty
+      const container = document.getElementById('sitewide-banners');
+      if (container && container.children.length === 0) {
+        container.remove();
+      }
+    })();
+
+    // Slideup animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideUp {
+        to {
+          opacity: 0;
+          transform: translateY(-20px);
+          max-height: 0;
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+<% } %>

@@ -70,6 +70,10 @@ async function createApp() {
   // Mount content API routes (protected by authentication)
   app.use('/', contentApiRoutes);
 
+  // Mount banner API routes (protected by authentication)
+  const bannerApiRoutes = require('./routes/bannerApi');
+  app.use('/', bannerApiRoutes);
+
   // Mount audio upload routes (protected by authentication)
   app.use('/', uploadAudioRoutes);
 
