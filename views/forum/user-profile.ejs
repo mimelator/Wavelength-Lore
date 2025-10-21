@@ -581,12 +581,10 @@
                 </div>
             `;
 
-            // Load radio player stats if this is the user's own profile
-            if (isOwnProfile) {
-                setTimeout(() => {
-                    loadRadioPlayerStats();
-                }, 100);
-            }
+            // Always load radio player stats (they're always visible now)
+            setTimeout(() => {
+                loadRadioPlayerStats();
+            }, 100);
         }
         
         function updateUserPosts(posts) {
