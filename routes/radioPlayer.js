@@ -64,7 +64,7 @@ async function getEnhancedPlaylist() {
           episodeUrl: `/season/${track.season}/episode/${track.episode}`,
           characters: allCharacters.filter(char =>
             episodeData.keywords?.some(keyword =>
-              char.keywords?.some(ck => ck.toLowerCase().includes(keyword.toLowerCase()))
+              char.keywords?.some(ck => ck.toLowerCase() === keyword.toLowerCase())
             )
           ).map(char => ({
             id: char.id,
