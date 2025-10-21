@@ -309,10 +309,25 @@
                         const leaderboardData = [];
                         let totalPointsSum = 0;
 
+                        // Debug: Log received data
+                        console.log('Received users data:', users);
+                        console.log('Number of users:', Object.keys(users || {}).length);
+
+                        // Ensure users exists
+                        if (!users || typeof users !== 'object') {
+                            console.error('Invalid users data:', users);
+                            document.getElementById('leaderboardContent').innerHTML = 
+                                '<div class="no-data">Invalid data format. Please try again.</div>';
+                            return;
+                        }
+
                         // Process users and extract leaderboard data
                         Object.keys(users).forEach(userId => {
                             const user = users[userId];
                             const stats = user.radioPlayerStats || {};
+                            
+                            // Debug: Log each user's stats
+                            console.log(`User ${userId}:`, { stats, totalPoints: stats.totalPoints });
                             const totalPoints = stats.totalPoints || 0;
                             const magicLevel = stats.magicLevel || 1;
 
