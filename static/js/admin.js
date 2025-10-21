@@ -567,7 +567,7 @@ class AdminManager {
      * View post
      */
     viewPost(postId) {
-        window.open(`/forum/post/${postId}`, '_blank');
+        window.open(`/forum/post/${postId}`);
     }
 
     /**

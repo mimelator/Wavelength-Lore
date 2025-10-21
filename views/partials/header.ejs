@@ -169,12 +169,67 @@
   /* Only style direct li children of top-level nav ul */
   header > nav > ul > li {
     margin: 0 12px;
+    position: relative; /* Needed for dropdown positioning */
+  }
+  /* Ensure has-dropdown parent is positioned */
+  header nav .has-dropdown {
+    position: relative;
+  }
+  /* Add invisible padding to bridge the gap */
+  header nav .has-dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: transparent;
   }
   /* Remove default list styling from dropdowns */
   header nav ul.dropdown {
     list-style: none;
     padding: 0;
     margin: 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: rgba(20, 20, 30, 0.98);
+    border: 2px solid var(--primary-color, #ffd700);
+    border-radius: 8px;
+    min-width: 200px;
+    display: none;
+    z-index: 1001;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+  }
+  /* Show dropdown on hover of parent li */
+  header nav .has-dropdown:hover > ul.dropdown {
+    display: block;
+  }
+  /* Keep dropdown visible when hovering over it */
+  header nav ul.dropdown:hover {
+    display: block;
+  }
+  /* Dropdown items */
+  header nav ul.dropdown li {
+    margin: 0;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+  }
+  header nav ul.dropdown li:last-child {
+    border-bottom: none;
+  }
+  header nav ul.dropdown li a {
+    padding: 0.75rem 1.25rem;
+    color: var(--text-color, #e0e0e0);
+    display: block;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+  header nav ul.dropdown li a:hover {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
+    color: var(--primary-color, #ffd700);
+    padding-left: 1.5rem;
   }
   /* Don't apply styles to dropdown links - handled by nav-dropdown.css */
   header > nav > ul > li > a {
