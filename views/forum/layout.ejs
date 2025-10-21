@@ -131,8 +131,52 @@
     <script src="/js/forum.js" defer></script>
 </head>
 <body>
-    <!-- Include main site navigation -->
-    <%- include('../partials/header') %>
+    <!-- Simple Forum Navigation (no dropdowns) -->
+    <%- include('../partials/banner') %>
+    <header>
+      <nav>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; flex-wrap: wrap; gap: 0;">
+          <li style="margin: 0 8px;"><a href="/" style="color: #fff; text-decoration: none; font-size: 16px; font-weight: 500; font-family: 'AnimeAce', Arial, sans-serif;">Home</a></li>
+          <li style="margin: 0 8px;"><a href="/characters" style="color: #fff; text-decoration: none; font-size: 16px; font-weight: 500; font-family: 'AnimeAce', Arial, sans-serif;">🦸 Heroes</a></li>
+          <li style="margin: 0 8px;"><a href="/lore" style="color: #fff; text-decoration: none; font-size: 16px; font-weight: 500; font-family: 'AnimeAce', Arial, sans-serif;">📖 Lore</a></li>
+          <li style="margin: 0 8px;"><a href="/map" style="color: #fff; text-decoration: none; font-size: 16px; font-weight: 500; font-family: 'AnimeAce', Arial, sans-serif;">🗺️ Map</a></li>
+          <li style="margin: 0 8px;"><a href="/forum" style="color: #fff; text-decoration: none; font-size: 16px; font-weight: 500; font-family: 'AnimeAce', Arial, sans-serif;">💬 Forum</a></li>
+          <li id="leaderboard-forum-nav" style="margin: 0 8px; display: none;"><a href="/leaderboard" style="color: #fff; text-decoration: none; font-size: 16px; font-weight: 500; font-family: 'AnimeAce', Arial, sans-serif;">🏆 Leaderboard</a></li>
+          <li id="profile-forum-nav" style="margin: 0 8px; display: none;"><a href="/forum/profile" style="color: #fff; text-decoration: none; font-size: 16px; font-weight: 500; font-family: 'AnimeAce', Arial, sans-serif;">👤 Profile</a></li>
+          <li style="margin: 0 8px;"><a href="/radio" style="color: #fff; text-decoration: none; font-size: 16px; font-weight: 500; font-family: 'AnimeAce', Arial, sans-serif;">📻 Radio</a></li>
+          <li style="margin: 0 8px;"><a href="/search" style="color: #fff; text-decoration: none; font-size: 16px; font-weight: 500; font-family: 'AnimeAce', Arial, sans-serif;">🔍 Search</a></li>
+          <li id="create-forum-nav" style="margin: 0 8px; display: none;"><a href="/create" style="color: #fff; text-decoration: none; font-size: 16px; font-weight: 500; font-family: 'AnimeAce', Arial, sans-serif;">✨ Create</a></li>
+          <li id="admin-forum-nav" style="margin: 0 8px; display: none;"><a href="/forum/admin" style="color: #fff; text-decoration: none; font-size: 16px; font-weight: 500; font-family: 'AnimeAce', Arial, sans-serif;">⚙️ Admin</a></li>
+        </ul>
+      </nav>
+    </header>
+    <script>
+      // Show auth-required links when user is authenticated
+      if (window.firebaseAuth && window.firebaseUtils) {
+        window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, async (user) => {
+          if (user) {
+            const idToken = await user.getIdToken();
+            const response = await fetch('/api/user/admin-status', {
+              headers: { 'Authorization': `Bearer ${idToken}` }
+            });
+            if (response.ok) {
+              const data = await response.json();
+              // Show leaderboard and profile for all authenticated users
+              document.getElementById('leaderboard-forum-nav').style.display = 'block';
+              document.getElementById('profile-forum-nav').style.display = 'block';
+              // Show admin link if admin
+              if (data.isAdmin) {
+                document.getElementById('admin-forum-nav').style.display = 'block';
+              }
+              // Show create link if content creator
+              if (data.groups && (data.groups.includes('content_manager') || data.groups.includes('admin') || data.groups.includes('super_admin'))) {
+                document.getElementById('create-forum-nav').style.display = 'block';
+              }
+            }
+          }
+        });
+      }
+    </script>
     
     <div class="forum-container">
         <!-- Forum Title Section -->
