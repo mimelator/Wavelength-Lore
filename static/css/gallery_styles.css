@@ -1,11 +1,14 @@
 /* Hero Gallery Styles */
 .gallery-subtitle {
     width: 80%;
+    max-width: 800px;
     margin: 0 auto 30px auto;
+    padding: 0;
     text-align: center;
     color: #666;
     font-style: italic;
     font-size: 1.1rem;
+    display: block;
 }
 
 .character-gallery {
