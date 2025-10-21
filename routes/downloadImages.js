@@ -51,7 +51,14 @@ router.post('/api/download/images', async (req, res) => {
 
     // Download each image and add to archive
     for (let i = 0; i < imageUrls.length; i++) {
-      const url = imageUrls[i];
+      let url = imageUrls[i];
+      
+      // Convert relative URLs to absolute URLs
+      if (url.startsWith('/')) {
+        // Use CDN_URL if available, otherwise construct from localhost
+        const baseUrl = process.env.CDN_URL || 'http://localhost:3001';
+        url = baseUrl + url;
+      }
       
       try {
         console.log(`📥 Downloading image ${i + 1}/${imageUrls.length}: ${url}`);
