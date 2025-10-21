@@ -589,6 +589,36 @@ router.get('/about', async (req, res) => {
 });
 
 /**
+ * Leaderboard page route
+ */
+router.get('/leaderboard', async (req, res) => {
+  try {
+    res.render('leaderboard', {
+      title: 'Global Leaderboard - Wavelength Lore',
+      pageTitle: 'Global Leaderboard - Top Players',
+      pageDescription: 'View the global leaderboard of top players in Wavelength Lore by total points earned from Game Mode and other activities.',
+      pageKeywords: 'wavelength leaderboard, top players, game rankings, high scores, points',
+      ogType: 'website',
+      ogImage: process.env.CDN_URL + '/images/wavelength-og-default.webp',
+      ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl,
+      structuredData: {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Wavelength Leaderboard",
+        "description": "Global leaderboard showing top players by total points in Wavelength Lore.",
+        "url": req.protocol + '://' + req.get('host') + req.originalUrl
+      },
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`,
+      req: req
+    });
+  } catch (error) {
+    console.error('Error rendering leaderboard page:', error);
+    res.status(500).send('Error loading leaderboard page');
+  }
+});
+
+/**
  * Map page route
  */
 router.get('/map', async (req, res) => {
