@@ -871,35 +871,68 @@
         z-index: 100;
         max-height: 30vh;
         overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
         transition: max-height 0.3s ease;
     }
 
     /* Expanded state for mobile player */
     .radio-player.expanded {
         max-height: 85vh;
+        overflow-y: scroll;
     }
 
-    /* Mobile expand button */
+    /* Mobile expand button - Make it very visible */
     .mobile-expand-btn {
         display: block;
-        position: absolute;
-        top: -15px;
-        right: 20px;
-        background: #667eea;
+        position: sticky;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0 auto 10px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        border: none;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        width: 120px;
+        height: 36px;
+        font-size: 1.1rem;
         cursor: pointer;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.6);
         z-index: 101;
-        transition: transform 0.3s ease;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .mobile-expand-btn::before {
+        content: 'Expand';
+        font-size: 0.75rem;
+        font-weight: 600;
     }
 
     .radio-player.expanded .mobile-expand-btn {
-        transform: rotate(180deg);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+
+    .radio-player.expanded .mobile-expand-btn::before {
+        content: 'Collapse';
+    }
+
+    /* Show hidden elements when expanded */
+    .radio-player.expanded .playlist-panel {
+        display: block !important;
+    }
+
+    .radio-player.expanded .volume-control {
+        display: flex !important;
+    }
+
+    .radio-player.expanded .playlist-mode {
+        display: flex !important;
     }
 
     .radio-title {
@@ -1055,6 +1088,11 @@
     .radio-player-body {
         padding-top: 120px;
     }
+}
+
+/* Hide mobile expand button on desktop */
+.mobile-expand-btn {
+    display: none;
 }
 
 /* Accessibility - Reduced Motion */
