@@ -145,6 +145,13 @@
                 <button class="mode-btn" data-mode="loop">Loop Favorites</button>
             </div>
 
+            <!-- Screen Saver Mode Toggle -->
+            <div class="screensaver-toggle-container">
+                <button class="screensaver-toggle-btn" id="screensaverToggle" title="Toggle Screen Saver Mode">
+                    🎨 Screen Saver Mode
+                </button>
+            </div>
+
             <!-- Playlist panel (moved inside radio-player for mobile scrolling) -->
             <div class="playlist-panel">
             <div class="playlist-header">
@@ -180,6 +187,21 @@
                 <% }); %>
             </div>
         </div>
+        </div>
+    </div>
+
+    <!-- Screen Saver Mode Overlay -->
+    <div id="screensaverOverlay" class="screensaver-overlay">
+        <div class="screensaver-gallery">
+            <!-- Episode collages will be displayed here -->
+        </div>
+        <div class="screensaver-exit-hint">
+            Press any key or click to exit screen saver
+        </div>
+        <div class="screensaver-minimal-controls">
+            <button class="screensaver-control" id="screensaverPrev" title="Previous">⏮</button>
+            <button class="screensaver-control" id="screensaverPlayPause" title="Play/Pause">▶</button>
+            <button class="screensaver-control" id="screensaverNext" title="Next">⏭</button>
         </div>
     </div>
 

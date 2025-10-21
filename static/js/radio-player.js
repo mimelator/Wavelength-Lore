@@ -49,6 +49,7 @@ class WavelengthRadio {
         this.initFirebaseSync();
         this.initSoundSystem();
         this.bindSoundToggle();
+        this.initScreenSaver();
 
         // Auto-resume from global radio player if it was playing
         this.restoreGlobalPlayerState();
@@ -985,6 +986,195 @@ class WavelengthRadio {
         document.body.appendChild(notification);
 
         setTimeout(() => notification.remove(), 2000);
+    }
+
+    // ===================================
+    // SCREEN SAVER MODE
+    // ===================================
+
+    initScreenSaver() {
+        this.screensaverActive = false;
+        this.screensaverInterval = null;
+        this.screensaverImages = [];
+        this.currentScreensaverIndex = 0;
+
+        // Bind toggle button
+        const toggleBtn = document.getElementById('screensaverToggle');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => this.toggleScreenSaver());
+        }
+
+        // Bind minimal controls
+        const screensaverPlayPause = document.getElementById('screensaverPlayPause');
+        const screensaverPrev = document.getElementById('screensaverPrev');
+        const screensaverNext = document.getElementById('screensaverNext');
+
+        if (screensaverPlayPause) {
+            screensaverPlayPause.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.togglePlay();
+            });
+        }
+
+        if (screensaverPrev) {
+            screensaverPrev.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.previousTrack();
+            });
+        }
+
+        if (screensaverNext) {
+            screensaverNext.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.nextTrack();
+            });
+        }
+
+        // Exit screen saver on any key press or click (except on controls)
+        document.addEventListener('keydown', (e) => {
+            if (this.screensaverActive) {
+                this.exitScreenSaver();
+            }
+        });
+
+        const overlay = document.getElementById('screensaverOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', (e) => {
+                // Don't exit if clicking on controls
+                if (!e.target.closest('.screensaver-minimal-controls')) {
+                    this.exitScreenSaver();
+                }
+            });
+        }
+    }
+
+    toggleScreenSaver() {
+        if (this.screensaverActive) {
+            this.exitScreenSaver();
+        } else {
+            this.enterScreenSaver();
+        }
+    }
+
+    enterScreenSaver() {
+        this.screensaverActive = true;
+        const overlay = document.getElementById('screensaverOverlay');
+        const gallery = overlay.querySelector('.screensaver-gallery');
+
+        // Get images from currently playing episode's gallery
+        this.screensaverImages = [];
+        
+        if (this.currentTrackIndex >= 0 && this.currentTrackIndex < this.playlist.length) {
+            const currentTrack = this.playlist[this.currentTrackIndex];
+            
+            // Get gallery images from the current episode
+            if (currentTrack.images && Array.isArray(currentTrack.images) && currentTrack.images.length > 0) {
+                currentTrack.images.forEach(img => {
+                    this.screensaverImages.push(this.cdnUrl + img);
+                });
+            }
+            
+            // Fallback: include episode main image if no gallery images
+            if (this.screensaverImages.length === 0 && currentTrack.episodeImage) {
+                this.screensaverImages.push(this.cdnUrl + currentTrack.episodeImage);
+            }
+        }
+
+        // If no current track or no images found, collect from all episodes
+        if (this.screensaverImages.length === 0) {
+            this.playlist.forEach(track => {
+                if (track.images && Array.isArray(track.images)) {
+                    track.images.forEach(img => {
+                        this.screensaverImages.push(this.cdnUrl + img);
+                    });
+                } else if (track.episodeImage) {
+                    this.screensaverImages.push(this.cdnUrl + track.episodeImage);
+                }
+            });
+        }
+
+        // Remove duplicates
+        this.screensaverImages = [...new Set(this.screensaverImages)];
+
+        if (this.screensaverImages.length === 0) {
+            console.warn('No images available for screen saver');
+            return;
+        }
+
+        // Clear gallery and populate with images
+        gallery.innerHTML = '';
+        this.screensaverImages.forEach((imgSrc, index) => {
+            const img = document.createElement('img');
+            img.src = imgSrc;
+            img.alt = `Episode gallery image ${index + 1}`;
+            if (index === 0) {
+                img.classList.add('active');
+            }
+            gallery.appendChild(img);
+        });
+
+        // Show overlay
+        overlay.classList.add('active');
+        document.body.classList.add('screensaver-active');
+
+        // Start image rotation
+        this.currentScreensaverIndex = 0;
+        this.startScreenSaverRotation();
+
+        console.log(`🎨 Screen saver mode activated with ${this.screensaverImages.length} images from current episode`);
+    }
+
+    exitScreenSaver() {
+        this.screensaverActive = false;
+        const overlay = document.getElementById('screensaverOverlay');
+
+        // Hide overlay
+        overlay.classList.remove('active');
+        document.body.classList.remove('screensaver-active');
+
+        // Stop image rotation
+        this.stopScreenSaverRotation();
+
+        console.log('🎨 Screen saver mode exited');
+    }
+
+    startScreenSaverRotation() {
+        // Rotate images every 8 seconds
+        this.screensaverInterval = setInterval(() => {
+            this.rotateScreenSaverImage();
+        }, 8000);
+    }
+
+    stopScreenSaverRotation() {
+        if (this.screensaverInterval) {
+            clearInterval(this.screensaverInterval);
+            this.screensaverInterval = null;
+        }
+    }
+
+    rotateScreenSaverImage() {
+        const gallery = document.querySelector('.screensaver-gallery');
+        if (!gallery) return;
+
+        const images = gallery.querySelectorAll('img');
+        if (images.length <= 1) return;
+
+        // Get current and next indices
+        const currentImg = images[this.currentScreensaverIndex];
+        this.currentScreensaverIndex = (this.currentScreensaverIndex + 1) % images.length;
+        const nextImg = images[this.currentScreensaverIndex];
+
+        // Fade out current, fade in next
+        currentImg.classList.remove('active');
+        currentImg.classList.add('fading-out');
+
+        nextImg.classList.remove('fading-out');
+        nextImg.classList.add('active');
+
+        // Clean up fading-out class after transition
+        setTimeout(() => {
+            currentImg.classList.remove('fading-out');
+        }, 2000);
     }
 }
 

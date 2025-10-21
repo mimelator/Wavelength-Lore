@@ -62,6 +62,7 @@ async function getEnhancedPlaylist() {
           ...track,
           episodeImage: episodeData.image || '',
           episodeUrl: `/season/${track.season}/episode/${track.episode}`,
+          images: episodeData.carouselImages || episodeData.image_gallery || episodeData.images || [],
           characters: allCharacters.filter(char =>
             episodeData.keywords?.some(keyword =>
               char.keywords?.some(ck => ck.toLowerCase() === keyword.toLowerCase())
