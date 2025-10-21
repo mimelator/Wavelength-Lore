@@ -30,6 +30,11 @@ let gameState = {
  * Initialize a new game
  */
 function initGame() {
+    // Disable global radio game while playing
+    if (window.globalRadioGame) {
+        window.globalRadioGame.disableGame();
+    }
+
     gameState = {
         board: [],
         selectedGem: null,

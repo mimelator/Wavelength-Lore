@@ -107,7 +107,7 @@ function configureMiddleware(app) {
  * Configure static file serving
  */
 function configureStaticFiles(app) {
-  // Serve static files from the public directory
+  // Serve static files from the static directory
   app.use(express.static(path.join(__dirname, '../static')));
 
   // Also serve static files under /static/ path for CDN compatibility in local development

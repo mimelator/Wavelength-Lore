@@ -1,5 +1,13 @@
 /* Wavelength Gems - Game Styling */
 
+/* Disable global radio game on game pages */
+.global-radio-game,
+.global-game-canvas {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
 /* Background Gallery - Faint collage of images from currently playing radio song */
 .game-background-gallery {
     position: fixed;
