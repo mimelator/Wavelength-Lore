@@ -50,6 +50,7 @@ class WavelengthRadio {
         this.initSoundSystem();
         this.bindSoundToggle();
         this.initScreenSaver();
+        this.initWeatherEffects();
 
         // Auto-resume from global radio player if it was playing
         this.restoreGlobalPlayerState();
@@ -465,6 +466,8 @@ class WavelengthRadio {
         this.currentTrackIndex = index;
         const track = this.playlist[index];
 
+        console.log(`🎵 Playing track ${index}: "${track.title}" (S${track.season}E${track.episode})`);
+
         // Build audio path
         const audioPath = `${this.cdnUrl}/images/seasons/season${track.season}/episodes/episode${track.episode}/${track.file}`;
 
@@ -474,6 +477,11 @@ class WavelengthRadio {
         // Update UI
         this.updateNowPlaying(track);
         this.updatePlaylistUI();
+
+        // Update screen saver images if active
+        if (this.screensaverActive) {
+            this.updateScreenSaverImages();
+        }
 
         // Play
         const playPromise = this.audio.play();
@@ -992,11 +1000,123 @@ class WavelengthRadio {
     // SCREEN SAVER MODE
     // ===================================
 
+    saveScreenSaverPreferences() {
+        try {
+            const preferences = {
+                weather: [],
+                imageEffects: [],
+                icons: [],
+                lyrics: 'off',
+                title: 'on'
+            };
+
+            // Save active weather modes
+            document.querySelectorAll('.weather-btn.active').forEach(btn => {
+                preferences.weather.push(btn.dataset.weather);
+            });
+
+            // Save active image effects
+            document.querySelectorAll('.image-btn.active').forEach(btn => {
+                preferences.imageEffects.push(btn.dataset.effect);
+            });
+
+            // Save active game icons
+            document.querySelectorAll('.icon-btn.active').forEach(btn => {
+                preferences.icons.push(btn.textContent.trim());
+            });
+
+            // Save lyrics mode
+            const activeLyricsBtn = document.querySelector('.lyrics-btn.active');
+            if (activeLyricsBtn) {
+                preferences.lyrics = activeLyricsBtn.dataset.lyrics;
+            }
+
+            // Save title display preference
+            const activeTitleBtn = document.querySelector('.title-btn.active');
+            if (activeTitleBtn) {
+                preferences.title = activeTitleBtn.dataset.title;
+            }
+
+            localStorage.setItem('wavelength_screensaver_prefs', JSON.stringify(preferences));
+            console.log('💾 Saved screen saver preferences:', preferences);
+        } catch (error) {
+            console.error('Error saving preferences:', error);
+        }
+    }
+
+    loadScreenSaverPreferences() {
+        try {
+            const saved = localStorage.getItem('wavelength_screensaver_prefs');
+            if (!saved) {
+                console.log('📂 No saved preferences found, using defaults');
+                return;
+            }
+
+            const preferences = JSON.parse(saved);
+            console.log('📂 Loading screen saver preferences:', preferences);
+
+            // Restore weather modes
+            document.querySelectorAll('.weather-btn').forEach(btn => {
+                const weather = btn.dataset.weather;
+                if (preferences.weather.includes(weather)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Restore image effects
+            document.querySelectorAll('.image-btn').forEach(btn => {
+                const effect = btn.dataset.effect;
+                if (preferences.imageEffects.includes(effect)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Restore game icons
+            document.querySelectorAll('.icon-btn').forEach(btn => {
+                const icon = btn.textContent.trim();
+                if (preferences.icons.includes(icon)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Restore lyrics mode
+            document.querySelectorAll('.lyrics-btn').forEach(btn => {
+                if (btn.dataset.lyrics === preferences.lyrics) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Restore title display preference
+            document.querySelectorAll('.title-btn').forEach(btn => {
+                if (btn.dataset.title === preferences.title) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            console.log('✅ Screen saver preferences restored');
+        } catch (error) {
+            console.error('Error loading preferences:', error);
+        }
+    }
+
     initScreenSaver() {
         this.screensaverActive = false;
         this.screensaverInterval = null;
         this.screensaverImages = [];
         this.currentScreensaverIndex = 0;
+
+        // Load saved preferences
+        this.loadScreenSaverPreferences();
 
         // Bind toggle button
         const toggleBtn = document.getElementById('screensaverToggle');
@@ -1019,16 +1139,108 @@ class WavelengthRadio {
         if (screensaverPrev) {
             screensaverPrev.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.previousTrack();
+                this.previous();
             });
         }
 
         if (screensaverNext) {
             screensaverNext.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.nextTrack();
+                this.next();
             });
         }
+
+        // Bind customization toggle
+        const customizationToggle = document.getElementById('customizationToggle');
+        const customizationPanel = document.getElementById('customizationPanel');
+        
+        if (customizationToggle && customizationPanel) {
+            customizationToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                customizationPanel.classList.toggle('expanded');
+            });
+        }
+
+        // Bind weather mode selector buttons (multi-select support)
+        const weatherBtns = document.querySelectorAll('.weather-btn');
+        weatherBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const weatherMode = btn.dataset.weather;
+                
+                if (weatherMode === 'auto') {
+                    // Auto mode: deselect all others
+                    weatherBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.setWeatherMode('auto');
+                } else {
+                    // Toggle this weather effect
+                    btn.classList.toggle('active');
+                    
+                    // If toggling on a weather, remove auto
+                    const autoBtn = document.querySelector('.weather-btn[data-weather="auto"]');
+                    if (btn.classList.contains('active') && autoBtn) {
+                        autoBtn.classList.remove('active');
+                    }
+                    
+                    // Update active weather modes
+                    this.updateActiveWeatherModes();
+                }
+                
+                // Save preferences
+                this.saveScreenSaverPreferences();
+            });
+        });
+
+        // Bind image effect buttons
+        const imageBtns = document.querySelectorAll('.image-btn');
+        imageBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                btn.classList.toggle('active');
+                this.updateActiveImageEffects();
+                this.saveScreenSaverPreferences();
+            });
+        });
+
+        // Bind game icon buttons
+        const iconBtns = document.querySelectorAll('.icon-btn');
+        iconBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                btn.classList.toggle('active');
+                this.updateFloatingIcons();
+                this.saveScreenSaverPreferences();
+            });
+        });
+
+        // Bind lyrics buttons
+        const lyricsBtns = document.querySelectorAll('.lyrics-btn');
+        lyricsBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Remove active class from all lyrics buttons
+                lyricsBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                // Update lyrics display
+                this.updateLyricsDisplay();
+                this.saveScreenSaverPreferences();
+            });
+        });
+
+        // Bind title display buttons
+        const titleBtns = document.querySelectorAll('.title-btn');
+        titleBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Remove active class from all title buttons
+                titleBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                this.saveScreenSaverPreferences();
+            });
+        });
 
         // Exit screen saver on any key press or click (except on controls)
         document.addEventListener('keydown', (e) => {
@@ -1040,11 +1252,158 @@ class WavelengthRadio {
         const overlay = document.getElementById('screensaverOverlay');
         if (overlay) {
             overlay.addEventListener('click', (e) => {
-                // Don't exit if clicking on controls
-                if (!e.target.closest('.screensaver-minimal-controls')) {
+                // Check if customization panel is open
+                const customizationPanel = document.getElementById('customizationPanel');
+                const isCustomizationOpen = customizationPanel && customizationPanel.classList.contains('expanded');
+                
+                // If customization is open and click is outside of it, just close customization
+                if (isCustomizationOpen && !e.target.closest('.screensaver-customization')) {
+                    customizationPanel.classList.remove('expanded');
+                    return; // Don't exit screen saver
+                }
+                
+                // Don't exit if clicking on controls or customization
+                if (!e.target.closest('.screensaver-minimal-controls') && 
+                    !e.target.closest('.screensaver-customization')) {
                     this.exitScreenSaver();
                 }
             });
+        }
+    }
+
+    updateActiveImageEffects() {
+        // Get all active image effect buttons
+        const activeEffectBtns = document.querySelectorAll('.image-btn.active');
+        const activeEffects = Array.from(activeEffectBtns).map(btn => btn.dataset.effect);
+        
+        console.log(`🖼️ Active image effects:`, activeEffects);
+        
+        // Build custom animation based on selected effects
+        this.applyImageEffects(activeEffects);
+    }
+
+    applyImageEffects(effects) {
+        const gallery = document.querySelector('.screensaver-gallery');
+        if (!gallery) return;
+
+        // Build keyframes based on selected effects
+        let keyframes = '@keyframes customWarpFilter {\n';
+        keyframes += '    0% {\n';
+        keyframes += '        filter:';
+        
+        const filters = [];
+        
+        if (effects.includes('hue')) {
+            filters.push(' hue-rotate(0deg)');
+        }
+        if (effects.includes('brightness')) {
+            filters.push(' brightness(0.9)');
+        }
+        if (effects.includes('contrast')) {
+            filters.push(' contrast(1)');
+        }
+        
+        keyframes += filters.join('') + ';\n';
+        
+        let transform = '        transform:';
+        const transforms = [];
+        
+        if (effects.includes('zoom')) {
+            transforms.push(' scale(1)');
+        }
+        if (effects.includes('rotate')) {
+            transforms.push(' rotate(0deg)');
+        }
+        
+        if (transforms.length > 0) {
+            keyframes += transform + transforms.join('') + ';\n';
+        }
+        
+        keyframes += '    }\n';
+        keyframes += '    50% {\n';
+        keyframes += '        filter:';
+        
+        const filters50 = [];
+        
+        if (effects.includes('hue')) {
+            filters50.push(' hue-rotate(180deg)');
+        }
+        if (effects.includes('brightness')) {
+            filters50.push(' brightness(1.2)');
+        }
+        if (effects.includes('contrast')) {
+            filters50.push(' contrast(1.35)');
+        }
+        
+        keyframes += filters50.join('') + ';\n';
+        
+        if (transforms.length > 0) {
+            keyframes += '        transform:';
+            const transforms50 = [];
+            
+            if (effects.includes('zoom')) {
+                transforms50.push(' scale(1.25)');
+            }
+            if (effects.includes('rotate')) {
+                transforms50.push(' rotate(3deg)');
+            }
+            
+            keyframes += transforms50.join('') + ';\n';
+        }
+        
+        keyframes += '    }\n';
+        keyframes += '    100% {\n';
+        keyframes += '        filter:';
+        
+        const filters100 = [];
+        
+        if (effects.includes('hue')) {
+            filters100.push(' hue-rotate(360deg)');
+        }
+        if (effects.includes('brightness')) {
+            filters100.push(' brightness(0.9)');
+        }
+        if (effects.includes('contrast')) {
+            filters100.push(' contrast(1)');
+        }
+        
+        keyframes += filters100.join('') + ';\n';
+        
+        if (transforms.length > 0) {
+            keyframes += '        transform:';
+            const transforms100 = [];
+            
+            if (effects.includes('zoom')) {
+                transforms100.push(' scale(1)');
+            }
+            if (effects.includes('rotate')) {
+                transforms100.push(' rotate(0deg)');
+            }
+            
+            keyframes += transforms100.join('') + ';\n';
+        }
+        
+        keyframes += '    }\n';
+        keyframes += '}\n';
+
+        // Remove old custom animation style
+        let styleEl = document.getElementById('customImageEffects');
+        if (styleEl) {
+            styleEl.remove();
+        }
+
+        // Add new animation if any effects selected
+        if (effects.length > 0) {
+            styleEl = document.createElement('style');
+            styleEl.id = 'customImageEffects';
+            styleEl.textContent = keyframes + '\n.screensaver-gallery img { animation: customWarpFilter 45s ease-in-out infinite !important; }';
+            document.head.appendChild(styleEl);
+        } else {
+            // Reset to default warpFilter if no effects
+            styleEl = document.createElement('style');
+            styleEl.id = 'customImageEffects';
+            styleEl.textContent = '.screensaver-gallery img { animation: warpFilter 45s ease-in-out infinite !important; }';
+            document.head.appendChild(styleEl);
         }
     }
 
@@ -1121,6 +1480,18 @@ class WavelengthRadio {
         this.currentScreensaverIndex = 0;
         this.startScreenSaverRotation();
 
+        // Start weather effects
+        this.startWeatherEffects();
+
+        // Initialize image effects (all active by default)
+        this.updateActiveImageEffects();
+
+        // Initialize lyrics display
+        this.updateLyricsDisplay();
+
+        // Show song title
+        this.showSongTitle();
+
         console.log(`🎨 Screen saver mode activated with ${this.screensaverImages.length} images from current episode`);
     }
 
@@ -1135,7 +1506,234 @@ class WavelengthRadio {
         // Stop image rotation
         this.stopScreenSaverRotation();
 
+        // Stop weather effects
+        this.stopWeatherEffects();
+
+        // Clear floating icons
+        this.clearFloatingIcons();
+
+        // Clear lyrics display
+        const lyricsContainer = document.querySelector('.screensaver-lyrics');
+        if (lyricsContainer) {
+            lyricsContainer.classList.remove('visible');
+            lyricsContainer.innerHTML = '';
+        }
+
+        // Clear title overlay
+        const titleOverlay = document.querySelector('.screensaver-title-overlay');
+        if (titleOverlay) {
+            titleOverlay.classList.remove('visible', 'fade-out');
+        }
+        if (this.titleFadeTimeout) {
+            clearTimeout(this.titleFadeTimeout);
+            this.titleFadeTimeout = null;
+        }
+
         console.log('🎨 Screen saver mode exited');
+    }
+
+    updateFloatingIcons() {
+        const activeIconBtns = document.querySelectorAll('.icon-btn.active');
+        const activeIcons = Array.from(activeIconBtns).map(btn => btn.textContent.trim());
+        
+        console.log(`🎮 Active game icons:`, activeIcons);
+        
+        // Clear existing icons
+        this.clearFloatingIcons();
+        
+        if (activeIcons.length > 0) {
+            this.createFloatingIcons(activeIcons);
+        }
+    }
+
+    createFloatingIcons(icons) {
+        const container = document.querySelector('.floating-game-icons');
+        if (!container) return;
+        
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        
+        // Create 3-4 floating icons total (reduced from 8-12)
+        const iconCount = 3 + Math.floor(Math.random() * 2);
+        
+        for (let i = 0; i < iconCount; i++) {
+            const icon = document.createElement('div');
+            icon.className = 'floating-icon';
+            
+            // Pick random icon from active ones
+            const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+            icon.textContent = randomIcon;
+            
+            // Random starting position
+            icon.style.left = Math.random() * (w - 100) + 'px';
+            icon.style.top = Math.random() * (h - 100) + 'px';
+            
+            // Random animation duration and delay for variety
+            icon.style.animationDuration = (8 + Math.random() * 4) + 's';
+            icon.style.animationDelay = -(Math.random() * 8) + 's';
+            
+            container.appendChild(icon);
+        }
+    }
+
+    clearFloatingIcons() {
+        const container = document.querySelector('.floating-game-icons');
+        if (container) {
+            container.innerHTML = '';
+        }
+    }
+
+    showSongTitle() {
+        const activeTitleBtn = document.querySelector('.title-btn.active');
+        const showTitle = activeTitleBtn ? activeTitleBtn.dataset.title === 'on' : true;
+
+        if (!showTitle) return;
+
+        const titleOverlay = document.querySelector('.screensaver-title-overlay');
+        const titleContent = titleOverlay?.querySelector('.title-content');
+        if (!titleOverlay || !titleContent) return;
+
+        const currentTrack = this.playlist[this.currentTrackIndex];
+        const title = currentTrack?.title || 'Unknown Track';
+
+        // Set title text
+        titleContent.textContent = title;
+
+        // Clear any existing timeout
+        if (this.titleFadeTimeout) {
+            clearTimeout(this.titleFadeTimeout);
+        }
+
+        // Show title with fade in
+        titleOverlay.classList.remove('fade-out');
+        titleOverlay.classList.add('visible');
+
+        // Fade out after 3 seconds
+        this.titleFadeTimeout = setTimeout(() => {
+            titleOverlay.classList.add('fade-out');
+            titleOverlay.classList.remove('visible');
+        }, 3000);
+
+        console.log(`🎼 Showing song title: "${title}"`);
+    }
+
+    updateLyricsDisplay() {
+        const lyricsContainer = document.querySelector('.screensaver-lyrics');
+        if (!lyricsContainer) return;
+
+        const activeBtn = document.querySelector('.lyrics-btn.active');
+        const mode = activeBtn ? activeBtn.dataset.lyrics : 'off';
+
+        console.log(`🎵 Lyrics mode:`, mode);
+
+        if (mode === 'off') {
+            lyricsContainer.classList.remove('visible');
+            lyricsContainer.innerHTML = '';
+            return;
+        }
+
+        // Get current track lyrics
+        const currentTrack = this.playlist[this.currentTrackIndex];
+        const lyrics = currentTrack?.lyrics || 'No lyrics available for this track';
+        const trackTitle = currentTrack?.title || 'Unknown';
+
+        console.log(`🎵 Current track index: ${this.currentTrackIndex}, Title: "${trackTitle}"`);
+        console.log(`🎵 Lyrics: "${lyrics.substring(0, 50)}..."`);
+
+        // Show lyrics container
+        lyricsContainer.classList.add('visible');
+
+        // Create or update lyrics content
+        let lyricsContent = lyricsContainer.querySelector('.lyrics-content');
+        if (!lyricsContent) {
+            lyricsContent = document.createElement('div');
+            lyricsContent.className = 'lyrics-content';
+            lyricsContainer.appendChild(lyricsContent);
+        }
+
+        // Update content and styling based on mode
+        lyricsContent.textContent = lyrics;
+        lyricsContent.classList.remove('scrolling', 'static');
+        
+        if (mode === 'scroll') {
+            // Remove animation temporarily to force restart
+            lyricsContent.style.animation = 'none';
+            
+            // Calculate animation duration based on text length
+            // Aim for a comfortable reading speed - about 3-4 characters per second
+            const textLength = lyrics.length;
+            const charsPerSecond = 3.5; // Comfortable reading speed
+            const duration = Math.max(20, textLength / charsPerSecond); // minimum 20s
+            
+            // Force reflow to restart animation
+            void lyricsContent.offsetWidth;
+            
+            // Reapply animation
+            lyricsContent.classList.add('scrolling');
+            lyricsContent.style.animation = '';
+            lyricsContent.style.animationDuration = `${duration}s`;
+            
+            console.log(`🎵 Text length: ${textLength}, Duration: ${duration}s`);
+        } else if (mode === 'static') {
+            lyricsContent.classList.add('static');
+            lyricsContent.style.animationDuration = '';
+        }
+
+        console.log(`✅ Updated lyrics display: ${mode} mode for track "${trackTitle}"`);
+    }
+
+    updateScreenSaverImages() {
+        if (!this.screensaverActive) return;
+        
+        const overlay = document.getElementById('screensaverOverlay');
+        const gallery = overlay?.querySelector('.screensaver-gallery');
+        if (!gallery) return;
+
+        console.log('🔄 Updating screen saver images for new track');
+
+        // Get images from new current track
+        this.screensaverImages = [];
+        
+        if (this.currentTrackIndex >= 0 && this.currentTrackIndex < this.playlist.length) {
+            const currentTrack = this.playlist[this.currentTrackIndex];
+            
+            // Get gallery images from the current episode
+            if (currentTrack.images && Array.isArray(currentTrack.images) && currentTrack.images.length > 0) {
+                currentTrack.images.forEach(img => {
+                    this.screensaverImages.push(this.cdnUrl + img);
+                });
+            }
+            
+            // Fallback: include episode main image if no gallery images
+            if (this.screensaverImages.length === 0 && currentTrack.episodeImage) {
+                this.screensaverImages.push(this.cdnUrl + currentTrack.episodeImage);
+            }
+        }
+
+        // Update gallery with new images
+        if (this.screensaverImages.length > 0) {
+            gallery.innerHTML = '';
+            this.screensaverImages.forEach((imgSrc, index) => {
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.alt = `Episode gallery image ${index + 1}`;
+                if (index === 0) {
+                    img.classList.add('active');
+                }
+                gallery.appendChild(img);
+            });
+
+            // Reset rotation to first image
+            this.currentScreensaverIndex = 0;
+            
+            // Update lyrics for new track
+            this.updateLyricsDisplay();
+            
+            // Show new song title
+            this.showSongTitle();
+            
+            console.log(`✅ Updated screen saver with ${this.screensaverImages.length} images from new episode`);
+        }
     }
 
     startScreenSaverRotation() {
@@ -1175,6 +1773,722 @@ class WavelengthRadio {
         setTimeout(() => {
             currentImg.classList.remove('fading-out');
         }, 2000);
+    }
+
+    // Weather Effects System
+    initWeatherEffects() {
+        this.weatherCanvas = document.querySelector('.weather-canvas');
+        this.weatherCtx = this.weatherCanvas ? this.weatherCanvas.getContext('2d') : null;
+        this.lightningFlash = document.querySelector('.lightning-flash');
+        this.particles = [];
+        this.currentWeather = null;
+        this.weatherAnimationFrame = null;
+        this.weatherMode = 'auto'; // 'auto' or specific weather type
+        
+        // Weather types with their durations (in seconds)
+        this.weatherTypes = ['rain', 'snow', 'clear', 'clouds', 'wind', 'lightning'];
+        this.weatherDurations = {
+            rain: 30,
+            snow: 40,
+            clear: 20,
+            clouds: 25,
+            wind: 15,
+            lightning: 20
+        };
+    }
+
+    setWeatherMode(mode) {
+        console.log(`🌤️ Weather mode set to: ${mode}`);
+        this.weatherMode = mode;
+        this.activeWeatherModes = [];
+        
+        if (mode === 'auto') {
+            // Resume auto cycling
+            if (this.weatherTimeout) {
+                clearTimeout(this.weatherTimeout);
+            }
+            this.cycleWeather();
+        } else {
+            // Stop auto cycling and set specific weather
+            if (this.weatherTimeout) {
+                clearTimeout(this.weatherTimeout);
+                this.weatherTimeout = null;
+            }
+            this.activeWeatherModes = [mode];
+            this.initMultiParticles();
+        }
+    }
+
+    updateActiveWeatherModes() {
+        // Get all active weather buttons (except auto)
+        const activeBtns = document.querySelectorAll('.weather-mode-btn.active:not([data-weather="auto"])');
+        this.activeWeatherModes = Array.from(activeBtns).map(btn => btn.dataset.weather);
+        
+        console.log(`🌤️ Active weather modes:`, this.activeWeatherModes);
+        
+        if (this.activeWeatherModes.length === 0) {
+            // No modes selected, go back to auto
+            const autoBtn = document.querySelector('.weather-mode-btn[data-weather="auto"]');
+            if (autoBtn) {
+                autoBtn.classList.add('active');
+            }
+            this.setWeatherMode('auto');
+        } else {
+            // Stop auto cycling
+            if (this.weatherTimeout) {
+                clearTimeout(this.weatherTimeout);
+                this.weatherTimeout = null;
+            }
+            this.weatherMode = 'multi';
+            this.initMultiParticles();
+        }
+    }
+
+    initMultiParticles() {
+        // Initialize particles for all active weather modes
+        this.multiParticles = {};
+        this.activeWeatherModes.forEach(weather => {
+            this.multiParticles[weather] = [];
+            const count = this.getParticleCountForWeather(weather);
+            for (let i = 0; i < count; i++) {
+                this.multiParticles[weather].push(this.createParticleForWeather(weather));
+            }
+        });
+    }
+
+    getParticleCountForWeather(weather) {
+        switch(weather) {
+            case 'rain': return 200;
+            case 'snow': return 100;
+            case 'wind': return 150;
+            case 'clouds': return 8;
+            default: return 0;
+        }
+    }
+
+    createParticleForWeather(weather) {
+        const w = this.weatherCanvas.width;
+        const h = this.weatherCanvas.height;
+        
+        switch(weather) {
+            case 'rain':
+                return {
+                    x: Math.random() * w,
+                    y: Math.random() * h - h,
+                    length: 15 + Math.random() * 10,
+                    speed: 15 + Math.random() * 10,
+                    opacity: 0.3 + Math.random() * 0.4
+                };
+            case 'snow':
+                return {
+                    x: Math.random() * w,
+                    y: Math.random() * h - h,
+                    radius: 2 + Math.random() * 3,
+                    speed: 1 + Math.random() * 2,
+                    drift: Math.random() * 2 - 1,
+                    opacity: 0.4 + Math.random() * 0.4
+                };
+            case 'wind':
+                return {
+                    x: -50,
+                    y: Math.random() * h,
+                    length: 20 + Math.random() * 30,
+                    speed: 20 + Math.random() * 15,
+                    opacity: 0.1 + Math.random() * 0.2
+                };
+            case 'clouds':
+                return {
+                    x: Math.random() * w,
+                    y: Math.random() * h * 0.4,
+                    width: 150 + Math.random() * 200,
+                    height: 60 + Math.random() * 80,
+                    speed: 0.3 + Math.random() * 0.5,
+                    opacity: 0.3 + Math.random() * 0.3
+                };
+            default:
+                return {};
+        }
+    }
+
+    startWeatherEffects() {
+        if (!this.weatherCanvas || !this.weatherCtx) return;
+        
+        // Set canvas size
+        this.resizeWeatherCanvas();
+        window.addEventListener('resize', () => this.resizeWeatherCanvas());
+        
+        // Start weather cycle
+        this.cycleWeather();
+    }
+
+    resizeWeatherCanvas() {
+        if (!this.weatherCanvas) return;
+        this.weatherCanvas.width = window.innerWidth;
+        this.weatherCanvas.height = window.innerHeight;
+    }
+
+    cycleWeather() {
+        // Only cycle if in auto mode
+        if (this.weatherMode !== 'auto') {
+            return;
+        }
+
+        // Pick random weather
+        const weatherIndex = Math.floor(Math.random() * this.weatherTypes.length);
+        this.currentWeather = this.weatherTypes[weatherIndex];
+        const duration = this.weatherDurations[this.currentWeather] * 1000;
+        
+        console.log(`🌤️ Weather changed to: ${this.currentWeather} for ${duration/1000}s`);
+        
+        // Initialize particles for this weather
+        this.initParticles();
+        
+        // Start animation if not already running
+        if (!this.weatherAnimationFrame) {
+            this.animateWeather();
+        }
+        
+        // Schedule next weather change (only in auto mode)
+        this.weatherTimeout = setTimeout(() => this.cycleWeather(), duration);
+    }
+
+    initParticles() {
+        this.particles = [];
+        const count = this.getParticleCount();
+        
+        for (let i = 0; i < count; i++) {
+            this.particles.push(this.createParticle());
+        }
+    }
+
+    getParticleCount() {
+        switch(this.currentWeather) {
+            case 'rain': return 200;
+            case 'snow': return 100;
+            case 'wind': return 150;
+            case 'clouds': return 8;
+            default: return 0;
+        }
+    }
+
+    createParticle() {
+        const w = this.weatherCanvas.width;
+        const h = this.weatherCanvas.height;
+        
+        switch(this.currentWeather) {
+            case 'rain':
+                return {
+                    x: Math.random() * w,
+                    y: Math.random() * h - h,
+                    length: 15 + Math.random() * 10,
+                    speed: 15 + Math.random() * 10,
+                    opacity: 0.3 + Math.random() * 0.4
+                };
+            case 'snow':
+                return {
+                    x: Math.random() * w,
+                    y: Math.random() * h - h,
+                    radius: 2 + Math.random() * 3,
+                    speed: 1 + Math.random() * 2,
+                    drift: Math.random() * 2 - 1,
+                    opacity: 0.4 + Math.random() * 0.4
+                };
+            case 'wind':
+                return {
+                    x: -50,
+                    y: Math.random() * h,
+                    length: 20 + Math.random() * 30,
+                    speed: 20 + Math.random() * 15,
+                    opacity: 0.1 + Math.random() * 0.2
+                };
+            case 'clouds':
+                return {
+                    x: Math.random() * w,
+                    y: Math.random() * h * 0.4,
+                    width: 150 + Math.random() * 200,
+                    height: 60 + Math.random() * 80,
+                    speed: 0.3 + Math.random() * 0.5,
+                    opacity: 0.3 + Math.random() * 0.3
+                };
+            default:
+                return {};
+        }
+    }
+
+    animateWeather() {
+        if (!this.weatherCtx) return;
+        
+        const ctx = this.weatherCtx;
+        const w = this.weatherCanvas.width;
+        const h = this.weatherCanvas.height;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, w, h);
+        
+        // Draw based on weather mode
+        if (this.weatherMode === 'multi' && this.activeWeatherModes.length > 0) {
+            // Draw multiple weather effects simultaneously
+            this.activeWeatherModes.forEach(weather => {
+                switch(weather) {
+                    case 'rain':
+                        this.drawRainMulti(ctx, w, h, weather);
+                        break;
+                    case 'snow':
+                        this.drawSnowMulti(ctx, w, h, weather);
+                        break;
+                    case 'wind':
+                        this.drawWindMulti(ctx, w, h, weather);
+                        break;
+                    case 'clouds':
+                        this.drawCloudsMulti(ctx, w, h, weather);
+                        break;
+                    case 'lightning':
+                        this.drawLightning();
+                        break;
+                    case 'clear':
+                        this.drawSunRays(ctx, w, h);
+                        break;
+                }
+            });
+        } else {
+            // Single weather mode
+            switch(this.currentWeather) {
+                case 'rain':
+                    this.drawRain(ctx, w, h);
+                    break;
+                case 'snow':
+                    this.drawSnow(ctx, w, h);
+                    break;
+                case 'wind':
+                    this.drawWind(ctx, w, h);
+                    break;
+                case 'clouds':
+                    this.drawClouds(ctx, w, h);
+                    break;
+                case 'lightning':
+                    this.drawLightning();
+                    break;
+                case 'clear':
+                    this.drawSunRays(ctx, w, h);
+                    break;
+            }
+        }
+        
+        // Continue animation
+        this.weatherAnimationFrame = requestAnimationFrame(() => this.animateWeather());
+    }
+
+    drawRain(ctx, w, h) {
+        ctx.strokeStyle = 'rgba(174, 194, 224, 0.5)';
+        ctx.lineWidth = 1;
+        
+        this.particles.forEach(drop => {
+            ctx.globalAlpha = drop.opacity;
+            ctx.beginPath();
+            ctx.moveTo(drop.x, drop.y);
+            ctx.lineTo(drop.x, drop.y + drop.length);
+            ctx.stroke();
+            
+            // Update position
+            drop.y += drop.speed;
+            drop.x -= drop.speed * 0.1; // slight angle
+            
+            // Reset if off screen
+            if (drop.y > h) {
+                drop.y = -drop.length;
+                drop.x = Math.random() * w;
+            }
+        });
+    }
+
+    drawSnow(ctx, w, h) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        
+        this.particles.forEach(flake => {
+            ctx.globalAlpha = flake.opacity;
+            ctx.beginPath();
+            ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Update position
+            flake.y += flake.speed;
+            flake.x += flake.drift;
+            flake.drift += (Math.random() - 0.5) * 0.1;
+            
+            // Reset if off screen
+            if (flake.y > h) {
+                flake.y = -10;
+                flake.x = Math.random() * w;
+            }
+        });
+    }
+
+    drawWind(ctx, w, h) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 2;
+        
+        this.particles.forEach(gust => {
+            ctx.globalAlpha = gust.opacity;
+            ctx.beginPath();
+            ctx.moveTo(gust.x, gust.y);
+            ctx.lineTo(gust.x + gust.length, gust.y);
+            ctx.stroke();
+            
+            // Update position
+            gust.x += gust.speed;
+            gust.y += (Math.random() - 0.5) * 2;
+            
+            // Reset if off screen
+            if (gust.x > w) {
+                gust.x = -gust.length;
+                gust.y = Math.random() * h;
+            }
+        });
+    }
+
+    drawClouds(ctx, w, h) {
+        this.particles.forEach(cloud => {
+            // Make clouds more visible
+            ctx.globalAlpha = cloud.opacity * 0.6; // Even more visible
+            
+            // Add blur filter for softer edges
+            ctx.filter = 'blur(35px)';
+            
+            // Draw cloud as multiple overlapping circles with gradient
+            const gradient = ctx.createRadialGradient(
+                cloud.x, cloud.y, 0,
+                cloud.x, cloud.y, cloud.width / 2
+            );
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+            gradient.addColorStop(0.4, 'rgba(245, 248, 255, 0.7)');
+            gradient.addColorStop(1, 'rgba(230, 235, 250, 0)');
+            
+            ctx.fillStyle = gradient;
+            
+            const circles = 7;
+            for (let i = 0; i < circles; i++) {
+                const offsetX = (i - 3) * (cloud.width / 8);
+                const offsetY = Math.sin(i * 0.8) * (cloud.height / 3);
+                const radius = cloud.height / 2 + Math.sin(i * 1.2) * 15;
+                ctx.beginPath();
+                ctx.arc(cloud.x + offsetX, cloud.y + offsetY, radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.filter = 'none'; // Reset filter
+            
+            // Update position
+            cloud.x += cloud.speed;
+            
+            // Reset if off screen
+            if (cloud.x > w + cloud.width) {
+                cloud.x = -cloud.width;
+                cloud.y = Math.random() * h * 0.4;
+            }
+        });
+    }
+
+    drawLightning() {
+        // Draw rain during lightning
+        this.drawRain(this.weatherCtx, this.weatherCanvas.width, this.weatherCanvas.height);
+        
+        // Track lightning strikes for auto-rotation
+        if (!this.lightningStrikeCount) {
+            this.lightningStrikeCount = 0;
+        }
+        
+        // Random lightning strikes with bolts (increased frequency)
+        if (Math.random() < 0.025) { // 2.5% chance per frame for more strikes
+            // Draw actual lightning bolt (bright and prominent)
+            this.drawLightningBolt(this.weatherCtx, this.weatherCanvas.width, this.weatherCanvas.height);
+            
+            // Increment strike counter
+            this.lightningStrikeCount++;
+            
+            // After 3-5 strikes in auto mode, rotate away from lightning
+            if (this.weatherMode === 'auto' && this.lightningStrikeCount >= (3 + Math.floor(Math.random() * 3))) {
+                console.log(`⚡ ${this.lightningStrikeCount} lightning strikes - rotating to new weather`);
+                this.lightningStrikeCount = 0;
+                
+                // Schedule immediate weather change
+                if (this.weatherTimeout) {
+                    clearTimeout(this.weatherTimeout);
+                }
+                setTimeout(() => this.cycleWeather(), 2000); // Change after 2 seconds
+            }
+        }
+    }
+
+    drawLightningBolt(ctx, w, h) {
+        // Start from top of screen
+        const startX = Math.random() * w;
+        const startY = 0;
+        let currentX = startX;
+        let currentY = startY;
+        
+        // Draw main bolt with intense glow
+        ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
+        ctx.lineWidth = 4;
+        ctx.shadowBlur = 30;
+        ctx.shadowColor = 'rgba(200, 220, 255, 1)';
+        ctx.globalAlpha = 1;
+        
+        ctx.beginPath();
+        ctx.moveTo(currentX, currentY);
+        
+        // Create jagged bolt path with more segments for forked appearance
+        const segments = 25 + Math.floor(Math.random() * 15);
+        for (let i = 0; i < segments; i++) {
+            currentX += (Math.random() - 0.5) * 70;
+            currentY += h / segments + (Math.random() - 0.5) * 40;
+            
+            ctx.lineTo(currentX, currentY);
+            
+            // More frequent forking for dramatic effect
+            if (Math.random() < 0.4) {
+                const branchX = currentX + (Math.random() - 0.5) * 150;
+                const branchY = currentY + 60 + Math.random() * 120;
+                
+                // Draw branch
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(currentX, currentY);
+                ctx.lineTo(branchX, branchY);
+                ctx.stroke();
+                
+                // Sub-branches for more forking
+                if (Math.random() < 0.3) {
+                    const subBranchX = branchX + (Math.random() - 0.5) * 80;
+                    const subBranchY = branchY + 40 + Math.random() * 60;
+                    ctx.beginPath();
+                    ctx.moveTo(branchX, branchY);
+                    ctx.lineTo(subBranchX, subBranchY);
+                    ctx.stroke();
+                }
+                
+                // Continue main bolt
+                ctx.beginPath();
+                ctx.moveTo(currentX, currentY);
+            }
+        }
+        
+        ctx.stroke();
+        
+        // Add bright core to bolt for intensity
+        ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 50;
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
+        
+        // Redraw main bolt path for bright core
+        currentX = startX;
+        currentY = startY;
+        ctx.beginPath();
+        ctx.moveTo(currentX, currentY);
+        
+        for (let i = 0; i < segments; i++) {
+            currentX += (Math.random() - 0.5) * 70;
+            currentY += h / segments + (Math.random() - 0.5) * 40;
+            ctx.lineTo(currentX, currentY);
+        }
+        
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+    }
+
+    drawSunRays(ctx, w, h) {
+        // Draw soft, subtle sun rays
+        const centerX = w * 0.8;
+        const centerY = h * 0.15;
+        const numRays = 16; // Fewer rays for subtlety
+        
+        // Add blur filter for soft edges
+        ctx.filter = 'blur(20px)';
+        
+        // Draw main sun rays
+        for (let i = 0; i < numRays; i++) {
+            const angle = (i / numRays) * Math.PI * 2 + Date.now() * 0.0002;
+            const length = 350 + Math.sin(Date.now() * 0.001 + i) * 80;
+            
+            const gradient = ctx.createLinearGradient(
+                centerX, centerY,
+                centerX + Math.cos(angle) * length,
+                centerY + Math.sin(angle) * length
+            );
+            gradient.addColorStop(0, 'rgba(255, 250, 220, 0.25)');
+            gradient.addColorStop(0.3, 'rgba(255, 240, 180, 0.15)');
+            gradient.addColorStop(0.6, 'rgba(255, 230, 150, 0.08)');
+            gradient.addColorStop(1, 'rgba(255, 220, 120, 0)');
+            
+            ctx.globalAlpha = 0.4; // Reduced from 0.6
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 50; // Slightly narrower
+            ctx.lineCap = 'round'; // Rounded ends for softer look
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(
+                centerX + Math.cos(angle) * length,
+                centerY + Math.sin(angle) * length
+            );
+            ctx.stroke();
+        }
+        
+        ctx.filter = 'none'; // Reset filter
+        
+        // Draw rainbow arc
+        this.drawRainbow(ctx, w, h);
+    }
+
+    drawRainbow(ctx, w, h) {
+        const centerX = w * 0.3;
+        const centerY = h * 1.5; // Further below screen for smaller arc
+        const baseRadius = h * 0.7; // Smaller radius
+        const arcWidth = 25; // Narrower bands
+        
+        const colors = [
+            { r: 255, g: 0, b: 0 },       // Red
+            { r: 255, g: 127, b: 0 },     // Orange
+            { r: 255, g: 255, b: 0 },     // Yellow
+            { r: 0, g: 255, b: 0 },       // Green
+            { r: 0, g: 0, b: 255 },       // Blue
+            { r: 75, g: 0, b: 130 },      // Indigo
+            { r: 148, g: 0, b: 211 }      // Violet
+        ];
+        
+        ctx.lineWidth = arcWidth;
+        ctx.filter = 'blur(8px)'; // Add blur for color blending
+        
+        colors.forEach((color, i) => {
+            const radius = baseRadius + (i * arcWidth * 0.8); // Overlap bands more
+            ctx.globalAlpha = 0.4;
+            ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, 0.5)`;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, Math.PI * 1.15, Math.PI * 1.85);
+            ctx.stroke();
+        });
+        
+        ctx.filter = 'none'; // Reset filter
+    }
+
+    // Multi-weather draw methods (use multiParticles)
+    drawRainMulti(ctx, w, h, weather) {
+        ctx.strokeStyle = 'rgba(174, 194, 224, 0.5)';
+        ctx.lineWidth = 1;
+        
+        if (!this.multiParticles[weather]) return;
+        
+        this.multiParticles[weather].forEach(drop => {
+            ctx.globalAlpha = drop.opacity;
+            ctx.beginPath();
+            ctx.moveTo(drop.x, drop.y);
+            ctx.lineTo(drop.x, drop.y + drop.length);
+            ctx.stroke();
+            
+            drop.y += drop.speed;
+            drop.x -= drop.speed * 0.1;
+            
+            if (drop.y > h) {
+                drop.y = -drop.length;
+                drop.x = Math.random() * w;
+            }
+        });
+    }
+
+    drawSnowMulti(ctx, w, h, weather) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        
+        if (!this.multiParticles[weather]) return;
+        
+        this.multiParticles[weather].forEach(flake => {
+            ctx.globalAlpha = flake.opacity;
+            ctx.beginPath();
+            ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            flake.y += flake.speed;
+            flake.x += flake.drift;
+            flake.drift += (Math.random() - 0.5) * 0.1;
+            
+            if (flake.y > h) {
+                flake.y = -10;
+                flake.x = Math.random() * w;
+            }
+        });
+    }
+
+    drawWindMulti(ctx, w, h, weather) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 2;
+        
+        if (!this.multiParticles[weather]) return;
+        
+        this.multiParticles[weather].forEach(gust => {
+            ctx.globalAlpha = gust.opacity;
+            ctx.beginPath();
+            ctx.moveTo(gust.x, gust.y);
+            ctx.lineTo(gust.x + gust.length, gust.y);
+            ctx.stroke();
+            
+            gust.x += gust.speed;
+            gust.y += (Math.random() - 0.5) * 2;
+            
+            if (gust.x > w) {
+                gust.x = -gust.length;
+                gust.y = Math.random() * h;
+            }
+        });
+    }
+
+    drawCloudsMulti(ctx, w, h, weather) {
+        if (!this.multiParticles[weather]) return;
+        
+        this.multiParticles[weather].forEach(cloud => {
+            ctx.globalAlpha = cloud.opacity * 0.6;
+            ctx.filter = 'blur(35px)';
+            
+            const gradient = ctx.createRadialGradient(
+                cloud.x, cloud.y, 0,
+                cloud.x, cloud.y, cloud.width / 2
+            );
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+            gradient.addColorStop(0.4, 'rgba(245, 248, 255, 0.7)');
+            gradient.addColorStop(1, 'rgba(230, 235, 250, 0)');
+            
+            ctx.fillStyle = gradient;
+            
+            const circles = 7;
+            for (let i = 0; i < circles; i++) {
+                const offsetX = (i - 3) * (cloud.width / 8);
+                const offsetY = Math.sin(i * 0.8) * (cloud.height / 3);
+                const radius = cloud.height / 2 + Math.sin(i * 1.2) * 15;
+                ctx.beginPath();
+                ctx.arc(cloud.x + offsetX, cloud.y + offsetY, radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.filter = 'none';
+            
+            cloud.x += cloud.speed;
+            
+            if (cloud.x > w + cloud.width) {
+                cloud.x = -cloud.width;
+                cloud.y = Math.random() * h * 0.4;
+            }
+        });
+    }
+
+    stopWeatherEffects() {
+        if (this.weatherAnimationFrame) {
+            cancelAnimationFrame(this.weatherAnimationFrame);
+            this.weatherAnimationFrame = null;
+        }
+        if (this.weatherTimeout) {
+            clearTimeout(this.weatherTimeout);
+            this.weatherTimeout = null;
+        }
+        if (this.weatherCtx && this.weatherCanvas) {
+            this.weatherCtx.clearRect(0, 0, this.weatherCanvas.width, this.weatherCanvas.height);
+        }
     }
 }
 

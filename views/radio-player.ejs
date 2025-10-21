@@ -191,13 +191,113 @@
     </div>
 
     <!-- Screen Saver Mode Overlay -->
-    <div id="screensaverOverlay" class="screensaver-overlay">
-        <div class="screensaver-gallery">
-            <!-- Episode collages will be displayed here -->
+    <div class="screensaver-overlay" id="screensaverOverlay">
+        <div class="screensaver-gallery"></div>
+        
+        <!-- Weather effects layer -->
+        <div class="weather-effects">
+            <canvas class="weather-canvas"></canvas>
+            <div class="lightning-flash"></div>
         </div>
-        <div class="screensaver-exit-hint">
-            Press any key or click to exit screen saver
+        
+        <div class="screensaver-exit-hint">Press any key or click to exit screen saver</div>
+        
+        <!-- Customization controls -->
+        <div class="screensaver-customization">
+            <!-- Toggle button -->
+            <button class="customization-toggle" id="customizationToggle">
+                ⚙️ Customize
+            </button>
+            
+            <!-- Collapsible panel -->
+            <div class="customization-panel" id="customizationPanel">
+                <!-- Weather controls -->
+                <div class="customization-section">
+                    <div class="customization-section-header">
+                        <span class="section-icon">🌤️</span>
+                        <span class="section-title">Weather</span>
+                    </div>
+                    <div class="customization-buttons">
+                        <button class="custom-btn weather-btn" data-weather="rain">🌧️ Rain</button>
+                        <button class="custom-btn weather-btn" data-weather="snow">❄️ Snow</button>
+                        <button class="custom-btn weather-btn" data-weather="clouds">☁️ Clouds</button>
+                        <button class="custom-btn weather-btn" data-weather="wind">💨 Wind</button>
+                        <button class="custom-btn weather-btn" data-weather="lightning">⚡ Lightning</button>
+                        <button class="custom-btn weather-btn" data-weather="clear">☀️ Sun</button>
+                        <button class="custom-btn weather-btn active" data-weather="auto">🔄 Auto</button>
+                    </div>
+                </div>
+                
+                <!-- Image controls -->
+                <div class="customization-section">
+                    <div class="customization-section-header">
+                        <span class="section-icon">🖼️</span>
+                        <span class="section-title">Image Effects</span>
+                    </div>
+                    <div class="customization-buttons">
+                        <button class="custom-btn image-btn active" data-effect="hue" title="Color shift">🎨 Colors</button>
+                        <button class="custom-btn image-btn active" data-effect="zoom" title="Zoom in/out">🔍 Zoom</button>
+                        <button class="custom-btn image-btn active" data-effect="rotate" title="Rotation">🔄 Rotate</button>
+                        <button class="custom-btn image-btn active" data-effect="brightness" title="Brightness pulse">💡 Brightness</button>
+                        <button class="custom-btn image-btn active" data-effect="contrast" title="Contrast shift">⚖️ Contrast</button>
+                    </div>
+                </div>
+                
+                <!-- Game Icons controls -->
+                <div class="customization-section">
+                    <div class="customization-section-header">
+                        <span class="section-icon">🎮</span>
+                        <span class="section-title">Game Icons</span>
+                    </div>
+                    <div class="customization-buttons">
+                        <button class="custom-btn icon-btn" data-icon="mushroom" title="Mushrooms">🍄</button>
+                        <button class="custom-btn icon-btn" data-icon="star" title="Stars">⭐</button>
+                        <button class="custom-btn icon-btn" data-icon="horseshoe" title="Horseshoes">🧲</button>
+                        <button class="custom-btn icon-btn" data-icon="sparkle" title="Sparkles">✨</button>
+                        <button class="custom-btn icon-btn" data-icon="crystal" title="Crystals">💎</button>
+                        <button class="custom-btn icon-btn" data-icon="moon" title="Moons">🌙</button>
+                    </div>
+                </div>
+                
+                <!-- Lyrics controls -->
+                <div class="customization-section">
+                    <div class="customization-section-header">
+                        <span class="section-icon">🎵</span>
+                        <span class="section-title">Lyrics</span>
+                    </div>
+                    <div class="customization-buttons">
+                        <button class="custom-btn lyrics-btn" data-lyrics="scroll" title="Scrolling lyrics">📜 Scroll</button>
+                        <button class="custom-btn lyrics-btn" data-lyrics="static" title="Static lyrics">📄 Static</button>
+                        <button class="custom-btn lyrics-btn active" data-lyrics="off" title="No lyrics">🚫 Off</button>
+                    </div>
+                </div>
+                
+                <!-- Title Display controls -->
+                <div class="customization-section">
+                    <div class="customization-section-header">
+                        <span class="section-icon">🎼</span>
+                        <span class="section-title">Song Title</span>
+                    </div>
+                    <div class="customization-buttons">
+                        <button class="custom-btn title-btn active" data-title="on" title="Show song titles">✅ Show</button>
+                        <button class="custom-btn title-btn" data-title="off" title="Hide song titles">🚫 Hide</button>
+                    </div>
+                </div>
+            </div>
         </div>
+        
+        <!-- Floating game icons container -->
+        <div class="floating-game-icons"></div>
+        
+        <!-- Scrolling lyrics container -->
+        <div class="screensaver-lyrics"></div>
+        
+        <!-- Song title overlay -->
+        <div class="screensaver-title-overlay">
+            <div class="title-content"></div>
+        </div>
+        
+        <!-- Minimal playback controls -->
         <div class="screensaver-minimal-controls">
             <button class="screensaver-control" id="screensaverPrev" title="Previous">⏮</button>
             <button class="screensaver-control" id="screensaverPlayPause" title="Play/Pause">▶</button>
