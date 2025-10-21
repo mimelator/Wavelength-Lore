@@ -447,8 +447,8 @@ class WavelengthRadio {
                 img.src = this.cdnUrl + imagePath;
                 img.classList.add('background-gallery-image');
 
-                // Random size
-                const size = Math.floor(Math.random() * 300) + 200; // 200-500px
+                // Random size - 125% to 175% larger (250-875px, was 200-500px)
+                const size = Math.floor(Math.random() * 625) + 250; // 250-875px
                 img.style.width = `${size}px`;
                 img.style.height = `${size}px`;
 
