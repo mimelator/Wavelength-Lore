@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs').promises;
 const path = require('path');
+const firebaseUtils = require('../helpers/firebase-utils');
+const characterHelpers = require('../helpers/character-helpers');
 
 // Radio player playlist - all 33 episode songs
 const playlist = [
@@ -47,14 +49,50 @@ const playlist = [
   { season: 4, episode: 8, title: "The Shire Dream", file: "TheShireDream_v1.mp3", duration: "4:50" }
 ];
 
+// Enhance playlist with episode data
+async function getEnhancedPlaylist() {
+  const allCharacters = characterHelpers.getAllCharactersSync(false);
+
+  const enhancedTracks = await Promise.all(playlist.map(async (track) => {
+    try {
+      const episodeData = await firebaseUtils.fetchFromFirebase(`videos/season${track.season}/episodes/episode${track.episode}`);
+
+      if (episodeData) {
+        return {
+          ...track,
+          carouselImages: episodeData.carouselImages || [],
+          episodeUrl: `/season/${track.season}/episode/${track.episode}`,
+          characters: allCharacters.filter(char =>
+            episodeData.keywords?.some(keyword =>
+              char.keywords?.some(ck => ck.toLowerCase().includes(keyword.toLowerCase()))
+            )
+          ).map(char => ({
+            id: char.id,
+            title: char.title,
+            image: char.image
+          }))
+        };
+      }
+    } catch (error) {
+      console.error(`Error fetching episode data for S${track.season}E${track.episode}:`, error.message);
+    }
+
+    return track;
+  }));
+
+  return enhancedTracks;
+}
+
 // Radio player page route
 router.get('/radio', async (req, res) => {
   try {
+    const enhancedPlaylist = await getEnhancedPlaylist();
+
     res.render('radio-player', {
       title: 'Wavelength Radio',
       pageTitle: 'Wavelength Radio - Interactive Music Player',
       pageDescription: 'Listen to the soundtrack of Wavelength Lore with our interactive radio player',
-      playlist: playlist,
+      playlist: enhancedPlaylist,
       cdnUrl: process.env.CDN_URL || '',
       version: `v${Date.now()}`,
       req: req
@@ -66,8 +104,14 @@ router.get('/radio', async (req, res) => {
 });
 
 // API endpoint to get playlist data
-router.get('/api/radio/playlist', (req, res) => {
-  res.json(playlist);
+router.get('/api/radio/playlist', async (_req, res) => {
+  try {
+    const enhancedPlaylist = await getEnhancedPlaylist();
+    res.json(enhancedPlaylist);
+  } catch (error) {
+    console.error('Error loading playlist:', error);
+    res.status(500).json({ error: 'Failed to load playlist' });
+  }
 });
 
 module.exports = router;

@@ -305,6 +305,23 @@ class WavelengthRadio {
     updateNowPlaying(track) {
         document.getElementById('trackTitle').textContent = track.title;
         document.getElementById('trackEpisode').textContent = `Season ${track.season} • Episode ${track.episode}`;
+
+        // Get the playlist item for this track
+        const playlistItem = document.querySelector(`.playlist-item[data-index="${this.currentTrackIndex}"]`);
+
+        if (playlistItem) {
+            // Update background gallery
+            this.updateBackgroundGallery(playlistItem);
+
+            // Update character badges
+            this.updateCharacterBadges(playlistItem);
+
+            // Update episode links
+            this.updateEpisodeLinks(playlistItem);
+
+            // Show episode info section
+            document.getElementById('episodeInfoSection').style.display = 'block';
+        }
     }
 
     // Update play button
@@ -402,6 +419,98 @@ class WavelengthRadio {
                 favBtn.textContent = '♥';
             }
         });
+    }
+
+    // Update background gallery with episode images
+    updateBackgroundGallery(playlistItem) {
+        const carouselImages = JSON.parse(playlistItem.dataset.carouselImages || '[]');
+        const gallery = document.getElementById('background-gallery');
+
+        // Clear existing images
+        gallery.innerHTML = '';
+
+        if (carouselImages.length > 0) {
+            // Select 5-8 random images from carousel
+            const numImages = Math.min(Math.floor(Math.random() * 4) + 5, carouselImages.length);
+            const selectedImages = [];
+
+            for (let i = 0; i < numImages; i++) {
+                const randomIndex = Math.floor(Math.random() * carouselImages.length);
+                if (!selectedImages.includes(carouselImages[randomIndex])) {
+                    selectedImages.push(carouselImages[randomIndex]);
+                }
+            }
+
+            // Create and position images
+            selectedImages.forEach((imagePath, index) => {
+                const img = document.createElement('img');
+                img.src = this.cdnUrl + imagePath;
+                img.classList.add('background-gallery-image');
+
+                // Random size
+                const size = Math.floor(Math.random() * 300) + 200; // 200-500px
+                img.style.width = `${size}px`;
+                img.style.height = `${size}px`;
+
+                // Random position
+                img.style.left = `${Math.random() * 100}%`;
+                img.style.top = `${Math.random() * 100}%`;
+
+                // Random animation delay
+                img.style.animationDelay = `${index * 2}s`;
+
+                gallery.appendChild(img);
+            });
+
+            // Show gallery
+            gallery.classList.add('active');
+        } else {
+            gallery.classList.remove('active');
+        }
+    }
+
+    // Update character badges
+    updateCharacterBadges(playlistItem) {
+        const characters = JSON.parse(playlistItem.dataset.characters || '[]');
+        const badgesContainer = document.getElementById('characterBadges');
+
+        // Clear existing badges
+        badgesContainer.innerHTML = '';
+
+        if (characters.length > 0) {
+            characters.forEach(character => {
+                const badge = document.createElement('img');
+                badge.src = this.cdnUrl + character.image;
+                badge.alt = character.title;
+                badge.title = character.title;
+                badge.classList.add('character-badge');
+
+                // Link to character page
+                badge.addEventListener('click', () => {
+                    window.open(`/character/${character.id}`, '_blank');
+                });
+
+                badgesContainer.appendChild(badge);
+            });
+        }
+    }
+
+    // Update episode links
+    updateEpisodeLinks(playlistItem) {
+        const episodeUrl = playlistItem.dataset.episodeUrl;
+        const season = playlistItem.dataset.season;
+        const episode = playlistItem.dataset.episode;
+        const title = playlistItem.dataset.title;
+
+        // Update episode link
+        const episodeLink = document.getElementById('episodeLink');
+        if (episodeUrl) {
+            episodeLink.href = episodeUrl;
+        }
+
+        // Update create post link
+        const createPostLink = document.getElementById('createPostLink');
+        createPostLink.href = `/forum/create?category=episodes&episodeTitle=${encodeURIComponent(title)}&seasonNumber=${season}&episodeNumber=${episode}`;
     }
 
     // Mystical element spawner

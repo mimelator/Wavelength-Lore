@@ -15,6 +15,27 @@
             <!-- Dynamic elements will be spawned here -->
         </div>
 
+        <!-- Background image gallery from current episode -->
+        <div id="background-gallery" class="background-gallery">
+            <!-- Episode images will be displayed here -->
+        </div>
+
+        <!-- Game stats at the top -->
+        <div class="game-stats">
+            <div class="stat-item">
+                <span class="stat-label">Mushrooms Collected:</span>
+                <span class="stat-value" id="mushroomCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Lucky Horseshoes:</span>
+                <span class="stat-value" id="horseshoeCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Magic Level:</span>
+                <span class="stat-value" id="magicLevel">1</span>
+            </div>
+        </div>
+
         <!-- Radio player controls -->
         <div class="radio-player">
             <div class="player-header">
@@ -45,6 +66,24 @@
                         <div class="progress-fill" id="progressFill"></div>
                         <div class="progress-handle" id="progressHandle"></div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Episode info section (hidden until track is playing) -->
+            <div class="episode-info-section" id="episodeInfoSection" style="display: none;">
+                <!-- Character badges -->
+                <div class="character-badges" id="characterBadges">
+                    <!-- Character badges will be added dynamically -->
+                </div>
+
+                <!-- Episode actions -->
+                <div class="episode-actions">
+                    <a href="#" id="episodeLink" class="episode-action-btn" target="_blank">
+                        📺 View Episode
+                    </a>
+                    <a href="#" id="createPostLink" class="episode-action-btn">
+                        💬 Create a Post
+                    </a>
                 </div>
             </div>
 
@@ -105,7 +144,10 @@
                      data-episode="<%= track.episode %>"
                      data-title="<%= track.title %>"
                      data-file="<%= track.file %>"
-                     data-duration="<%= track.duration %>">
+                     data-duration="<%= track.duration %>"
+                     data-carousel-images="<%= track.carouselImages ? JSON.stringify(track.carouselImages) : '[]' %>"
+                     data-episode-url="<%= track.episodeUrl || '' %>"
+                     data-characters="<%= track.characters ? JSON.stringify(track.characters) : '[]' %>">
                     <div class="playlist-item-number"><%= index + 1 %></div>
                     <div class="playlist-item-info">
                         <div class="playlist-item-title"><%= track.title %></div>
@@ -115,22 +157,6 @@
                     <button class="playlist-item-favorite" title="Add to favorites">♡</button>
                 </div>
                 <% }); %>
-            </div>
-        </div>
-
-        <!-- Interactive game stats -->
-        <div class="game-stats">
-            <div class="stat-item">
-                <span class="stat-label">Mushrooms Collected:</span>
-                <span class="stat-value" id="mushroomCount">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Lucky Horseshoes:</span>
-                <span class="stat-value" id="horseshoeCount">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Magic Level:</span>
-                <span class="stat-value" id="magicLevel">1</span>
             </div>
         </div>
     </div>
