@@ -265,7 +265,7 @@
         // Load games data
         async function loadGames() {
             try {
-                const response = await fetch('/forum/games/api/list');
+                const response = await fetch('/games/api/list');
                 const data = await response.json();
 
                 if (!data.success) {
@@ -321,7 +321,7 @@
         }
 
         function launchGame(gameId) {
-            window.location.href = `/forum/games/${gameId}`;
+            window.location.href = `/games/${gameId}`;
         }
 
         function showError(message) {

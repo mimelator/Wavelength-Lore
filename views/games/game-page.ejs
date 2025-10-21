@@ -270,7 +270,7 @@
                     <span id="launchBtnText">Coming Soon</span>
                 </button>
 
-                <button class="action-button" style="background: rgba(138, 43, 226, 0.2); color: rgba(255, 255, 255, 0.7);" onclick="window.location.href = '/forum/games'">
+                <button class="action-button" style="background: rgba(138, 43, 226, 0.2); color: rgba(255, 255, 255, 0.7);" onclick="window.location.href = '/games'">
                     ← Back to Games Hub
                 </button>
             </div>
@@ -284,7 +284,7 @@
 
         async function loadGameDetails() {
             try {
-                const response = await fetch(`/forum/games/api/${gameId}`);
+                const response = await fetch(`/games/api/${gameId}`);
                 const data = await response.json();
 
                 if (!data.success) {

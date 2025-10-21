@@ -6,12 +6,6 @@
 const express = require('express');
 const router = express.Router();
 
-// Import games routes
-const gamesRoutes = require('./games');
-
-// Mount games routes at /forum/games
-router.use('/games', gamesRoutes);
-
 /**
  * Forum Home Page - Display categories and recent activity
  */

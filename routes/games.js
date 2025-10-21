@@ -37,7 +37,7 @@ router.get('/:gameId', groupAuth.requireAction('game_access'), (req, res) => {
         gameId: gameId,
         userGroups: req.userGroups,
         breadcrumbs: [
-            { name: 'Games', url: '/forum/games' },
+            { name: 'Games', url: '/games' },
             { name: 'Game', url: null }
         ],
         cdnUrl: process.env.CDN_URL,
