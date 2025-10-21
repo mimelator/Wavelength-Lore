@@ -2,6 +2,7 @@ nature:
   - id: daphne-flower
     title: 🌸 Daphne 🌸
     type: nature
+    hidden: true
     keywords:
       - sweet
       - floral
