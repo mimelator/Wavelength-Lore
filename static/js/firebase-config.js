@@ -30,6 +30,7 @@ window.initializeWavelengthFirebase = function(firebaseConfig) {
                     set,
                     update,
                     onValue,
+                    get,
                     query,
                     orderByChild
                 } = dbModule;
@@ -120,6 +121,7 @@ window.initializeWavelengthFirebase = function(firebaseConfig) {
                         set,
                         update,
                         onValue,
+                        get,
                         query,
                         orderByChild
                     };
