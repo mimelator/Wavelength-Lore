@@ -282,10 +282,23 @@ class SecureDatabaseBackup {
    */
   async exportFirebaseData() {
     try {
+      // Initialize Firebase Admin if not already initialized
+      if (!admin.apps.length) {
+        admin.initializeApp({
+          credential: admin.credential.cert({
+            projectId: process.env.PROJECT_ID,
+            clientEmail: process.env.CLIENT_EMAIL,
+            privateKey: process.env.PRIVATE_KEY?.replace(/\\n/g, '\n')
+          }),
+          databaseURL: process.env.DATABASE_URL
+        });
+        console.log('🔥 Firebase Admin initialized for backup');
+      }
+
       const database = admin.database();
       const snapshot = await database.ref('/').once('value');
       const data = snapshot.val();
-      
+
       // Add backup metadata
       const exportData = {
         metadata: {
@@ -295,7 +308,7 @@ class SecureDatabaseBackup {
         },
         data: data || {}
       };
-      
+
       return JSON.stringify(exportData, null, 2);
     } catch (error) {
       throw new Error(`Firebase export failed: ${error.message}`);
