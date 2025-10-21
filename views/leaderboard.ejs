@@ -299,11 +299,11 @@
                 console.log('✅ Firebase ready, loading leaderboard data...');
 
                 // Use onValue for real-time updates
-                // User data with radioPlayerStats is stored under /forum/users
-                const usersRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/users');
-                console.log('📡 Setting up listener on forum/users path...');
+                // Radio player stats are stored under /users (not /forum/users)
+                const usersRef = window.firebaseUtils.ref(window.firebaseDB, 'users');
+                console.log('📡 Setting up listener on users path...');
                 
-                window.firebaseUtils.onValue(usersRef, (snapshot) => {
+                window.firebaseUtils.onValue(usersRef, async (snapshot) => {
                     console.log('📥 onValue callback triggered, snapshot exists:', snapshot.exists());
                     try {
                         if (!snapshot.exists()) {
@@ -328,6 +328,12 @@
                             return;
                         }
 
+                        // Fetch forum user data for display names
+                        const forumUsersRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/users');
+                        const forumSnapshot = await window.firebaseUtils.get(forumUsersRef);
+                        const forumUsers = forumSnapshot.exists() ? forumSnapshot.val() : {};
+                        console.log('📋 Fetched forum user data for names');
+
                         // Process users and extract leaderboard data
                         Object.keys(users).forEach(userId => {
                             const user = users[userId];
@@ -345,8 +351,8 @@
                             const magicLevel = stats.magicLevel || 1;
 
                             // Get user name from forum profile or use ID
-                            const forumUser = users[userId];
-                            const userName = forumUser.name || user.displayName || `Player ${userId.substring(0, 6)}`;
+                            const forumUser = forumUsers[userId] || {};
+                            const userName = forumUser.name || forumUser.displayName || `Player ${userId.substring(0, 6)}`;
 
                             if (totalPoints > 0) {
                                 leaderboardData.push({
