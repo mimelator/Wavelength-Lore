@@ -717,16 +717,11 @@
 }
 
 /* Neon green horseshoe in scoreboard */
-.stat-item:has(.stat-icon:nth-child(1)) .stat-icon {
-    /* This targets the third stat item which contains the horseshoe */
-}
-
-.stat-icon:contains("🧲"),
-.stat-item:nth-child(3) .stat-icon {
+.game-stats .stat-item:nth-child(3) .stat-icon {
     filter: drop-shadow(0 0 10px #00ff00)
             drop-shadow(0 0 20px #39ff14)
-            brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg);
-    animation: neonGreenPulse 2s ease-in-out infinite;
+            brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg) !important;
+    animation: neonGreenPulse 2s ease-in-out infinite !important;
 }
 
 .stat-label {
