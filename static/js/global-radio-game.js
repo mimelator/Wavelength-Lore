@@ -51,6 +51,9 @@ class GlobalRadioGame {
             this.showWidget();
             this.startSpawning();
         }
+
+        // Auto-resume playback if it was playing before navigation
+        this.restorePlaybackState();
     }
 
     async loadPlaylist() {
@@ -107,6 +110,18 @@ class GlobalRadioGame {
 
         if (this.audio) {
             this.audio.addEventListener('ended', () => this.next());
+
+            // Periodically save playback state while playing
+            this.audio.addEventListener('timeupdate', () => {
+                if (this.isPlaying) {
+                    this.savePlaybackState();
+                }
+            });
+
+            // Save state when pausing
+            this.audio.addEventListener('pause', () => {
+                this.savePlaybackState();
+            });
         }
     }
 
@@ -136,7 +151,7 @@ class GlobalRadioGame {
         }
     }
 
-    playTrack(index) {
+    playTrack(index, startTime = 0) {
         if (index < 0 || index >= this.playlist.length) return;
 
         this.currentTrackIndex = index;
@@ -152,13 +167,71 @@ class GlobalRadioGame {
         // Update UI
         this.updateNowPlaying(track);
 
+        // Set start time if resuming
+        if (startTime > 0) {
+            this.audio.currentTime = startTime;
+        }
+
         // Play
         this.audio.play().then(() => {
             this.isPlaying = true;
             this.updatePlayButton();
+            this.savePlaybackState();
         }).catch(err => {
             console.error('Error playing audio:', err);
         });
+    }
+
+    savePlaybackState() {
+        // Save current playback state to localStorage for cross-page persistence
+        if (this.audio && this.currentTrackIndex >= 0) {
+            const state = {
+                trackIndex: this.currentTrackIndex,
+                currentTime: this.audio.currentTime,
+                isPlaying: this.isPlaying,
+                volume: this.audio.volume,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('global_radio_playback_state', JSON.stringify(state));
+        }
+    }
+
+    restorePlaybackState() {
+        try {
+            const savedState = localStorage.getItem('global_radio_playback_state');
+            if (!savedState) return;
+
+            const state = JSON.parse(savedState);
+
+            // Only restore if the state is recent (within last 5 minutes)
+            const fiveMinutes = 5 * 60 * 1000;
+            if (Date.now() - state.timestamp > fiveMinutes) {
+                localStorage.removeItem('global_radio_playback_state');
+                return;
+            }
+
+            // Restore track and position
+            if (state.isPlaying && this.playlist.length > 0) {
+                console.log(`📻 Resuming playback: Track ${state.trackIndex} at ${Math.floor(state.currentTime)}s`);
+
+                // Set volume
+                if (state.volume !== undefined) {
+                    this.audio.volume = state.volume;
+                    const volumeSlider = document.getElementById('globalVolumeSlider');
+                    if (volumeSlider) {
+                        volumeSlider.value = state.volume * 100;
+                    }
+                }
+
+                // Resume playback
+                setTimeout(() => {
+                    this.playTrack(state.trackIndex, state.currentTime);
+                }, 500); // Small delay to ensure everything is loaded
+            }
+        } catch (error) {
+            console.error('Error restoring playback state:', error);
+            localStorage.removeItem('global_radio_playback_state');
+        }
     }
 
     updateNowPlaying(track) {
