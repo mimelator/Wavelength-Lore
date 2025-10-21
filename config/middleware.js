@@ -263,6 +263,12 @@ function configureTemplateLocals(app) {
     res.locals.simpleDisambiguationScript = simpleDisambiguation.getSimpleDisambiguationScript(process.env.CDN_URL);
     res.locals.simpleDisambiguationStyles = simpleDisambiguation.getSimpleDisambiguationStyles();
 
+    // Add current page path for conditional rendering (e.g., global radio game widget)
+    res.locals.currentPage = req.path;
+
+    // Add user object for authentication checks in templates
+    res.locals.user = req.user || null;
+
     next();
   });
 }
