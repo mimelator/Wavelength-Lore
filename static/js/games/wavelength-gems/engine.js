@@ -166,8 +166,8 @@ function swapGems(row1, col1, row2, col2) {
         const matches = findMatches();
 
         if (matches.length > 0) {
-            // Found matches - animate them
-            gameState.combo++;
+            // Found matches - start combo at 1
+            gameState.combo = 1;
             playSound('match');
             animateMatches(matches);
         } else {
