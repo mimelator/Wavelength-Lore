@@ -9,6 +9,7 @@
       <li><a href="/radio">📻 Radio</a></li>
       <li><a href="/search">Search</a></li>
       <li><a href="/forum">Forum</a></li>
+      <li id="profile-nav-item" style="display: none;"><a href="/forum/profile" class="profile-link">👤 My Profile</a></li>
       <li id="content-creator-nav-item" style="display: none;"><a href="/create" class="content-creator-link">✨ Create Content</a></li>
       <li id="admin-nav-item" style="display: none;"><a href="/forum/admin" class="admin-link">⚙️ Admin</a></li>
     </ul>
@@ -46,6 +47,9 @@
 
                   // Expose user groups globally
                   window.wavelengthUserGroups = data.groups || [];
+
+                  // Show profile link for all authenticated users
+                  document.getElementById('profile-nav-item').style.display = 'block';
 
                   // Show admin link if user is admin
                   if (data.isAdmin) {
@@ -126,6 +130,24 @@
   nav ul li a:hover {
     color: #4fc3f7;
     text-decoration: underline;
+  }
+  
+  /* Profile link styling */
+  nav ul li a.profile-link {
+    background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+    padding: 4px 12px;
+    border-radius: 15px;
+    color: white !important;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  
+  nav ul li a.profile-link:hover {
+    background: linear-gradient(135deg, #29b6f6, #4fc3f7);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    text-decoration: none;
   }
   
   /* Admin link styling */

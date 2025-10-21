@@ -173,6 +173,7 @@ router.get('/search', (req, res) => {
 router.get('/profile', (req, res) => {
     res.render('forum/user-profile', {
         userId: null, // Will be determined by client-side authentication
+        isOwnProfile: true, // This is always the user's own profile
         title: 'My Profile',
         cdnUrl: process.env.CDN_URL || '',
         version: process.env.VERSION || Date.now()
@@ -187,6 +188,7 @@ router.get('/user/:userId', (req, res) => {
     
     res.render('forum/user-profile', {
         userId: userId,
+        isOwnProfile: false, // This is viewing someone else's profile
         title: 'User Profile',
         cdnUrl: process.env.CDN_URL || '',
         version: process.env.VERSION || Date.now()
