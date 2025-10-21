@@ -1701,7 +1701,7 @@
 }
 
 .customization-section {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 
 .customization-section:last-child {
@@ -1712,8 +1712,8 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -1758,14 +1758,14 @@
 }
 
 /* Game Stats Display */
-.game-stats {
+.customization-panel .game-stats {
     display: flex;
     justify-content: space-between;
-    margin-top: 12px;
-    padding: 10px;
+    margin-top: 8px;
+    padding: 8px;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 8px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.9);
     font-family: 'AnimeAce', Arial, sans-serif;
 }
