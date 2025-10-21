@@ -9,7 +9,8 @@ class WavelengthRadio {
 
         // Player state
         this.currentTrackIndex = -1;
-        this.playMode = 'sequential'; // sequential, random, loop
+        this.playMode = localStorage.getItem('wavelength_play_mode') || 'sequential'; // sequential, random, loop
+        this.currentSeasonFilter = localStorage.getItem('wavelength_season_filter') || 'all';
         this.isPlaying = false;
         this.isShuffle = false;
         this.repeatMode = 'off'; // off, one, all
@@ -42,6 +43,9 @@ class WavelengthRadio {
     }
 
     init() {
+        // Pause and cleanup global radio player if it exists (shouldn't exist, but safeguard)
+        this.pauseGlobalPlayer();
+
         this.bindControls();
         this.bindPlaylist();
         this.bindAudioEvents();
@@ -54,8 +58,24 @@ class WavelengthRadio {
         this.initScreenSaver();
         this.initWeatherEffects();
 
+        // Restore saved player settings
+        this.restorePlayerSettings();
+
         // Auto-resume from global radio player if it was playing
         this.restoreGlobalPlayerState();
+    }
+
+    // Pause global radio player if it exists
+    pauseGlobalPlayer() {
+        try {
+            const globalAudio = document.getElementById('globalRadioAudio');
+            if (globalAudio) {
+                globalAudio.pause();
+                console.log('📻 Paused global radio player');
+            }
+        } catch (error) {
+            console.warn('Error pausing global player:', error);
+        }
     }
 
     // Initialize Web Audio API
@@ -95,6 +115,25 @@ class WavelengthRadio {
         if (soundToggle) {
             soundToggle.textContent = this.soundEnabled ? '🔊' : '🔇';
             soundToggle.title = this.soundEnabled ? 'Disable Sound Effects' : 'Enable Sound Effects';
+        }
+    }
+
+    // Restore saved player settings (play mode and season filter)
+    restorePlayerSettings() {
+        try {
+            // Restore play mode
+            if (this.playMode) {
+                this.setPlayMode(this.playMode);
+                console.log(`⚙️ Restored play mode: ${this.playMode}`);
+            }
+
+            // Restore season filter
+            if (this.currentSeasonFilter) {
+                this.filterBySeason(this.currentSeasonFilter);
+                console.log(`⚙️ Restored season filter: ${this.currentSeasonFilter}`);
+            }
+        } catch (error) {
+            console.error('Error restoring player settings:', error);
         }
     }
 
@@ -734,6 +773,9 @@ class WavelengthRadio {
     setPlayMode(mode) {
         this.playMode = mode;
 
+        // Save to localStorage
+        localStorage.setItem('wavelength_play_mode', mode);
+
         document.querySelectorAll('.mode-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.mode === mode);
         });
@@ -766,6 +808,10 @@ class WavelengthRadio {
 
     // Filter by season
     filterBySeason(season) {
+        // Save current filter
+        this.currentSeasonFilter = season;
+        localStorage.setItem('wavelength_season_filter', season);
+
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.season === season);
         });
@@ -1471,6 +1517,12 @@ class WavelengthRadio {
         this.screensaverActive = true;
         const overlay = document.getElementById('screensaverOverlay');
         const gallery = overlay.querySelector('.screensaver-gallery');
+
+        // Auto-play first song if no song is selected or playing
+        if (this.currentTrackIndex === -1 && this.playlist.length > 0) {
+            console.log('🎵 Auto-playing first song for screen saver mode');
+            this.playTrack(0); // Play the first track (Season 1, Episode 1)
+        }
 
         // Get images from currently playing episode's gallery
         this.screensaverImages = [];

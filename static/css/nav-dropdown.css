@@ -28,7 +28,7 @@ header nav ul li > a {
   padding: 0.75rem 1.25rem;
   color: var(--text-color, #e0e0e0);
   text-decoration: none;
-  font-family: var(--display-font, 'Anime Ace', sans-serif);
+  font-family: var(--display-font, 'AnimeAce', sans-serif);
   transition: all 0.3s ease;
   white-space: nowrap;
 }

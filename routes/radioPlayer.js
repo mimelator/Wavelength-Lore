@@ -95,6 +95,7 @@ router.get('/radio', async (req, res) => {
       pageTitle: 'Wavelength Radio - Interactive Music Player',
       pageDescription: 'Listen to the soundtrack of Wavelength Lore with our interactive radio player',
       playlist: enhancedPlaylist,
+      currentPage: '/radio',
       cdnUrl: process.env.CDN_URL || '',
       version: `v${Date.now()}`,
       req: req
