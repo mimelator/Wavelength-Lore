@@ -848,6 +848,11 @@
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
 }
 
+/* Hide mobile expand button on desktop - MUST come before mobile media query */
+.mobile-expand-btn {
+    display: none;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     /* Maximize game canvas space on mobile */
@@ -1091,11 +1096,6 @@
     .radio-player-body {
         padding-top: 120px;
     }
-}
-
-/* Hide mobile expand button on desktop */
-.mobile-expand-btn {
-    display: none;
 }
 
 /* Accessibility - Reduced Motion */
