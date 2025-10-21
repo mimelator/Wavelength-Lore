@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/css/games.css">
+    <link rel="stylesheet" href="/css/wavelength-gems.css">
+    <style>
+        .gems-game-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(75, 0, 130, 0.1));
+            padding: 20px;
+        }
+
+        .gems-game-container {
+            background: rgba(20, 20, 40, 0.9);
+            border: 2px solid rgba(138, 43, 226, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(138, 43, 226, 0.3);
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .game-title {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #a78bfa, #d8b4fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: rgba(138, 43, 226, 0.1);
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(138, 43, 226, 0.2);
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #a78bfa;
+            margin-top: 5px;
+        }
+
+        .game-board-wrapper {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        #gameBoard {
+            background: linear-gradient(135deg, rgba(100, 0, 200, 0.3), rgba(50, 0, 100, 0.3));
+            border: 3px solid rgba(138, 43, 226, 0.5);
+            border-radius: 15px;
+            display: grid;
+            gap: 3px;
+            padding: 10px;
+        }
+
+        .gem {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transition: all 0.1s ease;
+            user-select: none;
+            border: 2px solid transparent;
+        }
+
+        .gem:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+        }
+
+        .gem.selected {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            transform: scale(1.1);
+        }
+
+        .gem-daphne { background: linear-gradient(135deg, #a855f7, #7c3aed); }
+        .gem-jasper { background: linear-gradient(135deg, #3b82f6, #1e40af); }
+        .gem-miles { background: linear-gradient(135deg, #10b981, #047857); }
+        .gem-ivy { background: linear-gradient(135deg, #ec4899, #be185d); }
+        .gem-echo { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .gem-atlas { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+
+        .game-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #a78bfa, #818cf8);
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: rgba(138, 43, 226, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(138, 43, 226, 0.4);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(138, 43, 226, 0.3);
+        }
+
+        .game-info {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
+            border-left: 4px solid #22c55e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .gems-game-container {
+                padding: 15px;
+            }
+
+            .game-title {
+                font-size: 1.5rem;
+            }
+
+            .gem {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header') %>
+
+    <main class="gems-game-wrapper">
+        <div class="gems-game-container">
+            <!-- Game Header -->
+            <div class="game-header">
+                <h1 class="game-title">🎮 Wavelength Gems</h1>
+                <div class="game-stats">
+                    <div class="stat">
+                        <div class="stat-label">Level</div>
+                        <div class="stat-value" id="levelDisplay">1</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Score</div>
+                        <div class="stat-value" id="scoreDisplay">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Moves</div>
+                        <div class="stat-value" id="movesDisplay">∞</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Board -->
+            <div class="game-board-wrapper">
+                <div id="gameBoard"></div>
+            </div>
+
+            <!-- Game Controls -->
+            <div class="game-controls">
+                <button class="btn btn-primary" id="newGameBtn" onclick="initGame()">New Game</button>
+                <button class="btn btn-secondary" id="pauseBtn" onclick="togglePause()">Pause</button>
+                <button class="btn btn-secondary" id="soundBtn" onclick="toggleSound()">🔊 Sound On</button>
+                <button class="btn btn-secondary" onclick="window.location.href = '/games'">← Back to Games</button>
+            </div>
+
+            <!-- Game Info -->
+            <div class="game-info">
+                <strong>How to Play:</strong> Click on gems to select them, then click an adjacent gem to swap. Match 3 or more gems of the same type to clear them and earn points!
+            </div>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <script src="/js/games/wavelength-gems/engine.js"></script>
+    <script src="/js/games/wavelength-gems/ui.js"></script>
+    <script>
+        // Initialize game on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initGame();
+        });
+    </script>
+</body>
+</html>

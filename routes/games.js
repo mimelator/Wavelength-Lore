@@ -25,7 +25,23 @@ router.get('/', groupAuth.requireAction('game_access'), (req, res) => {
 });
 
 /**
- * Individual game page
+ * Wavelength Gems - Match-3 Puzzle Game
+ */
+router.get('/wavelength-gems', groupAuth.requireAction('game_access'), (req, res) => {
+    res.render('games/wavelength-gems', {
+        title: 'Wavelength Gems',
+        currentPage: 'wavelength-gems',
+        breadcrumbs: [
+            { name: 'Games', url: '/games' },
+            { name: 'Wavelength Gems', url: null }
+        ],
+        cdnUrl: process.env.CDN_URL,
+        version: `v${Date.now()}`
+    });
+});
+
+/**
+ * Individual game page (generic template for future games)
  * Template for launching hosted games
  */
 router.get('/:gameId', groupAuth.requireAction('game_access'), (req, res) => {
@@ -55,6 +71,14 @@ router.get('/api/list', groupAuth.requireAction('game_access'), async (req, res)
         res.json({
             success: true,
             games: [
+                {
+                    id: 'wavelength-gems',
+                    title: 'Wavelength Gems',
+                    description: 'Match gems featuring Wavelength characters in this addictive match-3 puzzle game',
+                    thumbnail: '/images/games/wavelength-gems.jpg',
+                    status: 'live',
+                    releaseDate: '2024-10-21'
+                },
                 {
                     id: 'wavelength-quest',
                     title: 'Wavelength Quest',
