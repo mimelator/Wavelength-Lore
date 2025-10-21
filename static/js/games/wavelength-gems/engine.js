@@ -384,13 +384,18 @@ function animateGravity() {
 }
 
 /**
- * Fill empty spaces with new gems
+ * Fill empty spaces with new gems (avoiding immediate matches)
  */
 function fillEmpty() {
     for (let col = 0; col < GAME_CONFIG.COLS; col++) {
         for (let row = 0; row < GAME_CONFIG.ROWS; row++) {
             if (gameState.board[row][col] === null) {
-                gameState.board[row][col] = getRandomGemType();
+                // Avoid creating immediate matches
+                let gemType;
+                do {
+                    gemType = getRandomGemType();
+                } while (createMatchAt(row, col, gemType));
+                gameState.board[row][col] = gemType;
             }
         }
     }
