@@ -2045,6 +2045,112 @@
     margin-top: 5px;
 }
 
+/* Radio Player Game Stats */
+.radio-player-stats {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.radio-player-stats h3 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: 'AnimeAce', monospace;
+    font-size: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.game-stat-item {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.game-stat-item:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.game-stat-item.rare-collectible {
+    background: linear-gradient(135deg, rgba(255, 69, 0, 0.3), rgba(255, 140, 0, 0.3));
+    border-color: rgba(255, 69, 0, 0.5);
+}
+
+.game-stat-item.rare-collectible:hover {
+    background: linear-gradient(135deg, rgba(255, 69, 0, 0.4), rgba(255, 140, 0, 0.4));
+    box-shadow: 0 5px 20px rgba(255, 69, 0, 0.4);
+}
+
+.game-stat-item.magic-level-stat {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 255, 0, 0.3));
+    border-color: rgba(255, 215, 0, 0.5);
+}
+
+.game-stat-item.total-score {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3));
+    border-color: rgba(255, 215, 0, 0.5);
+    grid-column: span 2;
+}
+
+.game-stat-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.game-stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    font-family: 'AnimeAce', monospace;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-stat-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.radio-stats-note {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 15px;
+}
+
+.radio-stats-note a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+.radio-stats-note a:hover {
+    border-bottom-color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
 .profile-bio {
     background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
     border-radius: 12px;

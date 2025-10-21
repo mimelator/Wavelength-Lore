@@ -285,9 +285,43 @@
             }
         }
         
+        function loadRadioPlayerStats() {
+            // Load radio player game stats from localStorage
+            const stats = {
+                mushrooms: parseInt(localStorage.getItem('mushroom_count') || '0'),
+                stars: parseInt(localStorage.getItem('star_count') || '0'),
+                horseshoes: parseInt(localStorage.getItem('horseshoe_count') || '0'),
+                sparkles: parseInt(localStorage.getItem('sparkle_count') || '0'),
+                crystals: parseInt(localStorage.getItem('crystal_count') || '0'),
+                moons: parseInt(localStorage.getItem('moon_count') || '0'),
+                goblins: parseInt(localStorage.getItem('goblin_count') || '0'),
+                magicLevel: parseInt(localStorage.getItem('magic_level') || '1')
+            };
+
+            // Calculate total score based on collectible values
+            const totalScore = (stats.mushrooms * 5) +
+                             (stats.stars * 3) +
+                             (stats.horseshoes * 7) +
+                             (stats.sparkles * 4) +
+                             (stats.crystals * 10) +
+                             (stats.moons * 8) +
+                             (stats.goblins * 25);
+
+            // Update UI elements
+            document.getElementById('radio-mushrooms').textContent = stats.mushrooms;
+            document.getElementById('radio-stars').textContent = stats.stars;
+            document.getElementById('radio-horseshoes').textContent = stats.horseshoes;
+            document.getElementById('radio-sparkles').textContent = stats.sparkles;
+            document.getElementById('radio-crystals').textContent = stats.crystals;
+            document.getElementById('radio-moons').textContent = stats.moons;
+            document.getElementById('radio-goblins').textContent = stats.goblins;
+            document.getElementById('radio-level').textContent = stats.magicLevel;
+            document.getElementById('radio-total-score').textContent = totalScore;
+        }
+
         function displayUserProfile(profile) {
             const container = document.getElementById('profile-container');
-            const isOwnProfile = window.forumState.currentUser && 
+            const isOwnProfile = window.forumState.currentUser &&
                                  window.forumState.currentUser.uid === profile.id;
             
             const joinDate = new Date(profile.joinDate || Date.now());
@@ -357,6 +391,63 @@
                             <div class="stat-label">Reputation</div>
                         </div>
                     </div>
+
+                    <!-- Radio Player Game Stats (Only visible for own profile) -->
+                    ${isOwnProfile ? `
+                        <div class="radio-player-stats">
+                            <h3>📻 Radio Player Game Stats</h3>
+                            <div class="game-stats-grid">
+                                <div class="game-stat-item">
+                                    <span class="game-stat-icon">🍄</span>
+                                    <span class="game-stat-value" id="radio-mushrooms">0</span>
+                                    <span class="game-stat-label">Mushrooms</span>
+                                </div>
+                                <div class="game-stat-item">
+                                    <span class="game-stat-icon">🌟</span>
+                                    <span class="game-stat-value" id="radio-stars">0</span>
+                                    <span class="game-stat-label">Stars</span>
+                                </div>
+                                <div class="game-stat-item">
+                                    <span class="game-stat-icon">🧲</span>
+                                    <span class="game-stat-value" id="radio-horseshoes">0</span>
+                                    <span class="game-stat-label">Horseshoes</span>
+                                </div>
+                                <div class="game-stat-item">
+                                    <span class="game-stat-icon">✨</span>
+                                    <span class="game-stat-value" id="radio-sparkles">0</span>
+                                    <span class="game-stat-label">Sparkles</span>
+                                </div>
+                                <div class="game-stat-item">
+                                    <span class="game-stat-icon">🔮</span>
+                                    <span class="game-stat-value" id="radio-crystals">0</span>
+                                    <span class="game-stat-label">Crystals</span>
+                                </div>
+                                <div class="game-stat-item">
+                                    <span class="game-stat-icon">🌙</span>
+                                    <span class="game-stat-value" id="radio-moons">0</span>
+                                    <span class="game-stat-label">Moons</span>
+                                </div>
+                                <div class="game-stat-item rare-collectible">
+                                    <span class="game-stat-icon">🧌</span>
+                                    <span class="game-stat-value" id="radio-goblins">0</span>
+                                    <span class="game-stat-label">Goblins</span>
+                                </div>
+                                <div class="game-stat-item magic-level-stat">
+                                    <span class="game-stat-icon">⭐</span>
+                                    <span class="game-stat-value" id="radio-level">1</span>
+                                    <span class="game-stat-label">Magic Level</span>
+                                </div>
+                                <div class="game-stat-item total-score">
+                                    <span class="game-stat-icon">🏆</span>
+                                    <span class="game-stat-value" id="radio-total-score">0</span>
+                                    <span class="game-stat-label">Total Score</span>
+                                </div>
+                            </div>
+                            <div class="radio-stats-note">
+                                <small>💡 Play the <a href="/radio">Radio Player</a> to collect items and level up!</small>
+                            </div>
+                        </div>
+                    ` : ''}
                     
                     <!-- Profile Bio -->
                     <div class="profile-bio">
@@ -413,6 +504,13 @@
                     </div>
                 </div>
             `;
+
+            // Load radio player stats if this is the user's own profile
+            if (isOwnProfile) {
+                setTimeout(() => {
+                    loadRadioPlayerStats();
+                }, 100);
+            }
         }
         
         function updateUserPosts(posts) {
