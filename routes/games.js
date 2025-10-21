@@ -74,24 +74,24 @@ router.get('/api/list', groupAuth.requireAction('game_access'), async (req, res)
                 {
                     id: 'wavelength-gems',
                     title: 'Wavelength Gems',
-                    description: 'Match gems featuring Wavelength characters in this addictive match-3 puzzle game',
-                    thumbnail: '/images/games/wavelength-gems.jpg',
+                    description: 'Match the ice blue gems in this addictive match-3 puzzle game featuring Wavelength characters and elements',
+                    thumbnail: '/images/games/wavelength-gems-ice-diamond.svg',
                     status: 'live',
                     releaseDate: '2024-10-21'
-                },
-                {
-                    id: 'wavelength-quest',
-                    title: 'Wavelength Quest',
-                    description: 'An interactive adventure through the Wavelength universe',
-                    thumbnail: '/images/games/wavelength-quest.jpg',
-                    status: 'coming-soon',
-                    releaseDate: '2024-Q4'
                 },
                 {
                     id: 'lore-puzzle',
                     title: 'Lore Puzzle Master',
                     description: 'Solve puzzles based on Wavelength lore and characters',
                     thumbnail: '/images/games/lore-puzzle.jpg',
+                    status: 'coming-soon',
+                    releaseDate: '2024-Q4'
+                },
+                {
+                    id: 'wavelength-quest',
+                    title: 'Wavelength Quest',
+                    description: 'An interactive adventure through the Wavelength universe',
+                    thumbnail: '/images/games/wavelength-quest.jpg',
                     status: 'coming-soon',
                     releaseDate: '2024-Q4'
                 }

@@ -1,0 +1,67 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="iceDiamond" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8f4f8;stop-opacity:1" />
+      <stop offset="25%" style="stop-color:#b8e6f0;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#7fd4e8;stop-opacity:1" />
+      <stop offset="75%" style="stop-color:#4bbce0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0099cc;stop-opacity:1" />
+    </linearGradient>
+
+    <radialGradient id="diamondShine" cx="35%" cy="35%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#ffffff;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+    </radialGradient>
+
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="rgba(79, 172, 224, 0.1)" stroke="rgba(79, 172, 224, 0.3)" stroke-width="2"/>
+
+  <!-- Main diamond shape - top facet -->
+  <polygon points="100,30 140,65 100,70 60,65" fill="url(#iceDiamond)" stroke="#0099cc" stroke-width="1" filter="url(#shadow)"/>
+
+  <!-- Upper middle facets -->
+  <polygon points="100,70 140,65 150,100 120,110" fill="url(#iceDiamond)" stroke="#0099cc" stroke-width="1" opacity="0.95"/>
+  <polygon points="100,70 60,65 50,100 80,110" fill="url(#iceDiamond)" stroke="#0099cc" stroke-width="1" opacity="0.95"/>
+
+  <!-- Center facet -->
+  <polygon points="80,110 120,110 125,140 75,140" fill="url(#iceDiamond)" stroke="#0099cc" stroke-width="1" opacity="0.9"/>
+
+  <!-- Bottom facets -->
+  <polygon points="100,165 125,140 120,110" fill="#0099cc" stroke="#0066aa" stroke-width="1" opacity="0.85" filter="url(#shadow)"/>
+  <polygon points="100,165 75,140 80,110" fill="#0099cc" stroke="#0066aa" stroke-width="1" opacity="0.85" filter="url(#shadow)"/>
+
+  <!-- Right side facets -->
+  <polygon points="150,100 140,65 160,85" fill="#4bbce0" stroke="#0099cc" stroke-width="1" opacity="0.8"/>
+  <polygon points="150,100 160,85 170,110" fill="#0099cc" stroke="#0066aa" stroke-width="1" opacity="0.8"/>
+
+  <!-- Left side facets -->
+  <polygon points="50,100 60,65 40,85" fill="#4bbce0" stroke="#0099cc" stroke-width="1" opacity="0.8"/>
+  <polygon points="50,100 40,85 30,110" fill="#0099cc" stroke="#0066aa" stroke-width="1" opacity="0.8"/>
+
+  <!-- Shine/reflection overlay -->
+  <ellipse cx="90" cy="60" rx="25" ry="35" fill="url(#diamondShine)"/>
+
+  <!-- Sparkle effects -->
+  <circle cx="100" cy="30" r="3" fill="#ffffff" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="170" cy="110" r="2" fill="#ffffff" opacity="0.6" filter="url(#glow)"/>
+  <circle cx="30" cy="110" r="2" fill="#ffffff" opacity="0.6" filter="url(#glow)"/>
+  <circle cx="100" cy="170" r="2.5" fill="#ffffff" opacity="0.7" filter="url(#glow)"/>
+
+  <!-- Subtle inner glow -->
+  <circle cx="100" cy="100" r="45" fill="none" stroke="rgba(79, 172, 224, 0.3)" stroke-width="1" opacity="0.5"/>
+  <circle cx="100" cy="100" r="35" fill="none" stroke="rgba(124, 212, 232, 0.2)" stroke-width="1" opacity="0.4"/>
+</svg>
