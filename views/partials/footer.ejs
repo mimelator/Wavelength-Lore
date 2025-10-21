@@ -1,6 +1,6 @@
 <!-- Firebase Authentication (API keys are PUBLIC and safe - security is via Firebase Rules) -->
 <% if (typeof cdnUrl !== 'undefined') { %>
-<script src="<%= cdnUrl %>/js/firebase-config.js"></script>
+<script src="<%= cdnUrl %>/js/firebase-config.js?v=<%= Date.now() %>"></script>
 <script>
   if (!window.firebaseAuth && !window.firebaseUtils) {
     window.initializeWavelengthFirebase({
