@@ -1,0 +1,331 @@
+<!-- Reusable Leaderboard Component -->
+<div class="leaderboard-container">
+    <div class="leaderboard-section">
+        <div class="leaderboard-title">
+            <h3>🎮 Wavelength Gems - Top Players</h3>
+            <p class="leaderboard-subtitle">Global leaderboard across all games</p>
+        </div>
+
+        <div class="leaderboard-content">
+            <div id="gemsLeaderboardList" class="leaderboard-list">
+                <div class="loading">
+                    <span class="spinner"></span>
+                    <p>Loading leaderboard...</p>
+                </div>
+            </div>
+
+            <div class="leaderboard-actions">
+                <a href="/games/wavelength-gems" class="leaderboard-link">🎮 Play Wavelength Gems</a>
+                <button class="leaderboard-link" onclick="reloadLeaderboard()">🔄 Refresh</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .leaderboard-container {
+        margin: 30px 0;
+    }
+
+    .leaderboard-section {
+        background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(75, 0, 130, 0.1));
+        border: 2px solid rgba(138, 43, 226, 0.3);
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .leaderboard-title {
+        text-align: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid rgba(138, 43, 226, 0.2);
+    }
+
+    .leaderboard-title h3 {
+        margin: 0 0 8px 0;
+        font-size: 1.8rem;
+        background: linear-gradient(135deg, #a78bfa, #d8b4fe);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .leaderboard-subtitle {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.95rem;
+    }
+
+    .leaderboard-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .leaderboard-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 500px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+    .leaderboard-list::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .leaderboard-list::-webkit-scrollbar-track {
+        background: rgba(138, 43, 226, 0.05);
+        border-radius: 10px;
+    }
+
+    .leaderboard-list::-webkit-scrollbar-thumb {
+        background: rgba(138, 43, 226, 0.3);
+        border-radius: 10px;
+    }
+
+    .leaderboard-list::-webkit-scrollbar-thumb:hover {
+        background: rgba(138, 43, 226, 0.5);
+    }
+
+    .leaderboard-entry {
+        display: grid;
+        grid-template-columns: 60px 1fr 150px;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: rgba(138, 43, 226, 0.1);
+        border: 1px solid rgba(138, 43, 226, 0.2);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        animation: slideInLeft 0.4s ease-out;
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .leaderboard-entry:hover {
+        background: rgba(138, 43, 226, 0.2);
+        border-color: rgba(138, 43, 226, 0.4);
+        transform: translateX(8px);
+    }
+
+    .leaderboard-entry.top-1 {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(138, 43, 226, 0.2));
+        border-color: rgba(255, 215, 0, 0.4);
+    }
+
+    .leaderboard-entry.top-2 {
+        background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(138, 43, 226, 0.2));
+        border-color: rgba(192, 192, 192, 0.3);
+    }
+
+    .leaderboard-entry.top-3 {
+        background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(138, 43, 226, 0.2));
+        border-color: rgba(205, 127, 50, 0.3);
+    }
+
+    .leaderboard-rank {
+        font-weight: bold;
+        font-size: 1.3rem;
+        text-align: center;
+        color: #ffd700;
+    }
+
+    .leaderboard-entry.top-1 .leaderboard-rank::before {
+        content: '🥇 ';
+    }
+
+    .leaderboard-entry.top-2 .leaderboard-rank::before {
+        content: '🥈 ';
+    }
+
+    .leaderboard-entry.top-3 .leaderboard-rank::before {
+        content: '🥉 ';
+    }
+
+    .leaderboard-player {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .leaderboard-name {
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
+        font-size: 1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .leaderboard-info {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .leaderboard-score {
+        text-align: right;
+        font-weight: bold;
+        color: #a78bfa;
+        font-size: 1.2rem;
+    }
+
+    .loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        gap: 15px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(138, 43, 226, 0.2);
+        border-radius: 50%;
+        border-top-color: #a78bfa;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .leaderboard-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .leaderboard-link {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .leaderboard-link:hover {
+        background: linear-gradient(135deg, #a78bfa, #818cf8);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(138, 43, 226, 0.4);
+    }
+
+    .no-scores {
+        text-align: center;
+        padding: 40px 20px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    @media (max-width: 768px) {
+        .leaderboard-section {
+            padding: 15px;
+        }
+
+        .leaderboard-title h3 {
+            font-size: 1.3rem;
+        }
+
+        .leaderboard-entry {
+            grid-template-columns: 50px 1fr 100px;
+            padding: 12px;
+            gap: 10px;
+        }
+
+        .leaderboard-score {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<script>
+    // Load leaderboard data on page load
+    async function loadLeaderboard() {
+        const container = document.getElementById('gemsLeaderboardList');
+        if (!container) return;
+
+        try {
+            const response = await fetch('/api/games/wavelength-gems/top-scores?limit=10');
+            const data = await response.json();
+
+            if (!data.success || !data.topScores || data.topScores.length === 0) {
+                container.innerHTML = `
+                    <div class="no-scores">
+                        <p>No scores yet. Be the first to play!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = data.topScores.map(score => {
+                const topClass = score.rank <= 3 ? `top-${score.rank}` : '';
+                return `
+                    <div class="leaderboard-entry ${topClass}">
+                        <div class="leaderboard-rank">${score.rank}</div>
+                        <div class="leaderboard-player">
+                            <div class="leaderboard-name">${escapeHtml(score.userName)}</div>
+                            <div class="leaderboard-info">Level ${score.level}</div>
+                        </div>
+                        <div class="leaderboard-score">${score.score.toLocaleString()}</div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = html;
+        } catch (error) {
+            console.error('Error loading leaderboard:', error);
+            container.innerHTML = `
+                <div class="no-scores">
+                    <p>Failed to load leaderboard</p>
+                </div>
+            `;
+        }
+    }
+
+    // Reload leaderboard
+    function reloadLeaderboard() {
+        loadLeaderboard();
+    }
+
+    // Escape HTML for security
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // Load on page load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadLeaderboard);
+    } else {
+        loadLeaderboard();
+    }
+</script>
