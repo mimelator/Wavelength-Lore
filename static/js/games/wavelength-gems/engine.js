@@ -10,7 +10,21 @@ const GAME_CONFIG = {
     GEM_TYPES: ['daphne', 'jasper', 'miles', 'ivy', 'echo', 'atlas'],
     MATCH_MIN: 3,
     BASE_POINTS: 100,
-    ANIMATION_DURATION: 300 // Duration of animations in ms
+    ANIMATION_DURATION: 300, // Duration of animations in ms
+    GOBLIN_IMAGES: [ // Random goblin images for the glitch easter egg
+        '/static/images/characters/wavelength/TheBattleOfTheShire-050.webp',
+        '/static/images/characters/wavelength/TheBattleOfTheShire-058.webp',
+        '/static/images/characters/wavelength/yeti-1.webp',
+        '/static/images/characters/wavelength/yeti-2.webp'
+    ],
+    GOBLIN_MESSAGES: [
+        "Goblin mischief detected! 👹",
+        "The goblins are at it again!",
+        "Pesky goblin interference!",
+        "Goblin glitch in progress...",
+        "A wild goblin appears!",
+        "Goblins in the gemworks!"
+    ]
 };
 
 // Animation frame tracking
@@ -54,7 +68,8 @@ function initGame() {
         combo: 0,
         history: [],
         maxCascades: 10,
-        currentCascadeDepth: 0
+        currentCascadeDepth: 0,
+        shouldAnimateNewGems: false // Flag to control spawn animation
     };
 
     animationFrames.clear();
@@ -254,7 +269,30 @@ function swapGems(row1, col1, row2, col2) {
     }
 
     // Render the swap animation
-    animateSwap(row1, col1, row2, col2);
+    animateSwap(row1, col1, row2, col2, () => {
+        console.log('🔄 Swap animation complete, updating data attributes...');
+        // After animation completes, update data attributes to match swapped data
+        const gem1 = document.querySelector(`[data-row="${row1}"][data-col="${col1}"]`);
+        const gem2 = document.querySelector(`[data-row="${row2}"][data-col="${col2}"]`);
+        console.log('Found gem1:', gem1 ? `${gem1.dataset.row},${gem1.dataset.col} type=${gem1.dataset.type}` : 'NOT FOUND');
+        console.log('Found gem2:', gem2 ? `${gem2.dataset.row},${gem2.dataset.col} type=${gem2.dataset.type}` : 'NOT FOUND');
+        console.log('Board expects at [' + row1 + '][' + col1 + ']:', gameState.board[row1][col1]);
+        console.log('Board expects at [' + row2 + '][' + col2 + ']:', gameState.board[row2][col2]);
+        
+        if (gem1) {
+            console.log(`Updating gem1 from [${gem1.dataset.row}][${gem1.dataset.col}] to [${row2}][${col2}]`);
+            gem1.dataset.row = row2;
+            gem1.dataset.col = col2;
+        }
+        if (gem2) {
+            console.log(`Updating gem2 from [${gem2.dataset.row}][${gem2.dataset.col}] to [${row1}][${col1}]`);
+            gem2.dataset.row = row1;
+            gem2.dataset.col = col1;
+        }
+        // Don't call renderBoard() here - wait for match detection
+        // If there's a match, gravity will handle DOM reordering
+        // If no match, swap-back will handle it
+    });
 
     // Check for matches after swap animation
     setTimeout(() => {
@@ -267,7 +305,10 @@ function swapGems(row1, col1, row2, col2) {
             console.log('🎮 Match found! Combo reset to:', gameState.combo, 'Matches:', matches.length);
             clearAllHighlights(); // Clear highlights before animating matches
             playSound('match');
-            animateMatches(matches);
+            highlightMatches(matches); // Highlight matched gems briefly
+            setTimeout(() => {
+                animateMatches(matches);
+            }, 300); // Brief delay to show the match
         } else {
             // No match - swap back with animation
             console.log('❌ No match found, swapping back...');
@@ -275,53 +316,97 @@ function swapGems(row1, col1, row2, col2) {
             console.log(`  [${row1}][${col1}] = ${gameState.board[row1][col1]}`);
             console.log(`  [${row2}][${col2}] = ${gameState.board[row2][col2]}`);
             
-            [gameState.board[row1][col1], gameState.board[row2][col2]] =
-            [gameState.board[row2][col2], gameState.board[row1][col1]];
+            // Show shake animation first
+            showInvalidSwap(row1, col1, row2, col2);
             
-            console.log('📍 After swap-back:');
-            console.log(`  [${row1}][${col1}] = ${gameState.board[row1][col1]}`);
-            console.log(`  [${row2}][${col2}] = ${gameState.board[row2][col2]}`);
-            console.log('❌ No match. Combo reset to 0');
-            
-            gameState.combo = 0;
-            playSound('invalid');
-            animateSwap(row1, col1, row2, col2);
-
             setTimeout(() => {
-                console.log('🎨 Calling renderBoard() after swap-back...');
-                gameState.isAnimating = false;
+                [gameState.board[row1][col1], gameState.board[row2][col2]] =
+                [gameState.board[row2][col2], gameState.board[row1][col1]];
                 
-                // Clear animation timeout
-                if (gameState.animationTimeout) {
-                    clearTimeout(gameState.animationTimeout);
-                    gameState.animationTimeout = null;
-                }
+                console.log('📍 After swap-back:');
+                console.log(`  [${row1}][${col1}] = ${gameState.board[row1][col1]}`);
+                console.log(`  [${row2}][${col2}] = ${gameState.board[row2][col2]}`);
+                console.log('❌ No match. Combo reset to 0');
                 
-                // Clear all visual highlights since swap failed
-                clearAllHighlights();
+                gameState.combo = 0;
+                playSound('invalid');
+                animateSwap(row1, col1, row2, col2, () => {
+                    // After swap-back animation, update data attributes back
+                    const gem1 = document.querySelector(`[data-row="${row2}"][data-col="${col2}"]`);
+                    const gem2 = document.querySelector(`[data-row="${row1}"][data-col="${col1}"]`);
+                    if (gem1) {
+                        gem1.dataset.row = row1;
+                        gem1.dataset.col = col1;
+                    }
+                    if (gem2) {
+                        gem2.dataset.row = row2;
+                        gem2.dataset.col = col2;
+                    }
+                    // Don't call renderBoard() here - board should already be correct
+                    // Data attributes are back to original positions after swap-back
+                    console.log('🎨 Swap-back complete, data attributes restored');
+                    gameState.isAnimating = false;
                 
-                // Verify board consistency
-                setTimeout(() => {
-                    verifyBoardConsistency();
-                }, 100);
-                
-                renderBoard();
-            }, GAME_CONFIG.ANIMATION_DURATION);
+                    // Clear animation timeout
+                    if (gameState.animationTimeout) {
+                        clearTimeout(gameState.animationTimeout);
+                        gameState.animationTimeout = null;
+                    }
+                    
+                    // Clear all visual highlights since swap failed
+                    clearAllHighlights();
+                    
+                    // Verify board consistency
+                    setTimeout(() => {
+                        verifyBoardConsistency();
+                    }, 100);
+                });
+            }, 400); // Wait for shake animation
         }
     }, GAME_CONFIG.ANIMATION_DURATION);
 
-    renderBoard();
+    // Don't call renderBoard here - let the animation system handle DOM updates
+    // renderBoard() will be called after matches are cleared or swap-back completes
 }
 
 /**
  * Animate gem swap
  */
-function animateSwap(row1, col1, row2, col2) {
+function animateSwap(row1, col1, row2, col2, callback) {
     const gem1 = document.querySelector(`[data-row="${row1}"][data-col="${col1}"]`);
     const gem2 = document.querySelector(`[data-row="${row2}"][data-col="${col2}"]`);
 
-    if (gem1) gem1.classList.add('swapping');
-    if (gem2) gem2.classList.add('swapping');
+    if (!gem1 || !gem2) {
+        console.warn('⚠️ Could not find gems for swap animation');
+        if (callback) callback();
+        return;
+    }
+
+    // Calculate the distance to swap
+    const deltaRow = row2 - row1;
+    const deltaCol = col2 - col1;
+    const distance1X = deltaCol * 60; // 60px per column
+    const distance1Y = deltaRow * 60; // 60px per row
+    
+    // Apply the swap animation with actual movement
+    gem1.classList.add('swapping');
+    gem2.classList.add('swapping');
+    gem1.style.transition = 'transform 0.3s ease-out';
+    gem2.style.transition = 'transform 0.3s ease-out';
+    gem1.style.transform = `translate(${distance1X}px, ${distance1Y}px)`;
+    gem2.style.transform = `translate(${-distance1X}px, ${-distance1Y}px)`;
+    
+    // After animation, clear transforms and call callback
+    setTimeout(() => {
+        gem1.classList.remove('swapping');
+        gem2.classList.remove('swapping');
+        gem1.style.transition = '';
+        gem1.style.transform = '';
+        gem2.style.transition = '';
+        gem2.style.transform = '';
+        
+        if (callback) callback();
+    }, 300);
 }
 
 /**
@@ -349,16 +434,29 @@ function animateMatches(matches) {
     });
 
     setTimeout(() => {
-        // Clear the matched gems
+        // Calculate and show points for each match
+        const pointsPerGem = 10 * gameState.combo;
+        const totalPoints = pointsPerGem * matches.length;
+        
+        // Show floating points for first gem in match
+        if (matches.length > 0) {
+            showFloatingPoints(totalPoints, matches[0].row, matches[0].col);
+        }
+        
+        // Update score with animation
+        updateScoreAnimated(totalPoints);
+        
+        // Clear the matched gems from board data
         matches.forEach(({ row, col }) => {
             gameState.board[row][col] = null;
         });
 
-        renderBoard();
+        // Don't call renderBoard() here - matched gems will fade out with animation
+        // Gravity will handle removing them and filling spaces
 
         // Show combo indicator if combo > 1
         if (gameState.combo > 1) {
-            showComboIndicator();
+            showComboIndicator(gameState.combo);
         }
 
         // Apply gravity and fill empty spaces
@@ -417,6 +515,20 @@ function showComboIndicator() {
 function animateGravity() {
     console.log('🎬 animateGravity() called');
     
+    // First, remove any gems that are marked as null in the board (matched gems)
+    // This cleans up after the match animation
+    for (let row = 0; row < GAME_CONFIG.ROWS; row++) {
+        for (let col = 0; col < GAME_CONFIG.COLS; col++) {
+            if (gameState.board[row][col] === null) {
+                const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                if (gem) {
+                    gem.remove();
+                    console.log(`🗑️ Removed matched gem at [${row}][${col}]`);
+                }
+            }
+        }
+    }
+    
     // Track gem movements BEFORE modifying the board
     const movements = []; // Array of {oldRow, oldCol, newRow, newCol, gemType, fallDistance}
 
@@ -456,24 +568,99 @@ function animateGravity() {
     }
 
     if (movements.length === 0) {
-        console.log('📊 No gems need to fall');
+        console.log('📊 No gems need to fall, but checking for empty spaces...');
         gameState.board = newBoard;
-        renderBoard();
+        // Don't render yet - wait until after fillEmpty() so no holes appear
+        
+        // Still need to fill empty spaces even if nothing fell
+        try {
+            fillEmpty(); // This will call renderBoard() with new gems
+            
+            // Check for cascade matches after filling
+            setTimeout(() => {
+                gameState.currentCascadeDepth++;
+                
+                // Safety check: prevent infinite cascades
+                if (gameState.currentCascadeDepth > gameState.maxCascades) {
+                    console.warn('⚠️ Maximum cascade depth reached (' + gameState.maxCascades + '), stopping cascades');
+                    gameState.isAnimating = false;
+                    gameState.combo = 0;
+                    gameState.currentCascadeDepth = 0;
+                    clearAllHighlights();
+                    updateUI();
+                    return;
+                }
+                
+                const newMatches = findMatches();
+                if (newMatches.length > 0) {
+                    gameState.combo++;
+                    console.log('🔄 Cascade match! Combo incremented to:', gameState.combo, 'Cascade depth:', gameState.currentCascadeDepth, 'Matches:', newMatches.length);
+                    playSound('match');
+                    highlightMatches(newMatches);
+                    setTimeout(() => {
+                        animateMatches(newMatches);
+                    }, 300);
+                } else {
+                    console.log('✅ No more cascades. Combo final:', gameState.combo, 'Total cascade depth:', gameState.currentCascadeDepth);
+                    gameState.combo = 0;
+                    gameState.currentCascadeDepth = 0;
+                    gameState.isAnimating = false;
+                    clearAllHighlights();
+                    updateUI();
+                }
+            }, 400); // Wait for spawn animation
+            
+        } catch (error) {
+            console.error('❌ Error in fillEmpty:', error);
+            gameState.isAnimating = false;
+            gameState.combo = 0;
+            gameState.currentCascadeDepth = 0;
+            updateUI();
+        }
         return;
     }
     
     console.log(`📊 ${movements.length} gems will fall`);
     
-    // Apply CSS transforms to gems BEFORE updating board state
-    movements.forEach(({oldRow, oldCol, newRow, fallDistance}) => {
+    // Group movements by column for staggered animation
+    const columnMovements = {};
+    movements.forEach(movement => {
+        if (!columnMovements[movement.oldCol]) {
+            columnMovements[movement.oldCol] = [];
+        }
+        columnMovements[movement.oldCol].push(movement);
+    });
+    
+    // FIRST: Mark ALL gems as falling immediately (before stagger delays)
+    movements.forEach(({oldRow, oldCol}) => {
         const gem = document.querySelector(`[data-row="${oldRow}"][data-col="${oldCol}"]`);
         if (gem) {
-            const fallPixels = fallDistance * 60; // 60px per row
-            gem.style.transition = 'transform 0.3s ease-out';
-            gem.style.transform = `translateY(${fallPixels}px)`;
-            console.log(`💫 Gem [${oldRow}][${oldCol}] falling ${fallDistance} rows to [${newRow}][${oldCol}]`);
+            gem.classList.add('falling');
         }
     });
+    
+    // THEN: Apply CSS transforms with stagger delay per column
+    Object.keys(columnMovements).forEach(col => {
+        const colIndex = parseInt(col);
+        const staggerDelay = colIndex * 30; // 30ms delay per column for waterfall effect
+        
+        setTimeout(() => {
+            columnMovements[col].forEach(({oldRow, oldCol, newRow, fallDistance}) => {
+                const gem = document.querySelector(`[data-row="${oldRow}"][data-col="${oldCol}"]`);
+                if (gem) {
+                    const fallPixels = fallDistance * 60; // 60px per row
+                    // .falling class already added above
+                    gem.style.transition = 'transform 0.3s ease-out';
+                    gem.style.transform = `translateY(${fallPixels}px)`;
+                    console.log(`💫 Gem [${oldRow}][${oldCol}] falling ${fallDistance} rows to [${newRow}][${oldCol}]`);
+                }
+            });
+        }, staggerDelay);
+    });
+
+    // Calculate total animation time (base animation + stagger delay for last column)
+    const maxStaggerDelay = (GAME_CONFIG.COLS - 1) * 30;
+    const totalAnimationTime = 300 + maxStaggerDelay;
 
     // After animation, update board state and data attributes
     setTimeout(() => {
@@ -481,12 +668,13 @@ function animateGravity() {
         gameState.board = newBoard;
         
         // Update DOM data attributes to match new positions
+        // Keep .falling class AND transforms until renderBoard() handles them
         movements.forEach(({oldRow, oldCol, newRow, newCol}) => {
             const gem = document.querySelector(`[data-row="${oldRow}"][data-col="${oldCol}"]`);
             if (gem) {
                 gem.dataset.row = newRow;
-                gem.style.transform = '';
-                gem.style.transition = '';
+                // Don't clear transform/transition yet - let renderBoard() do it
+                // This prevents gems from snapping to final position before DOM reorder
             }
         });
         
@@ -532,7 +720,10 @@ function animateGravity() {
                 gameState.combo++;
                 console.log('🔄 Cascade match! Combo incremented to:', gameState.combo, 'Cascade depth:', gameState.currentCascadeDepth, 'Matches:', newMatches.length);
                 playSound('match');
-                animateMatches(newMatches);
+                highlightMatches(newMatches); // Highlight before animating
+                setTimeout(() => {
+                    animateMatches(newMatches);
+                }, 300);
             } else {
                 console.log('✅ No more cascades. Combo final:', gameState.combo, 'Total cascade depth:', gameState.currentCascadeDepth);
                 gameState.combo = 0;
@@ -556,7 +747,7 @@ function animateGravity() {
                 updateUI();
             }
         }, GAME_CONFIG.ANIMATION_DURATION);
-    }, 300);
+    }, totalAnimationTime);
 }
 
 /**
@@ -614,23 +805,10 @@ function fillEmpty() {
     
     console.log('📦 Filled:', filledCount, 'empty spaces (expected:', nullCount + ') at cascade depth:', gameState.currentCascadeDepth);
 
-    // Update the board rendering to show new gems
+    // Set flag to animate new gems, then render
+    gameState.shouldAnimateNewGems = true;
     renderBoard();
-
-    // Add spawn animation only to newly filled gems
-    // Wait a frame to ensure gems are rendered first
-    requestAnimationFrame(() => {
-        newlyFilledPositions.forEach(({ row, col }) => {
-            const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-            if (gem) {
-                gem.classList.add('spawning');
-                // Remove the class after animation completes
-                setTimeout(() => {
-                    gem.classList.remove('spawning');
-                }, 400);
-            }
-        });
-    });
+    gameState.shouldAnimateNewGems = false;
 }
 
 /**
@@ -694,6 +872,43 @@ function findMatches() {
 function renderBoard() {
     console.log('🎨 renderBoard() called');
     const boardElement = document.getElementById('gameBoard');
+    
+    // Check if any gems are currently animating (spawning, falling, or swapping)
+    const spawningGems = boardElement.querySelectorAll('.gem.spawning');
+    const fallingGems = boardElement.querySelectorAll('.gem.falling');
+    const swappingGems = boardElement.querySelectorAll('.gem.swapping');
+    const animatingGems = spawningGems.length + fallingGems.length + swappingGems.length;
+    
+    if (animatingGems > 0 && !gameState.shouldAnimateNewGems) {
+        // Animating gems exist but this isn't the initial fillEmpty() call
+        // Calculate proper wait time based on actual animations
+        const hasSpawning = spawningGems.length > 0;
+        const hasFalling = fallingGems.length > 0;
+        const hasSwapping = swappingGems.length > 0;
+        
+        // Spawn animation: 400ms
+        // Fall animation: 300ms base + up to 210ms stagger (7 cols × 30ms) = 510ms max
+        // Swap animation: 300ms
+        let waitTime = 100; // Base buffer
+        if (hasSpawning) waitTime = Math.max(waitTime, 450); // 400ms spawn + 50ms buffer
+        if (hasFalling) waitTime = Math.max(waitTime, 550); // 510ms max fall + 40ms buffer
+        if (hasSwapping) waitTime = Math.max(waitTime, 350); // 300ms swap + 50ms buffer
+        
+        console.log(`⏸️ Deferring renderBoard() for ${waitTime}ms - ${spawningGems.length} spawning, ${fallingGems.length} falling, ${swappingGems.length} swapping`);
+        
+        // 👹 Show goblin glitch easter egg when new gems spawn (indicates cascade/refill after match)
+        if (hasSpawning) {
+            console.log('👹 GOBLIN TRIGGER: hasSpawning =', hasSpawning, 'spawning gems:', spawningGems.length);
+            showGoblinGlitch();
+        }
+        
+        setTimeout(() => {
+            console.log('⏩ Retrying renderBoard() after animations');
+            renderBoard();
+        }, waitTime);
+        return;
+    }
+    
     boardElement.style.gridTemplateColumns = `repeat(${GAME_CONFIG.COLS}, 60px)`;
 
     // Build target state
@@ -707,8 +922,11 @@ function renderBoard() {
         }
     }
     
+    console.log(`🎯 Target: ${targetGems.length} gems expected`);
+    
     // Get current gems
     const currentGems = Array.from(boardElement.querySelectorAll('.gem'));
+    console.log(`📦 Current: ${currentGems.length} gems in DOM`);
     
     // Create a map of existing gems by position
     const existingGemsMap = new Map();
@@ -721,59 +939,96 @@ function renderBoard() {
     currentGems.forEach(gem => {
         const key = `${gem.dataset.row},${gem.dataset.col}`;
         if (!targetGems.find(t => `${t.row},${t.col}` === key)) {
+            console.log(`🗑️ Removing gem at ${key} (not in target)`);
             gem.remove();
         }
     });
     
-    // Now add/reorder gems in correct order
-    let addedCount = 0;
-    let reorderedCount = 0;
+    // Track which gems need spawn animation (used by fillEmpty)
+    const newGems = [];
     
+    // Now reorder gems - detach all, then reattach in correct order
+    let addedCount = 0;
+    let typeChangedCount = 0;
+    
+    // First, remove all gems that need to be repositioned
+    const gemsToReorder = [];
     targetGems.forEach((target, targetIndex) => {
         const key = `${target.row},${target.col}`;
         let gem = existingGemsMap.get(key);
         
         if (!gem) {
             // Gem doesn't exist - create it
+            console.log(`➕ Creating new gem at [${target.row}][${target.col}] type=${target.type}`);
             gem = createGemElement(target.row, target.col, target.type);
+            // Only add spawn animation if this is from fillEmpty
+            if (gameState.shouldAnimateNewGems) {
+                gem.classList.add('spawning');
+                newGems.push(gem);
+            }
             addedCount++;
         } else if (gem.dataset.type !== target.type) {
             // Gem exists but wrong type - update it
+            console.log(`🔄 Changing gem at [${target.row}][${target.col}] from ${gem.dataset.type} to ${target.type}`);
+            const oldType = gem.dataset.type;
             gem.dataset.type = target.type;
+            gem.dataset.row = target.row;
+            gem.dataset.col = target.col;
             gem.textContent = getGemEmoji(target.type);
-            gem.className = `gem gem-${target.type}`;
+            gem.classList.remove(`gem-${oldType}`);
+            gem.classList.add(`gem-${target.type}`);
             gem.onclick = function() {
                 const clickedRow = parseInt(this.dataset.row);
                 const clickedCol = parseInt(this.dataset.col);
                 onGemClick(clickedRow, clickedCol);
             };
+            typeChangedCount++;
         }
         
-        // Insert gem at correct position
-        const currentDOMIndex = Array.from(boardElement.children).indexOf(gem);
-        
-        if (currentDOMIndex === -1) {
-            // New gem - insert at target position
-            if (targetIndex < boardElement.children.length) {
-                boardElement.insertBefore(gem, boardElement.children[targetIndex]);
-            } else {
-                boardElement.appendChild(gem);
-            }
-        } else if (currentDOMIndex !== targetIndex) {
-            // Gem exists but in wrong position - move it
-            if (targetIndex < boardElement.children.length) {
-                boardElement.insertBefore(gem, boardElement.children[targetIndex]);
-            } else {
-                boardElement.appendChild(gem);
-            }
-            reorderedCount++;
+        gemsToReorder.push(gem);
+    });
+    
+    console.log(`🧹 Detaching ${gemsToReorder.length} gems to reorder (including ${gemsToReorder.filter(g => g.classList.contains('spawning')).length} spawning)`);
+    
+    // Detach ALL gems (CSS animations will continue on detached elements)
+    gemsToReorder.forEach(gem => {
+        if (gem.parentNode) {
+            gem.parentNode.removeChild(gem);
         }
     });
     
+    // Reattach all gems in correct row-major order
+    gemsToReorder.forEach(gem => {
+        boardElement.appendChild(gem);
+    });
+    
+    // Clean up animation classes and transforms now that reordering is complete
+    gemsToReorder.forEach(gem => {
+        gem.classList.remove('falling');
+        gem.classList.remove('swapping');
+        // Clear any residual transforms from animations
+        if (gem.style.transform) gem.style.transform = '';
+        if (gem.style.transition) gem.style.transition = '';
+        // Keep 'spawning' class for newly created gems
+    });
+    
     if (addedCount > 0) console.log(`➕ Added ${addedCount} gems`);
-    if (reorderedCount > 0) console.log(`🔄 Reordered ${reorderedCount} gems`);
+    if (typeChangedCount > 0) console.log(`🔄 Changed type of ${typeChangedCount} gems`);
     console.log(`📊 Rendered ${targetGems.length} gems in correct row-major order`);
     console.log('✅ renderBoard() complete');
+    console.log('✅ renderBoard() complete');
+    
+    // Trigger spawn animation for new gems after a small delay
+    if (newGems.length > 0) {
+        requestAnimationFrame(() => {
+            newGems.forEach(gem => {
+                // Remove spawn class after animation completes
+                setTimeout(() => {
+                    gem.classList.remove('spawning');
+                }, 400);
+            });
+        });
+    }
     
     // Validate board after rendering
     if (window.validateGame && !gameState.isAnimating) {
@@ -1134,6 +1389,33 @@ function updateUI() {
 }
 
 /**
+ * Update score with count-up animation
+ */
+function updateScoreAnimated(points) {
+    const oldScore = gameState.score;
+    gameState.score += points;
+    const newScore = gameState.score;
+    
+    const scoreElement = document.getElementById('scoreDisplay');
+    const duration = 300; // ms
+    const steps = 20;
+    const increment = (newScore - oldScore) / steps;
+    const stepDuration = duration / steps;
+    
+    let currentStep = 0;
+    const interval = setInterval(() => {
+        currentStep++;
+        const displayScore = Math.floor(oldScore + (increment * currentStep));
+        scoreElement.textContent = displayScore.toLocaleString();
+        
+        if (currentStep >= steps) {
+            clearInterval(interval);
+            scoreElement.textContent = newScore.toLocaleString();
+        }
+    }, stepDuration);
+}
+
+/**
  * Submit score to Firebase
  */
 async function submitScoreToFirebase() {
@@ -1232,6 +1514,108 @@ function showNotification(message) {
     document.body.appendChild(notification);
 
     setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+/**
+ * Highlight matched gems before removal
+ */
+function highlightMatches(matches) {
+    matches.forEach(match => {
+        const gem = document.querySelector(`[data-row="${match.row}"][data-col="${match.col}"]`);
+        if (gem) {
+            gem.classList.add('matched');
+        }
+    });
+}
+
+/**
+ * Show invalid swap animation
+ */
+function showInvalidSwap(row1, col1, row2, col2) {
+    const gem1 = document.querySelector(`[data-row="${row1}"][data-col="${col1}"]`);
+    const gem2 = document.querySelector(`[data-row="${row2}"][data-col="${col2}"]`);
+    
+    if (gem1) gem1.classList.add('invalid-swap');
+    if (gem2) gem2.classList.add('invalid-swap');
+    
+    setTimeout(() => {
+        if (gem1) gem1.classList.remove('invalid-swap');
+        if (gem2) gem2.classList.remove('invalid-swap');
+    }, 400);
+}
+
+/**
+ * Show floating points text
+ */
+function showFloatingPoints(points, row, col) {
+    const boardElement = document.getElementById('gameBoard');
+    const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+    
+    if (!gem || !boardElement) return;
+    
+    const rect = gem.getBoundingClientRect();
+    const boardRect = boardElement.getBoundingClientRect();
+    
+    const floatingText = document.createElement('div');
+    floatingText.className = 'floating-points';
+    floatingText.textContent = `+${points}`;
+    floatingText.style.left = `${rect.left - boardRect.left + rect.width/2}px`;
+    floatingText.style.top = `${rect.top - boardRect.top}px`;
+    
+    boardElement.appendChild(floatingText);
+    
+    setTimeout(() => {
+        floatingText.remove();
+    }, 1000);
+}
+
+/**
+ * Show combo multiplier indicator
+ */
+function showComboIndicator(combo) {
+    if (combo <= 1) return;
+    
+    const boardElement = document.getElementById('gameBoard');
+    if (!boardElement) return;
+    
+    const comboText = document.createElement('div');
+    comboText.className = 'combo-indicator';
+    
+    if (combo === 2) comboText.textContent = 'COMBO! 2x';
+    else if (combo === 3) comboText.textContent = 'GREAT! 3x';
+    else if (combo === 4) comboText.textContent = 'AMAZING! 4x';
+    else comboText.textContent = `MEGA! ${combo}x`;
+    
+    boardElement.appendChild(comboText);
+    
+    setTimeout(() => {
+        comboText.remove();
+    }, 600);
+}
+
+/**
+ * Show notification
+ */
+function showNotification_old(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-weight: bold;
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease-out forwards';
         setTimeout(() => notification.remove(), 300);
     }, 3000);
@@ -1243,4 +1627,72 @@ function showNotification(message) {
 function endGame() {
     gameState.isPaused = true;
     submitScoreToFirebase();
+}
+
+/**
+ * Show Goblin Glitch Easter Egg
+ * "It's not a bug, it's a goblin!" 
+ * Appears IN the hole at the bottom of the game board
+ */
+function showGoblinGlitch() {
+    console.log('👹 showGoblinGlitch() called!');
+    
+    // Get the game board wrapper (parent of the board)
+    const boardWrapper = document.querySelector('.game-board-wrapper');
+    if (!boardWrapper) {
+        console.error('❌ Could not find .game-board-wrapper');
+        return;
+    }
+    
+    // Remove any existing goblin
+    const existingGoblin = document.querySelector('.goblin-glitch');
+    const existingTooltip = document.querySelector('.goblin-tooltip');
+    if (existingGoblin) existingGoblin.remove();
+    if (existingTooltip) existingTooltip.remove();
+    
+    // Create goblin container
+    const goblin = document.createElement('div');
+    goblin.className = 'goblin-glitch';
+    
+    // Random goblin image
+    const randomImage = GAME_CONFIG.GOBLIN_IMAGES[Math.floor(Math.random() * GAME_CONFIG.GOBLIN_IMAGES.length)];
+    goblin.innerHTML = `<img src="${randomImage}" alt="Mischievous Goblin">`;
+    
+    // Create tooltip
+    const tooltip = document.createElement('div');
+    tooltip.className = 'goblin-tooltip';
+    const randomMessage = GAME_CONFIG.GOBLIN_MESSAGES[Math.floor(Math.random() * GAME_CONFIG.GOBLIN_MESSAGES.length)];
+    tooltip.textContent = randomMessage;
+    
+    // Add to game board wrapper (so it appears over the board)
+    boardWrapper.appendChild(goblin);
+    boardWrapper.appendChild(tooltip);
+    
+    console.log('👹 Goblin elements added to DOM');
+    
+    // Animate in
+    requestAnimationFrame(() => {
+        goblin.classList.add('active');
+        tooltip.classList.add('active');
+        console.log('👹 Goblin animated in!');
+        
+        // Add glitch shake
+        setTimeout(() => {
+            goblin.classList.add('glitching');
+        }, 200);
+    });
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        goblin.classList.remove('active', 'glitching');
+        tooltip.classList.remove('active');
+        
+        setTimeout(() => {
+            goblin.remove();
+            tooltip.remove();
+            console.log('👹 Goblin removed');
+        }, 500);
+    }, 3000);
+    
+    console.log('👹 Goblin glitch easter egg triggered!');
 }
