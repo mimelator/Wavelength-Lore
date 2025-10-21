@@ -2151,6 +2151,100 @@
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
 
+/* Favorite Songs Section */
+.favorite-songs-section {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 20px rgba(240, 147, 251, 0.3);
+}
+
+.favorite-songs-section h3 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: 'AnimeAce', monospace;
+    font-size: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.favorite-songs-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+}
+
+.favorite-song-item {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.favorite-song-item:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.favorite-song-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    text-decoration: none;
+    color: #fff;
+}
+
+.favorite-song-number {
+    font-size: 1.5rem;
+    color: #ff1744;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    min-width: 30px;
+    text-align: center;
+}
+
+.favorite-song-info {
+    flex: 1;
+}
+
+.favorite-song-title {
+    font-weight: bold;
+    font-size: 0.95rem;
+    color: #fff;
+    margin-bottom: 4px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.favorite-song-meta {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.no-favorites {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    font-size: 0.95rem;
+}
+
+.no-favorites a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+.no-favorites a:hover {
+    border-bottom-color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
 .profile-bio {
     background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
     border-radius: 12px;

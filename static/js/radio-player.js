@@ -42,6 +42,132 @@ class WavelengthRadio {
         this.updateStats();
         this.startMysticalSpawner();
         this.loadFavorites();
+        this.initFirebaseSync();
+    }
+
+    // Initialize Firebase sync for game stats
+    initFirebaseSync() {
+        // Wait for Firebase to be ready
+        if (window.firebaseAuth && window.firebaseUtils) {
+            window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
+                if (user) {
+                    this.currentUserId = user.uid;
+                    this.loadStatsFromFirebase();
+                    this.loadFavoritesFromFirebase();
+                }
+            });
+        } else {
+            // Retry after a delay if Firebase isn't ready yet
+            setTimeout(() => this.initFirebaseSync(), 500);
+        }
+    }
+
+    // Load stats from Firebase and merge with localStorage
+    async loadStatsFromFirebase() {
+        if (!this.currentUserId || !window.firebaseDB) return;
+
+        try {
+            const userStatsRef = window.firebaseUtils.ref(window.firebaseDB, `users/${this.currentUserId}/radioPlayerStats`);
+            const snapshot = await window.firebaseUtils.get(userStatsRef);
+
+            if (snapshot.exists()) {
+                const firebaseStats = snapshot.val();
+
+                // Merge Firebase stats with local stats (take the higher value)
+                this.stats.mushrooms = Math.max(this.stats.mushrooms, firebaseStats.mushrooms || 0);
+                this.stats.stars = Math.max(this.stats.stars, firebaseStats.stars || 0);
+                this.stats.horseshoes = Math.max(this.stats.horseshoes, firebaseStats.horseshoes || 0);
+                this.stats.sparkles = Math.max(this.stats.sparkles, firebaseStats.sparkles || 0);
+                this.stats.crystals = Math.max(this.stats.crystals, firebaseStats.crystals || 0);
+                this.stats.moons = Math.max(this.stats.moons, firebaseStats.moons || 0);
+                this.stats.goblins = Math.max(this.stats.goblins, firebaseStats.goblins || 0);
+                this.stats.magicLevel = Math.max(this.stats.magicLevel, firebaseStats.magicLevel || 1);
+
+                // Update localStorage with merged values
+                localStorage.setItem('mushroom_count', this.stats.mushrooms);
+                localStorage.setItem('star_count', this.stats.stars);
+                localStorage.setItem('horseshoe_count', this.stats.horseshoes);
+                localStorage.setItem('sparkle_count', this.stats.sparkles);
+                localStorage.setItem('crystal_count', this.stats.crystals);
+                localStorage.setItem('moon_count', this.stats.moons);
+                localStorage.setItem('goblin_count', this.stats.goblins);
+                localStorage.setItem('magic_level', this.stats.magicLevel);
+
+                this.updateStats();
+
+                console.log('✅ Loaded and merged game stats from Firebase');
+            } else {
+                // No Firebase stats yet, save current localStorage stats to Firebase
+                await this.saveStatsToFirebase();
+            }
+        } catch (error) {
+            console.error('Error loading stats from Firebase:', error);
+        }
+    }
+
+    // Save stats to Firebase
+    async saveStatsToFirebase() {
+        if (!this.currentUserId || !window.firebaseDB) return;
+
+        try {
+            const userStatsRef = window.firebaseUtils.ref(window.firebaseDB, `users/${this.currentUserId}/radioPlayerStats`);
+            await window.firebaseUtils.set(userStatsRef, {
+                mushrooms: this.stats.mushrooms,
+                stars: this.stats.stars,
+                horseshoes: this.stats.horseshoes,
+                sparkles: this.stats.sparkles,
+                crystals: this.stats.crystals,
+                moons: this.stats.moons,
+                goblins: this.stats.goblins,
+                magicLevel: this.stats.magicLevel,
+                lastUpdated: Date.now()
+            });
+        } catch (error) {
+            console.error('Error saving stats to Firebase:', error);
+        }
+    }
+
+    // Save favorites to Firebase
+    async saveFavoritesToFirebase() {
+        if (!this.currentUserId || !window.firebaseDB) return;
+
+        try {
+            const userFavoritesRef = window.firebaseUtils.ref(window.firebaseDB, `users/${this.currentUserId}/radioPlayerFavorites`);
+            await window.firebaseUtils.set(userFavoritesRef, {
+                favorites: this.favorites,
+                lastUpdated: Date.now()
+            });
+        } catch (error) {
+            console.error('Error saving favorites to Firebase:', error);
+        }
+    }
+
+    // Load favorites from Firebase
+    async loadFavoritesFromFirebase() {
+        if (!this.currentUserId || !window.firebaseDB) return;
+
+        try {
+            const userFavoritesRef = window.firebaseUtils.ref(window.firebaseDB, `users/${this.currentUserId}/radioPlayerFavorites`);
+            const snapshot = await window.firebaseUtils.get(userFavoritesRef);
+
+            if (snapshot.exists()) {
+                const firebaseData = snapshot.val();
+
+                // Merge Firebase favorites with local favorites
+                const mergedFavorites = [...new Set([...this.favorites, ...(firebaseData.favorites || [])])];
+                this.favorites = mergedFavorites;
+
+                // Update localStorage
+                localStorage.setItem('wavelength_favorites', JSON.stringify(this.favorites));
+
+                // Update UI
+                this.loadFavorites();
+
+                console.log('✅ Loaded and merged favorites from Firebase');
+            }
+        } catch (error) {
+            console.error('Error loading favorites from Firebase:', error);
+        }
     }
 
     // Control bindings
@@ -412,6 +538,11 @@ class WavelengthRadio {
         }
 
         localStorage.setItem('wavelength_favorites', JSON.stringify(this.favorites));
+
+        // Save to Firebase if user is authenticated
+        if (this.currentUserId) {
+            this.saveFavoritesToFirebase();
+        }
     }
 
     // Load favorites from storage
@@ -594,6 +725,11 @@ class WavelengthRadio {
         }
 
         this.updateStats();
+
+        // Save to Firebase if user is authenticated
+        if (this.currentUserId) {
+            this.saveStatsToFirebase();
+        }
 
         // Remove element
         setTimeout(() => {
