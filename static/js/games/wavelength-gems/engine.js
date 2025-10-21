@@ -204,10 +204,21 @@ function animateSwap(row1, col1, row2, col2) {
 function animateMatches(matches) {
     const matchSet = new Set(matches.map(m => `${m.row},${m.col}`));
 
+    // Calculate score for this match
+    const matchCount = matches.length;
+    const baseScore = GAME_CONFIG.BASE_POINTS * matchCount;
+    const comboMultiplier = Math.max(1, gameState.combo);
+    const matchScore = baseScore * comboMultiplier;
+
+    // Update game score
+    gameState.score += matchScore;
+
     matches.forEach(({ row, col }) => {
         const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
         if (gem) {
             gem.classList.add('matching');
+            // Show score popup from this gem's position
+            showScorePopup(gem, matchScore / matches.length);
         }
     });
 
@@ -219,6 +230,11 @@ function animateMatches(matches) {
 
         renderBoard();
 
+        // Show combo indicator if combo > 1
+        if (gameState.combo > 1) {
+            showComboIndicator();
+        }
+
         // Apply gravity and fill empty spaces
         setTimeout(() => {
             animateGravity();
@@ -227,15 +243,60 @@ function animateMatches(matches) {
 }
 
 /**
+ * Show floating score popup from gem position
+ */
+function showScorePopup(gemElement, points) {
+    const popup = document.createElement('div');
+    popup.className = 'score-popup';
+    popup.textContent = '+' + Math.round(points);
+
+    const rect = gemElement.getBoundingClientRect();
+    popup.style.left = (rect.left + rect.width / 2) + 'px';
+    popup.style.top = (rect.top + rect.height / 2) + 'px';
+    popup.style.transform = 'translate(-50%, -50%)';
+
+    document.body.appendChild(popup);
+
+    // Remove after animation
+    setTimeout(() => popup.remove(), 800);
+}
+
+/**
+ * Show combo multiplier indicator
+ */
+function showComboIndicator() {
+    // Remove existing indicator
+    const existing = document.querySelector('.combo-indicator');
+    if (existing) existing.remove();
+
+    const indicator = document.createElement('div');
+    indicator.className = 'combo-indicator';
+    indicator.innerHTML = `<div class="combo-text">COMBO x${gameState.combo}!</div>`;
+
+    document.body.appendChild(indicator);
+
+    // Remove after animation
+    setTimeout(() => indicator.remove(), 400);
+}
+
+/**
  * Animate gravity - gems falling down
  */
 function animateGravity() {
-    // Calculate gravity
+    // Track which gems fall and their distances
+    const fallingGems = new Map(); // Key: "row,col", Value: fallDistance
+
+    // Calculate gravity and track movement
     for (let col = 0; col < GAME_CONFIG.COLS; col++) {
         let writePos = GAME_CONFIG.ROWS - 1;
 
         for (let row = GAME_CONFIG.ROWS - 1; row >= 0; row--) {
             if (gameState.board[row][col] !== null) {
+                const fallDistance = row - writePos;
+                if (fallDistance > 0) {
+                    // Mark gems that are falling
+                    fallingGems.set(`${writePos},${col}`, fallDistance);
+                }
                 gameState.board[writePos][col] = gameState.board[row][col];
                 if (writePos !== row) {
                     gameState.board[row][col] = null;
@@ -248,13 +309,19 @@ function animateGravity() {
     // Render with falling animation
     renderBoard();
 
-    // Add falling animation class to gems that moved
+    // Add falling animation class and adjust animation duration based on fall distance
     for (let col = 0; col < GAME_CONFIG.COLS; col++) {
         for (let row = 0; row < GAME_CONFIG.ROWS; row++) {
             if (gameState.board[row][col] !== null) {
                 const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
                 if (gem) {
-                    gem.classList.add('falling');
+                    const fallDistance = fallingGems.get(`${row},${col}`) || 0;
+                    if (fallDistance > 0) {
+                        gem.classList.add('falling');
+                        // Adjust animation timing based on distance (max 200ms for far falls)
+                        const duration = Math.min(200 + (fallDistance * 30), 400);
+                        gem.style.animationDuration = (duration / 1000) + 's';
+                    }
                 }
             }
         }
