@@ -286,7 +286,7 @@
 
     <script>
         // Load leaderboard data from Firebase
-        async function loadLeaderboard() {
+        function loadLeaderboard() {
             try {
                 // Wait for Firebase to be ready
                 if (!window.firebaseDB || !window.firebaseUtils) {
@@ -294,64 +294,76 @@
                     return;
                 }
 
+                // Use onValue for real-time updates
                 const usersRef = window.firebaseUtils.ref(window.firebaseDB, 'users');
-                const snapshot = await window.firebaseUtils.get(usersRef);
+                
+                window.firebaseUtils.onValue(usersRef, (snapshot) => {
+                    try {
+                        if (!snapshot.exists()) {
+                            document.getElementById('leaderboardContent').innerHTML = 
+                                '<div class="no-data">No players found yet. Be the first!</div>';
+                            return;
+                        }
 
-                if (!snapshot.exists()) {
-                    document.getElementById('leaderboardContent').innerHTML = 
-                        '<div class="no-data">No players found yet. Be the first!</div>';
-                    return;
-                }
+                        const users = snapshot.val();
+                        const leaderboardData = [];
+                        let totalPointsSum = 0;
 
-                const users = snapshot.val();
-                const leaderboardData = [];
-                let totalPointsSum = 0;
+                        // Process users and extract leaderboard data
+                        Object.keys(users).forEach(userId => {
+                            const user = users[userId];
+                            const stats = user.radioPlayerStats || {};
+                            const totalPoints = stats.totalPoints || 0;
+                            const magicLevel = stats.magicLevel || 1;
 
-                // Process users and extract leaderboard data
-                Object.keys(users).forEach(userId => {
-                    const user = users[userId];
-                    const stats = user.radioPlayerStats || {};
-                    const totalPoints = stats.totalPoints || 0;
-                    const magicLevel = stats.magicLevel || 1;
+                            // Get user name from forum profile or use ID
+                            const forumUser = users[userId];
+                            const userName = forumUser.name || user.displayName || `Player ${userId.substring(0, 6)}`;
 
-                    // Get user name from forum profile or use ID
-                    const forumUser = users[userId];
-                    const userName = forumUser.name || user.displayName || `Player ${userId.substring(0, 6)}`;
-
-                    if (totalPoints > 0) {
-                        leaderboardData.push({
-                            userId,
-                            userName,
-                            totalPoints,
-                            magicLevel,
-                            isCurrentUser: window.forumState?.currentUser?.uid === userId
+                            if (totalPoints > 0) {
+                                leaderboardData.push({
+                                    userId,
+                                    userName,
+                                    totalPoints,
+                                    magicLevel,
+                                    isCurrentUser: window.forumState?.currentUser?.uid === userId
+                                });
+                                totalPointsSum += totalPoints;
+                            }
                         });
-                        totalPointsSum += totalPoints;
+
+                        // Sort by total points
+                        leaderboardData.sort((a, b) => b.totalPoints - a.totalPoints);
+
+                        // Update stats
+                        document.getElementById('totalPlayers').textContent = leaderboardData.length.toLocaleString();
+                        document.getElementById('totalPoints').textContent = totalPointsSum.toLocaleString();
+
+                        // Find current user's rank
+                        const currentUserIndex = leaderboardData.findIndex(p => p.isCurrentUser);
+                        if (currentUserIndex >= 0) {
+                            document.getElementById('yourRank').textContent = `#${currentUserIndex + 1}`;
+                        } else {
+                            document.getElementById('yourRank').textContent = 'N/A';
+                        }
+
+                        // Render leaderboard
+                        renderLeaderboard(leaderboardData);
+                    } catch (error) {
+                        console.error('Error processing leaderboard data:', error);
+                        document.getElementById('leaderboardContent').innerHTML = 
+                            '<div class="no-data">Error processing data. Please try again.</div>';
                     }
+                }, (error) => {
+                    console.error('Error loading leaderboard:', error);
+                    document.getElementById('leaderboardContent').innerHTML = 
+                        '<div class="no-data">Failed to load leaderboard. Please try again later.</div>';
                 });
 
-                // Sort by total points
-                leaderboardData.sort((a, b) => b.totalPoints - a.totalPoints);
-
-                // Update stats
-                document.getElementById('totalPlayers').textContent = leaderboardData.length.toLocaleString();
-                document.getElementById('totalPoints').textContent = totalPointsSum.toLocaleString();
-
-                // Find current user's rank
-                const currentUserIndex = leaderboardData.findIndex(p => p.isCurrentUser);
-                if (currentUserIndex >= 0) {
-                    document.getElementById('yourRank').textContent = `#${currentUserIndex + 1}`;
-                } else {
-                    document.getElementById('yourRank').textContent = 'N/A';
-                }
-
-                // Render leaderboard
-                renderLeaderboard(leaderboardData);
-
             } catch (error) {
-                console.error('Error loading leaderboard:', error);
+                console.error('Error setting up leaderboard:', error);
                 document.getElementById('leaderboardContent').innerHTML = 
-                    '<div class="no-data">Failed to load leaderboard. Please try again later.</div>';
+                    '<div class="no-data">Failed to initialize leaderboard.</div>';
             }
         }
 
