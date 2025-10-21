@@ -221,6 +221,7 @@
                 <button class="btn btn-secondary" id="pauseBtn" onclick="togglePause()">Pause</button>
                 <button class="btn btn-secondary" id="soundBtn" onclick="toggleSound()">🔊 Sound On</button>
                 <button class="btn btn-secondary" onclick="toggleLeaderboard()">🏆 Leaderboard</button>
+                <button class="btn btn-secondary" onclick="debugBoardState()">🔍 Debug Board</button>
                 <button class="btn btn-secondary" onclick="window.location.href = '/games'">← Back to Games</button>
             </div>
 
@@ -242,14 +243,10 @@
         </div>
     </main>
 
-    <!-- Background Gallery - Images from currently playing radio song -->
-    <div id="game-background-gallery" class="game-background-gallery"></div>
-
     <%- include('../partials/footer') %>
 
     <script src="/js/games/wavelength-gems/engine.js"></script>
     <script src="/js/games/wavelength-gems/ui.js"></script>
-    <script src="/js/games/wavelength-gems/background-gallery.js"></script>
     <script>
         // Toggle leaderboard visibility
         function toggleLeaderboard() {

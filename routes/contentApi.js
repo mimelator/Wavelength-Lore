@@ -14,6 +14,42 @@ const { requireGroup } = require('../middleware/groupAuth');
 const { updateDataAsAdmin } = require('../helpers/firebase-admin-utils');
 
 /**
+ * Get all episodes (public endpoint for background gallery, etc.)
+ * GET /api/episodes
+ */
+router.get('/api/episodes', async (req, res) => {
+    try {
+        const episodeHelpers = require('../helpers/episode-helpers');
+        const allEpisodes = await episodeHelpers.getAllEpisodes();
+        
+        // Format episodes for response
+        const episodes = allEpisodes
+            .filter(ep => ep.visible !== false) // Only return visible episodes
+            .map(ep => ({
+                id: ep.id,
+                seasonNumber: ep.seasonNumber,
+                episodeNumber: ep.episodeNumber,
+                title: ep.title,
+                image: ep.image,
+                carouselImages: ep.carouselImages || []
+            }));
+        
+        res.json({
+            success: true,
+            episodes: episodes,
+            count: episodes.length
+        });
+    } catch (error) {
+        console.error('Error fetching episodes:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch episodes',
+            message: error.message
+        });
+    }
+});
+
+/**
  * Helper function to strip CDN URL from paths
  * Ensures we only store relative paths in the database
  */

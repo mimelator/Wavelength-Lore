@@ -174,11 +174,18 @@ class GameBackgroundGallery {
     }
 }
 
-// Initialize when document is ready
+// Export for manual initialization
+window.GameBackgroundGallery = GameBackgroundGallery;
+
+// Auto-initialize only if the default container exists
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        window.gameBackgroundGallery = new GameBackgroundGallery();
+        if (document.getElementById('game-background-gallery')) {
+            window.gameBackgroundGallery = new GameBackgroundGallery();
+        }
     });
 } else {
-    window.gameBackgroundGallery = new GameBackgroundGallery();
+    if (document.getElementById('game-background-gallery')) {
+        window.gameBackgroundGallery = new GameBackgroundGallery();
+    }
 }

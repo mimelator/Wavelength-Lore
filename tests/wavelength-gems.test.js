@@ -23,16 +23,44 @@ describe('Wavelength Gems Engine', () => {
     }
 
     function createMatchAt(board, row, col, gemType) {
-        // Check horizontal
+        // Check horizontal (left side)
         if (col >= 2) {
             if (board[row][col - 1] === gemType && board[row][col - 2] === gemType) {
                 return true;
             }
         }
+        
+        // Check horizontal (right side)
+        if (col <= GAME_CONFIG.COLS - 3) {
+            if (board[row][col + 1] === gemType && board[row][col + 2] === gemType) {
+                return true;
+            }
+        }
+        
+        // Check horizontal (middle)
+        if (col >= 1 && col <= GAME_CONFIG.COLS - 2) {
+            if (board[row][col - 1] === gemType && board[row][col + 1] === gemType) {
+                return true;
+            }
+        }
 
-        // Check vertical
+        // Check vertical (top side)
         if (row >= 2) {
             if (board[row - 1][col] === gemType && board[row - 2][col] === gemType) {
+                return true;
+            }
+        }
+        
+        // Check vertical (bottom side)
+        if (row <= GAME_CONFIG.ROWS - 3) {
+            if (board[row + 1][col] === gemType && board[row + 2][col] === gemType) {
+                return true;
+            }
+        }
+        
+        // Check vertical (middle)
+        if (row >= 1 && row <= GAME_CONFIG.ROWS - 2) {
+            if (board[row - 1][col] === gemType && board[row + 1][col] === gemType) {
                 return true;
             }
         }
@@ -104,13 +132,30 @@ describe('Wavelength Gems Engine', () => {
     }
 
     function fillEmpty(board) {
-        for (let col = 0; col < GAME_CONFIG.COLS; col++) {
-            for (let row = 0; row < GAME_CONFIG.ROWS; row++) {
+        // Fill from bottom to top, left to right
+        for (let row = GAME_CONFIG.ROWS - 1; row >= 0; row--) {
+            for (let col = 0; col < GAME_CONFIG.COLS; col++) {
                 if (board[row][col] === null) {
                     let gemType;
+                    let attemptCount = 0;
+                    const maxAttempts = GAME_CONFIG.GEM_TYPES.length * 10;
+                    
                     do {
                         gemType = getRandomGemType();
+                        attemptCount++;
+                        
+                        if (attemptCount > maxAttempts) {
+                            // Emergency fallback
+                            for (let i = 0; i < GAME_CONFIG.GEM_TYPES.length; i++) {
+                                gemType = GAME_CONFIG.GEM_TYPES[i];
+                                if (!createMatchAt(board, row, col, gemType)) {
+                                    break;
+                                }
+                            }
+                            break;
+                        }
                     } while (createMatchAt(board, row, col, gemType));
+                    
                     board[row][col] = gemType;
                 }
             }
@@ -216,6 +261,79 @@ describe('Wavelength Gems Engine', () => {
             }
             const matches = findMatches(board);
             expect(matches).toHaveLength(0);
+        });
+    });
+
+    describe('createMatchAt Validation', () => {
+        test('should detect horizontal match to the left', () => {
+            const board = Array(GAME_CONFIG.ROWS).fill(null).map(() => Array(GAME_CONFIG.COLS).fill(null));
+            board[4][0] = 'daphne';
+            board[4][1] = 'daphne';
+            
+            const wouldMatch = createMatchAt(board, 4, 2, 'daphne');
+            expect(wouldMatch).toBe(true);
+        });
+
+        test('should detect horizontal match to the right', () => {
+            const board = Array(GAME_CONFIG.ROWS).fill(null).map(() => Array(GAME_CONFIG.COLS).fill(null));
+            board[4][1] = 'daphne';
+            board[4][2] = 'daphne';
+            
+            const wouldMatch = createMatchAt(board, 4, 0, 'daphne');
+            expect(wouldMatch).toBe(true);
+        });
+
+        test('should detect horizontal match in the middle', () => {
+            const board = Array(GAME_CONFIG.ROWS).fill(null).map(() => Array(GAME_CONFIG.COLS).fill(null));
+            board[4][0] = 'daphne';
+            board[4][2] = 'daphne';
+            
+            const wouldMatch = createMatchAt(board, 4, 1, 'daphne');
+            expect(wouldMatch).toBe(true);
+        });
+
+        test('should detect vertical match above', () => {
+            const board = Array(GAME_CONFIG.ROWS).fill(null).map(() => Array(GAME_CONFIG.COLS).fill(null));
+            board[0][4] = 'jasper';
+            board[1][4] = 'jasper';
+            
+            const wouldMatch = createMatchAt(board, 2, 4, 'jasper');
+            expect(wouldMatch).toBe(true);
+        });
+
+        test('should detect vertical match below', () => {
+            const board = Array(GAME_CONFIG.ROWS).fill(null).map(() => Array(GAME_CONFIG.COLS).fill(null));
+            board[1][4] = 'jasper';
+            board[2][4] = 'jasper';
+            
+            const wouldMatch = createMatchAt(board, 0, 4, 'jasper');
+            expect(wouldMatch).toBe(true);
+        });
+
+        test('should detect vertical match in the middle', () => {
+            const board = Array(GAME_CONFIG.ROWS).fill(null).map(() => Array(GAME_CONFIG.COLS).fill(null));
+            board[0][4] = 'jasper';
+            board[2][4] = 'jasper';
+            
+            const wouldMatch = createMatchAt(board, 1, 4, 'jasper');
+            expect(wouldMatch).toBe(true);
+        });
+
+        test('should NOT detect match with only 2 gems', () => {
+            const board = Array(GAME_CONFIG.ROWS).fill(null).map(() => Array(GAME_CONFIG.COLS).fill(null));
+            board[4][0] = 'daphne';
+            
+            const wouldMatch = createMatchAt(board, 4, 1, 'daphne');
+            expect(wouldMatch).toBe(false);
+        });
+
+        test('should NOT detect match with different gem types', () => {
+            const board = Array(GAME_CONFIG.ROWS).fill(null).map(() => Array(GAME_CONFIG.COLS).fill(null));
+            board[4][0] = 'daphne';
+            board[4][1] = 'jasper';
+            
+            const wouldMatch = createMatchAt(board, 4, 2, 'daphne');
+            expect(wouldMatch).toBe(false);
         });
     });
 
