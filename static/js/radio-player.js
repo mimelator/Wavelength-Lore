@@ -2144,8 +2144,25 @@ class WavelengthRadio {
             const currentTrack = this.playlist[this.currentTrackIndex];
             if (!currentTrack) return;
 
-            const characters = JSON.parse(currentTrack.dataset?.characters || currentTrack.characters || '[]');
-            if (characters.length === 0) return;
+            // Parse character data from dataset (handle empty/invalid JSON)
+            let characters = [];
+            try {
+                const charactersData = currentTrack.dataset?.characters || '';
+                if (charactersData) {
+                    characters = JSON.parse(charactersData);
+                }
+            } catch (error) {
+                console.warn('👥 Failed to parse character data:', error);
+                return;
+            }
+
+            if (!characters || characters.length === 0) {
+                console.log('👥 No characters found for current track, skipping badge spawn');
+                // Still schedule next attempt
+                const nextSpawn = 5000 + Math.random() * 5000;
+                this.badgeSpawnInterval = setTimeout(spawnBadge, nextSpawn);
+                return;
+            }
 
             // Pick a random character
             const character = characters[Math.floor(Math.random() * characters.length)];
