@@ -18,7 +18,11 @@ class WavelengthRadio {
         // Game state
         this.stats = {
             mushrooms: parseInt(localStorage.getItem('mushroom_count') || '0'),
+            stars: parseInt(localStorage.getItem('star_count') || '0'),
             horseshoes: parseInt(localStorage.getItem('horseshoe_count') || '0'),
+            sparkles: parseInt(localStorage.getItem('sparkle_count') || '0'),
+            crystals: parseInt(localStorage.getItem('crystal_count') || '0'),
+            moons: parseInt(localStorage.getItem('moon_count') || '0'),
             magicLevel: parseInt(localStorage.getItem('magic_level') || '1')
         };
 
@@ -536,12 +540,12 @@ class WavelengthRadio {
 
         // Random type
         const types = [
-            { emoji: '🍄', class: 'mushroom', points: 10, stat: 'mushrooms' },
-            { emoji: '🌟', class: 'sparkle', points: 5, stat: null },
-            { emoji: '🧲', class: 'horseshoe', points: 15, stat: 'horseshoes' },
-            { emoji: '✨', class: 'sparkle', points: 5, stat: null },
-            { emoji: '🔮', class: 'sparkle', points: 8, stat: null },
-            { emoji: '🌙', class: 'sparkle', points: 7, stat: null }
+            { emoji: '🍄', class: 'mushroom', points: 10, stat: 'mushrooms', name: 'Mushroom' },
+            { emoji: '🌟', class: 'star', points: 5, stat: 'stars', name: 'Star' },
+            { emoji: '🧲', class: 'horseshoe', points: 15, stat: 'horseshoes', name: 'Horseshoe' },
+            { emoji: '✨', class: 'sparkle', points: 5, stat: 'sparkles', name: 'Sparkle' },
+            { emoji: '🔮', class: 'crystal', points: 8, stat: 'crystals', name: 'Crystal' },
+            { emoji: '🌙', class: 'moon', points: 7, stat: 'moons', name: 'Moon' }
         ];
 
         const type = types[Math.floor(Math.random() * types.length)];
@@ -580,17 +584,16 @@ class WavelengthRadio {
         element.classList.remove('appearing');
         element.classList.add('collecting');
 
-        // Update stats
-        if (type.stat === 'mushrooms') {
-            this.stats.mushrooms++;
-            localStorage.setItem('mushroom_count', this.stats.mushrooms);
-        } else if (type.stat === 'horseshoes') {
-            this.stats.horseshoes++;
-            localStorage.setItem('horseshoe_count', this.stats.horseshoes);
+        // Update stats for this specific collectible type
+        if (type.stat && this.stats.hasOwnProperty(type.stat)) {
+            this.stats[type.stat]++;
+            localStorage.setItem(`${type.stat.slice(0, -1)}_count`, this.stats[type.stat]);
         }
 
-        // Level up every 50 items
-        const totalCollected = this.stats.mushrooms + this.stats.horseshoes;
+        // Level up every 50 items (total across all types)
+        const totalCollected = this.stats.mushrooms + this.stats.stars +
+                               this.stats.horseshoes + this.stats.sparkles +
+                               this.stats.crystals + this.stats.moons;
         const newLevel = Math.floor(totalCollected / 50) + 1;
         if (newLevel > this.stats.magicLevel) {
             this.stats.magicLevel = newLevel;
@@ -610,7 +613,11 @@ class WavelengthRadio {
     // Update game stats display
     updateStats() {
         document.getElementById('mushroomCount').textContent = this.stats.mushrooms;
+        document.getElementById('starCount').textContent = this.stats.stars;
         document.getElementById('horseshoeCount').textContent = this.stats.horseshoes;
+        document.getElementById('sparkleCount').textContent = this.stats.sparkles;
+        document.getElementById('crystalCount').textContent = this.stats.crystals;
+        document.getElementById('moonCount').textContent = this.stats.moons;
         document.getElementById('magicLevel').textContent = this.stats.magicLevel;
     }
 

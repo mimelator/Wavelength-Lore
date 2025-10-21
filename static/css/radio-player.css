@@ -101,6 +101,11 @@
     animation: float 6s ease-in-out infinite, glow 2s ease-in-out infinite;
 }
 
+.mystical-element.star {
+    font-size: 2.5rem;
+    animation: float 5s ease-in-out infinite, twinkle 1.5s ease-in-out infinite, spin 8s linear infinite;
+}
+
 .mystical-element.horseshoe {
     font-size: 2.5rem;
     animation: float 7s ease-in-out infinite, spin 10s linear infinite;
@@ -109,6 +114,16 @@
 .mystical-element.sparkle {
     font-size: 2rem;
     animation: float 5s ease-in-out infinite, twinkle 1.5s ease-in-out infinite;
+}
+
+.mystical-element.crystal {
+    font-size: 2.3rem;
+    animation: float 6s ease-in-out infinite, pulse 2s ease-in-out infinite;
+}
+
+.mystical-element.moon {
+    font-size: 2.8rem;
+    animation: float 8s ease-in-out infinite, glow 3s ease-in-out infinite;
 }
 
 .mystical-element.character {
@@ -642,23 +657,41 @@
 
 .stat-item {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     gap: 8px;
 }
 
+.stat-icon {
+    font-size: 1.8rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
 .stat-label {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: #666;
+    font-weight: 600;
 }
 
 .stat-value {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: bold;
     background: linear-gradient(135deg, #667eea, #764ba2);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    min-width: 30px;
+    text-align: center;
+}
+
+.stat-item.magic-level {
+    padding-left: 20px;
+    border-left: 2px solid rgba(102, 126, 234, 0.3);
+    margin-left: 10px;
+}
+
+.stat-item.magic-level .stat-value {
+    font-size: 1.8rem;
 }
 
 /* Episode Info Section */
