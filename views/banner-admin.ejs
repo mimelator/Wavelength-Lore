@@ -330,26 +330,43 @@
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
-      checkAuth();
-      loadBanners();
+      initializePage();
     });
+
+    async function initializePage() {
+      // Wait for Firebase to be ready first
+      await checkAuth();
+      // Then load banners
+      await loadBanners();
+    }
 
     async function checkAuth() {
       // Wait for Firebase to initialize
       if (!window.firebaseAuth) {
-        setTimeout(checkAuth, 100);
-        return;
+        await new Promise(resolve => setTimeout(resolve, 100));
+        return checkAuth();
       }
 
-      const user = window.firebaseAuth.currentUser;
-      if (!user) {
-        window.location.href = '/forum';
-        return;
+      // Wait for auth state to be ready
+      if (!window.firebaseAuth.currentUser) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        // Check one more time
+        if (!window.firebaseAuth.currentUser) {
+          window.location.href = '/forum';
+          return;
+        }
       }
     }
 
     async function loadBanners() {
       try {
+        // Double-check Firebase is ready
+        if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+          console.error('Firebase not ready when loading banners');
+          showError('Authentication not ready. Please refresh the page.');
+          return;
+        }
+
         const response = await fetch('/api/banners', {
           headers: {
             'Authorization': `Bearer ${await window.firebaseAuth.currentUser.getIdToken()}`
@@ -469,6 +486,11 @@
     async function saveBanner(event) {
       event.preventDefault();
 
+      if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+        showError('Not authenticated. Please refresh the page.');
+        return;
+      }
+
       const id = document.getElementById('banner-id').value;
       const bannerData = {
         message: document.getElementById('banner-message').value,
@@ -512,6 +534,11 @@
     }
 
     async function toggleBanner(id) {
+      if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+        showError('Not authenticated. Please refresh the page.');
+        return;
+      }
+
       try {
         const token = await window.firebaseAuth.currentUser.getIdToken();
         const response = await fetch(`/api/banners/${id}/toggle`, {
@@ -537,6 +564,11 @@
 
     async function deleteBanner(id) {
       if (!confirm('Are you sure you want to delete this banner? This cannot be undone.')) {
+        return;
+      }
+
+      if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+        showError('Not authenticated. Please refresh the page.');
         return;
       }
 
