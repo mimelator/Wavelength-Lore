@@ -147,11 +147,23 @@ window.initializeWavelengthFirebase = function(firebaseConfig) {
                         }
                     };
                     
+                    // Store token immediately if user is already signed in
+                    (async () => {
+                        console.log('🎯 Checking for existing user session...');
+                        const currentUser = auth.currentUser;
+                        if (currentUser) {
+                            console.log('👤 User already signed in, storing token immediately...');
+                            await storeToken(currentUser);
+                        } else {
+                            console.log('⏳ No current user, waiting for auth state...');
+                        }
+                    })();
+                    
                     // Listen for auth state changes and store token
                     // This fires when auth state is restored from localStorage or when user signs in
                     console.log('🎯 Setting up onAuthStateChanged listener in firebase-config.js...');
                     onAuthStateChanged(auth, async (user) => {
-                        console.log('� Auth state changed in firebase-config.js:', user ? `User: ${user.uid}` : 'No user');
+                        console.log('🔄 Auth state changed in firebase-config.js:', user ? `User: ${user.uid}` : 'No user');
                         await storeToken(user);
                     });
                     
@@ -176,7 +188,7 @@ window.initializeWavelengthFirebase = function(firebaseConfig) {
                         }
                     }, 5 * 60 * 1000); // Check every 5 minutes
                     
-                    console.log('Firebase initialized with 2-week session persistence');
+                    console.log('✅ Firebase initialized with 2-week session persistence and token storage');
                     return { auth, database };
                     
                 }).catch((error) => {
