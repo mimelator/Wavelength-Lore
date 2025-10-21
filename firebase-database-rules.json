@@ -169,18 +169,11 @@
       ".write": "auth != null && auth.token.isScript == true"
     },
     "users": {
+      ".read": "auth != null",
       "$userId": {
-        ".read": "auth != null && (auth.uid == $userId || auth.token.isScript == true)",
         ".write": "auth != null && (auth.uid == $userId || auth.token.isScript == true)",
         "radioPlayerStats": {
-          ".read": "auth != null",
           ".write": "auth != null && auth.uid == $userId"
-        },
-        "name": {
-          ".read": "auth != null"
-        },
-        "displayName": {
-          ".read": "auth != null"
         }
       }
     }
