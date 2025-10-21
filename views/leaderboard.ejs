@@ -287,17 +287,23 @@
     <script>
         // Load leaderboard data from Firebase
         function loadLeaderboard() {
+            console.log('🏆 loadLeaderboard() called');
             try {
                 // Wait for Firebase to be ready
                 if (!window.firebaseDB || !window.firebaseUtils) {
+                    console.log('⏳ Firebase not ready, retrying...');
                     setTimeout(loadLeaderboard, 500);
                     return;
                 }
+                
+                console.log('✅ Firebase ready, loading leaderboard data...');
 
                 // Use onValue for real-time updates
                 const usersRef = window.firebaseUtils.ref(window.firebaseDB, 'users');
+                console.log('📡 Setting up listener on users path...');
                 
                 window.firebaseUtils.onValue(usersRef, (snapshot) => {
+                    console.log('📥 onValue callback triggered, snapshot exists:', snapshot.exists());
                     try {
                         if (!snapshot.exists()) {
                             document.getElementById('leaderboardContent').innerHTML = 
