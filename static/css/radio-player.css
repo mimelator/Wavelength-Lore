@@ -1618,9 +1618,9 @@
     font-size: 0.9rem;
     opacity: 0.8;
     z-index: 20;
-    animation: fadeInOut 4s ease-in-out infinite;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
 }
 
 @keyframes fadeInOut {

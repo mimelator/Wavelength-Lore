@@ -1668,6 +1668,26 @@ class WavelengthRadio {
         // Start game if active
         this.updateGameMode();
 
+        // Show exit hint for 5 seconds, then hide it
+        const exitHint = overlay.querySelector('.screensaver-exit-hint');
+        if (exitHint) {
+            exitHint.style.opacity = '1';
+            exitHint.style.visibility = 'visible';
+
+            // Clear any existing timeout
+            if (this.exitHintTimeout) {
+                clearTimeout(this.exitHintTimeout);
+            }
+
+            // Hide after 5 seconds
+            this.exitHintTimeout = setTimeout(() => {
+                exitHint.style.opacity = '0';
+                setTimeout(() => {
+                    exitHint.style.visibility = 'hidden';
+                }, 500); // Wait for fade out transition
+            }, 5000);
+        }
+
         console.log(`🎨 Screen saver mode activated with ${this.screensaverImages.length} images from current episode`);
     }
 
@@ -1703,6 +1723,12 @@ class WavelengthRadio {
         if (this.titleFadeTimeout) {
             clearTimeout(this.titleFadeTimeout);
             this.titleFadeTimeout = null;
+        }
+
+        // Clear exit hint timeout
+        if (this.exitHintTimeout) {
+            clearTimeout(this.exitHintTimeout);
+            this.exitHintTimeout = null;
         }
 
         console.log('🎨 Screen saver mode exited');
