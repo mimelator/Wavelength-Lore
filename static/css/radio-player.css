@@ -1172,13 +1172,14 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background: #000;
     z-index: 10000;
     display: none;
     opacity: 0;
     transition: opacity 0.8s ease;
+    overflow: hidden;
 }
 
 .screensaver-overlay.active {
@@ -2176,6 +2177,13 @@
 }
 
 /* Hide radio player and other elements when screen saver is active */
+body.screensaver-active {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+
 body.screensaver-active .radio-player,
 body.screensaver-active .game-stats,
 body.screensaver-active .mystical-canvas {
