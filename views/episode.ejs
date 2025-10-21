@@ -4,6 +4,7 @@
     <%- include('partials/head') %>
     <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css">
     <link rel="stylesheet" href="<%= cdnUrl %>/css/modal_styles.css">
+    <link rel="stylesheet" href="<%= cdnUrl %>/css/radio-player.css?<%= version %>">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
     <link rel="stylesheet" type="text/css" href="<%= cdnUrl %>/css/carousel.css">
@@ -104,12 +105,59 @@
             </div>
         </section>
 
-        <section class="audio-player">
+        <!-- Radio Player Section -->
+        <section class="episode-radio-player">
             <h2>Listen to the Song</h2>
-            <audio controls>
-                <source src="<%= audioUrl %>" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
+            <div class="radio-player" id="radioPlayer" style="margin: 20px auto; max-width: 600px;">
+                <div class="player-header">
+                    <h3 class="radio-title" style="font-size: 1.2rem;">Now Playing</h3>
+                </div>
+
+                <!-- Album art -->
+                <div class="album-art-container">
+                    <div class="album-art" id="albumArt">
+                        <div class="vinyl-record"></div>
+                        <div class="album-glow"></div>
+                    </div>
+                </div>
+
+                <!-- Now playing info -->
+                <div class="now-playing">
+                    <div class="track-info">
+                        <h2 id="trackTitle"><%= title %></h2>
+                        <p id="trackEpisode">Season <%= seasonNumber %> • Episode <%= episodeNumber %></p>
+                    </div>
+                    <div class="progress-container">
+                        <div class="time-display">
+                            <span id="currentTime">0:00</span>
+                            <span id="duration">0:00</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                            <div class="progress-handle" id="progressHandle"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audio element -->
+                <audio id="audioPlayer" preload="metadata">
+                    <source src="<%= audioUrl %>" type="audio/mpeg">
+                </audio>
+
+                <!-- Playback controls -->
+                <div class="controls">
+                    <button class="control-btn play-btn" id="playPauseBtn" title="Play">
+                        <span id="playIcon">▶</span>
+                    </button>
+                </div>
+
+                <!-- Volume control -->
+                <div class="volume-control">
+                    <span class="volume-icon">🔊</span>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="80" class="volume-slider">
+                    <span id="volumeValue">80%</span>
+                </div>
+            </div>
         </section>
 
         <section class="lyrics">
@@ -128,11 +176,12 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    <script src="<%= cdnUrl %>/js/radio-player.js?<%= version %>"></script>
     <script>
         $(document).ready(function() {
             $('#episode-carousel').slick({
                 infinite: true,
-                slidesToShow: window.innerWidth <= 768 ? 2 : 5, // Show 2 slides on mobile, 5 otherwise
+                slidesToShow: window.innerWidth <= 768 ? 2 : 5,
                 slidesToScroll: 1,
                 autoplay: true,
                 autoplaySpeed: 4000,
@@ -142,6 +191,37 @@
                 variableWidth: false,
                 adaptiveHeight: false
             });
+
+            // Initialize radio player for this episode only
+            if (typeof RadioPlayer !== 'undefined') {
+                const episodeData = {
+                    title: '<%= title %>',
+                    season: <%= seasonNumber %>,
+                    episode: <%= episodeNumber %>,
+                    audio: '<%= audioUrl %>',
+                    image: '<%= image %>',
+                    episodeImage: '<%= image %>',
+                    images: <%- JSON.stringify(carouselImages || []) %>
+                };
+
+                const player = new RadioPlayer('<%= cdnUrl %>', '<%= version %>');
+                
+                // Create minimal playlist with just this episode
+                const playlistElement = document.createElement('div');
+                playlistElement.className = 'playlist-item';
+                playlistElement.dataset.audio = episodeData.audio;
+                playlistElement.dataset.title = episodeData.title;
+                playlistElement.dataset.season = episodeData.season;
+                playlistElement.dataset.episode = episodeData.episode;
+                playlistElement.dataset.episodeImage = '<%= cdnUrl %>' + episodeData.episodeImage;
+                playlistElement.dataset.images = JSON.stringify(episodeData.images.map(img => '<%= cdnUrl %>' + img));
+                
+                player.playlist = [playlistElement];
+                player.currentTrackIndex = 0;
+                
+                // Auto-play the track
+                player.playTrack(0);
+            }
         });
     </script>
     <script>
