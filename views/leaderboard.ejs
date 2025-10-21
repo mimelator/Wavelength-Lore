@@ -334,7 +334,13 @@
                             const stats = user.radioPlayerStats || {};
                             
                             // Debug: Log each user's stats
-                            console.log(`User ${userId}:`, { stats, totalPoints: stats.totalPoints });
+                            console.log(`User ${userId}:`, { 
+                                user: user,
+                                stats: stats, 
+                                totalPoints: stats.totalPoints,
+                                hasRadioPlayerStats: !!user.radioPlayerStats,
+                                allKeys: Object.keys(user)
+                            });
                             const totalPoints = stats.totalPoints || 0;
                             const magicLevel = stats.magicLevel || 1;
 
