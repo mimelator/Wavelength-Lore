@@ -75,8 +75,18 @@ let canvasManager = {
             // Insert canvas into gameBoard div
             const gameBoard = document.getElementById('gameBoard');
             if (gameBoard) {
+                // Preserve hero badge and goblin elements before clearing
+                const heroBadge = document.getElementById('heroBadge');
+                const goblinUnderneath = document.querySelector('.goblin-underneath');
+                
                 // Clear the board's old content
                 gameBoard.innerHTML = '';
+                
+                // Re-add preserved elements
+                if (heroBadge) gameBoard.appendChild(heroBadge);
+                if (goblinUnderneath) gameBoard.appendChild(goblinUnderneath);
+                
+                // Add canvas
                 gameBoard.appendChild(canvas);
             }
         }
