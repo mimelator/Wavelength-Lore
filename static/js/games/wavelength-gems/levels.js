@@ -57,12 +57,14 @@ function applyDefaults(level) {
         easy: { moveLimit: 30, targetScore: 1500, gemTypeCount: 4, cascadeBonus: 1.2 },
         medium: { moveLimit: 25, targetScore: 2500, gemTypeCount: 5, cascadeBonus: 1.5 },
         hard: { moveLimit: 20, targetScore: 4000, gemTypeCount: 6, cascadeBonus: 2.0 },
+        very_hard: { moveLimit: 15, targetScore: 6000, gemTypeCount: 7, cascadeBonus: 2.5 },
         expert: { moveLimit: 15, targetScore: 5500, gemTypeCount: 6, cascadeBonus: 2.5 },
-        legend: { moveLimit: 10, targetScore: 7500, gemTypeCount: 6, cascadeBonus: 3.0 }
+        legend: { moveLimit: 10, targetScore: 7500, gemTypeCount: 6, cascadeBonus: 3.0 },
+        boss: { moveLimit: 35, targetScore: 8000, gemTypeCount: 8, cascadeBonus: 3.0 }
     };
 
     const difficulty = level.difficulty || 'easy';
-    const baseValues = DEFAULT_DIFFICULTY_VALUES[difficulty];
+    const baseValues = DEFAULT_DIFFICULTY_VALUES[difficulty] || DEFAULT_DIFFICULTY_VALUES['easy'];
 
     return {
         // Apply defaults with YAML data override

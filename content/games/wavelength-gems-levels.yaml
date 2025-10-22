@@ -142,4 +142,617 @@ levels:
       unlockRequirements:
         previousLevel: 1
 
-  # Levels 3-11 will be added one at a time
+  # Level 3: Dream With Me
+  - level: 3
+    season: 1
+    episode: 3
+    episodeKey: season1/episode3
+    title: Dream With Me
+    description: Explore the realm of dreams where anything is possible. Match gems to unlock your imagination!
+    difficulty: easy
+    
+    theme:
+      primaryColor: "#8B5CF6"        # Purple (dreams)
+      secondaryColor: "#EC4899"      # Pink (imagination)
+      accentColor: "#F59E0B"         # Amber (magic)
+      backgroundImage: /static/images/seasons/season1/episodes/episode3/images/dream_with_me.webp
+      backgroundOpacity: 0.12
+      carouselImages:
+        - /static/images/seasons/season1/episodes/episode3/images/dream_with_me.webp
+      particleEffect: dream_stars
+      borderGlowColor: "#8B5CF6"
+      borderGlowIntensity: 0.6
+    
+    gemThemes:
+      daphne: 🌙  # Crescent moon (dreams)
+      jasper: ⭐  # Star (wishes)
+      miles: 🎵   # Music note (harmony)
+      ivy: 💭     # Thought bubble (imagination)
+      echo: 🌟    # Sparkles (magic)
+    
+    objectives:
+      primary:
+        type: score
+        target: 3500
+        description: Reach 3500 points
+      secondary:
+        - type: cascades
+          target: 5
+          description: Trigger 5 cascade combos
+          reward:
+            points: 500
+            stars: 1
+    
+    constraints:
+      moveLimit: 25
+      gemTypes:
+        - daphne
+        - jasper
+        - miles
+        - ivy
+        - echo
+      gemTypeCount: 5
+    
+    narrative:
+      briefing: Close your eyes and dream with me! In this realm, imagination becomes reality. Match the celestial gems to unlock your inner vision.
+      loreReference: season1/episode3
+      characters:
+        - Wavelength
+      locations:
+        - Dream Realm
+    
+    progression:
+      unlockRequirements:
+        previousLevel: 2
+
+  # Level 4: Daphne
+  - level: 4
+    season: 1
+    episode: 4
+    episodeKey: season1/episode4
+    title: Daphne
+    description: Meet Daphne, the brave and curious adventurer. Match gems to discover her story and strength!
+    difficulty: medium
+    
+    theme:
+      primaryColor: "#DC2626"        # Red (courage)
+      secondaryColor: "#F59E0B"      # Amber (warmth)
+      accentColor: "#7C3AED"         # Violet (magic)
+      backgroundImage: /static/images/characters/daphne/Daphne-01.webp
+      backgroundOpacity: 0.12
+      carouselImages:
+        - /static/images/characters/daphne/Daphne-01.webp
+        - /static/images/characters/daphne/Daphne-02.webp
+      particleEffect: null
+      borderGlowColor: "#DC2626"
+      borderGlowIntensity: 0.6
+    
+    gemThemes:
+      daphne: 🗡️   # Sword (bravery)
+      jasper: 🛡️   # Shield (protection)
+      miles: 💎   # Gem (treasure)
+      ivy: 🔥     # Fire (passion)
+      echo: ⚡    # Lightning (power)
+    
+    objectives:
+      primary:
+        type: score
+        target: 4000
+        description: Reach 4000 points
+      secondary:
+        - type: cascades
+          target: 6
+          description: Trigger 6 cascade combos
+          reward:
+            points: 600
+            stars: 1
+    
+    constraints:
+      moveLimit: 22
+      gemTypes:
+        - daphne
+        - jasper
+        - miles
+        - ivy
+        - echo
+      gemTypeCount: 5
+    
+    narrative:
+      briefing: Daphne's courage inspires all who meet her. Channel her strength and determination as you match gems and overcome challenges!
+      loreReference: season1/episode4
+      characters:
+        - Daphne
+      locations:
+        - The Road
+    
+    progression:
+      unlockRequirements:
+        previousLevel: 3
+
+  # Level 5: Falling
+  - level: 5
+    season: 1
+    episode: 5
+    episodeKey: season1/episode5
+    title: Falling
+    description: Sometimes we fall, but that's when we learn to fly. Match gems through the descent and discover resilience!
+    difficulty: medium
+    
+    theme:
+      primaryColor: "#06B6D4"        # Cyan (sky)
+      secondaryColor: "#1E40AF"      # Blue (depth)
+      accentColor: "#F3F4F6"         # Light gray (clouds)
+      backgroundImage: /static/images/seasons/season1/episodes/episode5/images/falling.webp
+      backgroundOpacity: 0.12
+      carouselImages:
+        - /static/images/seasons/season1/episodes/episode5/images/falling.webp
+      particleEffect: falling_leaves
+      borderGlowColor: "#06B6D4"
+      borderGlowIntensity: 0.6
+    
+    gemThemes:
+      daphne: 🪶  # Feather (lightness)
+      jasper: 🌊  # Wave (flow)
+      miles: 🍃   # Leaves (falling)
+      ivy: 💨     # Wind (movement)
+      echo: ☁️    # Cloud (softness)
+      nova: 🌀    # Spiral (momentum)
+    
+    objectives:
+      primary:
+        type: score
+        target: 4500
+        description: Reach 4500 points
+      secondary:
+        - type: cascades
+          target: 7
+          description: Trigger 7 cascade combos
+          reward:
+            points: 700
+            stars: 1
+    
+    constraints:
+      moveLimit: 20
+      gemTypes:
+        - daphne
+        - jasper
+        - miles
+        - ivy
+        - echo
+        - nova
+      gemTypeCount: 6
+    
+    narrative:
+      briefing: When you're falling, don't fight it—embrace the journey. Every descent teaches us how to rise again. Match gems as you tumble through the sky!
+      loreReference: season1/episode5
+      characters:
+        - Wavelength
+      locations:
+        - The Sky
+    
+    progression:
+      unlockRequirements:
+        previousLevel: 4
+
+  # Level 6: Once More
+  - level: 6
+    season: 1
+    episode: 6
+    episodeKey: season1/episode6
+    title: Once More
+    description: Sometimes we need to try again. Match gems to find the courage for one more attempt!
+    difficulty: medium
+    
+    theme:
+      primaryColor: "#F59E0B"        # Amber (determination)
+      secondaryColor: "#DC2626"      # Red (passion)
+      accentColor: "#10B981"         # Green (hope)
+      backgroundImage: /static/images/seasons/season1/episodes/episode6/images/once_more.webp
+      backgroundOpacity: 0.12
+      carouselImages:
+        - /static/images/seasons/season1/episodes/episode6/images/once_more.webp
+      particleEffect: null
+      borderGlowColor: "#F59E0B"
+      borderGlowIntensity: 0.6
+    
+    gemThemes:
+      daphne: 🔄  # Arrows (retry)
+      jasper: 💪  # Muscle (strength)
+      miles: 🎯   # Target (focus)
+      ivy: 🔥     # Fire (persistence)
+      echo: ⚡    # Lightning (energy)
+      nova: 🌟    # Star (aspiration)
+    
+    objectives:
+      primary:
+        type: score
+        target: 5000
+        description: Reach 5000 points
+      secondary:
+        - type: cascades
+          target: 8
+          description: Trigger 8 cascade combos
+          reward:
+            points: 800
+            stars: 1
+    
+    constraints:
+      moveLimit: 18
+      gemTypes:
+        - daphne
+        - jasper
+        - miles
+        - ivy
+        - echo
+        - nova
+      gemTypeCount: 6
+    
+    narrative:
+      briefing: Never give up! Every attempt brings you closer to success. Match gems with determination and prove that persistence pays off!
+      loreReference: season1/episode6
+      characters:
+        - Wavelength
+        - Daphne
+      locations:
+        - The Shire
+    
+    progression:
+      unlockRequirements:
+        previousLevel: 5
+
+  # Level 7: History Lessons
+  - level: 7
+    season: 1
+    episode: 7
+    episodeKey: season1/episode7
+    title: History Lessons
+    description: Learn from the past to shape the future. Match ancient gems to unlock forgotten wisdom!
+    difficulty: hard
+    
+    theme:
+      primaryColor: "#92400E"        # Brown (ancient)
+      secondaryColor: "#FCD34D"      # Gold (treasure)
+      accentColor: "#7C3AED"         # Purple (wisdom)
+      backgroundImage: /static/images/seasons/season1/episodes/episode7/images/history_lessons.webp
+      backgroundOpacity: 0.12
+      carouselImages:
+        - /static/images/seasons/season1/episodes/episode7/images/history_lessons.webp
+      particleEffect: ancient_dust
+      borderGlowColor: "#92400E"
+      borderGlowIntensity: 0.6
+    
+    gemThemes:
+      daphne: 📜  # Scroll (knowledge)
+      jasper: 🏛️   # Classical building (history)
+      miles: ⏳   # Hourglass (time)
+      ivy: 🗝️     # Key (unlock secrets)
+      echo: 📚    # Books (learning)
+      nova: 🔮    # Crystal ball (foresight)
+    
+    objectives:
+      primary:
+        type: score
+        target: 5500
+        description: Reach 5500 points
+      secondary:
+        - type: cascades
+          target: 9
+          description: Trigger 9 cascade combos
+          reward:
+            points: 900
+            stars: 1
+    
+    constraints:
+      moveLimit: 18
+      gemTypes:
+        - daphne
+        - jasper
+        - miles
+        - ivy
+        - echo
+        - nova
+      gemTypeCount: 6
+    
+    narrative:
+      briefing: The past holds the keys to our future. Study these ancient gems to uncover the lessons of history and avoid repeating old mistakes!
+      loreReference: season1/episode7
+      characters:
+        - Wavelength
+        - Elder Historian
+      locations:
+        - The Ancient Library
+    
+    progression:
+      unlockRequirements:
+        previousLevel: 6
+
+  # Level 8: Life In The Shire
+  - level: 8
+    season: 1
+    episode: 8
+    episodeKey: season1/episode8
+    title: Life In The Shire
+    description: Experience the peaceful daily life in the Shire. Match gems to celebrate community and harmony!
+    difficulty: hard
+    
+    theme:
+      primaryColor: "#10B981"        # Green (nature)
+      secondaryColor: "#F59E0B"      # Amber (warmth)
+      accentColor: "#EC4899"         # Pink (joy)
+      backgroundImage: /static/images/seasons/season1/episodes/episode8/images/life_in_the_shire.webp
+      backgroundOpacity: 0.12
+      carouselImages:
+        - /static/images/seasons/season1/episodes/episode8/images/life_in_the_shire.webp
+      particleEffect: fireflies
+      borderGlowColor: "#10B981"
+      borderGlowIntensity: 0.6
+    
+    gemThemes:
+      daphne: 🏡  # House (home)
+      jasper: 🌻  # Sunflower (growth)
+      miles: 🎵   # Music (celebration)
+      ivy: 🍞     # Bread (sustenance)
+      echo: 🌾    # Wheat (harvest)
+      nova: 🐝    # Bee (community)
+      orion: 🌳   # Tree (nature)
+    
+    objectives:
+      primary:
+        type: score
+        target: 6000
+        description: Reach 6000 points
+      secondary:
+        - type: cascades
+          target: 10
+          description: Trigger 10 cascade combos
+          reward:
+            points: 1000
+            stars: 1
+    
+    constraints:
+      moveLimit: 16
+      gemTypes:
+        - daphne
+        - jasper
+        - miles
+        - ivy
+        - echo
+        - nova
+        - orion
+      gemTypeCount: 7
+    
+    narrative:
+      briefing: The Shire is alive with joy and harmony! Join the daily life of the community—match gems to celebrate the simple pleasures of home!
+      loreReference: season1/episode8
+      characters:
+        - Shire Folk
+        - Lucky
+      locations:
+        - The Shire
+    
+    progression:
+      unlockRequirements:
+        previousLevel: 7
+
+  # Level 9: Feed The Crows
+  - level: 9
+    season: 1
+    episode: 9
+    episodeKey: season1/episode9
+    title: Feed The Crows
+    description: Dark omens gather as crows circle overhead. Match gems to prepare for what's coming!
+    difficulty: hard
+    
+    theme:
+      primaryColor: "#1F2937"        # Dark gray (ominous)
+      secondaryColor: "#6B7280"      # Medium gray (shadow)
+      accentColor: "#DC2626"         # Red (danger)
+      backgroundImage: /static/images/seasons/season1/episodes/episode9/images/feed_the_crows.webp
+      backgroundOpacity: 0.12
+      carouselImages:
+        - /static/images/seasons/season1/episodes/episode9/images/feed_the_crows.webp
+      particleEffect: dark_feathers
+      borderGlowColor: "#1F2937"
+      borderGlowIntensity: 0.6
+    
+    gemThemes:
+      daphne: 🦅  # Eagle (vigilance)
+      jasper: 🪶  # Feather (crows)
+      miles: 🌑   # New moon (darkness)
+      ivy: ⚔️     # Crossed swords (conflict)
+      echo: 🔔    # Bell (warning)
+      nova: 🌩️    # Storm (turmoil)
+      orion: 👁️    # Eye (watching)
+    
+    objectives:
+      primary:
+        type: score
+        target: 6500
+        description: Reach 6500 points
+      secondary:
+        - type: cascades
+          target: 11
+          description: Trigger 11 cascade combos
+          reward:
+            points: 1100
+            stars: 1
+    
+    constraints:
+      moveLimit: 15
+      gemTypes:
+        - daphne
+        - jasper
+        - miles
+        - ivy
+        - echo
+        - nova
+        - orion
+      gemTypeCount: 7
+    
+    narrative:
+      briefing: The crows gather, bringing whispers of dark times ahead. Steel yourself and match gems to face the approaching storm!
+      loreReference: season1/episode9
+      characters:
+        - Wavelength
+        - The Crows
+      locations:
+        - The Dark Woods
+    
+    progression:
+      unlockRequirements:
+        previousLevel: 8
+
+  # Level 10: Keep On
+  - level: 10
+    season: 1
+    episode: 10
+    episodeKey: season1/episode10
+    title: Keep On
+    description: No matter how hard it gets, you must keep pushing forward. Match gems to find your inner strength!
+    difficulty: very_hard
+    
+    theme:
+      primaryColor: "#DC2626"        # Red (determination)
+      secondaryColor: "#F59E0B"      # Amber (perseverance)
+      accentColor: "#8B5CF6"         # Purple (willpower)
+      backgroundImage: /static/images/seasons/season1/episodes/episode10/images/keep_on.webp
+      backgroundOpacity: 0.12
+      carouselImages:
+        - /static/images/seasons/season1/episodes/episode10/images/keep_on.webp
+      particleEffect: energy_burst
+      borderGlowColor: "#DC2626"
+      borderGlowIntensity: 0.7
+    
+    gemThemes:
+      daphne: 💪  # Muscle (strength)
+      jasper: 🏃  # Runner (perseverance)
+      miles: 🎵   # Music (rhythm)
+      ivy: 🔥     # Fire (passion)
+      echo: ⚡    # Lightning (energy)
+      nova: 🌟    # Star (aspiration)
+      orion: 💫   # Dizzy (pushing limits)
+      atlas: 🏔️   # Mountain (overcome obstacles)
+    
+    objectives:
+      primary:
+        type: score
+        target: 7000
+        description: Reach 7000 points
+      secondary:
+        - type: cascades
+          target: 12
+          description: Trigger 12 cascade combos
+          reward:
+            points: 1200
+            stars: 1
+    
+    constraints:
+      moveLimit: 14
+      gemTypes:
+        - daphne
+        - jasper
+        - miles
+        - ivy
+        - echo
+        - nova
+        - orion
+        - atlas
+      gemTypeCount: 8
+    
+    narrative:
+      briefing: "When the road gets tough and you want to give up, remember: you must keep on! Match gems with unwavering determination!"
+      loreReference: season1/episode10
+      characters:
+        - Wavelength
+        - Daphne
+      locations:
+        - The Mountain Pass
+    
+    progression:
+      unlockRequirements:
+        previousLevel: 9
+
+  # Level 11: Back To The Shire (BOSS LEVEL)
+  - level: 11
+    season: 1
+    episode: 11
+    episodeKey: season1/episode11
+    title: Back To The Shire
+    description: 'BOSS LEVEL: The Goblin King threatens the Shire! Match gems to defend your home in this epic showdown!'
+    difficulty: boss
+    
+    theme:
+      primaryColor: "#7C3AED"        # Purple (epic)
+      secondaryColor: "#DC2626"      # Red (battle)
+      accentColor: "#FFD700"         # Gold (victory)
+      backgroundImage: /static/images/seasons/season1/episodes/episode11/images/back_to_the_shire.webp
+      backgroundOpacity: 0.15
+      carouselImages:
+        - /static/images/seasons/season1/episodes/episode11/images/back_to_the_shire.webp
+      particleEffect: epic_battle
+      borderGlowColor: "#7C3AED"
+      borderGlowIntensity: 0.8
+    
+    gemThemes:
+      daphne: 🗡️   # Sword (offense)
+      jasper: 🛡️   # Shield (defense)
+      miles: 🎵   # Music (power of song)
+      ivy: 🌈     # Rainbow (hope)
+      echo: ⚡    # Lightning (magic)
+      nova: 🔥    # Fire (destruction)
+      orion: 👑   # Crown (Goblin King)
+      atlas: 💎   # Gem (Shire treasure)
+    
+    objectives:
+      primary:
+        type: score
+        target: 8000
+        description: Reach 8000 points to defeat the Goblin King!
+      secondary:
+        - type: cascades
+          target: 15
+          description: Trigger 15 cascade combos
+          reward:
+            points: 1500
+            stars: 2
+        - type: special_gems
+          target: 10
+          description: Create 10 special gem combinations
+          reward:
+            points: 1000
+            stars: 1
+    
+    constraints:
+      moveLimit: 35
+      gemTypes:
+        - daphne
+        - jasper
+        - miles
+        - ivy
+        - echo
+        - nova
+        - orion
+        - atlas
+      gemTypeCount: 8
+      bossMode: true
+      bossHealth: 100
+    
+    narrative:
+      briefing: The Goblin King has arrived at the gates of the Shire! This is the ultimate test—match gems to unleash your full power and save your home! Victory requires skill, strategy, and determination!
+      loreReference: season1/episode11
+      characters:
+        - Wavelength
+        - Daphne
+        - Goblin King
+        - Shire Folk
+        - Lucky
+      locations:
+        - The Shire
+        - The Battlefield
+    
+    progression:
+      unlockRequirements:
+        previousLevel: 10
+      bossLevel: true
+      seasonComplete: true
+      unlocksNextSeason: true

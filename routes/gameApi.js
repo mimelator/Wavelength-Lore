@@ -455,5 +455,126 @@ router.get('/wavelength-gems/levels', async (req, res) => {
     }
 });
 
+/**
+ * POST /api/games/wavelength-gems/save-progress
+ * Save progress for a specific level (used by admin panel)
+ */
+router.post('/wavelength-gems/save-progress', async (req, res) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                error: 'Authentication required'
+            });
+        }
+
+        const { level, score, stars, completed } = req.body;
+
+        if (!level) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing required field: level'
+            });
+        }
+
+        // Path to user's level progress
+        const levelProgressPath = `forum/users/${user.uid}/games/wavelength-gems/levels/${level}`;
+        
+        // Get existing level data
+        const existingData = await fetchDataAsAdmin(levelProgressPath);
+
+        // Prepare level progress data
+        const levelData = {
+            levelId: parseInt(level),
+            status: completed ? 'completed' : 'in_progress',
+            attempts: (existingData?.attempts || 0) + 1,
+            bestScore: Math.max(existingData?.bestScore || 0, score || 0),
+            bestStars: Math.max(existingData?.bestStars || 0, stars || 0),
+            lastScore: score,
+            lastStars: stars,
+            lastAttemptDate: new Date().toISOString()
+        };
+
+        // If this is first completion, record it
+        if (completed && !existingData?.firstCompletedDate) {
+            levelData.firstCompletedDate = new Date().toISOString();
+        } else if (existingData?.firstCompletedDate) {
+            levelData.firstCompletedDate = existingData.firstCompletedDate;
+        }
+
+        // Save to Firebase
+        await updateDataAsAdmin(levelProgressPath, levelData);
+
+        // Update user's game stats
+        const gameStatsPath = `forum/users/${user.uid}/games/wavelength-gems/stats`;
+        const existingStats = await fetchDataAsAdmin(gameStatsPath);
+        
+        const completedLevels = new Set(existingStats?.completedLevels || []);
+        if (completed) {
+            completedLevels.add(parseInt(level));
+        }
+
+        const stats = {
+            totalAttempts: (existingStats?.totalAttempts || 0) + 1,
+            completedLevels: Array.from(completedLevels),
+            highestLevel: Math.max(existingStats?.highestLevel || 0, level),
+            lastPlayed: new Date().toISOString()
+        };
+
+        await updateDataAsAdmin(gameStatsPath, stats);
+
+        res.json({
+            success: true,
+            message: 'Progress saved successfully',
+            levelData,
+            stats
+        });
+
+    } catch (error) {
+        console.error('Error saving progress:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to save progress',
+            details: error.message
+        });
+    }
+});
+
+/**
+ * POST /api/games/wavelength-gems/reset-progress
+ * Reset all progress for the current user (used by admin panel)
+ */
+router.post('/wavelength-gems/reset-progress', async (req, res) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                error: 'Authentication required'
+            });
+        }
+
+        // Path to user's game data
+        const gameDataPath = `forum/users/${user.uid}/games/wavelength-gems`;
+        
+        // Delete all game data
+        await updateDataAsAdmin(gameDataPath, null);
+
+        res.json({
+            success: true,
+            message: 'Progress reset successfully'
+        });
+
+    } catch (error) {
+        console.error('Error resetting progress:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to reset progress',
+            details: error.message
+        });
+    }
+});
+
 module.exports = router;
 

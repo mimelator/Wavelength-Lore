@@ -1,0 +1,329 @@
+/**
+ * Wavelength Gems - Admin Panel Styles
+ */
+
+.admin-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    max-width: 90vw;
+    max-height: 90vh;
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    border: 3px solid #fbbf24;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8),
+                0 0 0 1px rgba(251, 191, 36, 0.3),
+                0 0 40px rgba(251, 191, 36, 0.4);
+    z-index: 10000;
+    font-family: 'AnimeAce', 'Courier New', monospace;
+    overflow: hidden;
+    animation: adminPanelSlideIn 0.3s ease-out;
+}
+
+@keyframes adminPanelSlideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.admin-panel-header {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #d97706;
+}
+
+.admin-panel-header h3 {
+    margin: 0;
+    color: #111827;
+    font-size: 20px;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.admin-close-btn {
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px solid #111827;
+    color: #111827;
+    font-size: 24px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    line-height: 1;
+    padding: 0;
+}
+
+.admin-close-btn:hover {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
+    transform: rotate(90deg);
+}
+
+.admin-panel-content {
+    padding: 20px;
+    max-height: calc(90vh - 140px);
+    overflow-y: auto;
+}
+
+/* Custom scrollbar */
+.admin-panel-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.admin-panel-content::-webkit-scrollbar-track {
+    background: #111827;
+    border-radius: 5px;
+}
+
+.admin-panel-content::-webkit-scrollbar-thumb {
+    background: #fbbf24;
+    border-radius: 5px;
+}
+
+.admin-panel-content::-webkit-scrollbar-thumb:hover {
+    background: #f59e0b;
+}
+
+.admin-section {
+    background: rgba(31, 41, 55, 0.5);
+    border: 2px solid #374151;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+}
+
+.admin-section:hover {
+    border-color: #fbbf24;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+}
+
+.admin-section h4 {
+    margin: 0 0 12px 0;
+    color: #fbbf24;
+    font-size: 16px;
+    border-bottom: 2px solid #374151;
+    padding-bottom: 8px;
+}
+
+.admin-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.admin-row:last-child {
+    margin-bottom: 0;
+}
+
+.admin-row label {
+    color: #d1d5db;
+    min-width: 70px;
+    font-size: 14px;
+}
+
+.admin-input {
+    flex: 1;
+    background: #111827;
+    border: 2px solid #374151;
+    color: #f9fafb;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: 'AnimeAce', 'Courier New', monospace;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.admin-input:focus {
+    outline: none;
+    border-color: #fbbf24;
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+}
+
+.admin-input::placeholder {
+    color: #6b7280;
+}
+
+.admin-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border: 2px solid #1e40af;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'AnimeAce', 'Courier New', monospace;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.admin-btn:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.admin-btn:active {
+    transform: translateY(0);
+}
+
+.admin-btn-small {
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
+.admin-btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-color: #047857;
+}
+
+.admin-btn-success:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.admin-btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border-color: #b91c1c;
+}
+
+.admin-btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.admin-info {
+    background: #111827;
+    border: 2px solid #374151;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.admin-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #374151;
+    font-size: 13px;
+}
+
+.admin-info-row:last-child {
+    border-bottom: none;
+}
+
+.admin-info-row span:first-child {
+    color: #9ca3af;
+}
+
+.admin-info-row span:last-child {
+    color: #fbbf24;
+    font-weight: bold;
+}
+
+.admin-panel-footer {
+    background: #111827;
+    padding: 12px 20px;
+    text-align: center;
+    border-top: 2px solid #374151;
+}
+
+.admin-panel-footer small {
+    color: #6b7280;
+    font-size: 11px;
+}
+
+/* Select dropdown styling */
+select.admin-input {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23fbbf24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 20px;
+    padding-right: 36px;
+}
+
+select.admin-input option {
+    background: #111827;
+    color: #f9fafb;
+    padding: 8px;
+}
+
+/* Input number styling */
+input[type="number"].admin-input {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+input[type="number"].admin-input::-webkit-inner-spin-button,
+input[type="number"].admin-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .admin-panel {
+        width: 95vw;
+        max-height: 95vh;
+    }
+    
+    .admin-row {
+        flex-wrap: wrap;
+    }
+    
+    .admin-row label {
+        min-width: 100%;
+        margin-bottom: 4px;
+    }
+    
+    .admin-btn {
+        flex: 1;
+        min-width: calc(50% - 4px);
+    }
+}
+
+/* Animation for buttons */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.admin-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.admin-btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* God mode active indicator */
+#godModeBtn.active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-color: #047857;
+    animation: pulse 2s infinite;
+}

@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/css/games.css">
     <link rel="stylesheet" href="/css/wavelength-gems.css">
     <link rel="stylesheet" href="/css/goblin-glitch.css">
+    <link rel="stylesheet" href="/css/admin-panel.css">
     <style>
         /* Target both main.gems-game-wrapper and .gems-game-wrapper */
         main.gems-game-wrapper,
@@ -373,7 +374,6 @@
                     <button class="btn btn-secondary" id="pauseBtn" onclick="togglePause()">⏸ Pause</button>
                     <button class="btn btn-secondary" id="soundBtn" onclick="toggleSound()">🔊 Sound On</button>
                     <button class="btn btn-secondary" onclick="toggleLeaderboard()">🏆 Leaderboard</button>
-                    <button class="btn btn-secondary" onclick="debugBoardState()">🔍 Debug Board</button>
                     <button class="btn btn-secondary" onclick="window.location.href = '/games'">← Back to Games</button>
                 </div>
 
@@ -434,6 +434,10 @@
     <script src="/js/games/wavelength-gems/validator.js"></script>
     <script src="/js/games/wavelength-gems/engine.js"></script>
     <script src="/js/games/wavelength-gems/ui.js"></script>
+    
+    <!-- Admin/Developer Debug Panel (Ctrl+Shift+D to toggle) -->
+    <script src="/js/games/wavelength-gems/admin-panel.js"></script>
+    
     <script>
         // Validator available but disabled by default (major bugs fixed!)
         // To enable validation: startValidation(1000) in console
