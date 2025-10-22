@@ -34,23 +34,30 @@ let animationFrames = new Map(); // Map of gem positions to their animation stat
 // Calculates size so 8x8 board fits perfectly with gaps
 function getGemSize() {
     const width = window.innerWidth;
-    const GAP_SIZE = 2; // pixels between gems (reduced from 3)
-    const BOARD_PADDING = 6; // pixels padding on board (reduced from 10)
-    const CONTAINER_MARGIN = 10; // total page margins/padding (reduced from 20)
-    const BORDER_WIDTH = 2; // board border (reduced from 3)
+
+    // Be VERY conservative to account for scrollbars, safe margins, etc
+    const GAP_SIZE = 2; // pixels between gems
+    const BOARD_PADDING = 4; // pixels padding on board
+    const WRAPPER_PADDING = 4; // wrapper padding
+    const CONTAINER_PADDING = 4; // container padding
+    const BORDER_WIDTH = 2; // board border
+    const SAFETY_MARGIN = 10; // extra safety margin
+
+    // Total overhead on both sides
+    const totalOverhead = SAFETY_MARGIN + WRAPPER_PADDING + CONTAINER_PADDING +
+                         (BOARD_PADDING * 2) + (BORDER_WIDTH * 2);
 
     // Available width = viewport - all constraints
-    // Account for: container margins + board padding + board border
-    const availableWidth = width - CONTAINER_MARGIN - (BOARD_PADDING * 2) - (BORDER_WIDTH * 2);
+    const availableWidth = width - totalOverhead;
 
     // Formula: (gemSize * 8) + (gap * 7) = availableWidth
     // Solving: gemSize = (availableWidth - (gap * 7)) / 8
     const calculatedGemSize = Math.floor((availableWidth - (GAP_SIZE * 7)) / 8);
 
     // Clamp between reasonable min/max
-    let gemSize = Math.max(32, Math.min(calculatedGemSize, 60));
+    let gemSize = Math.max(30, Math.min(calculatedGemSize, 60));
 
-    console.log(`📏 Viewport: ${width}px | Available: ${availableWidth}px (after margins/padding/border) | Calculated: ${calculatedGemSize}px | Final gem size: ${gemSize}px`);
+    console.log(`📏 Viewport: ${width}px | Overhead: ${totalOverhead}px | Available: ${availableWidth}px | Calculated: ${calculatedGemSize}px | Final gem size: ${gemSize}px`);
     return gemSize;
 }
 
