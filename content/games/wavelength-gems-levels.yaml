@@ -223,7 +223,7 @@ levels:
       accentColor: "#7C3AED"         # Violet (magic)
       backgroundImage: /static/images/characters/daphne/Daphne-01.webp
       backgroundOpacity: 0.12
-      heroImage: /static/images/characters/daphne/Daphne-02.webp
+      heroImage: /static/images/characters/wavelength/daphne-4.webp
       carouselImages:
         - /static/images/characters/daphne/Daphne-01.webp
         - /static/images/characters/daphne/Daphne-02.webp
