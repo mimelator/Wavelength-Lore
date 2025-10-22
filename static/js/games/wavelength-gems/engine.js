@@ -30,6 +30,320 @@ const GAME_CONFIG = {
 // Animation frame tracking
 let animationFrames = new Map(); // Map of gem positions to their animation state
 
+// ═════════════════════════════════════════════════════════════════════════════
+// CANVAS RENDERING SYSTEM
+// ═════════════════════════════════════════════════════════════════════════════
+
+let canvasManager = {
+    canvas: null,
+    ctx: null,
+    dpi: window.devicePixelRatio || 1,
+    boardPadding: 10,
+    gemGapSize: 2,
+    gemImages: {}, // Cache for gem images
+    animatingGems: new Map(), // Track gems currently animating on canvas
+
+    /**
+     * Initialize Canvas rendering
+     */
+    init() {
+        // Find or create canvas element
+        let canvas = document.getElementById('gemsCanvas');
+        if (!canvas) {
+            canvas = document.createElement('canvas');
+            canvas.id = 'gemsCanvas';
+            canvas.style.cssText = `
+                display: block;
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+                background: transparent;
+                touch-action: none;
+                cursor: pointer;
+            `;
+
+            // Insert canvas into gameBoard div
+            const gameBoard = document.getElementById('gameBoard');
+            if (gameBoard) {
+                // Clear the board's old content
+                gameBoard.innerHTML = '';
+                gameBoard.appendChild(canvas);
+            }
+        }
+
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.resizeCanvas();
+
+        // Add event listeners for clicks/touches
+        canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
+        canvas.addEventListener('touchstart', (e) => this.handleCanvasClick(e));
+
+        // Resize on window resize
+        window.addEventListener('resize', () => this.resizeCanvas());
+
+        console.log('🎨 Canvas manager initialized');
+    },
+
+    /**
+     * Resize canvas to match viewport dimensions
+     */
+    resizeCanvas() {
+        if (!this.canvas) return;
+
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // Account for DPI for sharp rendering
+        this.canvas.width = width * this.dpi;
+        this.canvas.height = height * this.dpi;
+
+        // Scale context for DPI
+        this.ctx.scale(this.dpi, this.dpi);
+
+        // Calculate board dimensions
+        this.calculateBoardDimensions();
+
+        console.log(`📐 Canvas resized: ${width}x${height}px (DPI: ${this.dpi})`);
+    },
+
+    /**
+     * Calculate board position and size within canvas
+     */
+    calculateBoardDimensions() {
+        const viewport = window.innerWidth;
+        const isMobile = viewport <= 768;
+
+        // Calculate gem size
+        let gemSize;
+        if (isMobile) {
+            gemSize = 52; // Fixed size for mobile
+        } else {
+            // Desktop calculation
+            const availableWidth = viewport - (this.boardPadding * 2);
+            const gapTotal = (GAME_CONFIG.COLS - 1) * this.gemGapSize;
+            gemSize = Math.floor((availableWidth - gapTotal) / GAME_CONFIG.COLS);
+            gemSize = Math.max(25, Math.min(gemSize, 60));
+        }
+
+        // Calculate board width and height
+        const boardWidth = (GAME_CONFIG.COLS * gemSize) + ((GAME_CONFIG.COLS - 1) * this.gemGapSize);
+        const boardHeight = (GAME_CONFIG.ROWS * gemSize) + ((GAME_CONFIG.ROWS - 1) * this.gemGapSize);
+
+        // Center the board horizontally
+        const boardX = (viewport - boardWidth) / 2;
+        const boardY = 100; // Top padding
+
+        this.boardX = boardX;
+        this.boardY = boardY;
+        this.gemSize = gemSize;
+        this.boardWidth = boardWidth;
+        this.boardHeight = boardHeight;
+
+        console.log(`📏 Board dimensions: ${gemSize}px gems | Board: ${boardWidth}x${boardHeight}px | Position: (${boardX}, ${boardY})`);
+    },
+
+    /**
+     * Draw the entire board
+     */
+    draw() {
+        if (!this.ctx || !this.canvas) return;
+
+        // Clear canvas
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw board background
+        this.drawBoardBackground();
+
+        // Draw all gems
+        this.drawAllGems();
+
+        // Highlight selected gem
+        if (gameState.selectedGem) {
+            this.drawSelectedHighlight();
+        }
+    },
+
+    /**
+     * Draw board background rectangle
+     */
+    drawBoardBackground() {
+        const ctx = this.ctx;
+
+        ctx.fillStyle = 'rgba(20, 20, 40, 0.8)';
+        ctx.fillRect(
+            this.boardX - this.boardPadding,
+            this.boardY - this.boardPadding,
+            this.boardWidth + (this.boardPadding * 2),
+            this.boardHeight + (this.boardPadding * 2)
+        );
+
+        ctx.strokeStyle = 'rgba(138, 43, 226, 0.3)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(
+            this.boardX - this.boardPadding,
+            this.boardY - this.boardPadding,
+            this.boardWidth + (this.boardPadding * 2),
+            this.boardHeight + (this.boardPadding * 2)
+        );
+    },
+
+    /**
+     * Draw all gems on the board
+     */
+    drawAllGems() {
+        for (let row = 0; row < GAME_CONFIG.ROWS; row++) {
+            for (let col = 0; col < GAME_CONFIG.COLS; col++) {
+                const gemType = gameState.board[row][col];
+                if (gemType) {
+                    this.drawGem(row, col, gemType);
+                }
+            }
+        }
+    },
+
+    /**
+     * Draw a single gem
+     */
+    drawGem(row, col, gemType) {
+        const x = this.boardX + (col * (this.gemSize + this.gemGapSize));
+        const y = this.boardY + (row * (this.gemSize + this.gemGapSize));
+
+        const ctx = this.ctx;
+
+        // Get gem color
+        const color = this.getGemColor(gemType);
+
+        // Draw gem with rounded corners
+        ctx.fillStyle = color;
+        ctx.shadowColor = `rgba(${color}, 0.5)`;
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+        // Rounded rectangle
+        const radius = 4;
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + this.gemSize - radius, y);
+        ctx.quadraticCurveTo(x + this.gemSize, y, x + this.gemSize, y + radius);
+        ctx.lineTo(x + this.gemSize, y + this.gemSize - radius);
+        ctx.quadraticCurveTo(x + this.gemSize, y + this.gemSize, x + this.gemSize - radius, y + this.gemSize);
+        ctx.lineTo(x + radius, y + this.gemSize);
+        ctx.quadraticCurveTo(x, y + this.gemSize, x, y + this.gemSize - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.fill();
+
+        // Draw emoji/character
+        ctx.font = `${Math.floor(this.gemSize * 0.6)}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'white';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 3;
+
+        const emoji = getGemEmoji(gemType);
+        ctx.fillText(emoji, x + this.gemSize / 2, y + this.gemSize / 2);
+
+        // Reset shadow
+        ctx.shadowColor = 'transparent';
+    },
+
+    /**
+     * Draw selection highlight
+     */
+    drawSelectedHighlight() {
+        const { row, col } = gameState.selectedGem;
+        const x = this.boardX + (col * (this.gemSize + this.gemGapSize));
+        const y = this.boardY + (row * (this.gemSize + this.gemGapSize));
+
+        const ctx = this.ctx;
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 3;
+        ctx.shadowColor = '#FFD700';
+        ctx.shadowBlur = 10;
+
+        const radius = 4;
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + this.gemSize - radius, y);
+        ctx.quadraticCurveTo(x + this.gemSize, y, x + this.gemSize, y + radius);
+        ctx.lineTo(x + this.gemSize, y + this.gemSize - radius);
+        ctx.quadraticCurveTo(x + this.gemSize, y + this.gemSize, x + this.gemSize - radius, y + this.gemSize);
+        ctx.lineTo(x + radius, y + this.gemSize);
+        ctx.quadraticCurveTo(x, y + this.gemSize, x, y + this.gemSize - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.shadowColor = 'transparent';
+    },
+
+    /**
+     * Handle clicks on canvas
+     */
+    handleCanvasClick(e) {
+        e.preventDefault();
+
+        // Get mouse position relative to canvas
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+
+        let x, y;
+        if (e.touches) {
+            x = (e.touches[0].clientX - rect.left) * scaleX;
+            y = (e.touches[0].clientY - rect.top) * scaleY;
+        } else {
+            x = (e.clientX - rect.left) * scaleX;
+            y = (e.clientY - rect.top) * scaleY;
+        }
+
+        // Unscale for DPI
+        x /= this.dpi;
+        y /= this.dpi;
+
+        // Convert pixel coordinates to board row/col
+        const col = Math.floor((x - this.boardX) / (this.gemSize + this.gemGapSize));
+        const row = Math.floor((y - this.boardY) / (this.gemSize + this.gemGapSize));
+
+        // Validate click is within bounds
+        if (row >= 0 && row < GAME_CONFIG.ROWS && col >= 0 && col < GAME_CONFIG.COLS) {
+            onGemClick(row, col);
+        }
+    },
+
+    /**
+     * Get color for gem type
+     */
+    getGemColor(gemType) {
+        const colors = {
+            daphne: '#8B5CF6',  // Purple
+            jasper: '#EF4444',  // Red
+            miles: '#3B82F6',   // Blue
+            ivy: '#10B981',     // Green
+            echo: '#F59E0B',    // Orange
+            atlas: '#EC4899'    // Pink
+        };
+        return colors[gemType] || '#999999';
+    }
+};
+
+// Initialize canvas when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.readyState === 'loading') return;
+    canvasManager.init();
+});
+
+// Also try to init immediately if DOM is ready
+if (document.readyState === 'interactive' || document.readyState === 'complete') {
+    canvasManager.init();
+}
+
 // Get responsive gem size based on viewport width
 // Calculates size so 8x8 board fits perfectly with gaps
 function getGemSize() {
@@ -744,18 +1058,18 @@ function onGemClick(row, col) {
         if (dist === 1) {
             // Adjacent gem - swap
             console.log('🔄 Swapping gems:', gameState.selectedGem, 'with', {row, col});
-            unhighlightGem(gameState.selectedGem.row, gameState.selectedGem.col);
+            unhighlightGem();
             swapGems(gameState.selectedGem.row, gameState.selectedGem.col, row, col);
             gameState.selectedGem = null;
         } else if (dist === 0) {
             // Same gem - deselect
-            unhighlightGem(gameState.selectedGem.row, gameState.selectedGem.col);
+            unhighlightGem();
             gameState.selectedGem = null;
             console.log('❌ Deselected gem');
         } else {
             // Not adjacent - select new gem
             console.log(`⚠️ Gems not adjacent! Distance: ${dist} (from [${gameState.selectedGem.row}][${gameState.selectedGem.col}] to [${row}][${col}])`);
-            unhighlightGem(gameState.selectedGem.row, gameState.selectedGem.col);
+            unhighlightGem();
             gameState.selectedGem = { row, col };
             highlightGem(row, col);
             console.log('🔄 Changed selection to:', row, col);
@@ -1426,203 +1740,25 @@ function findMatches() {
  * Reorders existing gems and adds/removes as needed without flashing
  */
 function renderBoard() {
-    console.log('🎨 renderBoard() called');
-    const boardElement = document.getElementById('gameBoard');
+    console.log('🎨 renderBoard() called - Canvas-based rendering');
 
-    // Check if any gems are currently animating (spawning, falling, or swapping)
-    const spawningGems = boardElement.querySelectorAll('.gem.spawning');
-    const fallingGems = boardElement.querySelectorAll('.gem.falling');
-    const swappingGems = boardElement.querySelectorAll('.gem.swapping');
-    const animatingGems = spawningGems.length + fallingGems.length + swappingGems.length;
+    // With Canvas rendering, animations are handled differently
+    // Canvas doesn't have CSS classes, so we just draw the current state
+    // and let the animation loop handle transitions
 
-    if (animatingGems > 0 && !gameState.shouldAnimateNewGems) {
-        // Animating gems exist but this isn't the initial fillEmpty() call
-        // Calculate proper wait time based on actual animations
-        const hasSpawning = spawningGems.length > 0;
-        const hasFalling = fallingGems.length > 0;
-        const hasSwapping = swappingGems.length > 0;
+    // Draw the board immediately using Canvas
+    canvasManager.draw();
 
-        // CRITICAL FIX: After animateGravity completes and clears the 'falling' class,
-        // this condition should be false. If still true, wait longer to ensure animations finish.
-        // Spawn animation: 400ms
-        // Fall animation: 300ms base + up to 210ms stagger (7 cols × 30ms) = 510ms max
-        // Swap animation: 300ms
-        let waitTime = 100; // Base buffer
-        if (hasSpawning) waitTime = Math.max(waitTime, 450); // 400ms spawn + 50ms buffer
-        if (hasFalling) waitTime = Math.max(waitTime, 600); // INCREASED: 510ms max fall + 90ms safety margin
-        if (hasSwapping) waitTime = Math.max(waitTime, 350); // 300ms swap + 50ms buffer
-
-        console.log(`⏸️ Deferring renderBoard() for ${waitTime}ms - ${spawningGems.length} spawning, ${fallingGems.length} falling, ${swappingGems.length} swapping`);
-
-        // 👹 Show goblin glitch easter egg when new gems spawn (indicates cascade/refill after match)
-        if (hasSpawning) {
-            console.log('👹 GOBLIN TRIGGER: hasSpawning =', hasSpawning, 'spawning gems:', spawningGems.length);
-            showGoblinGlitch();
-        }
-
-        setTimeout(() => {
-            console.log('⏩ Retrying renderBoard() after animations');
-            renderBoard();
-        }, waitTime);
-        return;
-    }
-
-    // Use responsive gem size from gameState
-    if (window.innerWidth <= 768) {
-        // Mobile: Use a grid that will shrink gems to fit within container
-        // Each gem is exactly 1/8th of container width, and rows are also 1fr for square gems
-        boardElement.style.gridTemplateColumns = `repeat(${GAME_CONFIG.COLS}, 1fr)`;
-        boardElement.style.gridAutoRows = `1fr`; // Make rows same size as columns for square gems
-        console.log(`📐 Mobile grid: repeat(8, 1fr) with auto-rows: 1fr - ensures square gems that fit viewport`);
-    } else {
-        // Desktop: Fixed gem size
-        boardElement.style.gridTemplateColumns = `repeat(${GAME_CONFIG.COLS}, ${gameState.gemSize}px)`;
-        boardElement.style.gridAutoRows = `${gameState.gemSize}px`;
-        console.log(`📐 Desktop grid: repeat(8, ${gameState.gemSize}px) with auto-rows: ${gameState.gemSize}px`);
-    }
-
-    // Build target state
-    const targetGems = []; // Array of {row, col, type} in correct order
-    for (let row = 0; row < GAME_CONFIG.ROWS; row++) {
-        for (let col = 0; col < GAME_CONFIG.COLS; col++) {
-            const gemType = gameState.board[row][col];
-            if (gemType) {
-                targetGems.push({ row, col, type: gemType });
-            }
-        }
-    }
-    
-    console.log(`🎯 Target: ${targetGems.length} gems expected`);
-    
-    // Get current gems
-    const currentGems = Array.from(boardElement.querySelectorAll('.gem'));
-    console.log(`📦 Current: ${currentGems.length} gems in DOM`);
-    
-    // Create a map of existing gems by position
-    const existingGemsMap = new Map();
-    currentGems.forEach(gem => {
-        const key = `${gem.dataset.row},${gem.dataset.col}`;
-        existingGemsMap.set(key, gem);
-    });
-    
-    // Remove gems that shouldn't exist
-    currentGems.forEach(gem => {
-        const key = `${gem.dataset.row},${gem.dataset.col}`;
-        if (!targetGems.find(t => `${t.row},${t.col}` === key)) {
-            console.log(`🗑️ Removing gem at ${key} (not in target)`);
-            gem.remove();
-        }
-    });
-    
-    // Track which gems need spawn animation (used by fillEmpty)
-    const newGems = [];
-    
-    // Now reorder gems - detach all, then reattach in correct order
-    let addedCount = 0;
-    let typeChangedCount = 0;
-    
-    // First, remove all gems that need to be repositioned
-    const gemsToReorder = [];
-    targetGems.forEach((target, targetIndex) => {
-        const key = `${target.row},${target.col}`;
-        let gem = existingGemsMap.get(key);
-        
-        if (!gem) {
-            // Gem doesn't exist - create it
-            console.log(`➕ Creating new gem at [${target.row}][${target.col}] type=${target.type}`);
-            gem = createGemElement(target.row, target.col, target.type);
-            // Only add spawn animation if this is from fillEmpty
-            if (gameState.shouldAnimateNewGems) {
-                gem.classList.add('spawning');
-                newGems.push(gem);
-            }
-            addedCount++;
-        } else if (gem.dataset.type !== target.type) {
-            // Gem exists but wrong type - update it
-            console.log(`🔄 Changing gem at [${target.row}][${target.col}] from ${gem.dataset.type} to ${target.type}`);
-            const oldType = gem.dataset.type;
-            gem.dataset.type = target.type;
-            gem.dataset.row = target.row;
-            gem.dataset.col = target.col;
-            gem.textContent = getGemEmoji(target.type);
-            gem.classList.remove(`gem-${oldType}`);
-            gem.classList.add(`gem-${target.type}`);
-            gem.onclick = function() {
-                const clickedRow = parseInt(this.dataset.row);
-                const clickedCol = parseInt(this.dataset.col);
-                onGemClick(clickedRow, clickedCol);
-            };
-            typeChangedCount++;
-        }
-        
-        gemsToReorder.push(gem);
-    });
-    
-    console.log(`🧹 Detaching ${gemsToReorder.length} gems to reorder (including ${gemsToReorder.filter(g => g.classList.contains('spawning')).length} spawning)`);
-    
-    // Detach ALL gems (CSS animations will continue on detached elements)
-    gemsToReorder.forEach(gem => {
-        if (gem.parentNode) {
-            gem.parentNode.removeChild(gem);
-        }
-    });
-    
-    // Reattach all gems in correct row-major order
-    gemsToReorder.forEach(gem => {
-        boardElement.appendChild(gem);
-    });
-    
-    // Clean up animation classes and transforms now that reordering is complete
-    gemsToReorder.forEach(gem => {
-        gem.classList.remove('falling');
-        gem.classList.remove('swapping');
-        // Clear any residual transforms from animations
-        if (gem.style.transform) gem.style.transform = '';
-        if (gem.style.transition) gem.style.transition = '';
-        // Keep 'spawning' class for newly created gems
-    });
-    
-    if (addedCount > 0) console.log(`➕ Added ${addedCount} gems`);
-    if (typeChangedCount > 0) console.log(`🔄 Changed type of ${typeChangedCount} gems`);
-    console.log(`📊 Rendered ${targetGems.length} gems in correct row-major order`);
-    console.log('✅ renderBoard() complete');
-    console.log('✅ renderBoard() complete');
-    
-    // Trigger spawn animation for new gems after a small delay
-    if (newGems.length > 0) {
-        requestAnimationFrame(() => {
-            newGems.forEach(gem => {
-                // Remove spawn class after animation completes
-                setTimeout(() => {
-                    gem.classList.remove('spawning');
-                }, 400);
-            });
-        });
-    }
-    
-    // Validate board after rendering
-    if (window.validateGame && !gameState.isAnimating) {
-        setTimeout(() => window.validateGame(), 50);
-    }
+    console.log(`✅ Canvas board rendered`);
 }
 
 /**
- * Create a gem DOM element
+ * NOTE: createGemElement is no longer needed - Canvas rendering handles all gem drawing
+ * Keeping function stub for backward compatibility if any code references it
  */
 function createGemElement(row, col, gemType) {
-    const gem = document.createElement('div');
-    gem.className = `gem gem-${gemType}`;
-    gem.textContent = getGemEmoji(gemType);
-    // Use event.target to get coordinates from data attributes at click time
-    gem.onclick = function() {
-        const clickedRow = parseInt(this.dataset.row);
-        const clickedCol = parseInt(this.dataset.col);
-        onGemClick(clickedRow, clickedCol);
-    };
-    gem.dataset.row = row;
-    gem.dataset.col = col;
-    gem.dataset.type = gemType;
-    return gem;
+    console.warn('⚠️ createGemElement called but Canvas rendering is active - no DOM element created');
+    return null;
 }
 
 /**
@@ -1641,106 +1777,53 @@ function getGemEmoji(gemType) {
 }
 
 /**
- * Highlight selected gem
+ * Highlight selected gem (Canvas-based - just redraw with highlight)
  */
 function highlightGem(row, col) {
-    // First, clear any existing selections
-    document.querySelectorAll('.gem.selected').forEach(gem => {
-        gem.classList.remove('selected');
-    });
-    
-    const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-    if (gem) {
-        gem.classList.add('selected');
-        console.log(`⭐ Highlighted gem at [${row}][${col}]`);
-    } else {
-        console.log(`❌ Could not find gem to highlight at [${row}][${col}]`);
-    }
-    
-    // Highlight valid adjacent targets
-    highlightValidTargets(row, col);
+    // Canvas rendering handles highlighting through gameState.selectedGem
+    // Just redraw the board with the new selection
+    console.log(`⭐ Highlighted gem at [${row}][${col}]`);
+    canvasManager.draw();
 }
 
 /**
- * Highlight valid adjacent gems that can be swapped with
+ * Highlight valid adjacent gems that can be swapped with (Canvas-based)
+ * Note: Canvas rendering doesn't need DOM-based highlighting - stored in state
  */
 function highlightValidTargets(row, col) {
-    // Clear any existing valid targets
-    document.querySelectorAll('.valid-target').forEach(gem => {
-        gem.classList.remove('valid-target');
-    });
-    
-    // Highlight adjacent gems (up, down, left, right)
+    // With Canvas, adjacent gems are visually highlighted during rendering
+    // Store valid targets in gameState if needed for later reference
     const adjacents = [
         { row: row - 1, col: col, dir: 'up' },
         { row: row + 1, col: col, dir: 'down' },
         { row: row, col: col - 1, dir: 'left' },
         { row: row, col: col + 1, dir: 'right' }
     ];
-    
-    let highlightedCount = 0;
-    const highlightedPositions = [];
-    const notFoundPositions = [];
-    
-    adjacents.forEach(({ row: r, col: c, dir }) => {
-        if (r >= 0 && r < GAME_CONFIG.ROWS && c >= 0 && c < GAME_CONFIG.COLS) {
-            const adjacentGem = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
-            if (adjacentGem) {
-                adjacentGem.classList.add('valid-target');
-                highlightedCount++;
-                highlightedPositions.push(`${dir}:[${r}][${c}]`);
-                
-                // Debug: Check computed styles
-                const computedStyle = window.getComputedStyle(adjacentGem);
-                const hasClass = adjacentGem.classList.contains('valid-target');
-                console.log(`  🎨 ${dir}:[${r}][${c}] class=${hasClass}, animation=${computedStyle.animation}, border=${computedStyle.border}`);
-            } else {
-                notFoundPositions.push(`${dir}:[${r}][${c}] NOT FOUND`);
-            }
-        }
-    });
-    
-    console.log(`💚 Highlighted ${highlightedCount} valid targets around [${row}][${col}]: ${highlightedPositions.join(', ')}`);
-    if (notFoundPositions.length > 0) {
-        console.log(`❌ Could not find gems at: ${notFoundPositions.join(', ')}`);
-    }
-    
-    // Final verification: count how many .valid-target elements exist
-    const validTargets = document.querySelectorAll('.valid-target');
-    console.log(`✅ Total .valid-target elements in DOM: ${validTargets.length}`);
-    
-    // Validate highlights after applying
-    if (window.validateGame) {
-        setTimeout(() => window.validateGame(), 50);
-    }
+
+    const validTargets = adjacents.filter(({ row: r, col: c }) =>
+        r >= 0 && r < GAME_CONFIG.ROWS && c >= 0 && c < GAME_CONFIG.COLS
+    );
+
+    console.log(`💚 Valid targets around [${row}][${col}]: ${validTargets.map(t => `${t.dir}:[${t.row}][${t.col}]`).join(', ')}`);
+    canvasManager.draw();
 }
 
 /**
- * Unhighlight gem
+ * Unhighlight gem (Canvas-based)
  */
-function unhighlightGem(row, col) {
-    const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-    if (gem) {
-        gem.classList.remove('selected');
-    }
-    
-    // Clear valid targets
-    document.querySelectorAll('.valid-target').forEach(gem => {
-        gem.classList.remove('valid-target');
-    });
+function unhighlightGem() {
+    // Canvas rendering handles unhighlighting by clearing gameState.selectedGem
+    console.log(`🗑️ Unhighlighting gem`);
+    canvasManager.draw();
 }
 
 /**
- * Clear all highlights and selections
+ * Clear all highlights and selections (Canvas-based)
  */
 function clearAllHighlights() {
     console.log('🧹 Clearing all highlights');
-    document.querySelectorAll('.gem.selected').forEach(gem => {
-        gem.classList.remove('selected');
-    });
-    document.querySelectorAll('.gem.valid-target').forEach(gem => {
-        gem.classList.remove('valid-target');
-    });
+    gameState.selectedGem = null;
+    canvasManager.draw();
 }
 
 /**
