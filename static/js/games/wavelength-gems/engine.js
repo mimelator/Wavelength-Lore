@@ -155,9 +155,8 @@ let canvasManager = {
     draw() {
         if (!this.ctx || !this.canvas) return;
 
-        // Clear canvas (keep transparent to show container gradient)
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0)';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        // Clear canvas completely (removes all previous drawing including shadow artifacts)
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         // NOTE: drawBackgroundImage() disabled - we use the page background instead
         // this.drawBackgroundImage();
@@ -268,10 +267,37 @@ let canvasManager = {
 
     /**
      * Draw a single gem
+     * Adjacent gems to selected are scaled up with animation that restarts on each click
      */
     drawGem(row, col, gemType) {
-        const x = this.boardX + (col * (this.gemSize + this.gemGapSize));
-        const y = this.boardY + (row * (this.gemSize + this.gemGapSize));
+        // Check if this gem is adjacent to the selected gem
+        let isAdjacent = false;
+        let scale = 1.0;
+        
+        if (gameState.selectedGem) {
+            const { row: sRow, col: sCol } = gameState.selectedGem;
+            const adjacents = [
+                { row: sRow - 1, col: sCol },
+                { row: sRow + 1, col: sCol },
+                { row: sRow, col: sCol - 1 },
+                { row: sRow, col: sCol + 1 }
+            ];
+            isAdjacent = adjacents.some(adj => adj.row === row && adj.col === col);
+            if (isAdjacent) {
+                // Use same animation as the highlight
+                const timeSinceSelection = (Date.now() - gameState.highlightAnimationStartTime) / 1000;
+                const pulse = Math.sin(timeSinceSelection * 3.5) * 0.5 + 0.5;
+                scale = 1.15 + (pulse * 0.20); // Animate between 1.15 and 1.35
+            }
+        }
+
+        const baseX = this.boardX + (col * (this.gemSize + this.gemGapSize));
+        const baseY = this.boardY + (row * (this.gemSize + this.gemGapSize));
+        
+        const scaledSize = this.gemSize * scale;
+        const offset = (scaledSize - this.gemSize) / 2;
+        const x = baseX - offset;
+        const y = baseY - offset;
 
         const ctx = this.ctx;
 
@@ -289,19 +315,19 @@ let canvasManager = {
         const radius = 4;
         ctx.beginPath();
         ctx.moveTo(x + radius, y);
-        ctx.lineTo(x + this.gemSize - radius, y);
-        ctx.quadraticCurveTo(x + this.gemSize, y, x + this.gemSize, y + radius);
-        ctx.lineTo(x + this.gemSize, y + this.gemSize - radius);
-        ctx.quadraticCurveTo(x + this.gemSize, y + this.gemSize, x + this.gemSize - radius, y + this.gemSize);
-        ctx.lineTo(x + radius, y + this.gemSize);
-        ctx.quadraticCurveTo(x, y + this.gemSize, x, y + this.gemSize - radius);
+        ctx.lineTo(x + scaledSize - radius, y);
+        ctx.quadraticCurveTo(x + scaledSize, y, x + scaledSize, y + radius);
+        ctx.lineTo(x + scaledSize, y + scaledSize - radius);
+        ctx.quadraticCurveTo(x + scaledSize, y + scaledSize, x + scaledSize - radius, y + scaledSize);
+        ctx.lineTo(x + radius, y + scaledSize);
+        ctx.quadraticCurveTo(x, y + scaledSize, x, y + scaledSize - radius);
         ctx.lineTo(x, y + radius);
         ctx.quadraticCurveTo(x, y, x + radius, y);
         ctx.closePath();
         ctx.fill();
 
-        // Draw emoji/character
-        ctx.font = `${Math.floor(this.gemSize * 0.6)}px Arial`;
+        // Draw emoji/character (scaled with gem)
+        ctx.font = `${Math.floor(scaledSize * 0.6)}px Arial`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = 'white';
@@ -309,7 +335,7 @@ let canvasManager = {
         ctx.shadowBlur = 3;
 
         const emoji = getGemEmoji(gemType);
-        ctx.fillText(emoji, x + this.gemSize / 2, y + this.gemSize / 2);
+        ctx.fillText(emoji, x + scaledSize / 2, y + scaledSize / 2);
 
         // Reset shadow
         ctx.shadowColor = 'transparent';
@@ -351,6 +377,7 @@ let canvasManager = {
 
     /**
      * Draw highlight rings around valid adjacent gems
+     * Enhanced with animated glow and scale effects that restart on each click
      */
     drawAdjacentHighlights(row, col) {
         const ctx = this.ctx;
@@ -361,6 +388,22 @@ let canvasManager = {
             { row: row, col: col + 1 }
         ];
 
+        // Calculate animation values based on time since selection - VERY dramatic
+        const timeSinceSelection = (Date.now() - gameState.highlightAnimationStartTime) / 1000;
+        const pulse = Math.sin(timeSinceSelection * 3.5) * 0.5 + 0.5; // Oscillates between 0 and 1
+        
+        // Animate scale between 1.15 and 1.35 (MUCH larger growth - 15% to 35%)
+        const animatedScale = 1.15 + (pulse * 0.20);
+        
+        // Animate glow between 25 and 45 (VERY dramatic glow)
+        const animatedGlow = 25 + (pulse * 20);
+        
+        // Animate line width between 5 and 9 (very thick pulse)
+        const animatedLineWidth = 5 + (pulse * 4);
+        
+        // Animate opacity for extra drama
+        const animatedAlpha = 0.8 + (pulse * 0.2); // Between 0.8 and 1.0
+
         for (const { row: aRow, col: aCol } of adjacents) {
             // Check if adjacent position is valid
             if (aRow < 0 || aRow >= GAME_CONFIG.ROWS || aCol < 0 || aCol >= GAME_CONFIG.COLS) {
@@ -370,16 +413,28 @@ let canvasManager = {
             const ax = this.boardX + (aCol * (this.gemSize + this.gemGapSize));
             const ay = this.boardY + (aRow * (this.gemSize + this.gemGapSize));
 
-            // Draw a subtle glowing ring around adjacent gems
-            const glowRadius = this.gemSize / 2 + 8;
+            // Calculate scaled size and offset
+            const scaledSize = this.gemSize * animatedScale;
+            const offset = (scaledSize - this.gemSize) / 2;
 
-            ctx.strokeStyle = 'rgba(255, 215, 0, 0.4)';
-            ctx.lineWidth = 2;
-            ctx.shadowColor = 'rgba(255, 215, 0, 0.6)';
-            ctx.shadowBlur = 8;
+            // Draw highlight with animated properties
+            ctx.strokeStyle = `rgba(255, 215, 0, ${animatedAlpha})`;
+            ctx.lineWidth = animatedLineWidth;
+            ctx.shadowColor = '#FFD700';
+            ctx.shadowBlur = animatedGlow;
 
+            const radius = 6; // Rounded corners
             ctx.beginPath();
-            ctx.arc(ax + this.gemSize / 2, ay + this.gemSize / 2, glowRadius, 0, Math.PI * 2);
+            ctx.moveTo(ax - offset + radius, ay - offset);
+            ctx.lineTo(ax - offset + scaledSize - radius, ay - offset);
+            ctx.quadraticCurveTo(ax - offset + scaledSize, ay - offset, ax - offset + scaledSize, ay - offset + radius);
+            ctx.lineTo(ax - offset + scaledSize, ay - offset + scaledSize - radius);
+            ctx.quadraticCurveTo(ax - offset + scaledSize, ay - offset + scaledSize, ax - offset + scaledSize - radius, ay - offset + scaledSize);
+            ctx.lineTo(ax - offset + radius, ay - offset + scaledSize);
+            ctx.quadraticCurveTo(ax - offset, ay - offset + scaledSize, ax - offset, ay - offset + scaledSize - radius);
+            ctx.lineTo(ax - offset, ay - offset + radius);
+            ctx.quadraticCurveTo(ax - offset, ay - offset, ax - offset + radius, ay - offset);
+            ctx.closePath();
             ctx.stroke();
 
             ctx.shadowColor = 'transparent';
@@ -1085,6 +1140,7 @@ function getGemSize() {
 let gameState = {
     board: [],
     selectedGem: null,
+    highlightAnimationStartTime: 0, // Timestamp when highlight animation started
     score: 0,
     level: 1,
     levelConfig: null, // Current level configuration (loaded from LEVELS)
@@ -1234,7 +1290,7 @@ function updateSidebarInfo(levelConfig) {
         const [season, episode] = levelConfig.episodeKey.split('/');
         const seasonNum = season.replace('season', '');
         const episodeNum = episode.replace('episode', '');
-        episodeLink.href = `/videos/season/${seasonNum}/episode/${episodeNum}`;
+        episodeLink.href = `/season/${seasonNum}/episode/${episodeNum}`;
         episodeLink.style.display = 'inline-block';
     } else if (episodeLink) {
         episodeLink.style.display = 'none';
@@ -1501,6 +1557,7 @@ function onGemClick(row, col) {
     if (!gameState.selectedGem) {
         // First selection
         gameState.selectedGem = { row, col };
+        gameState.highlightAnimationStartTime = Date.now(); // Reset animation timer
         highlightGem(row, col);
         console.log('✅ First gem selected:', row, col);
     } else {
@@ -1523,6 +1580,7 @@ function onGemClick(row, col) {
             console.log(`⚠️ Gems not adjacent! Distance: ${dist} (from [${gameState.selectedGem.row}][${gameState.selectedGem.col}] to [${row}][${col}])`);
             unhighlightGem();
             gameState.selectedGem = { row, col };
+            gameState.highlightAnimationStartTime = Date.now(); // Reset animation timer
             highlightGem(row, col);
             console.log('🔄 Changed selection to:', row, col);
         }
@@ -2143,7 +2201,18 @@ function createGemElement(row, col, gemType) {
 /**
  * Get emoji for gem type
  */
+/**
+ * Get emoji for gem type
+ * Can be themed per level - defaults to standard gems
+ */
 function getGemEmoji(gemType) {
+    // Check if current level has custom gem themes
+    if (gameState.levelConfig && gameState.levelConfig.gemThemes) {
+        const themed = gameState.levelConfig.gemThemes[gemType];
+        if (themed) return themed;
+    }
+
+    // Default gem emojis
     const emojis = {
         'daphne': '💜',
         'jasper': '💙',

@@ -140,6 +140,13 @@ const LEVELS = [
             borderGlowColor: "#FFD700",
             borderGlowIntensity: 0.6
         },
+        // Episode 1 themed gems - Irish/Lucky symbols
+        gemThemes: {
+            'daphne': '🍀',  // Four-leaf clover (lucky)
+            'jasper': '🧲',  // Horseshoe (luck & protection)
+            'miles': '🎵',   // Music note (Wavelength theme)
+            'ivy': '🌈'      // Rainbow (pot of gold)
+        },
         objectives: {
             primary: {
                 type: "score",
