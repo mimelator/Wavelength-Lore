@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Gallery - Wavelength Lore</title>
+  <link rel="stylesheet" href="/static/css/gallery/gallery.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .intro {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #666;
+    }
+    
+    #gallery-container {
+      min-height: 400px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>My Photo Gallery</h1>
+    
+    <div class="intro">
+      <p>Your personal collection of images from the Wavelength Lore universe.</p>
+      <p>Explore the site and click "Save to Gallery" on any image you want to add to your collection.</p>
+    </div>
+    
+    <div id="gallery-container"></div>
+  </div>
+  
+  <script src="/static/js/components/gallery/gallery.js"></script>
+  <script src="/static/js/components/gallery/user-gallery.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize the user gallery
+      const userGallery = new UserGallery({
+        containerId: 'gallery-container',
+        apiEndpoint: '/api/gallery/user',
+        enableDownload: true,
+        enableScreensaver: true,
+        enableDelete: true
+      });
+    });
+  </script>
+</body>
+</html>
