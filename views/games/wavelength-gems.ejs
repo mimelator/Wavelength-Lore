@@ -559,6 +559,9 @@
     <script src="/js/games/wavelength-gems/engine.js"></script>
     <script src="/js/games/wavelength-gems/ui.js"></script>
     
+    <!-- Permission checks for restricted features -->
+    <script src="/js/games/wavelength-gems/permission-check.js"></script>
+    
     <!-- Admin/Developer Debug Panel (Ctrl+Shift+D to toggle) -->
     <script src="/js/games/wavelength-gems/admin-panel.js"></script>
     
@@ -566,6 +569,12 @@
         // Validator available but disabled by default (major bugs fixed!)
         // To enable validation: startValidation(1000) in console
         // Manual commands: validateGame(), diagnoseStuckGame(), visualizePositionMismatches()
+        
+        // Set up user data for admin panel (using safer approach that avoids EJS template syntax errors)
+        window.userData = {};
+        
+        // Initialize local development flag
+        window.isLocalDevelopment = false;
         
         // Toggle leaderboard visibility
         function toggleLeaderboard() {

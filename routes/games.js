@@ -65,7 +65,8 @@ router.get('/wavelength-gems', groupAuth.requireAction('game_access'), (req, res
         ],
         cdnUrl: process.env.CDN_URL,
         version: `v${Date.now()}`,
-        adMobEnvVars: adMobEnvVars // Pass AdMob env vars to the template
+        adMobEnvVars: adMobEnvVars, // Pass AdMob env vars to the template
+        userGroups: req.userGroups || [] // Pass user groups for permission checks
     });
 });
 

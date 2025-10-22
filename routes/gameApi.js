@@ -577,6 +577,46 @@ router.post('/wavelength-gems/reset-progress', async (req, res) => {
 });
 
 /**
+ * GET /api/user/current-user-groups
+ * Get the current user's group memberships
+ */
+router.get('/user/current-user-groups', async (req, res) => {
+    try {
+        const user = req.user;
+        
+        if (!user) {
+            return res.json({
+                success: true,
+                groups: [],
+                message: 'Not authenticated'
+            });
+        }
+
+        // Fetch user data from Firebase
+        const userData = await fetchDataAsAdmin(`forum/users/${user.uid}`);
+        const groups = userData?.groups || [];
+        
+        // Check if user is admin/developer
+        const isAdmin = groups.includes('admin') || groups.includes('super_admin');
+        const isDeveloper = groups.includes('developer') || isAdmin;
+        
+        res.json({
+            success: true,
+            groups: groups,
+            isAdmin: isAdmin,
+            isDeveloper: isDeveloper
+        });
+    } catch (error) {
+        console.error('Error fetching user groups:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch user groups',
+            details: error.message
+        });
+    }
+});
+
+/**
  * GET /api/games/wavelength-gems/admob-config
  * Get AdMob configuration settings from environment variables
  */

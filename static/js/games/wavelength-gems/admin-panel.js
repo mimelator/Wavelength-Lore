@@ -492,8 +492,16 @@ function adminAddCombo(amount) {
 
 /**
  * Toggle god mode (infinite moves)
+ * Access restricted to users in developer group
  */
 function adminToggleGodMode() {
+    // Check if user belongs to developer group
+    if (window.PermissionManager && !window.PermissionManager.isDeveloper()) {
+        alert('⚠️ Access Denied: God Mode is restricted to developer group members only.');
+        console.log('🔒 Access Denied: God Mode attempted by non-developer user');
+        return;
+    }
+    
     godModeEnabled = !godModeEnabled;
     
     if (godModeEnabled && typeof gameState !== 'undefined') {
