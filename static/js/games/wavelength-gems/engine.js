@@ -34,30 +34,32 @@ let animationFrames = new Map(); // Map of gem positions to their animation stat
 // Calculates size so 8x8 board fits perfectly with gaps
 function getGemSize() {
     const width = window.innerWidth;
+    const isMobile = width <= 768;
 
-    // EXTREMELY conservative - prioritize fitting all 8 columns
-    const GAP_SIZE = 1; // minimal gaps between gems
-    const BOARD_PADDING = 2; // minimal padding on board
-    const WRAPPER_PADDING = 2; // minimal wrapper padding
-    const CONTAINER_PADDING = 2; // minimal container padding
-    const BORDER_WIDTH = 1; // minimal border
-    const SAFETY_MARGIN = 5; // minimal safety margin
+    if (isMobile) {
+        // Mobile: Use fixed small gem size that fits 8 columns in ~400px container
+        // (8 gems × 48px) + (7 gaps × 1px) = 391px - fits perfectly in constrained container
+        const gemSize = 48;
+        console.log(`📏 Mobile viewport (${width}px): Using fixed gem size ${gemSize}px to fit 8 columns in constrained container`);
+        return gemSize;
+    }
 
-    // Total overhead on both sides
+    // Desktop: Calculate based on viewport
+    const GAP_SIZE = 1;
+    const BOARD_PADDING = 2;
+    const WRAPPER_PADDING = 2;
+    const CONTAINER_PADDING = 2;
+    const BORDER_WIDTH = 1;
+    const SAFETY_MARGIN = 5;
+
     const totalOverhead = SAFETY_MARGIN + WRAPPER_PADDING + CONTAINER_PADDING +
                          (BOARD_PADDING * 2) + (BORDER_WIDTH * 2);
 
-    // Available width = viewport - all constraints
     const availableWidth = width - totalOverhead;
-
-    // Formula: (gemSize * 8) + (gap * 7) = availableWidth
-    // Solving: gemSize = (availableWidth - (gap * 7)) / 8
     const calculatedGemSize = Math.floor((availableWidth - (GAP_SIZE * 7)) / 8);
-
-    // Clamp between reasonable min/max - prioritize fitting all 8 columns
     let gemSize = Math.max(25, Math.min(calculatedGemSize, 60));
 
-    console.log(`📏 Viewport: ${width}px | Overhead: ${totalOverhead}px | Available: ${availableWidth}px | Calculated: ${calculatedGemSize}px | Final gem size: ${gemSize}px`);
+    console.log(`📏 Desktop viewport: ${width}px | Overhead: ${totalOverhead}px | Available: ${availableWidth}px | Calculated: ${calculatedGemSize}px | Final gem size: ${gemSize}px`);
     return gemSize;
 }
 
@@ -156,6 +158,131 @@ function createDebugPanel() {
 }
 
 /**
+ * Comprehensive auto-diagnostics with layout validation
+ */
+function autoValidateLayout() {
+    const viewport = window.innerWidth;
+    const boardElement = document.getElementById('gameBoard');
+    const containerElement = document.querySelector('.gems-game-container');
+    const isMobile = viewport <= 768;
+
+    if (!boardElement || !containerElement) {
+        console.warn(`⚠️ Layout validation: Missing elements`);
+        return;
+    }
+
+    const boardRect = boardElement.getBoundingClientRect();
+    const containerRect = containerElement.getBoundingClientRect();
+    const gemElements = boardElement.querySelectorAll('.gem');
+
+    // Check for horizontal scroll
+    const documentWidth = document.documentElement.scrollWidth;
+    const windowWidth = window.innerWidth;
+    const hasHorizontalScroll = documentWidth > windowWidth;
+
+    // Calculate visible columns
+    let visibleColumns = 0;
+    if (gemElements.length > 0) {
+        const firstGem = gemElements[0];
+        const gemRect = firstGem.getBoundingClientRect();
+        const gemWidth = gemRect.width;
+        if (gemWidth > 0) {
+            visibleColumns = (windowWidth / gemWidth).toFixed(2);
+        }
+    }
+
+    // Validation checks
+    const allColumnsVisible = visibleColumns >= 7.9; // Allow slight rounding
+    const noHorizontalScroll = !hasHorizontalScroll;
+    const boardFitsContainer = boardRect.width <= containerRect.width + 5; // Allow 5px tolerance
+
+    // Color code the status
+    const statusIcon = allColumnsVisible && noHorizontalScroll ? '✅' : '⚠️';
+    const scrollIcon = hasHorizontalScroll ? '🔴' : '✅';
+    const columnsIcon = allColumnsVisible ? '✅' : '⚠️';
+
+    console.log(`\n📱 LAYOUT VALIDATION (Viewport: ${viewport}px, Mobile: ${isMobile})`);
+    console.log(`════════════════════════════════════════`);
+    console.log(`${statusIcon} Overall Status: ${allColumnsVisible && noHorizontalScroll ? 'OPTIMAL' : 'NEEDS ADJUSTMENT'}`);
+    console.log(`${scrollIcon} Horizontal Scroll: ${hasHorizontalScroll ? 'YES (BAD)' : 'NO (GOOD)'}`);
+    console.log(`   Document width: ${documentWidth}px, Window width: ${windowWidth}px, Overflow: ${Math.max(0, documentWidth - windowWidth)}px`);
+    console.log(`${columnsIcon} All 8 Columns Visible: ${allColumnsVisible ? 'YES' : 'NO'}`);
+    console.log(`   Visible columns: ${visibleColumns} / 8`);
+    console.log(`   First gem size: ${gemElements.length > 0 ? Math.round(gemElements[0].getBoundingClientRect().width) : 'N/A'}px`);
+    console.log(`   Board width: ${Math.round(boardRect.width)}px`);
+    console.log(`   Container width: ${Math.round(containerRect.width)}px`);
+    console.log(`════════════════════════════════════════\n`);
+
+    return {
+        allColumnsVisible,
+        noHorizontalScroll,
+        boardFitsContainer,
+        visibleColumns,
+        documentWidth,
+        windowWidth,
+        hasHorizontalScroll
+    };
+}
+
+/**
+ * Comprehensive DOM and CSS diagnostics - ALWAYS runs regardless of viewport
+ */
+function logFullDiagnostics() {
+    console.log(`\n🔬 FULL DOM & CSS DIAGNOSTICS`);
+    console.log(`════════════════════════════════════════`);
+
+    // Get all key elements
+    const mainElement = document.querySelector('main.gems-game-wrapper');
+    const containerElement = document.querySelector('.gems-game-container');
+    const wrapperElement = document.querySelector('.game-board-wrapper');
+    const boardElement = document.getElementById('gameBoard');
+
+    // Log each element's computed and inline styles
+    const elements = [
+        { name: 'main.gems-game-wrapper', el: mainElement },
+        { name: '.gems-game-container', el: containerElement },
+        { name: '.game-board-wrapper', el: wrapperElement },
+        { name: '#gameBoard', el: boardElement }
+    ];
+
+    for (const { name, el } of elements) {
+        if (!el) {
+            console.log(`❌ ${name}: NOT FOUND`);
+            continue;
+        }
+
+        const rect = el.getBoundingClientRect();
+        const styles = window.getComputedStyle(el);
+
+        console.log(`\n✓ ${name}`);
+        console.log(`  Rendered size: ${Math.round(rect.width)}x${Math.round(rect.height)}px`);
+        console.log(`  CSS width: ${styles.width}`);
+        console.log(`  CSS max-width: ${styles.maxWidth}`);
+        console.log(`  CSS padding: ${styles.paddingLeft} ${styles.paddingRight} ${styles.paddingTop} ${styles.paddingBottom}`);
+        console.log(`  CSS margin: ${styles.marginLeft} ${styles.marginRight} ${styles.marginTop} ${styles.marginBottom}`);
+        console.log(`  CSS box-sizing: ${styles.boxSizing}`);
+        console.log(`  Inline style.width: "${el.style.width || '(not set)'}"`);
+        console.log(`  Inline style.maxWidth: "${el.style.maxWidth || '(not set)'}"`);
+    }
+
+    console.log(`\n🔗 PARENT CHAIN ANALYSIS`);
+    if (containerElement) {
+        let current = containerElement.parentElement;
+        let depth = 0;
+        while (current && depth < 8) {
+            const rect = current.getBoundingClientRect();
+            const styles = window.getComputedStyle(current);
+            console.log(`  Level ${depth}: ${current.tagName}.${current.className || 'no-class'}`);
+            console.log(`    - Rendered: ${Math.round(rect.width)}px | CSS width: ${styles.width}`);
+            current = current.parentElement;
+            depth++;
+        }
+    }
+
+    console.log(`════════════════════════════════════════\n`);
+}
+
+/**
  * Log board dimensions to console
  */
 function logBoardDimensions() {
@@ -215,6 +342,18 @@ let gameState = {
  * Initialize a new game
  */
 function initGame() {
+    // Log page load state FIRST thing - use multiple console methods to ensure visibility
+    const loadTime = performance.now();
+    const isMobile = window.innerWidth <= 768;
+    const timestamp = new Date().toLocaleTimeString();
+
+    // Use different console methods to ensure at least one is visible
+    console.error(`🚨 GEMS GAME INIT - ${timestamp} - Viewport: ${window.innerWidth}px, Mobile: ${isMobile}`);
+    console.log(`════════════════════════════════════════`);
+    console.log(`🎮 WAVELENGTH GEMS INITIALIZING`);
+    console.log(`⏱️  Load Time: ${loadTime.toFixed(0)}ms | Viewport: ${window.innerWidth}x${window.innerHeight}px | Mobile: ${isMobile}`);
+    console.log(`════════════════════════════════════════`);
+
     // Disable collectibles while playing (keep radio visible)
     if (window.globalRadioGame && window.globalRadioGame.disableCollectiblesOnly) {
         window.globalRadioGame.disableCollectiblesOnly();
@@ -276,93 +415,143 @@ function initGame() {
     document.head.appendChild(style);
     console.log(`📐 Injected dynamic gem size CSS: ${gameState.gemSize}px with aggressive overrides`);
 
-    // FORCE width constraints on mobile using JavaScript (bypasses any CSS issues)
-    console.log(`🔧 Checking mobile viewport: window.innerWidth=${window.innerWidth}px, mobile=${window.innerWidth <= 768}`);
-    if (window.innerWidth <= 768) {
-        console.log(`📱 Mobile detected, applying inline style overrides...`);
-        setTimeout(() => {
-            const wrapper = document.querySelector('.gems-game-wrapper');
-            const container = document.querySelector('.gems-game-container');
-            const boardWrapper = document.querySelector('.game-board-wrapper');
-            const board = document.getElementById('gameBoard');
-
-            // Debug: Check what's constraining the container
-            if (container) {
-                const containerStyle = window.getComputedStyle(container);
-                console.log(`🔍 Container element:`, container.className);
-                console.log(`   Container computed width:`, containerStyle.width);
-                console.log(`   Container computed max-width:`, containerStyle.maxWidth);
-                console.log(`   Container inline style width:`, container.style.width);
-                console.log(`   Container inline style max-width:`, container.style.maxWidth);
-
-                // Walk up the DOM tree
-                let current = container.parentElement;
-                let depth = 0;
-                while (current && depth < 6) {
-                    const style = window.getComputedStyle(current);
-                    console.log(`   └─ Parent L${depth}: ${current.tagName}.${current.className || '(no class)'} - width: ${style.width}, max-width: ${style.maxWidth}`);
-                    current = current.parentElement;
-                    depth++;
-                }
-            }
-
-            // Force these to 100% or full viewport
-            if (wrapper) {
-                wrapper.style.width = '100vw';
-                wrapper.style.maxWidth = '100vw';
-                wrapper.style.marginLeft = 'calc(-50vw + 50%)';
-                wrapper.style.boxSizing = 'border-box';
-                console.log(`✅ Wrapper: set to 100vw`);
-            }
-
-            if (container) {
-                container.style.width = 'calc(100vw - 0px)';
-                container.style.maxWidth = 'calc(100vw - 0px)';
-                container.style.marginLeft = '0';
-                container.style.marginRight = '0';
-                container.style.boxSizing = 'border-box';
-                container.style.padding = '4px';
-                console.log(`✅ Container: set to calc(100vw - 0px)`);
-            }
-
-            if (boardWrapper) {
-                boardWrapper.style.width = '100%';
-                boardWrapper.style.maxWidth = '100%';
-                boardWrapper.style.boxSizing = 'border-box';
-                boardWrapper.style.padding = '0 2px';
-                console.log(`✅ BoardWrapper: set to 100%`);
-            }
-
-            if (board) {
-                board.style.width = '100%';
-                board.style.maxWidth = '100%';
-                board.style.boxSizing = 'border-box';
-                board.style.margin = '0';
-                board.style.padding = '4px';
-                console.log(`✅ Board: set to 100%`);
-            }
-
-            // Check again what the actual sizes are
-            setTimeout(() => {
-                const wrapperRect = wrapper?.getBoundingClientRect();
-                const containerRect = container?.getBoundingClientRect();
-                const boardRect = board?.getBoundingClientRect();
-
-                console.log(`📊 AFTER inline styles applied:`);
-                console.log(`   Wrapper: ${Math.round(wrapperRect?.width)}px`);
-                console.log(`   Container: ${Math.round(containerRect?.width)}px`);
-                console.log(`   Board: ${Math.round(boardRect?.width)}px`);
-            }, 50);
-        }, 100);
-    }
 
     // Debug: Create on-screen debug panel to show actual dimensions
     createDebugPanel();
+
+    // Full diagnostics immediately after DOM is ready
+    setTimeout(() => {
+        logFullDiagnostics();
+        autoValidateLayout();
+    }, 100);
 
     // Also log to console
     setTimeout(() => {
         logBoardDimensions();
     }, 500);
+
+    // Set up continuous auto-validation every 5 seconds during gameplay
+    window._layoutValidationInterval = setInterval(() => {
+        autoValidateLayout();
+    }, 5000);
+
+    // CRITICAL: Add window resize listener to handle viewport changes (e.g., DevTools resizing)
+    // This is needed because media queries don't always re-evaluate when viewport changes
+    const applyMobileLayoutFix = () => {
+        const isMobileNow = window.innerWidth <= 768;
+        console.log(`🔄 VIEWPORT RESIZE DETECTED: ${window.innerWidth}px, Mobile now: ${isMobileNow}`);
+
+        if (isMobileNow) {
+            // Force mobile layout on resize - need to break free from all parent constraints
+            // CRITICAL: Must also constrain body width or it limits the main element
+            const bodyElement = document.body;
+            const mainWrapper = document.querySelector('main.gems-game-wrapper');
+            const wrapper = document.querySelector('.gems-game-wrapper');
+            const container = document.querySelector('.gems-game-container');
+            const boardWrapper = document.querySelector('.game-board-wrapper');
+            const board = document.getElementById('gameBoard');
+
+            // Force body to full viewport width first (it's the parent constraint)
+            if (bodyElement) {
+                bodyElement.style.setProperty('width', '100vw', 'important');
+                bodyElement.style.setProperty('max-width', '100vw', 'important');
+                bodyElement.style.setProperty('margin', '0', 'important');
+                bodyElement.style.setProperty('padding', '0', 'important');
+                bodyElement.style.setProperty('overflow-x', 'hidden', 'important');
+                bodyElement.style.setProperty('overflow-y', 'auto', 'important');
+                console.log(`✅ BODY forced to 100vw with overflow-x: hidden !important on resize`);
+            }
+
+            // The main element (if it's a main tag) needs to be full viewport width
+            // Must use !important to override CSS media query rules
+            if (mainWrapper && mainWrapper.tagName === 'MAIN') {
+                mainWrapper.style.setProperty('width', '100vw', 'important');
+                mainWrapper.style.setProperty('max-width', '100vw', 'important');
+                mainWrapper.style.setProperty('margin-left', 'calc(-50vw + 50%)', 'important');
+                mainWrapper.style.setProperty('padding', '4px', 'important');
+                console.log(`✅ MAIN.gems-game-wrapper forced to 100vw !important on resize`);
+            }
+
+            if (wrapper && wrapper !== mainWrapper) {
+                wrapper.style.setProperty('width', '100vw', 'important');
+                wrapper.style.setProperty('max-width', '100vw', 'important');
+                wrapper.style.setProperty('margin-left', 'calc(-50vw + 50%)', 'important');
+                console.log(`✅ .gems-game-wrapper forced to 100vw !important on resize`);
+            }
+
+            if (container) {
+                container.style.setProperty('width', 'calc(100vw - 8px)', 'important');
+                container.style.setProperty('max-width', 'calc(100vw - 8px)', 'important');
+                container.style.setProperty('margin-left', '0', 'important');
+                container.style.setProperty('margin-right', '0', 'important');
+                container.style.setProperty('padding', '4px', 'important');
+                console.log(`✅ Container forced to calc(100vw - 8px) !important on resize`);
+            }
+
+            if (boardWrapper) {
+                boardWrapper.style.setProperty('width', '100%', 'important');
+                boardWrapper.style.setProperty('max-width', '100%', 'important');
+                boardWrapper.style.setProperty('padding', '0 2px', 'important');
+                console.log(`✅ BoardWrapper forced to 100% !important on resize`);
+            }
+
+            if (board) {
+                board.style.setProperty('width', '100%', 'important');
+                board.style.setProperty('max-width', '100%', 'important');
+                board.style.setProperty('margin', '0', 'important');
+                board.style.setProperty('padding', '4px', 'important');
+                console.log(`✅ Board forced to 100% !important on resize`);
+            }
+        } else {
+            // Reset to default on desktop
+            const wrapper = document.querySelector('.gems-game-wrapper');
+            const container = document.querySelector('.gems-game-container');
+            const boardWrapper = document.querySelector('.game-board-wrapper');
+            const board = document.getElementById('gameBoard');
+
+            if (wrapper) {
+                wrapper.style.width = '';
+                wrapper.style.maxWidth = '';
+                wrapper.style.marginLeft = '';
+            }
+
+            if (container) {
+                container.style.width = '';
+                container.style.maxWidth = '';
+                container.style.marginLeft = '';
+                container.style.padding = '';
+            }
+
+            if (boardWrapper) {
+                boardWrapper.style.width = '';
+                boardWrapper.style.maxWidth = '';
+                boardWrapper.style.padding = '';
+            }
+
+            if (board) {
+                board.style.width = '';
+                board.style.maxWidth = '';
+                board.style.margin = '';
+                board.style.padding = '';
+            }
+
+            console.log(`🔄 Reset to desktop layout on resize`);
+        }
+
+        // Log dimensions after resize and validate layout
+        setTimeout(() => {
+            logBoardDimensions();
+            logFullDiagnostics();
+            autoValidateLayout();
+        }, 100);
+    };
+
+    // Call immediately on init if mobile
+    console.log(`📋 Calling applyMobileLayoutFix() immediately at init time...`);
+    applyMobileLayoutFix();
+
+    // Also listen for resize events
+    window.addEventListener('resize', applyMobileLayoutFix);
 
     animationFrames.clear();
     generateBoard();

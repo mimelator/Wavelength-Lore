@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="/css/wavelength-gems.css">
     <link rel="stylesheet" href="/css/goblin-glitch.css">
     <style>
+        /* Target both main.gems-game-wrapper and .gems-game-wrapper */
+        main.gems-game-wrapper,
         .gems-game-wrapper {
             display: flex;
             flex-direction: column;
@@ -23,6 +25,7 @@
         }
 
         @media (max-width: 768px) {
+            main.gems-game-wrapper,
             .gems-game-wrapper {
                 padding: 4px;
                 width: 100% !important;
