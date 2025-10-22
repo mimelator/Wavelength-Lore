@@ -1,9 +1,11 @@
-<%- include('banner') %>
 <header>
   <nav>
-    <ul>
+    <div class="menu-icon">
+      <span>☰</span>  <!-- Hamburger icon placeholder -->
+    </div>
+    <ul class="nav-links">
       <li><a href="/">Home</a></li>
-      
+
       <!-- Browse Dropdown -->
       <li class="has-dropdown">
         <a href="#" onclick="return false;">Browse</a>
@@ -162,9 +164,26 @@
           }
         });
       });
+
+      // Hamburger menu functionality
+      const menuIcon = document.querySelector('.menu-icon');
+      const navLinks = document.querySelector('.nav-links');
+
+      console.log('menuIcon:', menuIcon); // Debug: Check if menuIcon is found
+      console.log('navLinks:', navLinks); // Debug: Check if navLinks is found
+
+      if (menuIcon && navLinks) {
+      menuIcon.addEventListener('click', () => {
+          console.log('Hamburger icon clicked!'); // Debug: Check if click event is firing
+        navLinks.classList.toggle('active');
+      });
+      } else {
+        console.warn('menuIcon or navLinks not found!'); // Debug: Warn if elements are missing
+  }
     });
   }
-</script><style>
+</script>
+<style>
   header {
     background-color: #333;
     color: #fff;
@@ -172,8 +191,24 @@
     position: relative;
     z-index: 1000;
   }
-  /* Only style the top-level nav ul, not dropdown ul */
-  header > nav > ul {
+
+  /* Menu icon styling */
+  .menu-icon {
+    display: none; /* Hide by default */
+    cursor: pointer;
+    padding: 10px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1002; /* Ensure it's above the nav links */
+  }
+
+  .menu-icon span {
+    font-size: 24px;
+  }
+
+  /* Style the nav links container */
+    .nav-links {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -181,12 +216,12 @@
     justify-content: center;
     flex-wrap: wrap;
   }
+
   /* Only style direct li children of top-level nav ul */
-  header > nav > ul > li {
+  .nav-links > li {
     margin: 0 12px;
     position: relative; /* Needed for dropdown positioning */
-  }
-  /* Ensure has-dropdown parent is positioned */
+    }
   header nav .has-dropdown {
     position: relative;
   }
@@ -318,9 +353,34 @@
   
   /* Responsive navigation */
   @media (max-width: 768px) {
-    header > nav > ul > li {
-      margin: 0 8px;
+    .nav-links {
+      display: none; /* Hide nav links on mobile */
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: #333;
+      flex-direction: column;
+      align-items: center;
+      z-index: 1001;
     }
+
+    .nav-links.active {
+      display: flex; /* Show nav links when active class is present */
+    }
+
+    .nav-links > li {
+      margin: 10px 0;
+    }
+
+    .menu-icon {
+      display: block; /* Show menu icon on mobile */
+    }
+
+    header > nav > ul > li {
+      margin: 0; /* Remove horizontal margins on mobile */
+    }
+
     header > nav > ul > li > a {
       font-size: 14px;
     }
@@ -328,7 +388,7 @@
   
   @media (max-width: 480px) {
     header > nav > ul > li {
-      margin: 0 6px;
+      margin: 0;
     }
     header > nav > ul > li > a {
       font-size: 13px;
