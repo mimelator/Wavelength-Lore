@@ -144,7 +144,7 @@ let canvasManager = {
     },
 
     /**
-     * Draw the entire board
+     * Draw the entire board with animations
      */
     draw() {
         if (!this.ctx || !this.canvas) return;
@@ -159,9 +159,43 @@ let canvasManager = {
         // Draw all gems
         this.drawAllGems();
 
-        // Highlight selected gem
+        // Draw animations on top
+        animationSystem.drawAnimations();
+
+        // Highlight selected gem (drawn last so it's on top)
         if (gameState.selectedGem) {
             this.drawSelectedHighlight();
+        }
+    },
+
+    /**
+     * Start animation loop
+     */
+    startAnimationLoop() {
+        const animate = (currentTime) => {
+            // Update all animations
+            animationSystem.updateAnimations(currentTime);
+
+            // Redraw canvas
+            this.draw();
+
+            // Continue loop if animations are active
+            if (animationSystem.isAnimating()) {
+                animationSystem.animationFrameId = requestAnimationFrame(animate);
+            }
+        };
+
+        // Start the loop
+        animationSystem.animationFrameId = requestAnimationFrame(animate);
+    },
+
+    /**
+     * Stop animation loop
+     */
+    stopAnimationLoop() {
+        if (animationSystem.animationFrameId) {
+            cancelAnimationFrame(animationSystem.animationFrameId);
+            animationSystem.animationFrameId = null;
         }
     },
 
@@ -330,6 +364,272 @@ let canvasManager = {
             atlas: '#EC4899'    // Pink
         };
         return colors[gemType] || '#999999';
+    }
+};
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ANIMATION SYSTEM
+// ═════════════════════════════════════════════════════════════════════════════
+
+let animationSystem = {
+    activeAnimations: new Map(), // Map of "row,col" to animation state
+    scorePopups: [], // Array of floating score displays
+    animationFrameId: null,
+
+    /**
+     * Register a gem animation
+     * Type: 'swap', 'fall', 'spawn', 'removal'
+     */
+    startAnimation(row, col, type, options = {}) {
+        const key = `${row},${col}`;
+        const now = performance.now();
+
+        this.activeAnimations.set(key, {
+            row,
+            col,
+            type,
+            startTime: now,
+            duration: options.duration || 300,
+            delay: options.delay || 0,
+            targetRow: options.targetRow || row,
+            targetCol: options.targetCol || col,
+            easing: options.easing || 'easeInOutCubic',
+            progress: 0
+        });
+    },
+
+    /**
+     * Update all active animations
+     */
+    updateAnimations(currentTime) {
+        const toRemove = [];
+
+        for (const [key, anim] of this.activeAnimations.entries()) {
+            const elapsed = currentTime - anim.startTime - anim.delay;
+
+            if (elapsed < 0) {
+                // Still in delay phase
+                anim.progress = 0;
+            } else if (elapsed >= anim.duration) {
+                // Animation complete
+                anim.progress = 1;
+                toRemove.push(key);
+            } else {
+                // In progress
+                anim.progress = elapsed / anim.duration;
+            }
+        }
+
+        // Remove completed animations
+        toRemove.forEach(key => this.activeAnimations.delete(key));
+
+        // Update score popups
+        this.updateScorePopups(currentTime);
+    },
+
+    /**
+     * Get animation progress with easing
+     */
+    getEasingValue(progress, easing = 'easeInOutCubic') {
+        const easeInOutCubic = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+        const easeInQuad = (t) => t * t;
+        const easeOutQuad = (t) => t * (2 - t);
+        const easeOutBounce = (t) => {
+            const n1 = 7.5625, d1 = 2.75;
+            if (t < 1 / d1) return n1 * t * t;
+            else if (t < 2 / d1) return n1 * (t -= 1.5 / d1) * t + 0.75;
+            else if (t < 2.5 / d1) return n1 * (t -= 2.25 / d1) * t + 0.9375;
+            else return n1 * (t -= 2.625 / d1) * t + 0.984375;
+        };
+
+        const easings = {
+            easeInOutCubic, easeOutCubic, easeInQuad, easeOutQuad, easeOutBounce,
+            linear: (t) => t
+        };
+
+        return (easings[easing] || easeInOutCubic)(Math.min(progress, 1));
+    },
+
+    /**
+     * Create a score popup animation
+     */
+    createScorePopup(row, col, points) {
+        const x = canvasManager.boardX + (col * (canvasManager.gemSize + canvasManager.gemGapSize)) + canvasManager.gemSize / 2;
+        const y = canvasManager.boardY + (row * (canvasManager.gemSize + canvasManager.gemGapSize)) + canvasManager.gemSize / 2;
+
+        this.scorePopups.push({
+            x,
+            y,
+            points,
+            startTime: performance.now(),
+            duration: 1200 // 1.2 seconds
+        });
+    },
+
+    /**
+     * Update and draw score popups
+     */
+    updateScorePopups(currentTime) {
+        const toRemove = [];
+
+        for (let i = 0; i < this.scorePopups.length; i++) {
+            const popup = this.scorePopups[i];
+            const elapsed = currentTime - popup.startTime;
+            const progress = elapsed / popup.duration;
+
+            if (progress >= 1) {
+                toRemove.push(i);
+            } else {
+                // Move up with fade
+                popup.currentY = popup.y - (progress * 60); // Move up 60px
+                popup.opacity = 1 - progress; // Fade out
+            }
+        }
+
+        // Remove completed popups (in reverse order to maintain indices)
+        for (let i = toRemove.length - 1; i >= 0; i--) {
+            this.scorePopups.splice(toRemove[i], 1);
+        }
+    },
+
+    /**
+     * Draw all active animations
+     */
+    drawAnimations() {
+        const ctx = canvasManager.ctx;
+
+        // Draw animating gems
+        for (const [, anim] of this.activeAnimations.entries()) {
+            const eased = this.getEasingValue(anim.progress, anim.easing);
+
+            // Calculate current position based on animation type
+            let currentRow = anim.row;
+            let currentCol = anim.col;
+            let opacity = 1;
+            let scale = 1;
+
+            switch (anim.type) {
+                case 'swap':
+                    // Interpolate between positions
+                    currentRow = anim.row + (anim.targetRow - anim.row) * eased;
+                    currentCol = anim.col + (anim.targetCol - anim.col) * eased;
+                    break;
+
+                case 'fall':
+                    // Only vertical movement for falling
+                    currentRow = anim.row + (anim.targetRow - anim.row) * eased;
+                    break;
+
+                case 'spawn':
+                    // Scale in effect
+                    scale = eased;
+                    opacity = eased;
+                    break;
+
+                case 'removal':
+                    // Scale and fade out
+                    scale = 1 - (eased * 0.3);
+                    opacity = 1 - eased;
+                    break;
+            }
+
+            const gemType = gameState.board[anim.row]?.[anim.col];
+            if (gemType) {
+                this.drawAnimatingGem(currentRow, currentCol, gemType, scale, opacity);
+            }
+        }
+
+        // Draw score popups
+        ctx.font = `bold 24px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        for (const popup of this.scorePopups) {
+            ctx.fillStyle = `rgba(255, 215, 0, ${popup.opacity})`;
+            ctx.shadowColor = `rgba(0, 0, 0, ${popup.opacity * 0.8})`;
+            ctx.shadowBlur = 10;
+            ctx.fillText(`+${popup.points}`, popup.x, popup.currentY);
+        }
+
+        ctx.shadowColor = 'transparent';
+    },
+
+    /**
+     * Draw a single animating gem at intermediate position
+     */
+    drawAnimatingGem(row, col, gemType, scale = 1, opacity = 1) {
+        const ctx = canvasManager.ctx;
+
+        // Convert row/col (may be decimals) to pixel coordinates
+        const x = canvasManager.boardX + (col * (canvasManager.gemSize + canvasManager.gemGapSize));
+        const y = canvasManager.boardY + (row * (canvasManager.gemSize + canvasManager.gemGapSize));
+
+        const gemSize = canvasManager.gemSize;
+        const radius = 4;
+
+        // Apply scale from center
+        const centerX = x + gemSize / 2;
+        const centerY = y + gemSize / 2;
+        const scaledSize = gemSize * scale;
+        const scaledX = centerX - scaledSize / 2;
+        const scaledY = centerY - scaledSize / 2;
+
+        ctx.globalAlpha = opacity;
+
+        // Get gem color
+        const color = canvasManager.getGemColor(gemType);
+
+        // Draw gem with rounded corners
+        ctx.fillStyle = color;
+        ctx.shadowColor = `rgba(${this.hexToRgb(color)}, ${opacity * 0.5})`;
+        ctx.shadowBlur = 10;
+
+        // Rounded rectangle
+        ctx.beginPath();
+        ctx.moveTo(scaledX + radius, scaledY);
+        ctx.lineTo(scaledX + scaledSize - radius, scaledY);
+        ctx.quadraticCurveTo(scaledX + scaledSize, scaledY, scaledX + scaledSize, scaledY + radius);
+        ctx.lineTo(scaledX + scaledSize, scaledY + scaledSize - radius);
+        ctx.quadraticCurveTo(scaledX + scaledSize, scaledY + scaledSize, scaledX + scaledSize - radius, scaledY + scaledSize);
+        ctx.lineTo(scaledX + radius, scaledY + scaledSize);
+        ctx.quadraticCurveTo(scaledX, scaledY + scaledSize, scaledX, scaledY + scaledSize - radius);
+        ctx.lineTo(scaledX, scaledY + radius);
+        ctx.quadraticCurveTo(scaledX, scaledY, scaledX + radius, scaledY);
+        ctx.closePath();
+        ctx.fill();
+
+        // Draw emoji
+        ctx.font = `${Math.floor(scaledSize * 0.6)}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+        ctx.shadowColor = `rgba(0, 0, 0, ${opacity * 0.8})`;
+        ctx.shadowBlur = 3;
+
+        const emoji = getGemEmoji(gemType);
+        ctx.fillText(emoji, centerX, centerY);
+
+        ctx.globalAlpha = 1;
+        ctx.shadowColor = 'transparent';
+    },
+
+    /**
+     * Convert hex color to RGB string for rgba
+     */
+    hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        if (result) {
+            return `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`;
+        }
+        return '0, 0, 0';
+    },
+
+    /**
+     * Check if any animations are active
+     */
+    isAnimating() {
+        return this.activeAnimations.size > 0;
     }
 };
 
@@ -1234,51 +1534,45 @@ function swapGems(row1, col1, row2, col2) {
 }
 
 /**
- * Animate gem swap
+ * Canvas-based swap animation
  */
 function animateSwap(row1, col1, row2, col2, callback) {
-    const gem1 = document.querySelector(`[data-row="${row1}"][data-col="${col1}"]`);
-    const gem2 = document.querySelector(`[data-row="${row2}"][data-col="${col2}"]`);
+    console.log(`🎬 Starting swap animation: [${row1}][${col1}] <-> [${row2}][${col2}]`);
 
-    if (!gem1 || !gem2) {
-        console.warn('⚠️ Could not find gems for swap animation');
-        if (callback) callback();
-        return;
-    }
+    // Start animations for both gems
+    animationSystem.startAnimation(row1, col1, 'swap', {
+        duration: 300,
+        targetRow: row2,
+        targetCol: col2,
+        easing: 'easeOutCubic'
+    });
 
-    // Calculate the distance to swap using responsive gem size
-    const deltaRow = row2 - row1;
-    const deltaCol = col2 - col1;
-    const gemSize = gameState.gemSize;
-    const distance1X = deltaCol * gemSize;
-    const distance1Y = deltaRow * gemSize;
-    
-    // Apply the swap animation with actual movement
-    gem1.classList.add('swapping');
-    gem2.classList.add('swapping');
-    gem1.style.transition = 'transform 0.3s ease-out';
-    gem2.style.transition = 'transform 0.3s ease-out';
-    gem1.style.transform = `translate(${distance1X}px, ${distance1Y}px)`;
-    gem2.style.transform = `translate(${-distance1X}px, ${-distance1Y}px)`;
-    
-    // After animation, clear transforms and call callback
+    animationSystem.startAnimation(row2, col2, 'swap', {
+        duration: 300,
+        targetRow: row1,
+        targetCol: col1,
+        easing: 'easeOutCubic'
+    });
+
+    // Start animation loop
+    canvasManager.startAnimationLoop();
+
+    // Call callback when animation completes
     setTimeout(() => {
-        gem1.classList.remove('swapping');
-        gem2.classList.remove('swapping');
-        gem1.style.transition = '';
-        gem1.style.transform = '';
-        gem2.style.transition = '';
-        gem2.style.transform = '';
-        
+        console.log(`✅ Swap animation complete`);
+        // Clear animations
+        animationSystem.activeAnimations.clear();
+        canvasManager.draw();
+
         if (callback) callback();
     }, 300);
 }
 
 /**
- * Animate matched gems with explosion effect
+ * Canvas-based match animation with removal effects
  */
 function animateMatches(matches) {
-    const matchSet = new Set(matches.map(m => `${m.row},${m.col}`));
+    console.log(`🎯 Animating ${matches.length} matched gems`);
 
     // Calculate score for this match
     const matchCount = matches.length;
@@ -1289,46 +1583,44 @@ function animateMatches(matches) {
     // Update game score
     gameState.score += matchScore;
 
+    // Start removal animations for each matched gem
     matches.forEach(({ row, col }) => {
-        const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-        if (gem) {
-            gem.classList.add('matching');
-            // Show score popup from this gem's position
-            showScorePopup(gem, matchScore / matches.length);
-        }
+        animationSystem.startAnimation(row, col, 'removal', {
+            duration: 300,
+            easing: 'easeInQuad'
+        });
+
+        // Create score popup for this gem
+        const pointsPerGem = Math.floor(matchScore / matches.length);
+        animationSystem.createScorePopup(row, col, pointsPerGem);
     });
 
+    // Start animation loop
+    canvasManager.startAnimationLoop();
+
+    // After removal animation, show combo and apply gravity
     setTimeout(() => {
-        // Calculate and show points for each match
-        const pointsPerGem = 10 * gameState.combo;
-        const totalPoints = pointsPerGem * matches.length;
-        
-        // Show floating points for first gem in match
-        if (matches.length > 0) {
-            showFloatingPoints(totalPoints, matches[0].row, matches[0].col);
-        }
-        
-        // Update score with animation
-        updateScoreAnimated(totalPoints);
-        
+        console.log(`✅ Match animation complete - clearing gems`);
+
         // Clear the matched gems from board data
         matches.forEach(({ row, col }) => {
             gameState.board[row][col] = null;
         });
 
-        // Don't call renderBoard() here - matched gems will fade out with animation
-        // Gravity will handle removing them and filling spaces
+        // Clear removal animations
+        animationSystem.activeAnimations.clear();
+        canvasManager.draw();
 
         // Show combo indicator if combo > 1
         if (gameState.combo > 1) {
-            showComboIndicator(gameState.combo);
+            console.log(`🎊 COMBO x${gameState.combo}!`);
         }
 
         // Apply gravity and fill empty spaces
         setTimeout(() => {
             animateGravity();
         }, 100);
-    }, GAME_CONFIG.ANIMATION_DURATION);
+    }, 300);
 }
 
 /**
