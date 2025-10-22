@@ -189,13 +189,21 @@
         /* Adjust for smaller screens */
         @media (max-width: 1600px) {
             .hero-badge {
-                width: 300px;
-                left: -350px;
+                width: 280px;
+                left: -320px;
             }
         }
 
-        /* Hide hero badge on smaller screens */
-        @media (max-width: 1400px) {
+        /* Further adjustment for medium screens */
+        @media (max-width: 1300px) {
+            .hero-badge {
+                width: 240px;
+                left: -270px;
+            }
+        }
+
+        /* Hide hero badge when sidebars are hidden */
+        @media (max-width: 1100px) {
             .hero-badge {
                 display: none;
             }

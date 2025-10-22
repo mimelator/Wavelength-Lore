@@ -56,11 +56,12 @@ class AutoDiagnostics {
         
         console.log(`  Viewport: ${width}x${height}`);
         
-        if (width < 1400) {
+        // Updated breakpoint from 1400px to 1100px
+        if (width < 1100) {
             this.warnings.push({
                 category: 'Viewport',
-                message: `Viewport width (${width}px) is below 1400px - hero badge will be hidden`,
-                suggestion: 'Increase browser window width to see hero badge'
+                message: `Viewport width (${width}px) is below 1100px - hero badge will be hidden`,
+                suggestion: 'Increase browser window width to at least 1100px to see hero badge'
             });
         }
         
@@ -75,7 +76,7 @@ class AutoDiagnostics {
         this.info.push({
             category: 'Viewport',
             message: `Screen: ${width}x${height}`,
-            details: `Device pixel ratio: ${window.devicePixelRatio}`
+            details: `Device pixel ratio: ${window.devicePixelRatio}, Hero badge: ${width >= 1100 ? 'VISIBLE' : 'HIDDEN'}`
         });
     }
 
@@ -287,10 +288,12 @@ class AutoDiagnostics {
         const canvas = document.getElementById('gameCanvas');
         
         if (!canvas) {
-            this.warnings.push({
+            // This is expected on initial load - canvas is created by game engine
+            console.log('  ℹ️  Canvas not yet created (will be created by game engine)');
+            this.info.push({
                 category: 'Canvas',
-                message: 'Game canvas not found - it may not be created yet',
-                suggestion: 'Canvas is created dynamically by the game engine'
+                message: 'Canvas not yet created',
+                details: 'This is normal - canvas is created dynamically by the game engine after initialization'
             });
             return;
         }
@@ -301,7 +304,7 @@ class AutoDiagnostics {
 
         this.info.push({
             category: 'Canvas',
-            message: `Canvas size: ${canvas.width}x${canvas.height}`,
+            message: `Canvas created: ${canvas.width}x${canvas.height}`,
             details: `Context available: ${!!ctx}`
         });
     }
@@ -394,8 +397,8 @@ class AutoDiagnostics {
         // Recommendations
         if (this.issues.length > 0 || this.warnings.length > 0) {
             console.log('\n%c🔧 QUICK FIXES:', 'color: #8B5CF6; font-weight: bold;');
-            if (window.innerWidth < 1400) {
-                console.log('  • Increase browser window width to at least 1400px to see hero badge');
+            if (window.innerWidth < 1100) {
+                console.log('  • Increase browser window width to at least 1100px to see hero badge');
             }
             if (this.warnings.some(w => w.category === 'Hero Badge' && w.message.includes('parent'))) {
                 console.log('  • Move hero badge element inside #gameBoard container');
