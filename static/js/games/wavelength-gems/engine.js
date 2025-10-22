@@ -61,6 +61,121 @@ function getGemSize() {
     return gemSize;
 }
 
+/**
+ * Create an on-screen debug panel showing actual dimensions
+ */
+function createDebugPanel() {
+    // Remove existing debug panel if any
+    const existing = document.getElementById('debug-panel');
+    if (existing) existing.remove();
+
+    const debugPanel = document.createElement('div');
+    debugPanel.id = 'debug-panel';
+    debugPanel.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.9);
+        color: #0f0;
+        padding: 15px;
+        font-family: monospace;
+        font-size: 12px;
+        border: 2px solid #0f0;
+        border-radius: 5px;
+        z-index: 10000;
+        max-width: 300px;
+        line-height: 1.6;
+    `;
+
+    function updateDebugInfo() {
+        const boardElement = document.getElementById('gameBoard');
+        const wrapperElement = document.querySelector('.game-board-wrapper');
+        const containerElement = document.querySelector('.gems-game-container');
+
+        let html = `<strong>📐 LAYOUT DEBUG</strong><br>`;
+
+        if (boardElement) {
+            const boardRect = boardElement.getBoundingClientRect();
+            const wrapperRect = wrapperElement?.getBoundingClientRect() || {};
+            const containerRect = containerElement?.getBoundingClientRect() || {};
+
+            html += `Viewport: ${window.innerWidth}px<br>`;
+            html += `Container: ${Math.round(containerRect.width)}px<br>`;
+            html += `Wrapper: ${Math.round(wrapperRect.width)}px<br>`;
+            html += `Board: ${Math.round(boardRect.width)}px<br>`;
+            html += `<br>`;
+
+            if (boardRect.width > window.innerWidth) {
+                html += `<span style="color: #f00;">❌ OVERFLOW: ${Math.round(boardRect.width - window.innerWidth)}px</span><br>`;
+            } else {
+                html += `<span style="color: #0f0;">✅ FITS (margin: ${Math.round(window.innerWidth - boardRect.width)}px)</span><br>`;
+            }
+
+            // Calculate visible columns
+            const gemElements = boardElement.querySelectorAll('.gem');
+            if (gemElements.length > 0) {
+                const firstGem = gemElements[0];
+                const gemRect = firstGem.getBoundingClientRect();
+                const gemWidth = gemRect.width;
+                const visibleCols = (window.innerWidth / gemWidth).toFixed(2);
+                html += `<br>Gem width: ${Math.round(gemWidth)}px<br>`;
+                html += `Visible cols: ${visibleCols} / 8<br>`;
+            }
+        }
+
+        debugPanel.innerHTML = html;
+    }
+
+    // Update every 300ms
+    const updateInterval = setInterval(updateDebugInfo, 300);
+
+    // Initial update
+    updateDebugInfo();
+
+    document.body.appendChild(debugPanel);
+
+    // Store interval ID for cleanup
+    window._debugInterval = updateInterval;
+}
+
+/**
+ * Log board dimensions to console
+ */
+function logBoardDimensions() {
+    const boardElement = document.getElementById('gameBoard');
+    const wrapperElement = document.querySelector('.game-board-wrapper');
+    const containerElement = document.querySelector('.gems-game-container');
+
+    if (boardElement) {
+        const boardRect = boardElement.getBoundingClientRect();
+        const wrapperRect = wrapperElement?.getBoundingClientRect() || {};
+        const containerRect = containerElement?.getBoundingClientRect() || {};
+
+        console.group('📐 BOARD DIMENSIONS');
+        console.log(`Viewport width: ${window.innerWidth}px`);
+        console.log(`Container width: ${Math.round(containerRect.width)}px`);
+        console.log(`Wrapper width: ${Math.round(wrapperRect.width)}px`);
+        console.log(`Board width: ${Math.round(boardRect.width)}px`);
+        console.log(`Board height: ${Math.round(boardRect.height)}px`);
+
+        if (boardRect.width > window.innerWidth) {
+            console.error(`⚠️ OVERFLOW: Board exceeds viewport by ${Math.round(boardRect.width - window.innerWidth)}px`);
+        } else {
+            console.log(`✅ Board fits with ${Math.round(window.innerWidth - boardRect.width)}px margin`);
+        }
+
+        const gemElements = boardElement.querySelectorAll('.gem');
+        if (gemElements.length > 0) {
+            const firstGem = gemElements[0];
+            const gemRect = firstGem.getBoundingClientRect();
+            const visibleCols = (window.innerWidth / gemRect.width).toFixed(2);
+            console.log(`First gem width: ${Math.round(gemRect.width)}px`);
+            console.log(`Visible columns: ${visibleCols} / 8`);
+        }
+        console.groupEnd();
+    }
+}
+
 // Game state
 let gameState = {
     board: [],
@@ -144,19 +259,12 @@ function initGame() {
     document.head.appendChild(style);
     console.log(`📐 Injected dynamic gem size CSS: ${gameState.gemSize}px with aggressive overrides`);
 
-    // Debug: Log actual board dimensions after rendering
+    // Debug: Create on-screen debug panel to show actual dimensions
+    createDebugPanel();
+
+    // Also log to console
     setTimeout(() => {
-        const boardElement = document.getElementById('gameBoard');
-        if (boardElement) {
-            const rect = boardElement.getBoundingClientRect();
-            console.log(`🎯 Board dimensions: ${rect.width}px wide × ${rect.height}px tall`);
-            console.log(`📱 Viewport: ${window.innerWidth}px wide`);
-            if (rect.width > window.innerWidth) {
-                console.warn(`⚠️ BOARD OVERFLOW: Board (${rect.width}px) exceeds viewport (${window.innerWidth}px) by ${rect.width - window.innerWidth}px`);
-            } else {
-                console.log(`✅ Board fits within viewport`);
-            }
-        }
+        logBoardDimensions();
     }, 500);
 
     animationFrames.clear();
