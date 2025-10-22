@@ -276,6 +276,47 @@ function initGame() {
     document.head.appendChild(style);
     console.log(`📐 Injected dynamic gem size CSS: ${gameState.gemSize}px with aggressive overrides`);
 
+    // FORCE width constraints on mobile using JavaScript (bypasses any CSS issues)
+    if (window.innerWidth <= 768) {
+        setTimeout(() => {
+            const wrapper = document.querySelector('.gems-game-wrapper');
+            const container = document.querySelector('.gems-game-container');
+            const boardWrapper = document.querySelector('.game-board-wrapper');
+            const board = document.getElementById('gameBoard');
+
+            // Force these to 100% or full viewport
+            if (wrapper) {
+                wrapper.style.width = '100vw';
+                wrapper.style.maxWidth = '100vw';
+                wrapper.style.marginLeft = 'calc(-50vw + 50%)';
+                wrapper.style.boxSizing = 'border-box';
+            }
+
+            if (container) {
+                container.style.width = '100vw';
+                container.style.maxWidth = '100vw';
+                container.style.marginLeft = 'calc(-50vw + 50%)';
+                container.style.boxSizing = 'border-box';
+            }
+
+            if (boardWrapper) {
+                boardWrapper.style.width = '100vw';
+                boardWrapper.style.maxWidth = '100vw';
+                boardWrapper.style.marginLeft = 'calc(-50vw + 50%)';
+                boardWrapper.style.boxSizing = 'border-box';
+            }
+
+            if (board) {
+                board.style.width = '100%';
+                board.style.maxWidth = 'calc(100vw - 4px)';
+                board.style.boxSizing = 'border-box';
+                board.style.margin = '0 auto';
+            }
+
+            console.log(`✅ Applied inline width overrides to all elements`);
+        }, 100);
+    }
+
     // Debug: Create on-screen debug panel to show actual dimensions
     createDebugPanel();
 
