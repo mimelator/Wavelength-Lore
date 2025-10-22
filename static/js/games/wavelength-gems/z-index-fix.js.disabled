@@ -1,0 +1,80 @@
+/**
+ * DISABLED: Game Board Z-index Fix
+ * This file is no longer needed as we fixed the underlying issues in the engine.js file.
+ * Kept for reference in case z-index issues return in the future.
+ */
+
+/* 
+// Function to fix the game board z-index issues - DISABLED
+function fixGameBoardZIndex() {
+  console.log('Applying game board z-index fixes...');
+  
+  // Fix for game board
+  const gameBoard = document.getElementById('gameBoard');
+  if (gameBoard) {
+    gameBoard.style.zIndex = '100';
+    console.log('Game board z-index set to 100');
+  }
+  
+  // Fix for gems
+  const gems = document.querySelectorAll('.gem');
+  if (gems.length > 0) {
+    gems.forEach(gem => {
+      gem.style.zIndex = '110';
+      gem.style.pointerEvents = 'auto';
+    });
+    console.log(`Applied z-index fixes to ${gems.length} gems`);
+  }
+  
+  // Make sure the game board wrapper has proper context
+  const boardWrapper = document.querySelector('.game-board-wrapper');
+  if (boardWrapper) {
+    boardWrapper.style.zIndex = '50';
+    boardWrapper.style.position = 'relative';
+    console.log('Game board wrapper z-index set');
+  }
+  
+  // Fix for any overlays that might interfere
+  const adTestPanel = document.getElementById('ad-test-panel');
+  if (adTestPanel) {
+    adTestPanel.style.zIndex = '10';
+    adTestPanel.style.pointerEvents = 'auto';
+    console.log('Ad test panel z-index adjusted');
+  }
+  
+  // Special handling for game container
+  const gameContainer = document.querySelector('.gems-game-container');
+  if (gameContainer) {
+    gameContainer.style.zIndex = '20';
+    gameContainer.style.position = 'relative';
+    console.log('Game container z-index set');
+  }
+}
+*/
+
+console.log('Z-index fix script is disabled - no longer needed since engine.js fixes');
+
+/*
+// DISABLED: All event listeners and fix applications
+document.addEventListener('DOMContentLoaded', () => {
+  // Initial application
+  setTimeout(fixGameBoardZIndex, 1000);
+  
+  // Re-apply after any level change or game restart
+  window.addEventListener('levelLoaded', fixGameBoardZIndex);
+  
+  // Periodic re-application to catch dynamic changes
+  setInterval(fixGameBoardZIndex, 5000);
+});
+
+// Apply fixes when window resizes
+window.addEventListener('resize', fixGameBoardZIndex);
+
+// Apply fixes when orientation changes on mobile
+window.addEventListener('orientationchange', () => {
+  setTimeout(fixGameBoardZIndex, 500);
+});
+*/
+
+// This file is now disabled - the underlying issue was fixed in engine.js
+console.log('Z-index fix script loaded but disabled - no longer needed');

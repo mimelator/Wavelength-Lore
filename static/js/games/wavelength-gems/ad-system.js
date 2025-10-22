@@ -32,12 +32,38 @@ const AdSystem = {
     // Load user preferences
     this.loadUserPreferences();
     
-    // Set provider from options or default
-    this.providerType = options.provider || this.providerType;
+    // Check for AdMob config
+    if (window.AdMobConfig) {
+      console.log('Found AdMobConfig, using configuration from there');
+      
+      // Use config settings
+      const settings = window.AdMobConfig.settings;
+      if (settings) {
+        if (settings.minTimeBetweenInterstitials) {
+          this.minTimeBetweenAds = settings.minTimeBetweenInterstitials;
+        }
+        if (settings.interstitialFrequency) {
+          this.adFrequency = settings.interstitialFrequency;
+        }
+        
+        // Check if ads are globally disabled
+        if (settings.adsEnabled === false) {
+          console.log('Ads are disabled in AdMobConfig');
+          this.userOptedOut = true;
+        }
+      }
+      
+      // Default to AdMob provider when config is present
+      this.providerType = 'admob';
+    }
     
-    // Override config from options
+    // Override with options if provided
+    if (options.provider) this.providerType = options.provider;
     if (options.minTimeBetweenAds) this.minTimeBetweenAds = options.minTimeBetweenAds;
     if (options.adFrequency) this.adFrequency = options.adFrequency;
+    
+    // Track the current reward type for analytics
+    this.currentRewardType = null;
     
     // Initialize selected provider
     this.initProvider();
@@ -47,7 +73,7 @@ const AdSystem = {
     
     // Mark as initialized
     this.initialized = true;
-    console.log('✅ Ad System initialized');
+    console.log('✅ Ad System initialized with provider:', this.providerType);
   },
   
   /**
@@ -76,45 +102,234 @@ const AdSystem = {
   
   /**
    * Initialize Google AdMob
-   * (Placeholder - replace with actual AdMob integration)
+   * Uses AdMobConfig to properly integrate with AdMob SDK
    */
   initAdMob: function() {
     console.log('Initializing AdMob...');
     
-    // Simulating AdMob initialization
+    // Make sure AdMobConfig exists
+    if (!window.AdMobConfig) {
+      console.error('AdMobConfig not found! Make sure admob-config.js is loaded before ad-system.js');
+      return;
+    }
+    
+    // Create the provider object using real AdMob SDK
     this.provider = {
       name: 'AdMob',
       
-      // AdMob typically needs ad unit IDs for different ad formats
-      adUnitIds: {
-        rewarded: 'ca-app-pub-XXXXXXXXXXXXXXXX/REWARDED_VIDEO_ID',
-        interstitial: 'ca-app-pub-XXXXXXXXXXXXXXXX/INTERSTITIAL_ID',
-        banner: 'ca-app-pub-XXXXXXXXXXXXXXXX/BANNER_ID'
+      // Store reference to config for convenience
+      config: window.AdMobConfig,
+      
+      // Initialize AdMob SDK
+      initialize: () => {
+        // Get the device platform (should be implemented or detected)
+        const platform = this.getPlatform(); // 'android', 'ios', or 'web'
+        
+        if (typeof admob !== 'undefined') {
+          // Initialize with the app ID for the current platform
+          admob.start()
+            .then(() => {
+              console.log('AdMob SDK initialized successfully');
+              
+              // Configure ad targeting based on settings
+              if (this.provider.config.settings.targeting) {
+                const targeting = this.provider.config.settings.targeting;
+                admob.setOptions({
+                  maxAdContentRating: targeting.maxAdContentRating || 'T',
+                  tagForChildDirectedTreatment: targeting.tagForChildDirectedTreatment || false,
+                  tagForUnderAgeOfConsent: targeting.tagForUnderAgeOfConsent || false
+                });
+              }
+              
+              // Load initial ads
+              this.provider.loadRewardedVideo();
+              this.provider.loadInterstitial();
+            })
+            .catch(error => {
+              console.error('AdMob initialization failed:', error);
+            });
+        } else {
+          console.warn('AdMob SDK not detected, using simulation mode');
+          // Simulate initialization for development without SDK
+          this.simulateAdMob();
+        }
       },
       
-      // Methods would be replaced with actual AdMob SDK calls
+      // Load a rewarded video ad
       loadRewardedVideo: () => {
-        console.log('Loading AdMob rewarded video...');
-        // Simulate ad loading
-        setTimeout(() => {
-          this.rewardedVideoReady = true;
-          console.log('AdMob rewarded video loaded and ready');
-        }, 1000);
+        if (typeof admob === 'undefined') {
+          // Simulate for development
+          setTimeout(() => {
+            this.rewardedVideoReady = true;
+            console.log('AdMob rewarded video loaded and ready (simulated)');
+          }, 1000);
+          return;
+        }
+        
+        // Get the correct ad unit ID from config
+        const adUnitId = this.provider.config.getAdUnitId('rewardedVideo');
+        
+        // Prepare the ad
+        admob.rewardVideo.prepare({
+          adUnitId: adUnitId
+        })
+          .then(() => {
+            console.log('Rewarded video ad is ready to show');
+            this.rewardedVideoReady = true;
+          })
+          .catch(error => {
+            console.error('Failed to prepare rewarded video ad:', error);
+            // Try again later
+            setTimeout(() => this.provider.loadRewardedVideo(), 60000);
+          });
       },
       
+      // Show a rewarded video ad
+      showRewardedVideo: (rewardCallback) => {
+        if (typeof admob === 'undefined') {
+          // Simulate for development
+          setTimeout(() => {
+            if (rewardCallback) rewardCallback();
+            this.rewardedVideoReady = false;
+            // Reload
+            this.provider.loadRewardedVideo();
+          }, 2000);
+          return;
+        }
+        
+        // Show the ad
+        admob.rewardVideo.show()
+          .then(() => {
+            console.log('Rewarded video ad shown successfully');
+          })
+          .catch(error => {
+            console.error('Failed to show rewarded video ad:', error);
+          });
+          
+        // Set up reward event listener (if not already set)
+        if (!this.rewardListenerSet) {
+          document.addEventListener('admob.reward_video.reward', (event) => {
+            console.log('User earned reward:', event);
+            if (rewardCallback) rewardCallback();
+          });
+          
+          document.addEventListener('admob.reward_video.close', () => {
+            console.log('Rewarded video closed, loading next ad');
+            this.rewardedVideoReady = false;
+            this.provider.loadRewardedVideo();
+          });
+          
+          this.rewardListenerSet = true;
+        }
+      },
+      
+      // Load an interstitial ad
       loadInterstitial: () => {
-        console.log('Loading AdMob interstitial...');
-        // Simulate ad loading
-        setTimeout(() => {
-          this.interstitialReady = true;
-          console.log('AdMob interstitial loaded and ready');
-        }, 1000);
+        if (typeof admob === 'undefined') {
+          // Simulate for development
+          setTimeout(() => {
+            this.interstitialReady = true;
+            console.log('AdMob interstitial loaded and ready (simulated)');
+          }, 1000);
+          return;
+        }
+        
+        // Get the correct ad unit ID from config
+        const adUnitId = this.provider.config.getAdUnitId('interstitial');
+        
+        // Prepare the ad
+        admob.interstitial.prepare({
+          adUnitId: adUnitId
+        })
+          .then(() => {
+            console.log('Interstitial ad is ready to show');
+            this.interstitialReady = true;
+          })
+          .catch(error => {
+            console.error('Failed to prepare interstitial ad:', error);
+            // Try again later
+            setTimeout(() => this.provider.loadInterstitial(), 60000);
+          });
+      },
+      
+      // Show an interstitial ad
+      showInterstitial: (completionCallback) => {
+        if (typeof admob === 'undefined') {
+          // Simulate for development
+          setTimeout(() => {
+            if (completionCallback) completionCallback();
+            this.interstitialReady = false;
+            // Reload
+            this.provider.loadInterstitial();
+          }, 2000);
+          return;
+        }
+        
+        // Show the ad
+        admob.interstitial.show()
+          .then(() => {
+            console.log('Interstitial ad shown successfully');
+          })
+          .catch(error => {
+            console.error('Failed to show interstitial ad:', error);
+            if (completionCallback) completionCallback();
+          });
+          
+        // Set up close event listener (if not already set)
+        if (!this.interstitialListenerSet) {
+          document.addEventListener('admob.interstitial.close', () => {
+            console.log('Interstitial closed, loading next ad');
+            this.interstitialReady = false;
+            this.provider.loadInterstitial();
+            if (completionCallback) completionCallback();
+          });
+          
+          this.interstitialListenerSet = true;
+        }
       }
     };
     
-    // Initial ad loading
-    this.provider.loadRewardedVideo();
-    this.provider.loadInterstitial();
+    // Initialize AdMob
+    this.provider.initialize();
+    
+    // Apply config settings to our ad system
+    if (window.AdMobConfig.settings) {
+      this.minTimeBetweenAds = window.AdMobConfig.settings.minTimeBetweenInterstitials || this.minTimeBetweenAds;
+      this.adFrequency = window.AdMobConfig.settings.interstitialFrequency || this.adFrequency;
+    }
+  },
+  
+  /**
+   * Simulate AdMob for development without SDK
+   */
+  simulateAdMob: function() {
+    console.log('Using simulated AdMob for development');
+    setTimeout(() => {
+      this.rewardedVideoReady = true;
+      this.interstitialReady = true;
+      console.log('Simulated ads are ready to show');
+    }, 1000);
+  },
+  
+  /**
+   * Detect the current platform
+   * @returns {string} 'android', 'ios', or 'web'
+   */
+  getPlatform: function() {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    
+    // Detect iOS
+    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+      return 'ios';
+    }
+    
+    // Detect Android
+    if (/android/i.test(userAgent)) {
+      return 'android';
+    }
+    
+    // Default to web
+    return 'web';
   },
   
   /**
@@ -194,29 +409,19 @@ const AdSystem = {
     // Track last ad shown time
     this.lastAdShownTime = Date.now();
     
-    // In real implementation, this would trigger the actual ad display
-    // For prototype, we'll simulate the ad display and completion
-    setTimeout(() => {
-      // Hide loading UI
+    // Call the provider's implementation
+    if (this.provider && typeof this.provider.showRewardedVideo === 'function') {
+      // Hide loading UI since the ad SDK will show its own UI
+      setTimeout(() => this.hideAdLoadingUI(), 500);
+      
+      // Show the ad
+      this.provider.showRewardedVideo(rewardCallback);
+    } else {
+      // Fallback for when provider isn't available
+      console.error('Provider missing showRewardedVideo method');
       this.hideAdLoadingUI();
-      
-      // Mark as used
-      this.rewardedVideoReady = false;
-      
-      // Reload ad
-      if (this.provider && typeof this.provider.loadRewardedVideo === 'function') {
-        this.provider.loadRewardedVideo();
-      }
-      
-      // Execute reward callback
-      if (rewardCallback && typeof rewardCallback === 'function') {
-        console.log('User earned reward');
-        rewardCallback();
-      }
-      
-      // Log event
-      console.log('Rewarded video ad completed');
-    }, 1000); // Simulated ad duration
+      return false;
+    }
     
     return true;
   },
@@ -260,28 +465,20 @@ const AdSystem = {
     // Track last ad shown time
     this.lastAdShownTime = Date.now();
     
-    // In real implementation, this would trigger the actual ad display
-    // For prototype, we'll simulate the ad display and completion
-    setTimeout(() => {
-      // Hide loading UI
+    // Call the provider's implementation
+    if (this.provider && typeof this.provider.showInterstitial === 'function') {
+      // Hide loading UI since the ad SDK will show its own UI
+      setTimeout(() => this.hideAdLoadingUI(), 500);
+      
+      // Show the ad
+      this.provider.showInterstitial(completionCallback);
+    } else {
+      // Fallback for when provider isn't available
+      console.error('Provider missing showInterstitial method');
       this.hideAdLoadingUI();
-      
-      // Mark as used
-      this.interstitialReady = false;
-      
-      // Reload ad
-      if (this.provider && typeof this.provider.loadInterstitial === 'function') {
-        this.provider.loadInterstitial();
-      }
-      
-      // Execute completion callback
-      if (completionCallback && typeof completionCallback === 'function') {
-        completionCallback();
-      }
-      
-      // Log event
-      console.log('Interstitial ad closed');
-    }, 1000); // Simulated ad duration
+      if (completionCallback) completionCallback();
+      return false;
+    }
     
     return true;
   },
@@ -337,11 +534,21 @@ const AdSystem = {
   refreshAds: function() {
     if (this.userOptedOut) return;
     
-    if (!this.rewardedVideoReady && this.provider && typeof this.provider.loadRewardedVideo === 'function') {
+    // Check if ad provider is available
+    if (!this.provider) {
+      console.warn('Ad provider not initialized, cannot refresh ads');
+      return;
+    }
+    
+    // Load a new rewarded video ad if needed
+    if (!this.rewardedVideoReady && typeof this.provider.loadRewardedVideo === 'function') {
+      console.log('Refreshing rewarded video ad');
       this.provider.loadRewardedVideo();
     }
     
-    if (!this.interstitialReady && this.provider && typeof this.provider.loadInterstitial === 'function') {
+    // Load a new interstitial ad if needed
+    if (!this.interstitialReady && typeof this.provider.loadInterstitial === 'function') {
+      console.log('Refreshing interstitial ad');
       this.provider.loadInterstitial();
     }
   },
@@ -394,7 +601,7 @@ const AdSystem = {
           <div class="ad-offer-card">
             <h2 id="ad-offer-title"></h2>
             <div class="reward-image">
-              <img id="ad-reward-image" src="/static/images/special-gem.png" alt="Reward">
+              <img id="ad-reward-image" src="/static/images/special-gem.svg" alt="Reward">
             </div>
             <p id="ad-reward-description" class="reward-description"></p>
             <div class="ad-duration">30 seconds</div>
@@ -442,6 +649,15 @@ const AdSystem = {
    * Offer extra life in exchange for watching ad
    */
   offerExtraLife: function() {
+    // Save the reward type for use in analytics
+    this.currentRewardType = 'extraLife';
+    
+    // Update image to life gem
+    const rewardImage = document.getElementById('ad-reward-image');
+    if (rewardImage) {
+      rewardImage.src = '/static/images/life-gem.svg';
+    }
+    
     this.showAdOfferDialog(
       "Need an Extra Life?",
       "Watch a short video to continue playing!",
@@ -458,6 +674,15 @@ const AdSystem = {
    * Offer special power gem in exchange for watching ad
    */
   offerSpecialGem: function() {
+    // Save the reward type for use in analytics
+    this.currentRewardType = 'powerGem';
+    
+    // Update image to power gem
+    const rewardImage = document.getElementById('ad-reward-image');
+    if (rewardImage) {
+      rewardImage.src = '/static/images/power-gem.svg';
+    }
+    
     this.showAdOfferDialog(
       "Power Up!",
       "Watch a short video to receive a special power gem!",
@@ -474,6 +699,15 @@ const AdSystem = {
    * Offer score multiplier in exchange for watching ad
    */
   offerScoreMultiplier: function() {
+    // Save the reward type for use in analytics
+    this.currentRewardType = 'scoreMultiplier';
+    
+    // Update image to multiplier gem
+    const rewardImage = document.getElementById('ad-reward-image');
+    if (rewardImage) {
+      rewardImage.src = '/static/images/multiplier-gem.svg';
+    }
+    
     this.showAdOfferDialog(
       "Double Your Score!",
       "Watch a short video to activate 2x score multiplier!",

@@ -576,5 +576,88 @@ router.post('/wavelength-gems/reset-progress', async (req, res) => {
     }
 });
 
+/**
+ * GET /api/games/wavelength-gems/admob-config
+ * Get AdMob configuration settings from environment variables
+ */
+router.get('/wavelength-gems/admob-config', async (req, res) => {
+    try {
+        // Collect AdMob environment variables
+        const adMobConfig = {
+            // App IDs
+            appId: {
+                android: process.env.ADMOB_APP_ID_ANDROID || '',
+                ios: process.env.ADMOB_APP_ID_IOS || '',
+                web: process.env.ADMOB_APP_ID_WEB || ''
+            },
+            
+            // Ad Unit IDs
+            adUnits: {
+                // Rewarded video ads
+                rewardedVideo: {
+                    production: process.env.ADMOB_REWARDED_VIDEO_PROD || '',
+                    test: 'ca-app-pub-3940256099942544/5224354917' // Google test ID
+                },
+                
+                rewardedVideoExtraLife: {
+                    production: process.env.ADMOB_REWARDED_EXTRA_LIFE_PROD || process.env.ADMOB_REWARDED_VIDEO_PROD || '',
+                    test: 'ca-app-pub-3940256099942544/5224354917' // Google test ID
+                },
+                
+                rewardedVideoPowerGem: {
+                    production: process.env.ADMOB_REWARDED_POWER_GEM_PROD || process.env.ADMOB_REWARDED_VIDEO_PROD || '',
+                    test: 'ca-app-pub-3940256099942544/5224354917' // Google test ID
+                },
+                
+                rewardedVideoScoreMultiplier: {
+                    production: process.env.ADMOB_REWARDED_SCORE_MULTI_PROD || process.env.ADMOB_REWARDED_VIDEO_PROD || '',
+                    test: 'ca-app-pub-3940256099942544/5224354917' // Google test ID
+                },
+                
+                // Interstitial ads
+                interstitial: {
+                    production: process.env.ADMOB_INTERSTITIAL_PROD || '',
+                    test: 'ca-app-pub-3940256099942544/1033173712' // Google test ID
+                },
+                
+                interstitialLevelComplete: {
+                    production: process.env.ADMOB_INTERSTITIAL_LEVEL_PROD || process.env.ADMOB_INTERSTITIAL_PROD || '',
+                    test: 'ca-app-pub-3940256099942544/1033173712' // Google test ID
+                },
+                
+                interstitialGameOver: {
+                    production: process.env.ADMOB_INTERSTITIAL_GAMEOVER_PROD || process.env.ADMOB_INTERSTITIAL_PROD || '',
+                    test: 'ca-app-pub-3940256099942544/1033173712' // Google test ID
+                }
+            },
+            
+            // Settings
+            settings: {
+                useTestAds: process.env.ADMOB_USE_TEST_ADS !== 'false', // Default to test ads in development
+                adsEnabled: process.env.ADMOB_ENABLED !== 'false', // Default to enabled
+                minTimeBetweenInterstitials: parseInt(process.env.ADMOB_MIN_TIME_BETWEEN_ADS || '60000'),
+                interstitialFrequency: parseInt(process.env.ADMOB_INTERSTITIAL_FREQUENCY || '3'),
+                targeting: {
+                    maxAdContentRating: process.env.ADMOB_MAX_CONTENT_RATING || 'PG',
+                    tagForChildDirectedTreatment: process.env.ADMOB_CHILD_DIRECTED === 'true',
+                    tagForUnderAgeOfConsent: process.env.ADMOB_UNDER_AGE_CONSENT === 'true'
+                }
+            }
+        };
+        
+        res.json({
+            success: true,
+            config: adMobConfig
+        });
+    } catch (error) {
+        console.error('Error fetching AdMob config:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch AdMob configuration',
+            details: error.message
+        });
+    }
+});
+
 module.exports = router;
 

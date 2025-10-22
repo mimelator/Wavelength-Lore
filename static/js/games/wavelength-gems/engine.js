@@ -167,18 +167,22 @@ let canvasManager = {
         // Draw board background
         this.drawBoardBackground();
 
-        // Draw all gems
-        this.drawAllGems();
-
-        // Draw particle effects
-        animationSystem.drawParticles();
-
-        // Draw animations on top
-        animationSystem.drawAnimations();
-
-        // Highlight selected gem (drawn last so it's on top)
-        if (gameState.selectedGem) {
-            this.drawSelectedHighlight();
+        // Draw all gems if board is initialized
+        if (gameState.board && Array.isArray(gameState.board) && gameState.board.length > 0) {
+            this.drawAllGems();
+            
+            // Draw particle effects
+            if (typeof animationSystem !== 'undefined' && animationSystem) {
+                animationSystem.drawParticles();
+                
+                // Draw animations on top
+                animationSystem.drawAnimations();
+            }
+    
+            // Highlight selected gem (drawn last so it's on top)
+            if (gameState.selectedGem) {
+                this.drawSelectedHighlight();
+            }
         }
     },
 
@@ -258,7 +262,15 @@ let canvasManager = {
      * Draw all gems on the board
      */
     drawAllGems() {
+        // Safety check: Make sure gameState.board exists and has rows
+        if (!gameState.board || !Array.isArray(gameState.board) || gameState.board.length === 0) {
+            return; // Skip drawing if board isn't initialized yet
+        }
+        
         for (let row = 0; row < GAME_CONFIG.ROWS; row++) {
+            // Safety check: Make sure this row exists
+            if (!gameState.board[row]) continue;
+            
             for (let col = 0; col < GAME_CONFIG.COLS; col++) {
                 const gemType = gameState.board[row][col];
                 if (gemType) {
@@ -1374,6 +1386,15 @@ async function initGame(levelNumber = 1) {
     // Set responsive gem size
     gameState.gemSize = getGemSize();
     console.log(`📏 Gem size set to: ${gameState.gemSize}px (viewport width: ${window.innerWidth}px)`);
+
+    // Create empty board to prevent rendering errors
+    if (!gameState.board || !Array.isArray(gameState.board)) {
+        gameState.board = [];
+        // Initialize with empty arrays
+        for (let i = 0; i < GAME_CONFIG.ROWS; i++) {
+            gameState.board[i] = [];
+        }
+    }
 
     gameState = {
         board: [],

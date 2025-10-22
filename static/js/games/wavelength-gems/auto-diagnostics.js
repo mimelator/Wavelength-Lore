@@ -1,24 +1,33 @@
 /**
- * Auto-Diagnostics System for Wavelength Gems
+ * Auto-Diagnostics System for Wavelength Gems - DISABLED FOR ADMOB TESTING
  * Automatically checks for common issues on page load and provides detailed reports
+ * 
+ * This file has been fully disabled to reduce console noise during AdMob integration testing.
  */
 
 class AutoDiagnostics {
     constructor() {
+        // Initialize arrays even though diagnostics are disabled
         this.issues = [];
         this.warnings = [];
         this.info = [];
     }
 
     /**
-     * Run all diagnostic checks
+     * Run all diagnostic checks - DISABLED FOR ADMOB TESTING
      */
     async runAll() {
+        // Completely disabled - no console output
+        return;
+        
+        // Original code - commented out
+        /* 
         console.log('%c🔍 AUTO-DIAGNOSTICS STARTING...', 'color: #3B82F6; font-size: 16px; font-weight: bold;');
         console.log('═'.repeat(80));
 
         // Wait for DOM to be fully loaded
         await this.waitForDOM();
+        */
 
         // Run checks
         this.checkViewport();
@@ -429,25 +438,24 @@ class AutoDiagnostics {
     }
 }
 
-// Auto-run diagnostics on page load
+// Auto-run diagnostics on page load - DISABLED FOR ADMOB TESTING
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         const diagnostics = new AutoDiagnostics();
+        // Only run the initialization method, not the additional checks
         diagnostics.runAll();
-        diagnostics.checkHeroBadgeAfterLoad();
+        // Don't run checkHeroBadgeAfterLoad() - disabled for AdMob testing
     });
 } else {
     const diagnostics = new AutoDiagnostics();
+    // Only run the initialization method, not the additional checks
     diagnostics.runAll();
-    diagnostics.checkHeroBadgeAfterLoad();
+    // Don't run checkHeroBadgeAfterLoad() - disabled for AdMob testing
 }
 
-// Export for manual use
+// Export for manual use (but disabled)
 window.AutoDiagnostics = AutoDiagnostics;
 window.runDiagnostics = () => {
-    const diagnostics = new AutoDiagnostics();
-    diagnostics.runAll();
-    return diagnostics;
+    console.log('Auto-diagnostics are disabled for AdMob testing.');
+    return { disabled: true };
 };
-
-console.log('%c💡 TIP: Run "runDiagnostics()" in console to manually check for issues', 'color: #8B5CF6; font-style: italic;');

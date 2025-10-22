@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wavelength Gems - AdMob Integration Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #4a148c;
+      margin-top: 0;
+    }
+    .button-group {
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #6a1b9a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #4a148c;
+    }
+    .section {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    .log {
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      margin-top: 20px;
+    }
+    .log-entry {
+      margin: 5px 0;
+      line-height: 1.4;
+    }
+    .info {
+      color: #2196F3;
+    }
+    .success {
+      color: #4CAF50;
+    }
+    .warning {
+      color: #FF9800;
+    }
+    .error {
+      color: #F44336;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Wavelength Gems - AdMob Integration Demo</h1>
+    
+    <div class="section">
+      <h2>Ad System Controls</h2>
+      <div class="button-group">
+        <button onclick="initializeAdSystem()">Initialize Ad System</button>
+        <button onclick="toggleAdPreference()">Toggle Ads On/Off</button>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Rewarded Video Ads</h2>
+      <div class="button-group">
+        <button onclick="offerExtraLife()">Offer Extra Life</button>
+        <button onclick="offerPowerGem()">Offer Power Gem</button>
+        <button onclick="offerScoreMultiplier()">Offer Score Multiplier</button>
+        <button onclick="showRewardedAd()">Show Generic Rewarded Ad</button>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Interstitial Ads</h2>
+      <div class="button-group">
+        <button onclick="showInterstitial()">Show Interstitial Ad</button>
+        <button onclick="simulateLevelComplete()">Simulate Level Complete</button>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Status</h2>
+      <div>
+        <p>Ad System Initialized: <span id="status-initialized">No</span></p>
+        <p>Ads Opted Out: <span id="status-opted-out">No</span></p>
+        <p>Rewarded Video Ready: <span id="status-rewarded">No</span></p>
+        <p>Interstitial Ready: <span id="status-interstitial">No</span></p>
+      </div>
+    </div>
+    
+    <div class="log">
+      <div class="log-entry info">Ad system log will appear here...</div>
+    </div>
+  </div>
+
+  <!-- Load the AdMob SDK - Comment in when using actual AdMob -->
+  <!-- 
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
+  <script src="path/to/admob.js"></script>
+  -->
+
+  <!-- Load our AdMob configuration -->
+  <script src="../static/js/games/wavelength-gems/admob-config.js"></script>
+  
+  <!-- Load our ad system -->
+  <script src="../static/js/games/wavelength-gems/ad-system.js"></script>
+  
+  <!-- Demo page script -->
+  <script>
+    // Simulation of the wavelengthGems game object
+    window.wavelengthGems = {
+      grantExtraLife: function() {
+        logToConsole('Extra life granted to player!', 'success');
+      },
+      grantSpecialGem: function() {
+        logToConsole('Special power gem granted to player!', 'success');
+      },
+      activateScoreMultiplier: function(multiplier, duration) {
+        logToConsole(`Score multiplier ${multiplier}x activated for ${duration} seconds!`, 'success');
+      }
+    };
+    
+    // Current level for simulation
+    let currentLevel = 0;
+    
+    // Function to initialize the ad system
+    function initializeAdSystem() {
+      // Initialize with custom options
+      window.wavelengthAds.init({
+        provider: 'admob',
+        minTimeBetweenAds: 30000, // 30 seconds for demo purposes
+        adFrequency: 2 // Show ads every 2 levels for demo purposes
+      });
+      
+      updateStatus();
+      logToConsole('Ad system initialized', 'info');
+      
+      // Set up status update interval
+      setInterval(updateStatus, 2000);
+    }
+    
+    // Toggle ad preference
+    function toggleAdPreference() {
+      const currentState = window.wavelengthAds.userOptedOut;
+      window.wavelengthAds.setUserAdPreference(!currentState);
+      updateStatus();
+      logToConsole(`User ad preference set to: ${window.wavelengthAds.userOptedOut ? 'opted out' : 'opted in'}`, 'info');
+    }
+    
+    // Offer an extra life through rewarded video
+    function offerExtraLife() {
+      window.wavelengthAds.offerExtraLife();
+      logToConsole('Offered extra life reward', 'info');
+    }
+    
+    // Offer a power gem through rewarded video
+    function offerPowerGem() {
+      window.wavelengthAds.offerSpecialGem();
+      logToConsole('Offered power gem reward', 'info');
+    }
+    
+    // Offer score multiplier through rewarded video
+    function offerScoreMultiplier() {
+      window.wavelengthAds.offerScoreMultiplier();
+      logToConsole('Offered score multiplier reward', 'info');
+    }
+    
+    // Show a generic rewarded video ad
+    function showRewardedAd() {
+      const shown = window.wavelengthAds.showRewardedAd(() => {
+        logToConsole('Generic reward earned!', 'success');
+      });
+      
+      if (!shown) {
+        logToConsole('Failed to show rewarded video ad', 'error');
+      }
+    }
+    
+    // Show an interstitial ad
+    function showInterstitial() {
+      const shown = window.wavelengthAds.showInterstitialAd(() => {
+        logToConsole('Interstitial ad closed', 'info');
+      });
+      
+      if (!shown) {
+        logToConsole('Failed to show interstitial ad', 'error');
+      }
+    }
+    
+    // Simulate completing a level
+    function simulateLevelComplete() {
+      currentLevel++;
+      logToConsole(`Level ${currentLevel} completed`, 'info');
+      
+      // Dispatch level complete event
+      window.dispatchEvent(new CustomEvent('levelComplete', {
+        detail: { level: currentLevel }
+      }));
+    }
+    
+    // Update status display
+    function updateStatus() {
+      if (window.wavelengthAds) {
+        document.getElementById('status-initialized').textContent = window.wavelengthAds.initialized ? 'Yes' : 'No';
+        document.getElementById('status-opted-out').textContent = window.wavelengthAds.userOptedOut ? 'Yes' : 'No';
+        document.getElementById('status-rewarded').textContent = window.wavelengthAds.rewardedVideoReady ? 'Yes' : 'No';
+        document.getElementById('status-interstitial').textContent = window.wavelengthAds.interstitialReady ? 'Yes' : 'No';
+      }
+    }
+    
+    // Log to the console
+    function logToConsole(message, type = 'info') {
+      const log = document.querySelector('.log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+      
+      // Also log to browser console
+      console.log(message);
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      // For demo, we'll wait for user to click initialize
+      logToConsole('Page loaded, click "Initialize Ad System" to begin', 'info');
+    });
+  </script>
+</body>
+</html>

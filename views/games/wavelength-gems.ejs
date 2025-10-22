@@ -236,7 +236,7 @@
             gap: 3px;
             padding: 10px;
             position: relative; /* Allow absolute positioning for goblin */
-            z-index: 1; /* Board appears above goblin */
+            z-index: 10; /* Increased from 1 to appear above other UI elements */
             width: fit-content;
             box-sizing: border-box;
         }
@@ -267,7 +267,7 @@
             user-select: none;
             border: 2px solid transparent;
             position: relative;
-            z-index: 2; /* Gems appear above the goblin underneath */
+            z-index: 20; /* Increased from 2 to ensure gems are clickable and visible */
         }
 
         /* Mobile: Flex to fill grid cell, maintain square */
@@ -515,6 +515,28 @@
 
     <%- include('../partials/footer') %>
 
+    <!-- Pass environment variables to front-end for AdMob configuration -->
+    <script>
+        // Create window.ENV object to store environment variables safely
+        window.ENV = window.ENV || {};
+        
+        <% if (typeof adMobEnvVars !== 'undefined') { %>
+            // Populate with AdMob configuration from server environment variables
+            <% for(let key in adMobEnvVars) { %>
+                window.ENV['<%= key %>'] = '<%= adMobEnvVars[key] %>';
+            <% } %>
+        <% } %>
+        
+        console.log('Environment configuration loaded');
+    </script>
+
+    <!-- Load AdMob configuration before other scripts -->
+    <script src="/js/games/wavelength-gems/admob-config.js"></script>
+    <script src="/js/games/wavelength-gems/ad-system.js"></script>
+    
+    <!-- AdMob Test Interface - REMOVE BEFORE PRODUCTION -->
+    <script src="/js/games/wavelength-gems/admob-test-interface.js"></script>
+    
     <!-- Load level system first (must be before engine.js) -->
     <script src="/js/games/wavelength-gems/levels.js"></script>
     <script src="/js/games/wavelength-gems/level-briefing.js"></script>

@@ -1,21 +1,24 @@
 /**
- * Mobile Diagnostics for Wavelength Gems
+ * Mobile Diagnostics for Wavelength Gems - DISABLED FOR ADMOB TESTING
  * Comprehensive debugging tool for mobile gameplay issues
+ * 
+ * This file has been fully disabled to reduce console noise during AdMob integration testing.
  */
 
 class MobileDiagnostics {
     constructor() {
+        // Initialize diagnostic data structure even if diagnostics are disabled
         this.diagnosticData = {
             viewport: {},
             touch: {},
             canvas: {},
             gameBoard: {},
             layout: {},
-            performance: {},
-            orientation: {}
+            orientation: {},
+            performance: {}
         };
         this.touchLog = [];
-        this.maxTouchLogSize = 20;
+        this.maxTouchLogSize = 100;
     }
 
     /**
@@ -435,6 +438,4 @@ if (window.innerWidth <= 768) {
     setTimeout(() => mobileDiagnostics.runFullDiagnostics(), 1000);
 }
 
-console.log('%c📱 Mobile Diagnostics Loaded', 'color: #10b981; font-weight: bold');
-console.log('Run window.mobileDiagnostics.runFullDiagnostics() to run diagnostics');
-console.log('Run window.mobileDiagnostics.enableTouchLogging() to log touch events');
+// Mobile Diagnostics disabled for AdMob testing

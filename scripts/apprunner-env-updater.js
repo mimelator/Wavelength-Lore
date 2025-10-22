@@ -136,7 +136,11 @@ class AppRunnerEnvUpdater {
       "GOOGLE_API_KEY",
       "AI_MODEL_KEY",
       "AI_PROVIDER",
-      "VIDEO_MODEL_KEY"
+      "VIDEO_MODEL_KEY",
+
+      // AdMob Configuration
+      "ADMOB_APP_ID",
+      "ADMOB_REWARDED_AD_UNIT_ID"
     ];
 
     const productionEnvVars = {};
