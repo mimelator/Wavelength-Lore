@@ -43,6 +43,16 @@ let canvasManager = {
     gemImages: {}, // Cache for gem images
     animatingGems: new Map(), // Track gems currently animating on canvas
 
+    // Theme support
+    backgroundImage: null, // Current level background image
+    backgroundImageCache: {}, // Cache for loaded images
+    themeColors: {
+        primary: '#8B5CF6',
+        secondary: '#EC4899',
+        accent: '#FF6B6B'
+    },
+    backgroundOpacity: 0.15,
+
     /**
      * Initialize Canvas rendering
      */
@@ -153,11 +163,17 @@ let canvasManager = {
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0)';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+        // Draw background image first (behind everything)
+        this.drawBackgroundImage();
+
         // Draw board background
         this.drawBoardBackground();
 
         // Draw all gems
         this.drawAllGems();
+
+        // Draw particle effects
+        animationSystem.drawParticles();
 
         // Draw animations on top
         animationSystem.drawAnimations();
@@ -172,9 +188,18 @@ let canvasManager = {
      * Start continuous animation loop
      */
     startAnimationLoop() {
+        let lastTime = performance.now();
+
         const animate = (currentTime) => {
+            // Calculate delta time for particle updates (in milliseconds)
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+
             // Update all animations
             animationSystem.updateAnimations(currentTime);
+
+            // Update particle effects
+            animationSystem.updateParticles(deltaTime);
 
             // Redraw canvas
             this.draw();
@@ -203,7 +228,13 @@ let canvasManager = {
     drawBoardBackground() {
         const ctx = this.ctx;
 
-        ctx.fillStyle = 'rgba(20, 20, 40, 0.8)';
+        // Use primary color with dark overlay
+        const primaryColor = this.themeColors.primary;
+        const rgbColor = this.hexToRgb(primaryColor);
+        const fillStyle = `rgba(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b}, 0.15)`;
+        const strokeStyle = `rgba(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b}, 0.5)`;
+
+        ctx.fillStyle = fillStyle;
         ctx.fillRect(
             this.boardX - this.boardPadding,
             this.boardY - this.boardPadding,
@@ -211,14 +242,18 @@ let canvasManager = {
             this.boardHeight + (this.boardPadding * 2)
         );
 
-        ctx.strokeStyle = 'rgba(138, 43, 226, 0.3)';
+        // Draw glowing border using primary theme color
+        ctx.strokeStyle = strokeStyle;
         ctx.lineWidth = 2;
+        ctx.shadowColor = primaryColor;
+        ctx.shadowBlur = 10;
         ctx.strokeRect(
             this.boardX - this.boardPadding,
             this.boardY - this.boardPadding,
             this.boardWidth + (this.boardPadding * 2),
             this.boardHeight + (this.boardPadding * 2)
         );
+        ctx.shadowColor = 'transparent';
     },
 
     /**
@@ -402,6 +437,124 @@ let canvasManager = {
             atlas: '#EC4899'    // Pink
         };
         return colors[gemType] || '#999999';
+    },
+
+    /**
+     * Convert hex color to RGB object
+     */
+    hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : { r: 139, g: 92, b: 246 }; // Default to purple if invalid
+    },
+
+    /**
+     * Load background image asynchronously
+     */
+    loadBackgroundImage(imagePath) {
+        if (!imagePath) {
+            this.backgroundImage = null;
+            return Promise.resolve(null);
+        }
+
+        // Return cached image if already loaded
+        if (this.backgroundImageCache[imagePath]) {
+            this.backgroundImage = this.backgroundImageCache[imagePath];
+            return Promise.resolve(this.backgroundImage);
+        }
+
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                this.backgroundImageCache[imagePath] = img;
+                this.backgroundImage = img;
+                resolve(img);
+            };
+            img.onerror = () => {
+                console.warn(`⚠️ Failed to load background image: ${imagePath}`);
+                this.backgroundImage = null;
+                resolve(null);
+            };
+            img.src = imagePath;
+        });
+    },
+
+    /**
+     * Apply level theme colors
+     */
+    applyTheme(themeConfig) {
+        if (!themeConfig) return;
+
+        if (themeConfig.primaryColor) {
+            this.themeColors.primary = themeConfig.primaryColor;
+        }
+        if (themeConfig.secondaryColor) {
+            this.themeColors.secondary = themeConfig.secondaryColor;
+        }
+        if (themeConfig.accentColor) {
+            this.themeColors.accent = themeConfig.accentColor;
+        }
+        if (themeConfig.backgroundImage) {
+            this.loadBackgroundImage(themeConfig.backgroundImage);
+        }
+        if (themeConfig.backgroundOpacity !== undefined) {
+            this.backgroundOpacity = themeConfig.backgroundOpacity;
+        }
+
+        console.log(`🎨 Theme applied - Primary: ${this.themeColors.primary}`);
+    },
+
+    /**
+     * Draw background image with opacity
+     */
+    drawBackgroundImage() {
+        if (!this.backgroundImage || !this.backgroundImage.complete) {
+            return;
+        }
+
+        const ctx = this.ctx;
+        const canvasWidth = this.canvas.width;
+        const canvasHeight = this.canvas.height;
+
+        // Save context state
+        ctx.save();
+
+        // Set opacity
+        ctx.globalAlpha = this.backgroundOpacity;
+
+        // Draw image to fill canvas while maintaining aspect ratio
+        const imgAspect = this.backgroundImage.width / this.backgroundImage.height;
+        const canvasAspect = canvasWidth / canvasHeight;
+
+        let drawWidth, drawHeight, offsetX, offsetY;
+
+        if (imgAspect > canvasAspect) {
+            // Image is wider - fit to height
+            drawHeight = canvasHeight;
+            drawWidth = canvasHeight * imgAspect;
+            offsetX = (canvasWidth - drawWidth) / 2;
+            offsetY = 0;
+        } else {
+            // Image is taller - fit to width
+            drawWidth = canvasWidth;
+            drawHeight = canvasWidth / imgAspect;
+            offsetX = 0;
+            offsetY = (canvasHeight - drawHeight) / 2;
+        }
+
+        ctx.drawImage(
+            this.backgroundImage,
+            offsetX,
+            offsetY,
+            drawWidth,
+            drawHeight
+        );
+
+        // Restore context state
+        ctx.restore();
     }
 };
 
@@ -413,6 +566,7 @@ let animationSystem = {
     activeAnimations: new Map(), // Map of "row,col" to animation state
     scorePopups: [], // Array of floating score displays
     comboOverlay: null, // Current combo overlay animation
+    particles: [], // Array of active particle effects
     animationFrameId: null,
 
     /**
@@ -783,10 +937,104 @@ let animationSystem = {
     },
 
     /**
+     * Create particle effect at position
+     */
+    createParticles(x, y, effectType = 'sparkles', count = 8) {
+        const effectConfig = {
+            sparkles: {
+                colors: ['#FFD700', '#FFA500', '#FF6B6B'],
+                speed: 3,
+                lifetime: 800,
+                size: 4
+            },
+            mist: {
+                colors: ['rgba(200, 150, 255, 0.6)', 'rgba(150, 200, 255, 0.5)'],
+                speed: 1.5,
+                lifetime: 1200,
+                size: 8
+            },
+            crystals: {
+                colors: ['#8B5CF6', '#EC4899', '#3B82F6'],
+                speed: 2.5,
+                lifetime: 1000,
+                size: 6
+            }
+        };
+
+        const config = effectConfig[effectType] || effectConfig.sparkles;
+
+        for (let i = 0; i < count; i++) {
+            const angle = (Math.PI * 2 * i) / count;
+            const velocity = config.speed + (Math.random() * 2 - 1);
+
+            this.particles.push({
+                x,
+                y,
+                vx: Math.cos(angle) * velocity,
+                vy: Math.sin(angle) * velocity,
+                color: config.colors[Math.floor(Math.random() * config.colors.length)],
+                size: config.size,
+                lifetime: config.lifetime,
+                age: 0,
+                type: effectType
+            });
+        }
+    },
+
+    /**
+     * Update particle effects
+     */
+    updateParticles(deltaTime) {
+        const toRemove = [];
+
+        for (let i = 0; i < this.particles.length; i++) {
+            const p = this.particles[i];
+            p.age += deltaTime;
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // Apply gravity
+            p.vy += 0.1;
+
+            // Fade out
+            p.opacity = Math.max(0, 1 - (p.age / p.lifetime));
+
+            if (p.age >= p.lifetime) {
+                toRemove.push(i);
+            }
+        }
+
+        // Remove dead particles (in reverse order to preserve indices)
+        for (let i = toRemove.length - 1; i >= 0; i--) {
+            this.particles.splice(toRemove[i], 1);
+        }
+    },
+
+    /**
+     * Draw all active particles
+     */
+    drawParticles() {
+        const ctx = canvasManager.ctx;
+
+        for (const p of this.particles) {
+            ctx.save();
+            ctx.globalAlpha = p.opacity;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+
+            // Draw circles for particles
+            ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+    },
+
+    /**
      * Check if any animations or popups are active
      */
     isAnimating() {
-        return this.activeAnimations.size > 0 || this.scorePopups.length > 0 || this.comboOverlay !== null;
+        return this.activeAnimations.size > 0 || this.scorePopups.length > 0 || this.comboOverlay !== null || this.particles.length > 0;
     }
 };
 
@@ -881,6 +1129,11 @@ function loadLevel(levelNumber) {
     gameState.targetScore = levelConfig.objectives.primary.target;
     gameState.gemTypes = levelConfig.constraints.gemTypes;
     gameState.maxCascades = levelConfig.constraints.cascadeLimit;
+
+    // Apply visual theme (colors, background, effects)
+    if (levelConfig.theme && canvasManager) {
+        canvasManager.applyTheme(levelConfig.theme);
+    }
 
     console.log(`🎮 Level ${levelNumber} loaded: "${levelConfig.title}"`);
     console.log(`📊 Moves: ${gameState.moves}, Target Score: ${gameState.targetScore}`);
@@ -1008,6 +1261,12 @@ function initGame(levelNumber = 1) {
     // Canvas rendering handles all layout independently - no CSS workarounds needed
 
     animationFrames.clear();
+
+    // Show level briefing if available
+    if (gameState.levelConfig && typeof levelBriefingUI !== 'undefined') {
+        levelBriefingUI.showBriefing(gameState.levelConfig);
+    }
+
     generateBoard();
     renderBoard();
     updateUI();
