@@ -323,109 +323,122 @@ class BackgroundDiagnostics {
      * Check hero image elements and visibility
      */
     checkHeroImage() {
-        console.log('🖼️  7. HERO IMAGE DIAGNOSTIC');
+        console.log('🖼️  7. HERO BADGE DIAGNOSTIC');
 
-        const heroCard = document.getElementById('heroImageCard');
-        const heroImg = document.getElementById('heroImage');
+        // Check for NEW hero badge (inside #gameBoard)
+        const heroBadge = document.getElementById('heroBadge');
+        const heroBadgeImage = document.getElementById('heroBadgeImage');
+        const gameBoard = document.getElementById('gameBoard');
         const rightSidebar = document.querySelector('.game-sidebar.right-sidebar');
         const leftSidebar = document.querySelector('.game-sidebar.left-sidebar');
         
         // Check viewport width
         const viewportWidth = window.innerWidth;
-        const breakpoint = 1000;
-        const sidebarsVisible = viewportWidth >= breakpoint;
+        const sidebarBreakpoint = 1000;
+        const badgeBreakpoint = 1100;
+        const sidebarsVisible = viewportWidth >= sidebarBreakpoint;
+        const badgeVisible = viewportWidth >= badgeBreakpoint;
         
         console.log(`   📐 Viewport Width: ${viewportWidth}px`);
-        console.log(`   📏 Sidebar Breakpoint: ${breakpoint}px`);
-        console.log(`   👁️  Sidebars Should Be Visible: ${sidebarsVisible ? 'YES' : 'NO (viewport too narrow)'}`);
+        console.log(`   📏 Sidebar Breakpoint: ${sidebarBreakpoint}px`);
+        console.log(`   � Badge Breakpoint: ${badgeBreakpoint}px`);
+        console.log(`   �👁️  Sidebars Should Be Visible: ${sidebarsVisible ? 'YES' : 'NO (viewport too narrow)'}`);
+        console.log(`   👁️  Badge Should Be Visible: ${badgeVisible ? 'YES' : 'NO (viewport too narrow)'}`);
         console.log('');
         
         // Check element existence
         this.results.heroImage = {
             viewportWidth,
             sidebarsVisible,
+            badgeVisible,
             elements: {
-                heroCard: !!heroCard,
-                heroImg: !!heroImg,
+                heroBadge: !!heroBadge,
+                heroBadgeImage: !!heroBadgeImage,
+                gameBoard: !!gameBoard,
                 rightSidebar: !!rightSidebar,
                 leftSidebar: !!leftSidebar
             }
         };
         
         console.log('   📋 Element Check:');
-        console.log(`      Hero Image Card: ${heroCard ? '✅ EXISTS' : '❌ MISSING'}`);
-        console.log(`      Hero Image Element: ${heroImg ? '✅ EXISTS' : '❌ MISSING'}`);
+        console.log(`      Hero Badge Container: ${heroBadge ? '✅ EXISTS' : '❌ MISSING'}`);
+        console.log(`      Hero Badge Image: ${heroBadgeImage ? '✅ EXISTS' : '❌ MISSING'}`);
+        console.log(`      Game Board (parent): ${gameBoard ? '✅ EXISTS' : '❌ MISSING'}`);
         console.log(`      Right Sidebar: ${rightSidebar ? '✅ EXISTS' : '❌ MISSING'}`);
         console.log(`      Left Sidebar: ${leftSidebar ? '✅ EXISTS' : '❌ MISSING'}`);
         console.log('');
         
-        if (!heroCard || !heroImg) {
-            this.results.issues.push('Hero image elements missing from DOM');
-            console.log('   ❌ CRITICAL: Hero image elements not found in DOM');
+        if (!heroBadge || !heroBadgeImage) {
+            this.results.issues.push('Hero badge elements missing from DOM');
+            console.log('   ❌ CRITICAL: Hero badge elements not found in DOM');
+            console.log('   💡 Check if elements exist in HTML: #heroBadge and #heroBadgeImage');
             console.log('');
             return;
         }
+
+        // Check if badge is child of gameBoard
+        const badgeParent = heroBadge.parentElement;
+        console.log(`   👪 Parent Check:`);
+        console.log(`      Badge parent: ${badgeParent?.id || badgeParent?.className || 'unknown'}`);
+        console.log(`      Correct parent: ${badgeParent?.id === 'gameBoard' ? '✅ YES' : '❌ NO (should be #gameBoard)'}`);
+        console.log('');
         
         // Check computed styles
-        const heroCardStyles = window.getComputedStyle(heroCard);
-        const heroImgStyles = window.getComputedStyle(heroImg);
-        const rightSidebarStyles = rightSidebar ? window.getComputedStyle(rightSidebar) : null;
+        const heroBadgeStyles = window.getComputedStyle(heroBadge);
+        const heroBadgeImgStyles = window.getComputedStyle(heroBadgeImage);
         
         console.log('   🎨 Computed Styles:');
-        console.log(`      Hero Card Display: ${heroCardStyles.display}`);
-        console.log(`      Hero Card Visibility: ${heroCardStyles.visibility}`);
-        console.log(`      Hero Card Opacity: ${heroCardStyles.opacity}`);
-        console.log(`      Hero Img Src: ${heroImg.src || '(empty)'}`);
-        console.log(`      Hero Img Display: ${heroImgStyles.display}`);
-        console.log(`      Hero Img Width x Height: ${heroImgStyles.width} x ${heroImgStyles.height}`);
-        
-        if (rightSidebarStyles) {
-            console.log(`      Right Sidebar Display: ${rightSidebarStyles.display}`);
-            console.log(`      Right Sidebar Visibility: ${rightSidebarStyles.visibility}`);
-        }
+        console.log(`      Badge Display: ${heroBadgeStyles.display}`);
+        console.log(`      Badge Position: ${heroBadgeStyles.position}`);
+        console.log(`      Badge Left: ${heroBadgeStyles.left}`);
+        console.log(`      Badge Top: ${heroBadgeStyles.top}`);
+        console.log(`      Badge Width: ${heroBadgeStyles.width}`);
+        console.log(`      Badge Z-Index: ${heroBadgeStyles.zIndex}`);
+        console.log(`      Badge Opacity: ${heroBadgeStyles.opacity}`);
+        console.log(`      Badge Visibility: ${heroBadgeStyles.visibility}`);
         console.log('');
         
-        // Check if hero image is loaded
-        const imgLoaded = heroImg.complete && heroImg.naturalHeight !== 0;
-        console.log('   📷 Image Status:');
-        console.log(`      Image Loaded: ${imgLoaded ? '✅ YES' : '❌ NO'}`);
-        console.log(`      Image Complete: ${heroImg.complete}`);
-        console.log(`      Natural Dimensions: ${heroImg.naturalWidth}x${heroImg.naturalHeight}`);
+        console.log('   🖼️  Image Status:');
+        console.log(`      Image Src: ${heroBadgeImage.src || 'not set'}`);
+        console.log(`      Image Loaded: ${heroBadgeImage.complete ? '✅ YES' : '⏳ LOADING'}`);
+        console.log(`      Natural Size: ${heroBadgeImage.naturalWidth}x${heroBadgeImage.naturalHeight}`);
+        console.log(`      Border: ${heroBadgeImgStyles.border}`);
         console.log('');
         
-        // Check level config
-        if (typeof gameState !== 'undefined' && gameState.levelConfig) {
-            const hasHeroImage = !!gameState.levelConfig.theme?.heroImage;
-            console.log('   📦 Level Configuration:');
-            console.log(`      Current Level: ${gameState.level}`);
-            console.log(`      Hero Image Defined: ${hasHeroImage ? 'YES' : 'NO'}`);
-            if (hasHeroImage) {
-                console.log(`      Hero Image Path: ${gameState.levelConfig.theme.heroImage}`);
+        // Analyze visibility issues
+        const issues = [];
+        if (heroBadgeStyles.display === 'none') {
+            if (viewportWidth < badgeBreakpoint) {
+                console.log(`   ℹ️  Badge hidden: Viewport (${viewportWidth}px) < breakpoint (${badgeBreakpoint}px)`);
+            } else {
+                issues.push('Badge display is none despite viewport being wide enough');
             }
-            console.log('');
         }
         
-        // Analyze issues
-        console.log('   🔍 Analysis:');
+        if (parseFloat(heroBadgeStyles.opacity) < 0.1) {
+            issues.push('Badge opacity is very low or zero');
+        }
         
-        if (!sidebarsVisible) {
-            this.results.issues.push(`Viewport too narrow (${viewportWidth}px < ${breakpoint}px) - sidebars hidden by CSS media query`);
-            console.log(`      ⚠️  ISSUE: Viewport is ${viewportWidth}px, but sidebars require ${breakpoint}px minimum`);
-            console.log('      💡 FIX: Widen browser window OR adjust CSS breakpoint');
-        } else if (rightSidebarStyles && rightSidebarStyles.display === 'none') {
-            this.results.issues.push('Right sidebar is hidden despite viewport being wide enough');
-            console.log('      ⚠️  ISSUE: Right sidebar hidden even though viewport is wide enough');
-        } else if (heroCardStyles.display === 'none') {
-            this.results.issues.push('Hero card is explicitly hidden');
-            console.log('      ⚠️  ISSUE: Hero card display is set to none');
-        } else if (!heroImg.src || heroImg.src === window.location.href) {
-            this.results.issues.push('Hero image src is empty or invalid');
-            console.log('      ⚠️  ISSUE: Hero image has no valid src attribute');
-        } else if (!imgLoaded) {
-            this.results.issues.push('Hero image failed to load');
-            console.log('      ⚠️  ISSUE: Hero image not loading properly');
-        } else {
-            console.log('      ✅ Hero image should be visible!');
+        if (!heroBadgeImage.src || heroBadgeImage.src.includes('undefined')) {
+            issues.push('Badge image source not set - wait for level to load');
+        } else if (!heroBadgeImage.complete) {
+            console.log('   ⏳ Badge image still loading...');
+        } else if (heroBadgeImage.naturalWidth === 0) {
+            issues.push('Badge image failed to load - check image path');
+        }
+        
+        if (badgeParent?.id !== 'gameBoard') {
+            issues.push('Badge parent should be #gameBoard for correct positioning');
+        }
+        
+        if (issues.length > 0) {
+            console.log('   ⚠️  Badge Issues:');
+            issues.forEach(issue => {
+                console.log(`      • ${issue}`);
+                this.results.issues.push(issue);
+            });
+        } else if (badgeVisible && heroBadgeStyles.display !== 'none') {
+            console.log('   ✅ Badge configuration looks correct!');
         }
         
         console.log('');
