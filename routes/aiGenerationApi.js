@@ -257,7 +257,7 @@ async function uploadImageToS3(imageBuffer, contentType, contentId, mimeType, me
   console.log(`📤 Uploading AI-generated image to S3: ${s3Key}`);
   
   const uploadParams = {
-    Bucket: process.env.S3_BUCKET_NAME || 'wavelength-lore-bucket',
+    Bucket: process.env.GALLERY_S3_BUCKET || process.env.S3_BUCKET_NAME || 'wavelength-lore-bucket',
     Key: s3Key,
     Body: imageBuffer,
     ContentType: mimeType,

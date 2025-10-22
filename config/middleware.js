@@ -233,6 +233,11 @@ function configureTemplateLocals(app) {
   app.use(async (req, res, next) => {
     // Get visibility filter based on user role
     const showHidden = res.locals.isContentCreator;
+    
+    // Gallery UI helpers
+    const galleryUi = require('../utils/gallery/ui');
+    res.locals.galleryUi = galleryUi;
+    res.locals.saveToGalleryButton = galleryUi.createSaveToGalleryButton;
 
     // Character helpers
     res.locals.characterHelpers = characterHelpers;

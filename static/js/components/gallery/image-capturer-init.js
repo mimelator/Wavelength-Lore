@@ -66,6 +66,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const capturer = new window.ImageCapturer({
       requireAuth: true,
       
+      // Exclude these selectors from getting Save to Gallery buttons
+      excludeSelectors: [
+        // Banner images
+        '.banner img', 
+        '.site-banner img',
+        '.header-banner img',
+        '.page-banner img',
+        '[class*="banner"] img',
+        
+        // Navigation elements
+        'nav img', 
+        '.navigation img',
+        '.nav-item img',
+        '.navbar img',
+        '.menu img',
+        
+        // Cards and badges
+        '.card img',
+        '.badge img',
+        '.nav-card img',
+        '.link-card img',
+        
+        // UI elements that shouldn't have save buttons
+        '.icon img',
+        '.logo img',
+        '.avatar img',
+        '.button img',
+        '.thumbnail img',
+        '.profile-picture img',
+        
+        // Additional selectors
+        '[role="button"] img',
+        '[role="navigation"] img'
+      ],
+      
       // Called when an image is captured
       onCapture: async (imageData) => {
         try {
@@ -86,8 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
           const data = await response.json();
           console.log('✅ Image saved to gallery:', data);
           
-          // Show success notification
-          showNotification('Image saved to your gallery!', 'success');
+          // Show success notification with gallery link
+          showNotification('Image saved to your gallery! <a href="/my-gallery" class="gallery-link">View Gallery</a>', 'success');
           
         } catch (error) {
           console.error('❌ Error saving image:', error);
@@ -173,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  // Add CSS for animations
+  // Add CSS for animations and gallery link
   const style = document.createElement('style');
   style.textContent = `
     @keyframes slideIn {
@@ -184,6 +219,23 @@ document.addEventListener('DOMContentLoaded', () => {
     @keyframes slideOut {
       from { transform: translateX(0); opacity: 1; }
       to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .gallery-link {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 8px;
+      background-color: #ffffff;
+      color: #2196f3;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+    
+    .gallery-link:hover {
+      background-color: #e3f2fd;
+      transform: translateY(-1px);
     }
   `;
   document.head.appendChild(style);

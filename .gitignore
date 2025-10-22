@@ -173,3 +173,4 @@ COMMIT_MESSAGE.txt
 *.tar.gz
 *.zip
 *.rar
+.env.test

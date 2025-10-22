@@ -1,0 +1,27 @@
+{
+  "ResponseHeadersPolicyConfig": {
+    "Name": "WavelengthCORSPolicy",
+    "Comment": "CORS policy for Wavelength Lore CDN",
+    "CorsConfig": {
+      "AccessControlAllowCredentials": false,
+      "AccessControlAllowHeaders": {
+        "Items": ["*", "Authorization", "Content-Type", "Origin", "X-Requested-With", "Accept"],
+        "Quantity": 6
+      },
+      "AccessControlAllowMethods": {
+        "Items": ["GET", "PUT", "POST", "DELETE", "HEAD", "OPTIONS"],
+        "Quantity": 6
+      },
+      "AccessControlAllowOrigins": {
+        "Items": ["*"],
+        "Quantity": 1
+      },
+      "AccessControlExposeHeaders": {
+        "Items": ["ETag", "Content-Length", "Content-Type", "Content-Disposition"],
+        "Quantity": 4
+      },
+      "AccessControlMaxAgeSec": 3000,
+      "OriginOverride": true
+    }
+  }
+}

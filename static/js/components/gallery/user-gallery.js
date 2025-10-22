@@ -21,7 +21,7 @@ class UserGallery {
    */
   constructor(options = {}) {
     this.container = document.getElementById(options.containerId);
-    this.apiEndpoint = options.apiEndpoint || '/gallery/api/user/images';
+    this.apiEndpoint = options.apiEndpoint || '/api/gallery/user/images';
     this.layout = options.layout || 'grid';
     this.enableLightbox = options.enableLightbox !== false;
     this.enableDownload = options.enableDownload !== false;

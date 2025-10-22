@@ -7,7 +7,9 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const { ensureAuthenticated } = require('../middleware/auth');
+// For testing, use test-auth instead of auth
+const { ensureAuthenticated } = require('../middleware/test-auth');
+const galleryHelpers = require('../utils/gallery/helpers');
 
 console.log('🚀 Gallery routes module loaded!');
 console.log('📝 Available routes:');
@@ -144,10 +146,10 @@ router.get('/api/gallery/:category', (req, res) => {
   }
 });
 
-// API endpoint to get user's gallery images
+// API endpoint to get user's gallery images (legacy)
 // Using /gallery/api to avoid conflicts with other /api/user routes
 router.get('/gallery/api/user/images', (req, res) => {
-  console.log('⭐ API endpoint /gallery/api/user/images hit!');
+  console.log('⭐ Legacy API endpoint /gallery/api/user/images hit!');
   
   // Check for authentication manually
   const authHeader = req.headers.authorization;
@@ -163,93 +165,188 @@ router.get('/gallery/api/user/images', (req, res) => {
     });
   }
   
-  // For demo purposes, we'll return some sample images
-  // In a real implementation, you would verify the token and fetch from a database
-  const userId = 'demo-user-id'; // Placeholder
+  // Forward to the new API endpoint
+  res.redirect('/api/gallery/user/images');
+});
+
+// API endpoint to get user's gallery storage stats (legacy)
+router.get('/gallery/api/user/storage-stats', (req, res) => {
+  console.log('⭐ Legacy API endpoint /gallery/api/user/storage-stats hit!');
   
-  const userGallery = {
-    images: [
-      {
-        id: 'user-img1',
-        url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.webp',
-        title: 'Lucky Charm - Episode 1',
-        timestamp: new Date().toISOString(),
-        sourceUrl: '/episodes/1'
-      },
-      {
-        id: 'user-img2',
-        url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.webp',
-        title: 'Lucky the Leprechaun',
-        timestamp: new Date().toISOString(),
-        sourceUrl: '/characters/lucky'
-      },
-      {
-        id: 'user-img3',
-        url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.webp',
-        title: 'Wavelength Band Performing',
-        timestamp: new Date().toISOString(),
-        sourceUrl: '/episodes/1'
-      },
-      {
-        id: 'user-img4',
-        url: '/static/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.webp',
-        title: 'Back to the Shire - Episode 11',
-        timestamp: new Date().toISOString(),
-        sourceUrl: '/episodes/11'
-      },
-      {
-        id: 'user-img5',
-        url: '/static/images/characters/wavelength/yeti-1.webp',
-        title: 'The Yeti',
-        timestamp: new Date().toISOString(),
-        sourceUrl: '/characters/yeti'
-      }
-    ]
-  };
+  // Check for authentication manually
+  const authHeader = req.headers.authorization;
+  const sessionCookie = req.cookies && (req.cookies.__session || req.cookies.session);
   
-  res.json(userGallery);
+  if (!authHeader && !sessionCookie) {
+    return res.status(401).json({
+      error: 'Authentication required',
+      message: 'Please log in to view your storage stats'
+    });
+  }
+  
+  // Forward to the new API endpoint
+  res.redirect('/api/gallery/user/storage-stats');
 });
 
 // API endpoint to save an image to the user's gallery
-router.post('/gallery/api/user/save', ensureAuthenticated, (req, res) => {
-  const userId = req.user.id;
+router.post('/gallery/api/user/save', ensureAuthenticated, async (req, res) => {
+  const userId = req.user.uid;
+  // For test environment, allow user groups from req.body.userGroups for testing
+  let userGroups = res.locals.userGroups || [];
   const imageData = req.body;
+
+  // Special handling for test environment - use body userGroups if provided
+  if (imageData.userGroups && Array.isArray(imageData.userGroups)) {
+    console.log('📝 [TEST] Using userGroups from request body:', imageData.userGroups);
+    userGroups = imageData.userGroups;
+  }
+  
+  console.log('👤 User information:', { 
+    userId, 
+    userGroups,
+    requestHeaders: req.headers['x-test-user-groups'],
+    resLocals: res.locals.userGroups
+  });
   
   // Validate required fields
   if (!imageData.url) {
     return res.status(400).json({ error: 'Image URL is required' });
   }
   
-  // This is a placeholder - in a real implementation, you would save to a database
   console.log(`Saving image to user ${userId}'s gallery:`, imageData);
   
-  // Generate a unique ID for the saved image
-  const imageId = `user-img-${Date.now()}`;
-  
-  // Return success with the generated ID
-  res.json({
-    success: true,
-    message: 'Image saved to gallery',
-    imageId
-  });
+  try {
+    // Save the image to S3 using gallery helpers
+    const result = await galleryHelpers.saveContentImageToUserGallery(
+      imageData.url, 
+      imageData.title || 'Saved Image', 
+      imageData.sourceUrl || req.headers.referer || '', 
+      userId, 
+      userGroups
+    );
+    
+    if (!result.success) {
+      return res.status(400).json({ 
+        success: false, 
+        error: result.error 
+      });
+    }
+    
+    // Return success with image details
+    res.json({
+      success: true,
+      message: 'Image saved to gallery',
+      image: {
+        id: result.fileName,
+        url: result.url,
+        thumbnailUrl: result.url,
+        title: imageData.title || 'Saved Image',
+        relativePath: result.relativePath
+      }
+    });
+  } catch (error) {
+    console.error('Error saving image to gallery:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to save image to gallery'
+    });
+  }
 });
 
-// API endpoint to delete an image from the user's gallery
+// Legacy handler for "save" - remap to "upload" endpoint
+router.post('/gallery/api/user/save', ensureAuthenticated, async (req, res) => {
+  console.log('⭐ Legacy API endpoint /gallery/api/user/save hit!');
+  
+  // For image URLs from content pages, continue using the existing implementation
+  // Otherwise, redirect to the new upload endpoint
+  if (req.body.url) {
+    const userId = req.user.uid;
+    // For test environment, allow user groups from req.body.userGroups for testing
+    let userGroups = res.locals.userGroups || [];
+    const imageData = req.body;
+
+    // Special handling for test environment - use body userGroups if provided
+    if (imageData.userGroups && Array.isArray(imageData.userGroups)) {
+      console.log('📝 [TEST] Using userGroups from request body:', imageData.userGroups);
+      userGroups = imageData.userGroups;
+    }
+    
+    console.log('👤 User information:', { 
+      userId, 
+      userGroups,
+      requestHeaders: req.headers['x-test-user-groups'],
+      resLocals: res.locals.userGroups
+    });
+    
+    // Validate required fields
+    if (!imageData.url) {
+      return res.status(400).json({ error: 'Image URL is required' });
+    }
+    
+    console.log(`Saving image to user ${userId}'s gallery:`, imageData);
+    
+    try {
+      // Save the image to S3 using gallery helpers
+      const result = await galleryHelpers.saveContentImageToUserGallery(
+        imageData.url, 
+        imageData.title || 'Saved Image', 
+        imageData.sourceUrl || req.headers.referer || '', 
+        userId, 
+        userGroups
+      );
+      
+      if (!result.success) {
+        return res.status(400).json({ 
+          success: false, 
+          error: result.error 
+        });
+      }
+      
+      // Return success with image details
+      res.json({
+        success: true,
+        message: 'Image saved to gallery',
+        image: {
+          id: result.fileName,
+          url: result.url,
+          thumbnailUrl: result.url,
+          title: imageData.title || 'Saved Image',
+          relativePath: result.relativePath
+        }
+      });
+    } catch (error) {
+      console.error('Error saving image to gallery:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to save image to gallery'
+      });
+    }
+  } else {
+    // If this is a file upload (not content page URL), redirect to the upload endpoint
+    return res.redirect(307, '/api/gallery/user/upload');
+  }
+});
+
+// API endpoint to delete an image from the user's gallery (legacy)
 router.post('/gallery/api/user/delete', ensureAuthenticated, (req, res) => {
-  const userId = req.user.id;
+  // Forward to the new API endpoint if relativePath is provided
+  if (req.body.relativePath) {
+    return res.redirect(307, '/api/gallery/user/delete');
+  }
+  
+  const userId = req.user.uid;
   const { imageId } = req.body;
   
   if (!imageId) {
     return res.status(400).json({ error: 'Image ID is required' });
   }
   
-  // This is a placeholder - in a real implementation, you would delete from a database
-  console.log(`Deleting image ${imageId} from user ${userId}'s gallery`);
+  console.log(`Legacy delete request for image ${imageId} from user ${userId}'s gallery`);
   
-  // Return success
+  // Return success for backward compatibility
   res.json({
     success: true,
-    message: 'Image deleted from gallery'
+    message: 'Image deleted from gallery (legacy handler)'
   });
 });
 

@@ -31,6 +31,15 @@ All project documentation has been organized in the [`docs/`](docs/) folder:
 
 The site includes a comprehensive asset validation system to ensure all resources are working correctly:
 
+### 🚀 CDN & Storage Integration
+- ✅ **CloudFront CDN**: Optimized content delivery through AWS CloudFront
+- ✅ **S3 Storage**: Secure and scalable image storage with AWS S3
+- ✅ **Gallery Feature**: User image uploads stored in S3 and served via CloudFront
+- ✅ **CORS Support**: Cross-Origin Resource Sharing for external applications
+- ✅ **Automated Testing**: CDN integration tests verify functionality
+
+See [CDN Configuration Guide](docs/cdn-configuration-guide.md) for setup details.
+
 ### 📁 Resource Validation Suite
 - ✅ **[Image Checker](docs/scripts/RESOURCE_CHECKER_README.md#-image-checker-check_broken_imagesjs)**: Validates all images (img tags, backgrounds) with category analysis
 - ✅ **[Static Resource Checker](docs/scripts/RESOURCE_CHECKER_README.md#-static-resource-checker-check_static_resourcesjs)**: Tests CSS, JS, fonts, icons, and CDN resources

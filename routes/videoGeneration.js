@@ -82,7 +82,7 @@ async function uploadVideoToS3AndAddToGallery(videoBuffer, contentType, contentI
   };
   
   const uploadParams = {
-    Bucket: process.env.S3_BUCKET_NAME || 'wavelength-lore-bucket',
+    Bucket: process.env.GALLERY_S3_BUCKET || process.env.S3_BUCKET_NAME || 'wavelength-lore-bucket',
     Key: s3Key,
     Body: videoBuffer,
     ContentType: 'video/mp4',

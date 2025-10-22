@@ -152,20 +152,20 @@ class ImageCapturer {
     button.className = `image-capture-button ${this.options.captureButtonPosition}`;
     button.innerHTML = `
       <span class="button-icon">🖼️</span>
-      <span class="button-text">Save to Gallery</span>
+      <span class="button-text">Save</span>
     `;
     
-    // Style button
+    // Style button (smaller size)
     button.style.position = 'absolute';
-    button.style.top = '10px';
-    button.style.right = '10px';
+    button.style.top = '5px';
+    button.style.right = '5px';
     button.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
     button.style.color = 'white';
     button.style.border = 'none';
     button.style.borderRadius = '4px';
-    button.style.padding = '8px 12px';
+    button.style.padding = '4px 8px';
     button.style.cursor = 'pointer';
-    button.style.fontSize = '14px';
+    button.style.fontSize = '12px';
     button.style.opacity = '0';
     button.style.transition = 'opacity 0.3s ease';
     button.style.zIndex = '1000';

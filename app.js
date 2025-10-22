@@ -15,6 +15,9 @@ const {
   configureAPIRoutes 
 } = require('./config/middleware');
 
+// Import S3 connection test
+const { testS3Connection } = require('./utils/gallery/s3-connection-test');
+
 // Import route modules
 const contentRoutes = require('./routes/content');
 const adminRoutes = require('./routes/admin');
@@ -30,6 +33,7 @@ const radioPlayerRoutes = require('./routes/radioPlayer');
 const gamesRoutes = require('./routes/games');
 const gameApiRoutes = require('./routes/gameApi');
 const galleryRoutes = require('./routes/gallery');
+const galleryApiRoutes = require('./routes/galleryApi');
 
 // Import secure backup system
 const SecureDatabaseBackup = require('./utils/secureBackup');
@@ -106,6 +110,9 @@ async function createApp() {
   
   // Mount gallery routes for Photo Gallery feature
   app.use('/', galleryRoutes);
+  
+  // Mount gallery API routes for S3 storage (protected by authentication)
+  app.use('/', galleryApiRoutes);
 
   // Mount content routes
   app.use('/', contentRoutes);
@@ -115,6 +122,36 @@ async function createApp() {
 
   // Initialize all systems
   await initializeAllCaches(database);
+
+  // Test S3 connection for gallery feature
+  try {
+    const s3Result = await testS3Connection();
+    
+    if (s3Result.success) {
+      console.log('📷 Gallery S3 storage connection verified successfully');
+      
+      // Store S3 connection status in app locals for reference
+      app.locals.galleryS3Status = {
+        connected: true,
+        bucketExists: s3Result.bucketExists,
+        availableBuckets: s3Result.availableBuckets
+      };
+    } else {
+      console.warn('⚠️ Gallery S3 storage connection failed. Gallery features may not work correctly.');
+      console.warn(`   Error: ${s3Result.error}`);
+      
+      app.locals.galleryS3Status = {
+        connected: false,
+        error: s3Result.error
+      };
+    }
+  } catch (error) {
+    console.error('❌ Error testing S3 connection:', error);
+    app.locals.galleryS3Status = {
+      connected: false,
+      error: error.message
+    };
+  }
 
   return app;
 }
