@@ -159,7 +159,7 @@ levels:
       accentColor: "#F59E0B"         # Amber (magic)
       backgroundImage: /static/images/seasons/season1/episodes/episode3/images/dream_with_me.webp
       backgroundOpacity: 0.12
-      heroImage: /static/images/seasons/season1/episodes/episode3/images/dream_with_me.webp
+      heroImage: /static/images/characters/wavelength/jewel-5.webp
       carouselImages:
         - /static/images/seasons/season1/episodes/episode3/images/dream_with_me.webp
       particleEffect: dream_stars
