@@ -288,11 +288,22 @@ function initGame() {
 
             // Debug: Check what's constraining the container
             if (container) {
-                const parentElement = container.parentElement;
-                const parentStyle = window.getComputedStyle(parentElement);
-                console.log(`🔍 Container parent:`, parentElement.tagName, parentElement.className);
-                console.log(`   Parent computed width:`, parentStyle.width);
-                console.log(`   Parent computed max-width:`, parentStyle.maxWidth);
+                const containerStyle = window.getComputedStyle(container);
+                console.log(`🔍 Container element:`, container.className);
+                console.log(`   Container computed width:`, containerStyle.width);
+                console.log(`   Container computed max-width:`, containerStyle.maxWidth);
+                console.log(`   Container inline style width:`, container.style.width);
+                console.log(`   Container inline style max-width:`, container.style.maxWidth);
+
+                // Walk up the DOM tree
+                let current = container.parentElement;
+                let depth = 0;
+                while (current && depth < 6) {
+                    const style = window.getComputedStyle(current);
+                    console.log(`   └─ Parent L${depth}: ${current.tagName}.${current.className || '(no class)'} - width: ${style.width}, max-width: ${style.maxWidth}`);
+                    current = current.parentElement;
+                    depth++;
+                }
             }
 
             // Force these to 100% or full viewport
