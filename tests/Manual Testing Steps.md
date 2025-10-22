@@ -17,11 +17,12 @@ This document outlines the manual testing steps for the Retry Threshold System i
 **Objective:** Verify that retry counting and threshold detection work correctly.
 
 1. Open the Wavelength Gems game
-2. Click "Test Threshold" button in the bottom-right corner
-3. Click "Reset Threshold" to start with all retries available
-4. Verify the initial state shows full retries (e.g. 5/5)
-5. Click "Use Retry" several times
-6. Verify:
+2. Open the Admin Debug Panel (Ctrl+Shift+D or Cmd+Shift+D on Mac)
+3. Click on the "Test Threshold" tab/section in the Admin Panel
+4. Click "Reset Threshold" to start with all retries available
+5. Verify the initial state shows full retries (e.g. 5/5)
+6. Click "Use Retry" several times
+7. Verify:
    - Retry count decreases with each use
    - Progress bar updates correctly
    - When all retries are used, status should show "At Threshold"
@@ -48,7 +49,7 @@ This document outlines the manual testing steps for the Retry Threshold System i
 
 1. Reset the threshold and use a specific number of retries (e.g., 2)
 2. Refresh the browser page
-3. Open the test UI again
+1. Open the Admin Debug Panel again and navigate to the Test Threshold tab
 4. Verify:
    - Retry count still shows the same value (e.g., 3/5 if 2 were used)
    - Timer countdown continues from where it left off
@@ -71,7 +72,7 @@ This document outlines the manual testing steps for the Retry Threshold System i
 
 **Objective:** Verify all automated test scenarios pass.
 
-1. Open the test UI
+1. Open the Admin Debug Panel (Ctrl+Shift+D or Cmd+Shift+D on Mac) and navigate to the Test Threshold tab
 2. Run each automated test one by one:
    - Basic Threshold Cycle
    - Reset Timer Test

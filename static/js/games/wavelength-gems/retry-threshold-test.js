@@ -29,49 +29,14 @@ const ThresholdTestRunner = {
      * Create simple UI for running tests
      */
     createTestUI() {
-        // Try to add to admin panel first
+        // Only add to admin panel - no standalone button
         const addedToPanel = this.addToAdminPanel();
         if (addedToPanel) {
             console.log(`${this.config.logPrefix} Added test button to admin panel`);
+        } else {
+            console.log(`${this.config.logPrefix} Couldn't add test button to admin panel`);
+            // No standalone button - functionality will be available via console
         }
-        
-        // Create floating button regardless (always available)
-        const container = document.createElement('div');
-        container.style.position = 'fixed';
-        container.style.bottom = '80px';
-        container.style.right = '20px';
-        container.style.zIndex = '9999';
-        container.style.display = 'flex';
-        container.style.gap = '10px';
-        container.style.flexDirection = 'column';
-        
-        const mainButton = document.createElement('button');
-        mainButton.textContent = '🧪 Test Threshold';
-        mainButton.style.padding = '10px 15px';
-        mainButton.style.backgroundColor = '#9b59b6';
-        mainButton.style.color = 'white';
-        mainButton.style.border = 'none';
-        mainButton.style.borderRadius = '8px';
-        mainButton.style.cursor = 'pointer';
-        mainButton.style.fontWeight = 'bold';
-        mainButton.style.boxShadow = '0 4px 6px rgba(0,0,0,0.3)';
-        mainButton.style.opacity = '0.8';
-        mainButton.style.transition = 'all 0.2s ease';
-        
-        mainButton.addEventListener('mouseenter', () => {
-            mainButton.style.opacity = '1';
-            mainButton.style.transform = 'scale(1.05)';
-        });
-        
-        mainButton.addEventListener('mouseleave', () => {
-            mainButton.style.opacity = '0.8';
-            mainButton.style.transform = 'scale(1)';
-        });
-        
-        mainButton.addEventListener('click', () => this.showTestMenu());
-        
-        container.appendChild(mainButton);
-        document.body.appendChild(container);
     },
     
     /**
