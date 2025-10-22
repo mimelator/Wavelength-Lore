@@ -1,134 +1,167 @@
-# Wavelength Lore Documentation
+# Wavelength Lore - Documentation Hub
 
-Welcome to the comprehensive documentation for the Wavelength Lore application. This directory contains all technical documentation, guides, and reference materials.
+Complete documentation for the Wavelength Lore platform, content systems, and games.
 
-## 📚 Documentation Index
+## Directory Structure
 
-### 🔒 Security & Protection
-- **[Security Enhancement Guide](SECURITY_ENHANCEMENT_GUIDE.md)** - Comprehensive security implementation guide covering Firebase, rate limiting, and input sanitization
-- **[Security Incident Response](SECURITY_INCIDENT_RESPONSE.md)** - Emergency response procedures and security incident handling
-- **[Rate Limiting Documentation](RATE_LIMITING_DOCUMENTATION.md)** - Smart rate limiting system configuration and usage
+```
+docs/
+├── README.md (this file) - Documentation hub
+├── game-systems/ - Game documentation
+│   ├── WAVELENGTH_GEMS_GETTING_STARTED.md    - Game developer onboarding
+│   ├── GAME_LEVEL_SYSTEM_SUMMARY.md          - Project overview
+│   ├── LEVEL_SYSTEM_GUIDE.md                 - Comprehensive reference
+│   └── LEVEL_SYSTEM_README.md                - Quick reference
+├── scripts/ - Utility scripts documentation
+└── [Other system documentation files...]
+```
 
-### 💾 Backup & Data Protection
-- **[Database Backup Setup Guide](DATABASE_BACKUP_SETUP_GUIDE.md)** - Complete step-by-step setup and usage guide
-- **[Backup Configuration](BACKUP_CONFIGURATION.md)** - Complete setup guide for automated S3 backups
-- **[Backup Implementation Summary](BACKUP_IMPLEMENTATION_SUMMARY.md)** - Overview of the implemented backup system features
+## Documentation Sections
 
-### 🚨 Disaster Recovery
-- **[Disaster Recovery Guide](DISASTER_RECOVERY.md)** - Complete catastrophic failure recovery procedures
-- **[Quick Recovery Checklist](QUICK_RECOVERY_CHECKLIST.md)** - Emergency reference for immediate disaster recovery
+### 🎮 [Wavelength Gems - Match-3 Game](game-systems/)
 
-### 🎮 Application Features
-- **[Character Reference System](CHARACTER_REFERENCE_SYSTEM.md)** - Character linking and disambiguation system
-- **[Lore System Documentation](LORE_SYSTEM_DOCUMENTATION.md)** - Lore management and linking functionality
-- **[Carousel Usage](CAROUSEL_USAGE.md)** - Image carousel implementation and usage
-- **[Forum Delete Functionality](FORUM_DELETE_FUNCTIONALITY.md)** - User post/reply deletion with authentication and S3 cleanup
-- **[Forum Category Guide](FORUM_CATEGORY_GUIDE.md)** - Complete guide for adding, modifying, and managing forum categories
+**Getting Started**: Start here if you're new to game development
+- **File**: [`game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md`](game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md)
+- **Contents**: Overview, quick start, file organization, common tasks
+- **Audience**: Developers, designers, new team members
 
-### 🔧 Admin & Management
-- **[Admin Access Guide](ADMIN_ACCESS_GUIDE.md)** - Admin panel access and API endpoints
-- **[Firebase Admin Implementation](FIREBASE_ADMIN_IMPLEMENTATION.md)** - Firebase Admin SDK integration and usage
+**Project Summary**: Executive overview of the level system
+- **File**: [`game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md`](game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md)
+- **Contents**: Implementation status, architecture, benefits, roadmap
+- **Audience**: Project managers, decision makers, developers
 
-### ⚡ Performance & Optimization
-- **[Cache Busting](CACHE_BUSTING.md)** - Static asset cache management and optimization
+**Comprehensive Guide**: Complete reference documentation
+- **File**: [`game-systems/LEVEL_SYSTEM_GUIDE.md`](game-systems/LEVEL_SYSTEM_GUIDE.md)
+- **Contents**: Full schema, usage examples, best practices, troubleshooting
+- **Audience**: Developers implementing features
 
-### 🔧 Asset Management & Scripts
-- **[Resource Checker Documentation](scripts/RESOURCE_CHECKER_README.md)** - Comprehensive resource validation suite for images, static files, and route links
-- **[Production Validation Guide](scripts/PRODUCTION_VALIDATION_README.md)** - Unified production validation system with multiple modes and CI/CD integration
-- **[AI Image Generation Guide](scripts/AI_IMAGE_GENERATION_README.md)** - Complete AI image generation system with Google GenAI integration
-- **[Smart Git Commit System](scripts/SMART_COMMIT_README.md)** - Professional commit message management with ignored message files
-- **[Deployment Scripts](scripts/DEPLOYMENT_README.md)** - Automated deployment workflows and pipeline management
+**Quick Reference**: Code examples and API reference
+- **File**: [`game-systems/LEVEL_SYSTEM_README.md`](game-systems/LEVEL_SYSTEM_README.md)
+- **Contents**: API usage, level structure, testing examples
+- **Audience**: Developers writing code
 
-### 🛠️ Development & Debugging
-- **[Node.js v24 Compatibility Fix](NODE_V24_COMPATIBILITY_FIX.md)** - Compatibility fixes for Node.js v24
-- **[GitHub Action Monitor](GITHUB_ACTION_MONITOR.md)** - CI/CD pipeline monitoring and deployment tracking
-- **[Deployment Troubleshooting](DEPLOYMENT_TROUBLESHOOTING.md)** - Comprehensive guide for ECR caching issues and production deployment problems
-- **[Project Structure Summary](PROJECT_STRUCTURE_SUMMARY.md)** - Overview of project organization and architecture
-- **[Version System](VERSION_SYSTEM_README.md)** - Semantic versioning implementation and management
-- **[Security Refactor Summary](SECURITY_REFACTOR_SUMMARY.md)** - Overview of security improvements and implementations
-- **[Debug Scripts](../debug/README.md)** - Debug and diagnostic scripts for troubleshooting
+## Quick Navigation
 
-### 📋 Implementation Plans
-- **[Email Login Implementation Plan](EMAIL_LOGIN_IMPLEMENTATION_PLAN.md)** - Comprehensive plan for adding email/password authentication to the forum system
+### I want to learn about...
 
-## 🚀 Quick Start Guides
+**Wavelength Gems Game**
+→ Start with [`game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md`](game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md)
 
-### Security Setup
-1. Review [Security Enhancement Guide](SECURITY_ENHANCEMENT_GUIDE.md)
-2. Configure Firebase security rules
-3. Set up rate limiting and input sanitization
-4. Follow [Security Incident Response](SECURITY_INCIDENT_RESPONSE.md) procedures
+**Game Level System Architecture**
+→ Read [`game-systems/LEVEL_SYSTEM_GUIDE.md`](game-systems/LEVEL_SYSTEM_GUIDE.md)
 
-### Backup Setup
-1. Read [Backup Configuration](BACKUP_CONFIGURATION.md)
-2. Configure AWS S3 credentials
-3. Initialize backup system with `node backup-cli.js init`
-4. Test backups with `node backup-cli.js test`
+**Game Project Status & Overview**
+→ Read [`game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md`](game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md)
 
-### Feature Implementation
-1. Character system: [Character Reference System](CHARACTER_REFERENCE_SYSTEM.md)
-2. Lore management: [Lore System Documentation](LORE_SYSTEM_DOCUMENTATION.md)
-3. UI components: [Carousel Usage](CAROUSEL_USAGE.md)
-4. Delete functionality: [Forum Delete Functionality](FORUM_DELETE_FUNCTIONALITY.md)
-5. Admin operations: [Admin Access Guide](ADMIN_ACCESS_GUIDE.md)
+**Game API & Code Examples**
+→ Read [`game-systems/LEVEL_SYSTEM_README.md`](game-systems/LEVEL_SYSTEM_README.md)
 
-### Deployment & Troubleshooting
-1. For deployment issues: [Deployment Troubleshooting](DEPLOYMENT_TROUBLESHOOTING.md)
-2. Monitor GitHub Actions: `node scripts/github-action-monitor.js --watch`
-3. Force ECR deployment: `node scripts/update-ecr-tag.js`
-4. Full pipeline monitoring: `node scripts/deployment-pipeline-monitor.js`
+**Implementing Phase 2 (Visual Theming)**
+→ See Phase 2 checklist in [`game-systems/LEVEL_SYSTEM_GUIDE.md`](game-systems/LEVEL_SYSTEM_GUIDE.md)
 
-## 📋 Documentation Standards
+**All Platform Documentation**
+→ Browse the docs directory - documentation exists for all major systems
 
-### File Organization
-- **Security**: All security-related documentation
-- **Features**: Application functionality and usage guides
-- **Technical**: Implementation details and API references
-- **Setup**: Installation and configuration guides
+## Game Systems Documentation Overview
 
-### Naming Convention
-- Use descriptive, uppercase titles with underscores
-- Include file extensions (.md for markdown)
-- Group related documents with common prefixes
+| Document | Purpose | Location | Audience |
+|----------|---------|----------|----------|
+| WAVELENGTH_GEMS_GETTING_STARTED.md | Onboarding guide | game-systems/ | New developers, designers |
+| GAME_LEVEL_SYSTEM_SUMMARY.md | Project overview | game-systems/ | Managers, team leads |
+| LEVEL_SYSTEM_GUIDE.md | Complete reference | game-systems/ | Developers, implementers |
+| LEVEL_SYSTEM_README.md | Quick reference | game-systems/ | Code developers |
 
-### Content Structure
-Each documentation file should include:
-- Clear title and purpose
-- Table of contents for longer documents
-- Code examples with syntax highlighting
-- Step-by-step instructions where applicable
-- Troubleshooting sections
-- Related document links
+## Implementation Status
 
-## 🔧 Maintenance
+### ✅ Phase 1: Level Schema & Configuration (COMPLETE)
+- Level schema documentation
+- 11 level configurations
+- Engine integration
+- Complete documentation
 
-### Updating Documentation
-1. Keep documentation current with code changes
-2. Update version references when releasing
-3. Review and update examples regularly
-4. Maintain cross-references between documents
+### 📋 Phase 2: Visual Theming (READY)
+Estimated: 4-6 hours
 
-### Review Schedule
-- **Security docs**: Review monthly or after security updates
-- **Feature docs**: Review with each major feature release
-- **Setup guides**: Review quarterly for accuracy
+### 🔄 Phases 3-5 (READY)
+See documentation for details
 
-## 📞 Support
+## Key Concepts
 
-For questions about documentation or implementation:
-1. Check the relevant documentation file first
-2. Review related troubleshooting sections
-3. Consult the Security Enhancement Guide for security questions
-4. Check backup documentation for data protection issues
+### Levels
+Game configurations tied to episodes. Each level has:
+- Episode reference (episodeKey)
+- Difficulty (tutorial → legend)
+- Objectives (primary + secondary)
+- Visual theme (colors, images, particles)
+- Narrative context (briefings, lore)
 
-## 📈 Version History
+### Episodes
+Content from the Wavelength Lore series stored in Firebase. Levels automatically inherit episode metadata.
 
-- **v1.0** - Initial documentation structure
-- **v1.1** - Added security enhancement guides
-- **v1.2** - Added backup system documentation
-- **v1.3** - Reorganized into centralized docs folder
-- **v1.4** - Added script documentation consolidation and AI image generation guides
+### Difficulty Progression
+6 levels: Tutorial (easy) → Legend (expert) with scaling moves, scores, gem types
+
+## Code Location
+
+### Schema & Configuration
+- `level-schema.js` - Level schema documentation
+- `levels.js` - 11 level definitions
+
+**Location**: `static/js/games/wavelength-gems/`
+
+### Game Engine
+- `engine.js` - Game logic with level support
+  - `loadLevel(levelNumber)` - Load level configuration
+  - `initGame(levelNumber)` - Initialize with level
+
+**Location**: `static/js/games/wavelength-gems/`
+
+## Resources
+
+### Official Files
+- **Schema Documentation**: `static/js/games/wavelength-gems/level-schema.js`
+- **Level Definitions**: `static/js/games/wavelength-gems/levels.js`
+- **Game Engine**: `static/js/games/wavelength-gems/engine.js`
+
+### Documentation
+- **Complete Guide**: `docs/game-systems/LEVEL_SYSTEM_GUIDE.md`
+- **Quick Reference**: `docs/game-systems/LEVEL_SYSTEM_README.md`
+- **Getting Started**: `docs/game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md`
+- **Project Summary**: `docs/game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md`
+
+## Next Steps
+
+### For Developers
+1. Read `docs/game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md`
+2. Review `docs/game-systems/LEVEL_SYSTEM_GUIDE.md`
+3. Start Phase 2 (Visual Theming)
+
+### For Designers
+1. Review level definitions in `levels.js`
+2. Understand difficulty progression in documentation
+3. Create custom levels following the examples
+
+### For Project Managers
+1. Read `docs/game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md` for overview
+2. Check implementation checklist for timeline
+3. Review phases 2-5 for dependencies and sequencing
+
+## Questions?
+
+### About the Level System
+See: `docs/game-systems/LEVEL_SYSTEM_README.md`
+
+### How to Implement Features
+See: `docs/game-systems/LEVEL_SYSTEM_GUIDE.md`
+
+### Getting Started with Development
+See: `docs/game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md`
+
+### Project Overview & Status
+See: `docs/game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md`
 
 ---
 
-*Last updated: October 19, 2025*
+**Last Updated**: October 22, 2024
+**Status**: Phase 1 Complete | Phases 2-5 Ready
+**Total Documentation**: 1,680+ lines across 4 comprehensive guides
