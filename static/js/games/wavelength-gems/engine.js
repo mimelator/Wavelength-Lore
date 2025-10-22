@@ -35,13 +35,13 @@ let animationFrames = new Map(); // Map of gem positions to their animation stat
 function getGemSize() {
     const width = window.innerWidth;
 
-    // Be VERY conservative to account for scrollbars, safe margins, etc
-    const GAP_SIZE = 2; // pixels between gems
-    const BOARD_PADDING = 4; // pixels padding on board
-    const WRAPPER_PADDING = 4; // wrapper padding
-    const CONTAINER_PADDING = 4; // container padding
-    const BORDER_WIDTH = 2; // board border
-    const SAFETY_MARGIN = 10; // extra safety margin
+    // EXTREMELY conservative - prioritize fitting all 8 columns
+    const GAP_SIZE = 1; // minimal gaps between gems
+    const BOARD_PADDING = 2; // minimal padding on board
+    const WRAPPER_PADDING = 2; // minimal wrapper padding
+    const CONTAINER_PADDING = 2; // minimal container padding
+    const BORDER_WIDTH = 1; // minimal border
+    const SAFETY_MARGIN = 5; // minimal safety margin
 
     // Total overhead on both sides
     const totalOverhead = SAFETY_MARGIN + WRAPPER_PADDING + CONTAINER_PADDING +
@@ -54,8 +54,8 @@ function getGemSize() {
     // Solving: gemSize = (availableWidth - (gap * 7)) / 8
     const calculatedGemSize = Math.floor((availableWidth - (GAP_SIZE * 7)) / 8);
 
-    // Clamp between reasonable min/max
-    let gemSize = Math.max(30, Math.min(calculatedGemSize, 60));
+    // Clamp between reasonable min/max - prioritize fitting all 8 columns
+    let gemSize = Math.max(25, Math.min(calculatedGemSize, 60));
 
     console.log(`📏 Viewport: ${width}px | Overhead: ${totalOverhead}px | Available: ${availableWidth}px | Calculated: ${calculatedGemSize}px | Final gem size: ${gemSize}px`);
     return gemSize;
