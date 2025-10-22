@@ -18,13 +18,15 @@
             z-index: 10;
             box-sizing: border-box;
             overflow: visible;
-            width: 100%;
+            width: 100% !important;
+            max-width: 100% !important;
         }
 
         @media (max-width: 768px) {
             .gems-game-wrapper {
                 padding: 4px;
-                width: 100%;
+                width: 100% !important;
+                max-width: 100% !important;
             }
         }
 
@@ -48,8 +50,8 @@
                 padding: 4px;
                 border-radius: 12px;
                 border-width: 1px;
-                max-width: 100%;
-                width: 100%;
+                max-width: 100% !important;
+                width: 100% !important;
                 overflow: visible;
             }
         }
@@ -114,8 +116,9 @@
         @media (max-width: 768px) {
             .game-board-wrapper {
                 margin: 5px 0;
-                padding: 0 4px;
-                width: 100%;
+                padding: 0 2px;
+                width: 100% !important;
+                max-width: 100% !important;
                 overflow: hidden !important;
                 box-sizing: border-box !important;
             }
