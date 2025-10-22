@@ -13,19 +13,32 @@
             justify-content: center;
             min-height: 100vh;
             background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(75, 0, 130, 0.1));
-            padding: 20px;
+            padding: 10px;
             position: relative;
             z-index: 10;
+            box-sizing: border-box;
         }
 
         .gems-game-container {
             background: rgba(20, 20, 40, 0.9);
             border: 2px solid rgba(138, 43, 226, 0.3);
             border-radius: 20px;
-            padding: 30px;
+            padding: 20px;
             max-width: 800px;
             width: 100%;
             box-shadow: 0 8px 32px rgba(138, 43, 226, 0.3);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .gems-game-container {
+                padding: 10px;
+                border-radius: 15px;
+                border-width: 1px;
+            }
         }
 
         .game-header {
@@ -135,13 +148,13 @@
         .gem-echo { background: linear-gradient(135deg, #f59e0b, #d97706); }
         .gem-atlas { background: linear-gradient(135deg, #06b6d4, #0891b2); }
 
-        /* Ensure viewport-based sizing for mobile (prevents gaps from looking too large) */
-        @media (max-width: 480px) {
+        /* Mobile board sizing - let CSS grid auto-size based on gem width */
+        @media (max-width: 768px) {
             #gameBoard {
-                /* Calculate board size to fit screen better on mobile */
-                /* 8 gems × 52px + 7 gaps × 4px + 2 × 8px padding = 480px */
                 width: fit-content;
-                max-width: 95vw;
+                margin: 0 auto;
+                max-width: 100vw;
+                overflow: hidden;
             }
         }
 

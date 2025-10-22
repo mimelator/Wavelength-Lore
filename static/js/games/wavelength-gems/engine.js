@@ -31,15 +31,25 @@ const GAME_CONFIG = {
 let animationFrames = new Map(); // Map of gem positions to their animation state
 
 // Get responsive gem size based on viewport width
+// Calculates size so 8x8 board fits perfectly with gaps
 function getGemSize() {
     const width = window.innerWidth;
-    if (width <= 480) {
-        return 52; // Small phones (iPhone XR, etc)
-    } else if (width <= 768) {
-        return 56; // Tablets
-    } else {
-        return 60; // Desktop
-    }
+    const GAP_SIZE = 3; // pixels between gems
+    const BOARD_PADDING = 10; // pixels padding on board
+    const CONTAINER_MARGIN = 20; // total page margins/padding
+
+    // Available width = viewport - container margins - board padding on each side
+    const availableWidth = width - CONTAINER_MARGIN - (BOARD_PADDING * 2);
+
+    // Formula: (gemSize * 8) + (gap * 7) = availableWidth
+    // Solving: gemSize = (availableWidth - (gap * 7)) / 8
+    const calculatedGemSize = Math.floor((availableWidth - (GAP_SIZE * 7)) / 8);
+
+    // Clamp between reasonable min/max
+    let gemSize = Math.max(35, Math.min(calculatedGemSize, 60));
+
+    console.log(`📏 Viewport: ${width}px | Available: ${availableWidth}px | Gem size: ${gemSize}px`);
+    return gemSize;
 }
 
 // Game state

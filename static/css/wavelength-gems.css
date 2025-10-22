@@ -489,77 +489,55 @@
     left: 100%;
 }
 
-/* Mobile-first responsive adjustments */
+/* Mobile responsive adjustments - gem sizes set dynamically by JavaScript */
 
-/* iPhone XR, small tablets: 390px - 480px */
-@media (max-width: 480px) {
+/* All mobile devices: width-based responsive scaling */
+@media (max-width: 768px) {
     .gem {
-        width: 52px !important;
-        height: 52px !important;
-        font-size: 1.8rem !important;
-    }
-
-    #gameBoard {
-        gap: 4px !important;
-        padding: 8px !important;
-        border-radius: 12px !important;
-        border-width: 2px !important;
-    }
-
-    .game-title {
-        font-size: 1.4rem;
-    }
-
-    .game-stats {
-        gap: 8px;
-    }
-
-    .stat {
-        padding: 8px 12px;
-        font-size: 0.8rem;
-    }
-
-    .stat-value {
-        font-size: 1.1rem;
-    }
-
-    .gems-game-container {
-        padding: 15px !important;
-    }
-}
-
-/* iPad Mini, larger phones: 481px - 768px */
-@media (min-width: 481px) and (max-width: 768px) {
-    .gem {
-        width: 56px !important;
-        height: 56px !important;
-        font-size: 1.9rem !important;
+        /* Size set dynamically by JavaScript using getGemSize() */
+        font-size: clamp(1.2rem, 5vw, 1.9rem);
     }
 
     #gameBoard {
         gap: 3px !important;
         padding: 10px !important;
-        border-radius: 15px !important;
+        border-radius: 12px !important;
+        border-width: 2px !important;
+        /* Allow board to be sized by grid, don't force width */
+        width: fit-content;
+        margin: 0 auto; /* Center on screen */
+    }
+
+    .game-title {
+        font-size: clamp(1.2rem, 5vw, 1.8rem);
     }
 
     .game-stats {
-        gap: 12px;
+        gap: 8px;
+        flex-wrap: wrap;
     }
 
     .stat {
-        padding: 10px 15px;
+        padding: 8px 12px;
+        font-size: clamp(0.7rem, 2.5vw, 0.9rem);
     }
 
     .stat-value {
-        font-size: 1.3rem;
+        font-size: clamp(0.9rem, 3vw, 1.3rem);
     }
 
     .gems-game-container {
-        padding: 20px !important;
+        padding: 15px !important;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .gems-game-wrapper {
+        padding: 10px !important;
     }
 }
 
-/* Desktop: 769px and up */
+/* Desktop: 769px and up - use larger fixed sizes */
 @media (min-width: 769px) {
     .gem {
         width: 60px !important;
