@@ -664,7 +664,7 @@ const AdSystem = {
         "Need an Extra Life?",
         "You've reached your free retry limit. Watch a short video to continue playing!",
         () => {
-          // Grant extra life
+          // Grant extra life directly (grantExtraLife will handle retrying the level)
           if (window.wavelengthGems && typeof window.wavelengthGems.grantExtraLife === 'function') {
             window.wavelengthGems.grantExtraLife();
           }

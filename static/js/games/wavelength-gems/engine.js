@@ -3317,8 +3317,9 @@ function offerAdToRetry() {
             "Need Another Chance?",
             "Watch a short video to retry this level!",
             () => {
-                // After ad is watched successfully, retry the level
-                retryLevel();
+                // After ad is watched successfully, bypass threshold check and retry directly
+                closeLevelModal();
+                initGame(gameState.level); // Don't call retryLevel to avoid loop
             }
         );
     } else {
@@ -3336,4 +3337,33 @@ window.startLevel = startLevel;
 window.closeLevelSelectionModal = closeLevelSelectionModal;
 window.showLevelSelectionMenu = showLevelSelectionMenu;
 window.offerAdToRetry = offerAdToRetry;
+
+// Create wavelengthGems object for ad rewards implementation
+window.wavelengthGems = {
+    /**
+     * Grant extra life after watching an ad
+     */
+    grantExtraLife: function() {
+        console.log('Extra life granted from ad reward!');
+        // Bypass threshold check and retry the level
+        closeLevelModal();
+        initGame(gameState.level);
+    },
+    
+    /**
+     * Grant special power gem as an ad reward
+     */
+    grantSpecialGem: function() {
+        console.log('Special gem granted from ad reward!');
+        // Add special gem reward logic here
+    },
+    
+    /**
+     * Activate score multiplier as an ad reward
+     */
+    activateScoreMultiplier: function(multiplier, duration) {
+        console.log(`Score multiplier activated: ${multiplier}x for ${duration} seconds`);
+        // Add multiplier logic here
+    }
+};
 
