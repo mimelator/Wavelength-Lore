@@ -89,10 +89,19 @@
         }
 
         .game-board-wrapper {
-            margin: 20px 0;
+            margin: 10px 0;
             display: flex;
             justify-content: center;
             position: relative; /* Allow absolute positioning for goblin */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+            .game-board-wrapper {
+                margin: 5px 0;
+                padding: 0 5px;
+            }
         }
 
         #gameBoard {
@@ -104,11 +113,21 @@
             padding: 10px;
             position: relative; /* Allow absolute positioning for goblin */
             z-index: 1; /* Board appears above goblin */
+            width: fit-content;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+            #gameBoard {
+                border-width: 2px;
+                padding: 8px;
+                gap: 2px;
+            }
         }
 
         .gem {
-            width: 60px;
-            height: 60px;
+            /* Width/height set dynamically by JavaScript - DO NOT override here */
             border-radius: 8px;
             cursor: pointer;
             display: flex;
@@ -120,6 +139,23 @@
             border: 2px solid transparent;
             position: relative;
             z-index: 2; /* Gems appear above the goblin underneath */
+        }
+
+        /* Mobile: Let JS set width/height, override desktop inline styles */
+        @media (max-width: 768px) {
+            .gem {
+                width: auto !important;
+                height: auto !important;
+                aspect-ratio: 1 / 1;
+            }
+        }
+
+        /* Desktop: Use fixed size */
+        @media (min-width: 769px) {
+            .gem {
+                width: 60px !important;
+                height: 60px !important;
+            }
         }
 
         .gem:hover {

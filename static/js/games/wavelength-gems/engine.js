@@ -100,6 +100,19 @@ function initGame() {
         gemSize: gameState.gemSize // Preserve the dynamically set gem size
     };
 
+    // Apply gem size to CSS on mobile
+    const style = document.createElement('style');
+    style.textContent = `
+        @media (max-width: 768px) {
+            .gem {
+                width: ${gameState.gemSize}px !important;
+                height: ${gameState.gemSize}px !important;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    console.log(`📐 Injected dynamic gem size CSS: ${gameState.gemSize}px`);
+
     animationFrames.clear();
     generateBoard();
     renderBoard();
