@@ -3072,6 +3072,51 @@ function showLevelFailedModal() {
     
     const shortfall = gameState.targetScore - gameState.score;
     
+    // Check if the user has reached the threshold
+    const thresholdReached = window.RetryThresholdManager && RetryThresholdManager.isThresholdReached();
+    let thresholdInfo = {};
+    
+    // Get threshold info if available
+    if (window.RetryThresholdManager) {
+        thresholdInfo = RetryThresholdManager.getThresholdInfo();
+    }
+    
+    // Create different content based on threshold status
+    let thresholdContent = '';
+    let buttonContent = '';
+    
+    if (thresholdReached) {
+        // Threshold reached - show info about wait time or ad option
+        thresholdContent = `
+            <div class="stat-row threshold-warning">
+                <span class="stat-label">Free Retries:</span>
+                <span class="stat-value">No more free retries available</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Next Reset:</span>
+                <span class="stat-value">${thresholdInfo.timeUntilReset}</span>
+            </div>
+        `;
+        
+        buttonContent = `
+            <button class="btn btn-primary" onclick="offerAdToRetry()">Watch Ad to Retry</button>
+            <button class="btn btn-secondary" onclick="returnToMenu()">← Menu</button>
+        `;
+    } else {
+        // Still has free retries
+        thresholdContent = `
+            <div class="stat-row">
+                <span class="stat-label">Free Retries:</span>
+                <span class="stat-value">${thresholdInfo.retriesRemaining}/${thresholdInfo.retriesTotal} remaining</span>
+            </div>
+        `;
+        
+        buttonContent = `
+            <button class="btn btn-primary" onclick="retryLevel()">↻ Try Again</button>
+            <button class="btn btn-secondary" onclick="returnToMenu()">← Menu</button>
+        `;
+    }
+    
     modal.innerHTML = `
         <div class="level-modal-content failed">
             <h2>😢 Level Failed</h2>
@@ -3089,10 +3134,10 @@ function showLevelFailedModal() {
                     <span class="stat-label">Needed:</span>
                     <span class="stat-value">${shortfall.toLocaleString()} more</span>
                 </div>
+                ${thresholdContent}
             </div>
             <div class="level-modal-buttons">
-                <button class="btn btn-primary" onclick="retryLevel()">↻ Try Again</button>
-                <button class="btn btn-secondary" onclick="returnToMenu()">← Menu</button>
+                ${buttonContent}
             </div>
         </div>
     `;
@@ -3134,6 +3179,18 @@ async function loadNextLevel() {
  * Retry current level
  */
 async function retryLevel() {
+    // Check if we're at the threshold limit for retries
+    if (window.RetryThresholdManager && RetryThresholdManager.isThresholdReached()) {
+        // If at threshold, show ad offer instead of directly retrying
+        offerAdToRetry();
+        return;
+    }
+    
+    // If we have free retries available, use one
+    if (window.RetryThresholdManager) {
+        RetryThresholdManager.useRetry();
+    }
+    
     closeLevelModal();
     await initGame(gameState.level);
 }
@@ -3248,6 +3305,29 @@ function closeLevelSelectionModal() {
     }
 }
 
+/**
+ * Offer ad to retry when threshold is reached
+ */
+function offerAdToRetry() {
+    closeLevelModal();
+    
+    // If ad system exists, show ad offer
+    if (window.wavelengthAds && typeof window.wavelengthAds.showAdOfferDialog === 'function') {
+        window.wavelengthAds.showAdOfferDialog(
+            "Need Another Chance?",
+            "Watch a short video to retry this level!",
+            () => {
+                // After ad is watched successfully, retry the level
+                retryLevel();
+            }
+        );
+    } else {
+        console.error("Ad system not available for retry offer");
+        // Fallback - just retry anyway
+        retryLevel();
+    }
+}
+
 // Make functions available globally
 window.loadNextLevel = loadNextLevel;
 window.retryLevel = retryLevel;
@@ -3255,4 +3335,5 @@ window.returnToMenu = returnToMenu;
 window.startLevel = startLevel;
 window.closeLevelSelectionModal = closeLevelSelectionModal;
 window.showLevelSelectionMenu = showLevelSelectionMenu;
+window.offerAdToRetry = offerAdToRetry;
 

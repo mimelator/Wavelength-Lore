@@ -649,25 +649,38 @@ const AdSystem = {
    * Offer extra life in exchange for watching ad
    */
   offerExtraLife: function() {
-    // Save the reward type for use in analytics
-    this.currentRewardType = 'extraLife';
-    
-    // Update image to life gem
-    const rewardImage = document.getElementById('ad-reward-image');
-    if (rewardImage) {
-      rewardImage.src = '/static/images/life-gem.svg';
-    }
-    
-    this.showAdOfferDialog(
-      "Need an Extra Life?",
-      "Watch a short video to continue playing!",
-      () => {
-        // Grant extra life
-        if (window.wavelengthGems && typeof window.wavelengthGems.grantExtraLife === 'function') {
-          window.wavelengthGems.grantExtraLife();
-        }
+    // Check if retry threshold has been reached
+    if (window.RetryThresholdManager && RetryThresholdManager.isThresholdReached()) {
+      // Save the reward type for use in analytics
+      this.currentRewardType = 'extraLife';
+      
+      // Update image to life gem
+      const rewardImage = document.getElementById('ad-reward-image');
+      if (rewardImage) {
+        rewardImage.src = '/static/images/life-gem.svg';
       }
-    );
+      
+      this.showAdOfferDialog(
+        "Need an Extra Life?",
+        "You've reached your free retry limit. Watch a short video to continue playing!",
+        () => {
+          // Grant extra life
+          if (window.wavelengthGems && typeof window.wavelengthGems.grantExtraLife === 'function') {
+            window.wavelengthGems.grantExtraLife();
+          }
+        }
+      );
+    } else {
+      // User still has free retries available
+      console.log('User has free retries available, using one now');
+      // Use one free retry
+      RetryThresholdManager.useRetry();
+      
+      // Grant extra life directly without watching ad
+      if (window.wavelengthGems && typeof window.wavelengthGems.grantExtraLife === 'function') {
+        window.wavelengthGems.grantExtraLife();
+      }
+    }
   },
   
   /**

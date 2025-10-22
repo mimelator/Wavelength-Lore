@@ -163,6 +163,38 @@ function createAdminPanelHTML() {
                 </div>
             </div>
             
+            <!-- Retry Threshold Controls -->
+            <div class="admin-section">
+                <h4>🔄 Retry Threshold Controls</h4>
+                <div class="admin-row">
+                    <label>Free Retries:</label>
+                    <input type="number" id="adminRetryCount" class="admin-input" min="0" max="10" value="0">
+                    <button onclick="adminSetRetryCount()" class="admin-btn">Set</button>
+                </div>
+                <div class="admin-info" id="thresholdDebugInfo">
+                    <div class="admin-info-row">
+                        <span>Retries Used:</span>
+                        <span id="debugRetriesUsed">-</span>
+                    </div>
+                    <div class="admin-info-row">
+                        <span>Daily Limit:</span>
+                        <span id="debugRetriesLimit">-</span>
+                    </div>
+                    <div class="admin-info-row">
+                        <span>Threshold Status:</span>
+                        <span id="debugThresholdStatus">-</span>
+                    </div>
+                    <div class="admin-info-row">
+                        <span>Next Reset:</span>
+                        <span id="debugNextReset">-</span>
+                    </div>
+                </div>
+                <div class="admin-row">
+                    <button onclick="adminResetThreshold()" class="admin-btn">🔄 Reset Threshold</button>
+                    <button onclick="adminForceThreshold()" class="admin-btn admin-btn-warning">⚠️ Force Threshold</button>
+                </div>
+            </div>
+            
             <!-- Quick Actions -->
             <div class="admin-section">
                 <h4>⚡ Quick Actions</h4>
@@ -238,9 +270,53 @@ function refreshAdminPanel() {
             godModeBtn.textContent = godModeEnabled ? '🛡️ God Mode: ON' : '🛡️ God Mode: OFF';
             godModeBtn.style.backgroundColor = godModeEnabled ? '#10b981' : '';
         }
+        
+        // Update retry threshold values if available
+        if (window.RetryThresholdManager) {
+            const thresholdInfo = RetryThresholdManager.getThresholdInfo();
+            const retryCountInput = document.getElementById('adminRetryCount');
+            
+            if (retryCountInput) {
+                retryCountInput.value = thresholdInfo.retriesUsed || 0;
+            }
+            
+            // Update threshold debug info
+            updateThresholdDebugInfo(thresholdInfo);
+        }
     }
     
     adminRefreshDebugInfo();
+}
+
+/**
+ * Update retry threshold debug information
+ */
+function updateThresholdDebugInfo(thresholdInfo) {
+    if (!thresholdInfo) return;
+    
+    const updates = {
+        debugRetriesUsed: `${thresholdInfo.retriesUsed} / ${thresholdInfo.retriesTotal}`,
+        debugRetriesLimit: thresholdInfo.retriesTotal,
+        debugThresholdStatus: thresholdInfo.isAtThreshold ? 
+            '⚠️ Threshold Reached' : '✅ Below Threshold',
+        debugNextReset: thresholdInfo.timeUntilReset
+    };
+    
+    for (const [id, value] of Object.entries(updates)) {
+        const elem = document.getElementById(id);
+        if (elem) {
+            elem.textContent = value;
+            
+            // Apply warning style if at threshold
+            if (id === 'debugThresholdStatus' && thresholdInfo.isAtThreshold) {
+                elem.style.color = '#e74c3c';
+                elem.style.fontWeight = 'bold';
+            } else if (id === 'debugThresholdStatus') {
+                elem.style.color = '#2ecc71';
+                elem.style.fontWeight = 'normal';
+            }
+        }
+    }
 }
 
 /**
@@ -618,6 +694,63 @@ function adminDebugBoard() {
     } else {
         console.error('🎮 Admin: debugBoardState function not found');
         alert('Debug board function not available');
+    }
+}
+
+/**
+ * Set retry count (retries used)
+ */
+function adminSetRetryCount() {
+    const input = document.getElementById('adminRetryCount');
+    const value = parseInt(input.value);
+    
+    if (isNaN(value) || value < 0) {
+        alert('Please enter a valid number of retries');
+        return;
+    }
+    
+    if (window.RetryThresholdManager) {
+        // Set retry count by setting state directly
+        RetryThresholdManager.currentState.retriesUsed = value;
+        RetryThresholdManager.saveState();
+        
+        console.log(`🎮 Admin: Retries used set to ${value}`);
+        alert(`Retries used set to ${value}`);
+        refreshAdminPanel();
+    } else {
+        alert('Retry Threshold Manager not available');
+    }
+}
+
+/**
+ * Reset threshold (start fresh)
+ */
+function adminResetThreshold() {
+    if (window.RetryThresholdManager) {
+        RetryThresholdManager.resetThreshold(true);
+        
+        console.log('🎮 Admin: Threshold reset');
+        alert('Threshold has been reset');
+        refreshAdminPanel();
+    } else {
+        alert('Retry Threshold Manager not available');
+    }
+}
+
+/**
+ * Force threshold (max out retries)
+ */
+function adminForceThreshold() {
+    if (window.RetryThresholdManager) {
+        const limit = RetryThresholdManager.thresholdConfig.defaultDailyLimit;
+        RetryThresholdManager.currentState.retriesUsed = limit;
+        RetryThresholdManager.saveState();
+        
+        console.log(`🎮 Admin: Threshold forced (${limit}/${limit} retries used)`);
+        alert(`Threshold reached: ${limit}/${limit} retries used`);
+        refreshAdminPanel();
+    } else {
+        alert('Retry Threshold Manager not available');
     }
 }
 

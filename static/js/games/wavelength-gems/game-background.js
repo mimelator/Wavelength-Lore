@@ -132,7 +132,7 @@ class GameBackgroundManager {
         this.currentImageIndex = (this.currentImageIndex + 1) % this.currentImages.length;
         const nextImg = this.currentImages[this.currentImageIndex];
 
-        console.log(`🔄 Rotating from image ${this.currentImageIndex === 0 ? this.currentImages.length - 1 : this.currentImageIndex - 1} to ${this.currentImageIndex}`);
+        // console.log(`🔄 Rotating from image ${this.currentImageIndex === 0 ? this.currentImages.length - 1 : this.currentImageIndex - 1} to ${this.currentImageIndex}`);
 
         // Fade out current, fade in next
         currentImg.classList.remove('active');

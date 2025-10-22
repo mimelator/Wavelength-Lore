@@ -1,0 +1,77 @@
+/* Additional CSS styles for the retry threshold system */
+
+/* Threshold container styling */
+.retry-threshold-container {
+  background-color: #2c3e50;
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 10px 15px;
+  margin: 10px 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  font-family: 'Arial', sans-serif;
+  max-width: 250px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+/* Threshold warning styling in modals */
+.threshold-warning {
+  color: #e74c3c !important;
+  font-weight: bold;
+}
+
+/* Threshold progress bar animation */
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+.threshold-progress-bar.critical {
+  animation: pulse 1.5s infinite;
+}
+
+/* Style for timer when close to reset */
+.threshold-timer.urgent {
+  color: #f39c12;
+  font-weight: bold;
+  animation: pulse 1.5s infinite;
+}
+
+/* Countdown styles */
+.threshold-countdown {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin: 10px 0;
+  color: #f39c12;
+}
+
+/* Button to purchase credits (future expansion) */
+.purchase-credits-btn {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px auto;
+}
+
+.purchase-credits-btn:hover {
+  background: linear-gradient(135deg, #f1c40f, #f39c12);
+  transform: scale(1.05);
+}
+
+/* Icon for credits */
+.credits-icon {
+  margin-right: 5px;
+  font-size: 16px;
+}

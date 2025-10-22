@@ -140,7 +140,19 @@ class AppRunnerEnvUpdater {
 
       // AdMob Configuration
       "ADMOB_APP_ID",
-      "ADMOB_REWARDED_AD_UNIT_ID"
+      "ADMOB_REWARDED_AD_UNIT_ID",
+      "ADMOB_APP_ID_ANDROID",
+      "ADMOB_APP_ID_IOS",
+      "ADMOB_APP_ID_WEB",
+      "ADMOB_REWARDED_VIDEO_PROD",
+      "ADMOB_INTERSTITIAL_GAMEOVER_PROD",
+      "ADMOB_USE_TEST_ADS",
+      "ADMOB_ENABLED",
+      "ADMOB_MIN_TIME_BETWEEN_ADS",
+      "ADMOB_INTERSTITIAL_FREQUENCY",
+      "ADMOB_MAX_CONTENT_RATING",
+      "ADMOB_CHILD_DIRECTED",
+      "ADMOB_UNDER_AGE_CONSENT",
     ];
 
     const productionEnvVars = {};

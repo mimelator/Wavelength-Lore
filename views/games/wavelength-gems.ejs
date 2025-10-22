@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/css/games.css">
     <link rel="stylesheet" href="/css/wavelength-gems.css">
     <link rel="stylesheet" href="/css/admin-panel.css">
+    <link rel="stylesheet" href="/css/retry-threshold.css">
     <style>
         /* Target both main.gems-game-wrapper and .gems-game-wrapper */
         main.gems-game-wrapper,
@@ -532,10 +533,14 @@
 
     <!-- Load AdMob configuration before other scripts -->
     <script src="/js/games/wavelength-gems/admob-config.js"></script>
+    <script src="/js/games/wavelength-gems/retry-threshold-manager.js"></script>
+    <script src="/js/games/wavelength-gems/retry-threshold-ui.js"></script>
+    <script src="/js/games/wavelength-gems/retry-threshold-test.js"></script>
     <script src="/js/games/wavelength-gems/ad-system.js"></script>
     
-    <!-- AdMob Test Interface - REMOVE BEFORE PRODUCTION -->
+    <!-- AdMob Test Interface - REMOVE BEFORE PRODUCTION 
     <script src="/js/games/wavelength-gems/admob-test-interface.js"></script>
+    -->
     
     <!-- Load level system first (must be before engine.js) -->
     <script src="/js/games/wavelength-gems/levels.js"></script>
