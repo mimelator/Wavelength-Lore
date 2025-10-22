@@ -843,7 +843,9 @@ let gameState = {
     selectedGem: null,
     score: 0,
     level: 1,
+    levelConfig: null, // Current level configuration (loaded from LEVELS)
     moves: Infinity,
+    targetScore: null, // Primary objective target from level config
     isPaused: false,
     isAnimating: false,
     soundEnabled: true,
@@ -852,13 +854,46 @@ let gameState = {
     maxCascades: 10, // Maximum cascade depth to prevent infinite loops
     currentCascadeDepth: 0,
     animationTimeout: null, // Track animation timeout for failsafe
-    gemSize: 60 // Will be set dynamically by getGemSize()
+    gemSize: 60, // Will be set dynamically by getGemSize()
+    gemTypes: [] // Gem types available in this level
 };
+
+/**
+ * Load a specific level by level number
+ */
+function loadLevel(levelNumber) {
+    // Get level configuration from LEVELS array (from levels.js)
+    if (typeof getLevel === 'undefined') {
+        console.warn('⚠️ Level system not loaded - using default game config');
+        return null;
+    }
+
+    const levelConfig = getLevel(levelNumber);
+    if (!levelConfig) {
+        console.error(`❌ Level ${levelNumber} not found`);
+        return null;
+    }
+
+    // Apply level configuration to game state
+    gameState.level = levelNumber;
+    gameState.levelConfig = levelConfig;
+    gameState.moves = levelConfig.constraints.moveLimit;
+    gameState.targetScore = levelConfig.objectives.primary.target;
+    gameState.gemTypes = levelConfig.constraints.gemTypes;
+    gameState.maxCascades = levelConfig.constraints.cascadeLimit;
+
+    console.log(`🎮 Level ${levelNumber} loaded: "${levelConfig.title}"`);
+    console.log(`📊 Moves: ${gameState.moves}, Target Score: ${gameState.targetScore}`);
+    console.log(`💎 Gem Types: ${gameState.gemTypes.join(', ')}`);
+    console.log(`🎨 Theme: Primary=${levelConfig.theme.primaryColor}, Secondary=${levelConfig.theme.secondaryColor}`);
+
+    return levelConfig;
+}
 
 /**
  * Initialize a new game
  */
-function initGame() {
+function initGame(levelNumber = 1) {
     // Log page load state FIRST thing - use multiple console methods to ensure visibility
     const loadTime = performance.now();
     const isMobile = window.innerWidth <= 768;
@@ -884,8 +919,10 @@ function initGame() {
         board: [],
         selectedGem: null,
         score: 0,
-        level: 1,
+        level: levelNumber,
+        levelConfig: null,
         moves: Infinity,
+        targetScore: null,
         isPaused: false,
         isAnimating: false,
         soundEnabled: true,
@@ -894,8 +931,16 @@ function initGame() {
         maxCascades: 10,
         currentCascadeDepth: 0,
         shouldAnimateNewGems: false, // Flag to control spawn animation
-        gemSize: gameState.gemSize // Preserve the dynamically set gem size
+        gemSize: gameState.gemSize, // Preserve the dynamically set gem size
+        gemTypes: [] // Will be set by loadLevel
     };
+
+    // Load level configuration if level system is available
+    if (typeof getLevel === 'function') {
+        loadLevel(levelNumber);
+    } else {
+        console.warn('⚠️ Level system not loaded - using default settings');
+    }
 
     // Apply gem size to CSS with AGGRESSIVE overrides to break through any constraints
     // CRITICAL: Must override BOTH media query AND inline styles with !important
@@ -1047,7 +1092,12 @@ function createMatchAt(row, col, gemType) {
  * Get random gem type
  */
 function getRandomGemType() {
-    return GAME_CONFIG.GEM_TYPES[Math.floor(Math.random() * GAME_CONFIG.GEM_TYPES.length)];
+    // Use level-specific gem types if a level is loaded, otherwise use all gem types
+    const gemTypesAvailable = gameState.gemTypes && gameState.gemTypes.length > 0
+        ? gameState.gemTypes
+        : GAME_CONFIG.GEM_TYPES;
+
+    return gemTypesAvailable[Math.floor(Math.random() * gemTypesAvailable.length)];
 }
 
 /**
