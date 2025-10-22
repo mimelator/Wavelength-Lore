@@ -38,7 +38,7 @@ let canvasManager = {
     canvas: null,
     ctx: null,
     dpi: window.devicePixelRatio || 1,
-    boardPadding: 10,
+    boardPadding: 5, // Reduced from 10 for more board space
     gemGapSize: 2,
     gemImages: {}, // Cache for gem images
     animatingGems: new Map(), // Track gems currently animating on canvas
@@ -91,8 +91,6 @@ let canvasManager = {
 
         // Resize on window resize
         window.addEventListener('resize', () => this.resizeCanvas());
-
-        console.log('🎨 Canvas manager initialized');
     },
 
     /**
@@ -113,8 +111,6 @@ let canvasManager = {
 
         // Calculate board dimensions
         this.calculateBoardDimensions();
-
-        console.log(`📐 Canvas resized: ${width}x${height}px (DPI: ${this.dpi})`);
     },
 
     /**
@@ -133,7 +129,7 @@ let canvasManager = {
             const availableWidth = viewport - (this.boardPadding * 2);
             const gapTotal = (GAME_CONFIG.COLS - 1) * this.gemGapSize;
             gemSize = Math.floor((availableWidth - gapTotal) / GAME_CONFIG.COLS);
-            gemSize = Math.max(25, Math.min(gemSize, 60));
+            gemSize = Math.max(40, Math.min(gemSize, 100)); // Increased from 85 to 100 for much larger gems
         }
 
         // Calculate board width and height
@@ -142,7 +138,7 @@ let canvasManager = {
 
         // Center the board horizontally
         const boardX = (viewport - boardWidth) / 2;
-        const boardY = 100; // Top padding
+        const boardY = 60; // Reduced from 100 for more vertical space
 
         this.boardX = boardX;
         this.boardY = boardY;
@@ -159,12 +155,12 @@ let canvasManager = {
     draw() {
         if (!this.ctx || !this.canvas) return;
 
-        // Clear canvas
+        // Clear canvas (keep transparent to show container gradient)
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0)';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Draw background image first (behind everything)
-        this.drawBackgroundImage();
+        // NOTE: drawBackgroundImage() disabled - we use the page background instead
+        // this.drawBackgroundImage();
 
         // Draw board background
         this.drawBoardBackground();
@@ -1079,7 +1075,7 @@ function getGemSize() {
 
     const availableWidth = width - totalOverhead;
     const calculatedGemSize = Math.floor((availableWidth - (GAP_SIZE * 7)) / 8);
-    let gemSize = Math.max(25, Math.min(calculatedGemSize, 60));
+    let gemSize = Math.max(40, Math.min(calculatedGemSize, 100)); // Increased from 85 to 100 for much larger board
 
     console.log(`📏 Desktop viewport: ${width}px | Overhead: ${totalOverhead}px | Available: ${availableWidth}px | Calculated: ${calculatedGemSize}px | Final gem size: ${gemSize}px`);
     return gemSize;
@@ -1105,6 +1101,16 @@ let gameState = {
     gemSize: 60, // Will be set dynamically by getGemSize()
     gemTypes: [] // Gem types available in this level
 };
+
+// Initialize background manager
+let gameBackgroundManager = null;
+if (typeof GameBackgroundManager !== 'undefined') {
+    console.log('✅ GameBackgroundManager class found, initializing...');
+    gameBackgroundManager = new GameBackgroundManager();
+    console.log('✅ gameBackgroundManager initialized:', gameBackgroundManager);
+} else {
+    console.error('❌ GameBackgroundManager class not found! Check if game-background.js is loaded.');
+}
 
 /**
  * Load a specific level by level number
@@ -1133,7 +1139,26 @@ function loadLevel(levelNumber) {
     // Apply visual theme (colors, background, effects)
     if (levelConfig.theme && canvasManager) {
         canvasManager.applyTheme(levelConfig.theme);
+        applyContainerGradient(levelConfig.theme);
     }
+
+    // Load background images and effects
+    if (gameBackgroundManager) {
+        gameBackgroundManager.loadLevelImages(levelConfig);
+        
+        // Set weather based on level theme or particle effect
+        const weatherMap = {
+            'lucky_sparkles': 'clear',
+            'forest_mist': 'wind',
+            'ice_crystals': 'snow',
+            'battle_sparks': 'clear'
+        };
+        const weather = weatherMap[levelConfig.theme?.particleEffect] || 'clear';
+        gameBackgroundManager.setWeather(weather);
+    }
+
+    // Update sidebar information
+    updateSidebarInfo(levelConfig);
 
     console.log(`🎮 Level ${levelNumber} loaded: "${levelConfig.title}"`);
     console.log(`📊 Moves: ${gameState.moves}, Target Score: ${gameState.targetScore}`);
@@ -1141,6 +1166,98 @@ function loadLevel(levelNumber) {
     console.log(`🎨 Theme: Primary=${levelConfig.theme.primaryColor}, Secondary=${levelConfig.theme.secondaryColor}`);
 
     return levelConfig;
+}
+
+/**
+ * Apply animated gradient to game container based on theme colors
+ * Note: Game container stays OPAQUE for readability
+ */
+function applyContainerGradient(theme) {
+    const container = document.querySelector('.gems-game-container');
+    if (!container) return;
+
+    const primary = theme.primaryColor || '#8B5CF6';
+    const secondary = theme.secondaryColor || '#EC4899';
+    const accent = theme.accentColor || '#FF6B6B';
+
+    // Convert hex to rgba - keeping HIGH opacity for container readability
+    const hexToRgba = (hex, alpha) => {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+
+    // Create opaque gradient with theme color tints over solid dark base
+    const gradient = `
+        linear-gradient(
+            135deg,
+            rgba(15, 15, 30, 0.98),
+            ${hexToRgba(primary, 0.85)},
+            ${hexToRgba(secondary, 0.85)},
+            rgba(15, 15, 30, 0.98)
+        )
+    `;
+
+    container.style.background = gradient;
+    container.style.backgroundSize = '400% 400%';
+    container.style.animation = 'gradientShift 20s ease infinite';
+
+    // Update border glow color
+    const borderColor = hexToRgba(primary, 0.6);
+    container.style.borderColor = borderColor;
+    container.style.boxShadow = `
+        0 8px 32px ${hexToRgba(primary, 0.4)},
+        inset 0 0 60px ${hexToRgba(primary, 0.15)}
+    `;
+
+    console.log(`🎨 Applied opaque animated gradient to container: ${primary} → ${secondary} → ${accent}`);
+}
+
+/**
+ * Update sidebar with level information
+ */
+function updateSidebarInfo(levelConfig) {
+    // Update left sidebar - Level Info
+    const levelTitle = document.getElementById('sidebarLevelTitle');
+    const levelSubtitle = document.getElementById('sidebarLevelSubtitle');
+    const levelDescription = document.getElementById('sidebarLevelDescription');
+    const episodeLink = document.getElementById('sidebarEpisodeLink');
+    const objectives = document.getElementById('sidebarObjectives');
+
+    if (levelTitle) levelTitle.textContent = `Level ${levelConfig.level}`;
+    if (levelSubtitle) levelSubtitle.textContent = levelConfig.title;
+    if (levelDescription) levelDescription.textContent = levelConfig.description;
+
+    // Set episode link
+    if (episodeLink && levelConfig.episodeKey) {
+        const [season, episode] = levelConfig.episodeKey.split('/');
+        const seasonNum = season.replace('season', '');
+        const episodeNum = episode.replace('episode', '');
+        episodeLink.href = `/videos/season/${seasonNum}/episode/${episodeNum}`;
+        episodeLink.style.display = 'inline-block';
+    } else if (episodeLink) {
+        episodeLink.style.display = 'none';
+    }
+
+    // Update objectives list
+    if (objectives) {
+        objectives.innerHTML = '';
+        
+        // Primary objective
+        const primaryLi = document.createElement('li');
+        primaryLi.textContent = levelConfig.objectives.primary.description;
+        objectives.appendChild(primaryLi);
+
+        // Secondary objectives
+        if (levelConfig.objectives.secondary && levelConfig.objectives.secondary.length > 0) {
+            levelConfig.objectives.secondary.forEach(obj => {
+                const li = document.createElement('li');
+                li.textContent = obj.description;
+                objectives.appendChild(li);
+            });
+        }
+    }
 }
 
 /**
@@ -1449,8 +1566,6 @@ function swapGems(row1, col1, row2, col2) {
     console.log('📍 After swap:');
     console.log(`  [${row1}][${col1}] = ${gameState.board[row1][col1]}`);
     console.log(`  [${row2}][${col2}] = ${gameState.board[row2][col2]}`);
-    console.log('🎨 Calling renderBoard()...');
-    
     // Capture board state after swap
     const afterSwap = createBoardSnapshot('After Swap');
     compareBoardSnapshots(beforeSwap, afterSwap);
@@ -1555,10 +1670,7 @@ function swapGems(row1, col1, row2, col2) {
                     // Clear all visual highlights since swap failed
                     clearAllHighlights();
                     
-                    // Verify board consistency
-                    setTimeout(() => {
-                        verifyBoardConsistency();
-                    }, 100);
+                    // Note: verifyBoardConsistency() disabled - checks DOM elements which don't exist with Canvas rendering
                 });
             }, 400); // Wait for shake animation
         }
@@ -1773,7 +1885,7 @@ function animateGravity() {
                     highlightMatches(newMatches);
                     setTimeout(() => animateMatches(newMatches), 300);
                 } else {
-                    console.log('✅ No more cascades');
+                    // No more cascades - reset combo and animation state
                     gameState.combo = 0;
                     gameState.currentCascadeDepth = 0;
                     gameState.isAnimating = false;
@@ -1868,7 +1980,7 @@ function animateGravity() {
                     animateMatches(newMatches);
                 }, 300);
             } else {
-                console.log('✅ No more cascades. Combo final:', gameState.combo, 'Total cascade depth:', gameState.currentCascadeDepth);
+                // No more cascades - reset combo and animation state
                 gameState.combo = 0;
                 gameState.currentCascadeDepth = 0;
                 gameState.isAnimating = false;
@@ -1882,10 +1994,8 @@ function animateGravity() {
                 // Clear all highlights now that cascades are complete
                 clearAllHighlights();
 
-                // Verify board consistency after all animations complete
-                setTimeout(() => {
-                    verifyBoardConsistency();
-                }, 100);
+                // Note: verifyBoardConsistency() disabled - checks DOM elements which don't exist with Canvas rendering
+                // The board consistency is now managed entirely through the internal gameState.board array
 
                 updateUI();
             }
@@ -2013,16 +2123,12 @@ function findMatches() {
  * Reorders existing gems and adds/removes as needed without flashing
  */
 function renderBoard() {
-    console.log('🎨 renderBoard() called - Canvas-based rendering');
-
     // With Canvas rendering, animations are handled differently
     // Canvas doesn't have CSS classes, so we just draw the current state
     // and let the animation loop handle transitions
 
     // Draw the board immediately using Canvas
     canvasManager.draw();
-
-    console.log(`✅ Canvas board rendered`);
 }
 
 /**
@@ -2030,7 +2136,7 @@ function renderBoard() {
  * Keeping function stub for backward compatibility if any code references it
  */
 function createGemElement(row, col, gemType) {
-    console.warn('⚠️ createGemElement called but Canvas rendering is active - no DOM element created');
+    // Canvas rendering - no DOM elements needed
     return null;
 }
 
@@ -2055,7 +2161,6 @@ function getGemEmoji(gemType) {
 function highlightGem(row, col) {
     // Canvas rendering handles highlighting through gameState.selectedGem
     // Just redraw the board with the new selection
-    console.log(`⭐ Highlighted gem at [${row}][${col}]`);
     canvasManager.draw();
 }
 
@@ -2077,7 +2182,6 @@ function highlightValidTargets(row, col) {
         r >= 0 && r < GAME_CONFIG.ROWS && c >= 0 && c < GAME_CONFIG.COLS
     );
 
-    console.log(`💚 Valid targets around [${row}][${col}]: ${validTargets.map(t => `${t.dir}:[${t.row}][${t.col}]`).join(', ')}`);
     canvasManager.draw();
 }
 
@@ -2086,7 +2190,6 @@ function highlightValidTargets(row, col) {
  */
 function unhighlightGem() {
     // Canvas rendering handles unhighlighting by clearing gameState.selectedGem
-    console.log(`🗑️ Unhighlighting gem`);
     canvasManager.draw();
 }
 
@@ -2094,7 +2197,6 @@ function unhighlightGem() {
  * Clear all highlights and selections (Canvas-based)
  */
 function clearAllHighlights() {
-    console.log('🧹 Clearing all highlights');
     gameState.selectedGem = null;
     canvasManager.draw();
 }
@@ -2312,6 +2414,104 @@ function updateUI() {
     document.getElementById('scoreDisplay').textContent = gameState.score.toLocaleString();
     document.getElementById('levelDisplay').textContent = gameState.level;
     document.getElementById('movesDisplay').textContent = gameState.moves === Infinity ? '∞' : gameState.moves;
+    
+    // Update target score display if element exists
+    const targetDisplay = document.getElementById('targetDisplay');
+    if (targetDisplay && gameState.targetScore) {
+        targetDisplay.textContent = gameState.targetScore.toLocaleString();
+    }
+    
+    // Check for level completion after UI update
+    checkLevelCompletion();
+}
+
+/**
+ * Check if level objectives have been met
+ */
+function checkLevelCompletion() {
+    if (!gameState.levelConfig) return;
+    
+    const primary = gameState.levelConfig.objectives.primary;
+    
+    // Check if primary objective is met
+    let objectiveMet = false;
+    switch (primary.type) {
+        case 'score':
+            objectiveMet = gameState.score >= primary.target;
+            break;
+        case 'matches':
+            // Would need to track match count
+            break;
+        case 'cascades':
+            // Would need to track cascade count
+            break;
+    }
+    
+    // Level complete!
+    if (objectiveMet && !gameState.isPaused) {
+        onLevelComplete();
+    }
+    
+    // Level failed - out of moves without reaching objective
+    if (gameState.moves <= 0 && !objectiveMet && !gameState.isPaused) {
+        onLevelFailed();
+    }
+}
+
+/**
+ * Handle level completion
+ */
+function onLevelComplete() {
+    gameState.isPaused = true;
+    
+    console.log('🎉 Level Complete!');
+    console.log(`   Score: ${gameState.score}`);
+    console.log(`   Moves Remaining: ${gameState.moves}`);
+    
+    // Calculate stars (1-3 based on performance)
+    const stars = calculateStars();
+    
+    // Submit score to Firebase
+    submitScoreToFirebase();
+    
+    // Save level progress to Firebase
+    saveLevelProgress(stars, true);
+    
+    // Show completion modal
+    showLevelCompleteModal(stars);
+}
+
+/**
+ * Handle level failure
+ */
+function onLevelFailed() {
+    gameState.isPaused = true;
+    
+    console.log('😢 Level Failed - Out of moves');
+    console.log(`   Final Score: ${gameState.score}`);
+    console.log(`   Target Score: ${gameState.targetScore}`);
+    
+    // Show failure modal
+    showLevelFailedModal();
+}
+
+/**
+ * Calculate star rating (1-3) based on performance
+ */
+function calculateStars() {
+    if (!gameState.levelConfig) return 1;
+    
+    const targetScore = gameState.targetScore;
+    const actualScore = gameState.score;
+    
+    // 3 stars: 150% or more of target
+    if (actualScore >= targetScore * 1.5) return 3;
+    
+    // 2 stars: 120% or more of target
+    if (actualScore >= targetScore * 1.2) return 2;
+    
+    // 1 star: reached target
+    return 1;
 }
 
 /**
@@ -2379,6 +2579,75 @@ async function submitScoreToFirebase() {
     } catch (error) {
         console.error('Error submitting score:', error);
     }
+}
+
+/**
+ * Save level progression to Firebase
+ * Tracks completion, best score, stars earned for each level
+ */
+async function saveLevelProgress(stars, completed = true) {
+    try {
+        const token = await getFirebaseToken();
+        if (!token) {
+            console.log('No auth token available, skipping level progress save');
+            return;
+        }
+
+        const progressData = {
+            levelId: gameState.level,
+            status: completed ? 'completed' : 'in_progress',
+            score: gameState.score,
+            stars: stars,
+            movesUsed: (gameState.levelConfig?.constraints.moveLimit || 0) - gameState.moves,
+            combo: gameState.combo,
+            timestamp: new Date().toISOString()
+        };
+
+        const response = await fetch('/api/games/wavelength-gems/level-progress', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(progressData)
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            console.log('✅ Level progress saved:', progressData);
+            return data;
+        } else {
+            console.error('Failed to save level progress:', data.error);
+        }
+    } catch (error) {
+        console.error('Error saving level progress:', error);
+    }
+    return null;
+}
+
+/**
+ * Load user's level progress from Firebase
+ */
+async function loadLevelProgress() {
+    try {
+        const token = await getFirebaseToken();
+        if (!token) return null;
+
+        const response = await fetch('/api/games/wavelength-gems/level-progress', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            console.log('📊 Level progress loaded:', data.progress);
+            return data.progress;
+        }
+    } catch (error) {
+        console.error('Error loading level progress:', error);
+    }
+    return null;
 }
 
 /**
@@ -2622,3 +2891,227 @@ function showGoblinGlitch() {
     
     console.log('👹 Goblin glitch easter egg triggered!');
 }
+
+// ═════════════════════════════════════════════════════════════════════════════
+// LEVEL COMPLETION MODALS
+// ═════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Show level complete modal with stars and next level option
+ */
+function showLevelCompleteModal(stars) {
+    const modal = document.createElement('div');
+    modal.id = 'levelCompleteModal';
+    modal.className = 'level-modal';
+    
+    const nextLevel = getNextLevel(gameState.level);
+    const hasNextLevel = nextLevel !== null;
+    
+    modal.innerHTML = `
+        <div class="level-modal-content">
+            <h2>🎉 Level Complete!</h2>
+            <div class="level-complete-stats">
+                <div class="stars-display">
+                    ${generateStarsHTML(stars)}
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Score:</span>
+                    <span class="stat-value">${gameState.score.toLocaleString()}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Target:</span>
+                    <span class="stat-value">${gameState.targetScore.toLocaleString()}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Moves Left:</span>
+                    <span class="stat-value">${gameState.moves}</span>
+                </div>
+            </div>
+            <div class="level-modal-buttons">
+                ${hasNextLevel ? `<button class="btn btn-primary" onclick="loadNextLevel()">Next Level →</button>` : ''}
+                <button class="btn btn-secondary" onclick="retryLevel()">↻ Retry</button>
+                <button class="btn btn-secondary" onclick="returnToMenu()">← Menu</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Animate in
+    setTimeout(() => modal.classList.add('active'), 10);
+}
+
+/**
+ * Show level failed modal
+ */
+function showLevelFailedModal() {
+    const modal = document.createElement('div');
+    modal.id = 'levelFailedModal';
+    modal.className = 'level-modal';
+    
+    const shortfall = gameState.targetScore - gameState.score;
+    
+    modal.innerHTML = `
+        <div class="level-modal-content failed">
+            <h2>😢 Level Failed</h2>
+            <div class="level-complete-stats">
+                <p class="failure-message">Out of moves!</p>
+                <div class="stat-row">
+                    <span class="stat-label">Your Score:</span>
+                    <span class="stat-value">${gameState.score.toLocaleString()}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Target:</span>
+                    <span class="stat-value">${gameState.targetScore.toLocaleString()}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Needed:</span>
+                    <span class="stat-value">${shortfall.toLocaleString()} more</span>
+                </div>
+            </div>
+            <div class="level-modal-buttons">
+                <button class="btn btn-primary" onclick="retryLevel()">↻ Try Again</button>
+                <button class="btn btn-secondary" onclick="returnToMenu()">← Menu</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Animate in
+    setTimeout(() => modal.classList.add('active'), 10);
+}
+
+/**
+ * Generate stars HTML
+ */
+function generateStarsHTML(stars) {
+    const totalStars = 3;
+    let html = '';
+    for (let i = 0; i < totalStars; i++) {
+        if (i < stars) {
+            html += '<span class="star filled">⭐</span>';
+        } else {
+            html += '<span class="star empty">☆</span>';
+        }
+    }
+    return html;
+}
+
+/**
+ * Load next level
+ */
+function loadNextLevel() {
+    const nextLevel = getNextLevel(gameState.level);
+    if (nextLevel) {
+        closeLevelModal();
+        initGame(nextLevel.level);
+    }
+}
+
+/**
+ * Retry current level
+ */
+function retryLevel() {
+    closeLevelModal();
+    initGame(gameState.level);
+}
+
+/**
+ * Return to level selection menu
+ */
+function returnToMenu() {
+    closeLevelModal();
+    showLevelSelectionMenu();
+}
+
+/**
+ * Close level completion modal
+ */
+function closeLevelModal() {
+    const modal = document.getElementById('levelCompleteModal') || document.getElementById('levelFailedModal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+/**
+ * Show level selection menu with progress indicators
+ */
+async function showLevelSelectionMenu() {
+    const modal = document.createElement('div');
+    modal.id = 'levelSelectionModal';
+    modal.className = 'level-modal';
+    
+    // Show loading state
+    modal.innerHTML = `
+        <div class="level-modal-content wide">
+            <h2>🎮 Select Level</h2>
+            <p style="text-align: center; color: rgba(255,255,255,0.8);">Loading levels...</p>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    setTimeout(() => modal.classList.add('active'), 10);
+    
+    // Load user's level progress
+    const userProgress = await loadLevelProgress() || {};
+    
+    const allLevels = getAllLevels();
+    const levelsHTML = allLevels.map(level => {
+        const levelProgress = userProgress[level.level];
+        const stars = levelProgress?.bestStars || 0;
+        const completed = levelProgress?.status === 'completed';
+        const starsHTML = generateStarsHTML(stars);
+        
+        return `
+            <button class="level-button ${completed ? 'completed' : ''}" onclick="startLevel(${level.level})">
+                <div class="level-number">Level ${level.level}</div>
+                <div class="level-title">${level.title}</div>
+                <div class="level-difficulty">${level.difficulty}</div>
+                ${completed ? `<div class="level-stars">${starsHTML}</div>` : ''}
+                ${levelProgress?.bestScore ? `<div class="level-best-score">Best: ${levelProgress.bestScore.toLocaleString()}</div>` : ''}
+            </button>
+        `;
+    }).join('');
+    
+    // Update modal content
+    modal.querySelector('.level-modal-content').innerHTML = `
+        <h2>🎮 Select Level</h2>
+        <div class="level-selection-grid">
+            ${levelsHTML}
+        </div>
+        <div class="level-modal-buttons">
+            <button class="btn btn-secondary" onclick="closeLevelSelectionModal()">Cancel</button>
+        </div>
+    `;
+}
+
+/**
+ * Start a specific level
+ */
+function startLevel(levelNumber) {
+    closeLevelSelectionModal();
+    initGame(levelNumber);
+}
+
+/**
+ * Close level selection modal
+ */
+function closeLevelSelectionModal() {
+    const modal = document.getElementById('levelSelectionModal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+// Make functions available globally
+window.loadNextLevel = loadNextLevel;
+window.retryLevel = retryLevel;
+window.returnToMenu = returnToMenu;
+window.startLevel = startLevel;
+window.closeLevelSelectionModal = closeLevelSelectionModal;
+window.showLevelSelectionMenu = showLevelSelectionMenu;
+

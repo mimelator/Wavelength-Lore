@@ -132,9 +132,9 @@ const LEVELS = [
             backgroundImage: "/static/images/characters/wavelength/MyLuckyCharm-02.webp",
             backgroundOpacity: 0.12,
             carouselImages: [
-                "/static/images/characters/wavelength/MyLuckyCharm-01.webp",
+                "/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.webp",
                 "/static/images/characters/wavelength/MyLuckyCharm-02.webp",
-                "/static/images/characters/wavelength/MyLuckyCharm-03.webp"
+                "/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.webp"
             ],
             particleEffect: "lucky_sparkles",
             borderGlowColor: "#FFD700",
@@ -143,15 +143,15 @@ const LEVELS = [
         objectives: {
             primary: {
                 type: "score",
-                target: 1500,
-                description: "Reach 1500 points"
+                target: 2500, // Increased from 1500 for more challenge
+                description: "Reach 2500 points"
             },
             secondary: [
                 {
                     type: "cascades",
-                    target: 2,
-                    description: "Trigger 2 cascade combos",
-                    reward: { points: 250, stars: 1 }
+                    target: 3, // Increased from 2 to require more combos
+                    description: "Trigger 3 cascade combos",
+                    reward: { points: 300, stars: 1 }
                 }
             ]
         },

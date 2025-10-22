@@ -313,4 +313,120 @@ router.get('/:gameId/top-scores', async (req, res) => {
     }
 });
 
+/**
+ * Save level progression data
+ * POST /api/games/:gameId/level-progress
+ * Body: { levelId, status, score, stars, movesUsed, combo, timestamp }
+ */
+router.post('/:gameId/level-progress', async (req, res) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                error: 'Authentication required'
+            });
+        }
+
+        const { gameId } = req.params;
+        const { levelId, status, score, stars, movesUsed, combo, timestamp } = req.body;
+
+        if (!levelId || !status) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing required fields: levelId, status'
+            });
+        }
+
+        // Path to user's level progress
+        const levelProgressPath = `forum/users/${user.uid}/games/${gameId}/levels/${levelId}`;
+        
+        // Get existing level data
+        const existingData = await fetchDataAsAdmin(levelProgressPath);
+
+        // Prepare level progress data
+        const levelData = {
+            levelId: parseInt(levelId),
+            status: status, // 'locked', 'unlocked', 'in_progress', 'completed'
+            attempts: (existingData?.attempts || 0) + 1,
+            bestScore: Math.max(existingData?.bestScore || 0, score || 0),
+            bestStars: Math.max(existingData?.bestStars || 0, stars || 0),
+            lastScore: score,
+            lastStars: stars,
+            movesUsed: movesUsed,
+            bestCombo: Math.max(existingData?.bestCombo || 0, combo || 0),
+            lastAttemptDate: timestamp || new Date().toISOString()
+        };
+
+        // If this is first completion, record it
+        if (status === 'completed' && !existingData?.firstCompletedDate) {
+            levelData.firstCompletedDate = timestamp || new Date().toISOString();
+        } else if (existingData?.firstCompletedDate) {
+            levelData.firstCompletedDate = existingData.firstCompletedDate;
+        }
+
+        // Save to Firebase
+        await updateDataAsAdmin(levelProgressPath, levelData);
+
+        // Also update the overall game progress to track highest level reached
+        const userGamePath = `forum/users/${user.uid}/games/${gameId}`;
+        const userGameData = await fetchDataAsAdmin(userGamePath);
+        const highestLevelReached = Math.max(userGameData?.highestLevelReached || 0, parseInt(levelId));
+        
+        await updateDataAsAdmin(userGamePath, {
+            highestLevelReached,
+            lastPlayedLevel: parseInt(levelId)
+        });
+
+        res.json({
+            success: true,
+            message: 'Level progress saved successfully',
+            levelData
+        });
+    } catch (error) {
+        console.error('Error saving level progress:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to save level progress',
+            details: error.message
+        });
+    }
+});
+
+/**
+ * Get user's level progression data
+ * GET /api/games/:gameId/level-progress
+ * Returns all level progress for the user
+ */
+router.get('/:gameId/level-progress', async (req, res) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                error: 'Authentication required'
+            });
+        }
+
+        const { gameId } = req.params;
+        const levelProgressPath = `forum/users/${user.uid}/games/${gameId}/levels`;
+        
+        // Get all level progress data
+        const levelProgress = await fetchDataAsAdmin(levelProgressPath);
+
+        res.json({
+            success: true,
+            progress: levelProgress || {}
+        });
+    } catch (error) {
+        console.error('Error loading level progress:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to load level progress',
+            details: error.message
+        });
+    }
+});
+
 module.exports = router;
+

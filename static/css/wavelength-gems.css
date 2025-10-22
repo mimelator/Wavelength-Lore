@@ -1,5 +1,249 @@
 /* Wavelength Gems - Game Styling */
 
+/* ═════════════════════════════════════════════════════════════════════════════
+   GAME BACKGROUND WITH EFFECTS (Adapted from Screensaver)
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+.game-background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(75, 0, 130, 0.1));
+}
+
+.game-background-gallery {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.25; /* Increased from 0.08 for better visibility */
+}
+
+.game-background-gallery img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 3s ease;
+    animation: kenBurns 20s ease-in-out infinite alternate;
+    filter: blur(1px); /* Reduced from 2px for better visibility */
+}
+
+.game-background-gallery img.active {
+    opacity: 1;
+}
+
+@keyframes kenBurns {
+    0% {
+        transform: scale(1) translate(0, 0);
+    }
+    100% {
+        transform: scale(1.15) translate(-5%, -5%);
+    }
+}
+
+.game-weather-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.game-lightning-flash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2;
+    transition: opacity 0.1s;
+}
+
+.game-lightning-flash.active {
+    opacity: 1;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   THREE-COLUMN LAYOUT (Left Sidebar | Game | Right Sidebar)
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+.gems-game-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr 300px;
+    gap: 20px;
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 2; /* Above background and wrapper */
+}
+
+/* Hide sidebars on mobile/tablet */
+@media (max-width: 1200px) {
+    .gems-game-layout {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .game-sidebar {
+        display: none !important;
+    }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   SIDEBAR STYLES
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+.game-sidebar {
+    position: sticky;
+    top: 80px;
+    height: fit-content;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+.level-info-card,
+.level-tips-card,
+.level-stats-card {
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.15), rgba(75, 0, 130, 0.15));
+    border: 2px solid rgba(138, 43, 226, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.level-info-header h3 {
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 5px 0;
+}
+
+.level-info-header p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #a78bfa;
+    margin: 0;
+    background: linear-gradient(135deg, #a78bfa, #d8b4fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.level-info-body {
+    margin: 15px 0;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+}
+
+.level-objectives h4 {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 15px 0 10px 0;
+}
+
+.level-objectives ul {
+    margin: 0;
+    padding-left: 20px;
+    list-style-type: none;
+}
+
+.level-objectives li {
+    margin: 5px 0;
+    position: relative;
+    padding-left: 20px;
+}
+
+.level-objectives li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #22c55e;
+}
+
+.episode-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.episode-link:hover {
+    background: linear-gradient(135deg, #a78bfa, #818cf8);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+}
+
+.tips-list {
+    margin: 10px 0 0 0;
+    padding-left: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.8;
+}
+
+.tips-list li {
+    margin: 8px 0;
+}
+
+.level-stats-card h3,
+.level-tips-card h3 {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 15px 0;
+}
+
+.stats-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(138, 43, 226, 0.1);
+    border-radius: 8px;
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+}
+
+.stat-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+}
+
+.stat-text span {
+    font-weight: bold;
+    color: #a78bfa;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   EXISTING STYLES (Updated for new layout)
+   ═════════════════════════════════════════════════════════════════════════════ */
+
 /* CRITICAL: Override ALL parent width constraints for mobile game board */
 @media (max-width: 768px) {
     main.gems-game-wrapper,
@@ -20,33 +264,9 @@
     pointer-events: none !important;
 }
 
-/* Background Gallery - Faint collage of images from currently playing radio song */
-.game-background-gallery {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: opacity 1s ease;
-    pointer-events: none;
-    background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(75, 0, 130, 0.1));
-}
-
-.game-background-gallery.active {
-    opacity: 1;
-}
-
-.game-background-gallery-image {
-    position: absolute;
-    object-fit: cover;
-    opacity: 0.08;
-    transition: all 8s ease-in-out;
-    filter: blur(2px);
-    animation: gameDrift 30s ease-in-out infinite;
-}
+/* Old background gallery styles - REMOVED (conflicted with new implementation)
+   The new implementation uses .game-background-gallery with direct opacity
+   and .active class on individual images instead of the gallery container */
 
 @keyframes gameDrift {
     0%, 100% {
@@ -693,3 +913,237 @@
         background: linear-gradient(135deg, rgba(60, 0, 120, 0.5), rgba(30, 0, 60, 0.5));
     }
 }
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   LEVEL COMPLETION MODALS
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+.level-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(8px);
+}
+
+.level-modal.active {
+    opacity: 1;
+}
+
+.level-modal-content {
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.95), rgba(75, 0, 130, 0.95));
+    border: 3px solid rgba(138, 43, 226, 0.8);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(138, 43, 226, 0.4);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.level-modal.active .level-modal-content {
+    transform: scale(1);
+}
+
+.level-modal-content.wide {
+    max-width: 800px;
+}
+
+.level-modal-content.failed {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.95), rgba(153, 27, 27, 0.95));
+    border-color: rgba(220, 38, 38, 0.8);
+}
+
+.level-modal-content h2 {
+    font-size: 2.5rem;
+    margin: 0 0 30px 0;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.level-complete-stats {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 20px 0;
+}
+
+.stars-display {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    letter-spacing: 10px;
+}
+
+.star {
+    display: inline-block;
+    animation: starPop 0.5s ease-out;
+}
+
+.star.filled {
+    animation: starPop 0.5s ease-out, starShine 2s ease-in-out infinite;
+}
+
+@keyframes starPop {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+@keyframes starShine {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.5); }
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.stat-value {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.failure-message {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.level-modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.level-modal-buttons .btn {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    min-width: 140px;
+}
+
+/* Level Selection Grid */
+.level-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.level-button {
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.6), rgba(75, 0, 130, 0.6));
+    border: 2px solid rgba(138, 43, 226, 0.5);
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    text-align: center;
+}
+
+.level-button:hover {
+    transform: translateY(-5px);
+    border-color: rgba(138, 43, 226, 0.9);
+    box-shadow: 0 10px 30px rgba(138, 43, 226, 0.4);
+}
+
+.level-button.completed {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.6), rgba(21, 128, 61, 0.6));
+    border-color: rgba(34, 197, 94, 0.5);
+}
+
+.level-button.completed:hover {
+    border-color: rgba(34, 197, 94, 0.9);
+    box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
+}
+
+.level-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.level-title {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    opacity: 0.9;
+}
+
+.level-difficulty {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    text-transform: capitalize;
+}
+
+.level-stars {
+    font-size: 1.2rem;
+    margin-top: 8px;
+    letter-spacing: 3px;
+}
+
+.level-best-score {
+    font-size: 0.85rem;
+    margin-top: 5px;
+    color: rgba(255, 215, 0, 0.9);
+    font-weight: 600;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .level-modal-content {
+        padding: 25px;
+        max-width: 95%;
+    }
+    
+    .level-modal-content h2 {
+        font-size: 1.8rem;
+    }
+    
+    .stars-display {
+        font-size: 2rem;
+        letter-spacing: 5px;
+    }
+    
+    .level-selection-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+    }
+    
+    .level-modal-buttons {
+        flex-direction: column;
+    }
+    
+    .level-modal-buttons .btn {
+        width: 100%;
+    }
+}
+
