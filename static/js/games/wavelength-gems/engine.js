@@ -514,7 +514,7 @@ function showComboIndicator() {
  */
 function animateGravity() {
     console.log('🎬 animateGravity() called');
-    
+
     // First, remove any gems that are marked as null in the board (matched gems)
     // This cleans up after the match animation
     for (let row = 0; row < GAME_CONFIG.ROWS; row++) {
@@ -528,7 +528,7 @@ function animateGravity() {
             }
         }
     }
-    
+
     // Track gem movements BEFORE modifying the board
     const movements = []; // Array of {oldRow, oldCol, newRow, newCol, gemType, fallDistance}
 
@@ -571,15 +571,15 @@ function animateGravity() {
         console.log('📊 No gems need to fall, but checking for empty spaces...');
         gameState.board = newBoard;
         // Don't render yet - wait until after fillEmpty() so no holes appear
-        
+
         // Still need to fill empty spaces even if nothing fell
         try {
             fillEmpty(); // This will call renderBoard() with new gems
-            
+
             // Check for cascade matches after filling
             setTimeout(() => {
                 gameState.currentCascadeDepth++;
-                
+
                 // Safety check: prevent infinite cascades
                 if (gameState.currentCascadeDepth > gameState.maxCascades) {
                     console.warn('⚠️ Maximum cascade depth reached (' + gameState.maxCascades + '), stopping cascades');
@@ -590,7 +590,7 @@ function animateGravity() {
                     updateUI();
                     return;
                 }
-                
+
                 const newMatches = findMatches();
                 if (newMatches.length > 0) {
                     gameState.combo++;
@@ -609,7 +609,7 @@ function animateGravity() {
                     updateUI();
                 }
             }, 400); // Wait for spawn animation
-            
+
         } catch (error) {
             console.error('❌ Error in fillEmpty:', error);
             gameState.isAnimating = false;
@@ -619,9 +619,9 @@ function animateGravity() {
         }
         return;
     }
-    
+
     console.log(`📊 ${movements.length} gems will fall`);
-    
+
     // Group movements by column for staggered animation
     const columnMovements = {};
     movements.forEach(movement => {
@@ -630,7 +630,7 @@ function animateGravity() {
         }
         columnMovements[movement.oldCol].push(movement);
     });
-    
+
     // FIRST: Mark ALL gems as falling immediately (before stagger delays)
     movements.forEach(({oldRow, oldCol}) => {
         const gem = document.querySelector(`[data-row="${oldRow}"][data-col="${oldCol}"]`);
@@ -638,12 +638,12 @@ function animateGravity() {
             gem.classList.add('falling');
         }
     });
-    
+
     // THEN: Apply CSS transforms with stagger delay per column
     Object.keys(columnMovements).forEach(col => {
         const colIndex = parseInt(col);
         const staggerDelay = colIndex * 30; // 30ms delay per column for waterfall effect
-        
+
         setTimeout(() => {
             columnMovements[col].forEach(({oldRow, oldCol, newRow, fallDistance}) => {
                 const gem = document.querySelector(`[data-row="${oldRow}"][data-col="${oldCol}"]`);
@@ -662,24 +662,28 @@ function animateGravity() {
     const maxStaggerDelay = (GAME_CONFIG.COLS - 1) * 30;
     const totalAnimationTime = 300 + maxStaggerDelay;
 
-    // After animation, update board state and data attributes
+    // After animation, update board state, fix data attributes, and ensure renderBoard waits for completion
     setTimeout(() => {
-        // Update board state
+        // Update board state FIRST
         gameState.board = newBoard;
-        
+
         // Update DOM data attributes to match new positions
-        // Keep .falling class AND transforms until renderBoard() handles them
+        // CRITICAL: Update ALL data attributes BEFORE any renderBoard calls
         movements.forEach(({oldRow, oldCol, newRow, newCol}) => {
             const gem = document.querySelector(`[data-row="${oldRow}"][data-col="${oldCol}"]`);
             if (gem) {
                 gem.dataset.row = newRow;
-                // Don't clear transform/transition yet - let renderBoard() do it
-                // This prevents gems from snapping to final position before DOM reorder
+                gem.dataset.col = newCol; // FIX: Also update col to maintain proper position mapping
+                // Clear transforms and animations immediately to lock gems in place
+                gem.style.transform = '';
+                gem.style.transition = '';
+                gem.classList.remove('falling'); // Remove falling class to unlock from deferred rendering
+                console.log(`🔧 Updated data attributes: [${oldRow}][${oldCol}] → [${newRow}][${newCol}]`);
             }
         });
-        
-        console.log('✅ Gravity animation complete');
-        
+
+        console.log('✅ Gravity animation complete and data attributes updated');
+
         // Fill empty spaces with new gems
         try {
             fillEmpty();
@@ -692,29 +696,30 @@ function animateGravity() {
             updateUI();
             return;
         }
-        
+
         // Check for cascade matches after filling
+        // Extend timeout to ensure fillEmpty() and renderBoard() complete fully
         setTimeout(() => {
             // Increment cascade depth
             gameState.currentCascadeDepth++;
-            
+
             // Safety check: prevent infinite cascades
             if (gameState.currentCascadeDepth > gameState.maxCascades) {
                 console.warn('⚠️ Maximum cascade depth reached (' + gameState.maxCascades + '), stopping cascades');
                 gameState.combo = 0;
                 gameState.currentCascadeDepth = 0;
                 gameState.isAnimating = false;
-                
+
                 // Clear animation timeout
                 if (gameState.animationTimeout) {
                     clearTimeout(gameState.animationTimeout);
                     gameState.animationTimeout = null;
                 }
-                
+
                 updateUI();
                 return;
             }
-            
+
             const newMatches = findMatches();
             if (newMatches.length > 0) {
                 gameState.combo++;
@@ -729,24 +734,24 @@ function animateGravity() {
                 gameState.combo = 0;
                 gameState.currentCascadeDepth = 0;
                 gameState.isAnimating = false;
-                
+
                 // Clear animation timeout since we're done
                 if (gameState.animationTimeout) {
                     clearTimeout(gameState.animationTimeout);
                     gameState.animationTimeout = null;
                 }
-                
+
                 // Clear all highlights now that cascades are complete
                 clearAllHighlights();
-                
+
                 // Verify board consistency after all animations complete
                 setTimeout(() => {
                     verifyBoardConsistency();
                 }, 100);
-                
+
                 updateUI();
             }
-        }, GAME_CONFIG.ANIMATION_DURATION);
+        }, GAME_CONFIG.ANIMATION_DURATION + 100); // Add extra buffer to ensure renderBoard completes
     }, totalAnimationTime);
 }
 
@@ -872,36 +877,38 @@ function findMatches() {
 function renderBoard() {
     console.log('🎨 renderBoard() called');
     const boardElement = document.getElementById('gameBoard');
-    
+
     // Check if any gems are currently animating (spawning, falling, or swapping)
     const spawningGems = boardElement.querySelectorAll('.gem.spawning');
     const fallingGems = boardElement.querySelectorAll('.gem.falling');
     const swappingGems = boardElement.querySelectorAll('.gem.swapping');
     const animatingGems = spawningGems.length + fallingGems.length + swappingGems.length;
-    
+
     if (animatingGems > 0 && !gameState.shouldAnimateNewGems) {
         // Animating gems exist but this isn't the initial fillEmpty() call
         // Calculate proper wait time based on actual animations
         const hasSpawning = spawningGems.length > 0;
         const hasFalling = fallingGems.length > 0;
         const hasSwapping = swappingGems.length > 0;
-        
+
+        // CRITICAL FIX: After animateGravity completes and clears the 'falling' class,
+        // this condition should be false. If still true, wait longer to ensure animations finish.
         // Spawn animation: 400ms
         // Fall animation: 300ms base + up to 210ms stagger (7 cols × 30ms) = 510ms max
         // Swap animation: 300ms
         let waitTime = 100; // Base buffer
         if (hasSpawning) waitTime = Math.max(waitTime, 450); // 400ms spawn + 50ms buffer
-        if (hasFalling) waitTime = Math.max(waitTime, 550); // 510ms max fall + 40ms buffer
+        if (hasFalling) waitTime = Math.max(waitTime, 600); // INCREASED: 510ms max fall + 90ms safety margin
         if (hasSwapping) waitTime = Math.max(waitTime, 350); // 300ms swap + 50ms buffer
-        
+
         console.log(`⏸️ Deferring renderBoard() for ${waitTime}ms - ${spawningGems.length} spawning, ${fallingGems.length} falling, ${swappingGems.length} swapping`);
-        
+
         // 👹 Show goblin glitch easter egg when new gems spawn (indicates cascade/refill after match)
         if (hasSpawning) {
             console.log('👹 GOBLIN TRIGGER: hasSpawning =', hasSpawning, 'spawning gems:', spawningGems.length);
             showGoblinGlitch();
         }
-        
+
         setTimeout(() => {
             console.log('⏩ Retrying renderBoard() after animations');
             renderBoard();
