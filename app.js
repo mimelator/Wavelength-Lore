@@ -29,6 +29,7 @@ const downloadImagesRoutes = require('./routes/downloadImages');
 const radioPlayerRoutes = require('./routes/radioPlayer');
 const gamesRoutes = require('./routes/games');
 const gameApiRoutes = require('./routes/gameApi');
+const galleryRoutes = require('./routes/gallery');
 
 // Import secure backup system
 const SecureDatabaseBackup = require('./utils/secureBackup');
@@ -102,6 +103,9 @@ async function createApp() {
   
   // Mount game API routes (VIP access required)
   app.use('/api/games', gameApiRoutes);
+  
+  // Mount gallery routes for Photo Gallery feature
+  app.use('/', galleryRoutes);
 
   // Mount content routes
   app.use('/', contentRoutes);

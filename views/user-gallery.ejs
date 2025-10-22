@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head') %>
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/gallery.css">
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css">
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/modal_styles.css">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/carousel.css">
+  <style>
+    .gallery-controls {
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 10px;
+      border: 3px solid #333;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .layout-button {
+      padding: 8px 16px;
+      background-color: #4a90e2;
+      color: white;
+      border: 2px solid #333;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'AnimeAce', Arial, sans-serif;
+      font-size: 14px;
+      display: inline-block;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .layout-button:hover {
+      background-color: #357abf;
+      transform: translateY(-2px);
+    }
+    
+    .layout-button.active {
+      background-color: #2c5e8c;
+    }
+    
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .gallery-item:hover {
+      transform: translateY(-5px);
+    }
+    
+    .gallery-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+    
+    .gallery-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .gallery-item:hover .gallery-caption {
+      transform: translateY(0);
+    }
+    
+    .intro {
+      text-align: center;
+      margin-bottom: 30px;
+      font-family: 'AnimeAce', Arial, sans-serif;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 10px;
+      border: 3px solid #333;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Main content container */
+    .gallery-main-container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+    
+    h1 {
+      font-family: 'AnimeAce', Arial, sans-serif;
+      color: #333;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+    }
+    
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .action-button {
+      padding: 8px 16px;
+      background-color: #4a90e2;
+      color: white;
+      border: 2px solid #333;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'AnimeAce', Arial, sans-serif;
+      font-size: 14px;
+      display: inline-block;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .action-button:hover {
+      background-color: #357abf;
+      transform: translateY(-2px);
+    }
+    
+    .delete-button {
+      background-color: #ff4d4d;
+    }
+    
+    .delete-button:hover {
+      background-color: #e60000;
+    }
+    
+    .download-button {
+      background-color: #4caf50;
+    }
+    
+    .download-button:hover {
+      background-color: #388e3c;
+    }
+    
+    .screensaver-button {
+      background-color: #ff9800;
+    }
+    
+    .screensaver-button:hover {
+      background-color: #f57c00;
+    }
+    
+    .login-button {
+      text-align: center;
+      margin-top: 30px;
+    }
+    
+    .login-btn {
+      padding: 12px 24px;
+      background-color: #4c84ff;
+      color: white;
+      border: 2px solid #333;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'AnimeAce', Arial, sans-serif;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .login-btn:hover {
+      background-color: #3a66cc;
+      transform: translateY(-2px);
+    }
+    
+    .empty-gallery {
+      text-align: center;
+      padding: 50px;
+      font-family: 'AnimeAce', Arial, sans-serif;
+      font-size: 18px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <!-- Include standard header -->
+  <%- include('partials/header') %>
+
+  <main class="gallery-main-container">
+    <h1>My Photo Gallery</h1>
+    
+    <div class="intro">
+      <p>Your personal collection of images from the Wavelength Lore universe.</p>
+      <p>Explore the site and click "Save to Gallery" on any image you want to add to your collection.</p>
+    </div>
+    
+    <!-- Carousel Section (Default View) -->
+    <section class="carousel-section" id="carousel-view">
+      <div class="carousel" id="gallery-carousel">
+        <!-- Images will be populated by JavaScript -->
+      </div>
+    </section>
+    
+    <!-- Gallery Controls -->
+    <section class="gallery-controls">
+      <button id="carousel-layout" class="layout-button active">Carousel View</button>
+      <button id="grid-layout" class="layout-button">Grid View</button>
+    </section>
+    
+    <!-- Action Buttons -->
+    <section class="action-buttons" id="action-buttons" style="display: none;">
+      <button id="download-all" class="action-button download-button">Download All Images</button>
+      <button id="start-screensaver" class="action-button screensaver-button">Start Screensaver</button>
+    </section>
+    
+    <!-- Grid View (Hidden by Default) -->
+    <div id="grid-view" style="display: none;">
+      <div class="gallery-grid" id="gallery-grid">
+        <!-- Images will be populated by JavaScript -->
+      </div>
+    </div>
+    
+    <!-- Modal for Image Viewing -->
+    <div id="imageModal" class="modal">
+      <span class="modal-close">&times;</span>
+      <img class="modal-content" id="fullSizeImage">
+      <div id="modalCaption" class="modal-caption"></div>
+      <button id="delete-image" class="action-button delete-button" style="position: absolute; bottom: 20px; right: 20px;">Delete Image</button>
+    </div>
+    
+    <!-- Screensaver Modal -->
+    <div id="screensaverModal" class="modal">
+      <span class="modal-close">&times;</span>
+      <div id="screensaver-container" style="width:100%; height:100%; display: flex; justify-content: center; align-items: center;">
+        <img class="modal-content" id="screensaverImage" style="object-fit: contain; max-width: 90%; max-height: 90%;">
+      </div>
+    </div>
+  </main>
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const carouselEl = document.getElementById('gallery-carousel');
+      const gridEl = document.getElementById('gallery-grid');
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('fullSizeImage');
+      const modalCaption = document.getElementById('modalCaption');
+      const deleteBtn = document.getElementById('delete-image');
+      const actionButtons = document.getElementById('action-buttons');
+      const screensaverModal = document.getElementById('screensaverModal');
+      const screensaverImage = document.getElementById('screensaverImage');
+      const downloadAllBtn = document.getElementById('download-all');
+      const startScreensaverBtn = document.getElementById('start-screensaver');
+      
+      let userImages = [];
+      let currentImageId = null;
+      let screensaverInterval = null;
+      let currentScreensaverIndex = 0;
+      
+      // Function to fetch user's images
+      function fetchUserGallery() {
+        fetch('/gallery/api/user/images', {
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => {
+          if (response.status === 401) {
+            showLoginButton();
+            throw new Error('Authentication required');
+          }
+          return response.json();
+        })
+        .then(data => {
+          userImages = data.images || [];
+          
+          if (userImages.length > 0) {
+            populateGallery(userImages);
+            actionButtons.style.display = 'flex';
+          } else {
+            showEmptyGallery();
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching gallery:', error);
+        });
+      }
+      
+      // Function to populate the gallery with images
+      function populateGallery(images) {
+        // Clear previous images
+        carouselEl.innerHTML = '';
+        gridEl.innerHTML = '';
+        
+        // Populate carousel view
+        images.forEach(image => {
+          const div = document.createElement('div');
+          const img = document.createElement('img');
+          img.src = image.url;
+          img.alt = image.title || '';
+          img.className = 'carousel-image';
+          img.dataset.id = image.id;
+          img.dataset.caption = image.title || '';
+          div.appendChild(img);
+          carouselEl.appendChild(div);
+        });
+        
+        // Initialize carousel with slick
+        $(document).ready(function() {
+          $('#gallery-carousel').slick({
+            infinite: true,
+            slidesToShow: window.innerWidth <= 768 ? 1 : 1,
+            slidesToScroll: 1,
+            autoplay: true,
+            autoplaySpeed: 4000,
+            dots: true,
+            arrows: true,
+            adaptiveHeight: true,
+            centerMode: true,
+            centerPadding: '0'
+          });
+        });
+        
+        // Populate grid view
+        images.forEach(image => {
+          const item = document.createElement('div');
+          item.classList.add('gallery-item');
+          
+          const img = document.createElement('img');
+          img.src = image.url;
+          img.alt = image.title || '';
+          img.dataset.id = image.id;
+          img.dataset.caption = image.title || '';
+          
+          if (image.title) {
+            const caption = document.createElement('div');
+            caption.classList.add('gallery-caption');
+            caption.textContent = image.title;
+            item.appendChild(caption);
+          }
+          
+          item.appendChild(img);
+          gridEl.appendChild(item);
+        });
+        
+        // Add click event to all images
+        document.querySelectorAll('.carousel-image, .gallery-item img').forEach(img => {
+          img.addEventListener('click', () => {
+            openModal(img.src, img.dataset.caption, img.dataset.id);
+          });
+        });
+      }
+      
+      // Function to show empty gallery message
+      function showEmptyGallery() {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.className = 'empty-gallery';
+        emptyMessage.innerHTML = `
+          <p>Your gallery is empty.</p>
+          <p>Explore the site and save images to your gallery!</p>
+        `;
+        
+        carouselEl.innerHTML = '';
+        gridEl.appendChild(emptyMessage);
+        
+        // Hide carousel view and show grid view with message
+        document.getElementById('carousel-view').style.display = 'none';
+        document.getElementById('grid-view').style.display = 'block';
+        document.getElementById('carousel-layout').classList.remove('active');
+        document.getElementById('grid-layout').classList.add('active');
+      }
+      
+      // Function to show login button
+      function showLoginButton() {
+        const loginContainer = document.createElement('div');
+        loginContainer.className = 'login-button';
+        
+        const button = document.createElement('button');
+        button.textContent = 'Login to View Gallery';
+        button.className = 'login-btn';
+        
+        button.addEventListener('click', () => {
+          const currentUrl = encodeURIComponent(window.location.href);
+          window.location.href = `/login?redirect=${currentUrl}`;
+        });
+        
+        loginContainer.appendChild(button);
+        
+        // Clear existing content and show login button
+        carouselEl.innerHTML = '';
+        gridEl.innerHTML = '';
+        document.querySelector('.gallery-controls').style.display = 'none';
+        
+        const mainContainer = document.querySelector('.gallery-main-container');
+        mainContainer.appendChild(loginContainer);
+      }
+      
+      // Function to open modal
+      function openModal(imgSrc, caption, imageId) {
+        modal.style.display = 'block';
+        modalImg.src = imgSrc;
+        modalCaption.textContent = caption;
+        currentImageId = imageId;
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+      }
+      
+      // Delete image function
+      deleteBtn.addEventListener('click', () => {
+        if (!currentImageId) return;
+        
+        fetch('/gallery/api/user/delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({ imageId: currentImageId })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Remove image from arrays and DOM
+            userImages = userImages.filter(img => img.id !== currentImageId);
+            
+            // Close modal
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+            
+            // Repopulate gallery
+            if (userImages.length > 0) {
+              populateGallery(userImages);
+            } else {
+              showEmptyGallery();
+              actionButtons.style.display = 'none';
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error deleting image:', error);
+        });
+      });
+      
+      // Download all images function
+      downloadAllBtn.addEventListener('click', () => {
+        if (userImages.length === 0) return;
+        
+        // For each image, create a temporary link and trigger download
+        userImages.forEach(image => {
+          const link = document.createElement('a');
+          link.href = image.url;
+          link.download = image.title || `wavelength-image-${image.id}`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+      });
+      
+      // Start screensaver function
+      startScreensaverBtn.addEventListener('click', () => {
+        if (userImages.length === 0) return;
+        
+        screensaverModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        // Show first image
+        currentScreensaverIndex = 0;
+        screensaverImage.src = userImages[currentScreensaverIndex].url;
+        
+        // Set up interval to cycle through images
+        screensaverInterval = setInterval(() => {
+          currentScreensaverIndex = (currentScreensaverIndex + 1) % userImages.length;
+          screensaverImage.src = userImages[currentScreensaverIndex].url;
+        }, 5000);
+      });
+      
+      // Close modal events
+      document.querySelectorAll('.modal-close').forEach(closeBtn => {
+        closeBtn.addEventListener('click', () => {
+          modal.style.display = 'none';
+          screensaverModal.style.display = 'none';
+          document.body.style.overflow = '';
+          
+          // Clear screensaver interval if active
+          if (screensaverInterval) {
+            clearInterval(screensaverInterval);
+            screensaverInterval = null;
+          }
+        });
+      });
+      
+      window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+          document.body.style.overflow = '';
+        }
+        if (event.target === screensaverModal) {
+          screensaverModal.style.display = 'none';
+          document.body.style.overflow = '';
+          
+          if (screensaverInterval) {
+            clearInterval(screensaverInterval);
+            screensaverInterval = null;
+          }
+        }
+      });
+      
+      // Layout switchers
+      const carouselView = document.getElementById('carousel-view');
+      const gridView = document.getElementById('grid-view');
+      const carouselBtn = document.getElementById('carousel-layout');
+      const gridBtn = document.getElementById('grid-layout');
+      
+      carouselBtn.addEventListener('click', () => {
+        if (userImages.length === 0) return;
+        
+        carouselView.style.display = 'block';
+        gridView.style.display = 'none';
+        carouselBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+        
+        // Refresh the carousel to fix layout issues
+        $('#gallery-carousel').slick('refresh');
+      });
+      
+      gridBtn.addEventListener('click', () => {
+        carouselView.style.display = 'none';
+        gridView.style.display = 'block';
+        gridBtn.classList.add('active');
+        carouselBtn.classList.remove('active');
+      });
+      
+      // Fetch user gallery on load
+      fetchUserGallery();
+    });
+  </script>
+  
+  <!-- Include standard footer -->
+  <%- include('partials/footer') %>
+</body>
+</html>

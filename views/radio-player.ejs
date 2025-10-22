@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <%- include('partials/head') %>
-    <link rel="stylesheet" href="<%= cdnUrl %>/css/radio-player.css?<%= version %>">
+    <link rel="stylesheet" href="<%= cdnUrl %>/css/radio-player.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
     <meta name="description" content="<%= pageDescription %>">
     <title><%= pageTitle %></title>
 </head>
@@ -395,7 +395,7 @@
         }
         window.CDN_URL = '<%= cdnUrl %>';
     </script>
-    <script src="<%= cdnUrl %>/js/firebase-config.js?<%= version %>"></script>
+    <script src="<%= cdnUrl %>/js/firebase-config.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
     <script>
         // Initialize Firebase
         if (!window.firebaseAuth && !window.firebaseUtils) {
@@ -410,6 +410,6 @@
             });
         }
     </script>
-    <script src="<%= cdnUrl %>/js/radio-player.js?<%= version %>"></script>
+    <script src="<%= cdnUrl %>/js/radio-player.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
 </body>
 </html>

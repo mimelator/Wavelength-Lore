@@ -21,7 +21,7 @@ class UserGallery {
    */
   constructor(options = {}) {
     this.container = document.getElementById(options.containerId);
-    this.apiEndpoint = options.apiEndpoint || '/api/gallery/user';
+    this.apiEndpoint = options.apiEndpoint || '/gallery/api/user/images';
     this.layout = options.layout || 'grid';
     this.enableLightbox = options.enableLightbox !== false;
     this.enableDownload = options.enableDownload !== false;
@@ -80,11 +80,72 @@ class UserGallery {
    */
   async loadUserGallery() {
     try {
+      // Attempt to get Firebase ID token if available
+      let headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Try to get Firebase token
+      if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+        try {
+          const token = await firebase.auth().currentUser.getIdToken();
+          headers['Authorization'] = `Bearer ${token}`;
+          console.log('📝 Added Firebase token to gallery request');
+        } catch (tokenError) {
+          console.warn('⚠️ Could not get Firebase token:', tokenError.message);
+        }
+      } else {
+        console.log('🔍 Firebase auth not available or user not logged in');
+      }
+      
       const response = await fetch(this.apiEndpoint, {
+        headers,
         credentials: 'include' // Include cookies for authentication
       });
       
       if (!response.ok) {
+        // If authentication error, redirect to login
+        if (response.status === 401) {
+          console.error('❌ Authentication required for gallery');
+          
+          // Show login prompt and redirect after delay
+          this.container.innerHTML = `
+            <div class="gallery-auth-error">
+              <h3>Authentication Required</h3>
+              <p>Please log in to view your gallery.</p>
+              <p>Redirecting to login page...</p>
+            </div>
+          `;
+          
+          // Add login button with immediate action
+          const loginButton = document.createElement('button');
+          loginButton.textContent = 'Log In Now';
+          loginButton.style.padding = '10px 20px';
+          loginButton.style.background = '#4c84ff';
+          loginButton.style.color = 'white';
+          loginButton.style.border = 'none';
+          loginButton.style.borderRadius = '4px';
+          loginButton.style.cursor = 'pointer';
+          loginButton.style.fontSize = '16px';
+          loginButton.style.margin = '20px auto';
+          loginButton.style.display = 'block';
+          
+          loginButton.addEventListener('click', () => {
+            const currentUrl = encodeURIComponent(window.location.href);
+            window.location.href = `/login?redirect=${currentUrl}`;
+          });
+          
+          this.container.querySelector('.gallery-auth-error').appendChild(loginButton);
+          
+          // Redirect to login after a short delay
+          setTimeout(() => {
+            const currentUrl = encodeURIComponent(window.location.href);
+            window.location.href = `/login?redirect=${currentUrl}`;
+          }, 5000);
+          
+          return;
+        }
+        
         throw new Error(`Failed to load gallery: ${response.status} ${response.statusText}`);
       }
       
@@ -575,7 +636,7 @@ class UserGallery {
     itemElement.classList.add('deleting');
     
     // Call API to delete the image
-    fetch(`${this.apiEndpoint}/delete`, {
+    fetch('/gallery/api/user/delete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

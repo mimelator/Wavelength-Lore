@@ -1,10 +1,7 @@
 /**
- * Image Capture Utility
+ * Image Capturer Class
  * 
- * This utility allows users to capture images from any page on the Wavelength Lore site
- * and save them to their personal gallery.
- * 
- * @module components/gallery/image-capturer
+ * This class adds "Save to Gallery" buttons to images on the website.
  */
 
 class ImageCapturer {
@@ -16,32 +13,42 @@ class ImageCapturer {
    * @param {Function} options.onAuthNeeded - Callback function when auth is needed but user is not logged in
    */
   constructor(options = {}) {
-    this.requireAuth = options.requireAuth !== false;
-    this.onCapture = options.onCapture || this.defaultCaptureHandler.bind(this);
-    this.onAuthNeeded = options.onAuthNeeded || this.defaultAuthHandler.bind(this);
-    this.captureButtons = [];
-    this.isEnabled = false;
-
+    this.options = {
+      requireAuth: true,           // Require authentication to save images
+      captureButtonPosition: 'top-right', // Position of capture button
+      minImageSize: 100,           // Minimum image size to add capture button
+      onCapture: null,             // Callback when an image is captured
+      onAuthNeeded: null,          // Callback when authentication is needed
+      excludeSelectors: [],        // Selectors to exclude from capture
+      ...options
+    };
+    
+    this.captureButtons = [];      // Track buttons added to the page
+    this.enabled = false;          // Is the capturer enabled
+    
     // Bind methods
+    this.enable = this.enable.bind(this);
+    this.disable = this.disable.bind(this);
+    this.processPage = this.processPage.bind(this);
     this.addCaptureButtonToImage = this.addCaptureButtonToImage.bind(this);
-    this.handleImageCapture = this.handleImageCapture.bind(this);
+    this.handleCaptureClick = this.handleCaptureClick.bind(this);
     this.handleMouseEnter = this.handleMouseEnter.bind(this);
     this.handleMouseLeave = this.handleMouseLeave.bind(this);
-    this.processPage = this.processPage.bind(this);
-    this.cleanupButtons = this.cleanupButtons.bind(this);
   }
-
+  
   /**
-   * Enable the image capturer for the current page
+   * Enable the image capturer
    */
   enable() {
-    if (this.isEnabled) return;
-    this.isEnabled = true;
-
-    // Process the page on load
+    if (this.enabled) return;
+    this.enabled = true;
+    
+    console.log("🖼️ Image Capturer: Enabling capture buttons");
+    
+    // Process the page now
     this.processPage();
-
-    // Set up mutation observer to watch for new images
+    
+    // Create mutation observer to detect new images
     this.observer = new MutationObserver((mutations) => {
       let shouldProcess = false;
       for (const mutation of mutations) {
@@ -54,154 +61,103 @@ class ImageCapturer {
         this.processPage();
       }
     });
-
-    // Start observing the entire document for changes
+    
+    // Start observing
     this.observer.observe(document.body, {
       childList: true,
       subtree: true
     });
-
-    // Handle dynamic content loading (e.g., AJAX, SPA navigation)
-    window.addEventListener('DOMContentLoaded', this.processPage);
-    window.addEventListener('load', this.processPage);
     
-    // If available, hook into router/navigation events
-    if (window.addEventListener) {
-      window.addEventListener('popstate', this.processPage);
-      window.addEventListener('hashchange', this.processPage);
-    }
+    console.log('✅ Image Capturer: Enabled');
   }
-
+  
   /**
    * Disable the image capturer
    */
   disable() {
-    if (!this.isEnabled) return;
-    this.isEnabled = false;
-
+    if (!this.enabled) return;
+    this.enabled = false;
+    
     // Stop the observer
     if (this.observer) {
       this.observer.disconnect();
       this.observer = null;
     }
-
-    // Remove event listeners
-    window.removeEventListener('DOMContentLoaded', this.processPage);
-    window.removeEventListener('load', this.processPage);
-    window.removeEventListener('popstate', this.processPage);
-    window.removeEventListener('hashchange', this.processPage);
-
-    // Clean up buttons
+    
+    // Remove all buttons
     this.cleanupButtons();
+    
+    console.log('❌ Image Capturer: Disabled');
   }
-
+  
   /**
    * Process the page to find images and add capture buttons
    */
   processPage() {
-    // First clean up any existing buttons
-    this.cleanupButtons();
-
-    // Find all images that should have capture buttons
-    const images = this.findCaptureableImages();
+    if (!this.enabled) return;
     
-    // Add capture buttons to these images
-    images.forEach(this.addCaptureButtonToImage);
-  }
-
-  /**
-   * Find all images on the page that can be captured
-   * @returns {Array} Array of image elements
-   */
-  findCaptureableImages() {
-    // Start with all img tags
-    let images = Array.from(document.querySelectorAll('img'));
-
-    // Filter out very small images, icons, etc.
-    images = images.filter(img => {
-      // Skip images that are too small (likely icons, avatars, etc.)
-      const minSize = 100; // Minimum dimension in pixels
-      if (img.width < minSize || img.height < minSize) {
+    console.log('🔍 Image Capturer: Processing page for images');
+    
+    // Find all images that meet our criteria
+    const images = Array.from(document.querySelectorAll('img')).filter(img => {
+      // Skip small images
+      if (img.naturalWidth < this.options.minImageSize || 
+          img.naturalHeight < this.options.minImageSize) {
         return false;
       }
-
-      // Skip images that are part of UI elements or icons
-      if (img.classList.contains('icon') || 
-          img.classList.contains('avatar') ||
-          img.classList.contains('logo')) {
-        return false;
-      }
-
-      // Skip images with certain patterns in their src
-      const excludePatterns = ['icon', 'avatar', 'logo', 'button', 'ui', 'background'];
-      for (const pattern of excludePatterns) {
-        if (img.src.toLowerCase().includes(pattern)) {
+      
+      // Skip images with excluded selectors
+      for (const selector of this.options.excludeSelectors) {
+        if (img.matches(selector)) {
           return false;
         }
       }
-
-      // Include images in certain contexts
-      const includeContainers = ['carousel', 'gallery', 'slideshow', 'banner', 'hero'];
-      for (const container of includeContainers) {
-        let parent = img.parentElement;
-        while (parent) {
-          if (parent.classList && 
-              (parent.classList.contains(container) || 
-               parent.id.toLowerCase().includes(container))) {
-            return true;
-          }
-          parent = parent.parentElement;
-        }
+      
+      // Skip images that already have a capture button
+      if (img.parentElement && 
+          img.parentElement.querySelector('.image-capture-button')) {
+        return false;
       }
-
-      // Default to including images that passed the size filter
+      
       return true;
     });
-
-    // Add special case for the radio page screensaver
-    const radioScreensaver = document.querySelector('#radio-screensaver img, .radio-screensaver img');
-    if (radioScreensaver && !images.includes(radioScreensaver)) {
-      images.push(radioScreensaver);
-    }
-
-    // Add special case for forum images
-    const forumImages = document.querySelectorAll('.forum-post img, .post-content img');
-    forumImages.forEach(img => {
-      if (!images.includes(img) && img.width >= 100 && img.height >= 100) {
-        images.push(img);
-      }
-    });
-
-    return images;
+    
+    console.log(`📷 Image Capturer: Found ${images.length} images`);
+    
+    // Add buttons to each image
+    images.forEach(this.addCaptureButtonToImage);
   }
-
+  
   /**
    * Add a capture button to an image
-   * @param {HTMLImageElement} img - The image to add a button to
+   * @param {HTMLImageElement} img - The image element
    */
   addCaptureButtonToImage(img) {
-    // Don't add a button if the image already has one
-    const existingButton = img.parentElement.querySelector('.image-capture-button');
-    if (existingButton) return;
-
-    // Create a container for the image and button if needed
-    let container = img.parentElement;
+    // Create a wrapper if the image doesn't have one
+    let wrapper = img.parentElement;
+    const needsWrapper = !wrapper || getComputedStyle(wrapper).position === 'static';
     
-    // Make sure the container is positioned relatively
-    if (getComputedStyle(container).position === 'static') {
-      container.style.position = 'relative';
+    if (needsWrapper) {
+      wrapper = document.createElement('div');
+      wrapper.style.position = 'relative';
+      wrapper.style.display = 'inline-block';
+      img.parentElement.insertBefore(wrapper, img);
+      wrapper.appendChild(img);
+    } else {
+      wrapper.style.position = 'relative';
     }
-
-    // Create the capture button
-    const button = document.createElement('button');
-    button.className = 'image-capture-button';
-    button.innerHTML = '<span class="icon">+</span><span class="text">Save to Gallery</span>';
-    button.setAttribute('aria-label', 'Save image to your gallery');
-    button.setAttribute('title', 'Save image to your gallery');
     
-    // Style the button
+    // Create button
+    const button = document.createElement('button');
+    button.className = `image-capture-button ${this.options.captureButtonPosition}`;
+    button.innerHTML = `
+      <span class="button-icon">🖼️</span>
+      <span class="button-text">Save to Gallery</span>
+    `;
+    
+    // Style button
     button.style.position = 'absolute';
-    button.style.bottom = '10px';
+    button.style.top = '10px';
     button.style.right = '10px';
     button.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
     button.style.color = 'white';
@@ -210,139 +166,141 @@ class ImageCapturer {
     button.style.padding = '8px 12px';
     button.style.cursor = 'pointer';
     button.style.fontSize = '14px';
-    button.style.display = 'flex';
-    button.style.alignItems = 'center';
     button.style.opacity = '0';
     button.style.transition = 'opacity 0.3s ease';
-    button.style.zIndex = '100';
+    button.style.zIndex = '1000';
+    button.style.fontFamily = 'inherit';
     
-    // Style the button icon
-    const icon = button.querySelector('.icon');
-    icon.style.marginRight = '5px';
-    icon.style.fontSize = '16px';
-    icon.style.fontWeight = 'bold';
-
-    // Initially hide the button, it will appear on hover
-    button.style.opacity = '0';
-
-    // Add button to the container
-    container.appendChild(button);
+    // Add hover event to show button
+    wrapper.addEventListener('mouseenter', this.handleMouseEnter);
+    wrapper.addEventListener('mouseleave', this.handleMouseLeave);
     
-    // Add the image and button to our tracking array
+    // Add click handler
+    button.addEventListener('click', (e) => this.handleCaptureClick(e, img));
+    
+    // Add to wrapper
+    wrapper.appendChild(button);
+    
+    // Keep track of buttons
     this.captureButtons.push({
       img,
       button,
-      container
+      wrapper
     });
     
-    // Add event listeners
-    button.addEventListener('click', (e) => this.handleImageCapture(e, img));
-    container.addEventListener('mouseenter', this.handleMouseEnter);
-    container.addEventListener('mouseleave', this.handleMouseLeave);
-    
-    // Add touch support for mobile
-    container.addEventListener('touchstart', () => {
-      button.style.opacity = '1';
-      // Hide after a delay if not tapped
-      setTimeout(() => {
-        button.style.opacity = '0';
-      }, 3000);
-    });
+    console.log('➕ Added capture button to image:', img.src.substring(0, 50) + '...');
   }
-
+  
   /**
-   * Handle mouse enter event on image container
-   * @param {Event} e - The mouse event
+   * Handle mouse enter on image
+   * @param {Event} e - Mouse event
    */
   handleMouseEnter(e) {
-    const container = e.currentTarget;
-    const button = container.querySelector('.image-capture-button');
+    const button = e.currentTarget.querySelector('.image-capture-button');
     if (button) {
       button.style.opacity = '1';
     }
   }
-
+  
   /**
-   * Handle mouse leave event on image container
-   * @param {Event} e - The mouse event
+   * Handle mouse leave on image
+   * @param {Event} e - Mouse event
    */
   handleMouseLeave(e) {
-    const container = e.currentTarget;
-    const button = container.querySelector('.image-capture-button');
+    const button = e.currentTarget.querySelector('.image-capture-button');
     if (button) {
       button.style.opacity = '0';
     }
   }
-
+  
   /**
-   * Handle image capture button click
-   * @param {Event} e - The click event
+   * Handle capture button click
+   * @param {Event} e - Click event
    * @param {HTMLImageElement} img - The image to capture
    */
-  handleImageCapture(e, img) {
+  handleCaptureClick(e, img) {
     e.preventDefault();
     e.stopPropagation();
     
-    // Check if user is authenticated
-    if (this.requireAuth && !this.isUserAuthenticated()) {
-      this.onAuthNeeded();
-      return;
+    console.log('🖱️ Image capture button clicked');
+    
+    // Check authentication if required
+    if (this.options.requireAuth) {
+      // Check if the user is authenticated
+      const isAuthenticated = window.userData && window.userData.isAuthenticated;
+      
+      if (!isAuthenticated) {
+        console.log('❌ Authentication required but user is not logged in');
+        
+        // Call auth needed callback if provided
+        if (typeof this.options.onAuthNeeded === 'function') {
+          this.options.onAuthNeeded();
+        }
+        
+        return;
+      }
     }
     
-    // Prepare image data
+    // Create image data
     const imageData = {
       url: img.src,
-      alt: img.alt || '',
-      title: img.title || img.alt || 'Captured Image',
-      width: img.naturalWidth,
-      height: img.naturalHeight,
-      timestamp: new Date().toISOString(),
-      sourceUrl: window.location.href,
-      pageTitle: document.title
+      title: img.alt || 'Image from ' + document.title,
+      source: {
+        url: window.location.href,
+        title: document.title
+      },
+      capturedAt: new Date().toISOString()
     };
     
-    // Call the capture handler
-    this.onCapture(imageData);
+    // Call capture callback if provided
+    if (typeof this.options.onCapture === 'function') {
+      console.log('📸 Calling onCapture callback');
+      this.options.onCapture(imageData);
+    } else {
+      console.log('⚠️ No onCapture callback provided');
+    }
     
-    // Show feedback that the image was captured
+    // Show feedback
     this.showCaptureFeedback(img);
   }
-
+  
   /**
-   * Show visual feedback that an image was captured
+   * Show feedback when an image is captured
    * @param {HTMLImageElement} img - The captured image
    */
   showCaptureFeedback(img) {
-    // Create a feedback overlay
+    const wrapper = img.parentElement;
+    
+    // Create overlay
     const overlay = document.createElement('div');
-    overlay.className = 'capture-feedback';
     overlay.style.position = 'absolute';
     overlay.style.top = '0';
     overlay.style.left = '0';
-    overlay.style.right = '0';
-    overlay.style.bottom = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
     overlay.style.backgroundColor = 'rgba(0, 150, 0, 0.3)';
     overlay.style.display = 'flex';
-    overlay.style.justifyContent = 'center';
     overlay.style.alignItems = 'center';
-    overlay.style.zIndex = '101';
+    overlay.style.justifyContent = 'center';
+    overlay.style.zIndex = '1001';
     
-    // Add success message
+    // Create message
     const message = document.createElement('div');
-    message.textContent = 'Saved to Gallery';
+    message.textContent = '✓ Saved to Gallery';
     message.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
     message.style.color = 'white';
     message.style.padding = '10px 15px';
     message.style.borderRadius = '4px';
-    message.style.fontSize = '16px';
+    message.style.fontWeight = 'bold';
     
+    // Add to DOM
     overlay.appendChild(message);
-    img.parentElement.appendChild(overlay);
+    wrapper.appendChild(overlay);
     
     // Remove after a delay
     setTimeout(() => {
-      if (overlay.parentElement) {
-        overlay.parentElement.removeChild(overlay);
+      if (wrapper.contains(overlay)) {
+        wrapper.removeChild(overlay);
       }
     }, 1500);
   }
@@ -351,72 +309,30 @@ class ImageCapturer {
    * Clean up all capture buttons
    */
   cleanupButtons() {
-    this.captureButtons.forEach(({ img, button, container }) => {
+    this.captureButtons.forEach(({img, button, wrapper}) => {
+      // Remove button if it exists
       if (button && button.parentElement) {
         button.parentElement.removeChild(button);
       }
       
-      container.removeEventListener('mouseenter', this.handleMouseEnter);
-      container.removeEventListener('mouseleave', this.handleMouseLeave);
+      // Remove event listeners
+      if (wrapper) {
+        wrapper.removeEventListener('mouseenter', this.handleMouseEnter);
+        wrapper.removeEventListener('mouseleave', this.handleMouseLeave);
+      }
     });
     
+    // Clear the array
     this.captureButtons = [];
-  }
-
-  /**
-   * Check if the user is authenticated
-   * @returns {boolean} True if user is authenticated
-   */
-  isUserAuthenticated() {
-    // Placeholder - replace with actual authentication check
-    return Boolean(
-      window.userData && 
-      window.userData.isAuthenticated === true
-    );
-  }
-
-  /**
-   * Default handler when an image is captured
-   * @param {Object} imageData - The captured image data
-   */
-  defaultCaptureHandler(imageData) {
-    console.log('Image captured:', imageData);
-    
-    // In a real implementation, this would call an API endpoint to save to user's gallery
-    fetch('/api/gallery/user/save', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(imageData),
-      credentials: 'include' // Include cookies for authentication
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Image saved to gallery:', data);
-    })
-    .catch(error => {
-      console.error('Error saving image to gallery:', error);
-    });
-  }
-
-  /**
-   * Default handler when authentication is needed
-   */
-  defaultAuthHandler() {
-    console.log('Authentication required to save images');
-    
-    // In a real implementation, show login dialog or redirect to login page
-    alert('Please log in to save images to your gallery');
-    
-    // Optionally redirect to login page
-    // window.location.href = '/login?redirect=' + encodeURIComponent(window.location.href);
   }
 }
 
-// Export the ImageCapturer class
+// Expose to window object
+if (typeof window !== 'undefined') {
+  window.ImageCapturer = ImageCapturer;
+}
+
+// Export for CommonJS
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ImageCapturer;
-} else if (typeof window !== 'undefined') {
-  window.ImageCapturer = ImageCapturer;
 }

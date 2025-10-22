@@ -114,9 +114,51 @@ class PhotoGallery {
    * @private
    */
   renderCarousel() {
-    // Carousel implementation will be added here
-    console.log('Carousel layout not yet implemented');
-    this.renderGrid(); // Fallback to grid for now
+    const carouselContainer = document.createElement('div');
+    carouselContainer.classList.add('carousel-section');
+    
+    const carousel = document.createElement('div');
+    carousel.classList.add('carousel');
+    carousel.id = 'gallery-carousel';
+    
+    this.images.forEach((image, index) => {
+      const div = document.createElement('div');
+      const img = document.createElement('img');
+      img.src = image.url;
+      img.alt = image.caption || `Image ${index + 1}`;
+      img.dataset.index = index;
+      img.classList.add('carousel-image');
+      
+      div.appendChild(img);
+      carousel.appendChild(div);
+    });
+    
+    carouselContainer.appendChild(carousel);
+    this.container.appendChild(carouselContainer);
+    
+    // Initialize slick carousel if jQuery and slick are available
+    if (typeof jQuery !== 'undefined' && typeof jQuery.fn.slick !== 'undefined') {
+      jQuery(carousel).slick({
+        infinite: true,
+        slidesToShow: window.innerWidth <= 768 ? 1 : 1,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 4000,
+        dots: true,
+        arrows: true,
+        adaptiveHeight: true,
+        centerMode: true,
+        centerPadding: '0'
+      });
+    } else {
+      console.warn('Slick carousel not available. Please include jQuery and slick.js for carousel functionality.');
+      // Add a basic non-slick carousel alternative here if needed
+      const warningDiv = document.createElement('div');
+      warningDiv.style.textAlign = 'center';
+      warningDiv.style.padding = '20px';
+      warningDiv.textContent = 'Carousel requires slick.js to function properly.';
+      carouselContainer.appendChild(warningDiv);
+    }
   }
   
   /**

@@ -1,6 +1,10 @@
-<!-- Gallery Activation Script -->
-<script src="/static/js/components/gallery/image-capturer.js"></script>
-<script src="/static/js/components/gallery/image-capturer-init.js"></script>
+<!-- Gallery Scripts -->
+<!-- The version variable is now properly provided by middleware.js -->
+<script src="<%= cdnUrl || '' %>/static/js/components/gallery/gallery.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+<script src="<%= cdnUrl || '' %>/static/js/components/gallery/user-gallery.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+<script src="<%= cdnUrl || '' %>/static/js/components/gallery/image-capturer.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+<script src="<%= cdnUrl || '' %>/static/js/components/gallery/image-capturer-init.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+<link rel="stylesheet" href="<%= cdnUrl || '' %>/static/css/gallery/gallery.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
 
 <!-- Add link to My Gallery in navigation -->
 <script>

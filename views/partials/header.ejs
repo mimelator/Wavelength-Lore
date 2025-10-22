@@ -23,6 +23,7 @@
           <li><a href="/forum">💬 Forum</a></li>
           <li id="leaderboard-dropdown-item" style="display: none;"><a href="/leaderboard">🏆 Leaderboard</a></li>
           <li id="profile-dropdown-item" style="display: none;"><a href="/forum/profile">👤 My Profile</a></li>
+          <li id="gallery-dropdown-item" style="display: none;"><a href="/my-gallery">🖼️ My Gallery</a></li>
           <li id="games-dropdown-item" style="display: none;"><a href="/games" style="background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #ffd700; font-weight: bold;">🎮 Games</a></li>
         </ul>
       </li>
@@ -68,7 +69,7 @@
                   // Expose user groups globally
                   window.wavelengthUserGroups = data.groups || [];
 
-                  // Show leaderboard and profile links for all authenticated users
+                  // Show leaderboard, profile, and gallery links for all authenticated users
                   const leaderboardDropdownItem = document.getElementById('leaderboard-dropdown-item');
                   if (leaderboardDropdownItem) {
                     leaderboardDropdownItem.style.display = 'block';
@@ -77,6 +78,11 @@
                   const profileDropdownItem = document.getElementById('profile-dropdown-item');
                   if (profileDropdownItem) {
                     profileDropdownItem.style.display = 'block';
+                  }
+                  
+                  const galleryDropdownItem = document.getElementById('gallery-dropdown-item');
+                  if (galleryDropdownItem) {
+                    galleryDropdownItem.style.display = 'block';
                   }
 
                   // Show admin link if user is admin

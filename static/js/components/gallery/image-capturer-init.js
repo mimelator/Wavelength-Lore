@@ -1,63 +1,128 @@
 /**
- * Image Capture Initializer
+ * Image Capture Initializer for Gallery
  * 
  * This file initializes the image capture functionality across the site,
  * enabling users to save images to their personal gallery.
  */
 
+// Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize the image capturer
-  const capturer = new ImageCapturer({
-    requireAuth: true, // Require authentication to save images
-    
-    // Custom handler when an image is captured
-    onCapture: async (imageData) => {
-      try {
-        const response = await fetch('/api/gallery/user/save', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(imageData),
-          credentials: 'include' // Include cookies for authentication
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to save image: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        console.log('Image saved to gallery:', result);
-        
-        // Show saved notification
-        showNotification('Image saved to your gallery!', 'success');
-        
-      } catch (error) {
-        console.error('Error saving image to gallery:', error);
-        showNotification('Failed to save image. Please try again.', 'error');
-      }
-    },
-    
-    // Custom handler when authentication is needed
-    onAuthNeeded: () => {
-      showNotification('Please log in to save images to your gallery', 'warning');
-      
-      // Store the current URL to redirect back after login
-      const currentUrl = encodeURIComponent(window.location.href);
-      
-      // Redirect to login page after a short delay
-      setTimeout(() => {
-        window.location.href = `/login?redirect=${currentUrl}`;
-      }, 2000);
-    }
-  });
+  console.log('🖼️ Initializing Image Capturer');
   
-  // Enable the capturer
-  capturer.enable();
+  // Create global window.userData object if it doesn't exist
+  // This is needed for the authentication check in the ImageCapturer
+  if (typeof window.userData === 'undefined') {
+    window.userData = {};
+  }
+  
+  // Check if user is authenticated via Firebase
+  if (window.firebaseAuth && window.firebaseUtils) {
+    window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
+      if (user) {
+        console.log('�� User authenticated, enabling image capture');
+        window.userData.isAuthenticated = true;
+        
+        // Initialize the image capturer
+        initializeImageCapturer();
+      } else {
+        console.log('👤 User not authenticated');
+        window.userData.isAuthenticated = false;
+      }
+    });
+  } else {
+    console.log('🔥 Firebase not available, checking for auth later');
+    // Check again after a delay
+    setTimeout(() => {
+      if (window.firebaseAuth && window.firebaseUtils) {
+        console.log('🔥 Firebase now available, checking auth');
+        window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
+          if (user) {
+            console.log('�� User authenticated, enabling image capture');
+            window.userData.isAuthenticated = true;
+            
+            // Initialize the image capturer
+            initializeImageCapturer();
+          }
+        });
+      } else {
+        console.log('🔥 Firebase still not available, proceeding with default initialization');
+        // Initialize anyway, but require auth
+        initializeImageCapturer();
+      }
+    }, 1000);
+  }
+  
+  // Function to initialize the image capturer
+  function initializeImageCapturer() {
+    console.log('🖼️ Creating ImageCapturer instance');
+    
+    // Check if ImageCapturer class is available
+    if (typeof window.ImageCapturer === 'undefined') {
+      console.error('❌ ImageCapturer class not found! Make sure image-capturer.js is loaded first.');
+      return;
+    }
+    
+    // Create a new image capturer instance
+    const capturer = new window.ImageCapturer({
+      requireAuth: true,
+      
+      // Called when an image is captured
+      onCapture: async (imageData) => {
+        try {
+          console.log('📸 Image captured:', imageData);
+          
+          // Save the image to the user's gallery
+          const response = await fetch('/gallery/api/user/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(imageData),
+            credentials: 'include' // Send cookies for authentication
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Server responded with ${response.status}`);
+          }
+          
+          const data = await response.json();
+          console.log('✅ Image saved to gallery:', data);
+          
+          // Show success notification
+          showNotification('Image saved to your gallery!', 'success');
+          
+        } catch (error) {
+          console.error('❌ Error saving image:', error);
+          showNotification('Failed to save image. Please try again.', 'error');
+        }
+      },
+      
+      // Called when authentication is needed but user is not logged in
+      onAuthNeeded: () => {
+        console.log('🔒 Authentication required');
+        
+        // Show login notification
+        showNotification('Please log in to save images to your gallery', 'info');
+        
+        // Redirect to login after a short delay
+        setTimeout(() => {
+          const currentUrl = encodeURIComponent(window.location.href);
+          window.location.href = `/login?redirect=${currentUrl}`;
+        }, 2000);
+      }
+    });
+    
+    // Enable the capturer
+    console.log('🖼️ Enabling image capture functionality');
+    capturer.enable();
+    
+    // Log that initialization is complete
+    console.log('✅ Image capturer initialized successfully');
+  }
   
   // Function to show notifications
   function showNotification(message, type = 'info') {
-    // Check if notification container exists, create if not
+    console.log(`📣 ${type.toUpperCase()}: ${message}`);
+    
+    // Create container if it doesn't exist
     let container = document.getElementById('gallery-notifications');
     if (!container) {
       container = document.createElement('div');
@@ -98,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 3000);
   }
   
-  // Helper function to get notification background color based on type
+  // Helper to get notification background color
   function getBackgroundColor(type) {
     switch (type) {
       case 'success': return '#4caf50';

@@ -9,14 +9,40 @@ const router = express.Router();
 const path = require('path');
 const { ensureAuthenticated } = require('../middleware/auth');
 
+console.log('🚀 Gallery routes module loaded!');
+console.log('📝 Available routes:');
+console.log('   - /gallery-demo');
+console.log('   - /my-gallery');
+console.log('   - /api/gallery/:category');
+console.log('   - /gallery/api/user/images');
+console.log('   - /gallery/api/user/save');
+console.log('   - /gallery/api/user/delete');
+
 // Gallery demo page
 router.get('/gallery-demo', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/gallery-demo.html'));
+  res.render('gallery-demo', {
+    title: 'Gallery Demo | Wavelength Lore',
+    cdnUrl: process.env.CDN_URL || '',
+    versionInfo: req.app.locals.versionInfo || null,
+    req: req // Pass request object for canonical URLs
+  });
 });
 
 // User gallery page (requires authentication)
-router.get('/my-gallery', ensureAuthenticated, (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user-gallery.html'));
+router.get('/my-gallery', (req, res) => {
+  // Check for authentication before serving the page
+  // This is a more user-friendly approach than using the middleware
+  if (req.cookies && (req.cookies.__session || req.cookies.session)) {
+    res.render('user-gallery', {
+      title: 'My Gallery | Wavelength Lore',
+      cdnUrl: process.env.CDN_URL || '',
+      versionInfo: req.app.locals.versionInfo || null,
+      req: req // Pass request object for canonical URLs
+    });
+  } else {
+    // No authentication token found, redirect to login
+    res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
+  }
 });
 
 // API endpoint to get gallery images by category
@@ -29,44 +55,85 @@ router.get('/api/gallery/:category', (req, res) => {
     episodes: [
       {
         id: 'ep1-img1',
-        url: '/static/images/episode1/MyLuckyCharm-01.webp',
-        thumbnailUrl: '/static/images/episode1/MyLuckyCharm-01.webp',
+        url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.webp',
+        thumbnailUrl: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.webp',
         title: 'Lucky Charm - Episode 1',
         episodeId: 1
       },
       {
         id: 'ep1-img2',
-        url: '/static/images/episode1/MyLuckyCharm-02.webp',
-        thumbnailUrl: '/static/images/episode1/MyLuckyCharm-02.webp',
+        url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.webp',
+        thumbnailUrl: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.webp',
         title: 'Wavelength Band Performing',
         episodeId: 1
       },
       {
+        id: 'ep1-img3',
+        url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.webp',
+        thumbnailUrl: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.webp',
+        title: 'Lucky the Leprechaun in Episode 1',
+        episodeId: 1
+      },
+      {
         id: 'ep11-img1',
-        url: '/static/images/episode11/back_to_the_shire.webp',
-        thumbnailUrl: '/static/images/episode11/back_to_the_shire.webp',
+        url: '/static/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.webp',
+        thumbnailUrl: '/static/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.webp',
         title: 'Back to the Shire - Episode 11',
+        episodeId: 11
+      },
+      {
+        id: 'ep11-img2',
+        url: '/static/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.webp',
+        thumbnailUrl: '/static/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.webp',
+        title: 'Concert Encore - Back to the Shire',
         episodeId: 11
       }
     ],
     characters: [
       {
         id: 'char-lucky',
-        url: '/static/images/episode1/MyLuckyCharm-03.webp',
-        thumbnailUrl: '/static/images/episode1/MyLuckyCharm-03.webp',
+        url: '/static/images/characters/wavelength/lucky-1.webp',
+        thumbnailUrl: '/static/images/characters/wavelength/lucky-1.webp',
         title: 'Lucky the Leprechaun',
         characterId: 'lucky'
       },
       {
-        id: 'char-goblin',
-        url: '/static/images/episode11/Goblin-King-01.webp',
-        thumbnailUrl: '/static/images/episode11/Goblin-King-01.webp',
-        title: 'The Goblin King',
-        characterId: 'goblin-king'
+        id: 'char-yeti',
+        url: '/static/images/characters/wavelength/yeti-1.webp',
+        thumbnailUrl: '/static/images/characters/wavelength/yeti-1.webp',
+        title: 'The Yeti',
+        characterId: 'yeti'
+      },
+      {
+        id: 'char-lucky-2',
+        url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.webp',
+        thumbnailUrl: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.webp',
+        title: 'Lucky Close-up',
+        characterId: 'lucky'
+      },
+      {
+        id: 'char-wavelength',
+        url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.webp',
+        thumbnailUrl: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.webp',
+        title: 'Wavelength Band',
+        characterId: 'band'
       }
     ],
     locations: [
-      // Location images would go here
+      {
+        id: 'loc-shire',
+        url: '/static/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.webp',
+        thumbnailUrl: '/static/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.webp',
+        title: 'The Shire Concert Venue',
+        locationId: 'shire'
+      },
+      {
+        id: 'loc-stage',
+        url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.webp',
+        thumbnailUrl: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.webp',
+        title: 'Concert Stage',
+        locationId: 'stage'
+      }
     ]
   };
   
@@ -78,27 +145,64 @@ router.get('/api/gallery/:category', (req, res) => {
 });
 
 // API endpoint to get user's gallery images
-router.get('/api/gallery/user', ensureAuthenticated, (req, res) => {
-  const userId = req.user.id;
+// Using /gallery/api to avoid conflicts with other /api/user routes
+router.get('/gallery/api/user/images', (req, res) => {
+  console.log('⭐ API endpoint /gallery/api/user/images hit!');
   
-  // This is a placeholder - in a real implementation, you would fetch from a database
-  // based on the user's ID
+  // Check for authentication manually
+  const authHeader = req.headers.authorization;
+  const sessionCookie = req.cookies && (req.cookies.__session || req.cookies.session);
+  
+  console.log('⭐ Auth header:', authHeader ? 'Present' : 'Not present');
+  console.log('⭐ Session cookie:', sessionCookie ? 'Present' : 'Not present');
+  
+  if (!authHeader && !sessionCookie) {
+    return res.status(401).json({
+      error: 'Authentication required',
+      message: 'Please log in to view your gallery'
+    });
+  }
+  
   // For demo purposes, we'll return some sample images
+  // In a real implementation, you would verify the token and fetch from a database
+  const userId = 'demo-user-id'; // Placeholder
+  
   const userGallery = {
     images: [
       {
         id: 'user-img1',
-        url: '/static/images/episode1/MyLuckyCharm-01.webp',
+        url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.webp',
         title: 'Lucky Charm - Episode 1',
         timestamp: new Date().toISOString(),
         sourceUrl: '/episodes/1'
       },
       {
         id: 'user-img2',
-        url: '/static/images/episode1/MyLuckyCharm-03.webp',
+        url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.webp',
         title: 'Lucky the Leprechaun',
         timestamp: new Date().toISOString(),
         sourceUrl: '/characters/lucky'
+      },
+      {
+        id: 'user-img3',
+        url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.webp',
+        title: 'Wavelength Band Performing',
+        timestamp: new Date().toISOString(),
+        sourceUrl: '/episodes/1'
+      },
+      {
+        id: 'user-img4',
+        url: '/static/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.webp',
+        title: 'Back to the Shire - Episode 11',
+        timestamp: new Date().toISOString(),
+        sourceUrl: '/episodes/11'
+      },
+      {
+        id: 'user-img5',
+        url: '/static/images/characters/wavelength/yeti-1.webp',
+        title: 'The Yeti',
+        timestamp: new Date().toISOString(),
+        sourceUrl: '/characters/yeti'
       }
     ]
   };
@@ -107,7 +211,7 @@ router.get('/api/gallery/user', ensureAuthenticated, (req, res) => {
 });
 
 // API endpoint to save an image to the user's gallery
-router.post('/api/gallery/user/save', ensureAuthenticated, (req, res) => {
+router.post('/gallery/api/user/save', ensureAuthenticated, (req, res) => {
   const userId = req.user.id;
   const imageData = req.body;
   
@@ -131,7 +235,7 @@ router.post('/api/gallery/user/save', ensureAuthenticated, (req, res) => {
 });
 
 // API endpoint to delete an image from the user's gallery
-router.post('/api/gallery/user/delete', ensureAuthenticated, (req, res) => {
+router.post('/gallery/api/user/delete', ensureAuthenticated, (req, res) => {
   const userId = req.user.id;
   const { imageId } = req.body;
   

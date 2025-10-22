@@ -213,6 +213,22 @@ function configureTemplateLocals(app) {
     next();
   });
 
+  // Middleware to add version information to all templates
+  app.use((req, res, next) => {
+    // Import version manager
+    const versionManager = require('../utils/version');
+    
+    // Add version information to templates
+    const versionInfo = versionManager.getTemplateData();
+    res.locals.version = versionInfo.version;
+    res.locals.displayVersion = versionInfo.displayVersion;
+    res.locals.buildNumber = versionInfo.buildNumber;
+    res.locals.environment = versionInfo.environment;
+    res.locals.versionInfo = versionInfo; // Add full version info for templates
+    
+    next();
+  });
+
   // Middleware to add character, lore, and episode helpers to all templates
   app.use(async (req, res, next) => {
     // Get visibility filter based on user role

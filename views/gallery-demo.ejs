@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head') %>
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/gallery.css">
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css">
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/modal_styles.css">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/carousel.css">
+  <style>
+    .gallery-controls {
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 10px;
+      border: 3px solid #333;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .layout-button {
+      padding: 8px 16px;
+      background-color: #4a90e2;
+      color: white;
+      border: 2px solid #333;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'AnimeAce', Arial, sans-serif;
+      font-size: 14px;
+      display: inline-block;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .layout-button:hover {
+      background-color: #357abf;
+      transform: translateY(-2px);
+    }
+    
+    .layout-button.active {
+      background-color: #2c5e8c;
+    }
+    
+    .gallery-container {
+      min-height: 400px;
+    }
+    
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .gallery-item:hover {
+      transform: translateY(-5px);
+    }
+    
+    .gallery-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+    
+    .gallery-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .gallery-item:hover .gallery-caption {
+      transform: translateY(0);
+    }
+    
+    .intro {
+      text-align: center;
+      margin-bottom: 30px;
+      font-family: 'AnimeAce', Arial, sans-serif;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 10px;
+      border: 3px solid #333;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Main content container */
+    .gallery-main-container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+    
+    h1 {
+      font-family: 'AnimeAce', Arial, sans-serif;
+      color: #333;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Include standard header -->
+  <%- include('partials/header') %>
+
+  <main class="gallery-main-container">
+    <h1>Wavelength Lore Photo Gallery</h1>
+    
+    <div class="intro">
+      <p>Explore the visual world of Wavelength Lore through our curated collection of images.</p>
+      <p>Click on any image to view it in full size.</p>
+    </div>
+    
+    <!-- Carousel Section (Default View) -->
+    <section class="carousel-section" id="carousel-view">
+      <div class="carousel" id="gallery-carousel">
+        <!-- Images will be populated by JavaScript -->
+      </div>
+    </section>
+    
+    <!-- Gallery Controls -->
+    <section class="gallery-controls">
+      <button id="carousel-layout" class="layout-button active">Carousel View</button>
+      <button id="grid-layout" class="layout-button">Grid View</button>
+    </section>
+    
+    <!-- Grid View (Hidden by Default) -->
+    <div id="grid-view" style="display: none;">
+      <div class="gallery-grid" id="gallery-grid">
+        <!-- Images will be populated by JavaScript -->
+      </div>
+    </div>
+    
+    <!-- Modal for Image Viewing -->
+    <!-- Modal for Image Viewing -->
+    <div id="imageModal" class="modal">
+      <span class="modal-close">&times;</span>
+      <img class="modal-content" id="fullSizeImage">
+      <div id="modalCaption" class="modal-caption"></div>
+    </div>
+  </main>
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Sample images for demo with updated paths
+      const demoImages = [
+        {
+          url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.webp',
+          thumbnailUrl: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.webp',
+          caption: 'Lucky Charm - Episode 1'
+        },
+        {
+          url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.webp',
+          thumbnailUrl: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-04.webp',
+          caption: 'Wavelength Band Performing'
+        },
+        {
+          url: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.webp',
+          thumbnailUrl: '/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.webp',
+          caption: 'Lucky the Leprechaun'
+        },
+        {
+          url: '/static/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.webp',
+          thumbnailUrl: '/static/images/seasons/season1/episodes/episode11/images/Concert_Encore_BTTS-01.webp',
+          caption: 'Back to the Shire - Episode 11'
+        },
+        {
+          url: '/static/images/characters/wavelength/yeti-1.webp',
+          thumbnailUrl: '/static/images/characters/wavelength/yeti-1.webp',
+          caption: 'The Yeti'
+        }
+      ];
+      
+      // Populate carousel view
+      const carouselEl = document.getElementById('gallery-carousel');
+      demoImages.forEach(image => {
+        const div = document.createElement('div');
+        const img = document.createElement('img');
+        img.src = image.url;
+        img.alt = image.caption || '';
+        img.className = 'carousel-image';
+        img.dataset.caption = image.caption || '';
+        div.appendChild(img);
+        carouselEl.appendChild(div);
+      });
+      
+      // Initialize carousel with slick
+      $(document).ready(function() {
+        $('#gallery-carousel').slick({
+          infinite: true,
+          slidesToShow: window.innerWidth <= 768 ? 1 : 1,
+          slidesToScroll: 1,
+          autoplay: true,
+          autoplaySpeed: 4000,
+          dots: true,
+          arrows: true,
+          adaptiveHeight: true,
+          centerMode: true,
+          centerPadding: '0'
+        });
+      });
+      
+      // Populate grid view
+      const gridEl = document.getElementById('gallery-grid');
+      demoImages.forEach(image => {
+        const item = document.createElement('div');
+        item.classList.add('gallery-item');
+        
+        const img = document.createElement('img');
+        img.src = image.thumbnailUrl || image.url;
+        img.alt = image.caption || '';
+        img.dataset.caption = image.caption || '';
+        
+        if (image.caption) {
+          const caption = document.createElement('div');
+          caption.classList.add('gallery-caption');
+          caption.textContent = image.caption;
+          item.appendChild(caption);
+        }
+        
+        item.appendChild(img);
+        gridEl.appendChild(item);
+      });
+      
+      // Modal functionality
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('fullSizeImage');
+      const modalCaption = document.getElementById('modalCaption');
+      const closeModal = document.querySelector('.modal-close');
+      
+      // Function to open modal
+      function openModal(imgSrc, caption) {
+        modal.style.display = 'block';
+        modalImg.src = imgSrc;
+        modalCaption.textContent = caption;
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+      }
+      
+      // Add click event to all images
+      document.querySelectorAll('.carousel-image, .gallery-item img').forEach(img => {
+        img.addEventListener('click', () => {
+          openModal(img.src, img.dataset.caption);
+        });
+      });
+      
+      // Close modal events
+      closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+        document.body.style.overflow = ''; // Restore scrolling
+      });
+      
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Layout switchers
+      const carouselView = document.getElementById('carousel-view');
+      const gridView = document.getElementById('grid-view');
+      const carouselBtn = document.getElementById('carousel-layout');
+      const gridBtn = document.getElementById('grid-layout');
+      
+      carouselBtn.addEventListener('click', () => {
+        carouselView.style.display = 'block';
+        gridView.style.display = 'none';
+        carouselBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+        
+        // Refresh the carousel to fix layout issues
+        $('#gallery-carousel').slick('refresh');
+      });
+      
+      gridBtn.addEventListener('click', () => {
+        carouselView.style.display = 'none';
+        gridView.style.display = 'block';
+        gridBtn.classList.add('active');
+        carouselBtn.classList.remove('active');
+      });
+    });
+  </script>
+  
+  <!-- Include standard footer -->
+  <%- include('partials/footer') %>
+</body>
+</html>
