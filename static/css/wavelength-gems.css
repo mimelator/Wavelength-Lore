@@ -245,6 +245,8 @@
 .level-hero-card {
     padding: 10px;
     overflow: hidden;
+    border: 3px solid #FFD700 !important; /* Temporary: Make it obvious */
+    background: rgba(255, 215, 0, 0.1) !important; /* Temporary: Golden glow */
 }
 
 .hero-image-container {
@@ -253,6 +255,7 @@
     overflow: hidden;
     position: relative;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 2px solid #a78bfa; /* Temporary: Purple border */
 }
 
 .hero-image {
@@ -260,6 +263,8 @@
     height: auto;
     display: block;
     transition: transform 0.3s ease;
+    min-height: 200px; /* Temporary: Ensure it has height */
+    background: rgba(255, 0, 0, 0.1); /* Temporary: Red tint to see if it's there */
 }
 
 .hero-image:hover {
