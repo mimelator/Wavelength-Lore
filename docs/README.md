@@ -1,167 +1,124 @@
 # Wavelength Lore - Documentation Hub
 
-Complete documentation for the Wavelength Lore platform, content systems, and games.
+Complete documentation for the Wavelength Lore platform, systems, and games.
 
 ## Directory Structure
 
 ```
 docs/
-├── README.md (this file) - Documentation hub
-├── game-systems/ - Game documentation
-│   ├── WAVELENGTH_GEMS_GETTING_STARTED.md    - Game developer onboarding
-│   ├── GAME_LEVEL_SYSTEM_SUMMARY.md          - Project overview
-│   ├── LEVEL_SYSTEM_GUIDE.md                 - Comprehensive reference
-│   └── LEVEL_SYSTEM_README.md                - Quick reference
-├── scripts/ - Utility scripts documentation
-└── [Other system documentation files...]
+├── README.md (this file) - Main documentation hub
+├── game-systems/  - Wavelength Gems game documentation
+│   ├── WAVELENGTH_GEMS_GETTING_STARTED.md    (420 lines - Developer onboarding)
+│   ├── GAME_LEVEL_SYSTEM_SUMMARY.md          (510 lines - Project overview)
+│   ├── LEVEL_SYSTEM_GUIDE.md                 (450 lines - Complete reference)
+│   └── LEVEL_SYSTEM_README.md                (300 lines - Quick reference)
+├── scripts/  - Utility scripts and automation
+└── [50+ other platform documentation files]  - Systems, features, guides, etc.
 ```
 
-## Documentation Sections
+## Documentation Categories
 
-### 🎮 [Wavelength Gems - Match-3 Game](game-systems/)
+### 🎮 Game Systems
+Located in `/game-systems/` directory
 
-**Getting Started**: Start here if you're new to game development
-- **File**: [`game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md`](game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md)
-- **Contents**: Overview, quick start, file organization, common tasks
-- **Audience**: Developers, designers, new team members
+- **[Wavelength Gems - Match-3 Game](game-systems/)**
+  - Getting started guide
+  - Level system architecture
+  - Implementation roadmap
+  - Code reference
 
-**Project Summary**: Executive overview of the level system
-- **File**: [`game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md`](game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md)
-- **Contents**: Implementation status, architecture, benefits, roadmap
-- **Audience**: Project managers, decision makers, developers
+### 🛠️ Platform Systems
+Located in root docs directory
 
-**Comprehensive Guide**: Complete reference documentation
-- **File**: [`game-systems/LEVEL_SYSTEM_GUIDE.md`](game-systems/LEVEL_SYSTEM_GUIDE.md)
-- **Contents**: Full schema, usage examples, best practices, troubleshooting
-- **Audience**: Developers implementing features
+- **Content & Lore Systems** - Episode, character, location management
+- **Security & Admin** - Authorization, access controls, administration
+- **Database & Backups** - Firebase, backup strategies, recovery
+- **Deployment & Infrastructure** - Deployment pipeline, hosting, monitoring
+- **UI & Components** - Component structure, specifications, documentation
+- **Authentication & Sessions** - Login, session management, OAuth
+- **Forum & Community** - Discussion system, moderation, features
+- **Tools & Scripts** - Automation, debugging, utilities
 
-**Quick Reference**: Code examples and API reference
-- **File**: [`game-systems/LEVEL_SYSTEM_README.md`](game-systems/LEVEL_SYSTEM_README.md)
-- **Contents**: API usage, level structure, testing examples
-- **Audience**: Developers writing code
+## Finding Documentation
 
-## Quick Navigation
+### By Topic
 
-### I want to learn about...
+| Topic | Files | Location |
+|-------|-------|----------|
+| Wavelength Gems Game | 4 guides (1,680 lines) | `/game-systems/` |
+| Content & Lore | Lore system, character references | Root docs |
+| Security | Admin access, incident response, analysis | Root docs |
+| Database | Firebase setup, backups, recovery | Root docs |
+| Deployment | Pipeline, infrastructure, troubleshooting | Root docs |
+| UI/UX | Components, specifications, structure | Root docs |
+| Authentication | Login, sessions, Firebase auth | Root docs |
+| Forum System | Categories, delete, functionality | Root docs |
 
-**Wavelength Gems Game**
-→ Start with [`game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md`](game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md)
+### By Role
 
-**Game Level System Architecture**
-→ Read [`game-systems/LEVEL_SYSTEM_GUIDE.md`](game-systems/LEVEL_SYSTEM_GUIDE.md)
+| Role | Start Here |
+|------|-----------|
+| **Game Developer** | [`game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md`](game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md) |
+| **Game Designer** | [`game-systems/LEVEL_SYSTEM_GUIDE.md`](game-systems/LEVEL_SYSTEM_GUIDE.md) |
+| **Game Manager** | [`game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md`](game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md) |
+| **Backend Developer** | Look for API, database, and system docs in root |
+| **Frontend Developer** | Look for UI component and feature docs in root |
+| **DevOps/Infrastructure** | Look for deployment and infrastructure docs in root |
+| **Content Manager** | Look for content creation and visibility docs in root |
+| **Admin/Security** | Look for admin, security, and access docs in root |
 
-**Game Project Status & Overview**
-→ Read [`game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md`](game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md)
+## Featured Documentation
 
-**Game API & Code Examples**
-→ Read [`game-systems/LEVEL_SYSTEM_README.md`](game-systems/LEVEL_SYSTEM_README.md)
+### 📚 Newest: Wavelength Gems Game System (October 22, 2024)
 
-**Implementing Phase 2 (Visual Theming)**
-→ See Phase 2 checklist in [`game-systems/LEVEL_SYSTEM_GUIDE.md`](game-systems/LEVEL_SYSTEM_GUIDE.md)
+**Status**: Phase 1 Complete, Phases 2-5 Ready
 
-**All Platform Documentation**
-→ Browse the docs directory - documentation exists for all major systems
+**Contents**: Complete game level system with episode integration
 
-## Game Systems Documentation Overview
+**Location**: [`game-systems/`](game-systems/)
 
-| Document | Purpose | Location | Audience |
-|----------|---------|----------|----------|
-| WAVELENGTH_GEMS_GETTING_STARTED.md | Onboarding guide | game-systems/ | New developers, designers |
-| GAME_LEVEL_SYSTEM_SUMMARY.md | Project overview | game-systems/ | Managers, team leads |
-| LEVEL_SYSTEM_GUIDE.md | Complete reference | game-systems/ | Developers, implementers |
-| LEVEL_SYSTEM_README.md | Quick reference | game-systems/ | Code developers |
+**Quick Links**:
+- [Getting Started](game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md) - New developers
+- [Complete Guide](game-systems/LEVEL_SYSTEM_GUIDE.md) - Implementers
+- [Project Summary](game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md) - Managers
+- [Quick Reference](game-systems/LEVEL_SYSTEM_README.md) - Developers
 
-## Implementation Status
+### 📖 Other Documentation
 
-### ✅ Phase 1: Level Schema & Configuration (COMPLETE)
-- Level schema documentation
-- 11 level configurations
-- Engine integration
-- Complete documentation
+Browse the docs directory for 50+ other guides covering all platform systems.
 
-### 📋 Phase 2: Visual Theming (READY)
-Estimated: 4-6 hours
+## How This Documentation Is Organized
 
-### 🔄 Phases 3-5 (READY)
-See documentation for details
+1. **Root Directory** - Platform-wide documentation
+   - 50+ guides covering all major systems
+   - Organized by topic (security, auth, deployment, etc.)
+   - Updated regularly
 
-## Key Concepts
+2. **game-systems/** - Game-specific documentation
+   - Wavelength Gems match-3 game
+   - Level system architecture
+   - Implementation guides
+   - Code examples
 
-### Levels
-Game configurations tied to episodes. Each level has:
-- Episode reference (episodeKey)
-- Difficulty (tutorial → legend)
-- Objectives (primary + secondary)
-- Visual theme (colors, images, particles)
-- Narrative context (briefings, lore)
+3. **scripts/** - Automation and utilities
+   - Script documentation
+   - Usage guides
+   - Helper tools
 
-### Episodes
-Content from the Wavelength Lore series stored in Firebase. Levels automatically inherit episode metadata.
+## Quick Links
 
-### Difficulty Progression
-6 levels: Tutorial (easy) → Legend (expert) with scaling moves, scores, gem types
-
-## Code Location
-
-### Schema & Configuration
-- `level-schema.js` - Level schema documentation
-- `levels.js` - 11 level definitions
-
-**Location**: `static/js/games/wavelength-gems/`
-
-### Game Engine
-- `engine.js` - Game logic with level support
-  - `loadLevel(levelNumber)` - Load level configuration
-  - `initGame(levelNumber)` - Initialize with level
-
-**Location**: `static/js/games/wavelength-gems/`
-
-## Resources
-
-### Official Files
-- **Schema Documentation**: `static/js/games/wavelength-gems/level-schema.js`
-- **Level Definitions**: `static/js/games/wavelength-gems/levels.js`
-- **Game Engine**: `static/js/games/wavelength-gems/engine.js`
-
-### Documentation
-- **Complete Guide**: `docs/game-systems/LEVEL_SYSTEM_GUIDE.md`
-- **Quick Reference**: `docs/game-systems/LEVEL_SYSTEM_README.md`
-- **Getting Started**: `docs/game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md`
-- **Project Summary**: `docs/game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md`
-
-## Next Steps
-
-### For Developers
-1. Read `docs/game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md`
-2. Review `docs/game-systems/LEVEL_SYSTEM_GUIDE.md`
-3. Start Phase 2 (Visual Theming)
-
-### For Designers
-1. Review level definitions in `levels.js`
-2. Understand difficulty progression in documentation
-3. Create custom levels following the examples
-
-### For Project Managers
-1. Read `docs/game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md` for overview
-2. Check implementation checklist for timeline
-3. Review phases 2-5 for dependencies and sequencing
-
-## Questions?
-
-### About the Level System
-See: `docs/game-systems/LEVEL_SYSTEM_README.md`
-
-### How to Implement Features
-See: `docs/game-systems/LEVEL_SYSTEM_GUIDE.md`
-
-### Getting Started with Development
-See: `docs/game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md`
-
-### Project Overview & Status
-See: `docs/game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md`
+| Need | Find |
+|------|------|
+| Game development help | `docs/game-systems/` |
+| Security/Admin access | Search root docs for ADMIN, SECURITY |
+| Database/Firebase | Search root docs for DATABASE, FIREBASE, BACKUP |
+| Deployment help | Search root docs for DEPLOYMENT |
+| UI/Component info | Search root docs for UI |
+| Authentication | Search root docs for AUTH, LOGIN, SESSION |
+| Content/Lore system | Search root docs for CONTENT, LORE, EPISODE |
 
 ---
 
 **Last Updated**: October 22, 2024
-**Status**: Phase 1 Complete | Phases 2-5 Ready
-**Total Documentation**: 1,680+ lines across 4 comprehensive guides
+**Documentation**: 50+ comprehensive guides + 1,680 lines of new game documentation
+**Status**: Actively maintained, regularly updated
