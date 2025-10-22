@@ -25,7 +25,7 @@ levels:
       accentColor: "#FFA500"         # Orange
       backgroundImage: /static/images/characters/wavelength/MyLuckyCharm-02.webp
       backgroundOpacity: 0.12
-      heroImage: /static/images/characters/wavelength/MyLuckyCharm-02.webp
+      heroImage: /static/images/characters/wavelength/lucky_closeup.webp
       carouselImages:
         - /static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.webp
         - /static/images/characters/wavelength/MyLuckyCharm-02.webp

@@ -1215,28 +1215,42 @@ async function loadLevel(levelNumber) {
         gameBackgroundManager.setWeather(weather);
     }
 
-    // Load hero image
+    // Load hero image (sidebar and badge)
     if (levelConfig.theme?.heroImage) {
+        // Sidebar hero image
         const heroImageElement = document.getElementById('heroImage');
         const heroImageCard = document.getElementById('heroImageCard');
+        
+        // Hero badge (on canvas)
+        const heroBadgeImage = document.getElementById('heroBadgeImage');
+        const heroBadge = document.getElementById('heroBadge');
+        
         console.log('🖼️ Loading hero image:', levelConfig.theme.heroImage);
-        console.log('🖼️ Hero image element:', heroImageElement);
-        console.log('🖼️ Hero card element:', heroImageCard);
+        
+        // Load sidebar version
         if (heroImageElement && heroImageCard) {
             heroImageElement.src = levelConfig.theme.heroImage;
             heroImageElement.alt = `${levelConfig.title} Hero`;
             heroImageCard.style.display = 'block';
-            console.log('✅ Hero image loaded successfully');
+            console.log('✅ Sidebar hero image loaded');
+        }
+        
+        // Load badge version (next to game board)
+        if (heroBadgeImage && heroBadge) {
+            heroBadgeImage.src = levelConfig.theme.heroImage;
+            heroBadgeImage.alt = `${levelConfig.title} Hero`;
+            heroBadge.style.display = 'block';
+            console.log('✅ Hero badge loaded');
         } else {
-            console.warn('⚠️ Hero image elements not found in DOM');
+            console.warn('⚠️ Hero badge elements not found in DOM');
         }
     } else {
         console.log('ℹ️ No hero image defined for this level');
-        // Hide hero image card if no hero image defined
+        // Hide hero elements if no hero image defined
         const heroImageCard = document.getElementById('heroImageCard');
-        if (heroImageCard) {
-            heroImageCard.style.display = 'none';
-        }
+        const heroBadge = document.getElementById('heroBadge');
+        if (heroImageCard) heroImageCard.style.display = 'none';
+        if (heroBadge) heroBadge.style.display = 'none';
     }
 
     // Update sidebar information
