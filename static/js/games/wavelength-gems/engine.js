@@ -1219,12 +1219,19 @@ async function loadLevel(levelNumber) {
     if (levelConfig.theme?.heroImage) {
         const heroImageElement = document.getElementById('heroImage');
         const heroImageCard = document.getElementById('heroImageCard');
+        console.log('🖼️ Loading hero image:', levelConfig.theme.heroImage);
+        console.log('🖼️ Hero image element:', heroImageElement);
+        console.log('🖼️ Hero card element:', heroImageCard);
         if (heroImageElement && heroImageCard) {
             heroImageElement.src = levelConfig.theme.heroImage;
             heroImageElement.alt = `${levelConfig.title} Hero`;
             heroImageCard.style.display = 'block';
+            console.log('✅ Hero image loaded successfully');
+        } else {
+            console.warn('⚠️ Hero image elements not found in DOM');
         }
     } else {
+        console.log('ℹ️ No hero image defined for this level');
         // Hide hero image card if no hero image defined
         const heroImageCard = document.getElementById('heroImageCard');
         if (heroImageCard) {

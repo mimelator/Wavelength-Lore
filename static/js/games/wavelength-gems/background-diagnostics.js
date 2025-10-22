@@ -30,6 +30,7 @@ class BackgroundDiagnostics {
         this.checkVisibility();
         this.checkImageLoading();
         this.checkAnimations();
+        this.checkHeroImage();
         this.analyzeIssues();
         this.printReport();
         
@@ -319,10 +320,122 @@ class BackgroundDiagnostics {
     }
 
     /**
+     * Check hero image elements and visibility
+     */
+    checkHeroImage() {
+        console.log('🖼️  7. HERO IMAGE DIAGNOSTIC');
+
+        const heroCard = document.getElementById('heroImageCard');
+        const heroImg = document.getElementById('heroImage');
+        const rightSidebar = document.querySelector('.game-sidebar.right-sidebar');
+        const leftSidebar = document.querySelector('.game-sidebar.left-sidebar');
+        
+        // Check viewport width
+        const viewportWidth = window.innerWidth;
+        const breakpoint = 1200;
+        const sidebarsVisible = viewportWidth >= breakpoint;
+        
+        console.log(`   📐 Viewport Width: ${viewportWidth}px`);
+        console.log(`   📏 Sidebar Breakpoint: ${breakpoint}px`);
+        console.log(`   👁️  Sidebars Should Be Visible: ${sidebarsVisible ? 'YES' : 'NO (viewport too narrow)'}`);
+        console.log('');
+        
+        // Check element existence
+        this.results.heroImage = {
+            viewportWidth,
+            sidebarsVisible,
+            elements: {
+                heroCard: !!heroCard,
+                heroImg: !!heroImg,
+                rightSidebar: !!rightSidebar,
+                leftSidebar: !!leftSidebar
+            }
+        };
+        
+        console.log('   📋 Element Check:');
+        console.log(`      Hero Image Card: ${heroCard ? '✅ EXISTS' : '❌ MISSING'}`);
+        console.log(`      Hero Image Element: ${heroImg ? '✅ EXISTS' : '❌ MISSING'}`);
+        console.log(`      Right Sidebar: ${rightSidebar ? '✅ EXISTS' : '❌ MISSING'}`);
+        console.log(`      Left Sidebar: ${leftSidebar ? '✅ EXISTS' : '❌ MISSING'}`);
+        console.log('');
+        
+        if (!heroCard || !heroImg) {
+            this.results.issues.push('Hero image elements missing from DOM');
+            console.log('   ❌ CRITICAL: Hero image elements not found in DOM');
+            console.log('');
+            return;
+        }
+        
+        // Check computed styles
+        const heroCardStyles = window.getComputedStyle(heroCard);
+        const heroImgStyles = window.getComputedStyle(heroImg);
+        const rightSidebarStyles = rightSidebar ? window.getComputedStyle(rightSidebar) : null;
+        
+        console.log('   🎨 Computed Styles:');
+        console.log(`      Hero Card Display: ${heroCardStyles.display}`);
+        console.log(`      Hero Card Visibility: ${heroCardStyles.visibility}`);
+        console.log(`      Hero Card Opacity: ${heroCardStyles.opacity}`);
+        console.log(`      Hero Img Src: ${heroImg.src || '(empty)'}`);
+        console.log(`      Hero Img Display: ${heroImgStyles.display}`);
+        console.log(`      Hero Img Width x Height: ${heroImgStyles.width} x ${heroImgStyles.height}`);
+        
+        if (rightSidebarStyles) {
+            console.log(`      Right Sidebar Display: ${rightSidebarStyles.display}`);
+            console.log(`      Right Sidebar Visibility: ${rightSidebarStyles.visibility}`);
+        }
+        console.log('');
+        
+        // Check if hero image is loaded
+        const imgLoaded = heroImg.complete && heroImg.naturalHeight !== 0;
+        console.log('   📷 Image Status:');
+        console.log(`      Image Loaded: ${imgLoaded ? '✅ YES' : '❌ NO'}`);
+        console.log(`      Image Complete: ${heroImg.complete}`);
+        console.log(`      Natural Dimensions: ${heroImg.naturalWidth}x${heroImg.naturalHeight}`);
+        console.log('');
+        
+        // Check level config
+        if (typeof gameState !== 'undefined' && gameState.levelConfig) {
+            const hasHeroImage = !!gameState.levelConfig.theme?.heroImage;
+            console.log('   📦 Level Configuration:');
+            console.log(`      Current Level: ${gameState.level}`);
+            console.log(`      Hero Image Defined: ${hasHeroImage ? 'YES' : 'NO'}`);
+            if (hasHeroImage) {
+                console.log(`      Hero Image Path: ${gameState.levelConfig.theme.heroImage}`);
+            }
+            console.log('');
+        }
+        
+        // Analyze issues
+        console.log('   🔍 Analysis:');
+        
+        if (!sidebarsVisible) {
+            this.results.issues.push(`Viewport too narrow (${viewportWidth}px < ${breakpoint}px) - sidebars hidden by CSS media query`);
+            console.log(`      ⚠️  ISSUE: Viewport is ${viewportWidth}px, but sidebars require ${breakpoint}px minimum`);
+            console.log('      💡 FIX: Widen browser window OR adjust CSS breakpoint');
+        } else if (rightSidebarStyles && rightSidebarStyles.display === 'none') {
+            this.results.issues.push('Right sidebar is hidden despite viewport being wide enough');
+            console.log('      ⚠️  ISSUE: Right sidebar hidden even though viewport is wide enough');
+        } else if (heroCardStyles.display === 'none') {
+            this.results.issues.push('Hero card is explicitly hidden');
+            console.log('      ⚠️  ISSUE: Hero card display is set to none');
+        } else if (!heroImg.src || heroImg.src === window.location.href) {
+            this.results.issues.push('Hero image src is empty or invalid');
+            console.log('      ⚠️  ISSUE: Hero image has no valid src attribute');
+        } else if (!imgLoaded) {
+            this.results.issues.push('Hero image failed to load');
+            console.log('      ⚠️  ISSUE: Hero image not loading properly');
+        } else {
+            console.log('      ✅ Hero image should be visible!');
+        }
+        
+        console.log('');
+    }
+
+    /**
      * Analyze issues and provide recommendations
      */
     analyzeIssues() {
-        console.log('🔧 7. ISSUE ANALYSIS');
+        console.log('🔧 8. ISSUE ANALYSIS');
 
         if (this.results.issues.length === 0) {
             console.log('   ✅ No issues detected!');
