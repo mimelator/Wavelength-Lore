@@ -94,7 +94,7 @@
 }
 
 /* Hide sidebars on mobile/tablet */
-@media (max-width: 1200px) {
+@media (max-width: 1000px) {
     .gems-game-layout {
         grid-template-columns: 1fr;
         gap: 0;

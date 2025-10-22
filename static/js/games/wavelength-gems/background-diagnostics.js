@@ -332,7 +332,7 @@ class BackgroundDiagnostics {
         
         // Check viewport width
         const viewportWidth = window.innerWidth;
-        const breakpoint = 1200;
+        const breakpoint = 1000;
         const sidebarsVisible = viewportWidth >= breakpoint;
         
         console.log(`   📐 Viewport Width: ${viewportWidth}px`);
