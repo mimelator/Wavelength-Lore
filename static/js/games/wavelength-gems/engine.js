@@ -169,7 +169,7 @@ let canvasManager = {
     },
 
     /**
-     * Start animation loop
+     * Start continuous animation loop
      */
     startAnimationLoop() {
         const animate = (currentTime) => {
@@ -179,10 +179,8 @@ let canvasManager = {
             // Redraw canvas
             this.draw();
 
-            // Continue loop if animations are active
-            if (animationSystem.isAnimating()) {
-                animationSystem.animationFrameId = requestAnimationFrame(animate);
-            }
+            // Continue loop if animations are active (always use RAF for smooth rendering)
+            animationSystem.animationFrameId = requestAnimationFrame(animate);
         };
 
         // Start the loop
@@ -468,7 +466,7 @@ let animationSystem = {
     },
 
     /**
-     * Update and draw score popups
+     * Update score popups
      */
     updateScorePopups(currentTime) {
         const toRemove = [];
@@ -476,15 +474,16 @@ let animationSystem = {
         for (let i = 0; i < this.scorePopups.length; i++) {
             const popup = this.scorePopups[i];
             const elapsed = currentTime - popup.startTime;
-            const progress = elapsed / popup.duration;
+            const progress = Math.max(0, elapsed / popup.duration);
 
             if (progress >= 1) {
+                // Mark for removal
                 toRemove.push(i);
-            } else {
-                // Move up with fade
-                popup.currentY = popup.y - (progress * 60); // Move up 60px
-                popup.opacity = 1 - progress; // Fade out
             }
+
+            // Always calculate position and opacity (even if > 1, for smooth final frame)
+            popup.currentY = popup.y - (progress * 60); // Move up 60px
+            popup.opacity = Math.max(0, 1 - progress); // Fade out (never negative)
         }
 
         // Remove completed popups (in reverse order to maintain indices)
@@ -626,10 +625,10 @@ let animationSystem = {
     },
 
     /**
-     * Check if any animations are active
+     * Check if any animations or popups are active
      */
     isAnimating() {
-        return this.activeAnimations.size > 0;
+        return this.activeAnimations.size > 0 || this.scorePopups.length > 0;
     }
 };
 
