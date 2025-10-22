@@ -1171,14 +1171,14 @@ if (typeof GameBackgroundManager !== 'undefined') {
 /**
  * Load a specific level by level number
  */
-function loadLevel(levelNumber) {
+async function loadLevel(levelNumber) {
     // Get level configuration from LEVELS array (from levels.js)
     if (typeof getLevel === 'undefined') {
         console.warn('⚠️ Level system not loaded - using default game config');
         return null;
     }
 
-    const levelConfig = getLevel(levelNumber);
+    const levelConfig = await getLevel(levelNumber);
     if (!levelConfig) {
         console.error(`❌ Level ${levelNumber} not found`);
         return null;
@@ -1319,14 +1319,14 @@ function updateSidebarInfo(levelConfig) {
 /**
  * Initialize a new game
  */
-function initGame(levelNumber = 1) {
+async function initGame(levelNumber = 1) {
     // Log page load state FIRST thing - use multiple console methods to ensure visibility
     const loadTime = performance.now();
     const isMobile = window.innerWidth <= 768;
     const timestamp = new Date().toLocaleTimeString();
 
-    // Use different console methods to ensure at least one is visible
-    console.error(`🚨 GEMS GAME INIT - ${timestamp} - Viewport: ${window.innerWidth}px, Mobile: ${isMobile}`);
+    // Log initialization info
+    console.log(`✅ GEMS GAME INIT - ${timestamp} - Viewport: ${window.innerWidth}px, Mobile: ${isMobile}`);
     console.log(`════════════════════════════════════════`);
     console.log(`🎮 WAVELENGTH GEMS INITIALIZING`);
     console.log(`⏱️  Load Time: ${loadTime.toFixed(0)}ms | Viewport: ${window.innerWidth}x${window.innerHeight}px | Mobile: ${isMobile}`);
@@ -1344,6 +1344,7 @@ function initGame(levelNumber = 1) {
     gameState = {
         board: [],
         selectedGem: null,
+        highlightAnimationStartTime: 0,
         score: 0,
         level: levelNumber,
         levelConfig: null,
@@ -1361,9 +1362,9 @@ function initGame(levelNumber = 1) {
         gemTypes: [] // Will be set by loadLevel
     };
 
-    // Load level configuration if level system is available
+    // Load level configuration if level system is available (AWAIT this!)
     if (typeof getLevel === 'function') {
-        loadLevel(levelNumber);
+        await loadLevel(levelNumber);
     } else {
         console.warn('⚠️ Level system not loaded - using default settings');
     }
@@ -2708,6 +2709,16 @@ async function loadLevelProgress() {
             }
         });
 
+        // Check if response is ok before parsing JSON
+        if (!response.ok) {
+            if (response.status === 404) {
+                console.log('📊 No level progress found yet (new player)');
+                return null;
+            }
+            console.warn(`⚠️ Failed to load level progress: ${response.status} ${response.statusText}`);
+            return null;
+        }
+
         const data = await response.json();
         if (data.success) {
             console.log('📊 Level progress loaded:', data.progress);
@@ -3070,20 +3081,20 @@ function generateStarsHTML(stars) {
 /**
  * Load next level
  */
-function loadNextLevel() {
-    const nextLevel = getNextLevel(gameState.level);
+async function loadNextLevel() {
+    const nextLevel = await getNextLevel(gameState.level);
     if (nextLevel) {
         closeLevelModal();
-        initGame(nextLevel.level);
+        await initGame(nextLevel.level);
     }
 }
 
 /**
  * Retry current level
  */
-function retryLevel() {
+async function retryLevel() {
     closeLevelModal();
-    initGame(gameState.level);
+    await initGame(gameState.level);
 }
 
 /**
@@ -3127,12 +3138,32 @@ async function showLevelSelectionMenu() {
     // Load user's level progress
     const userProgress = await loadLevelProgress() || {};
     
-    const allLevels = getAllLevels();
+    // Build completed levels array for unlocking check
+    const completedLevels = Object.keys(userProgress)
+        .filter(levelNum => userProgress[levelNum]?.status === 'completed')
+        .map(levelNum => parseInt(levelNum));
+    
+    const allLevels = await getAllLevels();
     const levelsHTML = allLevels.map(level => {
         const levelProgress = userProgress[level.level];
         const stars = levelProgress?.bestStars || 0;
         const completed = levelProgress?.status === 'completed';
         const starsHTML = generateStarsHTML(stars);
+        
+        // Check if level is unlocked (Level 1 always unlocked, others need previous completed)
+        const isUnlocked = level.level === 1 || completedLevels.includes(level.level - 1);
+        
+        // If locked, show a different button style
+        if (!isUnlocked) {
+            return `
+                <button class="level-button locked" disabled>
+                    <div class="level-number">Level ${level.level}</div>
+                    <div class="level-title">${level.title}</div>
+                    <div class="level-locked">🔒 Locked</div>
+                    <div class="level-unlock-hint">Complete Level ${level.level - 1}</div>
+                </button>
+            `;
+        }
         
         return `
             <button class="level-button ${completed ? 'completed' : ''}" onclick="startLevel(${level.level})">
@@ -3160,9 +3191,9 @@ async function showLevelSelectionMenu() {
 /**
  * Start a specific level
  */
-function startLevel(levelNumber) {
+async function startLevel(levelNumber) {
     closeLevelSelectionModal();
-    initGame(levelNumber);
+    await initGame(levelNumber);
 }
 
 /**

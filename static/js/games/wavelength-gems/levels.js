@@ -1,11 +1,8 @@
 /**
- * Wavelength Gems - Level Configuration Data
+ * Wavelength Gems - Level Configuration Loader
  *
- * This file contains the actual level definitions for the game.
- * Each level is tied to an episode from the Wavelength Lore series.
- *
- * Levels are automatically generated from episode data, but can be
- * manually customized here for game-specific balance and theming.
+ * This file loads level definitions from the server's YAML configuration.
+ * Levels are tied to episodes from the Wavelength Lore series.
  *
  * Structure:
  * - Season 1: Episodes 1-11 (Levels 1-11)
@@ -15,14 +12,46 @@
  */
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HELPER FUNCTION: CREATE LEVEL FROM TEMPLATE
+// LEVEL DATA STORAGE
 // ═════════════════════════════════════════════════════════════════════════════
 
+let LEVELS = [];
+let levelsLoaded = false;
+
 /**
- * Helper to create a level with defaults from difficulty config
- * Reduces repetition and makes levels easy to maintain
+ * Load levels from server
+ * @returns {Promise<Array>} Array of level configurations
  */
-function createLevel(override) {
+async function loadLevelsFromServer() {
+    if (levelsLoaded && LEVELS.length > 0) {
+        return LEVELS;
+    }
+    
+    try {
+        const response = await fetch('/api/games/wavelength-gems/levels');
+        const data = await response.json();
+        
+        if (data.success && data.levels) {
+            LEVELS = data.levels.map(level => applyDefaults(level));
+            levelsLoaded = true;
+            console.log(`✅ Loaded ${LEVELS.length} levels from server`);
+            return LEVELS;
+        } else {
+            console.error('Failed to load levels:', data.error);
+            return [];
+        }
+    } catch (error) {
+        console.error('Error loading levels from server:', error);
+        return [];
+    }
+}
+
+/**
+ * Apply default values to a level configuration
+ * @param {Object} level - Level data from YAML
+ * @returns {Object} Level with defaults applied
+ */
+function applyDefaults(level) {
     const DEFAULT_DIFFICULTY_VALUES = {
         tutorial: { moveLimit: 50, targetScore: 500, gemTypeCount: 3, cascadeBonus: 1.0 },
         easy: { moveLimit: 30, targetScore: 1500, gemTypeCount: 4, cascadeBonus: 1.2 },
@@ -32,17 +61,18 @@ function createLevel(override) {
         legend: { moveLimit: 10, targetScore: 7500, gemTypeCount: 6, cascadeBonus: 3.0 }
     };
 
-    const difficulty = override.difficulty || 'easy';
+    const difficulty = level.difficulty || 'easy';
     const baseValues = DEFAULT_DIFFICULTY_VALUES[difficulty];
 
     return {
-        // Defaults
-        season: 1,
-        episode: 1,
-        level: 1,
-        title: "Level",
-        description: "",
+        // Apply defaults with YAML data override
+        season: level.season || 1,
+        episode: level.episode || 1,
+        level: level.level || 1,
+        title: level.title || "Level",
+        description: level.description || "",
         difficulty: difficulty,
+        episodeKey: level.episodeKey || null,
         theme: {
             primaryColor: "#8B5CF6",
             secondaryColor: "#EC4899",
@@ -52,15 +82,18 @@ function createLevel(override) {
             carouselImages: [],
             particleEffect: null,
             borderGlowColor: "#8B5CF6",
-            borderGlowIntensity: 0.5
+            borderGlowIntensity: 0.5,
+            ...(level.theme || {})
         },
+        gemThemes: level.gemThemes || {},
         objectives: {
             primary: {
                 type: "score",
                 target: baseValues.targetScore,
-                description: `Reach ${baseValues.targetScore} points`
+                description: `Reach ${baseValues.targetScore} points`,
+                ...(level.objectives?.primary || {})
             },
-            secondary: []
+            secondary: level.objectives?.secondary || []
         },
         constraints: {
             moveLimit: baseValues.moveLimit,
@@ -68,20 +101,23 @@ function createLevel(override) {
             cascadeLimit: 10,
             gemTypes: ["daphne", "jasper", "miles", "ivy", "echo", "atlas"],
             gemTypeCount: baseValues.gemTypeCount,
-            boardSize: { rows: 8, cols: 8 }
+            boardSize: { rows: 8, cols: 8 },
+            ...(level.constraints || {})
         },
         narrative: {
             briefing: "",
             storySegments: [],
             loreReference: null,
             characters: [],
-            locations: []
+            locations: [],
+            ...(level.narrative || {})
         },
         progression: {
             unlockRequirements: {
                 previousLevel: null,
                 minimumScore: null,
-                playtime: null
+                playtime: null,
+                ...(level.progression?.unlockRequirements || {})
             },
             rewards: {
                 points: 500,
@@ -104,299 +140,9 @@ function createLevel(override) {
             author: "Game Design Team",
             version: "1.0",
             status: "active"
-        },
-
-        // Apply overrides
-        ...override
+        }
     };
 }
-
-// ═════════════════════════════════════════════════════════════════════════════
-// SEASON 1 LEVELS (Episodes 1-11)
-// ═════════════════════════════════════════════════════════════════════════════
-
-const LEVELS = [
-    // Level 1: My Lucky Charm
-    createLevel({
-        level: 1,
-        season: 1,
-        episode: 1,
-        episodeKey: "season1/episode1",
-        title: "My Lucky Charm",
-        description: "Lucky the Leprechaun has blessed the Shire! Match gems to spread joy and positivity across the land.",
-        difficulty: "easy",
-        theme: {
-            primaryColor: "#FFD700",        // Gold
-            secondaryColor: "#10B981",      // Green (Irish)
-            accentColor: "#FFA500",         // Orange
-            backgroundImage: "/static/images/characters/wavelength/MyLuckyCharm-02.webp",
-            backgroundOpacity: 0.12,
-            carouselImages: [
-                "/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.webp",
-                "/static/images/characters/wavelength/MyLuckyCharm-02.webp",
-                "/static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.webp"
-            ],
-            particleEffect: "lucky_sparkles",
-            borderGlowColor: "#FFD700",
-            borderGlowIntensity: 0.6
-        },
-        // Episode 1 themed gems - Irish/Lucky symbols
-        gemThemes: {
-            'daphne': '🍀',  // Four-leaf clover (lucky)
-            'jasper': '🧲',  // Horseshoe (luck & protection)
-            'miles': '🎵',   // Music note (Wavelength theme)
-            'ivy': '🌈'      // Rainbow (pot of gold)
-        },
-        objectives: {
-            primary: {
-                type: "score",
-                target: 2500, // Increased from 1500 for more challenge
-                description: "Reach 2500 points"
-            },
-            secondary: [
-                {
-                    type: "cascades",
-                    target: 3, // Increased from 2 to require more combos
-                    description: "Trigger 3 cascade combos",
-                    reward: { points: 300, stars: 1 }
-                }
-            ]
-        },
-        constraints: {
-            moveLimit: 30,
-            gemTypes: ["daphne", "jasper", "miles", "ivy"],
-            gemTypeCount: 4
-        },
-        narrative: {
-            briefing: "Lucky the Leprechaun appears with a mischievous grin, offering to bless the Shire with good fortune. Match gems to harness the magic!",
-            loreReference: "season1/episode1",
-            characters: ["Lucky", "Shire Folk"],
-            locations: ["The Shire"]
-        },
-        progression: {
-            unlockRequirements: {
-                previousLevel: null
-            }
-        }
-    }),
-
-    // Level 2: Prepare for Battle
-    createLevel({
-        level: 2,
-        season: 1,
-        episode: 2,
-        episodeKey: "season1/episode2",
-        title: "Prepare for Battle",
-        description: "The Goblin King's forces approach! Prepare Wavelength for the coming conflict by mastering gem combinations.",
-        difficulty: "easy",
-        theme: {
-            primaryColor: "#EF4444",        // Red (battle)
-            secondaryColor: "#1F2937",      // Dark gray
-            accentColor: "#FBBF24",         // Amber
-            backgroundImage: "/static/images/characters/wavelength/PrepareForBattle-14.webp",
-            backgroundOpacity: 0.12,
-            particleEffect: null,
-            borderGlowColor: "#EF4444",
-            borderGlowIntensity: 0.5
-        },
-        objectives: {
-            primary: {
-                type: "score",
-                target: 2000,
-                description: "Reach 2000 points"
-            },
-            secondary: [
-                {
-                    type: "cascades",
-                    target: 3,
-                    description: "Trigger 3 cascade combos",
-                    reward: { points: 300, stars: 1 }
-                }
-            ]
-        },
-        constraints: {
-            moveLimit: 28,
-            gemTypes: ["daphne", "jasper", "miles", "ivy", "echo"],
-            gemTypeCount: 5
-        },
-        narrative: {
-            briefing: "Danger looms! Prepare yourself by demonstrating your gem-matching prowess. Focus and stay alert!",
-            loreReference: "season1/episode2",
-            characters: ["Wavelength", "Goblin King"],
-            locations: ["The Shire", "Goblin Kingdom"]
-        },
-        progression: {
-            unlockRequirements: {
-                previousLevel: 1
-            }
-        }
-    }),
-
-    // Level 3: The Battle Begins
-    createLevel({
-        level: 3,
-        season: 1,
-        episode: 3,
-        episodeKey: "season1/episode3",
-        title: "The Battle Begins",
-        description: "The conflict has started! Battle the Goblin King's forces with skill and determination.",
-        difficulty: "medium",
-        theme: {
-            primaryColor: "#DC2626",        // Dark Red
-            secondaryColor: "#FCD34D",      // Yellow (magic)
-            accentColor: "#BFDBFE",         // Light Blue
-            backgroundImage: "/static/images/characters/wavelength/TheBattleOfTheShire-050.webp",
-            backgroundOpacity: 0.12,
-            particleEffect: "battle_sparks",
-            borderGlowColor: "#DC2626",
-            borderGlowIntensity: 0.7
-        },
-        objectives: {
-            primary: {
-                type: "score",
-                target: 2500,
-                description: "Reach 2500 points"
-            },
-            secondary: [
-                {
-                    type: "cascades",
-                    target: 3,
-                    description: "Trigger 3 cascade combos",
-                    reward: { points: 350, stars: 1 }
-                },
-                {
-                    type: "score_without_moves",
-                    target: 1500,
-                    moveLimit: 15,
-                    description: "Score 1500 points in 15 moves",
-                    reward: { points: 500, stars: 2 }
-                }
-            ]
-        },
-        constraints: {
-            moveLimit: 25,
-            gemTypes: ["daphne", "jasper", "miles", "ivy", "echo", "atlas"],
-            gemTypeCount: 6
-        },
-        narrative: {
-            briefing: "The battle is fierce! Combine your gems wisely to overcome the Goblin King's forces. Every move counts!",
-            loreReference: "season1/episode3",
-            characters: ["Wavelength", "Goblin King", "Goblins"],
-            locations: ["The Shire", "Battle Grounds"]
-        },
-        progression: {
-            unlockRequirements: {
-                previousLevel: 2
-            }
-        }
-    }),
-
-    // Level 4-11 would continue similar pattern...
-    // Placeholder for remaining Season 1 episodes
-    createLevel({
-        level: 4,
-        season: 1,
-        episode: 4,
-        episodeKey: "season1/episode4",
-        title: "Episode 4",
-        description: "Continue your journey through Season 1.",
-        difficulty: "medium",
-        progression: {
-            unlockRequirements: { previousLevel: 3 }
-        }
-    }),
-
-    createLevel({
-        level: 5,
-        season: 1,
-        episode: 5,
-        episodeKey: "season1/episode5",
-        title: "Episode 5",
-        description: "Continue your journey through Season 1.",
-        difficulty: "medium",
-        progression: {
-            unlockRequirements: { previousLevel: 4 }
-        }
-    }),
-
-    createLevel({
-        level: 6,
-        season: 1,
-        episode: 6,
-        episodeKey: "season1/episode6",
-        title: "Episode 6",
-        description: "Continue your journey through Season 1.",
-        difficulty: "medium",
-        progression: {
-            unlockRequirements: { previousLevel: 5 }
-        }
-    }),
-
-    createLevel({
-        level: 7,
-        season: 1,
-        episode: 7,
-        episodeKey: "season1/episode7",
-        title: "Episode 7",
-        description: "Continue your journey through Season 1.",
-        difficulty: "medium",
-        progression: {
-            unlockRequirements: { previousLevel: 6 }
-        }
-    }),
-
-    createLevel({
-        level: 8,
-        season: 1,
-        episode: 8,
-        episodeKey: "season1/episode8",
-        title: "Episode 8",
-        description: "Continue your journey through Season 1.",
-        difficulty: "hard",
-        progression: {
-            unlockRequirements: { previousLevel: 7 }
-        }
-    }),
-
-    createLevel({
-        level: 9,
-        season: 1,
-        episode: 9,
-        episodeKey: "season1/episode9",
-        title: "Episode 9",
-        description: "Continue your journey through Season 1.",
-        difficulty: "hard",
-        progression: {
-            unlockRequirements: { previousLevel: 8 }
-        }
-    }),
-
-    createLevel({
-        level: 10,
-        season: 1,
-        episode: 10,
-        episodeKey: "season1/episode10",
-        title: "Episode 10",
-        description: "Continue your journey through Season 1.",
-        difficulty: "hard",
-        progression: {
-            unlockRequirements: { previousLevel: 9 }
-        }
-    }),
-
-    createLevel({
-        level: 11,
-        season: 1,
-        episode: 11,
-        episodeKey: "season1/episode11",
-        title: "Episode 11",
-        description: "Continue your journey through Season 1.",
-        difficulty: "hard",
-        progression: {
-            unlockRequirements: { previousLevel: 10 }
-        }
-    })
-];
 
 // ═════════════════════════════════════════════════════════════════════════════
 // LEVEL MANAGER FUNCTIONS
@@ -405,55 +151,58 @@ const LEVELS = [
 /**
  * Get a level by level number
  * @param {number} levelNumber - Level 1-based index
- * @returns {Object} Level configuration or null
+ * @returns {Promise<Object>} Level configuration or null
  */
-function getLevel(levelNumber) {
-    return LEVELS.find(level => level.level === levelNumber) || null;
+async function getLevel(levelNumber) {
+    const levels = await loadLevelsFromServer();
+    return levels.find(level => level.level === levelNumber) || null;
 }
 
 /**
  * Get all levels
- * @returns {Array} All level configurations
+ * @returns {Promise<Array>} All level configurations
  */
-function getAllLevels() {
-    return LEVELS;
+async function getAllLevels() {
+    return await loadLevelsFromServer();
 }
 
 /**
  * Get levels for a specific season
  * @param {number} season - Season number (1, 2, 3, etc.)
- * @returns {Array} Levels in the season
+ * @returns {Promise<Array>} Levels in the season
  */
-function getLevelsBySeason(season) {
-    return LEVELS.filter(level => level.season === season);
+async function getLevelsBySeason(season) {
+    const levels = await loadLevelsFromServer();
+    return levels.filter(level => level.season === season);
 }
 
 /**
  * Get total number of levels
- * @returns {number} Total level count
+ * @returns {Promise<number>} Total level count
  */
-function getTotalLevelCount() {
-    return LEVELS.length;
+async function getTotalLevelCount() {
+    const levels = await loadLevelsFromServer();
+    return levels.length;
 }
 
 /**
  * Get next level after specified level
  * @param {number} currentLevel - Current level number
- * @returns {Object|null} Next level or null if at end
+ * @returns {Promise<Object|null>} Next level or null if at end
  */
-function getNextLevel(currentLevel) {
+async function getNextLevel(currentLevel) {
     const nextLevelNum = currentLevel + 1;
-    return getLevel(nextLevelNum);
+    return await getLevel(nextLevelNum);
 }
 
 /**
  * Check if a level is available based on unlock requirements
  * @param {number} levelNumber - Level to check
  * @param {Object} userProgress - User's progress object { completedLevels: [], bestScores: {} }
- * @returns {boolean} Whether level is unlocked
+ * @returns {Promise<boolean>} Whether level is unlocked
  */
-function isLevelUnlocked(levelNumber, userProgress = {}) {
-    const level = getLevel(levelNumber);
+async function isLevelUnlocked(levelNumber, userProgress = {}) {
+    const level = await getLevel(levelNumber);
     if (!level) return false;
 
     const { unlockRequirements } = level.progression;
@@ -484,13 +233,12 @@ function isLevelUnlocked(levelNumber, userProgress = {}) {
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
-        LEVELS,
+        loadLevelsFromServer,
         getLevel,
         getAllLevels,
         getLevelsBySeason,
         getTotalLevelCount,
         getNextLevel,
-        isLevelUnlocked,
-        createLevel
+        isLevelUnlocked
     };
 }

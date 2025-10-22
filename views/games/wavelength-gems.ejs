@@ -489,8 +489,8 @@
         }
 
         // Initialize game on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            initGame();
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initGame();
             loadUserStats();
         });
     </script>

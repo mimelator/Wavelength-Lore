@@ -1,0 +1,145 @@
+# Wavelength Gems - Level Configuration Data
+#
+# This file contains the level definitions for the game.
+# Each level is tied to an episode from the Wavelength Lore series.
+#
+# Structure:
+# - Season 1: Episodes 1-11 (Levels 1-11)
+# - Season 2: Episodes 1-7 (Levels 12-18)
+# - Season 3: Episodes 1-2 (Levels 19-20)
+# - Season 4: Episodes 1-8 (Levels 21-28) - FUTURE
+
+levels:
+  # Level 1: My Lucky Charm
+  - level: 1
+    season: 1
+    episode: 1
+    episodeKey: season1/episode1
+    title: My Lucky Charm
+    description: Lucky the Leprechaun has blessed the Shire! Match gems to spread joy and positivity across the land.
+    difficulty: easy
+    
+    theme:
+      primaryColor: "#FFD700"        # Gold
+      secondaryColor: "#10B981"      # Green (Irish)
+      accentColor: "#FFA500"         # Orange
+      backgroundImage: /static/images/characters/wavelength/MyLuckyCharm-02.webp
+      backgroundOpacity: 0.12
+      carouselImages:
+        - /static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.webp
+        - /static/images/characters/wavelength/MyLuckyCharm-02.webp
+        - /static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-03.webp
+      particleEffect: lucky_sparkles
+      borderGlowColor: "#FFD700"
+      borderGlowIntensity: 0.6
+    
+    # Episode 1 themed gems - Irish/Lucky symbols
+    gemThemes:
+      daphne: 🍀  # Four-leaf clover (lucky)
+      jasper: 🧲  # Horseshoe (luck & protection)
+      miles: 🎵   # Music note (Wavelength theme)
+      ivy: 🌈     # Rainbow (pot of gold)
+    
+    objectives:
+      primary:
+        type: score
+        target: 2500
+        description: Reach 2500 points
+      secondary:
+        - type: cascades
+          target: 3
+          description: Trigger 3 cascade combos
+          reward:
+            points: 300
+            stars: 1
+    
+    constraints:
+      moveLimit: 30
+      gemTypes:
+        - daphne
+        - jasper
+        - miles
+        - ivy
+      gemTypeCount: 4
+    
+    narrative:
+      briefing: Lucky the Leprechaun appears with a mischievous grin, offering to bless the Shire with good fortune. Match gems to harness the magic!
+      loreReference: season1/episode1
+      characters:
+        - Lucky
+        - Shire Folk
+      locations:
+        - The Shire
+    
+    progression:
+      unlockRequirements:
+        previousLevel: null
+
+  # Level 2: Jump Right In!
+  - level: 2
+    season: 1
+    episode: 2
+    episodeKey: season1/episode2
+    title: Jump Right In!
+    description: Life is about choices, so make one and see what happens next! Match gems to embrace adventure and take action.
+    difficulty: easy
+    
+    theme:
+      primaryColor: "#3B82F6"        # Blue (adventure)
+      secondaryColor: "#F59E0B"      # Amber (sunrise/new beginnings)
+      accentColor: "#10B981"         # Green (action/go)
+      backgroundImage: /static/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-01.webp
+      backgroundOpacity: 0.12
+      carouselImages:
+        - /static/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-01.webp
+        - /static/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-10.webp
+        - /static/images/seasons/season1/episodes/episode2/images/jump_right_in.webp
+      particleEffect: null
+      borderGlowColor: "#3B82F6"
+      borderGlowIntensity: 0.6
+    
+    # Episode 2 themed gems - Adventure/Choice symbols mixed with Lucky symbols
+    gemThemes:
+      daphne: 🧭  # Compass (navigation & choices)
+      jasper: 🧲  # Horseshoe (luck & protection) - from Level 1
+      miles: ⚡   # Lightning bolt (energy & quick decisions)
+      ivy: 🌈     # Rainbow (pot of gold) - from Level 1
+      echo: 🍀    # Four-leaf clover (lucky) - from Level 1
+    
+    objectives:
+      primary:
+        type: score
+        target: 3000
+        description: Reach 3000 points
+      secondary:
+        - type: cascades
+          target: 4
+          description: Trigger 4 cascade combos
+          reward:
+            points: 400
+            stars: 1
+    
+    constraints:
+      moveLimit: 25
+      gemTypes:
+        - daphne
+        - jasper
+        - miles
+        - ivy
+        - echo
+      gemTypeCount: 5
+    
+    narrative:
+      briefing: Life is about choices! Embrace new experiences and take chances. Every move you make is a decision that shapes your journey!
+      loreReference: season1/episode2
+      characters:
+        - Wavelength
+      locations:
+        - The Road
+        - New Horizons
+    
+    progression:
+      unlockRequirements:
+        previousLevel: 1
+
+  # Levels 3-11 will be added one at a time

@@ -6,6 +6,9 @@
 const express = require('express');
 const router = express.Router();
 const { fetchDataAsAdmin, updateDataAsAdmin } = require('../helpers/firebase-admin-utils');
+const yaml = require('js-yaml');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * Submit a game score
@@ -423,6 +426,30 @@ router.get('/:gameId/level-progress', async (req, res) => {
         res.status(500).json({
             success: false,
             error: 'Failed to load level progress',
+            details: error.message
+        });
+    }
+});
+
+/**
+ * GET /api/games/wavelength-gems/levels
+ * Load level definitions from YAML file
+ */
+router.get('/wavelength-gems/levels', async (req, res) => {
+    try {
+        const levelsPath = path.join(__dirname, '..', 'content', 'games', 'wavelength-gems-levels.yaml');
+        const fileContents = fs.readFileSync(levelsPath, 'utf8');
+        const levelsData = yaml.load(fileContents);
+        
+        res.json({
+            success: true,
+            levels: levelsData.levels
+        });
+    } catch (error) {
+        console.error('Error loading levels:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to load levels',
             details: error.message
         });
     }

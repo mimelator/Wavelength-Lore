@@ -1086,6 +1086,31 @@
     box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
 }
 
+.level-button.locked {
+    background: linear-gradient(135deg, rgba(75, 75, 75, 0.4), rgba(50, 50, 50, 0.4));
+    border-color: rgba(100, 100, 100, 0.3);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.level-button.locked:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: rgba(100, 100, 100, 0.3);
+}
+
+.level-locked {
+    font-size: 1.5rem;
+    margin: 10px 0;
+}
+
+.level-unlock-hint {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin-top: 5px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
 .level-number {
     font-size: 1.5rem;
     font-weight: bold;
