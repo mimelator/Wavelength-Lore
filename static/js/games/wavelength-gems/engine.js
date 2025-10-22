@@ -99,28 +99,45 @@ function createDebugPanel() {
             const wrapperRect = wrapperElement?.getBoundingClientRect() || {};
             const containerRect = containerElement?.getBoundingClientRect() || {};
 
-            html += `Viewport: ${window.innerWidth}px<br>`;
-            html += `Container: ${Math.round(containerRect.width)}px<br>`;
-            html += `Wrapper: ${Math.round(wrapperRect.width)}px<br>`;
-            html += `Board: ${Math.round(boardRect.width)}px<br>`;
+            const viewportWidth = window.innerWidth;
+            const containerWidth = Math.round(containerRect.width);
+            const wrapperWidth = Math.round(wrapperRect.width);
+            const boardWidth = Math.round(boardRect.width);
+
+            html += `Viewport: ${viewportWidth}px<br>`;
+            html += `Container: ${containerWidth}px<br>`;
+            html += `Wrapper: ${wrapperWidth}px<br>`;
+            html += `Board: ${boardWidth}px<br>`;
             html += `<br>`;
 
-            if (boardRect.width > window.innerWidth) {
-                html += `<span style="color: #f00;">❌ OVERFLOW: ${Math.round(boardRect.width - window.innerWidth)}px</span><br>`;
+            let status = '';
+            let overflowAmount = 0;
+            if (boardWidth > viewportWidth) {
+                html += `<span style="color: #f00;">❌ OVERFLOW: ${boardWidth - viewportWidth}px</span><br>`;
+                status = 'OVERFLOW';
+                overflowAmount = boardWidth - viewportWidth;
             } else {
-                html += `<span style="color: #0f0;">✅ FITS (margin: ${Math.round(window.innerWidth - boardRect.width)}px)</span><br>`;
+                html += `<span style="color: #0f0;">✅ FITS (margin: ${viewportWidth - boardWidth}px)</span><br>`;
+                status = 'FITS';
+                overflowAmount = viewportWidth - boardWidth;
             }
 
             // Calculate visible columns
+            let gemWidth = 0;
+            let visibleCols = 0;
             const gemElements = boardElement.querySelectorAll('.gem');
             if (gemElements.length > 0) {
                 const firstGem = gemElements[0];
                 const gemRect = firstGem.getBoundingClientRect();
-                const gemWidth = gemRect.width;
-                const visibleCols = (window.innerWidth / gemWidth).toFixed(2);
-                html += `<br>Gem width: ${Math.round(gemWidth)}px<br>`;
+                gemWidth = Math.round(gemRect.width);
+                visibleCols = (viewportWidth / gemRect.width).toFixed(2);
+                html += `<br>Gem width: ${gemWidth}px<br>`;
                 html += `Visible cols: ${visibleCols} / 8<br>`;
             }
+
+            // Log to console for copy-paste
+            const consoleData = `viewport: ${viewportWidth}px container ${containerWidth}px wrapper ${wrapperWidth}px board ${boardWidth}px ${status.toLowerCase()} ${overflowAmount}px gem width ${gemWidth}px visible cols ${visibleCols} / 8`;
+            console.log(`📊 ${consoleData}`);
         }
 
         debugPanel.innerHTML = html;
