@@ -75,16 +75,14 @@ let canvasManager = {
             // Insert canvas into gameBoard div
             const gameBoard = document.getElementById('gameBoard');
             if (gameBoard) {
-                // Preserve hero badge and goblin elements before clearing
+                // Preserve hero badge before clearing
                 const heroBadge = document.getElementById('heroBadge');
-                const goblinUnderneath = document.querySelector('.goblin-underneath');
                 
                 // Clear the board's old content
                 gameBoard.innerHTML = '';
                 
-                // Re-add preserved elements
+                // Re-add hero badge if it exists
                 if (heroBadge) gameBoard.appendChild(heroBadge);
-                if (goblinUnderneath) gameBoard.appendChild(goblinUnderneath);
                 
                 // Add canvas
                 gameBoard.appendChild(canvas);
@@ -2997,74 +2995,6 @@ function showNotification_old(message) {
 function endGame() {
     gameState.isPaused = true;
     submitScoreToFirebase();
-}
-
-/**
- * Show Goblin Glitch Easter Egg
- * "It's not a bug, it's a goblin!" 
- * Appears IN the hole at the bottom of the game board
- */
-function showGoblinGlitch() {
-    console.log('👹 showGoblinGlitch() called!');
-    
-    // Get the game board wrapper (parent of the board)
-    const boardWrapper = document.querySelector('.game-board-wrapper');
-    if (!boardWrapper) {
-        console.error('❌ Could not find .game-board-wrapper');
-        return;
-    }
-    
-    // Remove any existing goblin
-    const existingGoblin = document.querySelector('.goblin-glitch');
-    const existingTooltip = document.querySelector('.goblin-tooltip');
-    if (existingGoblin) existingGoblin.remove();
-    if (existingTooltip) existingTooltip.remove();
-    
-    // Create goblin container
-    const goblin = document.createElement('div');
-    goblin.className = 'goblin-glitch';
-    
-    // Random goblin image
-    const randomImage = GAME_CONFIG.GOBLIN_IMAGES[Math.floor(Math.random() * GAME_CONFIG.GOBLIN_IMAGES.length)];
-    goblin.innerHTML = `<img src="${randomImage}" alt="Mischievous Goblin">`;
-    
-    // Create tooltip
-    const tooltip = document.createElement('div');
-    tooltip.className = 'goblin-tooltip';
-    const randomMessage = GAME_CONFIG.GOBLIN_MESSAGES[Math.floor(Math.random() * GAME_CONFIG.GOBLIN_MESSAGES.length)];
-    tooltip.textContent = randomMessage;
-    
-    // Add to game board wrapper (so it appears over the board)
-    boardWrapper.appendChild(goblin);
-    boardWrapper.appendChild(tooltip);
-    
-    console.log('👹 Goblin elements added to DOM');
-    
-    // Animate in
-    requestAnimationFrame(() => {
-        goblin.classList.add('active');
-        tooltip.classList.add('active');
-        console.log('👹 Goblin animated in!');
-        
-        // Add glitch shake
-        setTimeout(() => {
-            goblin.classList.add('glitching');
-        }, 200);
-    });
-    
-    // Remove after 3 seconds
-    setTimeout(() => {
-        goblin.classList.remove('active', 'glitching');
-        tooltip.classList.remove('active');
-        
-        setTimeout(() => {
-            goblin.remove();
-            tooltip.remove();
-            console.log('👹 Goblin removed');
-        }, 500);
-    }, 3000);
-    
-    console.log('👹 Goblin glitch easter egg triggered!');
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
