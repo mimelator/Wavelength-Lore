@@ -13,19 +13,24 @@ Wavelength Gems is a match-3 puzzle game integrated with the Wavelength Lore nar
 ## Current Status
 
 ### ✅ Complete
-- Game engine with smooth animations and canvas rendering
+- **Phase 1:** Game engine with smooth animations and canvas rendering
 - Move highlighting for available swaps
 - Combo overlay with dynamic text and colors
 - Highlight effect showing adjacent valid moves
 - Full level schema and configuration system
 - 11 Season 1 level definitions
 - Engine integration with level support
+- **Phase 2:** Visual theming system
+  - Background image loading with opacity
+  - Color scheme application (primary, secondary, accent)
+  - Particle effects (sparkles, mist, crystals)
+  - Level briefing modal with objectives
+  - Image carousel gallery for episode artwork
 
 ### 🔄 In Progress / Ready
-- Visual theming (backgrounds, colors, particle effects)
-- UI components (level selection, progress tracking)
-- Episode data integration
-- Progression tracking in Firebase
+- **Phase 3:** Progression tracking in Firebase
+- **Phase 4:** UI components (level selection, progress display)
+- **Phase 5:** Episode data integration and auto-generation
 
 ## Quick Start
 
@@ -332,25 +337,39 @@ canvasManager.draw() → Called 60 times per second
 
 ## Next Steps
 
-### For Designers (Phase 2 - Visual Theming)
-1. Implement background image rendering
-2. Create color scheme application
-3. Add particle effect system
-4. Build level briefing modal
-5. Create carousel gallery UI
+### Phase 2 Complete! ✅
+Visual theming fully implemented. All features ready for gameplay.
 
-### For Developers (Phase 3+ - UI & Integration)
+### Phase 3 - Progression System
+For Backend/Firebase Developers:
+1. Create player progress tracking schema
+2. Implement level completion saving
+3. Add unlock requirement checking
+4. Create score/stat submission endpoints
+5. Build reward calculation system
+
+### Phase 4 - UI Components
+For Frontend Developers:
 1. Create level selection screen
-2. Implement progress tracking (Firebase)
-3. Build progress display components
-4. Fetch episode data from API
-5. Auto-generate levels from episodes
+2. Build progress display components
+3. Add achievement notifications
+4. Create stat overview dashboard
+5. Implement settings/preferences panel
 
-### For Content (Phase 5 - Episode Integration)
-1. Release new episodes on schedule
-2. Game automatically creates matching levels
-3. New levels appear in game after release
-4. Players experience story continuity
+### Phase 5 - Episode Integration
+For API/Integration:
+1. Fetch episode data from API
+2. Auto-generate levels from episodes
+3. Create dynamic level list builder
+4. Extract characters/locations from keywords
+5. Deploy automatic updates on new episodes
+
+### For Content Creators
+1. Create episode briefing text (for level context)
+2. Provide carousel images for levels
+3. Define level difficulty and move limits
+4. Set primary objective targets
+5. Create secondary objectives for replay
 
 ## Resources
 
