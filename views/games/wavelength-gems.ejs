@@ -137,15 +137,20 @@
             overflow: visible;
         }
 
-        /* Hero Badge - positioned to LEFT of game board within game container */
+        #gameBoard {
+            position: relative; /* Parent for hero badge positioning */
+        }
+
+        /* Hero Badge - positioned to LEFT of game canvas */
         .hero-badge {
             position: absolute;
-            left: -380px; /* Position closer to board, within purple bg */
+            left: -400px; /* Position to the left of the canvas */
             top: 50%;
             transform: translateY(-50%);
-            width: 350px; /* Even larger - almost half board size */
+            width: 350px; /* Large and prominent */
             z-index: 10;
             animation: heroBadgeAppear 0.5s ease-out;
+            pointer-events: auto; /* Allow hover interactions */
         }
 
         .hero-badge-img {
@@ -185,7 +190,7 @@
         @media (max-width: 1600px) {
             .hero-badge {
                 width: 300px;
-                left: -330px;
+                left: -350px;
             }
         }
 
@@ -425,12 +430,12 @@
 
                 <!-- Game Board -->
                 <div class="game-board-wrapper">
-                    <!-- Hero Badge (overlaid on right side of board) -->
-                    <div class="hero-badge" id="heroBadge">
-                        <img id="heroBadgeImage" src="" alt="Episode Hero" class="hero-badge-img">
-                    </div>
-                    
                     <div id="gameBoard">
+                        <!-- Hero Badge (overlaid on LEFT side of canvas) -->
+                        <div class="hero-badge" id="heroBadge">
+                            <img id="heroBadgeImage" src="" alt="Episode Hero" class="hero-badge-img">
+                        </div>
+                        
                         <!-- 👹 Static goblin underneath gems - revealed when holes appear -->
                         <div class="goblin-underneath">
                             <img src="/static/images/characters/wavelength/TheBattleOfTheShire-050.webp" alt="Goblin">
@@ -500,6 +505,9 @@
     <script src="/js/games/wavelength-gems/level-briefing.js"></script>
     <script src="/js/games/wavelength-gems/game-background.js"></script>
     <script src="/js/games/wavelength-gems/background-diagnostics.js"></script>
+    
+    <!-- Auto-diagnostics - runs on page load -->
+    <script src="/js/games/wavelength-gems/auto-diagnostics.js"></script>
     
     <!-- Game engine and utilities -->
     <script src="/js/games/wavelength-gems/validator.js"></script>
