@@ -111,6 +111,9 @@ let canvasManager = {
 
         // Calculate board dimensions
         this.calculateBoardDimensions();
+
+        // Redraw the game board after resize
+        this.draw();
     },
 
     /**
