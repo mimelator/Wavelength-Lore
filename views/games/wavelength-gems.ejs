@@ -120,12 +120,30 @@
             transform: scale(1.1);
         }
 
+        /* Mobile: Prevent emoji overflow and ensure proper display */
+        @media (max-width: 768px) {
+            .gem {
+                padding: 2px; /* Small padding to contain emoji */
+                line-height: 1;
+            }
+        }
+
         .gem-daphne { background: linear-gradient(135deg, #a855f7, #7c3aed); }
         .gem-jasper { background: linear-gradient(135deg, #3b82f6, #1e40af); }
         .gem-miles { background: linear-gradient(135deg, #10b981, #047857); }
         .gem-ivy { background: linear-gradient(135deg, #ec4899, #be185d); }
         .gem-echo { background: linear-gradient(135deg, #f59e0b, #d97706); }
         .gem-atlas { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+
+        /* Ensure viewport-based sizing for mobile (prevents gaps from looking too large) */
+        @media (max-width: 480px) {
+            #gameBoard {
+                /* Calculate board size to fit screen better on mobile */
+                /* 8 gems × 52px + 7 gaps × 4px + 2 × 8px padding = 480px */
+                width: fit-content;
+                max-width: 95vw;
+            }
+        }
 
         .game-controls {
             display: flex;

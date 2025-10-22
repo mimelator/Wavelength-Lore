@@ -30,6 +30,18 @@ const GAME_CONFIG = {
 // Animation frame tracking
 let animationFrames = new Map(); // Map of gem positions to their animation state
 
+// Get responsive gem size based on viewport width
+function getGemSize() {
+    const width = window.innerWidth;
+    if (width <= 480) {
+        return 52; // Small phones (iPhone XR, etc)
+    } else if (width <= 768) {
+        return 56; // Tablets
+    } else {
+        return 60; // Desktop
+    }
+}
+
 // Game state
 let gameState = {
     board: [],
@@ -44,7 +56,8 @@ let gameState = {
     history: [],
     maxCascades: 10, // Maximum cascade depth to prevent infinite loops
     currentCascadeDepth: 0,
-    animationTimeout: null // Track animation timeout for failsafe
+    animationTimeout: null, // Track animation timeout for failsafe
+    gemSize: 60 // Will be set dynamically by getGemSize()
 };
 
 /**
@@ -55,6 +68,10 @@ function initGame() {
     if (window.globalRadioGame && window.globalRadioGame.disableCollectiblesOnly) {
         window.globalRadioGame.disableCollectiblesOnly();
     }
+
+    // Set responsive gem size
+    gameState.gemSize = getGemSize();
+    console.log(`📏 Gem size set to: ${gameState.gemSize}px (viewport width: ${window.innerWidth}px)`);
 
     gameState = {
         board: [],
@@ -69,7 +86,8 @@ function initGame() {
         history: [],
         maxCascades: 10,
         currentCascadeDepth: 0,
-        shouldAnimateNewGems: false // Flag to control spawn animation
+        shouldAnimateNewGems: false, // Flag to control spawn animation
+        gemSize: gameState.gemSize // Preserve the dynamically set gem size
     };
 
     animationFrames.clear();
@@ -382,11 +400,12 @@ function animateSwap(row1, col1, row2, col2, callback) {
         return;
     }
 
-    // Calculate the distance to swap
+    // Calculate the distance to swap using responsive gem size
     const deltaRow = row2 - row1;
     const deltaCol = col2 - col1;
-    const distance1X = deltaCol * 60; // 60px per column
-    const distance1Y = deltaRow * 60; // 60px per row
+    const gemSize = gameState.gemSize;
+    const distance1X = deltaCol * gemSize;
+    const distance1Y = deltaRow * gemSize;
     
     // Apply the swap animation with actual movement
     gem1.classList.add('swapping');
@@ -648,7 +667,7 @@ function animateGravity() {
             columnMovements[col].forEach(({oldRow, oldCol, newRow, fallDistance}) => {
                 const gem = document.querySelector(`[data-row="${oldRow}"][data-col="${oldCol}"]`);
                 if (gem) {
-                    const fallPixels = fallDistance * 60; // 60px per row
+                    const fallPixels = fallDistance * gameState.gemSize; // Responsive gem size
                     // .falling class already added above
                     gem.style.transition = 'transform 0.3s ease-out';
                     gem.style.transform = `translateY(${fallPixels}px)`;
@@ -915,8 +934,9 @@ function renderBoard() {
         }, waitTime);
         return;
     }
-    
-    boardElement.style.gridTemplateColumns = `repeat(${GAME_CONFIG.COLS}, 60px)`;
+
+    // Use responsive gem size from gameState
+    boardElement.style.gridTemplateColumns = `repeat(${GAME_CONFIG.COLS}, ${gameState.gemSize}px)`;
 
     // Build target state
     const targetGems = []; // Array of {row, col, type} in correct order

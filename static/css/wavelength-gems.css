@@ -489,46 +489,91 @@
     left: 100%;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* Mobile-first responsive adjustments */
+
+/* iPhone XR, small tablets: 390px - 480px */
+@media (max-width: 480px) {
     .gem {
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 1.5rem !important;
+        width: 52px !important;
+        height: 52px !important;
+        font-size: 1.8rem !important;
     }
 
     #gameBoard {
-        gap: 2px !important;
+        gap: 4px !important;
         padding: 8px !important;
+        border-radius: 12px !important;
+        border-width: 2px !important;
+    }
+
+    .game-title {
+        font-size: 1.4rem;
     }
 
     .game-stats {
-        gap: 10px;
+        gap: 8px;
+    }
+
+    .stat {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+
+    .stat-value {
+        font-size: 1.1rem;
+    }
+
+    .gems-game-container {
+        padding: 15px !important;
+    }
+}
+
+/* iPad Mini, larger phones: 481px - 768px */
+@media (min-width: 481px) and (max-width: 768px) {
+    .gem {
+        width: 56px !important;
+        height: 56px !important;
+        font-size: 1.9rem !important;
+    }
+
+    #gameBoard {
+        gap: 3px !important;
+        padding: 10px !important;
+        border-radius: 15px !important;
+    }
+
+    .game-stats {
+        gap: 12px;
     }
 
     .stat {
         padding: 10px 15px;
     }
-}
 
-@media (max-width: 480px) {
-    .gem {
-        width: 40px !important;
-        height: 40px !important;
-        font-size: 1.2rem !important;
-    }
-
-    #gameBoard {
-        gap: 1px !important;
-        padding: 5px !important;
-    }
-
-    .game-title {
+    .stat-value {
         font-size: 1.3rem;
     }
 
-    .stat-value {
-        font-size: 1.2rem;
+    .gems-game-container {
+        padding: 20px !important;
+    }
+}
+
+/* Desktop: 769px and up */
+@media (min-width: 769px) {
+    .gem {
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 2rem !important;
+    }
+
+    #gameBoard {
+        gap: 3px !important;
+        padding: 10px !important;
+    }
+
+    .gems-game-container {
+        padding: 30px !important;
     }
 }
 
