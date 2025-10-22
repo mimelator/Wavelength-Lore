@@ -1150,6 +1150,7 @@ let gameState = {
     isAnimating: false,
     soundEnabled: true,
     combo: 0,
+    totalCascades: 0, // Total cascades achieved this level (for objectives)
     history: [],
     maxCascades: 10, // Maximum cascade depth to prevent infinite loops
     currentCascadeDepth: 0,
@@ -1191,6 +1192,7 @@ async function loadLevel(levelNumber) {
     gameState.targetScore = levelConfig.objectives.primary.target;
     gameState.gemTypes = levelConfig.constraints.gemTypes;
     gameState.maxCascades = levelConfig.constraints.cascadeLimit;
+    gameState.totalCascades = 0; // Reset cascade counter for new level
 
     // Apply visual theme (colors, background, effects)
     if (levelConfig.theme && canvasManager) {
@@ -1303,13 +1305,21 @@ function updateSidebarInfo(levelConfig) {
         // Primary objective
         const primaryLi = document.createElement('li');
         primaryLi.textContent = levelConfig.objectives.primary.description;
+        primaryLi.id = 'objectivePrimary';
         objectives.appendChild(primaryLi);
 
         // Secondary objectives
         if (levelConfig.objectives.secondary && levelConfig.objectives.secondary.length > 0) {
-            levelConfig.objectives.secondary.forEach(obj => {
+            levelConfig.objectives.secondary.forEach((obj, index) => {
                 const li = document.createElement('li');
                 li.textContent = obj.description;
+                li.id = `objectiveSecondary${index}`;
+                
+                // Add progress indicator for cascades
+                if (obj.type === 'cascades') {
+                    li.innerHTML = `${obj.description} <span id="cascadeProgress" style="color: #fbbf24;">(0/${obj.target})</span>`;
+                }
+                
                 objectives.appendChild(li);
             });
         }
@@ -1821,6 +1831,10 @@ function animateMatches(matches) {
         if (gameState.combo > 1) {
             console.log(`🎊 COMBO x${gameState.combo}!`);
             animationSystem.createComboOverlay(gameState.combo);
+            
+            // Increment total cascades (combo of 2+ means at least 1 cascade happened)
+            gameState.totalCascades++;
+            console.log(`🔥 Total cascades this level: ${gameState.totalCascades}`);
         }
 
         // Apply gravity and fill empty spaces
@@ -2491,8 +2505,58 @@ function updateUI() {
         targetDisplay.textContent = gameState.targetScore.toLocaleString();
     }
     
+    // Update cascades display if there's a cascade objective
+    updateCascadesDisplay();
+    
     // Check for level completion after UI update
     checkLevelCompletion();
+}
+
+/**
+ * Update cascades counter in UI
+ */
+function updateCascadesDisplay() {
+    const cascadesStat = document.getElementById('cascadesStat');
+    const cascadesDisplay = document.getElementById('cascadesDisplay');
+    const cascadesTarget = document.getElementById('cascadesTarget');
+    
+    if (!cascadesStat || !cascadesDisplay || !cascadesTarget) return;
+    
+    // Check if current level has cascade objective
+    if (gameState.levelConfig && gameState.levelConfig.objectives.secondary) {
+        const cascadeObjective = gameState.levelConfig.objectives.secondary.find(obj => obj.type === 'cascades');
+        
+        if (cascadeObjective) {
+            // Show cascades stat
+            cascadesStat.style.display = '';
+            cascadesDisplay.textContent = gameState.totalCascades;
+            cascadesTarget.textContent = ` / ${cascadeObjective.target}`;
+            
+            // Highlight when objective is met
+            if (gameState.totalCascades >= cascadeObjective.target) {
+                cascadesDisplay.style.color = '#10b981'; // Green
+                cascadesDisplay.style.fontWeight = 'bold';
+            } else {
+                cascadesDisplay.style.color = '';
+                cascadesDisplay.style.fontWeight = '';
+            }
+            
+            // Update sidebar cascade progress
+            const cascadeProgress = document.getElementById('cascadeProgress');
+            if (cascadeProgress) {
+                cascadeProgress.textContent = `(${gameState.totalCascades}/${cascadeObjective.target})`;
+                if (gameState.totalCascades >= cascadeObjective.target) {
+                    cascadeProgress.style.color = '#10b981'; // Green when complete
+                    cascadeProgress.style.fontWeight = 'bold';
+                }
+            }
+            
+            return;
+        }
+    }
+    
+    // Hide if no cascade objective
+    cascadesStat.style.display = 'none';
 }
 
 /**
