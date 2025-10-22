@@ -34,21 +34,23 @@ let animationFrames = new Map(); // Map of gem positions to their animation stat
 // Calculates size so 8x8 board fits perfectly with gaps
 function getGemSize() {
     const width = window.innerWidth;
-    const GAP_SIZE = 3; // pixels between gems
-    const BOARD_PADDING = 10; // pixels padding on board
-    const CONTAINER_MARGIN = 20; // total page margins/padding
+    const GAP_SIZE = 2; // pixels between gems (reduced from 3)
+    const BOARD_PADDING = 6; // pixels padding on board (reduced from 10)
+    const CONTAINER_MARGIN = 10; // total page margins/padding (reduced from 20)
+    const BORDER_WIDTH = 2; // board border (reduced from 3)
 
-    // Available width = viewport - container margins - board padding on each side
-    const availableWidth = width - CONTAINER_MARGIN - (BOARD_PADDING * 2);
+    // Available width = viewport - all constraints
+    // Account for: container margins + board padding + board border
+    const availableWidth = width - CONTAINER_MARGIN - (BOARD_PADDING * 2) - (BORDER_WIDTH * 2);
 
     // Formula: (gemSize * 8) + (gap * 7) = availableWidth
     // Solving: gemSize = (availableWidth - (gap * 7)) / 8
     const calculatedGemSize = Math.floor((availableWidth - (GAP_SIZE * 7)) / 8);
 
     // Clamp between reasonable min/max
-    let gemSize = Math.max(35, Math.min(calculatedGemSize, 60));
+    let gemSize = Math.max(32, Math.min(calculatedGemSize, 60));
 
-    console.log(`📏 Viewport: ${width}px | Available: ${availableWidth}px | Gem size: ${gemSize}px`);
+    console.log(`📏 Viewport: ${width}px | Available: ${availableWidth}px (after margins/padding/border) | Calculated: ${calculatedGemSize}px | Final gem size: ${gemSize}px`);
     return gemSize;
 }
 
@@ -112,6 +114,21 @@ function initGame() {
     `;
     document.head.appendChild(style);
     console.log(`📐 Injected dynamic gem size CSS: ${gameState.gemSize}px`);
+
+    // Debug: Log actual board dimensions after rendering
+    setTimeout(() => {
+        const boardElement = document.getElementById('gameBoard');
+        if (boardElement) {
+            const rect = boardElement.getBoundingClientRect();
+            console.log(`🎯 Board dimensions: ${rect.width}px wide × ${rect.height}px tall`);
+            console.log(`📱 Viewport: ${window.innerWidth}px wide`);
+            if (rect.width > window.innerWidth) {
+                console.warn(`⚠️ BOARD OVERFLOW: Board (${rect.width}px) exceeds viewport (${window.innerWidth}px) by ${rect.width - window.innerWidth}px`);
+            } else {
+                console.log(`✅ Board fits within viewport`);
+            }
+        }
+    }, 500);
 
     animationFrames.clear();
     generateBoard();
