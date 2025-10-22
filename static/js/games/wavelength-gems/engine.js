@@ -37,10 +37,13 @@ function getGemSize() {
     const isMobile = width <= 768;
 
     if (isMobile) {
-        // Mobile: Use fixed small gem size that fits 8 columns in ~400px container
-        // (8 gems × 48px) + (7 gaps × 1px) = 391px - fits perfectly in constrained container
-        const gemSize = 48;
-        console.log(`📏 Mobile viewport (${width}px): Using fixed gem size ${gemSize}px to fit 8 columns in constrained container`);
+        // Mobile: Use fixed small gem size that fits 8 columns in constrained viewport
+        // Need to account for all viewport sizes (460-530px)
+        // At 470px viewport: (8 gems × 54px) + (7 gaps × 2px) + (2px padding) = 468px (fits!)
+        // At 460px viewport: (8 gems × 54px) + (7 gaps × 1px) = 455px (safe!)
+        // Use 52px to ensure safety margin across all mobile sizes
+        const gemSize = 52;
+        console.log(`📏 Mobile viewport (${width}px): Using fixed gem size ${gemSize}px to fit 8 columns safely with margins`);
         return gemSize;
     }
 
@@ -164,6 +167,7 @@ function autoValidateLayout() {
     const viewport = window.innerWidth;
     const boardElement = document.getElementById('gameBoard');
     const containerElement = document.querySelector('.gems-game-container');
+    const mainElement = document.querySelector('main.gems-game-wrapper');
     const isMobile = viewport <= 768;
 
     if (!boardElement || !containerElement) {
@@ -173,6 +177,7 @@ function autoValidateLayout() {
 
     const boardRect = boardElement.getBoundingClientRect();
     const containerRect = containerElement.getBoundingClientRect();
+    const mainRect = mainElement?.getBoundingClientRect();
     const gemElements = boardElement.querySelectorAll('.gem');
 
     // Check for horizontal scroll
@@ -180,21 +185,34 @@ function autoValidateLayout() {
     const windowWidth = window.innerWidth;
     const hasHorizontalScroll = documentWidth > windowWidth;
 
-    // Calculate visible columns
-    let visibleColumns = 0;
+    // More accurate visible columns: use actual viewport and board position
+    let visibleColumnsInViewport = 0;
+    let visibleColumnsInContainer = 0;
+
     if (gemElements.length > 0) {
         const firstGem = gemElements[0];
         const gemRect = firstGem.getBoundingClientRect();
         const gemWidth = gemRect.width;
+
+        // Columns visible in viewport accounting for board position
         if (gemWidth > 0) {
-            visibleColumns = (windowWidth / gemWidth).toFixed(2);
+            visibleColumnsInViewport = (windowWidth / gemWidth).toFixed(2);
+        }
+
+        // Columns visible in container
+        if (gemWidth > 0 && containerRect.width > 0) {
+            visibleColumnsInContainer = (containerRect.width / gemWidth).toFixed(2);
         }
     }
 
-    // Validation checks
-    const allColumnsVisible = visibleColumns >= 7.9; // Allow slight rounding
+    // Validation checks - use viewport-based visibility
+    const allColumnsVisible = visibleColumnsInViewport >= 7.9; // Allow slight rounding
     const noHorizontalScroll = !hasHorizontalScroll;
     const boardFitsContainer = boardRect.width <= containerRect.width + 5; // Allow 5px tolerance
+
+    // Scroll position check
+    const scrollLeft = window.scrollX || window.pageXOffset;
+    const canScrollRight = documentWidth - (scrollLeft + windowWidth) > 0;
 
     // Color code the status
     const statusIcon = allColumnsVisible && noHorizontalScroll ? '✅' : '⚠️';
@@ -204,23 +222,47 @@ function autoValidateLayout() {
     console.log(`\n📱 LAYOUT VALIDATION (Viewport: ${viewport}px, Mobile: ${isMobile})`);
     console.log(`════════════════════════════════════════`);
     console.log(`${statusIcon} Overall Status: ${allColumnsVisible && noHorizontalScroll ? 'OPTIMAL' : 'NEEDS ADJUSTMENT'}`);
-    console.log(`${scrollIcon} Horizontal Scroll: ${hasHorizontalScroll ? 'YES (BAD)' : 'NO (GOOD)'}`);
-    console.log(`   Document width: ${documentWidth}px, Window width: ${windowWidth}px, Overflow: ${Math.max(0, documentWidth - windowWidth)}px`);
-    console.log(`${columnsIcon} All 8 Columns Visible: ${allColumnsVisible ? 'YES' : 'NO'}`);
-    console.log(`   Visible columns: ${visibleColumns} / 8`);
-    console.log(`   First gem size: ${gemElements.length > 0 ? Math.round(gemElements[0].getBoundingClientRect().width) : 'N/A'}px`);
-    console.log(`   Board width: ${Math.round(boardRect.width)}px`);
-    console.log(`   Container width: ${Math.round(containerRect.width)}px`);
+    console.log(`${scrollIcon} Horizontal Scroll Available: ${hasHorizontalScroll ? 'YES (BAD)' : 'NO (GOOD)'}`);
+    console.log(`   Document width: ${documentWidth}px, Window width: ${windowWidth}px, Total overflow: ${Math.max(0, documentWidth - windowWidth)}px`);
+    console.log(`   Current scroll position: ${Math.round(scrollLeft)}px, Can scroll right: ${canScrollRight ? 'YES' : 'NO'}`);
+    console.log(`${columnsIcon} All 8 Columns Visible in Viewport: ${allColumnsVisible ? 'YES' : 'NO'}`);
+    console.log(`   Visible columns (viewport): ${visibleColumnsInViewport} / 8`);
+    console.log(`   Visible columns (container): ${visibleColumnsInContainer} / 8`);
+
+    if (gemElements.length > 0) {
+        const firstGem = gemElements[0];
+        const lastGem = gemElements[7]; // 8th column first row
+        const firstGemRect = firstGem.getBoundingClientRect();
+        const lastGemRect = lastGem?.getBoundingClientRect();
+
+        console.log(`   First gem (col 0): ${Math.round(firstGemRect.left)}px from left, width: ${Math.round(firstGemRect.width)}px`);
+        if (lastGemRect) {
+            console.log(`   Last gem (col 7): ${Math.round(lastGemRect.right)}px from left, right edge: ${Math.round(lastGemRect.right)}px`);
+            console.log(`   All 8 gems fit in viewport: ${lastGemRect.right <= windowWidth ? 'YES ✅' : 'NO ❌ (extends ' + Math.round(lastGemRect.right - windowWidth) + 'px off screen)'}`);
+        }
+    }
+
+    console.log(`\n   Board measurements:`);
+    console.log(`   - Board width: ${Math.round(boardRect.width)}px`);
+    console.log(`   - Board left position: ${Math.round(boardRect.left)}px`);
+    console.log(`   - Board right edge: ${Math.round(boardRect.right)}px`);
+    console.log(`   - Container width: ${Math.round(containerRect.width)}px`);
+    if (mainRect) {
+        console.log(`   - Main element width: ${Math.round(mainRect.width)}px`);
+    }
     console.log(`════════════════════════════════════════\n`);
 
     return {
         allColumnsVisible,
         noHorizontalScroll,
         boardFitsContainer,
-        visibleColumns,
+        visibleColumnsInViewport,
+        visibleColumnsInContainer,
         documentWidth,
         windowWidth,
-        hasHorizontalScroll
+        hasHorizontalScroll,
+        scrollLeft,
+        canScrollRight
     };
 }
 
@@ -380,16 +422,35 @@ function initGame() {
         gemSize: gameState.gemSize // Preserve the dynamically set gem size
     };
 
-    // Apply gem size to CSS on mobile with AGGRESSIVE overrides to break through any constraints
+    // Apply gem size to CSS with AGGRESSIVE overrides to break through any constraints
+    // CRITICAL: Must override BOTH media query AND inline styles with !important
     const style = document.createElement('style');
     style.textContent = `
+        /* FORCE mobile gem size - overrides media queries and browser defaults */
+        .gem {
+            width: ${gameState.gemSize}px !important;
+            height: ${gameState.gemSize}px !important;
+            min-width: ${gameState.gemSize}px !important;
+            min-height: ${gameState.gemSize}px !important;
+            max-width: ${gameState.gemSize}px !important;
+            max-height: ${gameState.gemSize}px !important;
+            flex: none !important;
+            flex-shrink: 0 !important;
+            flex-grow: 0 !important;
+        }
+
         @media (max-width: 768px) {
             .gem {
                 width: ${gameState.gemSize}px !important;
                 height: ${gameState.gemSize}px !important;
                 min-width: ${gameState.gemSize}px !important;
                 min-height: ${gameState.gemSize}px !important;
+                max-width: ${gameState.gemSize}px !important;
+                max-height: ${gameState.gemSize}px !important;
+                aspect-ratio: unset !important;
                 flex: none !important;
+                flex-shrink: 0 !important;
+                flex-grow: 0 !important;
             }
 
             #gameBoard {
@@ -411,9 +472,17 @@ function initGame() {
                 overflow: visible !important;
             }
         }
+
+        /* ADDITIONAL: Non-media query overrides for when media query doesn't apply */
+        @supports (display: grid) {
+            .gem {
+                width: ${gameState.gemSize}px !important;
+                height: ${gameState.gemSize}px !important;
+            }
+        }
     `;
     document.head.appendChild(style);
-    console.log(`📐 Injected dynamic gem size CSS: ${gameState.gemSize}px with aggressive overrides`);
+    console.log(`📐 Injected gem size CSS: ${gameState.gemSize}px (Mobile: ${window.innerWidth <= 768}px) with AGGRESSIVE !important overrides`);
 
 
     // Debug: Create on-screen debug panel to show actual dimensions
