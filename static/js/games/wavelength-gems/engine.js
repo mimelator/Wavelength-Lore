@@ -277,7 +277,9 @@ function initGame() {
     console.log(`📐 Injected dynamic gem size CSS: ${gameState.gemSize}px with aggressive overrides`);
 
     // FORCE width constraints on mobile using JavaScript (bypasses any CSS issues)
+    console.log(`🔧 Checking mobile viewport: window.innerWidth=${window.innerWidth}px, mobile=${window.innerWidth <= 768}`);
     if (window.innerWidth <= 768) {
+        console.log(`📱 Mobile detected, applying inline style overrides...`);
         setTimeout(() => {
             const wrapper = document.querySelector('.gems-game-wrapper');
             const container = document.querySelector('.gems-game-container');
