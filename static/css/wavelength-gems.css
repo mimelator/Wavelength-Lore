@@ -1,5 +1,18 @@
 /* Wavelength Gems - Game Styling */
 
+/* CRITICAL: Override ALL parent width constraints for mobile game board */
+@media (max-width: 768px) {
+    main.gems-game-wrapper,
+    .gems-game-wrapper,
+    .gems-game-container,
+    .game-board-wrapper,
+    #gameBoard {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        margin-left: calc(-50vw + 50%) !important;
+    }
+}
+
 /* Hide collectibles canvas on game pages (but keep radio player visible) */
 .global-game-canvas {
     display: none !important;
