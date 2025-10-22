@@ -1005,9 +1005,18 @@ function renderBoard() {
     }
 
     // Use responsive gem size from gameState
-    // Mobile: use fixed gem size but set max-width on board to force fit
-    boardElement.style.gridTemplateColumns = `repeat(${GAME_CONFIG.COLS}, ${gameState.gemSize}px)`;
-    console.log(`📐 Grid columns: repeat(8, ${gameState.gemSize}px)`);
+    if (window.innerWidth <= 768) {
+        // Mobile: Use a grid that will shrink gems to fit within container
+        // Each gem is exactly 1/8th of container width, and rows are also 1fr for square gems
+        boardElement.style.gridTemplateColumns = `repeat(${GAME_CONFIG.COLS}, 1fr)`;
+        boardElement.style.gridAutoRows = `1fr`; // Make rows same size as columns for square gems
+        console.log(`📐 Mobile grid: repeat(8, 1fr) with auto-rows: 1fr - ensures square gems that fit viewport`);
+    } else {
+        // Desktop: Fixed gem size
+        boardElement.style.gridTemplateColumns = `repeat(${GAME_CONFIG.COLS}, ${gameState.gemSize}px)`;
+        boardElement.style.gridAutoRows = `${gameState.gemSize}px`;
+        console.log(`📐 Desktop grid: repeat(8, ${gameState.gemSize}px) with auto-rows: ${gameState.gemSize}px`);
+    }
 
     // Build target state
     const targetGems = []; // Array of {row, col, type} in correct order

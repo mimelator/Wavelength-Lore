@@ -163,12 +163,14 @@
             z-index: 2; /* Gems appear above the goblin underneath */
         }
 
-        /* Mobile: Let JS set width/height, override desktop inline styles */
+        /* Mobile: Flex to fill grid cell, maintain square */
         @media (max-width: 768px) {
             .gem {
-                width: auto !important;
-                height: auto !important;
+                width: 100% !important;
+                height: 100% !important;
                 aspect-ratio: 1 / 1;
+                min-width: 0;
+                min-height: 0;
             }
         }
 
