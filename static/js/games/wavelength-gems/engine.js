@@ -1329,7 +1329,7 @@ function animateGravity() {
     movements.forEach(movement => {
         setTimeout(() => {
             animationSystem.startAnimation(movement.fromRow, movement.col, 'fall', {
-                duration: 300,
+                duration: 500, // Increased from 300ms for slower, more satisfying fall
                 targetRow: movement.toRow,
                 easing: 'easeOutBounce'
             });
@@ -1341,7 +1341,7 @@ function animateGravity() {
 
     // Calculate total animation time
     const maxStaggerDelay = Math.max(...movements.map(m => m.staggerDelay));
-    const totalAnimationTime = maxStaggerDelay + 300;
+    const totalAnimationTime = maxStaggerDelay + 500;
 
     // After animation completes, update board state and fill empty spaces
     setTimeout(() => {
