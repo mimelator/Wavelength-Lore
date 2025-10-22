@@ -102,18 +102,40 @@ function initGame() {
         gemSize: gameState.gemSize // Preserve the dynamically set gem size
     };
 
-    // Apply gem size to CSS on mobile
+    // Apply gem size to CSS on mobile with AGGRESSIVE overrides to break through any constraints
     const style = document.createElement('style');
     style.textContent = `
         @media (max-width: 768px) {
             .gem {
                 width: ${gameState.gemSize}px !important;
                 height: ${gameState.gemSize}px !important;
+                min-width: ${gameState.gemSize}px !important;
+                min-height: ${gameState.gemSize}px !important;
+                flex: none !important;
+            }
+
+            #gameBoard {
+                max-width: none !important;
+                width: fit-content !important;
+                margin: 0 auto !important;
+                overflow: visible !important;
+            }
+
+            .game-board-wrapper {
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow: visible !important;
+            }
+
+            .gems-game-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow: visible !important;
             }
         }
     `;
     document.head.appendChild(style);
-    console.log(`📐 Injected dynamic gem size CSS: ${gameState.gemSize}px`);
+    console.log(`📐 Injected dynamic gem size CSS: ${gameState.gemSize}px with aggressive overrides`);
 
     // Debug: Log actual board dimensions after rendering
     setTimeout(() => {
