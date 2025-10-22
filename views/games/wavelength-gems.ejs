@@ -137,74 +137,82 @@
         }
 
         #gameBoard {
-            position: relative; /* Parent for hero badge positioning */
+            position: relative; /* Parent for canvas positioning */
         }
 
-        /* Hero Badge - positioned to LEFT of game canvas */
+        /* Hero Badge Container - centered above game board */
+        .hero-badge-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            min-height: 120px; /* Reserve space for badge */
+        }
+
+        /* Hero Badge - displayed above game board */
         .hero-badge {
-            position: absolute;
-            left: -400px; /* Position to the left of the canvas */
-            top: 50%;
-            transform: translateY(-50%);
-            width: 350px; /* Large and prominent */
-            z-index: 10;
-            animation: heroBadgeAppear 0.5s ease-out;
-            pointer-events: auto; /* Allow hover interactions */
+            width: 200px;
+            animation: heroBadgeAppear 0.8s ease-out;
         }
 
         .hero-badge-img {
             width: 100%;
             height: auto;
-            border-radius: 25px;
-            border: 8px solid #FFD700;
+            border-radius: 20px;
+            border: 6px solid #FFD700;
             box-shadow: 
-                0 16px 64px rgba(255, 215, 0, 0.8),
-                0 0 80px rgba(255, 215, 0, 0.6),
-                inset 0 0 40px rgba(255, 215, 0, 0.3);
+                0 12px 48px rgba(255, 215, 0, 0.8),
+                0 0 60px rgba(255, 215, 0, 0.5),
+                inset 0 0 30px rgba(255, 215, 0, 0.2);
             transition: all 0.3s ease;
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.4), rgba(75, 0, 130, 0.4));
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(75, 0, 130, 0.3));
+            display: block;
         }
 
         .hero-badge-img:hover {
-            transform: scale(1.1);
+            transform: scale(1.08);
             box-shadow: 
-                0 20px 80px rgba(255, 215, 0, 1),
-                0 0 100px rgba(255, 215, 0, 0.8),
-                inset 0 0 50px rgba(255, 215, 0, 0.4);
+                0 16px 64px rgba(255, 215, 0, 1),
+                0 0 80px rgba(255, 215, 0, 0.7),
+                inset 0 0 40px rgba(255, 215, 0, 0.3);
             border-color: #FFA500;
         }
 
         @keyframes heroBadgeAppear {
             from {
                 opacity: 0;
-                transform: translateY(-50%) translateX(-50px) scale(0.8);
+                transform: translateY(-30px) scale(0.8);
             }
             to {
                 opacity: 1;
-                transform: translateY(-50%) translateX(0) scale(1);
+                transform: translateY(0) scale(1);
             }
         }
 
-        /* Adjust for smaller screens */
+        /* Responsive sizing for hero badge */
         @media (max-width: 1600px) {
             .hero-badge {
-                width: 280px;
-                left: -320px;
+                width: 180px;
+            }
+            .hero-badge-container {
+                min-height: 100px;
             }
         }
 
-        /* Further adjustment for medium screens */
         @media (max-width: 1300px) {
             .hero-badge {
-                width: 240px;
-                left: -270px;
+                width: 160px;
+            }
+            .hero-badge-container {
+                min-height: 90px;
             }
         }
 
-        /* Hide hero badge when sidebars are hidden */
-        @media (max-width: 1100px) {
-            .hero-badge {
+        /* Hide hero badge on very narrow screens */
+        @media (max-width: 900px) {
+            .hero-badge-container {
                 display: none;
+                min-height: 0;
             }
         }
 
@@ -435,13 +443,17 @@
                     </div>
                 </div>
 
+                <!-- Hero Badge (centered above game board) -->
+                <div class="hero-badge-container">
+                    <div class="hero-badge" id="heroBadge">
+                        <img id="heroBadgeImage" src="" alt="Episode Hero" class="hero-badge-img">
+                    </div>
+                </div>
+
                 <!-- Game Board -->
                 <div class="game-board-wrapper">
                     <div id="gameBoard">
-                        <!-- Hero Badge (overlaid on LEFT side of canvas) -->
-                        <div class="hero-badge" id="heroBadge">
-                            <img id="heroBadgeImage" src="" alt="Episode Hero" class="hero-badge-img">
-                        </div>
+                        <!-- Canvas will be inserted here by engine.js -->
                     </div>
                 </div>
 

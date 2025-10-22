@@ -75,16 +75,8 @@ let canvasManager = {
             // Insert canvas into gameBoard div
             const gameBoard = document.getElementById('gameBoard');
             if (gameBoard) {
-                // Preserve hero badge before clearing
-                const heroBadge = document.getElementById('heroBadge');
-                
-                // Clear the board's old content
+                // Simply clear and add canvas (hero badge is outside gameBoard now)
                 gameBoard.innerHTML = '';
-                
-                // Re-add hero badge if it exists
-                if (heroBadge) gameBoard.appendChild(heroBadge);
-                
-                // Add canvas
                 gameBoard.appendChild(canvas);
             }
         }
