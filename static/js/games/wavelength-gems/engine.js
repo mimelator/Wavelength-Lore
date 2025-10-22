@@ -284,36 +284,62 @@ function initGame() {
             const boardWrapper = document.querySelector('.game-board-wrapper');
             const board = document.getElementById('gameBoard');
 
+            // Debug: Check what's constraining the container
+            if (container) {
+                const parentElement = container.parentElement;
+                const parentStyle = window.getComputedStyle(parentElement);
+                console.log(`🔍 Container parent:`, parentElement.tagName, parentElement.className);
+                console.log(`   Parent computed width:`, parentStyle.width);
+                console.log(`   Parent computed max-width:`, parentStyle.maxWidth);
+            }
+
             // Force these to 100% or full viewport
             if (wrapper) {
                 wrapper.style.width = '100vw';
                 wrapper.style.maxWidth = '100vw';
                 wrapper.style.marginLeft = 'calc(-50vw + 50%)';
                 wrapper.style.boxSizing = 'border-box';
+                console.log(`✅ Wrapper: set to 100vw`);
             }
 
             if (container) {
-                container.style.width = '100vw';
-                container.style.maxWidth = '100vw';
-                container.style.marginLeft = 'calc(-50vw + 50%)';
+                container.style.width = 'calc(100vw - 0px)';
+                container.style.maxWidth = 'calc(100vw - 0px)';
+                container.style.marginLeft = '0';
+                container.style.marginRight = '0';
                 container.style.boxSizing = 'border-box';
+                container.style.padding = '4px';
+                console.log(`✅ Container: set to calc(100vw - 0px)`);
             }
 
             if (boardWrapper) {
-                boardWrapper.style.width = '100vw';
-                boardWrapper.style.maxWidth = '100vw';
-                boardWrapper.style.marginLeft = 'calc(-50vw + 50%)';
+                boardWrapper.style.width = '100%';
+                boardWrapper.style.maxWidth = '100%';
                 boardWrapper.style.boxSizing = 'border-box';
+                boardWrapper.style.padding = '0 2px';
+                console.log(`✅ BoardWrapper: set to 100%`);
             }
 
             if (board) {
                 board.style.width = '100%';
-                board.style.maxWidth = 'calc(100vw - 4px)';
+                board.style.maxWidth = '100%';
                 board.style.boxSizing = 'border-box';
-                board.style.margin = '0 auto';
+                board.style.margin = '0';
+                board.style.padding = '4px';
+                console.log(`✅ Board: set to 100%`);
             }
 
-            console.log(`✅ Applied inline width overrides to all elements`);
+            // Check again what the actual sizes are
+            setTimeout(() => {
+                const wrapperRect = wrapper?.getBoundingClientRect();
+                const containerRect = container?.getBoundingClientRect();
+                const boardRect = board?.getBoundingClientRect();
+
+                console.log(`📊 AFTER inline styles applied:`);
+                console.log(`   Wrapper: ${Math.round(wrapperRect?.width)}px`);
+                console.log(`   Container: ${Math.round(containerRect?.width)}px`);
+                console.log(`   Board: ${Math.round(boardRect?.width)}px`);
+            }, 50);
         }, 100);
     }
 
