@@ -313,6 +313,46 @@ let canvasManager = {
         ctx.stroke();
 
         ctx.shadowColor = 'transparent';
+
+        // Draw highlights for adjacent valid moves
+        this.drawAdjacentHighlights(row, col);
+    },
+
+    /**
+     * Draw highlight rings around valid adjacent gems
+     */
+    drawAdjacentHighlights(row, col) {
+        const ctx = this.ctx;
+        const adjacents = [
+            { row: row - 1, col: col },
+            { row: row + 1, col: col },
+            { row: row, col: col - 1 },
+            { row: row, col: col + 1 }
+        ];
+
+        for (const { row: aRow, col: aCol } of adjacents) {
+            // Check if adjacent position is valid
+            if (aRow < 0 || aRow >= GAME_CONFIG.ROWS || aCol < 0 || aCol >= GAME_CONFIG.COLS) {
+                continue;
+            }
+
+            const ax = this.boardX + (aCol * (this.gemSize + this.gemGapSize));
+            const ay = this.boardY + (aRow * (this.gemSize + this.gemGapSize));
+
+            // Draw a subtle glowing ring around adjacent gems
+            const glowRadius = this.gemSize / 2 + 8;
+
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.shadowColor = 'rgba(255, 215, 0, 0.6)';
+            ctx.shadowBlur = 8;
+
+            ctx.beginPath();
+            ctx.arc(ax + this.gemSize / 2, ay + this.gemSize / 2, glowRadius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.shadowColor = 'transparent';
+        }
     },
 
     /**
@@ -372,6 +412,7 @@ let canvasManager = {
 let animationSystem = {
     activeAnimations: new Map(), // Map of "row,col" to animation state
     scorePopups: [], // Array of floating score displays
+    comboOverlay: null, // Current combo overlay animation
     animationFrameId: null,
 
     /**
@@ -423,6 +464,9 @@ let animationSystem = {
 
         // Update score popups
         this.updateScorePopups(currentTime);
+
+        // Update combo overlay
+        this.updateComboOverlay(currentTime);
     },
 
     /**
@@ -493,6 +537,33 @@ let animationSystem = {
     },
 
     /**
+     * Create combo overlay animation
+     */
+    createComboOverlay(combo) {
+        const now = performance.now();
+        this.comboOverlay = {
+            combo,
+            startTime: now,
+            duration: 1500, // 1.5 seconds total
+            holdDuration: 500 // Hold at full size for 500ms
+        };
+    },
+
+    /**
+     * Update combo overlay animation
+     */
+    updateComboOverlay(currentTime) {
+        if (!this.comboOverlay) return;
+
+        const elapsed = currentTime - this.comboOverlay.startTime;
+
+        if (elapsed >= this.comboOverlay.duration) {
+            // Animation complete
+            this.comboOverlay = null;
+        }
+    },
+
+    /**
      * Draw all active animations
      */
     drawAnimations() {
@@ -539,6 +610,11 @@ let animationSystem = {
             }
         }
 
+        // Draw combo overlay
+        if (this.comboOverlay) {
+            this.drawComboOverlay();
+        }
+
         // Draw score popups
         ctx.font = `bold 24px Arial`;
         ctx.textAlign = 'center';
@@ -550,6 +626,88 @@ let animationSystem = {
             ctx.shadowBlur = 10;
             ctx.fillText(`+${popup.points}`, popup.x, popup.currentY);
         }
+
+        ctx.shadowColor = 'transparent';
+    },
+
+    /**
+     * Draw combo overlay animation
+     */
+    drawComboOverlay() {
+        const ctx = canvasManager.ctx;
+        const currentTime = performance.now();
+        const elapsed = currentTime - this.comboOverlay.startTime;
+        const { duration, holdDuration, combo } = this.comboOverlay;
+
+        // Scale animation: 0-holdDuration = scale up, holdDuration-duration = scale down
+        let scale = 1;
+        let opacity = 1;
+
+        if (elapsed < holdDuration) {
+            // Scale in from small to large
+            scale = 0.3 + (elapsed / holdDuration) * 0.7; // 0.3 to 1.0
+        } else {
+            // Hold for a bit then scale out and fade
+            const fadeStart = holdDuration + 400;
+            if (elapsed >= fadeStart) {
+                const fadeDuration = duration - fadeStart;
+                const fadeProgress = (elapsed - fadeStart) / fadeDuration;
+                opacity = Math.max(0, 1 - fadeProgress);
+                scale = 1 + (fadeProgress * 0.2); // Slight grow as it fades
+            }
+        }
+
+        // Get combo text
+        let comboText = '';
+        let comboColor = '#FFD700'; // Gold
+        if (combo === 2) {
+            comboText = 'COMBO!';
+            comboColor = '#FFA500'; // Orange
+        } else if (combo === 3) {
+            comboText = 'GREAT!';
+            comboColor = '#FF6347'; // Tomato
+        } else if (combo === 4) {
+            comboText = 'AMAZING!';
+            comboColor = '#FF1493'; // Deep pink
+        } else if (combo >= 5) {
+            comboText = 'MEGA COMBO!';
+            comboColor = '#FFD700'; // Gold
+        } else {
+            comboText = 'COMBO!';
+        }
+
+        // Center position on board
+        const centerX = canvasManager.boardX + canvasManager.boardWidth / 2;
+        const centerY = canvasManager.boardY + canvasManager.boardHeight / 2;
+
+        // Draw semi-transparent background
+        const boxWidth = 250 * scale;
+        const boxHeight = 100 * scale;
+        ctx.fillStyle = `rgba(0, 0, 0, ${opacity * 0.6})`;
+        ctx.beginPath();
+        ctx.roundRect(
+            centerX - boxWidth / 2,
+            centerY - boxHeight / 2,
+            boxWidth,
+            boxHeight,
+            20
+        );
+        ctx.fill();
+
+        // Draw combo text
+        ctx.font = `bold ${Math.floor(60 * scale)}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = `rgba(${this.hexToRgb(comboColor)}, ${opacity})`;
+        ctx.shadowColor = `rgba(0, 0, 0, ${opacity * 0.8})`;
+        ctx.shadowBlur = 15;
+        ctx.fillText(comboText, centerX, centerY - 15 * scale);
+
+        // Draw combo multiplier
+        ctx.font = `bold ${Math.floor(40 * scale)}px Arial`;
+        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+        ctx.shadowBlur = 10;
+        ctx.fillText(`x${combo}`, centerX, centerY + 25 * scale);
 
         ctx.shadowColor = 'transparent';
     },
@@ -628,7 +786,7 @@ let animationSystem = {
      * Check if any animations or popups are active
      */
     isAnimating() {
-        return this.activeAnimations.size > 0 || this.scorePopups.length > 0;
+        return this.activeAnimations.size > 0 || this.scorePopups.length > 0 || this.comboOverlay !== null;
     }
 };
 
@@ -1182,6 +1340,7 @@ function animateMatches(matches) {
         // Show combo indicator if combo > 1
         if (gameState.combo > 1) {
             console.log(`🎊 COMBO x${gameState.combo}!`);
+            animationSystem.createComboOverlay(gameState.combo);
         }
 
         // Apply gravity and fill empty spaces
