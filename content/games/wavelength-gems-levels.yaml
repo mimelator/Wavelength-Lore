@@ -25,6 +25,7 @@ levels:
       accentColor: "#FFA500"         # Orange
       backgroundImage: /static/images/characters/wavelength/MyLuckyCharm-02.webp
       backgroundOpacity: 0.12
+      heroImage: /static/images/characters/wavelength/MyLuckyCharm-02.webp
       carouselImages:
         - /static/images/seasons/season1/episodes/episode1/images/MyLuckyCharm-01.webp
         - /static/images/characters/wavelength/MyLuckyCharm-02.webp
@@ -90,6 +91,7 @@ levels:
       accentColor: "#10B981"         # Green (action/go)
       backgroundImage: /static/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-01.webp
       backgroundOpacity: 0.12
+      heroImage: /static/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-10.webp
       carouselImages:
         - /static/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-01.webp
         - /static/images/seasons/season1/episodes/episode2/images/concert11_Jump_Right_In-10.webp
@@ -157,6 +159,7 @@ levels:
       accentColor: "#F59E0B"         # Amber (magic)
       backgroundImage: /static/images/seasons/season1/episodes/episode3/images/dream_with_me.webp
       backgroundOpacity: 0.12
+      heroImage: /static/images/seasons/season1/episodes/episode3/images/dream_with_me.webp
       carouselImages:
         - /static/images/seasons/season1/episodes/episode3/images/dream_with_me.webp
       particleEffect: dream_stars
@@ -220,6 +223,7 @@ levels:
       accentColor: "#7C3AED"         # Violet (magic)
       backgroundImage: /static/images/characters/daphne/Daphne-01.webp
       backgroundOpacity: 0.12
+      heroImage: /static/images/characters/daphne/Daphne-02.webp
       carouselImages:
         - /static/images/characters/daphne/Daphne-01.webp
         - /static/images/characters/daphne/Daphne-02.webp
@@ -284,6 +288,7 @@ levels:
       accentColor: "#F3F4F6"         # Light gray (clouds)
       backgroundImage: /static/images/seasons/season1/episodes/episode5/images/falling.webp
       backgroundOpacity: 0.12
+      heroImage: /static/images/seasons/season1/episodes/episode5/images/falling.webp
       carouselImages:
         - /static/images/seasons/season1/episodes/episode5/images/falling.webp
       particleEffect: falling_leaves
@@ -349,6 +354,7 @@ levels:
       accentColor: "#10B981"         # Green (hope)
       backgroundImage: /static/images/seasons/season1/episodes/episode6/images/once_more.webp
       backgroundOpacity: 0.12
+      heroImage: /static/images/seasons/season1/episodes/episode6/images/once_more.webp
       carouselImages:
         - /static/images/seasons/season1/episodes/episode6/images/once_more.webp
       particleEffect: null
@@ -415,6 +421,7 @@ levels:
       accentColor: "#7C3AED"         # Purple (wisdom)
       backgroundImage: /static/images/seasons/season1/episodes/episode7/images/history_lessons.webp
       backgroundOpacity: 0.12
+      heroImage: /static/images/seasons/season1/episodes/episode7/images/history_lessons.webp
       carouselImages:
         - /static/images/seasons/season1/episodes/episode7/images/history_lessons.webp
       particleEffect: ancient_dust
@@ -481,6 +488,7 @@ levels:
       accentColor: "#EC4899"         # Pink (joy)
       backgroundImage: /static/images/seasons/season1/episodes/episode8/images/life_in_the_shire.webp
       backgroundOpacity: 0.12
+      heroImage: /static/images/seasons/season1/episodes/episode8/images/life_in_the_shire.webp
       carouselImages:
         - /static/images/seasons/season1/episodes/episode8/images/life_in_the_shire.webp
       particleEffect: fireflies
@@ -549,6 +557,7 @@ levels:
       accentColor: "#DC2626"         # Red (danger)
       backgroundImage: /static/images/seasons/season1/episodes/episode9/images/feed_the_crows.webp
       backgroundOpacity: 0.12
+      heroImage: /static/images/seasons/season1/episodes/episode9/images/feed_the_crows.webp
       carouselImages:
         - /static/images/seasons/season1/episodes/episode9/images/feed_the_crows.webp
       particleEffect: dark_feathers
@@ -617,6 +626,7 @@ levels:
       accentColor: "#8B5CF6"         # Purple (willpower)
       backgroundImage: /static/images/seasons/season1/episodes/episode10/images/keep_on.webp
       backgroundOpacity: 0.12
+      heroImage: /static/images/seasons/season1/episodes/episode10/images/keep_on.webp
       carouselImages:
         - /static/images/seasons/season1/episodes/episode10/images/keep_on.webp
       particleEffect: energy_burst
@@ -687,6 +697,7 @@ levels:
       accentColor: "#FFD700"         # Gold (victory)
       backgroundImage: /static/images/seasons/season1/episodes/episode11/images/back_to_the_shire.webp
       backgroundOpacity: 0.15
+      heroImage: /static/images/characters/goblin-king/Goblin-King-01.webp
       carouselImages:
         - /static/images/seasons/season1/episodes/episode11/images/back_to_the_shire.webp
       particleEffect: epic_battle

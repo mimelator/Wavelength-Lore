@@ -119,7 +119,8 @@
 
 .level-info-card,
 .level-tips-card,
-.level-stats-card {
+.level-stats-card,
+.level-hero-card {
     background: linear-gradient(135deg, rgba(138, 43, 226, 0.15), rgba(75, 0, 130, 0.15));
     border: 2px solid rgba(138, 43, 226, 0.3);
     border-radius: 15px;
@@ -238,6 +239,31 @@
 .stat-text span {
     font-weight: bold;
     color: #a78bfa;
+}
+
+/* Hero Image Card */
+.level-hero-card {
+    padding: 10px;
+    overflow: hidden;
+}
+
+.hero-image-container {
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.hero-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.hero-image:hover {
+    transform: scale(1.05);
 }
 
 /* ═════════════════════════════════════════════════════════════════════════════
