@@ -1005,7 +1005,9 @@ function renderBoard() {
     }
 
     // Use responsive gem size from gameState
+    // Mobile: use fixed gem size but set max-width on board to force fit
     boardElement.style.gridTemplateColumns = `repeat(${GAME_CONFIG.COLS}, ${gameState.gemSize}px)`;
+    console.log(`📐 Grid columns: repeat(8, ${gameState.gemSize}px)`);
 
     // Build target state
     const targetGems = []; // Array of {row, col, type} in correct order

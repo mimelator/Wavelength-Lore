@@ -114,9 +114,10 @@
         @media (max-width: 768px) {
             .game-board-wrapper {
                 margin: 5px 0;
-                padding: 0 5px;
+                padding: 0 4px;
                 width: 100%;
-                overflow: visible;
+                overflow: hidden !important;
+                box-sizing: border-box !important;
             }
         }
 
@@ -138,8 +139,12 @@
                 border: 2px solid rgba(138, 43, 226, 0.5);
                 padding: 4px;
                 gap: 2px;
-                max-width: none;
                 border-radius: 12px;
+                /* FORCE board to fit within viewport */
+                max-width: 100% !important;
+                width: 100% !important;
+                overflow: hidden !important;
+                box-sizing: border-box !important;
             }
         }
 
