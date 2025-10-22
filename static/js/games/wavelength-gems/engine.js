@@ -1215,41 +1215,24 @@ async function loadLevel(levelNumber) {
         gameBackgroundManager.setWeather(weather);
     }
 
-    // Load hero image (sidebar and badge)
+    // Load hero badge (displayed next to game board)
     if (levelConfig.theme?.heroImage) {
-        // Sidebar hero image
-        const heroImageElement = document.getElementById('heroImage');
-        const heroImageCard = document.getElementById('heroImageCard');
-        
-        // Hero badge (on canvas)
         const heroBadgeImage = document.getElementById('heroBadgeImage');
         const heroBadge = document.getElementById('heroBadge');
         
-        console.log('🖼️ Loading hero image:', levelConfig.theme.heroImage);
+        console.log('🖼️ Loading hero badge:', levelConfig.theme.heroImage);
         
-        // Load sidebar version
-        if (heroImageElement && heroImageCard) {
-            heroImageElement.src = levelConfig.theme.heroImage;
-            heroImageElement.alt = `${levelConfig.title} Hero`;
-            heroImageCard.style.display = 'block';
-            console.log('✅ Sidebar hero image loaded');
-        }
-        
-        // Load badge version (next to game board)
         if (heroBadgeImage && heroBadge) {
             heroBadgeImage.src = levelConfig.theme.heroImage;
             heroBadgeImage.alt = `${levelConfig.title} Hero`;
             heroBadge.style.display = 'block';
-            console.log('✅ Hero badge loaded');
+            console.log('✅ Hero badge loaded and displayed');
         } else {
             console.warn('⚠️ Hero badge elements not found in DOM');
         }
     } else {
         console.log('ℹ️ No hero image defined for this level');
-        // Hide hero elements if no hero image defined
-        const heroImageCard = document.getElementById('heroImageCard');
         const heroBadge = document.getElementById('heroBadge');
-        if (heroImageCard) heroImageCard.style.display = 'none';
         if (heroBadge) heroBadge.style.display = 'none';
     }
 
