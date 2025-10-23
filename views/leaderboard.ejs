@@ -339,22 +339,58 @@
                             const user = users[userId];
                             const stats = user.radioPlayerStats || {};
                             
+                            // Calculate total points from individual stats for comparison
+                            const pointValues = {
+                                mushrooms: 10,
+                                stars: 5,
+                                horseshoes: 15,
+                                sparkles: 5,
+                                crystals: 8,
+                                moons: 7,
+                                goblins: 25
+                            };
+                            
+                            let calculatedTotal = 0;
+                            for (const [stat, count] of Object.entries(stats)) {
+                                if (pointValues[stat]) {
+                                    calculatedTotal += (count || 0) * pointValues[stat];
+                                }
+                            }
+                            calculatedTotal += (stats.gameModePoints || 0);
+                            
                             // Debug: Log each user's stats
                             console.log(`User ${userId}:`, { 
                                 user: user,
                                 stats: stats, 
-                                totalPoints: stats.totalPoints,
+                                storedTotalPoints: stats.totalPoints,
+                                calculatedTotalPoints: calculatedTotal,
                                 hasRadioPlayerStats: !!user.radioPlayerStats,
+                                individualStats: {
+                                    mushrooms: stats.mushrooms || 0,
+                                    stars: stats.stars || 0,
+                                    horseshoes: stats.horseshoes || 0,
+                                    sparkles: stats.sparkles || 0,
+                                    crystals: stats.crystals || 0,
+                                    moons: stats.moons || 0,
+                                    goblins: stats.goblins || 0,
+                                    gameModePoints: stats.gameModePoints || 0
+                                },
                                 allKeys: Object.keys(user)
                             });
-                            const totalPoints = stats.totalPoints || 0;
+                            
+                            // Use the higher of stored or calculated total points
+                            const totalPoints = Math.max(stats.totalPoints || 0, calculatedTotal);
                             const magicLevel = stats.magicLevel || 1;
 
                             // Get user name from forum profile or use ID
                             const forumUser = forumUsers[userId] || {};
                             const userName = forumUser.name || forumUser.displayName || `Player ${userId.substring(0, 6)}`;
 
-                            if (totalPoints > 0) {
+                            // Include users if they have any stats at all (not just totalPoints > 0)
+                            const hasAnyStats = totalPoints > 0 || 
+                                               Object.values(pointValues).some(value => (stats[Object.keys(pointValues).find(key => pointValues[key] === value)] || 0) > 0);
+                            
+                            if (hasAnyStats) {
                                 leaderboardData.push({
                                     userId,
                                     userName,

@@ -64,6 +64,9 @@ class WavelengthRadio {
 
         // Auto-resume from global radio player if it was playing
         this.restoreGlobalPlayerState();
+        
+        // Make this instance globally accessible for debugging
+        window.radioPlayer = this;
     }
 
     // Pause global radio player if it exists
@@ -1114,18 +1117,33 @@ class WavelengthRadio {
         // Add any bonus game mode points
         calculatedTotal += this.stats.gameModePoints || 0;
 
-        // Update total points if the calculated value is higher
-        if (calculatedTotal > this.stats.totalPoints) {
-            this.stats.totalPoints = calculatedTotal;
-            localStorage.setItem('total_points', this.stats.totalPoints);
-            console.log('🔄 Recalculated total points:', {
-                from: this.stats.totalPoints,
-                to: calculatedTotal,
-                breakdown: Object.entries(pointValues).map(([key, value]) => 
-                    `${key}: ${this.stats[key]} × ${value} = ${(this.stats[key] || 0) * value}`
-                ).join(', ')
-            });
+        // Always update total points to the calculated value (don't just take the higher value)
+        const oldTotal = this.stats.totalPoints;
+        this.stats.totalPoints = calculatedTotal;
+        localStorage.setItem('total_points', this.stats.totalPoints);
+        
+        console.log('🔄 Recalculated total points:', {
+            from: oldTotal,
+            to: calculatedTotal,
+            breakdown: Object.entries(pointValues).map(([key, value]) => 
+                `${key}: ${this.stats[key]} × ${value} = ${(this.stats[key] || 0) * value}`
+            ).join(', '),
+            gameModeBonus: this.stats.gameModePoints || 0
+        });
+        
+        // Automatically save to Firebase after recalculation
+        if (this.currentUserId) {
+            this.saveStatsToFirebase();
         }
+    }
+
+    // Debug function to force recalculate and save stats
+    forceRecalculateAndSave() {
+        console.log('🔧 Force recalculating stats...');
+        this.recalculateTotalPoints();
+        this.updateStats();
+        console.log('Current stats after recalculation:', this.stats);
+        return this.stats;
     }
 
     // Show level up notification
