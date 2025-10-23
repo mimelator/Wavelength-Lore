@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Create notification element
     const notification = document.createElement('div');
     notification.className = `gallery-notification ${type}`;
-    notification.textContent = message;
+    notification.innerHTML = message;
     
     // Style the notification
     notification.style.backgroundColor = getBackgroundColor(type);
