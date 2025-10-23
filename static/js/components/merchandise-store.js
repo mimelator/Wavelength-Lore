@@ -622,9 +622,9 @@ class MerchandiseStore {
     
     return this.galleryImages.map(image => `
       <div class="gallery-image-card ${this.selectedImage === image.id ? 'selected' : ''}">
-        <img src="${image.thumbnailUrl}" alt="${image.title}" />
+        <img src="${image.thumbnailUrl}" alt="${this.cleanImageTitle(image.title)}" />
         <div class="image-info">
-          <h4>${image.title}</h4>
+          <h4>${this.cleanImageTitle(image.title)}</h4>
           <p class="image-size">${this.formatFileSize(image.size)}</p>
           <div class="image-actions">
             <button class="gallery-image-select" data-image-id="${image.id}">
@@ -1060,6 +1060,22 @@ class MerchandiseStore {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+  
+  /**
+   * Clean up image title by removing file extensions
+   * @param {string} title - Original title/filename
+   * @returns {string} Clean title without extension
+   */
+  cleanImageTitle(title) {
+    if (!title) return 'Untitled';
+    
+    // Remove file extensions like .webp, .jpg, .png, etc.
+    return title.replace(/\.(webp|jpg|jpeg|png|gif|svg)$/i, '')
+                .replace(/^image-\d+-/, '') // Remove image-timestamp- prefix
+                .replace(/-/g, ' ')        // Replace hyphens with spaces
+                .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space between camelCase
+                .trim();
   }
   
   getAuthToken() {
