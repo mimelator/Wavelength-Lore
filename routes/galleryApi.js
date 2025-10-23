@@ -7,13 +7,14 @@
 
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
+// const multer = require('multer'); // Commented out - upload functionality disabled
 const path = require('path');
 // Use consistent authentication for all environments
 const { ensureAuthenticated } = require('../middleware/auth');
 const galleryStorage = require('../utils/gallery/storage');
 
-// Configure multer for memory storage
+// Configure multer for memory storage - DISABLED for upload removal
+/*
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -50,6 +51,7 @@ const upload = multer({
     }
   }
 });
+*/
 
 /**
  * GET /api/gallery/user/storage-stats
@@ -145,6 +147,12 @@ router.get('/api/gallery/user/images', ensureAuthenticated, async (req, res) => 
  * Upload an image to the user's gallery
  */
 router.post('/api/gallery/user/upload', ensureAuthenticated, async (req, res) => {
+  // Upload functionality is disabled
+  return res.status(501).json({
+    success: false,
+    error: 'Upload functionality is disabled. Use "Save to Gallery" buttons throughout the site to add images.'
+  });
+  
   try {
     console.log('🔍 Gallery upload initiated');
     
