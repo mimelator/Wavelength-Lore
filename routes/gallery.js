@@ -7,8 +7,8 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-// For testing, use test-auth instead of auth
-const { ensureAuthenticated } = require('../middleware/test-auth');
+// Use the real auth middleware consistently for all environments
+const { ensureAuthenticated } = require('../middleware/auth');
 const galleryHelpers = require('../utils/gallery/helpers');
 
 console.log('🚀 Gallery routes module loaded!');
@@ -31,20 +31,13 @@ router.get('/gallery-demo', (req, res) => {
 });
 
 // User gallery page (requires authentication)
-router.get('/my-gallery', (req, res) => {
-  // Check for authentication before serving the page
-  // This is a more user-friendly approach than using the middleware
-  if (req.cookies && (req.cookies.__session || req.cookies.session)) {
-    res.render('user-gallery', {
-      title: 'My Gallery | Wavelength Lore',
-      cdnUrl: process.env.CDN_URL || '',
-      versionInfo: req.app.locals.versionInfo || null,
-      req: req // Pass request object for canonical URLs
-    });
-  } else {
-    // No authentication token found, redirect to login
-    res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
-  }
+router.get('/my-gallery', ensureAuthenticated, (req, res) => {
+  res.render('user-gallery', {
+    title: 'My Gallery | Wavelength Lore',
+    cdnUrl: process.env.CDN_URL || '',
+    versionInfo: req.app.locals.versionInfo || null,
+    req: req // Pass request object for canonical URLs
+  });
 });
 
 // API endpoint to get gallery images by category
@@ -204,7 +197,6 @@ router.post('/gallery/api/user/save', ensureAuthenticated, async (req, res) => {
   console.log('👤 User information:', { 
     userId, 
     userGroups,
-    requestHeaders: req.headers['x-test-user-groups'],
     resLocals: res.locals.userGroups
   });
   
@@ -274,7 +266,6 @@ router.post('/gallery/api/user/save', ensureAuthenticated, async (req, res) => {
     console.log('👤 User information:', { 
       userId, 
       userGroups,
-      requestHeaders: req.headers['x-test-user-groups'],
       resLocals: res.locals.userGroups
     });
     

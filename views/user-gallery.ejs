@@ -100,6 +100,11 @@
       position: relative;
     }
     
+    /* Hide upload functionality per requirements */
+    #upload-form-container {
+      display: none !important;
+    }
+    
     .gallery-item.selectable::before {
       content: '';
       position: absolute;
@@ -390,7 +395,8 @@
     
     <!-- Action Buttons -->
     <section class="action-buttons" id="action-buttons">
-      <button id="upload-image" class="action-button upload-button">Upload New Image</button>
+      <!-- Upload functionality disabled per requirements -->
+      <!-- <button id="upload-image" class="action-button upload-button">Upload New Image</button> -->
       <button id="download-all" class="action-button download-button">Download All Images</button>
       <button id="start-screensaver" class="action-button screensaver-button">Start Screensaver</button>
       <button id="select-mode" class="action-button" style="background-color: #607d8b;">Select Multiple</button>
@@ -560,6 +566,8 @@
       
       // Function to fetch user's images
       function fetchUserGallery() {
+        console.log('🔍 fetchUserGallery() called - starting gallery fetch...');
+        
         fetch('/api/gallery/user/images', {
           credentials: 'include',
           headers: {
@@ -567,36 +575,52 @@
           }
         })
         .then(response => {
+          console.log('📡 Gallery API response status:', response.status);
+          console.log('📡 Gallery API response headers:', Object.fromEntries(response.headers.entries()));
+          
           if (response.status === 401) {
+            console.log('❌ Authentication required - showing login button');
             showLoginButton();
             throw new Error('Authentication required');
           }
           return response.json();
         })
         .then(data => {
+          console.log('📦 Gallery API response data:', data);
+          
           if (data.success) {
             userImages = data.images || [];
+            console.log(`✅ Gallery fetch successful! Found ${userImages.length} images:`, userImages);
             
             if (userImages.length > 0) {
               populateGallery(userImages);
             } else {
               showEmptyGallery();
             }
+          } else {
+            console.log('❌ Gallery API returned success: false', data);
           }
         })
         .catch(error => {
-          console.error('Error fetching gallery:', error);
+          console.error('❌ Error fetching gallery:', error);
         });
       }
       
       // Function to populate the gallery with images
       function populateGallery(images) {
+        console.log('🎨 populateGallery() called with', images.length, 'images:', images);
+        
         // Clear previous images
         carouselEl.innerHTML = '';
         gridEl.innerHTML = '';
         
+        console.log('🧹 Cleared carousel and grid elements');
+        console.log('📍 Carousel element:', carouselEl);
+        console.log('📍 Grid element:', gridEl);
+        
         // Populate carousel view
-        images.forEach(image => {
+        images.forEach((image, index) => {
+          console.log(`🖼️ Processing image ${index + 1}:`, image);
           const div = document.createElement('div');
           const img = document.createElement('img');
           img.src = image.url;
@@ -785,73 +809,82 @@
         }, 5000);
       });
       
-      // Upload functionality
-      uploadBtn.addEventListener('click', () => {
-        uploadFormContainer.style.display = 'block';
-        uploadStatus.style.display = 'none';
-      });
-      
-      cancelUploadBtn.addEventListener('click', () => {
-        uploadFormContainer.style.display = 'none';
-        resetUploadForm();
-      });
-      
-      fileInput.addEventListener('change', (e) => {
-        selectedFile = e.target.files[0];
-        if (selectedFile) {
-          // Preview the image
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            filePreview.src = e.target.result;
-            filePreview.style.display = 'block';
-            fileInputLabel.textContent = selectedFile.name;
-          };
-          reader.readAsDataURL(selectedFile);
-        }
-      });
-      
-      // Handle drag and drop
-      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        fileInputLabel.addEventListener(eventName, preventDefaults, false);
-      });
-      
-      function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
+      // Upload functionality (only if elements exist)
+      if (uploadBtn) {
+        uploadBtn.addEventListener('click', () => {
+          uploadFormContainer.style.display = 'block';
+          uploadStatus.style.display = 'none';
+        });
       }
       
-      ['dragenter', 'dragover'].forEach(eventName => {
-        fileInputLabel.addEventListener(eventName, () => {
-          fileInputLabel.classList.add('highlight');
-        }, false);
-      });
+      if (cancelUploadBtn) {
+        cancelUploadBtn.addEventListener('click', () => {
+          uploadFormContainer.style.display = 'none';
+          resetUploadForm();
+        });
+      }
       
-      ['dragleave', 'drop'].forEach(eventName => {
-        fileInputLabel.addEventListener(eventName, () => {
-          fileInputLabel.classList.remove('highlight');
-        }, false);
-      });
+      if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+          selectedFile = e.target.files[0];
+          if (selectedFile) {
+            // Preview the image
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              filePreview.src = e.target.result;
+              filePreview.style.display = 'block';
+              fileInputLabel.textContent = selectedFile.name;
+            };
+            reader.readAsDataURL(selectedFile);
+          }
+        });
+      }
       
-      fileInputLabel.addEventListener('drop', (e) => {
-        const dt = e.dataTransfer;
-        const files = dt.files;
+      // Handle drag and drop (only if elements exist)
+      if (fileInputLabel) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+          fileInputLabel.addEventListener(eventName, preventDefaults, false);
+        });
         
-        if (files.length > 0) {
-          selectedFile = files[0];
-          fileInput.files = dt.files;
-          
-          // Preview the image
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            filePreview.src = e.target.result;
-            filePreview.style.display = 'block';
-            fileInputLabel.textContent = selectedFile.name;
-          };
-          reader.readAsDataURL(selectedFile);
+        function preventDefaults(e) {
+          e.preventDefault();
+          e.stopPropagation();
         }
-      }, false);
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+          fileInputLabel.addEventListener(eventName, () => {
+            fileInputLabel.classList.add('highlight');
+          }, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+          fileInputLabel.addEventListener(eventName, () => {
+            fileInputLabel.classList.remove('highlight');
+          }, false);
+        });
+        
+        fileInputLabel.addEventListener('drop', (e) => {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          
+          if (files.length > 0) {
+            selectedFile = files[0];
+            fileInput.files = dt.files;
+            
+            // Preview the image
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              filePreview.src = e.target.result;
+              filePreview.style.display = 'block';
+              fileInputLabel.textContent = selectedFile.name;
+            };
+            reader.readAsDataURL(selectedFile);
+          }
+        }, false);
+      }
       
-      uploadForm.addEventListener('submit', (e) => {
+      if (uploadForm) {
+        uploadForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
         if (!selectedFile) {
@@ -965,12 +998,19 @@
         xhr.open('POST', '/api/gallery/user/upload', true);
         xhr.withCredentials = true; // For cookies/authentication
         xhr.send(formData);
-      });
+        });
+      }
       
       function resetUploadForm() {
-        fileInput.value = '';
-        filePreview.style.display = 'none';
-        fileInputLabel.textContent = 'Choose an image or drag it here';
+        if (fileInput) {
+          fileInput.value = '';
+        }
+        if (filePreview) {
+          filePreview.style.display = 'none';
+        }
+        if (fileInputLabel) {
+          fileInputLabel.textContent = 'Choose an image or drag it here';
+        }
         selectedFile = null;
         
         // Clear title and tags
@@ -1232,6 +1272,11 @@
       });
       
       // Fetch user gallery and storage stats on load
+      console.log('🚀 Gallery initialization starting...');
+      console.log('📍 DOM elements found:');
+      console.log('  - Carousel:', carouselEl ? 'Found' : 'NOT FOUND');
+      console.log('  - Grid:', gridEl ? 'Found' : 'NOT FOUND');
+      
       fetchStorageStats();
       fetchUserGallery();
     });
@@ -1239,5 +1284,1073 @@
   
   <!-- Include standard footer -->
   <%- include('partials/footer') %>
+  
+  <!-- Gallery Debugging Tools (DEVELOPMENT ONLY) -->
+  <% if (process.env.NODE_ENV === 'development') { %>
+  <script src="<%= cdnUrl %>/js/gallery-debug-tools.js"></script>
+  <script>
+    console.log('🔍 Gallery debugging tools loaded');
+    
+    // Add diagnostics button
+    const debugButton = document.createElement('button');
+    debugButton.textContent = 'Debug Gallery';
+    debugButton.style.position = 'fixed';
+    debugButton.style.bottom = '20px';
+    debugButton.style.left = '20px';
+    debugButton.style.zIndex = '9999';
+    debugButton.style.backgroundColor = '#ff6600';
+    debugButton.style.color = 'white';
+    debugButton.style.border = 'none';
+    debugButton.style.borderRadius = '4px';
+    debugButton.style.padding = '8px 15px';
+    debugButton.style.fontWeight = 'bold';
+    debugButton.style.cursor = 'pointer';
+    debugButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+    
+    debugButton.addEventListener('click', () => {
+      showGalleryDiagnostics();
+    });
+    
+    document.body.appendChild(debugButton);
+    
+    // Function to show comprehensive gallery diagnostics
+    function showGalleryDiagnostics() {
+      // Create diagnostic overlay
+      const diagnosticOverlay = document.createElement('div');
+      diagnosticOverlay.style.position = 'fixed';
+      diagnosticOverlay.style.top = '0';
+      diagnosticOverlay.style.left = '0';
+      diagnosticOverlay.style.width = '100%';
+      diagnosticOverlay.style.height = '100%';
+      diagnosticOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+      diagnosticOverlay.style.color = 'white';
+      diagnosticOverlay.style.fontFamily = 'monospace';
+      diagnosticOverlay.style.padding = '20px';
+      diagnosticOverlay.style.boxSizing = 'border-box';
+      diagnosticOverlay.style.zIndex = '10000';
+      diagnosticOverlay.style.overflow = 'auto';
+      
+      // Add close button
+      const closeButton = document.createElement('button');
+      closeButton.textContent = 'Close';
+      closeButton.style.position = 'absolute';
+      closeButton.style.top = '10px';
+      closeButton.style.right = '10px';
+      closeButton.style.backgroundColor = '#ff4444';
+      closeButton.style.border = 'none';
+      closeButton.style.borderRadius = '4px';
+      closeButton.style.padding = '8px 15px';
+      closeButton.style.color = 'white';
+      closeButton.style.cursor = 'pointer';
+      
+      closeButton.addEventListener('click', () => {
+        document.body.removeChild(diagnosticOverlay);
+      });
+      
+      diagnosticOverlay.appendChild(closeButton);
+      
+      // Add title
+      const title = document.createElement('h2');
+      title.textContent = 'Gallery Diagnostics';
+      title.style.color = '#33ccff';
+      diagnosticOverlay.appendChild(title);
+      
+      // Create content container with tabs
+      const tabContainer = document.createElement('div');
+      tabContainer.style.marginTop = '20px';
+      
+      const tabs = [
+        { id: 'environment', label: 'Environment' },
+        { id: 'authentication', label: 'Authentication' },
+        { id: 'storage', label: 'S3 Storage' },
+        { id: 'api', label: 'API Tests' },
+        { id: 'network', label: 'Network' },
+        { id: 'logs', label: 'Console Logs' }
+      ];
+      
+      // Create tab headers
+      const tabHeader = document.createElement('div');
+      tabHeader.style.display = 'flex';
+      tabHeader.style.marginBottom = '10px';
+      tabHeader.style.borderBottom = '1px solid #555';
+      
+      tabs.forEach(tab => {
+        const tabButton = document.createElement('button');
+        tabButton.textContent = tab.label;
+        tabButton.dataset.tabId = tab.id;
+        tabButton.style.backgroundColor = 'transparent';
+        tabButton.style.border = 'none';
+        tabButton.style.borderBottom = '3px solid transparent';
+        tabButton.style.padding = '10px 15px';
+        tabButton.style.margin = '0 5px';
+        tabButton.style.color = 'white';
+        tabButton.style.cursor = 'pointer';
+        
+        tabButton.addEventListener('click', () => {
+          // Hide all content panels
+          document.querySelectorAll('.diagnostic-tab-content').forEach(panel => {
+            panel.style.display = 'none';
+          });
+          
+          // Show selected panel
+          document.getElementById(`tab-content-${tab.id}`).style.display = 'block';
+          
+          // Update active tab styling
+          document.querySelectorAll('[data-tab-id]').forEach(btn => {
+            btn.style.borderBottom = '3px solid transparent';
+            btn.style.color = 'white';
+          });
+          
+          tabButton.style.borderBottom = '3px solid #33ccff';
+          tabButton.style.color = '#33ccff';
+        });
+        
+        tabHeader.appendChild(tabButton);
+      });
+      
+      tabContainer.appendChild(tabHeader);
+      
+      // Create content panels
+      tabs.forEach(tab => {
+        const contentPanel = document.createElement('div');
+        contentPanel.id = `tab-content-${tab.id}`;
+        contentPanel.className = 'diagnostic-tab-content';
+        contentPanel.style.display = 'none';
+        contentPanel.style.padding = '15px';
+        contentPanel.style.backgroundColor = '#111';
+        contentPanel.style.borderRadius = '4px';
+        contentPanel.style.minHeight = '300px';
+        
+        contentPanel.innerHTML = `<div id="${tab.id}-content">Loading ${tab.label} information...</div>`;
+        
+        tabContainer.appendChild(contentPanel);
+      });
+      
+      diagnosticOverlay.appendChild(tabContainer);
+      document.body.appendChild(diagnosticOverlay);
+      
+      // Select first tab by default
+      document.querySelector('[data-tab-id="environment"]').click();
+      
+      // Populate environment tab
+      populateEnvironmentTab();
+      
+      // Populate authentication tab
+      populateAuthenticationTab();
+      
+      // Populate storage tab
+      populateStorageTab();
+      
+      // Populate API tests tab
+      populateApiTestsTab();
+      
+      // Populate network tab
+      populateNetworkTab();
+      
+      // Populate logs tab
+      populateLogsTab();
+    }
+    
+    // Populate environment tab
+    function populateEnvironmentTab() {
+      const content = document.getElementById('environment-content');
+      
+      content.innerHTML = `
+        <h3 style="color: #33ccff;">Environment Variables</h3>
+        <div style="margin-bottom: 15px;">
+          <p><strong>CDN URL:</strong> ${window.cdnUrl || 'Not set'}</p>
+          <p><strong>API Base URL:</strong> ${window.location.origin}</p>
+          <p><strong>NODE_ENV:</strong> development</p>
+        </div>
+        
+        <h3 style="color: #33ccff;">Browser Information</h3>
+        <div style="margin-bottom: 15px;">
+          <p><strong>User Agent:</strong> ${navigator.userAgent}</p>
+          <p><strong>Cookies Enabled:</strong> ${navigator.cookieEnabled ? 'Yes' : 'No'}</p>
+          <p><strong>localStorage Available:</strong> ${typeof window.localStorage !== 'undefined' ? 'Yes' : 'No'}</p>
+        </div>
+        
+        <h3 style="color: #33ccff;">Tests</h3>
+        <div style="margin-bottom: 15px;">
+          <button id="test-cookies" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin-right: 10px; cursor: pointer;">Test Cookies</button>
+          <button id="test-browser-storage" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin-right: 10px; cursor: pointer;">Test localStorage</button>
+        </div>
+        <div id="env-test-results" style="background-color: #222; padding: 10px; border-radius: 4px;"></div>
+      `;
+      
+      // Add click handlers for test buttons
+      document.getElementById('test-cookies').addEventListener('click', () => {
+        const resultsDiv = document.getElementById('env-test-results');
+        resultsDiv.innerHTML = 'Testing cookies...';
+        
+        // Try to set a test cookie
+        document.cookie = 'gallery_test=1; path=/';
+        
+        // Check if it was set
+        setTimeout(() => {
+          if (document.cookie.indexOf('gallery_test=1') > -1) {
+            resultsDiv.innerHTML = '<span style="color: #4caf50;">✓ Cookie test passed!</span>';
+          } else {
+            resultsDiv.innerHTML = '<span style="color: #f44336;">❌ Cookie test failed! Cookies may be disabled.</span>';
+          }
+        }, 100);
+      });
+      
+      document.getElementById('test-browser-storage').addEventListener('click', () => {
+        const resultsDiv = document.getElementById('env-test-results');
+        resultsDiv.innerHTML = 'Testing localStorage...';
+        
+        try {
+          // Try to use localStorage
+          localStorage.setItem('gallery_test', '1');
+          const value = localStorage.getItem('gallery_test');
+          localStorage.removeItem('gallery_test');
+          
+          if (value === '1') {
+            resultsDiv.innerHTML = '<span style="color: #4caf50;">✓ localStorage test passed!</span>';
+          } else {
+            resultsDiv.innerHTML = '<span style="color: #f44336;">❌ localStorage test failed! Value mismatch.</span>';
+          }
+        } catch (error) {
+          resultsDiv.innerHTML = `<span style="color: #f44336;">❌ localStorage test failed! Error: ${error.message}</span>`;
+        }
+      });
+    }
+    
+    // Populate authentication tab
+    function populateAuthenticationTab() {
+      const content = document.getElementById('authentication-content');
+      
+      content.innerHTML = `
+        <h3 style="color: #33ccff;">Authentication Status</h3>
+        <div id="auth-status" style="margin-bottom: 15px;">Checking authentication status...</div>
+        
+        <h3 style="color: #33ccff;">Session Information</h3>
+        <div id="session-info" style="margin-bottom: 15px;">Checking session information...</div>
+        
+        <h3 style="color: #33ccff;">Tests</h3>
+        <div style="margin-bottom: 15px;">
+          <button id="test-auth-endpoint" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin-right: 10px; cursor: pointer;">Test Authentication Endpoint</button>
+          <button id="test-session-cookie" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin-right: 10px; cursor: pointer;">Check Session Cookie</button>
+        </div>
+        <div id="auth-test-results" style="background-color: #222; padding: 10px; border-radius: 4px;"></div>
+      `;
+      
+      // Check authentication status
+      fetch('/api/user/profile', {
+        credentials: 'include'
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        const authStatusDiv = document.getElementById('auth-status');
+        
+        if (data.user) {
+          authStatusDiv.innerHTML = `
+            <p style="color: #4caf50;">✓ Authenticated</p>
+            <p><strong>User ID:</strong> ${data.user.uid || 'Not available'}</p>
+            <p><strong>Email:</strong> ${data.user.email || 'Not available'}</p>
+            <p><strong>Display Name:</strong> ${data.user.displayName || 'Not available'}</p>
+          `;
+          
+          // Store user info for other tests
+          window.userData = {
+            isAuthenticated: true,
+            user: data.user
+          };
+        } else {
+          authStatusDiv.innerHTML = `
+            <p style="color: #f44336;">❌ Not authenticated</p>
+          `;
+          
+          window.userData = {
+            isAuthenticated: false
+          };
+        }
+      })
+      .catch(error => {
+        document.getElementById('auth-status').innerHTML = `
+          <p style="color: #f44336;">❌ Error checking authentication: ${error.message}</p>
+        `;
+      });
+      
+      // Check session cookies
+      const sessionInfoDiv = document.getElementById('session-info');
+      
+      let hasSessionCookie = false;
+      const cookies = document.cookie.split(';');
+      cookies.forEach(cookie => {
+        const [name, value] = cookie.trim().split('=');
+        if (name === '__session' || name === 'session') {
+          hasSessionCookie = true;
+          const truncatedValue = value.length > 20 ? value.substring(0, 20) + '...' : value;
+          sessionInfoDiv.innerHTML = `
+            <p><strong>Session Cookie:</strong> ${name} (${truncatedValue})</p>
+            <p style="color: #4caf50;">✓ Session cookie found</p>
+          `;
+        }
+      });
+      
+      if (!hasSessionCookie) {
+        sessionInfoDiv.innerHTML = `
+          <p style="color: #f44336;">❌ No session cookie found</p>
+          <p>Authentication may not work properly without a session cookie.</p>
+        `;
+      }
+      
+      // Add click handlers for test buttons
+      document.getElementById('test-auth-endpoint').addEventListener('click', () => {
+        const resultsDiv = document.getElementById('auth-test-results');
+        resultsDiv.innerHTML = 'Testing authentication endpoint...';
+        
+        fetch('/api/user/profile', {
+          credentials: 'include'
+        })
+        .then(response => {
+          resultsDiv.innerHTML += `<p>Response status: ${response.status} ${response.statusText}</p>`;
+          return response.json().catch(e => {
+            return { error: 'Failed to parse JSON response' };
+          });
+        })
+        .then(data => {
+          resultsDiv.innerHTML += `<pre style="background: #333; padding: 10px; overflow: auto;">${JSON.stringify(data, null, 2)}</pre>`;
+        })
+        .catch(error => {
+          resultsDiv.innerHTML += `<p style="color: #f44336;">Error: ${error.message}</p>`;
+        });
+      });
+      
+      document.getElementById('test-session-cookie').addEventListener('click', () => {
+        const resultsDiv = document.getElementById('auth-test-results');
+        resultsDiv.innerHTML = 'Checking session cookies...';
+        
+        const cookies = document.cookie.split(';');
+        let sessionFound = false;
+        
+        cookies.forEach(cookie => {
+          const [name, value] = cookie.trim().split('=');
+          if (name === '__session' || name === 'session') {
+            sessionFound = true;
+            const truncatedValue = value.length > 20 ? value.substring(0, 20) + '...' : value;
+            resultsDiv.innerHTML += `<p><strong>${name}:</strong> ${truncatedValue}</p>`;
+          }
+        });
+        
+        if (!sessionFound) {
+          resultsDiv.innerHTML += `<p style="color: #f44336;">No session cookies found!</p>`;
+        } else {
+          resultsDiv.innerHTML += `<p style="color: #4caf50;">Session cookie found.</p>`;
+        }
+      });
+    }
+    
+    // Populate storage tab
+    function populateStorageTab() {
+      const content = document.getElementById('storage-content');
+      
+      content.innerHTML = `
+        <h3 style="color: #33ccff;">S3 Storage Configuration</h3>
+        <div id="s3-config" style="margin-bottom: 15px;">
+          <p><strong>CDN URL:</strong> ${window.cdnUrl || 'Not set'}</p>
+          <p><strong>Direct S3 Tests:</strong> Available through API only (server-side)</p>
+        </div>
+        
+        <h3 style="color: #33ccff;">Gallery Storage Stats</h3>
+        <div id="storage-stats" style="margin-bottom: 15px;">Loading storage statistics...</div>
+        
+        <h3 style="color: #33ccff;">Upload Test</h3>
+        <div style="margin-bottom: 15px;">
+          <p>Test uploading a small image to verify S3 storage connection:</p>
+          <button id="test-small-upload" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin-right: 10px; cursor: pointer;">Test Small Upload (1KB)</button>
+          <button id="test-view-gallery" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin-right: 10px; cursor: pointer;">View Gallery Contents</button>
+        </div>
+        <div id="storage-test-results" style="background-color: #222; padding: 10px; border-radius: 4px; max-height: 300px; overflow: auto;"></div>
+      `;
+      
+      // Fetch storage stats
+      fetch('/api/gallery/user/storage-stats', {
+        credentials: 'include'
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        const storageStatsDiv = document.getElementById('storage-stats');
+        
+        if (data.success) {
+          const stats = data.stats;
+          
+          if (stats.quota === -1) {
+            storageStatsDiv.innerHTML = `
+              <p><strong>Storage Used:</strong> ${stats.usedFormatted}</p>
+              <p><strong>Storage Quota:</strong> Unlimited</p>
+              <p><strong>Status:</strong> <span style="color: #4caf50;">✓ No storage limit</span></p>
+            `;
+          } else {
+            storageStatsDiv.innerHTML = `
+              <p><strong>Storage Used:</strong> ${stats.usedFormatted} (${stats.percentage.toFixed(1)}%)</p>
+              <p><strong>Storage Quota:</strong> ${stats.quotaFormatted}</p>
+              <p><strong>Remaining:</strong> ${stats.remainingFormatted}</p>
+            `;
+            
+            // Add status color
+            if (stats.percentage >= 90) {
+              storageStatsDiv.innerHTML += `<p><strong>Status:</strong> <span style="color: #f44336;">⚠ Critical (${stats.percentage.toFixed(1)}% full)</span></p>`;
+            } else if (stats.percentage >= 70) {
+              storageStatsDiv.innerHTML += `<p><strong>Status:</strong> <span style="color: #ff9800;">⚠ Warning (${stats.percentage.toFixed(1)}% full)</span></p>`;
+            } else {
+              storageStatsDiv.innerHTML += `<p><strong>Status:</strong> <span style="color: #4caf50;">✓ Good (${stats.percentage.toFixed(1)}% full)</span></p>`;
+            }
+          }
+        } else {
+          storageStatsDiv.innerHTML = `
+            <p style="color: #f44336;">❌ Error fetching storage stats: ${data.error || 'Unknown error'}</p>
+          `;
+        }
+      })
+      .catch(error => {
+        document.getElementById('storage-stats').innerHTML = `
+          <p style="color: #f44336;">❌ Error fetching storage stats: ${error.message}</p>
+        `;
+      });
+      
+      // Test small upload
+      document.getElementById('test-small-upload').addEventListener('click', () => {
+        const resultsDiv = document.getElementById('storage-test-results');
+        resultsDiv.innerHTML = 'Creating test image for upload...';
+        
+        // Generate a simple 1x1 pixel transparent GIF
+        const base64Image = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        const binaryString = atob(base64Image);
+        const bytes = new Uint8Array(binaryString.length);
+        
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        
+        const imageBlob = new Blob([bytes], { type: 'image/gif' });
+        
+        // Create form data for upload
+        const formData = new FormData();
+        formData.append('file', imageBlob, 'test-image-' + Date.now() + '.gif');
+        formData.append('title', 'Diagnostic Test Image');
+        formData.append('tags', 'diagnostic,test');
+        
+        resultsDiv.innerHTML += '<p>Uploading test image...</p>';
+        
+        // Upload the image
+        fetch('/api/gallery/user/upload', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include'
+        })
+        .then(response => {
+          resultsDiv.innerHTML += `<p>Response status: ${response.status} ${response.statusText}</p>`;
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            resultsDiv.innerHTML += `
+              <p style="color: #4caf50;">✓ Upload successful!</p>
+              <p><strong>Image URL:</strong> <a href="${data.image.url}" target="_blank" style="color: #33ccff;">${data.image.url}</a></p>
+              <p><strong>Relative Path:</strong> ${data.image.relativePath}</p>
+              <p><strong>Size:</strong> ${data.image.sizeFormatted}</p>
+            `;
+            
+            // Show verify button
+            resultsDiv.innerHTML += `
+              <button id="verify-image-url" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin-top: 10px; cursor: pointer;">Verify URL Access</button>
+            `;
+            
+            // Add verify button handler
+            setTimeout(() => {
+              document.getElementById('verify-image-url')?.addEventListener('click', () => {
+                window.open(data.image.url, '_blank');
+              });
+            }, 100);
+          } else {
+            resultsDiv.innerHTML += `
+              <p style="color: #f44336;">❌ Upload failed: ${data.error || 'Unknown error'}</p>
+            `;
+          }
+        })
+        .catch(error => {
+          resultsDiv.innerHTML += `
+            <p style="color: #f44336;">❌ Error during upload: ${error.message}</p>
+          `;
+        });
+      });
+      
+      // View gallery contents
+      document.getElementById('test-view-gallery').addEventListener('click', () => {
+        const resultsDiv = document.getElementById('storage-test-results');
+        resultsDiv.innerHTML = 'Loading gallery contents...';
+        
+        fetch('/api/gallery/user/images', {
+          credentials: 'include'
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`API error: ${response.status} ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            const images = data.images || [];
+            
+            if (images.length === 0) {
+              resultsDiv.innerHTML = '<p>Your gallery is empty.</p>';
+            } else {
+              resultsDiv.innerHTML = `<p>Found ${images.length} images in your gallery:</p><ul>`;
+              
+              images.forEach((image, index) => {
+                resultsDiv.innerHTML += `
+                  <li style="margin-bottom: 10px;">
+                    <strong>${index + 1}. ${image.title || 'Untitled'}</strong><br>
+                    URL: <a href="${image.url}" target="_blank" style="color: #33ccff;">${image.url.substring(0, 50)}...</a><br>
+                    Path: ${image.relativePath}<br>
+                    Size: ${image.sizeFormatted || 'Unknown'}
+                  </li>
+                `;
+              });
+              
+              resultsDiv.innerHTML += '</ul>';
+            }
+          } else {
+            resultsDiv.innerHTML = `
+              <p style="color: #f44336;">❌ Error fetching gallery: ${data.error || 'Unknown error'}</p>
+            `;
+          }
+        })
+        .catch(error => {
+          resultsDiv.innerHTML = `
+            <p style="color: #f44336;">❌ Error: ${error.message}</p>
+          `;
+        });
+      });
+    }
+    
+    // Populate API tests tab
+    function populateApiTestsTab() {
+      const content = document.getElementById('api-content');
+      
+      content.innerHTML = `
+        <h3 style="color: #33ccff;">API Endpoints Test</h3>
+        <div style="margin-bottom: 15px;">
+          <p>Test key gallery API endpoints to ensure they're working correctly:</p>
+          <button id="test-gallery-images" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin: 5px; cursor: pointer;">Test /api/gallery/user/images</button>
+          <button id="test-storage-stats" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin: 5px; cursor: pointer;">Test /api/gallery/user/storage-stats</button>
+          <button id="test-upload-endpoint" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin: 5px; cursor: pointer;">Test Upload Endpoint</button>
+        </div>
+        <div id="api-test-results" style="background-color: #222; padding: 10px; border-radius: 4px; max-height: 300px; overflow: auto;"></div>
+      `;
+      
+      // Test gallery images endpoint
+      document.getElementById('test-gallery-images').addEventListener('click', () => {
+        const resultsDiv = document.getElementById('api-test-results');
+        resultsDiv.innerHTML = 'Testing /api/gallery/user/images...';
+        
+        fetch('/api/gallery/user/images', {
+          credentials: 'include'
+        })
+        .then(response => {
+          resultsDiv.innerHTML += `<p>Response status: ${response.status} ${response.statusText}</p>`;
+          return response.json().catch(e => {
+            return { error: 'Failed to parse JSON response' };
+          });
+        })
+        .then(data => {
+          if (data.success) {
+            resultsDiv.innerHTML += `<p style="color: #4caf50;">✓ API returned success</p>`;
+            resultsDiv.innerHTML += `<p>Found ${data.images ? data.images.length : 0} images</p>`;
+            
+            // Show sample of first image if available
+            if (data.images && data.images.length > 0) {
+              resultsDiv.innerHTML += `
+                <p><strong>Sample image:</strong></p>
+                <pre style="background: #333; padding: 10px; overflow: auto;">${JSON.stringify(data.images[0], null, 2)}</pre>
+              `;
+            }
+          } else {
+            resultsDiv.innerHTML += `<p style="color: #f44336;">❌ API returned error: ${data.error || 'Unknown error'}</p>`;
+          }
+        })
+        .catch(error => {
+          resultsDiv.innerHTML += `<p style="color: #f44336;">❌ Request failed: ${error.message}</p>`;
+        });
+      });
+      
+      // Test storage stats endpoint
+      document.getElementById('test-storage-stats').addEventListener('click', () => {
+        const resultsDiv = document.getElementById('api-test-results');
+        resultsDiv.innerHTML = 'Testing /api/gallery/user/storage-stats...';
+        
+        fetch('/api/gallery/user/storage-stats', {
+          credentials: 'include'
+        })
+        .then(response => {
+          resultsDiv.innerHTML += `<p>Response status: ${response.status} ${response.statusText}</p>`;
+          return response.json().catch(e => {
+            return { error: 'Failed to parse JSON response' };
+          });
+        })
+        .then(data => {
+          if (data.success) {
+            resultsDiv.innerHTML += `<p style="color: #4caf50;">✓ API returned success</p>`;
+            resultsDiv.innerHTML += `
+              <pre style="background: #333; padding: 10px; overflow: auto;">${JSON.stringify(data.stats, null, 2)}</pre>
+            `;
+          } else {
+            resultsDiv.innerHTML += `<p style="color: #f44336;">❌ API returned error: ${data.error || 'Unknown error'}</p>`;
+          }
+        })
+        .catch(error => {
+          resultsDiv.innerHTML += `<p style="color: #f44336;">❌ Request failed: ${error.message}</p>`;
+        });
+      });
+      
+      // Test upload endpoint with options
+      document.getElementById('test-upload-endpoint').addEventListener('click', () => {
+        const resultsDiv = document.getElementById('api-test-results');
+        
+        // Create options div
+        resultsDiv.innerHTML = `
+          <h4>Upload Endpoint Test</h4>
+          <p>Select test type:</p>
+          <button id="test-options-request" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin: 5px; cursor: pointer;">Test OPTIONS Request</button>
+          <button id="test-empty-post" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin: 5px; cursor: pointer;">Test Empty POST</button>
+          <div id="upload-test-output" style="margin-top: 10px;"></div>
+        `;
+        
+        // Add click handlers
+        document.getElementById('test-options-request').addEventListener('click', () => {
+          const outputDiv = document.getElementById('upload-test-output');
+          outputDiv.innerHTML = 'Sending OPTIONS request to /api/gallery/user/upload...';
+          
+          fetch('/api/gallery/user/upload', {
+            method: 'OPTIONS',
+            credentials: 'include'
+          })
+          .then(response => {
+            outputDiv.innerHTML += `<p>Response status: ${response.status} ${response.statusText}</p>`;
+            
+            // Check CORS headers
+            const corsHeaders = [
+              'Access-Control-Allow-Origin',
+              'Access-Control-Allow-Methods',
+              'Access-Control-Allow-Headers',
+              'Access-Control-Max-Age'
+            ];
+            
+            outputDiv.innerHTML += '<p><strong>CORS Headers:</strong></p>';
+            
+            corsHeaders.forEach(header => {
+              const value = response.headers.get(header);
+              if (value) {
+                outputDiv.innerHTML += `<p style="margin-left: 10px;"><span style="color: #4caf50;">✓</span> ${header}: ${value}</p>`;
+              } else {
+                outputDiv.innerHTML += `<p style="margin-left: 10px;"><span style="color: #f44336;">❌</span> ${header} not found</p>`;
+              }
+            });
+            
+            // Get all headers
+            outputDiv.innerHTML += '<p><strong>All Response Headers:</strong></p>';
+            response.headers.forEach((value, name) => {
+              outputDiv.innerHTML += `<p style="margin-left: 10px;">${name}: ${value}</p>`;
+            });
+          })
+          .catch(error => {
+            outputDiv.innerHTML += `<p style="color: #f44336;">❌ Request failed: ${error.message}</p>`;
+          });
+        });
+        
+        document.getElementById('test-empty-post').addEventListener('click', () => {
+          const outputDiv = document.getElementById('upload-test-output');
+          outputDiv.innerHTML = 'Sending empty POST request to /api/gallery/user/upload...';
+          
+          fetch('/api/gallery/user/upload', {
+            method: 'POST',
+            credentials: 'include'
+          })
+          .then(response => {
+            outputDiv.innerHTML += `<p>Response status: ${response.status} ${response.statusText}</p>`;
+            return response.text();
+          })
+          .then(text => {
+            try {
+              const data = JSON.parse(text);
+              outputDiv.innerHTML += `
+                <pre style="background: #333; padding: 10px; overflow: auto;">${JSON.stringify(data, null, 2)}</pre>
+              `;
+            } catch (e) {
+              outputDiv.innerHTML += `
+                <p>Response is not JSON:</p>
+                <div style="background: #333; padding: 10px; overflow: auto; max-height: 200px;">${text}</div>
+              `;
+            }
+          })
+          .catch(error => {
+            outputDiv.innerHTML += `<p style="color: #f44336;">❌ Request failed: ${error.message}</p>`;
+          });
+        });
+      });
+    }
+    
+    // Populate network tab
+    function populateNetworkTab() {
+      const content = document.getElementById('network-content');
+      
+      content.innerHTML = `
+        <h3 style="color: #33ccff;">Network Diagnostics</h3>
+        <div style="margin-bottom: 15px;">
+          <p>Test network connectivity to key resources:</p>
+          <button id="test-api-connectivity" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin: 5px; cursor: pointer;">Test API Connectivity</button>
+          <button id="test-cdn-connectivity" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; margin: 5px; cursor: pointer;">Test CDN Connectivity</button>
+        </div>
+        <div id="network-test-results" style="background-color: #222; padding: 10px; border-radius: 4px; max-height: 300px; overflow: auto;"></div>
+        
+        <h3 style="color: #33ccff;">CORS Test</h3>
+        <div style="margin-bottom: 15px;">
+          <p>Test CORS configuration for image access:</p>
+          <input type="text" id="test-image-url" style="width: 80%; padding: 5px; margin: 5px 0;" placeholder="Enter an image URL from your gallery to test...">
+          <button id="test-cors" style="background-color: #4a90e2; color: white; border: none; padding: 5px 10px; cursor: pointer;">Test CORS</button>
+        </div>
+        <div id="cors-test-results" style="background-color: #222; padding: 10px; border-radius: 4px; max-height: 300px; overflow: auto;"></div>
+      `;
+      
+      // Test API connectivity
+      document.getElementById('test-api-connectivity').addEventListener('click', () => {
+        const resultsDiv = document.getElementById('network-test-results');
+        resultsDiv.innerHTML = 'Testing API connectivity...';
+        
+        const startTime = Date.now();
+        
+        fetch('/api/gallery/user/images', {
+          credentials: 'include',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          }
+        })
+        .then(response => {
+          const endTime = Date.now();
+          const latency = endTime - startTime;
+          
+          resultsDiv.innerHTML = `
+            <p><strong>API Connection:</strong> <span style="color: #4caf50;">✓ Connected</span></p>
+            <p><strong>Response Status:</strong> ${response.status} ${response.statusText}</p>
+            <p><strong>Latency:</strong> ${latency}ms</p>
+          `;
+          
+          // Assess latency
+          if (latency < 100) {
+            resultsDiv.innerHTML += `<p><strong>Latency Assessment:</strong> <span style="color: #4caf50;">Excellent (${latency}ms)</span></p>`;
+          } else if (latency < 300) {
+            resultsDiv.innerHTML += `<p><strong>Latency Assessment:</strong> <span style="color: #8bc34a;">Good (${latency}ms)</span></p>`;
+          } else if (latency < 500) {
+            resultsDiv.innerHTML += `<p><strong>Latency Assessment:</strong> <span style="color: #ff9800;">Fair (${latency}ms)</span></p>`;
+          } else {
+            resultsDiv.innerHTML += `<p><strong>Latency Assessment:</strong> <span style="color: #f44336;">Poor (${latency}ms)</span></p>`;
+          }
+        })
+        .catch(error => {
+          resultsDiv.innerHTML = `
+            <p><strong>API Connection:</strong> <span style="color: #f44336;">❌ Failed</span></p>
+            <p><strong>Error:</strong> ${error.message}</p>
+          `;
+        });
+      });
+      
+      // Test CDN connectivity
+      document.getElementById('test-cdn-connectivity').addEventListener('click', () => {
+        const resultsDiv = document.getElementById('network-test-results');
+        resultsDiv.innerHTML = 'Testing CDN connectivity...';
+        
+        if (!window.cdnUrl) {
+          resultsDiv.innerHTML = `
+            <p><strong>CDN Connection:</strong> <span style="color: #f44336;">❌ No CDN URL configured</span></p>
+          `;
+          return;
+        }
+        
+        // Create a unique URL to prevent caching
+        const testUrl = `${window.cdnUrl}/css/gallery/gallery.css?t=${Date.now()}`;
+        const startTime = Date.now();
+        
+        fetch(testUrl, {
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          }
+        })
+        .then(response => {
+          const endTime = Date.now();
+          const latency = endTime - startTime;
+          
+          resultsDiv.innerHTML = `
+            <p><strong>CDN Connection:</strong> <span style="color: #4caf50;">✓ Connected</span></p>
+            <p><strong>CDN URL:</strong> ${window.cdnUrl}</p>
+            <p><strong>Response Status:</strong> ${response.status} ${response.statusText}</p>
+            <p><strong>Latency:</strong> ${latency}ms</p>
+          `;
+          
+          // Add CDN headers
+          resultsDiv.innerHTML += '<p><strong>CDN Headers:</strong></p>';
+          
+          ['server', 'x-cache', 'x-amz-cf-pop', 'x-amz-cf-id', 'via'].forEach(header => {
+            const value = response.headers.get(header);
+            if (value) {
+              resultsDiv.innerHTML += `<p style="margin-left: 10px;"><span style="color: #4caf50;">✓</span> ${header}: ${value}</p>`;
+            }
+          });
+          
+          // Assess latency
+          if (latency < 100) {
+            resultsDiv.innerHTML += `<p><strong>CDN Performance:</strong> <span style="color: #4caf50;">Excellent (${latency}ms)</span></p>`;
+          } else if (latency < 300) {
+            resultsDiv.innerHTML += `<p><strong>CDN Performance:</strong> <span style="color: #8bc34a;">Good (${latency}ms)</span></p>`;
+          } else if (latency < 500) {
+            resultsDiv.innerHTML += `<p><strong>CDN Performance:</strong> <span style="color: #ff9800;">Fair (${latency}ms)</span></p>`;
+          } else {
+            resultsDiv.innerHTML += `<p><strong>CDN Performance:</strong> <span style="color: #f44336;">Poor (${latency}ms)</span></p>`;
+          }
+        })
+        .catch(error => {
+          resultsDiv.innerHTML = `
+            <p><strong>CDN Connection:</strong> <span style="color: #f44336;">❌ Failed</span></p>
+            <p><strong>CDN URL:</strong> ${window.cdnUrl}</p>
+            <p><strong>Error:</strong> ${error.message}</p>
+          `;
+        });
+      });
+      
+      // Try to pre-fill the image URL input with the first image from the gallery
+      fetch('/api/gallery/user/images', {
+        credentials: 'include'
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success && data.images && data.images.length > 0) {
+          document.getElementById('test-image-url').value = data.images[0].url;
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching gallery images:', error);
+      });
+      
+      // Test CORS
+      document.getElementById('test-cors').addEventListener('click', () => {
+        const resultsDiv = document.getElementById('cors-test-results');
+        const imageUrl = document.getElementById('test-image-url').value.trim();
+        
+        if (!imageUrl) {
+          resultsDiv.innerHTML = '<p style="color: #f44336;">Please enter an image URL to test</p>';
+          return;
+        }
+        
+        resultsDiv.innerHTML = 'Testing CORS for the image URL...';
+        
+        // Create a canvas element
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 1;
+        canvas.height = 1;
+        
+        // Create an image
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        
+        // Add event listeners
+        img.onload = () => {
+          resultsDiv.innerHTML = `
+            <p><strong>Image Loaded:</strong> <span style="color: #4caf50;">✓ Success</span></p>
+            <p><strong>Size:</strong> ${img.width}x${img.height} pixels</p>
+          `;
+          
+          // Try to draw on canvas to check CORS
+          try {
+            ctx.drawImage(img, 0, 0);
+            
+            // Try to get image data
+            try {
+              const imageData = ctx.getImageData(0, 0, 1, 1);
+              resultsDiv.innerHTML += `
+                <p><strong>Canvas Access:</strong> <span style="color: #4caf50;">✓ Success</span></p>
+                <p><strong>CORS:</strong> <span style="color: #4caf50;">✓ Properly configured</span></p>
+              `;
+            } catch (canvasError) {
+              resultsDiv.innerHTML += `
+                <p><strong>Canvas Access:</strong> <span style="color: #f44336;">❌ Failed</span></p>
+                <p><strong>CORS:</strong> <span style="color: #f44336;">❌ Not properly configured</span></p>
+                <p><strong>Error:</strong> ${canvasError.message}</p>
+                <p>This indicates the CDN is not setting the correct CORS headers.</p>
+              `;
+            }
+          } catch (drawError) {
+            resultsDiv.innerHTML += `
+              <p><strong>Canvas Drawing:</strong> <span style="color: #f44336;">❌ Failed</span></p>
+              <p><strong>Error:</strong> ${drawError.message}</p>
+            `;
+          }
+        };
+        
+        img.onerror = () => {
+          resultsDiv.innerHTML = `
+            <p><strong>Image Loading:</strong> <span style="color: #f44336;">❌ Failed</span></p>
+            <p>This could be due to various reasons:</p>
+            <ul>
+              <li>The URL is invalid or the image doesn't exist</li>
+              <li>CORS is not properly configured on the CDN/server</li>
+              <li>Network issues preventing the image from loading</li>
+            </ul>
+          `;
+        };
+        
+        // Start loading the image
+        img.src = imageUrl;
+      });
+    }
+    
+    // Populate logs tab
+    function populateLogsTab() {
+      const content = document.getElementById('logs-content');
+      
+      content.innerHTML = `
+        <h3 style="color: #33ccff;">Console Logs</h3>
+        <p>The most recent console logs related to gallery functionality:</p>
+        <div id="console-logs" style="background-color: #222; padding: 10px; border-radius: 4px; max-height: 400px; overflow: auto; white-space: pre-wrap; font-family: monospace;"></div>
+        <button id="clear-logs" style="background-color: #f44336; color: white; border: none; padding: 5px 10px; margin-top: 10px; cursor: pointer;">Clear Console</button>
+        <button id="capture-logs" style="background-color: #4caf50; color: white; border: none; padding: 5px 10px; margin-top: 10px; margin-left: 10px; cursor: pointer;">Start Log Capture</button>
+      `;
+      
+      // Get existing console logs
+      const existingLogs = [];
+      
+      // Store original console methods
+      const originalConsole = {
+        log: console.log,
+        info: console.info,
+        warn: console.warn,
+        error: console.error
+      };
+      
+      // Function to format logs
+      function formatLog(type, args) {
+        const timestamp = new Date().toISOString().substr(11, 12);
+        const prefix = `[${timestamp}] [${type.toUpperCase()}] `;
+        
+        let message = '';
+        
+        for (const arg of args) {
+          if (typeof arg === 'object') {
+            try {
+              message += JSON.stringify(arg) + ' ';
+            } catch (e) {
+              message += arg + ' ';
+            }
+          } else {
+            message += arg + ' ';
+          }
+        }
+        
+        let color = '';
+        switch (type) {
+          case 'error':
+            color = '#f44336';
+            break;
+          case 'warn':
+            color = '#ff9800';
+            break;
+          case 'info':
+            color = '#2196f3';
+            break;
+          default:
+            color = '#ffffff';
+        }
+        
+        return `<span style="color: ${color}">${prefix}${message}</span>`;
+      }
+      
+      // Handle clear logs button
+      document.getElementById('clear-logs').addEventListener('click', () => {
+        document.getElementById('console-logs').innerHTML = '';
+        console.clear();
+      });
+      
+      // Handle capture logs button
+      const captureButton = document.getElementById('capture-logs');
+      let isCapturing = false;
+      
+      captureButton.addEventListener('click', () => {
+        if (isCapturing) {
+          // Stop capturing
+          isCapturing = false;
+          captureButton.textContent = 'Start Log Capture';
+          captureButton.style.backgroundColor = '#4caf50';
+          
+          // Restore original console methods
+          console.log = originalConsole.log;
+          console.info = originalConsole.info;
+          console.warn = originalConsole.warn;
+          console.error = originalConsole.error;
+        } else {
+          // Start capturing
+          isCapturing = true;
+          captureButton.textContent = 'Stop Log Capture';
+          captureButton.style.backgroundColor = '#f44336';
+          
+          const logsDiv = document.getElementById('console-logs');
+          
+          // Override console methods
+          console.log = function() {
+            const formattedLog = formatLog('log', arguments);
+            logsDiv.innerHTML += formattedLog + '<br>';
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            originalConsole.log.apply(console, arguments);
+          };
+          
+          console.info = function() {
+            const formattedLog = formatLog('info', arguments);
+            logsDiv.innerHTML += formattedLog + '<br>';
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            originalConsole.info.apply(console, arguments);
+          };
+          
+          console.warn = function() {
+            const formattedLog = formatLog('warn', arguments);
+            logsDiv.innerHTML += formattedLog + '<br>';
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            originalConsole.warn.apply(console, arguments);
+          };
+          
+          console.error = function() {
+            const formattedLog = formatLog('error', arguments);
+            logsDiv.innerHTML += formattedLog + '<br>';
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            originalConsole.error.apply(console, arguments);
+          };
+          
+          logsDiv.innerHTML += '<span style="color: #4caf50">Log capture started...</span><br>';
+        }
+      });
+      
+      // Display any existing errors from the console
+      if (window.console && window.console.error && window.console.error.logs) {
+        const logsDiv = document.getElementById('console-logs');
+        logsDiv.innerHTML += '<span style="color: #f44336">Previous errors:</span><br>';
+        
+        for (const log of window.console.error.logs) {
+          logsDiv.innerHTML += formatLog('error', log) + '<br>';
+        }
+      }
+    }
+  </script>
+  <% } %>
 </body>
 </html>

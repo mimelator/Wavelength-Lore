@@ -174,9 +174,37 @@ async function uploadGalleryImage(fileBuffer, fileName, mimeType, userId, userGr
     console.log(`📦 S3 bucket: ${bucketName}`);
     console.log(`🔗 CDN URL: ${cdnUrl}`);
     
+    // Check if file buffer is valid
+    if (!fileBuffer || !Buffer.isBuffer(fileBuffer)) {
+      console.error(`❌ Invalid file buffer:`, fileBuffer);
+      return {
+        success: false,
+        error: 'Invalid file buffer'
+      };
+    }
+    
     // Check file size
     const fileSize = fileBuffer.length;
     console.log(`📊 File size: ${fileSize} bytes`);
+    
+    if (fileSize === 0) {
+      console.error(`❌ Empty file buffer (zero bytes)`);
+      return {
+        success: false,
+        error: 'Empty file buffer'
+      };
+    }
+    
+    // Check AWS credentials
+    if (!process.env.ACCESS_KEY_ID || !process.env.SECRET_ACCESS_KEY) {
+      console.error(`❌ Missing AWS credentials`);
+      console.error(`ACCESS_KEY_ID: ${process.env.ACCESS_KEY_ID ? 'Set' : 'Missing'}`);
+      console.error(`SECRET_ACCESS_KEY: ${process.env.SECRET_ACCESS_KEY ? 'Set' : 'Missing'}`);
+      return {
+        success: false,
+        error: 'Missing AWS credentials'
+      };
+    }
     
     // Check user's quota
     console.log(`⚖️ Checking user quota...`);
@@ -232,15 +260,58 @@ async function uploadGalleryImage(fileBuffer, fileName, mimeType, userId, userGr
         'tags': sanitizeMetadata(tags.join(','))
       }
     };
+    
+    console.log(`🚀 Uploading to S3 with parameters:`);
+    console.log(`  Bucket: ${uploadParams.Bucket}`);
+    console.log(`  Key: ${uploadParams.Key}`);
+    console.log(`  ContentType: ${uploadParams.ContentType}`);
+    console.log(`  Metadata:`, uploadParams.Metadata);
 
     const command = new PutObjectCommand(uploadParams);
-    console.log(`🚀 Uploading to S3: ${s3Key}`);
     
     try {
+      console.log(`� Sending PutObjectCommand to S3...`);
       const result = await s3Client.send(command);
       console.log(`✅ S3 upload successful:`, result);
+      
+      // Verify the upload by trying to get the object
+      console.log(`🔍 Verifying upload by checking if object exists...`);
+      try {
+        const verifyCommand = new HeadObjectCommand({
+          Bucket: bucketName,
+          Key: s3Key
+        });
+        
+        const verifyResult = await s3Client.send(verifyCommand);
+        console.log(`✅ S3 upload verified. Object exists with ETag: ${verifyResult.ETag}`);
+      } catch (verifyError) {
+        console.error(`⚠️ Upload verification failed:`, verifyError);
+        console.log(`   Continuing anyway since the initial upload was successful.`);
+      }
     } catch (s3Error) {
       console.error('❌ S3 upload error:', s3Error);
+      
+      // More detailed error diagnostics
+      console.error(`S3 Error Details:`);
+      console.error(`  Code: ${s3Error.Code || s3Error.name}`);
+      console.error(`  Message: ${s3Error.message}`);
+      console.error(`  Request ID: ${s3Error.$metadata?.requestId || 'Unknown'}`);
+      
+      // Common error handling
+      if (s3Error.name === 'NoSuchBucket') {
+        console.error(`  The bucket "${bucketName}" does not exist.`);
+        return {
+          success: false,
+          error: `S3 bucket "${bucketName}" does not exist`
+        };
+      } else if (s3Error.name === 'AccessDenied') {
+        console.error(`  Access denied. Check IAM permissions for the user.`);
+        return {
+          success: false,
+          error: `Access denied to S3 bucket. Check IAM permissions`
+        };
+      }
+      
       throw s3Error;
     }
 
@@ -262,9 +333,11 @@ async function uploadGalleryImage(fileBuffer, fileName, mimeType, userId, userGr
     };
   } catch (error) {
     console.error('Error uploading gallery image:', error);
+    console.error('Stack trace:', error.stack);
     return {
       success: false,
-      error: error.message || 'Failed to upload image'
+      error: error.message || 'Failed to upload image',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     };
   }
 }

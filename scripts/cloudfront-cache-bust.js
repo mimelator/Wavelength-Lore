@@ -12,13 +12,24 @@ const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client
 const awsConfig = require('../config/aws-resources');
 
 class CloudFrontCacheBuster {
-  constructor() {
-    this.distributionId = awsConfig.cloudFront.distributionId;
+  constructor(distributionType = 'primary') {
+    // Set distribution ID based on type
+    if (distributionType === 'gallery') {
+      this.distributionId = process.env.GALLERY_CLOUDFRONT_DISTRIBUTION_ID || 
+                          (awsConfig.cloudFront.gallery && awsConfig.cloudFront.gallery.distributionId);
+      this.distributionName = 'Gallery';
+    } else {
+      this.distributionId = process.env.CLOUDFRONT_DISTRIBUTION_ID || 
+                          (awsConfig.cloudFront.primary && awsConfig.cloudFront.primary.distributionId) ||
+                          awsConfig.cloudFront.distributionId;
+      this.distributionName = 'Primary';
+    }
+    
     this.cloudFrontClient = new CloudFrontClient({
       region: 'us-east-1',
       credentials: {
-        accessKeyId: process.env.ACCESS_KEY_ID,
-        secretAccessKey: process.env.SECRET_ACCESS_KEY
+        accessKeyId: process.env.aws_wavelength_dev_access_key_id,
+        secretAccessKey: process.env.aws_wavelength_dev_secret_access_key
       }
     });
   }
@@ -80,12 +91,16 @@ async function main() {
     console.log('Usage: node cloudfront-cache-bust.js [options]');
     console.log('');
     console.log('Options:');
-    console.log('  --paths <paths>     Comma-separated paths to invalidate (default: /*)');
-    console.log('  --help, -h          Show this help message');
+    console.log('  --distribution <type>  Distribution to invalidate (primary|gallery, default: primary)');
+    console.log('  --paths <paths>        Comma-separated paths to invalidate (default: /*)');
+    console.log('  --fix-orb              First update CORS settings to fix ERR_BLOCKED_BY_ORB errors');
+    console.log('  --help, -h             Show this help message');
     console.log('');
     console.log('Examples:');
-    console.log('  node cloudfront-cache-bust.js                    # Invalidate all paths');
-    console.log('  node cloudfront-cache-bust.js --paths "/,/static/*"  # Invalidate specific paths');
+    console.log('  node cloudfront-cache-bust.js                           # Invalidate primary distribution');
+    console.log('  node cloudfront-cache-bust.js --distribution gallery    # Invalidate gallery distribution');
+    console.log('  node cloudfront-cache-bust.js --paths "/,/static/*"     # Invalidate specific paths');
+    console.log('  node cloudfront-cache-bust.js --fix-orb                 # Fix ORB issues before invalidation');
     console.log('');
     return;
   }
@@ -101,8 +116,44 @@ async function main() {
     // Validate environment first
     envHelper.validateEnvironment('aws');
     
-    const cacheBuster = new CloudFrontCacheBuster();
+    // Determine which distribution to use
+    const distIndex = args.indexOf('--distribution');
+    const distributionType = distIndex !== -1 && args[distIndex + 1] 
+                            ? args[distIndex + 1] 
+                            : 'primary';
+    
+    if (distributionType !== 'primary' && distributionType !== 'gallery') {
+      console.log('⚠️ Invalid distribution type. Must be "primary" or "gallery".');
+      console.log('Using "primary" distribution by default.');
+      distributionType = 'primary';
+    }
+    
+    console.log(`🔄 Using ${distributionType.toUpperCase()} CloudFront distribution`);
+    
+    // Check if we need to update CORS settings first (to fix ORB issues)
+    if (args.includes('--fix-orb')) {
+      console.log('🔧 Updating CORS settings to fix ERR_BLOCKED_BY_ORB issues...');
+      try {
+        const corsUpdater = require('./update-cors-settings');
+        await corsUpdater.updateS3BucketCors();
+        await corsUpdater.updateCloudFrontHeadersPolicy(distributionType);
+        console.log('✅ CORS settings updated to fix ORB issues');
+      } catch (corsError) {
+        console.error('⚠️ Error updating CORS settings:', corsError.message);
+        console.log('Continuing with cache invalidation...');
+      }
+    }
+    
+    const cacheBuster = new CloudFrontCacheBuster(distributionType);
     await cacheBuster.invalidateCache(paths);
+    
+    if (args.includes('--fix-orb')) {
+      console.log('\n🔒 ORB Issue Fix Information:');
+      console.log('If you\'re still seeing ERR_BLOCKED_BY_ORB errors after cache invalidation:');
+      console.log('1. Make sure your browser cache is cleared');
+      console.log('2. Check that your CloudFront distribution has the correct response headers policy');
+      console.log('3. Verify that CORS headers are properly configured on the S3 bucket');
+    }
     
   } catch (error) {
     console.error('❌ Error:', error.message);

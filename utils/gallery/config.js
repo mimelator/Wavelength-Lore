@@ -23,5 +23,5 @@ module.exports = {
   SECRET_ACCESS_KEY: process.env.SECRET_ACCESS_KEY,
   GALLERY_S3_BUCKET: process.env.GALLERY_S3_BUCKET,
   AWS_REGION: process.env.AWS_REGION || 'us-east-1',
-  CDN_URL: process.env.CDN_URL
+  CDN_URL: process.env.GALLERY_CDN_URL || process.env.CDN_URL
 };

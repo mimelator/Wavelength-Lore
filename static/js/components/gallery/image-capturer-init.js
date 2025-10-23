@@ -56,6 +56,30 @@ document.addEventListener('DOMContentLoaded', () => {
   function initializeImageCapturer() {
     console.log('🖼️ Creating ImageCapturer instance');
     
+    // Check if we're on a gallery page - if so, don't initialize the capturer
+    const currentPath = window.location.pathname;
+    const isGalleryPage = currentPath.includes('/gallery') || 
+                         currentPath === '/my-gallery' || 
+                         currentPath.includes('/gallery-demo');
+    
+    if (isGalleryPage) {
+      console.log('🚫 Gallery page detected - Save to Gallery functionality disabled');
+      return;
+    }
+    
+    // Check if we're on main entry pages where we don't want save buttons on cards/badges
+    const isMainEntryPage = currentPath === '/' || 
+                           currentPath === '/characters' || 
+                           currentPath === '/lore' || 
+                           currentPath === '/episodes' || 
+                           currentPath.startsWith('/character/') || 
+                           currentPath.startsWith('/lore/') || 
+                           currentPath.startsWith('/episode/');
+    
+    if (isMainEntryPage) {
+      console.log('🏠 Main entry page detected - Limited Save to Gallery functionality');
+    }
+    
     // Check if ImageCapturer class is available
     if (typeof window.ImageCapturer === 'undefined') {
       console.error('❌ ImageCapturer class not found! Make sure image-capturer.js is loaded first.');
@@ -75,18 +99,28 @@ document.addEventListener('DOMContentLoaded', () => {
         '.page-banner img',
         '[class*="banner"] img',
         
-        // Navigation elements
+        // Navigation elements and cards/badges on main entry pages
         'nav img', 
         '.navigation img',
         '.nav-item img',
         '.navbar img',
         '.menu img',
-        
-        // Cards and badges
-        '.card img',
-        '.badge img',
         '.nav-card img',
         '.link-card img',
+        '.card img',
+        '.badge img',
+        '.entry-card img',
+        '.character-card img',
+        '.lore-card img',
+        '.episode-card img',
+        
+        // Main navigation and index page elements
+        '.main-nav img',
+        '.page-nav img',
+        '.content-grid img',
+        '.content-card img',
+        '.grid-item img',
+        '.index-card img',
         
         // UI elements that shouldn't have save buttons
         '.icon img',

@@ -2,9 +2,9 @@
   "CORSRules": [
     {
       "AllowedHeaders": ["*"],
-      "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
+      "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD", "OPTIONS"],
       "AllowedOrigins": ["*"],
-      "ExposeHeaders": ["ETag", "Content-Length", "Content-Type", "Content-Disposition"]
+      "ExposeHeaders": ["ETag", "Content-Length", "Content-Type", "Content-Disposition", "Crossorigin-Resource-Policy"]
     }
   ]
 }
