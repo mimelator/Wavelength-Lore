@@ -36,6 +36,7 @@ const galleryRoutes = require('./routes/gallery');
 const galleryApiRoutes = require('./routes/galleryApi');
 const merchandiseRoutes = require('./routes/merchandise');
 const enhancedMerchandiseRoutes = require('./routes/enhanced-merchandise');
+const adminVendorResearchRoutes = require('./routes/admin-vendor-research');
 
 // Import secure backup system
 const SecureDatabaseBackup = require('./utils/secureBackup');
@@ -121,6 +122,9 @@ async function createApp() {
   app.use('/merchandise', merchandiseRoutes); // Also mount at /merchandise for the main store page
   app.use('/api/enhanced-merchandise', enhancedMerchandiseRoutes);
   app.use('/enhanced-merchandise', enhancedMerchandiseRoutes); // Also mount at /enhanced-merchandise for the AI store page
+
+  // Mount admin vendor research routes (admin only)
+  app.use('/admin', adminVendorResearchRoutes);
 
   // Mount content routes
   app.use('/', contentRoutes);

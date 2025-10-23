@@ -7,12 +7,19 @@
 
 const axios = require('axios');
 const { PrintifyConfig } = require('../config/printify-config');
+const RuntimeDiagnostics = require('../utils/runtime-diagnostics');
 
 class PrintifyService {
   constructor() {
-    this.baseUrl = `${PrintifyConfig.api.baseUrl}/${PrintifyConfig.api.version}`;
+    // Enhanced validation and URL construction
+    this.validateConfiguration();
+    
+    // Fix double version issue - use baseUrl directly since it already includes version
+    this.baseUrl = PrintifyConfig.api.baseUrl;
     this.shopId = PrintifyConfig.api.shopId;
     this.token = PrintifyConfig.api.token;
+    
+    console.log(`🔧 PrintifyService initialized with baseURL: ${this.baseUrl}`);
     
     // Configure axios instance
     this.api = axios.create({
@@ -50,6 +57,39 @@ class PrintifyService {
         return Promise.reject(error);
       }
     );
+  }
+  
+  /**
+   * Validate PrintifyService configuration
+   * @throws {Error} If configuration is invalid
+   */
+  validateConfiguration() {
+    const errors = [];
+    
+    if (!PrintifyConfig.api.baseUrl) {
+      errors.push('PrintifyConfig.api.baseUrl is required');
+    }
+    
+    if (!PrintifyConfig.api.shopId) {
+      errors.push('PrintifyConfig.api.shopId is required');
+    }
+    
+    if (!PrintifyConfig.api.token) {
+      errors.push('PrintifyConfig.api.token is required');
+    }
+    
+    // Check for double version in URL
+    if (PrintifyConfig.api.baseUrl && PrintifyConfig.api.baseUrl.includes('/v1/v1')) {
+      errors.push('PrintifyConfig.api.baseUrl contains duplicate version path');
+    }
+    
+    if (errors.length > 0) {
+      const errorMsg = `PrintifyService configuration errors: ${errors.join(', ')}`;
+      console.error('😨 PRINTIFY SERVICE CONFIGURATION ERROR:', errorMsg);
+      throw new Error(errorMsg);
+    }
+    
+    console.log('✅ PrintifyService configuration validated successfully');
   }
   
   /**
@@ -527,6 +567,34 @@ class PrintifyService {
    */
   validateImage(imageBuffer, fileName) {
     const config = PrintifyConfig.imageProcessing;
+    const context = 'validateImage';
+    
+    // ENHANCED DIAGNOSTICS: Parameter validation with detailed logging
+    const diagnostics = new RuntimeDiagnostics('PrintifyService');
+    console.log(`🔍 VALIDATE IMAGE DIAGNOSTICS: fileName="${fileName || 'undefined'}", bufferSize=${imageBuffer?.length || 'null'}`);
+    
+    // Validate parameters first
+    if (!imageBuffer || !Buffer.isBuffer(imageBuffer)) {
+      console.error('🚨 VALIDATION ERROR: imageBuffer is null, undefined, or not a Buffer');
+      console.error('📊 Received imageBuffer:', typeof imageBuffer, imageBuffer);
+      return {
+        valid: false,
+        error: 'Invalid image buffer provided'
+      };
+    }
+    
+    // Handle undefined fileName more gracefully
+    if (!fileName || typeof fileName !== 'string') {
+      console.warn(`⚠️ ${context}: fileName is null, undefined, or not a string - using default`);
+      console.warn('📊 Received fileName:', typeof fileName, fileName);
+      fileName = 'unknown-image.png'; // Provide default filename
+    }
+    
+    // Ensure filename has proper extension
+    if (!fileName.includes('.')) {
+      console.warn(`⚠️ ${context}: fileName lacks extension, adding .png:`, fileName);
+      fileName = `${fileName}.png`;
+    }
     
     // Check file size
     if (imageBuffer.length > config.maxFileSize) {
@@ -537,6 +605,11 @@ class PrintifyService {
     }
     
     // Check file format
+    if (!fileName || typeof fileName !== 'string' || !fileName.includes('.')) {
+      console.warn(`⚠️ ${context}: Invalid filename format, assuming PNG:`, fileName);
+      return { valid: true }; // Allow and assume PNG for cache files
+    }
+    
     const extension = fileName.split('.').pop().toUpperCase();
     if (!config.supportedFormats.includes(extension)) {
       return {
@@ -554,6 +627,10 @@ class PrintifyService {
    * @returns {string} MIME type
    */
   getContentType(fileName) {
+    if (!fileName || !fileName.includes('.')) {
+      return 'image/png'; // Default to PNG for cache files
+    }
+    
     const extension = fileName.split('.').pop().toLowerCase();
     const mimeTypes = {
       'jpg': 'image/jpeg',

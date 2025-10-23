@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Wavelength Lore</title>
+    <link rel="stylesheet" href="/css/admin-styles.css">
+    <link rel="stylesheet" href="/css/vendor-research.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .vendor-research-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .admin-header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .admin-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .product-category {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border: 1px solid #e1e8ed;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f3f4;
+        }
+        
+        .category-icon {
+            font-size: 2.5em;
+            margin-right: 15px;
+        }
+        
+        .category-info h2 {
+            margin: 0;
+            color: #1a202c;
+            font-size: 1.8em;
+        }
+        
+        .category-info p {
+            margin: 5px 0 0 0;
+            color: #718096;
+        }
+        
+        .vendors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .vendor-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .vendor-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+        
+        .vendor-card.current {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        }
+        
+        .vendor-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .vendor-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #1a202c;
+            margin: 0;
+        }
+        
+        .current-badge {
+            background: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        .vendor-location {
+            color: #718096;
+            font-size: 0.9em;
+            margin: 5px 0;
+        }
+        
+        .vendor-price {
+            color: #2d3748;
+            font-weight: 600;
+            margin: 5px 0;
+        }
+        
+        .vendor-handling {
+            color: #4a5568;
+            font-size: 0.9em;
+            margin: 5px 0;
+        }
+        
+        .ratings-section {
+            margin: 15px 0;
+        }
+        
+        .rating-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 5px 0;
+        }
+        
+        .rating-bar {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin: 0 10px;
+            overflow: hidden;
+        }
+        
+        .rating-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .rating-fill.quality { background: #10b981; }
+        .rating-fill.cost { background: #3b82f6; }
+        .rating-fill.speed { background: #f59e0b; }
+        
+        .pros-cons {
+            margin: 15px 0;
+        }
+        
+        .pros-cons h4 {
+            margin: 10px 0 5px 0;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .pros-cons ul {
+            margin: 0;
+            padding-left: 15px;
+            font-size: 0.85em;
+        }
+        
+        .pros { color: #059669; }
+        .cons { color: #dc2626; }
+        
+        .vendor-notes {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #4a5568;
+            margin: 15px 0;
+        }
+        
+        .vendor-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .admin-tools {
+            background: #1a202c;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .admin-tools h3 {
+            margin: 0 0 15px 0;
+            color: #f7fafc;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .tool-card {
+            background: #2d3748;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            transition: background 0.2s ease;
+        }
+        
+        .tool-card:hover {
+            background: #4a5568;
+        }
+        
+        .tool-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .notification {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .notification.success {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        
+        .notification.error {
+            background: #fee2e2;
+            border-color: #dc2626;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="vendor-research-container">
+        <!-- Admin Header -->
+        <div class="admin-header">
+            <h1>🔬 Vendor Research Dashboard</h1>
+            <p>Evaluate and compare print providers across product categories to optimize quality, cost, and fulfillment</p>
+        </div>
+
+        <!-- Admin Tools -->
+        <div class="admin-tools">
+            <h3>🛠️ Research Tools</h3>
+            <div class="tools-grid">
+                <div class="tool-card" onclick="fetchLiveData()">
+                    <div class="tool-icon">📡</div>
+                    <div>Fetch Live Data</div>
+                </div>
+                <div class="tool-card" onclick="exportReport()">
+                    <div class="tool-icon">📊</div>
+                    <div>Export Report</div>
+                </div>
+                <div class="tool-card" onclick="scheduleReview()">
+                    <div class="tool-icon">📅</div>
+                    <div>Schedule Review</div>
+                </div>
+                <div class="tool-card" onclick="viewAnalytics()">
+                    <div class="tool-icon">📈</div>
+                    <div>View Analytics</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Area -->
+        <div id="notification" class="notification" style="display: none;"></div>
+
+        <!-- Product Categories -->
+        <% Object.entries(vendorData).forEach(([categoryKey, categoryData]) => { %>
+        <div class="product-category">
+            <div class="category-header">
+                <div class="category-icon">
+                    <% if (categoryKey === 'tshirts') { %>👕
+                    <% } else if (categoryKey === 'mugs') { %>☕
+                    <% } else if (categoryKey === 'posters') { %>🖼️
+                    <% } else { %>📦<% } %>
+                </div>
+                <div class="category-info">
+                    <h2><%= categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1) %></h2>
+                    <p>Blueprint ID: <%= categoryData.blueprintId %> | Current Provider: <%= categoryData.currentProvider %></p>
+                </div>
+            </div>
+
+            <div class="vendors-grid">
+                <% categoryData.alternatives.forEach(vendor => { %>
+                <div class="vendor-card <%= vendor.id === categoryData.currentProvider ? 'current' : '' %>">
+                    <div class="vendor-header">
+                        <h3 class="vendor-name">
+                            <%= vendor.name %>
+                            <% if (vendor.id === categoryData.currentProvider) { %>
+                            <span class="current-badge">CURRENT</span>
+                            <% } %>
+                        </h3>
+                    </div>
+                    
+                    <div class="vendor-location">📍 <%= vendor.location %></div>
+                    <div class="vendor-price">💰 <%= vendor.priceRange %></div>
+                    <div class="vendor-handling">🚚 <%= vendor.handlingTime %></div>
+
+                    <div class="ratings-section">
+                        <div class="rating-item">
+                            <span>Quality</span>
+                            <div class="rating-bar">
+                                <div class="rating-fill quality" style="width: <%= (vendor.qualityRating / 5) * 100 %>%"></div>
+                            </div>
+                            <span><%= vendor.qualityRating %>/5</span>
+                        </div>
+                        <div class="rating-item">
+                            <span>Cost</span>
+                            <div class="rating-bar">
+                                <div class="rating-fill cost" style="width: <%= (vendor.costRating / 5) * 100 %>%"></div>
+                            </div>
+                            <span><%= vendor.costRating %>/5</span>
+                        </div>
+                        <div class="rating-item">
+                            <span>Speed</span>
+                            <div class="rating-bar">
+                                <div class="rating-fill speed" style="width: <%= (vendor.speedRating / 5) * 100 %>%"></div>
+                            </div>
+                            <span><%= vendor.speedRating %>/5</span>
+                        </div>
+                    </div>
+
+                    <div class="pros-cons">
+                        <h4 class="pros">✅ Pros:</h4>
+                        <ul class="pros">
+                            <% vendor.pros.forEach(pro => { %>
+                            <li><%= pro %></li>
+                            <% }); %>
+                        </ul>
+                        
+                        <h4 class="cons">❌ Cons:</h4>
+                        <ul class="cons">
+                            <% vendor.cons.forEach(con => { %>
+                            <li><%= con %></li>
+                            <% }); %>
+                        </ul>
+                    </div>
+
+                    <div class="vendor-notes">
+                        📝 <%= vendor.notes %>
+                    </div>
+
+                    <div class="vendor-actions">
+                        <button class="btn btn-primary" onclick="orderSample('<%= categoryKey %>', <%= vendor.id %>)">
+                            🧪 Order Sample
+                        </button>
+                        <% if (vendor.id !== categoryData.currentProvider) { %>
+                        <button class="btn btn-secondary" onclick="switchProvider('<%= categoryKey %>', <%= vendor.id %>)">
+                            🔄 Switch To This
+                        </button>
+                        <% } %>
+                        <button class="btn btn-secondary" onclick="rateVendor('<%= categoryKey %>', <%= vendor.id %>)">
+                            ⭐ Rate Quality
+                        </button>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+        </div>
+        <% }); %>
+
+        <!-- Research Summary -->
+        <div class="admin-tools">
+            <h3>📊 Research Summary</h3>
+            <p>Use the tools above to gather data, order samples, and make informed decisions about vendor selection. 
+               Quality assessments should be based on physical samples, customer feedback, and performance metrics.</p>
+            
+            <div style="margin-top: 20px;">
+                <button class="btn btn-success" onclick="generateReport()">📄 Generate Full Report</button>
+                <button class="btn btn-primary" onclick="reviewSchedule()">📅 Schedule Vendor Review</button>
+                <button class="btn btn-secondary" onclick="viewHistory()">📚 View Change History</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Admin vendor research functionality
+        function orderSample(productType, providerId) {
+            if (!confirm(`Order a sample from provider ${providerId} for ${productType}?`)) return;
+            
+            showNotification('Processing sample order...', 'info');
+            
+            fetch('/admin/vendor-research/sample-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productType,
+                    providerId,
+                    testImageId: 'admin-test-image',
+                    shippingAddress: 'admin-default'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(`Sample order created: ${data.order.orderId}`, 'success');
+                } else {
+                    showNotification('Failed to create sample order: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Error: ' + error.message, 'error');
+            });
+        }
+        
+        function switchProvider(productType, providerId) {
+            const reason = prompt(`Why are you switching to provider ${providerId} for ${productType}?`);
+            if (!reason) return;
+            
+            showNotification('Updating provider configuration...', 'info');
+            
+            fetch('/admin/vendor-research/update-provider', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productType,
+                    newProviderId: providerId,
+                    reason
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Provider updated successfully! ' + data.message, 'success');
+                    // In a real app, you might reload the page or update the UI
+                } else {
+                    showNotification('Failed to update provider: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Error: ' + error.message, 'error');
+            });
+        }
+        
+        function rateVendor(productType, providerId) {
+            // Create a simple rating form
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; padding: 30px; border-radius: 15px; width: 400px; max-width: 90%;">
+                        <h3>Rate Vendor Quality</h3>
+                        <p>Provider ${providerId} for ${productType}</p>
+                        
+                        <div style="margin: 15px 0;">
+                            <label>Quality Rating (1-5):</label>
+                            <input type="range" id="qualityRating" min="1" max="5" value="3" style="width: 100%;">
+                            <span id="qualityValue">3</span>
+                        </div>
+                        
+                        <div style="margin: 15px 0;">
+                            <label>Cost Rating (1-5):</label>
+                            <input type="range" id="costRating" min="1" max="5" value="3" style="width: 100%;">
+                            <span id="costValue">3</span>
+                        </div>
+                        
+                        <div style="margin: 15px 0;">
+                            <label>Speed Rating (1-5):</label>
+                            <input type="range" id="speedRating" min="1" max="5" value="3" style="width: 100%;">
+                            <span id="speedValue">3</span>
+                        </div>
+                        
+                        <div style="margin: 15px 0;">
+                            <label>Notes:</label>
+                            <textarea id="ratingNotes" style="width: 100%; height: 60px; resize: vertical;"></textarea>
+                        </div>
+                        
+                        <div style="margin: 20px 0 0 0; text-align: right;">
+                            <button class="btn btn-secondary" onclick="this.closest('div').parentNode.remove()">Cancel</button>
+                            <button class="btn btn-primary" onclick="submitRating('${productType}', ${providerId})">Submit Rating</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add range input listeners
+            modal.querySelector('#qualityRating').addEventListener('input', e => {
+                modal.querySelector('#qualityValue').textContent = e.target.value;
+            });
+            modal.querySelector('#costRating').addEventListener('input', e => {
+                modal.querySelector('#costValue').textContent = e.target.value;
+            });
+            modal.querySelector('#speedRating').addEventListener('input', e => {
+                modal.querySelector('#speedValue').textContent = e.target.value;
+            });
+            
+            document.body.appendChild(modal);
+        }
+        
+        function submitRating(productType, providerId) {
+            const modal = document.querySelector('div[style*="position: fixed"]').parentNode;
+            const qualityRating = modal.querySelector('#qualityRating').value;
+            const costRating = modal.querySelector('#costRating').value;
+            const speedRating = modal.querySelector('#speedRating').value;
+            const notes = modal.querySelector('#ratingNotes').value;
+            
+            fetch('/admin/vendor-research/quality-assessment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productType,
+                    providerId,
+                    qualityRating,
+                    costRating,
+                    speedRating,
+                    notes
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                modal.remove();
+                if (data.success) {
+                    showNotification('Quality assessment saved successfully!', 'success');
+                } else {
+                    showNotification('Failed to save assessment: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Error: ' + error.message, 'error');
+            });
+        }
+        
+        function fetchLiveData() {
+            showNotification('Fetching live vendor data...', 'info');
+            
+            fetch('/admin/vendor-research/api/live-data')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Live data updated successfully!', 'success');
+                    // In a real app, update the UI with new data
+                } else {
+                    showNotification('Failed to fetch live data: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Error: ' + error.message, 'error');
+            });
+        }
+        
+        function exportReport() {
+            showNotification('Generating vendor research report...', 'info');
+            // Implementation would export data to PDF/Excel
+            setTimeout(() => {
+                showNotification('Report exported successfully!', 'success');
+            }, 2000);
+        }
+        
+        function generateReport() {
+            showNotification('Generating comprehensive vendor report...', 'info');
+            // Implementation would create detailed analysis report
+        }
+        
+        function scheduleReview() {
+            alert('Vendor review scheduled for next quarter');
+        }
+        
+        function reviewSchedule() {
+            alert('Opening vendor review scheduler...');
+        }
+        
+        function viewHistory() {
+            alert('Opening vendor change history...');
+        }
+        
+        function viewAnalytics() {
+            alert('Opening vendor performance analytics...');
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

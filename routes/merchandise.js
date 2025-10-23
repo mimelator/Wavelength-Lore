@@ -19,8 +19,16 @@ const {
   generateProductTags,
   findProductById,
   getAllProducts,
-  getProductsByCategory 
 } = require('../config/product-types');
+
+// Helper function to sanitize Firebase keys
+function sanitizeFirebaseKey(key) {
+  if (!key) return 'unknown';
+  return key
+    .replace(/[.#$\/\[\]]/g, '_')  // Replace invalid Firebase characters
+    .replace(/_{2,}/g, '_')        // Replace multiple underscores with single
+    .replace(/^_|_$/g, '');        // Remove leading/trailing underscores
+}
 
 // Use the singleton instances of the services.
 const merchandiseDB = require('../services/merchandise-database'); 
@@ -48,9 +56,18 @@ function ensureDatabaseReady(res) {
 
 /**
  * GET /merchandise
- * Render the merchandise store page
+ * Render the merchandise store page (VIP only)
  */
 router.get('/', ensureAuthenticated, async (req, res) => {
+  // Check if user has VIP access
+  const userGroups = req.user.groups || [];
+  if (!userGroups.includes('admin') && !userGroups.includes('content_manager')) {
+    return res.status(403).render('error', {
+      title: 'Access Restricted',
+      message: 'VIP access required for merchandise store',
+      error: {}
+    });
+  }
   try {
     res.render('merchandise-store', {
       title: 'Custom Merchandise Store',
@@ -100,6 +117,14 @@ router.get('/enhancement-status', (req, res) => {
  * Get user's gallery images suitable for merchandise
  */
 router.get('/gallery-images', ensureAuthenticated, async (req, res) => {
+  // Check if user has VIP access
+  const userGroups = req.user.groups || [];
+  if (!userGroups.includes('admin') && !userGroups.includes('content_manager')) {
+    return res.status(403).json({
+      success: false,
+      error: 'VIP access required'
+    });
+  }
   try {
     const userId = req.user.uid;
     const images = await galleryStorage.listUserGalleryImages(userId);
@@ -185,6 +210,14 @@ router.get('/product-types/:category', async (req, res) => {
  * Create a product using guided selection (no user naming required)
  */
 router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
+  // Check if user has VIP access
+  const userGroups = req.user.groups || [];
+  if (!userGroups.includes('admin') && !userGroups.includes('content_manager')) {
+    return res.status(403).json({
+      success: false,
+      error: 'VIP access required'
+    });
+  }
   try {
     // Ensure database is ready
     if (!ensureDatabaseReady(res)) {
@@ -271,14 +304,14 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
     // Store product association with user
     await merchandiseDB.storeUserProduct(userId, {
       productId: productResult.productId,
-      imageId: selectedImage.relativePath,
+      imageId: sanitizeFirebaseKey(selectedImage.relativePath),
       printifyImageId: productResult.uploadedImage?.id,
       title: productName,
       description: productDescription,
       productType: productType,
       productConfig: productConfig,
       sourceImage: {
-        id: selectedImage.relativePath,
+        id: sanitizeFirebaseKey(selectedImage.relativePath),
         title: selectedImage.originalName,
         url: selectedImage.url
       },
@@ -286,7 +319,7 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
       enhancement: {
         autoEnhanced: productResult.imageEnhancement?.autoEnhanced || false,
         enhancementSource: productResult.imageEnhancement?.enhancementSource || 'none',
-        originalSuitable: productResult.imageEnhancement?.originalImageSuitable
+        originalSuitable: productResult.imageEnhancement?.originalImageSuitable || false
       },
       generatedAt: new Date().toISOString()
     });
@@ -331,6 +364,14 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
  * Create a custom product from a gallery image with automatic AI enhancement
  */
 router.post('/create-product', ensureAuthenticated, async (req, res) => {
+  // Check if user has VIP access
+  const userGroups = req.user.groups || [];
+  if (!userGroups.includes('admin') && !userGroups.includes('content_manager')) {
+    return res.status(403).json({
+      success: false,
+      error: 'VIP access required'
+    });
+  }
   try {
     // Ensure database is ready
     if (!ensureDatabaseReady(res)) {
@@ -392,11 +433,11 @@ router.post('/create-product', ensureAuthenticated, async (req, res) => {
     // Store product association with user
     await merchandiseDB.storeUserProduct(userId, {
       productId: productResult.productId,
-      imageId: selectedImage.relativePath,
+      imageId: sanitizeFirebaseKey(selectedImage.relativePath),
       printifyImageId: productResult.uploadedImage?.id,
       title: productResult.title,
       sourceImage: {
-        id: selectedImage.relativePath,
+        id: sanitizeFirebaseKey(selectedImage.relativePath),
         title: selectedImage.originalName,
         url: selectedImage.url
       },
@@ -404,7 +445,7 @@ router.post('/create-product', ensureAuthenticated, async (req, res) => {
       enhancement: {
         autoEnhanced: productResult.imageEnhancement?.autoEnhanced || false,
         enhancementSource: productResult.imageEnhancement?.enhancementSource || 'none',
-        originalSuitable: productResult.imageEnhancement?.originalImageSuitable
+        originalSuitable: productResult.imageEnhancement?.originalImageSuitable || false
       }
     });
     
@@ -423,7 +464,7 @@ router.post('/create-product', ensureAuthenticated, async (req, res) => {
         variants: productResult.variants,
         images: productResult.images,
         sourceImage: {
-          id: selectedImage.relativePath,
+          id: sanitizeFirebaseKey(selectedImage.relativePath),
           title: selectedImage.originalName,
           url: selectedImage.url
         }

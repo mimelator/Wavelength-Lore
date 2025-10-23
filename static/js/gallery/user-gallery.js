@@ -208,16 +208,18 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       actions.appendChild(deleteBtn);
 
-      // Merchandise store button
-      const merchBtn = document.createElement('button');
-      merchBtn.innerHTML = '<span class="icon">🛍️</span>';
-      merchBtn.className = 'merch-store-button';
-      merchBtn.setAttribute('title', 'Create custom merchandise from this image');
-      merchBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openInMerchStore(image);
-      });
-      actions.appendChild(merchBtn);
+      // Merchandise store button (VIP only)
+      if (window.userGroups && (window.userGroups.includes('admin') || window.userGroups.includes('content_manager'))) {
+        const merchBtn = document.createElement('button');
+        merchBtn.innerHTML = '<span class="icon">🛍️</span>';
+        merchBtn.className = 'merch-store-button';
+        merchBtn.setAttribute('title', 'Create custom merchandise from this image');
+        merchBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openInMerchStore(image);
+        });
+        actions.appendChild(merchBtn);
+      }
       
       div.appendChild(img);
       div.appendChild(actions);
@@ -311,16 +313,18 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       actions.appendChild(deleteBtn);
 
-      // Merchandise store button
-      const merchBtn = document.createElement('button');
-      merchBtn.innerHTML = '<span class="icon">🛍️</span>';
-      merchBtn.className = 'merch-store-button';
-      merchBtn.setAttribute('title', 'Create custom merchandise from this image');
-      merchBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openInMerchStore(image);
-      });
-      actions.appendChild(merchBtn);
+      // Merchandise store button (VIP only)
+      if (window.userGroups && (window.userGroups.includes('admin') || window.userGroups.includes('content_manager'))) {
+        const merchBtn = document.createElement('button');
+        merchBtn.innerHTML = '<span class="icon">🛍️</span>';
+        merchBtn.className = 'merch-store-button';
+        merchBtn.setAttribute('title', 'Create custom merchandise from this image');
+        merchBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openInMerchStore(image);
+        });
+        actions.appendChild(merchBtn);
+      }
       
       item.appendChild(img);
       item.appendChild(actions);

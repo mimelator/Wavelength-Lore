@@ -2,7 +2,8 @@
  * AI Image Upscaling Service
  * 
  * Provides high-quality image upscaling for print merchandise
- * using multiple AI services with fallback options
+ * using multiple AI services with fallback options.
+ * Integrates with Global Image Cache to prevent duplicate processing.
  */
 
 const axios = require('axios');
@@ -10,6 +11,8 @@ const sharp = require('sharp');
 const { OpenAI } = require('openai');
 const { toFile, File } = require('openai/uploads');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const GlobalImageCache = require('./global-image-cache');
+const { ServiceResponse, ParameterValidator } = require('../utils/service-contracts');
 
 // Import gallery config to use same S3 setup
 const galleryConfig = require('../utils/gallery/config');
@@ -29,6 +32,10 @@ class ImageUpscalingService {
     this.galleryBucket = galleryConfig.GALLERY_S3_BUCKET || 'wavelength-lore-bucket';
     this.upscaledFolder = 'upscaled'; // Subfolder for enhanced images
     this.cdnUrl = galleryConfig.CDN_URL || `https://${this.galleryBucket}.s3.amazonaws.com`;
+    
+    // Initialize Global Image Cache for de-duplication
+    this.globalCache = new GlobalImageCache();
+    this.cacheEnabled = true;
     
     // Initialize OpenAI client if API key is available
     if (process.env.OPENAI_API_KEY) {
@@ -96,12 +103,46 @@ class ImageUpscalingService {
   }
   
   /**
-   * Upscale image using AI service
+   * Upscale image using AI service with Global Cache integration
    * @param {Buffer} imageBuffer - Original image buffer
    * @param {Object} options - Upscaling options
    * @returns {Object} Upscaling result
    */
   async upscaleImage(imageBuffer, options = {}) { // fileName is now part of options
+    
+    // ENHANCED PARAMETER VALIDATION: Use standardized validation contracts
+    const paramValidation = ParameterValidator.validate(
+      { imageBuffer, options },
+      {
+        imageBuffer: { type: 'Buffer', required: true },
+        options: { 
+          type: 'object', 
+          required: false,
+          properties: {
+            method: { type: 'string', required: false },
+            scaleFactor: { type: 'number', required: false },
+            enhanceDetails: { type: 'boolean', required: false },
+            preserveStyle: { type: 'boolean', required: false },
+            contentType: { type: 'string', required: false },
+            originalImageId: { type: 'string', required: false },
+            userId: { type: 'string', required: false }
+          }
+        }
+      },
+      'upscaleImage'
+    );
+    
+    if (!paramValidation.isValid) {
+      const errorMessage = `Parameter validation failed: ${paramValidation.errors.join(', ')}`;
+      console.error('❌ PARAMETER VALIDATION FAILED:', errorMessage);
+      throw new Error(errorMessage);
+    }
+    
+    // ENHANCED LOGGING: Log parameter validation success
+    console.log('🔍 PARAMETER VALIDATION: upscaleImage called with valid parameters');
+    console.log(`   Image Buffer: ${imageBuffer.length} bytes`);
+    console.log(`   Options: ${Object.keys(options).length} properties`);
+    
     const {
       method = 'openai', // 'openai', 'replicate', 'auto'
       scaleFactor = 4,
@@ -113,7 +154,110 @@ class ImageUpscalingService {
     } = options;
     
     try {
+      // Step 1: Check Global Cache for existing upscaled version
+      if (this.cacheEnabled) {
+        console.log('🔍 Checking Global Cache for existing upscaled version...');
+        
+        await this.globalCache.initializeDatabase();
+        const cacheResult = await this.checkGlobalCacheForUpscaling(imageBuffer, options);
+        
+        if (cacheResult.found) {
+          console.log(`🎯 Global cache HIT! Using existing upscaled image`);
+          
+          // ENHANCED DIAGNOSTICS: Comprehensive cache validation logging
+          console.log('🔍 CACHE HIT DIAGNOSTICS:');
+          console.log(`   - Content Hash: ${cacheResult.contentHash}`);
+          console.log(`   - Enhanced URL: ${cacheResult.enhancedUrl ? '✅ Present' : '❌ Missing'}`);
+          console.log(`   - S3 Key: ${cacheResult.s3Key ? '✅ Present' : '❌ Missing'}`);
+          console.log(`   - Method: ${cacheResult.method}`);
+          console.log(`   - File Size: ${cacheResult.fileSize} bytes`);
+          
+          // ENHANCED DIAGNOSTICS: Timestamp validation
+          try {
+            const createdDate = new Date(cacheResult.createdAt);
+            if (isNaN(createdDate.getTime())) {
+              console.error(`   - Created: ❌ Invalid timestamp (${cacheResult.createdAt})`);
+            } else {
+              console.log(`   - Created: ✅ ${createdDate.toISOString()}`);
+            }
+          } catch (timeError) {
+            console.error(`   - Created: ❌ Timestamp error (${timeError.message})`);
+          }
+          
+          console.log(`   - Usage Count: ${cacheResult.usageCount}`);
+          
+          // ENHANCED DIAGNOSTICS: Data structure validation
+          console.log('🔍 CACHE DATA STRUCTURE VALIDATION:');
+          const requiredFields = ['contentHash', 'enhancedUrl', 's3Key', 'method', 'fileSize'];
+          const missingFields = requiredFields.filter(field => !cacheResult[field]);
+          if (missingFields.length > 0) {
+            console.error(`   ❌ Missing required fields: ${missingFields.join(', ')}`);
+            console.log('🔧 CACHE CORRUPTION DETECTED - Treating as cache miss to regenerate');
+            
+            // Log cache corruption for debugging
+            console.log('⚠️ CACHE CORRUPTION DETAILS:');
+            console.log(`   - Cache record exists but missing critical data`);
+            console.log(`   - Content Hash: ${cacheResult.contentHash}`);
+            console.log(`   - Will regenerate enhanced image to repair cache`);
+            
+            // Treat corrupted cache as cache miss - continue to regeneration
+            console.log('🔄 Continuing to image enhancement due to cache corruption...');
+          } else {
+            console.log('   ✅ All required fields present');
+            
+            // INTERFACE STANDARDIZATION: Use consistent structure
+            const returnValue = {
+              success: true,
+              method: 'cache', // CRITICAL: Set method to 'cache' for test compatibility
+              cached: true,    // CRITICAL: Set cached flag for test compatibility
+              upscaledUrl: cacheResult.enhancedUrl,
+              enhancedUrl: cacheResult.enhancedUrl,
+              upscaledBuffer: null, // Don't re-download the buffer from cache
+              s3Key: cacheResult.s3Key,
+              fileName: cacheResult.fileName,
+              fileSize: cacheResult.fileSize,
+              usedCache: true,
+              contentHash: cacheResult.contentHash,
+              metadata: {
+                url: cacheResult.enhancedUrl,
+                s3Key: cacheResult.s3Key,
+                method: 'cache', // Metadata method also set to cache
+                cached: true,
+                contentHash: cacheResult.contentHash,
+                enhancementData: cacheResult.enhancementData
+              }
+            };
+            
+            // ENHANCED VALIDATION: Verify return value integrity
+            console.log('🔍 RETURN VALUE VALIDATION:');
+            const validationErrors = [];
+            if (!returnValue.enhancedUrl) validationErrors.push('Missing enhancedUrl');
+            if (!returnValue.s3Key) validationErrors.push('Missing s3Key');
+            if (!returnValue.contentHash) validationErrors.push('Missing contentHash');
+            if (returnValue.usedCache !== true) validationErrors.push('usedCache not set to true');
+            if (returnValue.method !== 'cache') validationErrors.push('method not set to cache');
+            if (returnValue.cached !== true) validationErrors.push('cached not set to true');
+            
+            if (validationErrors.length > 0) {
+              console.error('❌ CACHE RETURN VALIDATION FAILED:');
+              validationErrors.forEach(error => console.error(`   - ${error}`));
+              throw new Error(`Cache return validation failed: ${validationErrors.join(', ')}`);
+            } else {
+              console.log('✅ Cache return validation passed');
+            }
+            
+            return returnValue;
+          }
+        }
+        
+        console.log(`❌ Global cache MISS - proceeding with upscaling`);
+      }
+      
+      // Step 2: Proceed with actual upscaling
       const upscaleMethod = method === 'auto' ? this.chooseUpscaleMethod(contentType) : method;
+      
+      // Track processing time
+      const processingStartTime = Date.now();
       
       let result;
       switch (upscaleMethod) {
@@ -128,6 +272,18 @@ class ImageUpscalingService {
           break;
         default:
           result = await this.upscaleWithSharp(imageBuffer, options);
+      }
+      
+      // Add processing metadata
+      const processingTime = Date.now() - processingStartTime;
+      if (result && result.metadata) {
+        result.metadata.method = upscaleMethod;
+        result.metadata.processingTime = processingTime;
+      } else if (result) {
+        result.metadata = {
+          method: upscaleMethod,
+          processingTime: processingTime
+        };
       }
       
       // Post-process for print optimization
@@ -157,6 +313,23 @@ class ImageUpscalingService {
         } catch (storeError) {
           console.error('Error auto-storing enhanced image:', storeError);
           // Don't fail the whole upscaling process if storage fails
+        }
+      }
+      
+      // Save result to Global Cache if successful
+      if (result.success && result.upscaledBuffer) {
+        try {
+          console.log('💾 Saving upscaled image to Global Cache...');
+          const cacheResult = await this.saveToGlobalCache(imageBuffer, result);
+          console.log('✅ Successfully saved to Global Cache');
+          
+          // RUNTIME VALIDATION: Comprehensive validation of the upscaling process
+          console.log('\n🔍 RUNTIME VALIDATION: Starting comprehensive validation...');
+          await this.performRuntimeValidation(imageBuffer, result, cacheResult);
+          
+        } catch (cacheError) {
+          console.warn('⚠️ Failed to save to Global Cache:', cacheError.message);
+          // Don't fail the whole process if cache saving fails
         }
       }
       
@@ -546,6 +719,456 @@ class ImageUpscalingService {
     }
     
     throw new Error('Replicate prediction timed out');
+  }
+  
+  /**
+   * Check Global Cache for existing upscaled version
+   */
+  async checkGlobalCacheForUpscaling(imageBuffer, options) {
+    try {
+      if (!this.cacheEnabled) {
+        return { found: false, reason: 'cache_disabled' };
+      }
+
+      // Generate content hash for the original image
+      const contentHash = this.globalCache.generateImageFingerprint(imageBuffer);
+      console.log(`🔑 Checking cache for content hash: ${contentHash}`);
+      
+      // Check for existing enhanced version using the correct method
+      const enhanced = await this.globalCache.getGlobalEnhancedImage(contentHash);
+      
+      if (enhanced) {
+        console.log(`🎯 Cache HIT! Found enhanced image:`);
+        console.log(`   S3 Key: ${enhanced.s3Key}`);
+        console.log(`   URL: ${enhanced.enhancedImageUrl}`);
+        console.log(`   Method: ${enhanced.enhancementMethod}`);
+        
+        return {
+          found: true,
+          exists: true,
+          enhancementData: enhanced,
+          enhancedUrl: enhanced.enhancedImageUrl,
+          s3Key: enhanced.s3Key,
+          fileName: enhanced.s3Key ? enhanced.s3Key.split('/').pop() : 'cached-image',
+          fileSize: enhanced.fileSize,
+          contentHash: contentHash,
+          method: enhanced.enhancementMethod,
+          id: contentHash
+        };
+      }
+      
+      console.log(`❌ Cache MISS: No enhanced version found for ${contentHash}`);
+      return { 
+        found: false, 
+        exists: false,
+        contentHash: contentHash,
+        reason: 'no_enhanced_version'
+      };
+      
+    } catch (error) {
+      console.log(`⚠️  Global cache check failed: ${error.message}`);
+      return { found: false };
+    }
+  }
+  
+  /**
+   * Save upscaled image to Global Cache with detailed logging
+   * @param {string|Buffer} imagePath - Original image path or buffer  
+   * @param {Object} result - Upscaling result object
+   */
+  async saveToGlobalCache(imagePath, result) {
+    try {
+      if (!this.cacheEnabled) {
+        console.log('🚫 Global Cache disabled - skipping save');
+        return { success: false, reason: 'cache_disabled' };
+      }
+      
+      console.log('� GLOBAL CACHE SAVE: Starting save process...');
+      console.log(`📄 Input type: ${typeof imagePath}, has upscaled buffer: ${!!result.upscaledBuffer}`);
+      
+      // Get original image buffer
+      let originalBuffer;
+      if (Buffer.isBuffer(imagePath)) {
+        originalBuffer = imagePath;
+        console.log(`📦 Using provided buffer (${originalBuffer.length} bytes)`);
+      } else {
+        // Load from path if needed
+        console.log(`📁 Loading image from path: ${imagePath}`);
+        originalBuffer = await this.loadImageBuffer(imagePath);
+      }
+      
+      if (!originalBuffer) {
+        console.error('❌ GLOBAL CACHE SAVE FAILED: No original image buffer available');
+        return { success: false, reason: 'no_original_buffer' };
+      }
+      
+      // Generate content hash for the original image
+      const contentHash = this.globalCache.generateImageFingerprint(originalBuffer);
+      console.log(`🔑 Generated content hash: ${contentHash}`);
+      
+      // Prepare enhancement data for storage
+      const enhancementData = {
+        contentHash: contentHash,
+        enhancedImageUrl: result.metadata?.url || null,
+        s3Key: result.s3Key || result.metadata?.s3Key || null,
+        enhancementMethod: result.metadata?.method || result.method || 'ai_upscaling',
+        originalDimensions: {
+          width: result.metadata?.originalWidth || this.extractDimensionFromString(result.metadata?.inputDimensions, 'width') || null,
+          height: result.metadata?.originalHeight || this.extractDimensionFromString(result.metadata?.inputDimensions, 'height') || null
+        },
+        enhancedDimensions: {
+          width: result.metadata?.width || this.extractDimensionFromString(result.metadata?.processedDimensions, 'width') || null,
+          height: result.metadata?.height || this.extractDimensionFromString(result.metadata?.processedDimensions, 'height') || null
+        },
+        scaleFactor: result.metadata?.scaleFactor || null,
+        qualityMetrics: result.metadata?.qualityScore ? {
+          qualityScore: result.metadata.qualityScore
+        } : {},
+        enhancementSource: 'ImageUpscalingService',
+        processingTime: result.metadata?.processingTime || null,
+        fileSize: result.upscaledBuffer?.length || null
+      };
+      
+      console.log('📊 ENHANCEMENT DATA TO STORE:');
+      console.log(JSON.stringify(enhancementData, null, 2));
+      
+      // Store enhanced version in global cache
+      console.log('💾 Storing enhancement data in Firebase...');
+      const storeResult = await this.globalCache.storeGlobalEnhancedImage(contentHash, enhancementData);
+      
+      if (storeResult.success) {
+        console.log('✅ GLOBAL CACHE SAVE SUCCESS:');
+        console.log(`   Content Hash: ${contentHash}`);
+        console.log(`   S3 Key: ${enhancementData.s3Key}`);
+        console.log(`   Enhancement URL: ${enhancementData.enhancedImageUrl}`);
+        console.log(`   Method: ${enhancementData.enhancementMethod}`);
+        console.log(`   File Size: ${enhancementData.fileSize} bytes`);
+        
+        return { 
+          success: true, 
+          contentHash: contentHash,
+          enhancementData: enhancementData,
+          firebaseResult: storeResult
+        };
+      } else {
+        console.error('❌ GLOBAL CACHE SAVE FAILED:');
+        console.error(`   Error: ${storeResult.error}`);
+        console.error(`   Content Hash: ${contentHash}`);
+        
+        return { 
+          success: false, 
+          reason: 'firebase_store_failed',
+          error: storeResult.error,
+          contentHash: contentHash
+        };
+      }
+      
+    } catch (error) {
+      console.error('❌ GLOBAL CACHE SAVE EXCEPTION:');
+      console.error(`   Error: ${error.message}`);
+      console.error(`   Stack: ${error.stack}`);
+      
+      return { 
+        success: false, 
+        reason: 'exception',
+        error: error.message 
+      };
+    }
+  }
+
+  /**
+   * Comprehensive runtime validation that runs after every upscaling operation
+   * Validates the entire pipeline from source image to final enhanced result
+   * @param {string|Buffer} originalImageBuffer - Original image buffer or path
+   * @param {Object} upscaleResult - The upscaling result object
+   * @param {Object} cacheResult - The Global Cache save result
+   */
+  async performRuntimeValidation(originalImageBuffer, upscaleResult, cacheResult) {
+    const validationId = `validation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    console.log(`\n📋 RUNTIME VALIDATION ${validationId}`);
+    console.log('=' .repeat(80));
+    console.log(`🕐 Started at: ${new Date().toISOString()}`);
+    
+    const validation = {
+      id: validationId,
+      timestamp: new Date().toISOString(),
+      originalImage: {},
+      upscaledImage: {},
+      globalCache: {},
+      apiVerification: {},
+      errors: [],
+      warnings: []
+    };
+
+    try {
+      // STEP 1: Validate Original Image Details
+      console.log('\n🔍 STEP 1: Original Image Analysis');
+      console.log('-' .repeat(50));
+      
+      let originalBuffer;
+      if (Buffer.isBuffer(originalImageBuffer)) {
+        originalBuffer = originalImageBuffer;
+        validation.originalImage.source = 'buffer';
+        validation.originalImage.size = originalBuffer.length;
+      } else {
+        validation.originalImage.source = 'file_path';
+        validation.originalImage.path = originalImageBuffer;
+        try {
+          originalBuffer = await this.loadImageBuffer(originalImageBuffer);
+          validation.originalImage.size = originalBuffer.length;
+        } catch (err) {
+          validation.errors.push(`Failed to load original image: ${err.message}`);
+        }
+      }
+      
+      if (originalBuffer) {
+        validation.originalImage.contentHash = this.globalCache.generateImageFingerprint(originalBuffer);
+        validation.originalImage.sizeKB = Math.round(originalBuffer.length / 1024);
+        
+        console.log(`📄 Original Image:`);
+        console.log(`   Source: ${validation.originalImage.source}`);
+        console.log(`   Size: ${validation.originalImage.sizeKB} KB`);
+        console.log(`   Content Hash: ${validation.originalImage.contentHash}`);
+        if (validation.originalImage.path) {
+          console.log(`   Path: ${validation.originalImage.path}`);
+        }
+      }
+
+      // STEP 2: Validate Upscaled Result
+      console.log('\n🚀 STEP 2: Upscaled Result Analysis');
+      console.log('-' .repeat(50));
+      
+      validation.upscaledImage.success = upscaleResult.success;
+      validation.upscaledImage.method = upscaleResult.metadata?.method || 'unknown';
+      validation.upscaledImage.hasBuffer = !!upscaleResult.upscaledBuffer;
+      validation.upscaledImage.s3Key = upscaleResult.s3Key || upscaleResult.metadata?.s3Key;
+      validation.upscaledImage.url = upscaleResult.metadata?.url;
+      validation.upscaledImage.processingTime = upscaleResult.metadata?.processingTime;
+      
+      if (upscaleResult.upscaledBuffer) {
+        validation.upscaledImage.size = upscaleResult.upscaledBuffer.length;
+        validation.upscaledImage.sizeKB = Math.round(upscaleResult.upscaledBuffer.length / 1024);
+        validation.upscaledImage.contentHash = this.globalCache.generateImageFingerprint(upscaleResult.upscaledBuffer);
+      }
+      
+      console.log(`🎨 Upscaled Image:`);
+      console.log(`   Success: ${validation.upscaledImage.success}`);
+      console.log(`   Method: ${validation.upscaledImage.method}`);
+      console.log(`   Size: ${validation.upscaledImage.sizeKB} KB`);
+      console.log(`   Content Hash: ${validation.upscaledImage.contentHash}`);
+      console.log(`   S3 Key: ${validation.upscaledImage.s3Key}`);
+      console.log(`   URL: ${validation.upscaledImage.url}`);
+      console.log(`   Processing Time: ${validation.upscaledImage.processingTime}ms`);
+
+      // STEP 3: Validate Global Cache Integration
+      console.log('\n🔥 STEP 3: Global Cache Validation');
+      console.log('-' .repeat(50));
+      
+      validation.globalCache.saveAttempted = !!cacheResult;
+      validation.globalCache.saveSuccess = cacheResult?.success || false;
+      validation.globalCache.contentHash = cacheResult?.contentHash;
+      validation.globalCache.enhancementData = cacheResult?.enhancementData;
+      
+      if (cacheResult?.success) {
+        console.log(`💾 Global Cache Save:`);
+        console.log(`   Success: ${validation.globalCache.saveSuccess}`);
+        console.log(`   Content Hash: ${validation.globalCache.contentHash}`);
+        console.log(`   Enhancement URL: ${cacheResult.enhancementData?.enhancedImageUrl}`);
+        console.log(`   S3 Key: ${cacheResult.enhancementData?.s3Key}`);
+        console.log(`   Method: ${cacheResult.enhancementData?.enhancementMethod}`);
+        console.log(`   File Size: ${cacheResult.enhancementData?.fileSize} bytes`);
+        
+        // Validate Firebase record structure
+        const requiredFields = ['contentHash', 'enhancedImageUrl', 's3Key', 'enhancementMethod'];
+        const missingFields = requiredFields.filter(field => !cacheResult.enhancementData[field]);
+        
+        if (missingFields.length > 0) {
+          validation.errors.push(`Missing required Firebase fields: ${missingFields.join(', ')}`);
+        } else {
+          console.log(`   ✅ All required Firebase fields present`);
+        }
+      } else {
+        validation.errors.push(`Global Cache save failed: ${cacheResult?.error || 'unknown error'}`);
+      }
+
+      // STEP 4: Verify Firebase Record Retrieval
+      console.log('\n🔍 STEP 4: Firebase Record Verification');
+      console.log('-' .repeat(50));
+      
+      if (validation.originalImage.contentHash) {
+        try {
+          const retrievedRecord = await this.globalCache.getGlobalEnhancedImage(validation.originalImage.contentHash);
+          validation.globalCache.retrievalSuccess = !!retrievedRecord;
+          validation.globalCache.retrievedRecord = retrievedRecord;
+          
+          if (retrievedRecord) {
+            console.log(`🎯 Firebase Record Retrieved:`);
+            console.log(`   Content Hash: ${retrievedRecord.contentHash}`);
+            console.log(`   Enhanced URL: ${retrievedRecord.enhancedImageUrl}`);
+            console.log(`   S3 Key: ${retrievedRecord.s3Key}`);
+            console.log(`   Method: ${retrievedRecord.enhancementMethod}`);
+            console.log(`   Created: ${new Date(retrievedRecord.createdAt).toISOString()}`);
+            console.log(`   Usage Count: ${retrievedRecord.usageCount}`);
+            
+            // Cross-validate with saved data
+            if (cacheResult?.enhancementData) {
+              const urlMatch = retrievedRecord.enhancedImageUrl === cacheResult.enhancementData.enhancedImageUrl;
+              const s3KeyMatch = retrievedRecord.s3Key === cacheResult.enhancementData.s3Key;
+              
+              if (!urlMatch || !s3KeyMatch) {
+                validation.errors.push('Retrieved Firebase record does not match saved data');
+              } else {
+                console.log(`   ✅ Retrieved record matches saved data`);
+              }
+            }
+          } else {
+            validation.errors.push('Failed to retrieve Firebase record immediately after saving');
+          }
+        } catch (err) {
+          validation.errors.push(`Firebase retrieval failed: ${err.message}`);
+        }
+      }
+
+      // STEP 5: API Availability Verification
+      console.log('\n🌐 STEP 5: API Availability Verification');
+      console.log('-' .repeat(50));
+      
+      if (validation.upscaledImage.url) {
+        try {
+          // Test direct URL access (should work via server proxy)
+          const axios = require('axios');
+          const response = await axios.head(validation.upscaledImage.url, { 
+            timeout: 5000,
+            validateStatus: (status) => status < 500 // Accept redirects and auth errors
+          });
+          
+          validation.apiVerification.directUrlAccess = {
+            status: response.status,
+            accessible: response.status < 400
+          };
+          
+          console.log(`🌍 Direct URL Access:`);
+          console.log(`   URL: ${validation.upscaledImage.url}`);
+          console.log(`   Status: ${response.status}`);
+          console.log(`   Accessible: ${response.status < 400}`);
+          
+        } catch (err) {
+          validation.apiVerification.directUrlAccess = {
+            status: 'error',
+            error: err.message,
+            accessible: false
+          };
+          validation.warnings.push(`Direct URL access failed: ${err.message}`);
+        }
+
+        // Test server proxy access
+        try {
+          const proxyUrl = validation.upscaledImage.url.replace(/^https:\/\/[^\/]+/, 'http://localhost:3001');
+          const axios = require('axios');
+          const response = await axios.head(proxyUrl, { 
+            timeout: 5000,
+            validateStatus: (status) => status < 500
+          });
+          
+          validation.apiVerification.proxyUrlAccess = {
+            status: response.status,
+            accessible: response.status < 400,
+            proxyUrl: proxyUrl
+          };
+          
+          console.log(`🔄 Proxy URL Access:`);
+          console.log(`   Proxy URL: ${proxyUrl}`);
+          console.log(`   Status: ${response.status}`);
+          console.log(`   Accessible: ${response.status < 400}`);
+          
+        } catch (err) {
+          validation.apiVerification.proxyUrlAccess = {
+            status: 'error',
+            error: err.message,
+            accessible: false
+          };
+          validation.warnings.push(`Proxy URL access failed: ${err.message}`);
+        }
+      }
+
+      // STEP 6: Quality Metrics Validation
+      console.log('\n📊 STEP 6: Quality Metrics');
+      console.log('-' .repeat(50));
+      
+      if (originalBuffer && upscaleResult.upscaledBuffer) {
+        const sizeIncrease = upscaleResult.upscaledBuffer.length / originalBuffer.length;
+        validation.qualityMetrics = {
+          sizeIncrease: sizeIncrease,
+          sizeIncreasePercent: Math.round((sizeIncrease - 1) * 100),
+          processingTime: upscaleResult.metadata?.processingTime,
+          qualityScore: upscaleResult.metadata?.qualityScore
+        };
+        
+        console.log(`📈 Quality Metrics:`);
+        console.log(`   Size Increase: ${validation.qualityMetrics.sizeIncreasePercent}%`);
+        console.log(`   Processing Time: ${validation.qualityMetrics.processingTime}ms`);
+        console.log(`   Quality Score: ${validation.qualityMetrics.qualityScore || 'N/A'}`);
+        
+        if (sizeIncrease < 1.1) {
+          validation.warnings.push('Upscaled image is not significantly larger than original');
+        }
+      }
+
+    } catch (validationError) {
+      validation.errors.push(`Validation exception: ${validationError.message}`);
+      console.error(`❌ Validation Exception: ${validationError.message}`);
+    }
+
+    // FINAL VALIDATION SUMMARY
+    console.log('\n📊 VALIDATION SUMMARY');
+    console.log('=' .repeat(80));
+    console.log(`🆔 Validation ID: ${validationId}`);
+    console.log(`⏱️  Completed at: ${new Date().toISOString()}`);
+    console.log(`✅ Errors: ${validation.errors.length}`);
+    console.log(`⚠️  Warnings: ${validation.warnings.length}`);
+    
+    if (validation.errors.length > 0) {
+      console.log('\n❌ ERRORS:');
+      validation.errors.forEach((error, index) => {
+        console.log(`   ${index + 1}. ${error}`);
+      });
+    }
+    
+    if (validation.warnings.length > 0) {
+      console.log('\n⚠️  WARNINGS:');
+      validation.warnings.forEach((warning, index) => {
+        console.log(`   ${index + 1}. ${warning}`);
+      });
+    }
+    
+    const isValid = validation.errors.length === 0;
+    console.log(`\n${isValid ? '🎉' : '💥'} VALIDATION RESULT: ${isValid ? 'PASSED' : 'FAILED'}`);
+    
+    // Store validation record for debugging
+    validation.isValid = isValid;
+    this.lastValidation = validation;
+    
+    // Log complete validation data as JSON for debugging
+    console.log('\n📋 COMPLETE VALIDATION DATA:');
+    console.log(JSON.stringify(validation, null, 2));
+    
+    return validation;
+  }
+
+  /**
+   * Extract width or height from dimension string like "1024x1024"
+   * @param {string} dimensionString - String in format "WIDTHxHEIGHT"
+   * @param {string} component - 'width' or 'height'
+   * @returns {number|null} The extracted dimension or null
+   */
+  extractDimensionFromString(dimensionString, component) {
+    if (!dimensionString || typeof dimensionString !== 'string') return null;
+    
+    const match = dimensionString.match(/^(\d+)x(\d+)$/);
+    if (!match) return null;
+    
+    return component === 'width' ? parseInt(match[1]) : parseInt(match[2]);
   }
 }
 

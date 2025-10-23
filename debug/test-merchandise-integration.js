@@ -84,8 +84,8 @@ async function testPrintifyIntegration() {
   
   // Test 3: Configuration File Loading
   runTest('Printify Configuration Loading', () => {
-    const config = require('../config/printify-config');
-    return config.API_ENDPOINTS && config.PRODUCT_BLUEPRINTS;
+    const { PrintifyConfig } = require('../config/printify-config');
+    return PrintifyConfig.api && PrintifyConfig.products;
   });
   
   // Test 4: Service Initialization

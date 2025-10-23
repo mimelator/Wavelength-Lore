@@ -249,29 +249,47 @@ class MerchandiseStore {
       
       let loadingMessage = `Creating your ${productType}...`;
       if (needsEnhancement) {
-        loadingMessage = `🎨 Preparing image for print quality...`;
+        loadingMessage = `🎨 Preparing your image for premium print quality...`;
         this.setLoading(true, loadingMessage);
         
-        // Show progressive loading messages
+        // Show progressive loading messages with more detail and encouragement
         setTimeout(() => {
           if (this.isLoading) {
-            this.setLoading(true, `🔍 Analyzing image quality...`);
+            this.setLoading(true, `🔍 Analyzing image resolution and quality...`);
           }
         }, 1000);
         
         setTimeout(() => {
           if (this.isLoading) {
-            this.setLoading(true, `✨ Enhancing image for optimal printing...`);
+            this.setLoading(true, `🚀 AI enhancement in progress - making your image print-perfect...`);
           }
-        }, 3000);
+        }, 2500);
         
         setTimeout(() => {
           if (this.isLoading) {
-            this.setLoading(true, `🎽 Creating your ${productType}...`);
+            this.setLoading(true, `✨ Enhancing details and sharpening for crystal-clear printing...`);
           }
-        }, 8000);
+        }, 4500);
+        
+        setTimeout(() => {
+          if (this.isLoading) {
+            this.setLoading(true, `🎯 Optimizing colors and contrast for vibrant merchandise...`);
+          }
+        }, 6500);
+        
+        setTimeout(() => {
+          if (this.isLoading) {
+            this.setLoading(true, `🎽 Almost ready! Creating your beautiful ${productType}...`);
+          }
+        }, 8500);
+        
+        setTimeout(() => {
+          if (this.isLoading) {
+            this.setLoading(true, `🏁 Final touches - your ${productType} will be amazing!`);
+          }
+        }, 10500);
       } else {
-        this.setLoading(true, loadingMessage);
+        this.setLoading(true, `🎽 Creating your ${productType} with your high-quality image...`);
       }
       
       const response = await fetch('/api/merchandise/create-guided-product', {
@@ -292,14 +310,20 @@ class MerchandiseStore {
       if (data.success) {
         this.products.push(data.product);
         
-        // Show enhancement feedback
-        let message = data.message || `${productType} created successfully!`;
+        // Show detailed enhancement feedback with celebration
+        let message = data.message || `🎉 Your ${productType} has been created successfully!`;
         if (data.enhancement?.autoEnhanced) {
           if (data.enhancement.enhancementSource === 'generated') {
-            message += ' ✨ Your image was automatically enhanced for optimal print quality!';
+            message += '\n\n🌟 Amazing! Your image was automatically enhanced using AI to ensure stunning print quality! The colors are more vibrant, details are sharper, and it\'s perfectly optimized for professional printing.';
           } else if (data.enhancement.enhancementSource === 'cached') {
-            message += ' ♻️ Used your previously optimized image for the best print quality!';
+            message += '\n\n⚡ Fantastic! We used your previously optimized image that was enhanced for premium print quality. Your ${productType} will look absolutely incredible!';
           }
+          
+          if (data.enhancement.qualityImproved) {
+            message += '\n\n🎨 Your original image has been transformed into a high-resolution masterpiece that will make your merchandise stand out!';
+          }
+        } else {
+          message += '\n\n✨ Your image was already perfect for printing - no enhancement needed! Your ${productType} will look amazing.';
         }
         
         this.showSuccess(message);
@@ -598,7 +622,7 @@ class MerchandiseStore {
             <div class="selected-image-preview">
               ${this.renderSelectedImagePreview()}
             </div>
-            <p class="section-description">Pick what you'd like to create - we'll handle the naming and details!</p>
+            <p class="section-description">Choose Your Merch!</p>
             <div class="product-types-grid">
               ${this.renderProductTypes()}
             </div>
@@ -837,6 +861,18 @@ class MerchandiseStore {
   selectImage(imageId) {
     this.selectedImage = imageId;
     this.render();
+    
+    // Auto-scroll to the Choose Product section for better UX (same as preselection)
+    setTimeout(() => {
+      const chooseProductSection = document.getElementById('choose-product-section');
+      if (chooseProductSection) {
+        chooseProductSection.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+        console.log('📍 Auto-scrolled to Choose Product section after image selection');
+      }
+    }, 300); // Shorter delay since DOM is already rendered
   }
   
   async selectProductType(productType) {

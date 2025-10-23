@@ -97,7 +97,31 @@ const ensureInGroup = (groups) => {
   };
 };
 
+/**
+ * Middleware to ensure user is an admin
+ */
+const requireAdmin = (req, res, next) => {
+  // Check if user is authenticated and is an admin
+  if (!req.user) {
+    return res.status(401).json({
+      error: 'Authentication required',
+      message: 'Please log in to access this resource'
+    });
+  }
+  
+  const userGroups = req.user.groups || [];
+  if (!userGroups.includes('admin')) {
+    return res.status(403).json({
+      error: 'Admin access required',
+      message: 'This resource requires administrator privileges'
+    });
+  }
+  
+  next();
+};
+
 module.exports = {
   ensureAuthenticated,
-  ensureInGroup
+  ensureInGroup,
+  requireAdmin
 };

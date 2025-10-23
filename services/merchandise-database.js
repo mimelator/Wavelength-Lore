@@ -477,6 +477,130 @@ class MerchandiseDatabase {
       };
     }
   }
+
+  /**
+   * Store vendor comparison data for admin research
+   */
+  async storeVendorComparison(userId, comparisonData) {
+    this.initializeDatabase();
+    
+    try {
+      const sanitizedId = comparisonData.id.replace(/[.#$\/\[\]]/g, '_');
+      const comparisonRef = this.db.ref(`merchandise/vendorComparisons/${userId}/${sanitizedId}`);
+      
+      await comparisonRef.set(comparisonData);
+      console.log('✅ Vendor comparison stored successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ Error storing vendor comparison:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get vendor comparisons for a user
+   */
+  async getVendorComparisons(userId, limit = 10) {
+    this.initializeDatabase();
+    
+    try {
+      const comparisonsRef = this.db.ref(`merchandise/vendorComparisons/${userId}`);
+      
+      const snapshot = await comparisonsRef.once('value');
+      const comparisons = [];
+      
+      snapshot.forEach((childSnapshot) => {
+        const data = childSnapshot.val();
+        if (data) { // Only include non-null data
+          comparisons.push({
+            id: childSnapshot.key,
+            ...data
+          });
+        }
+      });
+      
+      // Sort by generatedAt or report.generatedAt, most recent first
+      comparisons.sort((a, b) => {
+        const aTime = new Date(a.report?.generatedAt || a.generatedAt || 0).getTime();
+        const bTime = new Date(b.report?.generatedAt || b.generatedAt || 0).getTime();
+        return bTime - aTime;
+      });
+      
+      return comparisons.slice(0, limit);
+    } catch (error) {
+      console.error('❌ Error getting vendor comparisons:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get cached vendor preview
+   */
+  async getCachedPreview(cacheKey) {
+    this.initializeDatabase();
+    
+    try {
+      const previewRef = this.db.ref(`merchandise/previewCache/${cacheKey}`);
+      const snapshot = await previewRef.once('value');
+      return snapshot.val();
+    } catch (error) {
+      console.warn('Failed to get cached preview:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Store cached vendor preview
+   */
+  async setCachedPreview(cacheKey, previewData) {
+    this.initializeDatabase();
+    
+    try {
+      const previewRef = this.db.ref(`merchandise/previewCache/${cacheKey}`);
+      await previewRef.set(previewData);
+      console.log(`💾 Preview cached with key: ${cacheKey}`);
+      return true;
+    } catch (error) {
+      console.error('Failed to cache preview:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Delete expired cached preview
+   */
+  async deleteCachedPreview(cacheKey) {
+    this.initializeDatabase();
+    
+    try {
+      const previewRef = this.db.ref(`merchandise/previewCache/${cacheKey}`);
+      await previewRef.remove();
+      console.log(`🗑️ Removed expired cache: ${cacheKey}`);
+      return true;
+    } catch (error) {
+      console.warn('Failed to delete cached preview:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Delete a vendor comparison
+   */
+  async deleteVendorComparison(userId, comparisonId) {
+    this.initializeDatabase();
+    
+    try {
+      const sanitizedId = comparisonId.replace(/[.#$\/\[\]]/g, '_');
+      const comparisonRef = this.db.ref(`merchandise/vendorComparisons/${userId}/${sanitizedId}`);
+      
+      await comparisonRef.remove();
+      console.log('✅ Vendor comparison deleted successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ Error deleting vendor comparison:', error);
+      throw error;
+    }
+  }
 }
 
 /**

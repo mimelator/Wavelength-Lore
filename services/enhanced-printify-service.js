@@ -6,6 +6,8 @@
  */
 
 const PrintifyService = require('./printify-service');
+const { ServiceResponse, EnhancedServiceBase } = require('../utils/service-patterns');
+const RuntimeDiagnostics = require('../utils/runtime-diagnostics');
 const ImageUpscalingService = require('./image-upscaling-service');
 
 class EnhancedPrintifyService extends PrintifyService {
@@ -36,7 +38,35 @@ class EnhancedPrintifyService extends PrintifyService {
    * @returns {Object} Upload result with quality enhancements
    */
   async uploadImageWithAutoEnhancement(imageBuffer, fileName, options = {}) {
+    // ENHANCED DIAGNOSTICS: Pre-execution validation
+    const diagnostics = new RuntimeDiagnostics('EnhancedPrintifyService');
+    const paramDiagnostics = diagnostics.validateMethodParameters('uploadImageWithAutoEnhancement', {
+      imageBuffer,
+      fileName,
+      options
+    }, {
+      imageBuffer: 'buffer',
+      fileName: 'string',
+      options: 'object'
+    });
+    
     try {
+      // RUNTIME VALIDATION: Method entry point validation
+      console.log('🔍 PARAMETER VALIDATION: uploadImageWithAutoEnhancement called with parameters');
+      if (!imageBuffer || !Buffer.isBuffer(imageBuffer)) {
+        const error = new Error('Invalid imageBuffer: must be a Buffer object');
+        console.error('🚨 ENTRY VALIDATION FAILED:', error.message);
+        throw error;
+      }
+      if (!fileName || typeof fileName !== 'string') {
+        const error = new Error('Invalid fileName: must be a non-empty string');
+        console.error('🚨 ENTRY VALIDATION FAILED:', error.message);
+        throw error;
+      }
+      console.log(`   Image Buffer: ${imageBuffer.length} bytes`);
+      console.log(`   File Name: ${fileName}`);
+      console.log(`   Options: ${Object.keys(options).length} properties`);
+      
       console.log('🔍 Auto-analyzing image quality for print suitability...');
       
       // Step 1: Check if we already have an enhanced version stored in database
@@ -125,14 +155,33 @@ class EnhancedPrintifyService extends PrintifyService {
         try {
           const upscalingResult = await this.upscalingService.upscaleImage(imageBuffer, upscalingOptions);
           
+          // ENHANCED DIAGNOSTICS: Validate upscaling result signature
+          const resultDiagnostics = diagnostics.validateCacheResponse(upscalingResult, 'upscaling-result');
+          console.log(`🔍 UPSCALING RESULT DIAGNOSTICS:`, {
+            method: upscalingResult.method,
+            cached: upscalingResult.cached,
+            hasBuffer: !!upscalingResult.upscaledBuffer,
+            needsDownload: resultDiagnostics.validation.needsDownload
+          });
+          
           if (upscalingResult.success) {
-            finalImageBuffer = upscalingResult.printOptimized || upscalingResult.upscaledBuffer;
+            // Handle cache hit case where buffer needs to be downloaded
+            if (upscalingResult.method === 'cache' && !upscalingResult.upscaledBuffer && upscalingResult.upscaledUrl) {
+              console.log('🎯 Cache hit detected, downloading buffer from:', upscalingResult.upscaledUrl);
+              finalImageBuffer = await this.downloadImageBuffer(upscalingResult.upscaledUrl);
+              if (!finalImageBuffer) {
+                throw new Error('Failed to download cached image buffer');
+              }
+            } else {
+              finalImageBuffer = upscalingResult.printOptimized || upscalingResult.upscaledBuffer;
+            }
+            
             enhancementMetadata = upscalingResult.metadata;
             
             console.log('✨ Auto-enhancement successful:', {
               method: upscalingResult.method,
-              originalSize: `${Math.round(upscalingResult.metadata.originalSize / 1024)}KB`,
-              enhancedSize: `${Math.round(upscalingResult.metadata.upscaledSize / 1024)}KB`,
+              originalSize: `${Math.round((upscalingResult.metadata.originalSize || imageBuffer.length) / 1024)}KB`,
+              enhancedSize: `${Math.round((upscalingResult.metadata.upscaledSize || finalImageBuffer?.length || 0) / 1024)}KB`,
               scaleFactor: upscalingResult.metadata.scaleFactor
             });
             
@@ -140,10 +189,23 @@ class EnhancedPrintifyService extends PrintifyService {
             // This is now the single source of truth for writing to the cache.
             if (options.originalImageId && enhancementMetadata.url) {
               try {
-                // Calculate scale factor from actual dimensions
-                const enhancedWidth = parseInt(enhancementMetadata.processedDimensions.split('x')[0]);
-                const enhancedHeight = parseInt(enhancementMetadata.processedDimensions.split('x')[1]);
-                const calculatedScaleFactor = Math.round((enhancedWidth / qualityAnalysis.originalWidth) * 10) / 10;
+                // Validate processedDimensions before parsing
+                let enhancedWidth, enhancedHeight, calculatedScaleFactor;
+                
+                if (enhancementMetadata.processedDimensions && 
+                    typeof enhancementMetadata.processedDimensions === 'string' &&
+                    enhancementMetadata.processedDimensions.includes('x')) {
+                  // Calculate scale factor from actual dimensions
+                  enhancedWidth = parseInt(enhancementMetadata.processedDimensions.split('x')[0]);
+                  enhancedHeight = parseInt(enhancementMetadata.processedDimensions.split('x')[1]);
+                  calculatedScaleFactor = Math.round((enhancedWidth / qualityAnalysis.originalWidth) * 10) / 10;
+                } else {
+                  console.warn('⚠️ processedDimensions not available or invalid format:', enhancementMetadata.processedDimensions);
+                  // Fallback to provided dimensions or use defaults
+                  enhancedWidth = enhancementMetadata.enhancedDimensions?.width || 1024;
+                  enhancedHeight = enhancementMetadata.enhancedDimensions?.height || 1024;
+                  calculatedScaleFactor = enhancementMetadata.scaleFactor || 1.0;
+                }
                 
                 const enhancementData = {
                   s3Key: enhancementMetadata.s3Key,
@@ -158,7 +220,7 @@ class EnhancedPrintifyService extends PrintifyService {
                     height: enhancedHeight
                   },
                   scaleFactor: enhancementMetadata.scaleFactor || calculatedScaleFactor,
-                  improvementDescription: `Enhanced from ${qualityAnalysis.originalWidth}×${qualityAnalysis.originalHeight} to ${enhancementMetadata.processedDimensions}`
+                  improvementDescription: `Enhanced from ${qualityAnalysis.originalWidth}×${qualityAnalysis.originalHeight} to ${enhancedWidth}x${enhancedHeight}`
                 };
                 
                 // Log the exact record being sent to Firebase for debugging
@@ -191,9 +253,59 @@ class EnhancedPrintifyService extends PrintifyService {
       
       // Step 4: Upload to Printify using base class method
       console.log('🚀 Uploading final image to Printify...');
-      const uploadResult = await this.uploadImage(finalImageBuffer, fileName, options.title);
+      
+      // Ensure filename has proper extension for Printify validation
+      let uploadFileName = fileName;
+      if (!fileName.includes('.')) {
+        uploadFileName = `${fileName}.png`;
+        console.log(`🔧 Fixed filename: ${fileName} → ${uploadFileName}`);
+      }
+      
+      const uploadResult = await this.uploadImage(finalImageBuffer, uploadFileName, options.title);
       
       if (uploadResult.success) {
+        // Ensure metadata includes original dimensions for global cache
+        const enrichedMetadata = enhancementMetadata ? {
+          ...enhancementMetadata,
+          originalWidth: qualityAnalysis.originalWidth,
+          originalHeight: qualityAnalysis.originalHeight,
+          originalDimensions: {
+            width: qualityAnalysis.originalWidth,
+            height: qualityAnalysis.originalHeight
+          }
+        } : null;
+
+        // Also add enhanced dimensions if we have them from the enhancement process
+        if (enrichedMetadata && enhancementMetadata.processedDimensions) {
+          let enhancedWidth, enhancedHeight;
+          
+          // Validate processedDimensions before parsing
+          if (typeof enhancementMetadata.processedDimensions === 'string' &&
+              enhancementMetadata.processedDimensions.includes('x')) {
+            [enhancedWidth, enhancedHeight] = enhancementMetadata.processedDimensions.split('x').map(d => parseInt(d));
+            enrichedMetadata.enhancedWidth = enhancedWidth;
+            enrichedMetadata.enhancedHeight = enhancedHeight;
+            enrichedMetadata.enhancedDimensions = {
+              width: enhancedWidth,
+              height: enhancedHeight
+            };
+          } else {
+            console.warn('⚠️ Invalid processedDimensions format, using fallback:', enhancementMetadata.processedDimensions);
+            // Use existing dimensions or defaults
+            enhancedWidth = enhancementMetadata.enhancedDimensions?.width || 1024;
+            enhancedHeight = enhancementMetadata.enhancedDimensions?.height || 1024;
+            enrichedMetadata.enhancedDimensions = {
+              width: enhancedWidth,
+              height: enhancedHeight
+            };
+          }
+          
+          // Calculate scale factor if not present
+          if (!enrichedMetadata.scaleFactor && enhancedWidth && qualityAnalysis.originalWidth) {
+            enrichedMetadata.scaleFactor = Math.round((enhancedWidth / qualityAnalysis.originalWidth) * 10) / 10;
+          }
+        }
+        
         return {
           ...uploadResult,
           autoEnhanced,
@@ -201,7 +313,7 @@ class EnhancedPrintifyService extends PrintifyService {
           qualityEnhancement: {
             analysis: qualityAnalysis,
             enhanced: !!enhancementMetadata,
-            metadata: enhancementMetadata,
+            metadata: enrichedMetadata,
           }
         };
       }
@@ -627,6 +739,90 @@ class EnhancedPrintifyService extends PrintifyService {
     } catch (error) {
       console.error('Error downloading image buffer:', error);
       throw new Error('Failed to download image from URL');
+    }
+  }
+  /**
+   * Create product with specific blueprint configuration
+   */
+  async createProductWithBlueprint(imageBuffer, fileName, blueprintId, options = {}) {
+    try {
+      // RUNTIME VALIDATION: Method entry point validation
+      console.log('🔍 PARAMETER VALIDATION: createProductWithBlueprint called with parameters');
+      if (!imageBuffer || !Buffer.isBuffer(imageBuffer)) {
+        const error = new Error('Invalid imageBuffer: must be a Buffer object');
+        console.error('🚨 ENTRY VALIDATION FAILED:', error.message);
+        throw error;
+      }
+      if (!fileName || typeof fileName !== 'string') {
+        const error = new Error('Invalid fileName: must be a non-empty string');
+        console.error('🚨 ENTRY VALIDATION FAILED:', error.message);
+        throw error;
+      }
+      if (!blueprintId || (typeof blueprintId !== 'number' && typeof blueprintId !== 'string')) {
+        const error = new Error('Invalid blueprintId: must be a number or string');
+        console.error('🚨 ENTRY VALIDATION FAILED:', error.message);
+        throw error;
+      }
+      console.log(`   Image Buffer: ${imageBuffer.length} bytes`);
+      console.log(`   File Name: ${fileName}`);
+      console.log(`   Blueprint ID: ${blueprintId}`);
+      console.log(`   Options: ${Object.keys(options).length} properties`);
+      
+      const {
+        title = `Custom Product - ${fileName}`,
+        description = 'Custom product created with enhanced image',
+        tags = ['custom', 'enhanced'],
+        providerId,
+        basePrice = 2099,
+        runId
+      } = options;
+
+      console.log(`🔨 Creating product with blueprint ${blueprintId}...`);
+      
+      // Use the existing createEnhancedProduct method
+      const productData = {
+        imageBuffer,
+        fileName,
+        blueprintId,
+        printProviderId: providerId,
+        title,
+        description,
+        basePrice,
+        userId: 'admin-preview-generator',
+        originalImageId: `blueprint-${blueprintId}-${Date.now()}`,
+        upscaleOptions: {
+          forceAnalysis: false,
+          printOptimized: true,
+          runId
+        }
+      };
+
+      const result = await this.createEnhancedProduct(productData);
+      
+      console.log(`   ${result.success ? '✅' : '❌'} Blueprint ${blueprintId} product creation ${result.success ? 'successful' : 'failed'}`);
+      
+      return {
+        ...result,
+        blueprintId,
+        providerId,
+        metadata: {
+          blueprintId,
+          providerId,
+          fileName,
+          title,
+          runId,
+          createdAt: new Date().toISOString()
+        }
+      };
+
+    } catch (error) {
+      console.error(`❌ Error creating product with blueprint ${blueprintId}:`, error.message);
+      return {
+        success: false,
+        error: error.message,
+        blueprintId,
+        fileName
+      };
     }
   }
 }
