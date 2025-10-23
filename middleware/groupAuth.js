@@ -296,6 +296,14 @@ class GroupAuthentication {
    * Get authenticated user from request
    */
   async getAuthenticatedUser(req) {
+    // Development authentication bypass for localhost testing
+    if (this.isDevelopmentBypass(req)) {
+      console.log('🚀 Development bypass: Auto-authenticating test user for localhost (groupAuth)');
+      const testUser = this.getTestUser();
+      req.user = testUser; // Set it on request for consistency
+      return testUser;
+    }
+
     // Check if user is already authenticated by Firebase Auth middleware
     if (req.user) {
       return req.user;
@@ -567,6 +575,36 @@ class GroupAuthentication {
 
   getGroupHierarchy() {
     return this.groupHierarchy;
+  }
+
+  /**
+   * Check if request qualifies for development authentication bypass
+   */
+  isDevelopmentBypass(req) {
+    // Only enable in development environment
+    const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+    
+    // Check if request is from localhost
+    const isLocalhost = ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.ip) || 
+                       req.ip === 'localhost' ||
+                       req.hostname === 'localhost';
+    
+    return isDevelopment && isLocalhost;
+  }
+
+  /**
+   * Get test user for development bypass
+   */
+  getTestUser() {
+    return {
+      uid: '4fdbYxJHjEP4xksk9sgFE3lgYUs2',
+      email: 'mimel@imelshire.com', 
+      name: 'Mark Imel',
+      picture: 'https://lh3.googleusercontent.com/a/ACg8ocIKcqPpCHdorYUtvNI-QRcf7CMb7tC8OI-Z9j1IHKfvpJGop-MO=s96-c',
+      emailVerified: true,
+      groups: ['admin', 'content_manager'],
+      isContentCreator: true
+    };
   }
 }
 

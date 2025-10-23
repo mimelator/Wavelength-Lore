@@ -99,12 +99,13 @@
 
 .gallery-item-actions {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 8px;
+  right: 8px;
   display: flex;
-  gap: 5px;
+  gap: 6px;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.3s ease;
+  z-index: 10;
 }
 
 .gallery-item:hover .gallery-item-actions {
@@ -112,29 +113,50 @@
 }
 
 .gallery-item-actions button {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.7);
   color: white;
-  border: none;
+  border: 2px solid rgba(255, 255, 255, 0.8);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: normal;
+  backdrop-filter: blur(4px);
 }
 
 .gallery-item-actions button:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+  border-color: white;
 }
 
 .download-button {
-  background-color: rgba(0, 128, 0, 0.6) !important;
+  background-color: rgba(34, 139, 34, 0.8) !important;
 }
 
 .download-button:hover {
-  background-color: rgba(0, 128, 0, 0.8) !important;
+  background-color: rgba(34, 139, 34, 0.95) !important;
+}
+
+.delete-button {
+  background-color: rgba(220, 53, 69, 0.8) !important;
+}
+
+.delete-button:hover {
+  background-color: rgba(220, 53, 69, 0.95) !important;
+}
+
+.merch-store-button {
+  background-color: rgba(138, 43, 226, 0.8) !important;
+}
+
+.merch-store-button:hover {
+  background-color: rgba(138, 43, 226, 0.95) !important;
 }
 
 .delete-button {

@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <%- include('partials/head') %>
-  <link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/gallery.css">
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/gallery.css?v=<%= Date.now() %>">
   <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css">
   <link rel="stylesheet" href="<%= cdnUrl %>/css/modal_styles.css">
   <link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/gallery-buttons.css">
-  <link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/user-gallery.css">
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/user-gallery.css?v=<%= Date.now() %>">
   <link rel="stylesheet" href="<%= cdnUrl %>/css/shared/screensaver.css">
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
@@ -41,8 +41,8 @@
       <button id="delete-selected" class="action-button delete-button" style="display: none;">Delete Selected</button>
     </section>
     
-    <!-- Carousel Section (Default View) -->
-    <section class="carousel-section" id="carousel-view">
+    <!-- Carousel Section -->
+    <section class="carousel-section" id="carousel-view" style="display: none;">
               <!-- Gallery Carousel Section -->
         <div class="gallery-section">
             <h2>Your Gallery</h2>
@@ -67,8 +67,8 @@
     
     <!-- Gallery Controls -->
     <section class="gallery-controls">
-      <button id="carousel-layout" class="layout-button active">Carousel View</button>
-      <button id="grid-layout" class="layout-button">Grid View</button>
+      <button id="carousel-layout" class="layout-button">Carousel View</button>
+      <button id="grid-layout" class="layout-button active">Grid View</button>
       
       <!-- Search Box -->
       <div class="search-box" style="margin-left: auto; display: flex; align-items: center;">
@@ -78,8 +78,8 @@
       </div>
     </section>
     
-    <!-- Grid View (Hidden by Default) -->
-    <div id="grid-view" style="display: none;">
+    <!-- Grid View (Now Default) -->
+    <div id="grid-view" style="display: block;">
       <div class="gallery-grid" id="gallery-grid">
         <!-- Images will be populated by JavaScript -->
       </div>
@@ -235,10 +235,14 @@
     </div>
   </main>
   
+  <script>
+    // Pass user groups to JavaScript
+    window.userGroups = <%- JSON.stringify(user?.groups || []) %>;
+  </script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
   <script src="<%= cdnUrl %>/js/shared/screensaver.js"></script>
-  <script src="<%= cdnUrl %>/js/gallery/user-gallery.js"></script>
+  <script src="<%= cdnUrl %>/js/gallery/user-gallery.js?v=<%= Date.now() %>"></script>
   
   <!-- Include standard footer -->
   <%- include('partials/footer') %>
