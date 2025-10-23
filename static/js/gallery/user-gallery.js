@@ -148,11 +148,16 @@ document.addEventListener('DOMContentLoaded', () => {
       carouselEl.appendChild(div);
     });
     
-    // Initialize carousel with slick
-    $(document).ready(function() {
+    // Initialize carousel with slick (destroy existing first if present)
+    if ($('#gallery-carousel').hasClass('slick-initialized')) {
+      $('#gallery-carousel').slick('unslick');
+    }
+    
+    // Small delay to ensure images are loaded before initializing carousel
+    setTimeout(() => {
       $('#gallery-carousel').slick({
         infinite: true,
-        slidesToShow: window.innerWidth <= 768 ? 1 : 1,
+        slidesToShow: 1,
         slidesToScroll: 1,
         autoplay: true,
         autoplaySpeed: 4000,
@@ -162,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         centerMode: true,
         centerPadding: '0'
       });
-    });
+    }, 100);
     
     // Populate grid view
     images.forEach(image => {
@@ -546,8 +551,10 @@ document.addEventListener('DOMContentLoaded', () => {
     carouselBtn.classList.add('active');
     gridBtn.classList.remove('active');
     
-    // Refresh the carousel to fix layout issues
-    $('#gallery-carousel').slick('refresh');
+    // Refresh the carousel to fix layout issues (only if it exists)
+    if ($('#gallery-carousel').hasClass('slick-initialized')) {
+      $('#gallery-carousel').slick('refresh');
+    }
   });
   
   gridBtn.addEventListener('click', () => {
