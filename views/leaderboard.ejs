@@ -194,6 +194,57 @@
             font-size: 1.2rem;
         }
 
+        .game-filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: rgba(138, 43, 226, 0.2);
+            border: 2px solid rgba(138, 43, 226, 0.3);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .tab-btn:hover {
+            background: rgba(138, 43, 226, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #8a2be2, #4b0082);
+            color: white;
+            border-color: #8a2be2;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+        }
+
+        .game-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+
+        .game-badge {
+            background: rgba(138, 43, 226, 0.3);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            border: 1px solid rgba(138, 43, 226, 0.5);
+        }
+
+        .game-badge.radio { background: rgba(255, 140, 0, 0.3); border-color: rgba(255, 140, 0, 0.5); }
+        .game-badge.gems { background: rgba(0, 191, 255, 0.3); border-color: rgba(0, 191, 255, 0.5); }
+
         .loading {
             text-align: center;
             padding: 60px 20px;
@@ -255,8 +306,12 @@
                         <div class="value" id="totalPlayers">-</div>
                     </div>
                     <div class="stat-box">
-                        <div class="label">Total Points</div>
+                        <div class="label">Combined Points</div>
                         <div class="value" id="totalPoints">-</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Active Games</div>
+                        <div class="value" id="activeGames">-</div>
                     </div>
                     <div class="stat-box">
                         <div class="label">Your Rank</div>
@@ -265,11 +320,19 @@
                 </div>
             </div>
 
+            <!-- Game Filter Tabs -->
+            <div class="game-filter-tabs">
+                <button class="tab-btn active" data-game="all">🏆 All Games</button>
+                <button class="tab-btn" data-game="radio">📻 Radio Player</button>
+                <button class="tab-btn" data-game="wavelength-gems">💎 Wavelength Gems</button>
+                <button class="tab-btn" data-game="other-games">🎮 Other Games</button>
+            </div>
+
             <div class="leaderboard-table">
                 <div class="leaderboard-row header">
                     <div>Rank</div>
                     <div>Player</div>
-                    <div>Level</div>
+                    <div>Games</div>
                     <div>Total Points</div>
                 </div>
                 <div id="leaderboardContent">
@@ -285,7 +348,12 @@
     <%- include('partials/footer') %>
 
     <script>
-        // Load leaderboard data from Firebase
+        // Global leaderboard data
+        let allPlayersData = [];
+        let currentFilter = 'all';
+        let activeGames = new Set();
+
+        // Load leaderboard data from multiple sources
         function loadLeaderboard() {
             console.log('🏆 loadLeaderboard() called');
             try {
@@ -296,58 +364,69 @@
                     return;
                 }
                 
-                console.log('✅ Firebase ready, loading leaderboard data...');
+                console.log('✅ Firebase ready, loading multi-game leaderboard data...');
+                loadMultiGameLeaderboard();
 
-                // Use onValue for real-time updates
-                // Radio player stats are stored under /users (not /forum/users)
+            } catch (error) {
+                console.error('Error setting up leaderboard:', error);
+                document.getElementById('leaderboardContent').innerHTML = 
+                    '<div class="no-data">Failed to initialize leaderboard.</div>';
+            }
+        }
+
+        async function loadMultiGameLeaderboard() {
+            try {
+                // Load both radio player stats and game scores in parallel
+                const [radioPlayersData, gameScoresData] = await Promise.all([
+                    loadRadioPlayerStats(),
+                    loadGameScores()
+                ]);
+
+                console.log('📊 Radio players loaded:', radioPlayersData.length);
+                console.log('🎮 Game scores loaded:', gameScoresData.length);
+
+                // Combine all player data
+                const combinedData = combinePlayerData(radioPlayersData, gameScoresData);
+                
+                allPlayersData = combinedData;
+                updateStats(combinedData);
+                renderLeaderboard(combinedData, currentFilter);
+
+            } catch (error) {
+                console.error('Error loading multi-game leaderboard:', error);
+                document.getElementById('leaderboardContent').innerHTML = 
+                    '<div class="no-data">Error loading leaderboard data. Please try again.</div>';
+            }
+        }
+
+        async function loadRadioPlayerStats() {
+            return new Promise((resolve) => {
                 const usersRef = window.firebaseUtils.ref(window.firebaseDB, 'users');
-                console.log('📡 Setting up listener on users path...');
                 
                 window.firebaseUtils.onValue(usersRef, async (snapshot) => {
-                    console.log('📥 onValue callback triggered, snapshot exists:', snapshot.exists());
                     try {
+                        const players = [];
+                        
                         if (!snapshot.exists()) {
-                            document.getElementById('leaderboardContent').innerHTML = 
-                                '<div class="no-data">No players found yet. Be the first!</div>';
+                            resolve(players);
                             return;
                         }
 
                         const users = snapshot.val();
-                        const leaderboardData = [];
-                        let totalPointsSum = 0;
-
-                        // Debug: Log received data
-                        console.log('Received users data:', users);
-                        console.log('Number of users:', Object.keys(users || {}).length);
-
-                        // Ensure users exists
-                        if (!users || typeof users !== 'object') {
-                            console.error('Invalid users data:', users);
-                            document.getElementById('leaderboardContent').innerHTML = 
-                                '<div class="no-data">Invalid data format. Please try again.</div>';
-                            return;
-                        }
-
-                        // Fetch forum user data for display names
+                        
+                        // Get forum user data for display names
                         const forumUsersRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/users');
                         const forumSnapshot = await window.firebaseUtils.get(forumUsersRef);
                         const forumUsers = forumSnapshot.exists() ? forumSnapshot.val() : {};
-                        console.log('📋 Fetched forum user data for names');
 
-                        // Process users and extract leaderboard data
                         Object.keys(users).forEach(userId => {
                             const user = users[userId];
                             const stats = user.radioPlayerStats || {};
                             
-                            // Calculate total points from individual stats for comparison
+                            // Calculate total points from individual stats
                             const pointValues = {
-                                mushrooms: 10,
-                                stars: 5,
-                                horseshoes: 15,
-                                sparkles: 5,
-                                crystals: 8,
-                                moons: 7,
-                                goblins: 25
+                                mushrooms: 10, stars: 5, horseshoes: 15, sparkles: 5,
+                                crystals: 8, moons: 7, goblins: 25
                             };
                             
                             let calculatedTotal = 0;
@@ -358,95 +437,145 @@
                             }
                             calculatedTotal += (stats.gameModePoints || 0);
                             
-                            // Debug: Log each user's stats
-                            console.log(`User ${userId}:`, { 
-                                user: user,
-                                stats: stats, 
-                                storedTotalPoints: stats.totalPoints,
-                                calculatedTotalPoints: calculatedTotal,
-                                hasRadioPlayerStats: !!user.radioPlayerStats,
-                                individualStats: {
-                                    mushrooms: stats.mushrooms || 0,
-                                    stars: stats.stars || 0,
-                                    horseshoes: stats.horseshoes || 0,
-                                    sparkles: stats.sparkles || 0,
-                                    crystals: stats.crystals || 0,
-                                    moons: stats.moons || 0,
-                                    goblins: stats.goblins || 0,
-                                    gameModePoints: stats.gameModePoints || 0
-                                },
-                                allKeys: Object.keys(user)
-                            });
-                            
-                            // Use the higher of stored or calculated total points
                             const totalPoints = Math.max(stats.totalPoints || 0, calculatedTotal);
-                            const magicLevel = stats.magicLevel || 1;
-
-                            // Get user name from forum profile or use ID
-                            const forumUser = forumUsers[userId] || {};
-                            const userName = forumUser.name || forumUser.displayName || `Player ${userId.substring(0, 6)}`;
-
-                            // Include users if they have any stats at all (not just totalPoints > 0)
-                            const hasAnyStats = totalPoints > 0 || 
-                                               Object.values(pointValues).some(value => (stats[Object.keys(pointValues).find(key => pointValues[key] === value)] || 0) > 0);
                             
-                            if (hasAnyStats) {
-                                leaderboardData.push({
+                            if (totalPoints > 0) {
+                                const forumUser = forumUsers[userId] || {};
+                                const userName = forumUser.name || forumUser.displayName || `Player ${userId.substring(0, 6)}`;
+                                
+                                players.push({
                                     userId,
                                     userName,
-                                    totalPoints,
-                                    magicLevel,
+                                    radioPoints: totalPoints,
+                                    radioLevel: stats.magicLevel || 1,
                                     isCurrentUser: window.forumState?.currentUser?.uid === userId
                                 });
-                                totalPointsSum += totalPoints;
+                                
+                                activeGames.add('radio');
                             }
                         });
-
-                        // Sort by total points
-                        leaderboardData.sort((a, b) => b.totalPoints - a.totalPoints);
-
-                        // Update stats
-                        document.getElementById('totalPlayers').textContent = leaderboardData.length.toLocaleString();
-                        document.getElementById('totalPoints').textContent = totalPointsSum.toLocaleString();
-
-                        // Find current user's rank
-                        const currentUserIndex = leaderboardData.findIndex(p => p.isCurrentUser);
-                        if (currentUserIndex >= 0) {
-                            document.getElementById('yourRank').textContent = `#${currentUserIndex + 1}`;
-                        } else {
-                            document.getElementById('yourRank').textContent = 'N/A';
-                        }
-
-                        // Render leaderboard
-                        renderLeaderboard(leaderboardData);
+                        
+                        resolve(players);
                     } catch (error) {
-                        console.error('Error processing leaderboard data:', error);
-                        document.getElementById('leaderboardContent').innerHTML = 
-                            '<div class="no-data">Error processing data. Please try again.</div>';
+                        console.error('Error processing radio player data:', error);
+                        resolve([]);
                     }
-                }, (error) => {
-                    console.error('Error loading leaderboard:', error);
-                    document.getElementById('leaderboardContent').innerHTML = 
-                        '<div class="no-data">Failed to load leaderboard. Please try again later.</div>';
                 });
+            });
+        }
 
+        async function loadGameScores() {
+            try {
+                const response = await fetch('/api/games/leaderboard/global?limit=1000');
+                const data = await response.json();
+                
+                if (data.success && data.leaderboard) {
+                    // Track which games are active
+                    data.leaderboard.forEach(player => {
+                        if (player.gamesPlayed > 0) {
+                            activeGames.add('games');
+                            // You could track specific games here if needed
+                        }
+                    });
+                    
+                    return data.leaderboard.map(player => ({
+                        userId: player.userId,
+                        userName: player.userName,
+                        gamePoints: player.totalScore,
+                        gamesPlayed: player.gamesPlayed,
+                        isCurrentUser: window.forumState?.currentUser?.uid === player.userId
+                    }));
+                }
+                return [];
             } catch (error) {
-                console.error('Error setting up leaderboard:', error);
-                document.getElementById('leaderboardContent').innerHTML = 
-                    '<div class="no-data">Failed to initialize leaderboard.</div>';
+                console.error('Error loading game scores:', error);
+                return [];
             }
         }
 
-        function renderLeaderboard(data) {
+        function combinePlayerData(radioPlayers, gamePlayers) {
+            const playerMap = new Map();
+            
+            // Add radio player data
+            radioPlayers.forEach(player => {
+                playerMap.set(player.userId, {
+                    ...player,
+                    gamePoints: 0,
+                    gamesPlayed: 0,
+                    totalCombinedPoints: player.radioPoints
+                });
+            });
+            
+            // Add/merge game player data
+            gamePlayers.forEach(player => {
+                if (playerMap.has(player.userId)) {
+                    const existing = playerMap.get(player.userId);
+                    existing.gamePoints = player.gamePoints;
+                    existing.gamesPlayed = player.gamesPlayed;
+                    existing.totalCombinedPoints = (existing.radioPoints || 0) + player.gamePoints;
+                } else {
+                    playerMap.set(player.userId, {
+                        ...player,
+                        radioPoints: 0,
+                        radioLevel: 1,
+                        totalCombinedPoints: player.gamePoints
+                    });
+                }
+            });
+            
+            // Convert to array and sort by total combined points
+            return Array.from(playerMap.values())
+                .filter(player => player.totalCombinedPoints > 0)
+                .sort((a, b) => b.totalCombinedPoints - a.totalCombinedPoints);
+        }
+
+        function updateStats(players) {
+            const totalPlayers = players.length;
+            const totalPoints = players.reduce((sum, p) => sum + p.totalCombinedPoints, 0);
+            const currentUserIndex = players.findIndex(p => p.isCurrentUser);
+            
+            document.getElementById('totalPlayers').textContent = totalPlayers.toLocaleString();
+            document.getElementById('totalPoints').textContent = totalPoints.toLocaleString();
+            document.getElementById('activeGames').textContent = activeGames.size;
+            document.getElementById('yourRank').textContent = currentUserIndex >= 0 ? `#${currentUserIndex + 1}` : 'N/A';
+        }
+
+        function renderLeaderboard(players, filter = 'all') {
             const content = document.getElementById('leaderboardContent');
             
-            if (data.length === 0) {
-                content.innerHTML = '<div class="no-data">No players on the leaderboard yet!</div>';
+            // Filter players based on selected filter
+            let filteredPlayers = players;
+            
+            switch (filter) {
+                case 'radio':
+                    filteredPlayers = players.filter(p => p.radioPoints > 0);
+                    break;
+                case 'wavelength-gems':
+                case 'other-games':
+                    filteredPlayers = players.filter(p => p.gamePoints > 0);
+                    break;
+                case 'all':
+                default:
+                    filteredPlayers = players;
+                    break;
+            }
+            
+            // Re-sort and re-rank based on filter
+            if (filter === 'radio') {
+                filteredPlayers.sort((a, b) => b.radioPoints - a.radioPoints);
+            } else if (filter === 'wavelength-gems' || filter === 'other-games') {
+                filteredPlayers.sort((a, b) => b.gamePoints - a.gamePoints);
+            } else {
+                filteredPlayers.sort((a, b) => b.totalCombinedPoints - a.totalCombinedPoints);
+            }
+            
+            if (filteredPlayers.length === 0) {
+                content.innerHTML = '<div class="no-data">No players found for this filter!</div>';
                 return;
             }
 
             // Render top players (limit to top 100)
-            const topPlayers = data.slice(0, 100);
+            const topPlayers = filteredPlayers.slice(0, 100);
             
             content.innerHTML = topPlayers.map((player, index) => {
                 const rank = index + 1;
@@ -470,8 +599,24 @@
                     rowClass += ' current-user';
                 }
 
+                // Get display points based on filter
+                let displayPoints = player.totalCombinedPoints;
+                if (filter === 'radio') displayPoints = player.radioPoints;
+                else if (filter === 'wavelength-gems' || filter === 'other-games') displayPoints = player.gamePoints;
+
                 // Get first letter for avatar
                 const avatarLetter = player.userName.charAt(0).toUpperCase();
+
+                // Create game badges
+                let gameBadges = '';
+                if (filter === 'all') {
+                    if (player.radioPoints > 0) {
+                        gameBadges += '<span class="game-badge radio">📻 Radio</span>';
+                    }
+                    if (player.gamePoints > 0) {
+                        gameBadges += '<span class="game-badge gems">💎 Games</span>';
+                    }
+                }
 
                 return `
                     <div class="leaderboard-row ${rowClass}">
@@ -481,12 +626,18 @@
                             <div>
                                 <span class="player-name">${escapeHtml(player.userName)}</span>
                                 ${player.isCurrentUser ? '<span class="player-badge">You</span>' : ''}
+                                <div class="game-badges">${gameBadges}</div>
                             </div>
                         </div>
                         <div class="level">
-                            <span class="level-badge">Lv ${player.magicLevel}</span>
+                            ${filter === 'all' ? 
+                                `Radio: ${player.radioPoints.toLocaleString()}<br>Games: ${player.gamePoints.toLocaleString()}` :
+                                filter === 'radio' ? 
+                                    `<span class="level-badge">Lv ${player.radioLevel}</span>` :
+                                    `${player.gamesPlayed} games`
+                            }
                         </div>
-                        <div class="points">${player.totalPoints.toLocaleString()}</div>
+                        <div class="points">${displayPoints.toLocaleString()}</div>
                     </div>
                 `;
             }).join('');
@@ -498,11 +649,30 @@
             return div.innerHTML;
         }
 
-        // Load when page is ready
+        // Setup filter tab event listeners
+        function setupFilterTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active tab
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Update filter and re-render
+                    currentFilter = btn.dataset.game;
+                    renderLeaderboard(allPlayersData, currentFilter);
+                });
+            });
+        }
+
+        // Initialize everything when page loads
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadLeaderboard);
+            document.addEventListener('DOMContentLoaded', () => {
+                loadLeaderboard();
+                setupFilterTabs();
+            });
         } else {
             loadLeaderboard();
+            setupFilterTabs();
         }
     </script>
 </body>
