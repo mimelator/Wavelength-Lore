@@ -831,11 +831,46 @@ router.post('/preview-enhancement', ensureAuthenticated, async (req, res) => {
       });
     }
     
+    // Check if we already have a cached enhanced version
+    const sanitizedImageId = _sanitizeFirebaseKey(imageId);
+    console.log(`🔍 Checking cache for enhanced version of: ${imageId}`);
+    
+    const cachedVersion = await merchandiseDB.getEnhancedImage(sanitizedImageId);
+    
+    if (cachedVersion && cachedVersion.enhancedImageUrl) {
+      console.log(`✅ Using cached enhanced version for: ${imageId}`);
+      
+      // Return the cached version
+      return res.json({
+        success: true,
+        original: {
+          url: selectedImage.url,
+          width: cachedVersion.originalDimensions?.width || 1024,
+          height: cachedVersion.originalDimensions?.height || 1024,
+          suitableForPrint: false
+        },
+        enhanced: {
+          url: cachedVersion.enhancedImageUrl,
+          width: cachedVersion.enhancedDimensions?.width || 2048,
+          height: cachedVersion.enhancedDimensions?.height || 2048
+        },
+        analysis: {
+          method: cachedVersion.enhancementMethod || 'AI Upscaling',
+          improvement: cachedVersion.improvementDescription || 'Quality enhanced for printing',
+          scaleFactor: cachedVersion.scaleFactor || 2.0,
+          cached: true
+        }
+      });
+    }
+
+    console.log(`🎨 No cached version found, generating new enhancement for: ${imageId}`);
+    
     // Generate enhancement preview
     const startTime = Date.now();
     const enhancementResult = await printifyService.previewImageEnhancement(
       imageBuffer,
-      selectedImage.fileName || selectedImage.originalName
+      selectedImage.fileName || selectedImage.originalName,
+      { originalImageId: imageId } // Pass originalImageId for caching
     );
     
     if (!enhancementResult.success) {
