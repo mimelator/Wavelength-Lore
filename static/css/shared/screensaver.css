@@ -1,9 +1,10 @@
 /**
  * Shared Screensaver Styles
- * Common styling for screensaver functionality across the application
+ * Complete styling for reusable screensaver functionality across the application
+ * Includes transitions, weather effects, customization panel, game mode, and accessibility features
  */
 
-/* Screensaver overlay base styles */
+/* Core Screensaver Structure */
 .screensaver-overlay {
   position: fixed;
   top: 0;
@@ -11,8 +12,8 @@
   width: 100%;
   height: 100%;
   background: #000;
-  z-index: 9999;
   display: none;
+  z-index: 9999;
   overflow: hidden;
 }
 
@@ -20,35 +21,354 @@
   display: block;
 }
 
-/* Gallery container */
+/* Image Gallery */
 .screensaver-gallery {
   position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
 }
 
 .screensaver-gallery img {
   position: absolute;
+  top: 50%;
+  left: 50%;
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
   opacity: 0;
-  transition: opacity 1s ease-in-out;
-  transform-origin: center;
+  transition: opacity 3s ease-in-out, 
+              filter 3s ease-in-out,
+              transform 3s ease-in-out;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
 }
 
 .screensaver-gallery img.active {
   opacity: 1;
-  z-index: 2;
 }
 
 .screensaver-gallery img.fading-out {
   opacity: 0;
-  z-index: 1;
 }
+
+/* Weather Effects */
+.weather-effects {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.weather-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.lightning-flash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+  pointer-events: none;
+}
+
+/* Customization Panel */
+.screensaver-customization {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 20;
+}
+
+.customization-toggle {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.customization-toggle:hover {
+  background: rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.customization-panel {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 320px;
+  max-height: 80vh;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transform: translateY(-20px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.customization-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.customization-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.customization-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.customization-panel.expanded {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.customization-section {
+  margin-bottom: 25px;
+}
+
+.customization-section:last-child {
+  margin-bottom: 0;
+}
+
+.customization-section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: white;
+  font-size: 0.95rem;
+}
+
+.section-icon {
+  margin-right: 8px;
+  font-size: 1.1rem;
+}
+
+.section-title {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.customization-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.custom-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.custom-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.custom-btn.active {
+  background: rgba(74, 144, 226, 0.3);
+  border-color: rgba(74, 144, 226, 0.5);
+  color: #4a90e2;
+  font-weight: 500;
+}
+
+.game-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Game Mode Elements */
+.floating-game-icons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.floating-game-icon {
+  position: absolute;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 15;
+  user-select: none;
+  pointer-events: auto;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease;
+}
+
+.floating-game-icon:hover {
+  transform: scale(1.2);
+}
+
+.game-hud {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 15;
+  display: flex;
+  gap: 20px;
+}
+
+.hud-score {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px 15px;
+  border-radius: 8px;
+  color: white;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hud-label {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  display: block;
+}
+
+.hud-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #4a90e2;
+}
+
+/* Other Feature Overlays */
+.screensaver-lyrics {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80%;
+  text-align: center;
+  color: white;
+  font-size: 1.2rem;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 15px 25px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 5;
+}
+
+.screensaver-lyrics.visible {
+  opacity: 1;
+}
+
+.screensaver-title-overlay {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80%;
+  text-align: center;
+  color: white;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 15px 25px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 5;
+}
+
+.screensaver-title-overlay.visible {
+  opacity: 1;
+}
+
+.screensaver-summary-overlay {
+  position: absolute;
+  bottom: 120px;
+  right: 20px;
+  max-width: 300px;
+  color: white;
+  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 15px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 5;
+}
+
+.screensaver-summary-overlay.visible {
+  opacity: 1;
+}
+
+.screensaver-badges-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 8;
+}
+
+/* Exit Hints */
+.screensaver-exit-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 8px 16px;
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
+  z-index: 5;
+  animation: fadeInOut 4s ease-in-out infinite;
+}
+
+/* Image Transition Effects */
 
 /* Disable animations when specified */
 .screensaver-gallery img.no-animation {
@@ -230,6 +550,38 @@
   100% {
     transform: translate(0%, 0%) scale(1);
     opacity: 1;
+  }
+}
+
+/* Additional animations for advanced features */
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes scorePopup {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5) translateY(-50px);
+  }
+}
+
+@keyframes fadeInOutIcon {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  20%, 80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
   }
 }
 

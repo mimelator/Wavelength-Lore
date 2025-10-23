@@ -36,14 +36,19 @@ document.addEventListener('DOMContentLoaded', () => {
         containerId: 'screensaverModal',
         gallerySelector: '#screensaver-container',
         autoRotate: true,
-        rotationInterval: 5000,
+        rotationInterval: 8000,
         transitionsEnabled: true,
+        weatherEffects: true,
         exitOnClick: true,
-        exitOnKeypress: true
+        exitOnKeypress: true,
+        imageEffects: true,
+        gameMode: true,
+        badges: true,
+        showControls: false
       });
       
       galleryScreensaver.init();
-      console.log('✅ Gallery screensaver initialized with shared utility');
+      console.log('✅ Gallery screensaver initialized with advanced features');
     } else {
       // Fallback to simple screensaver if shared utility not loaded
       console.warn('⚠️ Shared screensaver utility not available, using fallback');
