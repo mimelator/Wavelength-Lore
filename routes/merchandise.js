@@ -35,6 +35,14 @@ function ensureDatabaseReady(res) {
   try {
     // With the singleton, the database is always ready.
     return merchandiseDB.isDatabaseReady();
+  } catch (error) {
+    console.error('Database availability check failed:', error);
+    res.status(503).json({
+      success: false,
+      error: 'Database service temporarily unavailable',
+      details: process.env.NODE_ENV === 'development' ? error.message : 'Service initialization error'
+    });
+    return false;
   }
 }
 
