@@ -130,7 +130,25 @@ class MerchandiseStore {
   
   async createProduct(imageId, productOptions) {
     try {
-      this.setLoading(true, 'Creating your custom product...');
+      // Start with progress feedback for product creation
+      this.setLoading(true, 'Preparing your image for product creation...');
+      
+      // Show progressive updates during the product creation process
+      const productProgressMessages = [
+        'Preparing your image for product creation...',
+        'Checking if image enhancement is needed...',
+        'Optimizing image for high-quality printing...',
+        'Creating product variants and options...',
+        'Finalizing your custom product...'
+      ];
+      
+      let currentStep = 0;
+      const productProgressInterval = setInterval(() => {
+        if (currentStep < productProgressMessages.length - 1) {
+          currentStep++;
+          this.setLoading(true, productProgressMessages[currentStep]);
+        }
+      }, 5000); // Update every 5 seconds for longer process
       
       const response = await fetch('/api/merchandise/create-product', {
         method: 'POST',
@@ -144,30 +162,38 @@ class MerchandiseStore {
         })
       });
       
+      clearInterval(productProgressInterval);
+      
       const data = await response.json();
       
       if (data.success) {
-        this.products.push(data.product);
+        this.setLoading(true, 'Product created! Preparing final details...');
         
-        // Show enhancement feedback
-        let message = data.message || 'Custom product created successfully!';
-        if (data.enhancement?.autoEnhanced) {
-          message += ' ✨ Your image was automatically enhanced for better print quality!';
-        }
+        setTimeout(() => {
+          this.products.push(data.product);
+          
+          // Show enhancement feedback
+          let message = data.message || 'Custom product created successfully!';
+          if (data.enhancement?.autoEnhanced) {
+            message += ' ✨ Your image was automatically enhanced for better print quality!';
+          }
+          
+          this.showSuccess(message);
+          this.render();
+          this.setLoading(false);
+        }, 800);
         
-        this.showSuccess(message);
-        this.render();
         return data.product;
       } else {
         throw new Error(data.error || 'Failed to create product');
       }
       
     } catch (error) {
+      clearInterval(productProgressInterval);
       console.error('Error creating product:', error);
       this.showError('Failed to create product: ' + error.message);
-      return null;
-    } finally {
       this.setLoading(false);
+      return null;
     }
   }
   
@@ -431,7 +457,25 @@ class MerchandiseStore {
   
   async previewEnhancement(imageId) {
     try {
-      this.setLoading(true, 'Generating enhancement preview...');
+      // Start with progress feedback
+      this.setLoading(true, 'Analyzing image for print quality...');
+      
+      // Show progressive updates during the enhancement process
+      const progressMessages = [
+        'Analyzing image for print quality...',
+        'Processing image with AI enhancement...',
+        'Optimizing colors and details...',
+        'Generating high-resolution version...',
+        'Finalizing enhancement preview...'
+      ];
+      
+      let currentStep = 0;
+      const progressInterval = setInterval(() => {
+        if (currentStep < progressMessages.length - 1) {
+          currentStep++;
+          this.setLoading(true, progressMessages[currentStep]);
+        }
+      }, 4000); // Update every 4 seconds for ~20 second process
       
       const response = await fetch('/api/merchandise/preview-enhancement', {
         method: 'POST',
@@ -442,10 +486,16 @@ class MerchandiseStore {
         body: JSON.stringify({ imageId })
       });
       
+      clearInterval(progressInterval);
+      
       const data = await response.json();
       
       if (data.success) {
-        this.showEnhancementPreview(data.original, data.enhanced, data.analysis);
+        this.setLoading(true, 'Enhancement complete! Loading preview...');
+        setTimeout(() => {
+          this.showEnhancementPreview(data.original, data.enhanced, data.analysis);
+          this.setLoading(false);
+        }, 500);
       } else {
         throw new Error(data.error || 'Failed to generate preview');
       }
@@ -453,7 +503,6 @@ class MerchandiseStore {
     } catch (error) {
       console.error('Error previewing enhancement:', error);
       this.showError('Failed to preview enhancement: ' + error.message);
-    } finally {
       this.setLoading(false);
     }
   }

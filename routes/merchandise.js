@@ -861,7 +861,7 @@ router.post('/preview-enhancement', ensureAuthenticated, async (req, res) => {
         };
         
         const sanitizedImageId = _sanitizeFirebaseKey(imageId);
-        const storeResult = await merchandiseDatabase.storeEnhancedImage(sanitizedImageId, enhancementData);
+        const storeResult = await merchandiseDB.storeEnhancedImage(sanitizedImageId, enhancementData);
         if (storeResult.success) {
           console.log(`✅ Automatically stored enhanced image for ${imageId}`);
         } else {
@@ -925,7 +925,7 @@ router.post('/check-enhancement-status', ensureAuthenticated, async (req, res) =
     }
     
     // Check if enhanced version exists in database
-    const hasEnhanced = await merchandiseDatabase.hasEnhancedVersion(imageId);
+    const hasEnhanced = await merchandiseDB.hasEnhancedVersion(imageId);
     
     res.json({
       success: true,
