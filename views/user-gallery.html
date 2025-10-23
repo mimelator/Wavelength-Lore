@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Gallery | Wavelength Lore</title>
+  <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/gallery/gallery.css">
+  <!-- Include Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .intro {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #666;
+    }
+    
+    #gallery-container {
+      min-height: 400px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>My Photo Gallery</h1>
+    
+    <div class="intro">
+      <p>Your personal collection of images from the Wavelength Lore universe.</p>
+      <p>Explore the site and click "Save to Gallery" on any image you want to add to your collection.</p>
+    </div>
+    
+    <div id="gallery-container"></div>
+  </div>
+  
+  <script src="/static/js/components/gallery/gallery.js"></script>
+  <script src="/static/js/components/gallery/user-gallery.js"></script>
+  <script>
+    // Make firebase accessible to other scripts
+    window.firebaseAuth = null;
+    window.firebaseUtils = null;
+    
+    // Firebase configuration (will be populated from server)
+    const firebaseConfig = {
+      apiKey: "AIzaSyA-example-key-xyzabc",
+      authDomain: "wavelength-lore.firebaseapp.com",
+      projectId: "wavelength-lore",
+      storageBucket: "wavelength-lore.appspot.com",
+      messagingSenderId: "123456789012",
+      appId: "1:123456789012:web:abcdef1234567890"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    window.firebaseAuth = firebase.auth();
+    window.firebaseUtils = firebase;
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize the user gallery
+      const userGallery = new UserGallery({
+        containerId: 'gallery-container',
+        apiEndpoint: '/gallery/api/user/images',
+        enableDownload: true,
+        enableScreensaver: true,
+        enableDelete: true
+      });
+      
+      // Add a login button if needed
+      const container = document.querySelector('.container');
+      const loginButton = document.createElement('div');
+      loginButton.className = 'login-button';
+      loginButton.style.textAlign = 'center';
+      loginButton.style.marginTop = '20px';
+      
+      const button = document.createElement('button');
+      button.textContent = 'Login to View Gallery';
+      button.style.padding = '10px 20px';
+      button.style.background = '#4c84ff';
+      button.style.color = 'white';
+      button.style.border = 'none';
+      button.style.borderRadius = '4px';
+      button.style.cursor = 'pointer';
+      button.style.fontSize = '16px';
+      
+      button.addEventListener('click', () => {
+        const currentUrl = encodeURIComponent(window.location.href);
+        window.location.href = `/login?redirect=${currentUrl}`;
+      });
+      
+      loginButton.appendChild(button);
+      
+      // Add login button if user is not logged in
+      firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          container.appendChild(loginButton);
+        } else if (loginButton.parentNode) {
+          loginButton.parentNode.removeChild(loginButton);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

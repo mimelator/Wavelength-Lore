@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gallery Debug Test</title>
+</head>
+<body>
+    <h1>Gallery Debug Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Debug page loaded');
+            
+            const resultsDiv = document.getElementById('results');
+            
+            // Test 1: Check if we can reach the API
+            resultsDiv.innerHTML += '<p>Testing gallery API...</p>';
+            
+            fetch('/api/gallery/user/images', {
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log('📡 API response:', response.status, response.statusText);
+                resultsDiv.innerHTML += `<p>API Response: ${response.status} ${response.statusText}</p>`;
+                return response.json().catch(() => ({ error: 'Non-JSON response' }));
+            })
+            .then(data => {
+                console.log('📦 API data:', data);
+                resultsDiv.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                
+                if (data.success && data.images) {
+                    resultsDiv.innerHTML += `<p>✅ Found ${data.images.length} images!</p>`;
+                    data.images.forEach((img, i) => {
+                        resultsDiv.innerHTML += `<p>Image ${i+1}: ${img.title || 'Untitled'} - ${img.url}</p>`;
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('❌ API error:', error);
+                resultsDiv.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -59,11 +59,11 @@ async function getEnhancedPlaylist() {
 
       if (episodeData) {
         // Debug logging for summary field
-        if (track.season === 1 && track.episode === 1) {
+        /*if (track.season === 1 && track.episode === 1) {
           console.log('📖 Episode data fields:', Object.keys(episodeData));
           console.log('📖 Story field:', episodeData.story);
           console.log('📖 Summary field:', episodeData.summary);
-        }
+        }*/
 
         return {
           ...track,
@@ -92,9 +92,10 @@ async function getEnhancedPlaylist() {
             const allLore = loreHelpers.getAllLoreSync(false);
             
             // Debug: Show all lore for S2E1
+            /*
             if (track.season === 2 && track.episode === 1) {
               console.log('🔍 All lore items:', allLore.map(l => ({ id: l.id, name: l.name, keywords: l.keywords })));
-            }
+            }*/
             
             const matchedLore = allLore.filter(lore =>
               episodeData.keywords?.some(keyword =>

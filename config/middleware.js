@@ -113,9 +113,22 @@ function configureStaticFiles(app) {
   // Also serve static files under /static/ path for CDN compatibility in local development
   app.use('/static', express.static(path.join(__dirname, '../static')));
 
+  // Handle gallery images in local development via S3 proxy
+  if (process.env.CDN_URL && process.env.CDN_URL.includes('localhost')) {
+    console.log('🖼️ Using Gallery S3 Proxy for local development');
+    const galleryS3Proxy = require('../middleware/galleryS3Proxy');
+    // Mount the proxy at the full path so it gets the complete path
+    app.use(galleryS3Proxy);
+  }
+
   // Map clean URLs to static files (for YAML path compatibility)
   // Fallback to CDN for images not found locally (e.g., AI-generated images)
   app.use('/images', express.static(path.join(__dirname, '../static/images')), (req, res, next) => {
+    // Skip if already handled by gallery S3 proxy
+    if (req.path.startsWith('/gallery/')) {
+      return next();
+    }
+    
     // If file not found locally, redirect to real CDN (CloudFront)
     // Use the actual CloudFront URL as fallback, not localhost
     const cloudFrontUrl = 'https://df5sj8f594cdx.cloudfront.net';
@@ -213,10 +226,48 @@ function configureTemplateLocals(app) {
     next();
   });
 
+  // Middleware to add version information to all templates
+  app.use((req, res, next) => {
+    // Import version manager
+    const versionManager = require('../utils/version');
+    
+    // Add version information to templates
+    const versionInfo = versionManager.getTemplateData();
+    res.locals.version = versionInfo.version;
+    res.locals.displayVersion = versionInfo.displayVersion;
+    res.locals.buildNumber = versionInfo.buildNumber;
+    res.locals.environment = versionInfo.environment;
+    res.locals.versionInfo = versionInfo; // Add full version info for templates
+    
+    next();
+  });
+
   // Middleware to add character, lore, and episode helpers to all templates
   app.use(async (req, res, next) => {
     // Get visibility filter based on user role
     const showHidden = res.locals.isContentCreator;
+    
+    // Gallery UI helpers - disable on gallery pages
+    const galleryUi = require('../utils/gallery/ui');
+    res.locals.galleryUi = galleryUi;
+    
+    // Don't provide save to gallery functionality on gallery pages or main navigation pages
+    const isGalleryPage = req.path.includes('/gallery') || req.path === '/my-gallery';
+    const isMainNavPage = req.path === '/' || req.path === '/characters' || req.path === '/lore' || req.path === '/episodes';
+    
+    if (isGalleryPage) {
+      // Provide a disabled version that returns empty string
+      res.locals.saveToGalleryButton = () => '';
+    } else if (isMainNavPage) {
+      // Provide a limited version for main nav pages
+      res.locals.saveToGalleryButton = (imageUrl, title, sourceUrl = '') => {
+        // Only show on specific image pages, not on card/badge images
+        return '';
+      };
+    } else {
+      // Normal functionality for other pages
+      res.locals.saveToGalleryButton = galleryUi.createSaveToGalleryButton;
+    }
 
     // Character helpers
     res.locals.characterHelpers = characterHelpers;

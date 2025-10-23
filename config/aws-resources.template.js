@@ -28,6 +28,19 @@ module.exports = {
 
   // CloudFront
   cloudFront: {
+    // Primary distribution (main site)
+    primary: {
+      distributionId: process.env.CLOUDFRONT_DISTRIBUTION_ID || 'your-distribution-id',
+      distributionDomain: process.env.CLOUDFRONT_DOMAIN || 'your-distribution.cloudfront.net',
+      etag: process.env.CLOUDFRONT_ETAG || 'your-etag'
+    },
+    // Gallery distribution (photo gallery)
+    gallery: {
+      distributionId: process.env.GALLERY_CLOUDFRONT_DISTRIBUTION_ID || 'your-gallery-distribution-id',
+      distributionDomain: process.env.GALLERY_CLOUDFRONT_DOMAIN || 'your-gallery-distribution.cloudfront.net',
+      etag: process.env.GALLERY_CLOUDFRONT_ETAG || 'your-gallery-etag'
+    },
+    // Legacy field for backward compatibility
     distributionId: process.env.CLOUDFRONT_DISTRIBUTION_ID || 'your-distribution-id',
     distributionDomain: process.env.CLOUDFRONT_DOMAIN || 'your-distribution.cloudfront.net',
     etag: process.env.CLOUDFRONT_ETAG || 'your-etag'

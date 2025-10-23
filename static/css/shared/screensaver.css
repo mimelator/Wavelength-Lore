@@ -1,0 +1,981 @@
+/**
+ * Shared Screensaver Styles
+ * Complete styling for reusable screensaver functionality across the application
+ * Includes transitions, weather effects, customization panel, game mode, and accessibility features
+ */
+
+/* Core Screensaver Structure */
+.screensaver-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  z-index: 10000;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  overflow: hidden;
+}
+
+.screensaver-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Screen Saver Gallery */
+.screensaver-gallery {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Fog Effects Overlay - Balanced Version */
+.screensaver-gallery::before,
+.screensaver-gallery::after {
+  content: '';
+  position: absolute;
+  width: 220%;
+  height: 220%;
+  top: -60%;
+  left: -60%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.screensaver-gallery::before {
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 30%, transparent 60%),
+    radial-gradient(circle at 80% 70%, rgba(200, 220, 255, 0.2) 0%, rgba(180, 210, 255, 0.06) 28%, transparent 55%),
+    radial-gradient(circle at 40% 80%, rgba(255, 240, 255, 0.18) 0%, rgba(240, 220, 250, 0.05) 32%, transparent 58%),
+    radial-gradient(circle at 60% 20%, rgba(230, 255, 250, 0.21) 0%, rgba(210, 245, 240, 0.07) 30%, transparent 62%);
+  animation: fogDrift1 55s ease-in-out infinite;
+  opacity: 0.5;
+  filter: blur(40px);
+}
+
+.screensaver-gallery::after {
+  background: 
+    radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.2) 0%, rgba(245, 245, 255, 0.07) 28%, transparent 58%),
+    radial-gradient(circle at 30% 60%, rgba(210, 230, 255, 0.23) 0%, rgba(190, 220, 250, 0.08) 30%, transparent 62%),
+    radial-gradient(circle at 50% 90%, rgba(255, 250, 240, 0.19) 0%, rgba(240, 235, 230, 0.06) 32%, transparent 60%),
+    radial-gradient(circle at 90% 10%, rgba(240, 255, 255, 0.21) 0%, rgba(220, 245, 250, 0.07) 29%, transparent 56%);
+  animation: fogDrift2 75s ease-in-out infinite reverse;
+  opacity: 0.45;
+  filter: blur(35px);
+}
+
+@keyframes fogDrift1 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 0.5;
+  }
+  25% {
+    transform: translate(-12%, 6%) rotate(6deg) scale(1.05);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(8%, -10%) rotate(-5deg) scale(0.97);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translate(-6%, 8%) rotate(5deg) scale(1.03);
+    opacity: 0.55;
+  }
+}
+
+@keyframes fogDrift2 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 0.45;
+  }
+  25% {
+    transform: translate(10%, -8%) rotate(-6deg) scale(1.04);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate(-11%, 7%) rotate(7deg) scale(0.96);
+    opacity: 0.35;
+  }
+  75% {
+    transform: translate(7%, -9%) rotate(-5deg) scale(1.03);
+    opacity: 0.5;
+  }
+}
+
+.screensaver-gallery img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 3s ease-in-out, transform 3s ease-in-out;
+  animation: warpFilterNoTransform 45s ease-in-out infinite;
+  user-select: none;
+  pointer-events: none;
+}
+
+.screensaver-gallery img.active {
+  opacity: 1;
+  z-index: 2;
+}
+
+.screensaver-gallery img.fading-out {
+  opacity: 0;
+  z-index: 1;
+}
+
+/* Weather Effects */
+.weather-effects {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.weather-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.lightning-flash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+  pointer-events: none;
+}
+
+/* Customization Panel */
+.screensaver-customization {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 20;
+}
+
+.customization-toggle {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.customization-toggle:hover {
+  background: rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.customization-panel {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 320px;
+  max-height: 80vh;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transform: translateY(-20px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.customization-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.customization-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.customization-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.customization-panel.expanded {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.customization-section {
+  margin-bottom: 25px;
+}
+
+.customization-section:last-child {
+  margin-bottom: 0;
+}
+
+.customization-section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: white;
+  font-size: 0.95rem;
+}
+
+.section-icon {
+  margin-right: 8px;
+  font-size: 1.1rem;
+}
+
+.section-title {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.customization-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.custom-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.custom-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.custom-btn.active {
+  background: rgba(74, 144, 226, 0.3);
+  border-color: rgba(74, 144, 226, 0.5);
+  color: #4a90e2;
+  font-weight: 500;
+}
+
+.game-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Game Mode Elements */
+.floating-game-icons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.floating-game-icon {
+  position: absolute;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 15;
+  user-select: none;
+  pointer-events: auto;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease;
+}
+
+.floating-game-icon:hover {
+  transform: scale(1.2);
+}
+
+.game-hud {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 15;
+  display: flex;
+  gap: 20px;
+}
+
+.hud-score {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px 15px;
+  border-radius: 8px;
+  color: white;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hud-label {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  display: block;
+}
+
+.hud-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #4a90e2;
+}
+
+/* Other Feature Overlays */
+.screensaver-lyrics {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80%;
+  text-align: center;
+  color: white;
+  font-size: 1.2rem;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 15px 25px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 5;
+}
+
+.screensaver-lyrics.visible {
+  opacity: 1;
+}
+
+.screensaver-title-overlay {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80%;
+  text-align: center;
+  color: white;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 15px 25px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 5;
+}
+
+.screensaver-title-overlay.visible {
+  opacity: 1;
+}
+
+.screensaver-summary-overlay {
+  position: absolute;
+  bottom: 120px;
+  right: 20px;
+  max-width: 300px;
+  color: white;
+  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 15px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 5;
+}
+
+.screensaver-summary-overlay.visible {
+  opacity: 1;
+}
+
+.screensaver-badges-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 8;
+}
+
+/* Exit Hints */
+.screensaver-exit-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 8px 16px;
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
+  z-index: 5;
+  animation: fadeInOut 4s ease-in-out infinite;
+}
+
+/* Image Transition Effects */
+
+/* Disable animations when specified */
+.screensaver-gallery img.no-animation {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Transition Effects */
+.screensaver-gallery img.transition-fade {
+  transition: opacity 3s ease-in-out;
+}
+
+.screensaver-gallery img.transition-slide-left {
+  animation: slideInLeft 3s ease-in-out;
+}
+
+.screensaver-gallery img.transition-slide-right {
+  animation: slideInRight 3s ease-in-out;
+}
+
+.screensaver-gallery img.transition-slide-up {
+  animation: slideInUp 3s ease-in-out;
+}
+
+.screensaver-gallery img.transition-slide-down {
+  animation: slideInDown 3s ease-in-out;
+}
+
+.screensaver-gallery img.transition-zoom-in {
+  animation: zoomIn 3s ease-in-out;
+}
+
+.screensaver-gallery img.transition-zoom-out {
+  animation: zoomOut 3s ease-in-out;
+}
+
+.screensaver-gallery img.transition-rotate-left {
+  animation: rotateInLeft 3s ease-in-out;
+}
+
+.screensaver-gallery img.transition-rotate-right {
+  animation: rotateInRight 3s ease-in-out;
+}
+
+.screensaver-gallery img.transition-blur {
+  animation: blurIn 3s ease-in-out;
+}
+
+.screensaver-gallery img.transition-diagonal-tl {
+  animation: diagonalTopLeft 3s ease-in-out;
+}
+
+.screensaver-gallery img.transition-diagonal-br {
+  animation: diagonalBottomRight 3s ease-in-out;
+}
+
+/* Keyframe Animations */
+@keyframes slideInLeft {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInDown {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes zoomIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes zoomOut {
+  0% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes rotateInLeft {
+  0% {
+    transform: rotate(-90deg) scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes rotateInRight {
+  0% {
+    transform: rotate(90deg) scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes blurIn {
+  0% {
+    filter: blur(20px);
+    opacity: 0;
+  }
+  100% {
+    filter: blur(0px);
+    opacity: 1;
+  }
+}
+
+@keyframes diagonalTopLeft {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(0%, 0%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes diagonalBottomRight {
+  0% {
+    transform: translate(50%, 50%) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(0%, 0%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Additional animations for advanced features */
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes scorePopup {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5) translateY(-50px);
+  }
+}
+
+@keyframes fadeInOutIcon {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  20%, 80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+/* Weather canvas */
+.weather-canvas {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+}
+
+/* Screensaver controls */
+.screensaver-controls {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  gap: 15px;
+  z-index: 10;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.screensaver-controls:hover {
+  opacity: 1;
+}
+
+.screensaver-control {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.screensaver-control:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4);
+}
+
+.screensaver-control:active {
+  transform: scale(0.95);
+}
+
+/* Exit hint */
+.screensaver-exit-hint {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  z-index: 20;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+/* Hide body overflow when screensaver is active */
+body.screensaver-active {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* Disable animation when user turns it off */
+.screensaver-gallery img.no-animation {
+  animation: none !important;
+}
+
+.screensaver-gallery img.transition-fade {
+  transition: opacity 3s ease-in-out, transform 3s ease-in-out !important;
+}
+
+/* Slide Left: Current slides left, Next enters from right */
+.screensaver-gallery img.transition-slide-left {
+  transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out !important;
+}
+
+.screensaver-gallery img.transition-slide-left:not(.active):not(.fading-out) {
+  transform: translateX(100%);
+}
+
+.screensaver-gallery img.transition-slide-left.active {
+  transform: translateX(0) !important;
+}
+
+.screensaver-gallery img.transition-slide-left.fading-out {
+  transform: translateX(-100%) !important;
+}
+
+/* Slide Right: Current slides right, Next enters from left */
+.screensaver-gallery img.transition-slide-right {
+  transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out;
+}
+
+.screensaver-gallery img.transition-slide-right:not(.active):not(.fading-out) {
+  transform: translateX(-100%);
+}
+
+.screensaver-gallery img.transition-slide-right.active {
+  transform: translateX(0) !important;
+}
+
+.screensaver-gallery img.transition-slide-right.fading-out {
+  transform: translateX(100%) !important;
+}
+
+/* Slide Up: Current slides up, Next enters from bottom */
+.screensaver-gallery img.transition-slide-up {
+  transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out;
+}
+
+.screensaver-gallery img.transition-slide-up:not(.active):not(.fading-out) {
+  transform: translateY(100%);
+}
+
+.screensaver-gallery img.transition-slide-up.active {
+  transform: translateY(0) !important;
+}
+
+.screensaver-gallery img.transition-slide-up.fading-out {
+  transform: translateY(-100%) !important;
+}
+
+/* Slide Down: Current slides down, Next enters from top */
+.screensaver-gallery img.transition-slide-down {
+  transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out;
+}
+
+.screensaver-gallery img.transition-slide-down:not(.active):not(.fading-out) {
+  transform: translateY(-100%);
+}
+
+.screensaver-gallery img.transition-slide-down.active {
+  transform: translateY(0) !important;
+}
+
+.screensaver-gallery img.transition-slide-down.fading-out {
+  transform: translateY(100%) !important;
+}
+
+/* Zoom In: Current zooms in, stays visible longer, then fades */
+.screensaver-gallery img.transition-zoom-in {
+  transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out;
+}
+
+.screensaver-gallery img.transition-zoom-in:not(.active):not(.fading-out) {
+  transform: scale(0.8);
+}
+
+.screensaver-gallery img.transition-zoom-in.active {
+  transform: scale(1) !important;
+}
+
+.screensaver-gallery img.transition-zoom-in.fading-out {
+  transform: scale(1.2) !important;
+}
+
+/* Zoom Out: Current zooms out */
+.screensaver-gallery img.transition-zoom-out {
+  transition: opacity 2.5s ease-in-out, transform 2.5s ease-in-out;
+}
+
+.screensaver-gallery img.transition-zoom-out:not(.active):not(.fading-out) {
+  transform: scale(1.2);
+}
+
+.screensaver-gallery img.transition-zoom-out.active {
+  transform: scale(1) !important;
+}
+
+.screensaver-gallery img.transition-zoom-out.fading-out {
+  transform: scale(0.8) !important;
+}
+
+/* Warp Filter Animations */
+@keyframes warpFilter {
+  0% {
+    filter: hue-rotate(0deg) saturate(1) brightness(1) contrast(1);
+    transform: scale(1) rotate(0deg);
+  }
+  12.5% {
+    filter: hue-rotate(45deg) saturate(1.3) brightness(1.1) contrast(1.1);
+    transform: scale(1.08) rotate(2deg);
+  }
+  25% {
+    filter: hue-rotate(90deg) saturate(1.6) brightness(1.2) contrast(1.2);
+    transform: scale(1.15) rotate(-2deg);
+  }
+  37.5% {
+    filter: hue-rotate(135deg) saturate(1.8) brightness(1.15) contrast(1.3);
+    transform: scale(1.2) rotate(3deg);
+  }
+  50% {
+    filter: hue-rotate(180deg) saturate(2) brightness(0.95) contrast(1.35);
+    transform: scale(1.25) rotate(0deg);
+  }
+  62.5% {
+    filter: hue-rotate(225deg) saturate(1.8) brightness(0.9) contrast(1.3);
+    transform: scale(1.2) rotate(-3deg);
+  }
+  75% {
+    filter: hue-rotate(270deg) saturate(1.6) brightness(1.1) contrast(1.2);
+    transform: scale(1.15) rotate(2deg);
+  }
+  87.5% {
+    filter: hue-rotate(315deg) saturate(1.3) brightness(1.15) contrast(1.1);
+    transform: scale(1.08) rotate(-2deg);
+  }
+  100% {
+    filter: hue-rotate(360deg) saturate(1) brightness(1) contrast(1);
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Warping Filter Animation - No Transform (for use with transitions) */
+@keyframes warpFilterNoTransform {
+  0% {
+    filter: hue-rotate(0deg) saturate(1) brightness(1) contrast(1);
+  }
+  12.5% {
+    filter: hue-rotate(45deg) saturate(1.3) brightness(1.1) contrast(1.1);
+  }
+  25% {
+    filter: hue-rotate(90deg) saturate(1.6) brightness(1.2) contrast(1.2);
+  }
+  37.5% {
+    filter: hue-rotate(135deg) saturate(1.8) brightness(1.15) contrast(1.3);
+  }
+  50% {
+    filter: hue-rotate(180deg) saturate(2) brightness(0.95) contrast(1.35);
+  }
+  62.5% {
+    filter: hue-rotate(225deg) saturate(1.8) brightness(0.9) contrast(1.3);
+  }
+  75% {
+    filter: hue-rotate(270deg) saturate(1.6) brightness(1.1) contrast(1.2);
+  }
+  87.5% {
+    filter: hue-rotate(315deg) saturate(1.3) brightness(1.15) contrast(1.1);
+  }
+  100% {
+    filter: hue-rotate(360deg) saturate(1) brightness(1) contrast(1);
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .screensaver-controls {
+    bottom: 20px;
+    right: 20px;
+    gap: 10px;
+  }
+
+  .screensaver-control {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .screensaver-exit-hint {
+    top: 20px;
+    font-size: 14px;
+    padding: 8px 15px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .screensaver-control {
+    background: rgba(255, 255, 255, 0.8);
+    color: black;
+    border-color: white;
+  }
+
+  .screensaver-exit-hint {
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .screensaver-gallery img {
+    transition: opacity 0.5s ease;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .screensaver-control {
+    transition: none;
+  }
+
+  .screensaver-control:hover {
+    transform: none;
+  }
+}

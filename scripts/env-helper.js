@@ -38,6 +38,11 @@ const ENV_MAPPINGS = {
   // Other common script variables
   YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY,
   CDN_URL: process.env.CDN_URL,
+  
+  // CloudFront and CORS settings
+  CLOUDFRONT_DISTRIBUTION_ID: process.env.CLOUDFRONT_DISTRIBUTION_ID,
+  CLOUDFRONT_HEADERS_POLICY_ID: process.env.CLOUDFRONT_HEADERS_POLICY_ID,
+  GALLERY_S3_BUCKET: process.env.GALLERY_S3_BUCKET || process.env.S3_BUCKET_NAME,
 };
 
 /**

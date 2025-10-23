@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head') %>
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/gallery.css">
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css">
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/modal_styles.css">
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/gallery-buttons.css">
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/user-gallery.css">
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/shared/screensaver.css">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/carousel.css">
+</head>
+<body>
+  <!-- Include standard header -->
+  <%- include('partials/header') %>
+
+  <main class="gallery-main-container">
+    <h1>My Photo Gallery</h1>
+    
+    <div class="intro">
+      <p>Your personal collection of images from the Wavelength Lore universe.</p>
+      <p>Save your favorite images by clicking "Save to Gallery" on any image throughout the site!</p>
+    </div>
+    
+    <!-- Storage Usage Meter -->
+    <div class="storage-meter-container" id="storage-meter-container">
+      <h3>Storage Usage</h3>
+      <div class="storage-meter">
+        <div class="storage-used" id="storage-used-bar"></div>
+      </div>
+      <div class="storage-text" id="storage-text">Loading...</div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <section class="action-buttons" id="action-buttons">
+      <button id="download-all" class="action-button download-button">Download All Images</button>
+      <button id="start-screensaver" class="action-button screensaver-button">Start Screensaver</button>
+      <button id="select-mode" class="action-button" style="background-color: #607d8b;">Select Multiple</button>
+      <button id="delete-selected" class="action-button delete-button" style="display: none;">Delete Selected</button>
+    </section>
+    
+    <!-- Carousel Section (Default View) -->
+    <section class="carousel-section" id="carousel-view">
+              <!-- Gallery Carousel Section -->
+        <div class="gallery-section">
+            <h2>Your Gallery</h2>
+            <%- include('partials/carousel', {
+                carouselId: 'gallery-carousel',
+                items: null,
+                type: 'user-gallery',
+                options: {
+                    infinite: true,
+                    slidesToShow: 3,
+                    slidesToScroll: 1,
+                    autoplay: false,
+                    dots: true,
+                    arrows: true,
+                    variableWidth: true,
+                    adaptiveHeight: true
+                },
+                showModal: true
+            }) %>
+        </div>
+    </section>
+    
+    <!-- Gallery Controls -->
+    <section class="gallery-controls">
+      <button id="carousel-layout" class="layout-button active">Carousel View</button>
+      <button id="grid-layout" class="layout-button">Grid View</button>
+      
+      <!-- Search Box -->
+      <div class="search-box" style="margin-left: auto; display: flex; align-items: center;">
+        <input type="text" id="gallery-search" placeholder="Search images..." 
+               style="padding: 8px; border-radius: 4px; border: 2px solid #333; margin-right: 10px;">
+        <button id="search-button" class="layout-button">Search</button>
+      </div>
+    </section>
+    
+    <!-- Grid View (Hidden by Default) -->
+    <div id="grid-view" style="display: none;">
+      <div class="gallery-grid" id="gallery-grid">
+        <!-- Images will be populated by JavaScript -->
+      </div>
+    </div>
+    
+    <!-- Modal for Image Viewing -->
+    <div id="imageModal" class="modal">
+      <span class="modal-close">&times;</span>
+      <img class="modal-content" id="fullSizeImage">
+      <div id="modalCaption" class="modal-caption"></div>
+      <button id="delete-image" class="action-button delete-button" style="position: absolute; bottom: 20px; right: 20px;">Delete Image</button>
+    </div>
+    
+    <!-- Enhanced Screensaver Modal -->
+    <!-- Enhanced Screensaver Modal -->
+    <div id="screensaverOverlay" class="screensaver-overlay">
+      <!-- Background gallery images -->
+      <div class="screensaver-gallery">
+        <!-- Images will be dynamically loaded here -->
+      </div>      <!-- Weather effects layer -->
+      <div class="weather-effects">
+          <canvas class="weather-canvas"></canvas>
+          <div class="lightning-flash"></div>
+      </div>
+
+      <!-- Floating character badges layer -->
+      <div class="screensaver-badges-container" id="screensaverBadges">
+          <!-- Character badges will appear here randomly -->
+      </div>
+      
+      <!-- Exit hint -->
+      <div class="screensaver-exit-hint">
+        Click anywhere or press any key to exit screensaver
+      </div>
+      
+      <!-- Full Customization controls -->
+      <div class="screensaver-customization">
+          <!-- Toggle button -->
+          <button class="customization-toggle" id="customizationToggle">
+              ⚙️ Customize
+          </button>
+          
+          <!-- Collapsible panel -->
+          <div class="customization-panel" id="customizationPanel">
+              <!-- Weather controls -->
+              <div class="customization-section">
+                  <div class="customization-section-header">
+                      <span class="section-icon">🌤️</span>
+                      <span class="section-title">Weather</span>
+                  </div>
+                  <div class="customization-buttons">
+                      <button class="custom-btn weather-btn" data-weather="rain">🌧️ Rain</button>
+                      <button class="custom-btn weather-btn" data-weather="snow">❄️ Snow</button>
+                      <button class="custom-btn weather-btn" data-weather="clouds">☁️ Clouds</button>
+                      <button class="custom-btn weather-btn" data-weather="wind">💨 Wind</button>
+                      <button class="custom-btn weather-btn" data-weather="lightning">⚡ Lightning</button>
+                      <button class="custom-btn weather-btn" data-weather="clear">☀️ Sun</button>
+                      <button class="custom-btn weather-btn active" data-weather="auto">🔄 Auto</button>
+                  </div>
+              </div>
+              
+              <!-- Image controls -->
+              <div class="customization-section">
+                  <div class="customization-section-header">
+                      <span class="section-icon">🖼️</span>
+                      <span class="section-title">Image Effects</span>
+                  </div>
+                  <div class="customization-buttons">
+                      <button class="custom-btn image-btn active" data-effect="hue" title="Color shift">🎨 Colors</button>
+                      <button class="custom-btn image-btn active" data-effect="zoom" title="Zoom in/out">🔍 Zoom</button>
+                      <button class="custom-btn image-btn active" data-effect="rotate" title="Rotation">🔄 Rotate</button>
+                      <button class="custom-btn image-btn active" data-effect="brightness" title="Brightness pulse">💡 Brightness</button>
+                      <button class="custom-btn image-btn active" data-effect="contrast" title="Contrast shift">⚖️ Contrast</button>
+                  </div>
+              </div>
+              
+              <!-- Game Mode controls -->
+              <div class="customization-section">
+                  <div class="customization-section-header">
+                      <span class="section-icon">🎮</span>
+                      <span class="section-title">Game Mode</span>
+                  </div>
+                  <div class="customization-buttons">
+                      <button class="custom-btn game-btn active" data-game="off" title="Game off">🚫 Off</button>
+                      <button class="custom-btn game-btn" data-game="easy" title="Easy mode">😊 Easy</button>
+                      <button class="custom-btn game-btn" data-game="medium" title="Medium mode">😎 Medium</button>
+                      <button class="custom-btn game-btn" data-game="hard" title="Hard mode">😈 Hard</button>
+                  </div>
+                  <div class="game-stats">
+                      <span class="game-score">Score: <span id="gameScore">0</span></span>
+                      <span class="game-timer">Time: <span id="gameTimer">0:00</span></span>
+                  </div>
+              </div>
+
+              <!-- Transitions controls -->
+              <div class="customization-section">
+                  <div class="customization-section-header">
+                      <span class="section-icon">🎞️</span>
+                      <span class="section-title">Image Transitions</span>
+                  </div>
+                  <div class="customization-buttons">
+                      <button class="custom-btn transition-btn active" data-transition="on" title="Random transitions between images">✨ Random</button>
+                      <button class="custom-btn transition-btn" data-transition="off" title="No transitions">🚫 Off</button>
+                  </div>
+              </div>
+
+              <!-- Image Animation controls -->
+              <div class="customization-section">
+                  <div class="customization-section-header">
+                      <span class="section-icon">🌈</span>
+                      <span class="section-title">Image Animation</span>
+                  </div>
+                  <div class="customization-buttons">
+                      <button class="custom-btn animation-btn active" data-animation="on" title="Slow-motion color/filter animation">✨ On</button>
+                      <button class="custom-btn animation-btn" data-animation="off" title="No image animation">🚫 Off</button>
+                  </div>
+              </div>
+
+              <!-- Character Badges controls -->
+              <div class="customization-section">
+                  <div class="customization-section-header">
+                      <span class="section-icon">🎭</span>
+                      <span class="section-title">Character Badges</span>
+                  </div>
+                  <div class="customization-buttons">
+                      <button class="custom-btn badges-btn active" data-badges="on" title="Show character badges">✨ Show</button>
+                      <button class="custom-btn badges-btn" data-badges="off" title="Hide character badges">🚫 Hide</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+      
+      <!-- Floating game icons container -->
+      <div class="floating-game-icons"></div>
+      
+      <!-- Game HUD overlay -->
+      <div class="game-hud">
+          <div class="hud-score">
+              <span class="hud-label">SCORE</span>
+              <span class="hud-value" id="hudScore">0</span>
+          </div>
+      </div>
+      
+      <!-- Optional simple controls (fallback) -->
+      <div class="screensaver-controls" style="display: none;">
+        <button class="screensaver-control" onclick="galleryScreensaver?.previousImage()" title="Previous Image">
+          &#8249;
+        </button>
+        <button class="screensaver-control" onclick="galleryScreensaver?.nextImage()" title="Next Image">
+          &#8250;
+        </button>
+      </div>
+    </div>
+  </main>
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+  <script src="<%= cdnUrl %>/js/shared/screensaver.js"></script>
+  <script src="<%= cdnUrl %>/js/gallery/user-gallery.js"></script>
+  
+  <!-- Include standard footer -->
+  <%- include('partials/footer') %>
+  
+  <!-- Gallery debugging tools (development only) -->
+  <%- include('partials/gallery-debug-tools') %>
+</body>
+</html>

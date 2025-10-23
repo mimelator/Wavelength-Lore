@@ -1,0 +1,43 @@
+/**
+ * Gallery CSS Customizations for Save to Gallery Button
+ * This file contains custom CSS to properly size and position Save to Gallery buttons
+ */
+
+/* Smaller save buttons for carousel images */
+.carousel .image-capture-button,
+.slick-slider .image-capture-button,
+.slick-slide .image-capture-button,
+[class*="carousel"] .image-capture-button {
+  /* Make buttons even smaller on carousel elements */
+  padding: 3px 6px !important;
+  font-size: 10px !important;
+  top: 3px !important;
+  right: 3px !important;
+}
+
+/* Hide text in carousel save buttons, show only icon */
+.carousel .image-capture-button .button-text,
+.slick-slider .image-capture-button .button-text,
+.slick-slide .image-capture-button .button-text,
+[class*="carousel"] .image-capture-button .button-text {
+  display: none;
+}
+
+/* Ensure banner images never get save buttons */
+.banner .image-capture-button,
+[class*="banner"] .image-capture-button,
+header .image-capture-button,
+.header-image .image-capture-button {
+  display: none !important;
+}
+
+/* Ensure navigation elements never get save buttons */
+nav .image-capture-button,
+.navigation .image-capture-button,
+.navbar .image-capture-button,
+.menu .image-capture-button,
+.card .image-capture-button,
+.badge .image-capture-button,
+[role="navigation"] .image-capture-button {
+  display: none !important;
+}

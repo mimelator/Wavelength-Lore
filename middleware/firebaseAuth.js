@@ -34,17 +34,35 @@ class FirebaseAuth {
    */
   verifyToken = async (req, res, next) => {
     try {
-      // Extract token from Authorization header
+      // Extract token from Authorization header or session cookie
       const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        console.log('❌ No Bearer token in Authorization header');
+      let idToken;
+      
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        idToken = authHeader.substring(7); // Remove 'Bearer ' prefix
+        console.log('🎫 Verifying ID token from Authorization header, length:', idToken.length);
+      } else if (req.cookies && req.cookies.__session) {
+        // Try to use __session cookie (Firebase Auth uses this name)
+        idToken = req.cookies.__session;
+        console.log('🎫 Verifying ID token from __session cookie, length:', idToken.length);
+      } else if (req.cookies && req.cookies.session) {
+        // Try to use session cookie (fallback)
+        idToken = req.cookies.session;
+        console.log('🎫 Verifying ID token from session cookie, length:', idToken.length);
+      } else {
+        // Check if this is the user gallery HTML page request
+        if (req.path === '/my-gallery' && !req.path.startsWith('/api/')) {
+          console.log('❌ No authentication for /my-gallery page - redirecting to login');
+          return res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
+        }
+        
+        console.log('❌ No authentication token found (checked header and cookies)');
         return res.status(401).json({
           error: 'Authentication required',
-          message: 'Bearer token required in Authorization header'
+          message: 'Authentication token required'
         });
       }
-
-      const idToken = authHeader.substring(7); // Remove 'Bearer ' prefix
+      
       console.log('🎫 Verifying ID token, length:', idToken.length);
 
       // Verify the ID token

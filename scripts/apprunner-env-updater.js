@@ -91,6 +91,8 @@ class AppRunnerEnvUpdater {
       
       // CDN Configuration
       'CDN_URL',
+      'CLOUDFRONT_DISTRIBUTION_ID',
+      'GALLERY_CLOUDFRONT_DISTRIBUTION_ID',
       
       // Admin Authentication (NEW)
       'ADMIN_SECRET_KEY',
