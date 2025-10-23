@@ -157,4 +157,38 @@ router.get('/api/:gameId', groupAuth.requireAction('game_access'), async (req, r
     }
 });
 
+/**
+ * Unity Ads Test Page - Development testing interface
+ * Only available in development/localhost environments
+ */
+router.get('/unity-ads-test', (req, res) => {
+    // Only allow in development environments
+    const isDevelopment = req.get('host').includes('localhost') || 
+                         req.get('host').includes('dev') || 
+                         process.env.NODE_ENV === 'development';
+    
+    if (!isDevelopment) {
+        return res.status(404).send('Test page not available in production');
+    }
+    
+    res.sendFile(require('path').join(__dirname, '../views/test/unity-ads-test.html'));
+});
+
+/**
+ * Google IMA Test Page - Development testing interface for real video ads
+ * Only available in development/localhost environments
+ */
+router.get('/google-ima-test', (req, res) => {
+    // Only allow in development environments
+    const isDevelopment = req.get('host').includes('localhost') || 
+                         req.get('host').includes('dev') || 
+                         process.env.NODE_ENV === 'development';
+    
+    if (!isDevelopment) {
+        return res.status(404).send('Test page not available in production');
+    }
+    
+    res.sendFile(require('path').join(__dirname, '../views/test/google-ima-test.html'));
+});
+
 module.exports = router;

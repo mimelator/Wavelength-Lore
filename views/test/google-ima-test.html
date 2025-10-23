@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google IMA Video Ads Test - Wavelength Gems</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .status-card h3 {
+            margin-top: 0;
+            color: #fff;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .status-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .status-item .label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .status-item .value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .test-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .test-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .test-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .test-btn.secondary {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+        
+        .test-btn.warning {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+        
+        .test-btn.danger {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+        }
+        
+        .log-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .log-container h3 {
+            margin-top: 0;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        
+        .log {
+            background: #000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+        
+        .info-section {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .info-section h3 {
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        
+        .info-section ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .info-section li {
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+        
+        .success-msg {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+            color: #4CAF50;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        
+        .error-msg {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+            color: #f44336;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        
+        .warning-msg {
+            background: rgba(255, 152, 0, 0.2);
+            border: 1px solid rgba(255, 152, 0, 0.5);
+            color: #FF9800;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎬 Google IMA Video Ads</h1>
+        <p>Testing Real Video Advertisement System for Wavelength Gems</p>
+        <p><strong>This system provides REAL video ads with actual revenue generation!</strong></p>
+    </div>
+
+    <div class="status-card">
+        <h3>📊 System Status</h3>
+        <div class="status-grid">
+            <div class="status-item">
+                <div class="label">SDK Status</div>
+                <div class="value" id="sdk-status">Loading...</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Can Show Ad</div>
+                <div class="value" id="can-show-status">Checking...</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Daily Ad Count</div>
+                <div class="value" id="daily-count">0</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Total Completions</div>
+                <div class="value" id="total-completions">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-card">
+        <h3>🎮 Test Actions</h3>
+        <div class="test-buttons">
+            <button class="test-btn" onclick="testShowAdOffer()">
+                🎬 Show Ad Offer Dialog
+            </button>
+            <button class="test-btn secondary" onclick="testDirectAd()">
+                ▶️ Show Video Ad Directly
+            </button>
+            <button class="test-btn warning" onclick="testCanShowAd()">
+                ❓ Check Ad Availability
+            </button>
+            <button class="test-btn" onclick="testRetryIntegration()">
+                🔄 Test Retry Integration
+            </button>
+            <button class="test-btn secondary" onclick="showStatistics()">
+                📈 Show Statistics
+            </button>
+            <button class="test-btn danger" onclick="clearData()">
+                🗑️ Clear All Data
+            </button>
+        </div>
+    </div>
+
+    <div class="log-container">
+        <h3>📋 Event Log</h3>
+        <div class="log" id="log"></div>
+    </div>
+
+    <div class="info-section">
+        <h3>ℹ️ Google IMA vs Unity Ads</h3>
+        <ul>
+            <li><strong>Google IMA:</strong> Real web video ads with actual revenue</li>
+            <li><strong>Unity Ads:</strong> Mobile-only SDK, doesn't work in browsers</li>
+            <li><strong>VAST Protocol:</strong> Industry standard for video advertising</li>
+            <li><strong>Ad Networks:</strong> Works with Google Ad Manager, AdSense, and others</li>
+            <li><strong>Revenue:</strong> Generates actual income from completed video views</li>
+            <li><strong>Fill Rate:</strong> Higher ad availability than mobile-focused networks</li>
+        </ul>
+    </div>
+
+    <div class="info-section">
+        <h3>🔧 Setup Instructions</h3>
+        <ul>
+            <li>Currently using Google's test ad tag for demonstration</li>
+            <li>For production: Get Google Ad Manager account and create video ad units</li>
+            <li>Generate VAST ad tag URL and update google-ima-config.js</li>
+            <li>Test ads with real content before going live</li>
+            <li>Monitor revenue through Google Ad Manager dashboard</li>
+        </ul>
+    </div>
+
+    <!-- Load Google IMA system -->
+    <script src="/static/js/games/wavelength-gems/google-ima-config.js"></script>
+    <script src="/static/js/games/wavelength-gems/google-ima-system.js"></script>
+
+    <script>
+        // Test functions
+        let logElement = document.getElementById('log');
+        let logMessages = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            
+            logMessages.push(logMessage);
+            if (logMessages.length > 100) {
+                logMessages = logMessages.slice(-50);
+            }
+            
+            logElement.textContent = logMessages.join('\n');
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            // Also log to console
+            console.log(logMessage);
+        }
+
+        async function testShowAdOffer() {
+            log('Testing ad offer dialog...');
+            
+            try {
+                const result = await window.wavelengthAds.showAdOfferDialog({
+                    onReward: (amount) => {
+                        log(`✅ Reward received: ${amount} retries`, 'success');
+                        updateStatus();
+                    }
+                });
+                
+                log(`Ad offer result: ${JSON.stringify(result)}`);
+                
+            } catch (error) {
+                log(`❌ Error showing ad offer: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDirectAd() {
+            log('Testing direct ad display...');
+            
+            try {
+                const result = await window.wavelengthAds.showRewardedAd({
+                    onReward: (amount) => {
+                        log(`✅ Direct ad reward: ${amount} retries`, 'success');
+                        updateStatus();
+                    }
+                });
+                
+                log(`Direct ad result: ${JSON.stringify(result)}`);
+                
+            } catch (error) {
+                log(`❌ Error showing direct ad: ${error.message}`, 'error');
+            }
+        }
+
+        function testCanShowAd() {
+            const canShow = window.wavelengthAds.canShowAd();
+            log(`Can show ad: ${canShow}`);
+            
+            if (!canShow) {
+                const stats = window.wavelengthAds.getStatistics();
+                const timeSinceLastAd = Date.now() - stats.lastAdTime;
+                const cooldownRemaining = Math.max(0, (GoogleIMAConfig.settings.minTimeBetweenAds - timeSinceLastAd) / 1000);
+                
+                if (cooldownRemaining > 0) {
+                    log(`⏰ Cooldown remaining: ${Math.ceil(cooldownRemaining)} seconds`);
+                }
+                
+                if (stats.dailyAdCount >= GoogleIMAConfig.settings.maxAdsPerDay) {
+                    log(`📈 Daily limit reached: ${stats.dailyAdCount}/${GoogleIMAConfig.settings.maxAdsPerDay}`);
+                }
+            }
+            
+            updateStatus();
+        }
+
+        function testRetryIntegration() {
+            log('Testing retry threshold integration...');
+            
+            // Mock retry threshold manager for testing
+            if (!window.RetryThresholdManager) {
+                window.RetryThresholdManager = {
+                    grantAdReward: (amount) => {
+                        log(`🔄 Mock retry manager received ${amount} retries`);
+                    }
+                };
+            }
+            
+            log('✅ Retry integration test complete');
+        }
+
+        function showStatistics() {
+            const stats = window.wavelengthAds.getStatistics();
+            log('📈 Current Statistics:');
+            log(`  Total Requests: ${stats.totalRequests}`);
+            log(`  Total Starts: ${stats.totalStarts}`);
+            log(`  Total Completions: ${stats.totalCompletions}`);
+            log(`  Total Skips: ${stats.totalSkips}`);
+            log(`  Total Rewards: ${stats.totalRewards}`);
+            log(`  Completion Rate: ${stats.completionRate}`);
+            log(`  Daily Ad Count: ${stats.dailyAdCount}`);
+            log(`  Session Ad Count: ${stats.sessionAdCount}`);
+            log(`  Average Reward: ${stats.averageRewardPerAd}`);
+            
+            updateStatus();
+        }
+
+        function clearData() {
+            if (confirm('Clear all ad statistics and localStorage data?')) {
+                localStorage.removeItem('ima_daily_stats');
+                log('🗑️ All data cleared. Refresh page to reset.');
+                
+                // Reset statistics
+                if (window.googleIMAds) {
+                    window.googleIMAds.adStatistics = {
+                        totalRequests: 0,
+                        totalStarts: 0,
+                        totalCompletions: 0,
+                        totalSkips: 0,
+                        totalRewards: 0,
+                        lastAdTime: 0,
+                        sessionAdCount: 0,
+                        dailyAdCount: 0
+                    };
+                }
+                
+                updateStatus();
+            }
+        }
+
+        function updateStatus() {
+            // Update status display
+            const canShow = window.wavelengthAds?.canShowAd() || false;
+            const stats = window.wavelengthAds?.getStatistics() || {};
+            
+            document.getElementById('sdk-status').textContent = window.googleIMAds?.isInitialized ? 'Ready' : 'Loading';
+            document.getElementById('can-show-status').textContent = canShow ? 'Yes' : 'No';
+            document.getElementById('daily-count').textContent = stats.dailyAdCount || 0;
+            document.getElementById('total-completions').textContent = stats.totalCompletions || 0;
+            
+            // Update button states
+            const buttons = document.querySelectorAll('.test-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.includes('Show') && !canShow) {
+                    btn.disabled = true;
+                } else {
+                    btn.disabled = false;
+                }
+            });
+        }
+
+        // Initialize page
+        log('🚀 Google IMA Video Ads Test Page Loaded');
+        log('📱 Unlike Unity Ads, this works in web browsers!');
+        log('💰 This system provides REAL video ads with revenue generation');
+        log('⏳ Waiting for Google IMA SDK to initialize...');
+
+        // Check initialization status
+        function checkInitialization() {
+            if (window.googleIMAds && window.googleIMAds.isInitialized) {
+                log('✅ Google IMA SDK initialized successfully');
+                log('🎬 Ready to show real video advertisements');
+                updateStatus();
+            } else if (window.googleIMAds) {
+                log('⏳ Google IMA SDK still initializing...');
+                setTimeout(checkInitialization, 1000);
+            } else {
+                log('❌ Google IMA system not found');
+                setTimeout(checkInitialization, 1000);
+            }
+        }
+
+        // Start checking after a short delay
+        setTimeout(checkInitialization, 500);
+
+        // Update status every 5 seconds
+        setInterval(updateStatus, 5000);
+
+        // Test configuration validation
+        setTimeout(() => {
+            if (GoogleIMAConfig) {
+                log('✅ Google IMA configuration loaded');
+                log(`🔗 Ad tag URL: ${GoogleIMAConfig.adTagUrl.substring(0, 60)}...`);
+                log(`🎁 Reward per ad: ${GoogleIMAConfig.rewards.watchVideoRetries} retries`);
+                log(`⏰ Min time between ads: ${GoogleIMAConfig.settings.minTimeBetweenAds / 1000} seconds`);
+                log(`📊 Max ads per day: ${GoogleIMAConfig.settings.maxAdsPerDay}`);
+                
+                if (GoogleIMAConfig.adTagUrl.includes('test') || GoogleIMAConfig.adTagUrl.includes('single_ad_samples')) {
+                    log('⚠️ Using test ad tag - remember to update for production revenue');
+                }
+            } else {
+                log('❌ Google IMA configuration not found');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

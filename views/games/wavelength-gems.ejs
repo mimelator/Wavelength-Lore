@@ -516,27 +516,37 @@
 
     <%- include('../partials/footer') %>
 
-    <!-- Pass environment variables to front-end for AdMob configuration -->
+    <!-- Google IMA Video Ads - configuration loaded via separate script -->
     <script>
-        // Create window.ENV object to store environment variables safely
+        // Create window.ENV object for compatibility
         window.ENV = window.ENV || {};
-        
-        <% if (typeof adMobEnvVars !== 'undefined') { %>
-            // Populate with AdMob configuration from server environment variables
-            <% for(let key in adMobEnvVars) { %>
-                window.ENV['<%= key %>'] = '<%= adMobEnvVars[key] %>';
-            <% } %>
-        <% } %>
-        
-        console.log('Environment configuration loaded');
+        console.log('Environment configuration loaded for Google IMA');
     </script>
 
-    <!-- Load AdMob configuration before other scripts -->
+    <!-- Load Ad System configuration before other scripts -->
+    <!-- Google IMA Video Ads System (real web video ads with revenue generation) -->
+    <script src="/js/games/wavelength-gems/google-ima-config.js"></script>
+    <script src="/js/games/wavelength-gems/google-ima-system.js"></script>
+    
+    <!-- Legacy Systems (archived) -->
+    <!-- Unity Ads System (mobile app only - archived for web incompatibility)
+    <script src="/js/games/wavelength-gems/unity-ads-config.js"></script>
+    <script src="/js/games/wavelength-gems/unity-ads-system.js"></script>
+    -->
+    
+    <!-- Legacy AdMob system (mobile app only - archived) 
     <script src="/js/games/wavelength-gems/admob-config.js"></script>
+    <script src="/js/games/wavelength-gems/ad-system.js"></script>
+    -->
+    
+    <!-- Legacy AdSense system (not ideal for gaming - archived)
+    <script src="/js/games/wavelength-gems/adsense-config.js"></script>
+    <script src="/js/games/wavelength-gems/adsense-system.js"></script>
+    -->
+    
     <script src="/js/games/wavelength-gems/retry-threshold-manager.js"></script>
     <script src="/js/games/wavelength-gems/retry-threshold-ui.js"></script>
     <script src="/js/games/wavelength-gems/retry-threshold-test.js"></script>
-    <script src="/js/games/wavelength-gems/ad-system.js"></script>
     
     <!-- AdMob Test Interface - REMOVE BEFORE PRODUCTION 
     <script src="/js/games/wavelength-gems/admob-test-interface.js"></script>
