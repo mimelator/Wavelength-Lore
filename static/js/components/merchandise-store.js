@@ -133,13 +133,13 @@ class MerchandiseStore {
       // Start with progress feedback for product creation
       this.setLoading(true, 'Preparing your image for product creation...');
       
-      // Show progressive updates during the product creation process
+      // Show progressive updates during the product creation process with technical details
       const productProgressMessages = [
-        'Preparing your image for product creation...',
-        'Checking if image enhancement is needed...',
-        'Optimizing image for high-quality printing...',
-        'Creating product variants and options...',
-        'Finalizing your custom product...'
+        '🔍 Analyzing your image: Checking resolution and print compatibility...',
+        '📏 Quality Check: Ensuring optimal dimensions for professional printing',
+        '🎨 AI Enhancement: Upscaling to 300 DPI print resolution for crisp details',
+        '🎽 Creating premium product variants: T-shirts, hoodies, mugs & more!',
+        '✅ Finalizing your AMAZING custom merchandise - Ready for purchase!'
       ];
       
       let currentStep = 0;
@@ -460,13 +460,13 @@ class MerchandiseStore {
       // Start with progress feedback
       this.setLoading(true, 'Analyzing image for print quality...');
       
-      // Show progressive updates during the enhancement process
+      // Show progressive updates during the enhancement process with technical details
       const progressMessages = [
-        'Analyzing image for print quality...',
-        'Processing image with AI enhancement...',
-        'Optimizing colors and details...',
-        'Generating high-resolution version...',
-        'Finalizing enhancement preview...'
+        'Analyzing image for print quality and optimal dimensions...',
+        '🎨 AI Enhancement: Targeting 2048×2048px at 300 DPI for premium print quality',
+        '✨ Optimizing colors, contrast, and fine details for merchandise printing',
+        '🖼️ Generating high-resolution artwork - Perfect for t-shirts, mugs & more!',
+        '🎯 Finalizing your professional-grade custom artwork preview...'
       ];
       
       let currentStep = 0;
