@@ -39,8 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function initializeScreensaver() {
     if (typeof WavelengthScreensaver !== 'undefined') {
       galleryScreensaver = new WavelengthScreensaver({
-        containerId: 'screensaverModal',
-        gallerySelector: '#screensaver-container',
+        containerId: 'screensaverOverlay',
+        gallerySelector: '.screensaver-gallery',
         autoRotate: true,
         rotationInterval: 8000,
         transitionsEnabled: true,
@@ -48,13 +48,16 @@ document.addEventListener('DOMContentLoaded', () => {
         exitOnClick: true,
         exitOnKeypress: true,
         imageEffects: true,
-        gameMode: true,
+        gameMode: false, // Match radio player default
         badges: true,
+        lyrics: false, // Not applicable for gallery
+        titleDisplay: false, // Not applicable for gallery
+        summary: false, // Not applicable for gallery
         showControls: false
       });
       
       galleryScreensaver.init();
-      console.log('✅ Gallery screensaver initialized with advanced features');
+      console.log('✅ Gallery screensaver initialized with radio player parity');
     } else {
       // Fallback to simple screensaver if shared utility not loaded
       console.warn('⚠️ Shared screensaver utility not available, using fallback');
@@ -374,25 +377,44 @@ document.addEventListener('DOMContentLoaded', () => {
       galleryScreensaver.enter(imageUrls);
     } else {
       // Fallback to simple modal screensaver
-      const screensaverModal = document.getElementById('screensaverModal');
-      const screensaverImage = document.getElementById('screensaverImage');
+      const screensaverModal = document.getElementById('screensaverOverlay');
+      const screensaverGallery = screensaverModal?.querySelector('.screensaver-gallery');
       
-      if (screensaverModal && screensaverImage) {
-        screensaverModal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
+      if (screensaverModal && screensaverGallery) {
+        // Clear and populate gallery
+        screensaverGallery.innerHTML = '';
         
         let currentIndex = 0;
-        screensaverImage.src = imageUrls[currentIndex];
+        
+        // Create images
+        imageUrls.forEach((url, index) => {
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = `Gallery image ${index + 1}`;
+          if (index === 0) img.classList.add('active');
+          screensaverGallery.appendChild(img);
+        });
+        
+        screensaverModal.style.display = 'block';
+        screensaverModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        document.body.classList.add('screensaver-active');
         
         const interval = setInterval(() => {
-          currentIndex = (currentIndex + 1) % imageUrls.length;
-          screensaverImage.src = imageUrls[currentIndex];
-        }, 5000);
+          const images = screensaverGallery.querySelectorAll('img');
+          if (images.length > 0) {
+            images[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex + 1) % images.length;
+            images[currentIndex].classList.add('active');
+          }
+        }, 8000); // Match radio player timing
         
         // Simple exit on click
         screensaverModal.addEventListener('click', () => {
           screensaverModal.style.display = 'none';
+          screensaverModal.classList.remove('active');
           document.body.style.overflow = '';
+          document.body.classList.remove('screensaver-active');
           clearInterval(interval);
         }, { once: true });
       }

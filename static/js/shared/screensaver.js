@@ -1461,7 +1461,7 @@ class WavelengthScreensaver {
       { selector: '.title-btn.active', preference: 'title', attribute: 'title' },
       { selector: '.summary-btn.active', preference: 'summary', attribute: 'summary' },
       { selector: '.badges-btn.active', preference: 'badges', attribute: 'badges' },
-      { selector: '.transition-btn.active', preference: 'transitions', attribute: 'transition' },
+      { selector: '.transition-btn.active', preference: 'transition', attribute: 'transition' },
       { selector: '.animation-btn.active', preference: 'animation', attribute: 'animation' }
     ];
 
