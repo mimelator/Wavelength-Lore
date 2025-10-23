@@ -3,7 +3,7 @@
 // Parameters:
 // - carouselId: unique ID for the carousel
 // - items: array of items to display
-// - type: 'character', 'episode', 'season' (affects how items are rendered)
+// - type: 'character', 'episode', 'season', 'user-gallery' (affects how items are rendered)
 // - options: optional object with slick carousel settings overrides
 // - showModal: boolean to include modal functionality (default: true)
 // - seasonNumber: for season type carousels
@@ -36,6 +36,9 @@ const includeModal = showModal !== false; // Default to true unless explicitly s
                     <img src="<%= cdnUrl %><%= image %>" alt="Episode Image" <%= includeModal ? 'class="carousel-image"' : '' %>>
                 </div>
             <% }); %>
+        <% } else if (type === 'user-gallery') { %>
+            <!-- User gallery images will be populated by JavaScript -->
+            <!-- This provides the structure for dynamic population -->
         <% } else if (type === 'season' && items) { %>
             <% for (var episode in items) { %>
                 <div>
@@ -59,28 +62,46 @@ const includeModal = showModal !== false; // Default to true unless explicitly s
     <div id="imageModal" class="modal">
         <span class="modal-close">&times;</span>
         <img class="modal-content" id="fullSizeImage">
+        <div id="modalCaption" class="modal-caption"></div>
+        <button id="delete-image" class="action-button delete-button" style="position: absolute; bottom: 20px; right: 20px;">Delete Image</button>
     </div>
 <% } %>
 
 <script>
+    <% if (type === 'user-gallery') { %>
+    // For user gallery, initialization will be handled by user-gallery.js
+    window.userGalleryCarouselOptions = <%- JSON.stringify(carouselOptions) %>;
+    <% } else { %>
     $(document).ready(function() {
         const options = <%- JSON.stringify(carouselOptions) %>;
         // Add responsive behavior for mobile
         options.slidesToShow = window.innerWidth <= 768 ? 2 : options.slidesToShow;
         $('#<%= carouselId %>').slick(options);
     });
+    <% } %>
 
     <% if (includeModal) { %>
     document.addEventListener('DOMContentLoaded', () => {
         const modal = document.getElementById('imageModal');
         const modalImg = document.getElementById('fullSizeImage');
+        const modalCaption = document.getElementById('modalCaption');
         const closeModal = document.querySelector('.modal-close');
 
-        document.querySelectorAll('#<%= carouselId %> .carousel-image').forEach(image => {
-            image.addEventListener('click', () => {
+        document.addEventListener('click', (event) => {
+            // Handle clicks on carousel images
+            if (event.target.matches('#<%= carouselId %> .carousel-image, #<%= carouselId %> img[data-id]')) {
+                const image = event.target;
                 modal.style.display = 'block';
                 modalImg.src = image.src;
-            });
+                if (modalCaption) {
+                    modalCaption.textContent = image.dataset.caption || image.alt || '';
+                }
+                
+                // For user gallery, set current image for delete functionality
+                if (typeof setCurrentImageForModal === 'function') {
+                    setCurrentImageForModal(image.dataset.id, image.dataset.relativePath);
+                }
+            }
         });
 
         closeModal.addEventListener('click', () => {

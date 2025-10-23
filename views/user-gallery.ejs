@@ -43,9 +43,26 @@
     
     <!-- Carousel Section (Default View) -->
     <section class="carousel-section" id="carousel-view">
-      <div class="carousel" id="gallery-carousel">
-        <!-- Images will be populated by JavaScript -->
-      </div>
+              <!-- Gallery Carousel Section -->
+        <div class="gallery-section">
+            <h2>Your Gallery</h2>
+            <%- include('partials/carousel', {
+                carouselId: 'gallery-carousel',
+                items: null,
+                type: 'user-gallery',
+                options: {
+                    infinite: true,
+                    slidesToShow: 3,
+                    slidesToScroll: 1,
+                    autoplay: false,
+                    dots: true,
+                    arrows: true,
+                    variableWidth: true,
+                    adaptiveHeight: true
+                },
+                showModal: true
+            }) %>
+        </div>
     </section>
     
     <!-- Gallery Controls -->

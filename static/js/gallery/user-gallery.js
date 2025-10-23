@@ -26,6 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectMode = false;
   let selectedImages = [];
   
+  // Global function for carousel partial to use for modal handling
+  window.setCurrentImageForModal = function(imageId, relativePath) {
+    currentImageId = imageId;
+    currentRelativePath = relativePath;
+  };
+  
   // Initialize shared screensaver utility
   let galleryScreensaver = null;
   
@@ -159,14 +165,13 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📍 Carousel element:', carouselEl);
     console.log('📍 Grid element:', gridEl);
     
-    // Populate carousel view
+    // Populate carousel view - now using the carousel partial structure
     images.forEach((image, index) => {
       console.log(`🖼️ Processing image ${index + 1}:`, image);
       const div = document.createElement('div');
       const img = document.createElement('img');
       img.src = image.url;
       img.alt = image.title || '';
-      img.className = 'carousel-image';
       img.dataset.id = image.id;
       img.dataset.caption = image.title || '';
       img.dataset.relativePath = image.relativePath;
@@ -174,25 +179,45 @@ document.addEventListener('DOMContentLoaded', () => {
       carouselEl.appendChild(div);
     });
     
-    // Initialize carousel with slick (destroy existing first if present)
+    // Initialize carousel with slick using options from carousel partial
     if ($('#gallery-carousel').hasClass('slick-initialized')) {
       $('#gallery-carousel').slick('unslick');
     }
     
+    // Use options provided by the carousel partial, or fallback defaults
+    const carouselOptions = window.userGalleryCarouselOptions || {
+      infinite: true,
+      slidesToShow: 3,
+      slidesToScroll: 1,
+      autoplay: false,
+      dots: true,
+      arrows: true,
+      variableWidth: true,
+      adaptiveHeight: true
+    };
+    
+    // Add responsive behavior
+    carouselOptions.responsive = [
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      }
+    ];
+    
     // Small delay to ensure images are loaded before initializing carousel
     setTimeout(() => {
-      $('#gallery-carousel').slick({
-        infinite: true,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        autoplay: true,
-        autoplaySpeed: 4000,
-        dots: true,
-        arrows: true,
-        adaptiveHeight: true,
-        centerMode: true,
-        centerPadding: '0'
-      });
+      $('#gallery-carousel').slick(carouselOptions);
+      console.log('Gallery carousel initialized with options:', carouselOptions);
     }, 100);
     
     // Populate grid view
@@ -218,8 +243,8 @@ document.addEventListener('DOMContentLoaded', () => {
       gridEl.appendChild(item);
     });
     
-    // Add click event to all images
-    document.querySelectorAll('.carousel-image, .gallery-item img').forEach(img => {
+    // Add click event to all images - now compatible with carousel partial modal handling
+    document.querySelectorAll('#gallery-carousel img, .gallery-item img').forEach(img => {
       img.addEventListener('click', () => {
         openModal(img.src, img.dataset.caption, img.dataset.id, img.dataset.relativePath);
       });
