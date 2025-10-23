@@ -101,13 +101,15 @@ class ImageUpscalingService {
    * @param {Object} options - Upscaling options
    * @returns {Object} Upscaling result
    */
-  async upscaleImage(imageBuffer, options = {}) {
+  async upscaleImage(imageBuffer, options = {}) { // fileName is now part of options
     const {
       method = 'openai', // 'openai', 'replicate', 'auto'
       scaleFactor = 4,
       enhanceDetails = true,
       preserveStyle = true,
-      contentType = 'illustration' // 'photo', 'illustration', 'artwork'
+      contentType = 'illustration', // 'photo', 'illustration', 'artwork'
+      originalImageId, // If provided, will store the enhanced image in S3
+      userId = 'unknown-user' // User ID for S3 storage
     } = options;
     
     try {
@@ -130,6 +132,33 @@ class ImageUpscalingService {
       
       // Post-process for print optimization
       result.printOptimized = await this.optimizeForPrint(result.upscaledBuffer);
+      
+      // AUTO-STORE: If originalImageId is provided, automatically store the enhanced image in S3
+      // This ensures that enhanced images are cached for future use
+      if (originalImageId && result.success && result.upscaledBuffer) {
+        try {
+          console.log(`💾 Auto-storing enhanced image for ${originalImageId} in S3...`);
+          const storeResult = await this.storeUpscaledImage(
+            userId,
+            originalImageId,
+            result.printOptimized || result.upscaledBuffer, // Use print-optimized version if available
+            result.metadata
+          );
+          
+          if (storeResult && storeResult.url) {
+            // Add S3 storage info to the result metadata
+            result.metadata.url = storeResult.url;
+            result.metadata.s3Key = storeResult.s3Key;
+            result.s3Key = storeResult.s3Key;
+            console.log(`✅ Enhanced image stored successfully at: ${storeResult.s3Key}`);
+          } else {
+            console.warn('⚠️ Failed to store enhanced image in S3');
+          }
+        } catch (storeError) {
+          console.error('Error auto-storing enhanced image:', storeError);
+          // Don't fail the whole upscaling process if storage fails
+        }
+      }
       
       return result;
       
@@ -373,6 +402,7 @@ class ImageUpscalingService {
       return {
         key: key,
         url: cdnUrl,
+        s3Key: key, // Add the key here for explicit reference
         size: upscaledBuffer.length,
         metadata: metadata,
         bucket: this.galleryBucket,

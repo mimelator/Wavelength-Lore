@@ -221,6 +221,64 @@ class UpscaledImageManager {
   }
   
   /**
+   * Delete all upscaled versions for a specific original image
+   * @param {string} userId - User ID
+   * @param {string} originalImageId - Original image ID
+   * @returns {Object} Deletion results
+   */
+  async deleteUpscaledVersions(userId, originalImageId) {
+    try {
+      const versions = await this.getUpscaledVersions(userId, originalImageId);
+      
+      if (versions.length === 0) {
+        // Use silent logging for cleanup operations to avoid EPIPE errors
+        this._safeLog(`ℹ️ No upscaled versions found for ${originalImageId}`, 'silent');
+        return {
+          total: 0,
+          deleted: 0,
+          failed: 0,
+          results: []
+        };
+      }
+      
+      this._safeLog(`🗑️ Deleting ${versions.length} upscaled version(s) for ${originalImageId}`, 'silent');
+      
+      const deleteResults = await Promise.all(
+        versions.map(async (version) => {
+          try {
+            const command = new DeleteObjectCommand({
+              Bucket: this.galleryBucket,
+              Key: version.key
+            });
+            await this.s3Client.send(command);
+            this._safeLog(`✅ Deleted: ${version.key}`, 'silent');
+            return { key: version.key, success: true };
+          } catch (error) {
+            this._safeLog(`❌ Failed to delete ${version.key}: ${error.message}`, 'silent');
+            return { key: version.key, success: false, error: error.message };
+          }
+        })
+      );
+      
+      const deletedCount = deleteResults.filter(r => r.success).length;
+      const failedCount = deleteResults.filter(r => !r.success).length;
+      
+      this._safeLog(`🧹 Deletion completed: ${deletedCount} deleted, ${failedCount} failed`, 'silent');
+      
+      return {
+        total: versions.length,
+        deleted: deletedCount,
+        failed: failedCount,
+        results: deleteResults
+      };
+      
+    } catch (error) {
+      console.error('Error deleting upscaled versions:', error);
+      throw new Error('Failed to delete upscaled versions: ' + error.message);
+    }
+  }
+
+  /**
    * Extract original image ID from upscaled image key
    * @param {string} key - S3 object key
    * @returns {string} Original image ID
@@ -230,6 +288,41 @@ class UpscaledImageManager {
     return match ? match[1] : 'unknown';
   }
   
+  /**
+   * Safe logging that handles EPIPE errors when output streams are closed
+   * @param {string} message - Message to log
+   * @param {string} level - Log level ('log', 'error', 'warn', 'silent')
+   */
+  _safeLog(message, level = 'log') {
+    // Skip all logging for silent level (used during cleanup operations)
+    if (level === 'silent') {
+      return;
+    }
+    
+    // Check if we're in a test environment where output might be truncated
+    if (process.env.NODE_ENV === 'test' || process.argv.some(arg => arg.includes('head'))) {
+      return; // Skip logging in test mode to avoid EPIPE errors
+    }
+    
+    // Use direct write to stdout/stderr to avoid console.log's internal buffering
+    const output = level === 'error' ? process.stderr : process.stdout;
+    
+    // Check if the output stream is writable
+    if (output.destroyed || !output.writable) {
+      return; // Skip logging if output stream is not available
+    }
+    
+    // Use synchronous write to avoid async EPIPE issues
+    try {
+      output.write(message + '\n');
+    } catch (error) {
+      // Silently ignore EPIPE and similar pipe errors
+      if (error.code !== 'EPIPE' && error.code !== 'EBADF') {
+        throw error;
+      }
+    }
+  }
+
   /**
    * Get folder information and structure
    * @returns {Object} Folder structure info

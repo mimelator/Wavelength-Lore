@@ -22,16 +22,9 @@ const {
   getProductsByCategory 
 } = require('../config/product-types');
 
-// Initialize services with auto-enhancement
-const merchandiseDB = new MerchandiseDatabase();
+// Use the singleton instances of the services.
+const merchandiseDB = require('../services/merchandise-database'); 
 const printifyService = new AutoEnhancedPrintifyService();
-
-// Initialize merchandise database following the same pattern as other helpers
-try {
-  merchandiseDB.initializeDatabase();
-} catch (error) {
-  console.error('⚠️ Failed to initialize merchandise database on module load:', error.message);
-}
 
 /**
  * Ensure database is ready for operations
@@ -40,19 +33,8 @@ try {
  */
 function ensureDatabaseReady(res) {
   try {
-    if (!merchandiseDB.isDatabaseReady()) {
-      console.log('🔄 Reinitializing merchandise database...');
-      merchandiseDB.initializeDatabase();
-    }
-    return true;
-  } catch (error) {
-    console.error('Database initialization failed:', error);
-    res.status(503).json({
-      success: false,
-      error: 'Database service temporarily unavailable',
-      details: process.env.NODE_ENV === 'development' ? error.message : 'Service initialization error'
-    });
-    return false;
+    // With the singleton, the database is always ready.
+    return merchandiseDB.isDatabaseReady();
   }
 }
 
@@ -870,7 +852,8 @@ router.post('/preview-enhancement', ensureAuthenticated, async (req, res) => {
           improvementDescription: enhancementResult.improvementDescription || 'Image resolution and quality enhanced'
         };
         
-        const storeResult = await merchandiseDatabase.storeEnhancedImage(imageId, enhancementData);
+        const sanitizedImageId = _sanitizeFirebaseKey(imageId);
+        const storeResult = await merchandiseDatabase.storeEnhancedImage(sanitizedImageId, enhancementData);
         if (storeResult.success) {
           console.log(`✅ Automatically stored enhanced image for ${imageId}`);
         } else {
@@ -969,6 +952,16 @@ async function downloadImageBuffer(imageUrl) {
   }
 }
 
+/**
+ * Sanitizes a string to be used as a valid Firebase Realtime Database key.
+ * This is a local copy to avoid dependency issues and ensure routes are self-contained.
+ * Replaces illegal characters ('.', '#', '$', '[', ']', '/') with an underscore.
+ * @param {string} key - The string to sanitize.
+ * @returns {string} A valid Firebase key.
+ */
+function _sanitizeFirebaseKey(key) {
+  return key.replace(/[.#$\[\]\/]/g, '_');
+}
 /**
  * Refund payment (integrate with your payment system)
  */

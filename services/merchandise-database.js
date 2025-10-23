@@ -26,7 +26,7 @@ class MerchandiseDatabase {
    * Uses the same pattern as other database helpers in the system
    */
   initializeDatabase() {
-    if (this.initialized) return; // Already initialized
+    if (this.initialized) return this;
     
     try {
       // Ensure Firebase Admin is initialized first (same pattern as config/database.js)
@@ -51,6 +51,8 @@ class MerchandiseDatabase {
       
       this.initialized = true;
       console.log('✅ Merchandise database initialized successfully');
+      return this;
+
     } catch (error) {
       console.error('Failed to initialize Firebase database for merchandise:', error);
       throw error;
@@ -72,9 +74,7 @@ class MerchandiseDatabase {
    * @returns {Promise<Object>} Operation result
    */
   async storeUserProduct(userId, productData) {
-    try {
-      this.initializeDatabase(); // Ensure database is initialized
-      
+    try {      
       const productKey = `${userId}_${productData.productId}`;
       
       const productRecord = {
@@ -112,9 +112,7 @@ class MerchandiseDatabase {
    * @returns {Promise<Array>} User's products
    */
   async getUserProducts(userId) {
-    try {
-      this.initializeDatabase(); // Ensure database is initialized
-      
+    try {      
       const snapshot = await this.userProductsRef.child(userId).once('value');
       const products = [];
       
@@ -144,9 +142,7 @@ class MerchandiseDatabase {
    * @returns {Promise<Object>} Operation result
    */
   async storeUserOrder(userId, orderData) {
-    try {
-      this.initializeDatabase(); // Ensure database is initialized
-      
+    try {      
       const orderKey = `${userId}_${orderData.orderId}`;
       
       const orderRecord = {
@@ -184,9 +180,7 @@ class MerchandiseDatabase {
    * @returns {Promise<Array>} User's orders
    */
   async getUserOrders(userId) {
-    try {
-      this.initializeDatabase(); // Ensure database is initialized
-      
+    try {      
       const snapshot = await this.userOrdersRef.child(userId).once('value');
       const orders = [];
       
@@ -216,9 +210,7 @@ class MerchandiseDatabase {
    * @returns {Promise<Object>} Operation result
    */
   async updateOrderStatus(orderId, orderData) {
-    try {
-      this.initializeDatabase(); // Ensure database is initialized
-      
+    try {      
       // Find all records with this order ID
       const ordersSnapshot = await this.ordersRef.orderByChild('orderId').equalTo(orderId).once('value');
       
@@ -342,16 +334,10 @@ class MerchandiseDatabase {
    * @returns {Promise<Object>} Operation result
    */
   async storeEnhancedImage(originalImageId, enhancementData) {
-    try {
-      this.initializeDatabase(); // Ensure database is initialized
-      
+    try {      
       const enhancementRecord = {
-        originalImageId,
-        enhancedImageUrl: enhancementData.enhancedImageUrl,
-        enhancementMethod: enhancementData.enhancementMethod,
-        originalDimensions: enhancementData.originalDimensions,
-        enhancedDimensions: enhancementData.enhancedDimensions,
-        scaleFactor: enhancementData.scaleFactor,
+        ...enhancementData, // Copy all properties from the input data
+        originalImageId, // Ensure this is set correctly
         createdAt: admin.database.ServerValue.TIMESTAMP,
         status: 'active'
       };
@@ -381,9 +367,7 @@ class MerchandiseDatabase {
    * @returns {Promise<Object|null>} Enhanced image data or null
    */
   async getEnhancedImage(originalImageId) {
-    try {
-      this.initializeDatabase(); // Ensure database is initialized
-      
+    try {      
       const snapshot = await this.enhancedImagesRef.child(originalImageId).once('value');
       
       if (snapshot.exists()) {
@@ -422,9 +406,7 @@ class MerchandiseDatabase {
    * @returns {Promise<Object>} Operation result
    */
   async deleteEnhancedImage(originalImageId) {
-    try {
-      this.initializeDatabase(); // Ensure database is initialized
-      
+    try {      
       await this.enhancedImagesRef.child(originalImageId).remove();
       
       console.log(`🗑️ Deleted enhanced image association for ${originalImageId}`);
@@ -497,5 +479,10 @@ class MerchandiseDatabase {
   }
 }
 
-// Export the class directly to avoid immediate Firebase initialization
-module.exports = MerchandiseDatabase;
+/**
+ * Singleton instance of the MerchandiseDatabase.
+ * This ensures the entire application shares one single, initialized connection.
+ */
+const instance = new MerchandiseDatabase();
+instance.initializeDatabase();
+module.exports = instance;

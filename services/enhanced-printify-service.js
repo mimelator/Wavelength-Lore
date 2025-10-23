@@ -14,10 +14,19 @@ class EnhancedPrintifyService extends PrintifyService {
     this.upscalingService = new ImageUpscalingService();
     
     // Import and initialize merchandise database for enhanced image associations
-    const MerchandiseDatabase = require('./merchandise-database');
-    this.merchandiseDatabase = new MerchandiseDatabase();
+    // Use the singleton instance of the MerchandiseDatabase
+    this.merchandiseDatabase = require('./merchandise-database');
   }
   
+  /**
+   * Sanitizes a string to be used as a valid Firebase Realtime Database key.
+   * Replaces illegal characters ('.', '#', '$', '[', ']', '/') with an underscore.
+   * @param {string} key - The string to sanitize.
+   * @returns {string} A valid Firebase key.
+   */
+  _sanitizeFirebaseKey(key) {
+    return key.replace(/[.#$\[\]\/]/g, '_');
+  }
   /**
    * Enhanced image upload with automatic quality analysis and upscaling
    * This method automatically enhances images when needed - no user intervention required
@@ -34,10 +43,11 @@ class EnhancedPrintifyService extends PrintifyService {
       let existingEnhanced = null;
       if (options.originalImageId) {
         try {
-          existingEnhanced = await this.merchandiseDatabase.getEnhancedImage(options.originalImageId);
+          const sanitizedImageId = this._sanitizeFirebaseKey(options.originalImageId);
+          existingEnhanced = await this.merchandiseDatabase.getEnhancedImage(sanitizedImageId);
           
           if (existingEnhanced && existingEnhanced.enhancedImageUrl) {
-            console.log(`♻️ Found existing enhanced version for ${options.originalImageId}, using cached image`);
+            console.log(`♻️ Found existing enhanced version for ${options.originalImageId}, using cached image via S3 key: ${existingEnhanced.s3Key}`);
             
             // Download the cached enhanced image
             const enhancedImageBuffer = await this.downloadImageBuffer(existingEnhanced.enhancedImageUrl);
@@ -49,22 +59,27 @@ class EnhancedPrintifyService extends PrintifyService {
                 options.title
               );
               
-              return {
-                ...uploadResult,
-                autoEnhanced: true,
-                enhancementSource: 'cached',
-                qualityEnhancement: {
-                  analysis: { suitableForPrint: true, enhanced: true },
-                  enhanced: true,
-                  metadata: { 
-                    method: existingEnhanced.enhancementMethod || 'cached', 
-                    cached: true,
-                    scaleFactor: existingEnhanced.scaleFactor
+              // If the upload of the cached image to Printify is successful,
+              // construct a complete response object that mirrors the structure
+              // of a newly generated enhancement. This is the critical fix.
+              if (uploadResult.success) {
+                return {
+                  ...uploadResult,
+                  autoEnhanced: true,
+                  enhancementSource: 'cached', // Explicitly set the source
+                  qualityEnhancement: {
+                    analysis: { suitableForPrint: true, enhanced: true, cached: true },
+                    s3Key: existingEnhanced.s3Key,
+                    enhanced: true,
+                    metadata: { 
+                      method: existingEnhanced.enhancementMethod || 'cached', 
+                      cached: true,
+                      scaleFactor: existingEnhanced.scaleFactor,
+                      ...existingEnhanced // Include all other cached metadata
+                    },
                   },
-                  originalSuitable: false,
-                  existingEnhanced: existingEnhanced
-                }
-              };
+                };
+              }
             } else {
               console.warn('⚠️ Failed to download cached enhanced image, will generate new one');
             }
@@ -97,11 +112,14 @@ class EnhancedPrintifyService extends PrintifyService {
         const upscalingOptions = {
           method: options.upscaleMethod || 'auto',
           scaleFactor: qualityAnalysis.targetDimensions?.scaleFactor || 4,
+          fileName: fileName, // Pass the fileName for content type detection
           enhanceDetails: true,
           preserveStyle: true,
           contentType: this.detectContentType(fileName, options),
           character: options.character,
-          style: options.style
+          style: options.style,
+          originalImageId: options.originalImageId, // Pass originalImageId for storage key
+          userId: options.userId // Pass userId for S3 storage
         };
         
         try {
@@ -119,24 +137,36 @@ class EnhancedPrintifyService extends PrintifyService {
             });
             
             // Store enhanced image association in database for future use
-            if (options.originalImageId && upscalingResult.url) {
+            // This is now the single source of truth for writing to the cache.
+            if (options.originalImageId && enhancementMetadata.url) {
               try {
+                // Calculate scale factor from actual dimensions
+                const enhancedWidth = parseInt(enhancementMetadata.processedDimensions.split('x')[0]);
+                const enhancedHeight = parseInt(enhancementMetadata.processedDimensions.split('x')[1]);
+                const calculatedScaleFactor = Math.round((enhancedWidth / qualityAnalysis.originalWidth) * 10) / 10;
+                
                 const enhancementData = {
-                  enhancedImageUrl: upscalingResult.url,
+                  s3Key: enhancementMetadata.s3Key,
+                  enhancedImageUrl: enhancementMetadata.url,
                   enhancementMethod: upscalingResult.method || 'AI Upscaling',
                   originalDimensions: {
                     width: qualityAnalysis.originalWidth,
                     height: qualityAnalysis.originalHeight
                   },
-                  enhancedDimensions: upscalingResult.metadata.dimensions || {
-                    width: qualityAnalysis.originalWidth * (upscalingResult.metadata.scaleFactor || 2),
-                    height: qualityAnalysis.originalHeight * (upscalingResult.metadata.scaleFactor || 2)
+                  enhancedDimensions: {
+                    width: enhancedWidth,
+                    height: enhancedHeight
                   },
-                  scaleFactor: upscalingResult.metadata.scaleFactor,
-                  improvementDescription: `Enhanced from ${qualityAnalysis.originalWidth}×${qualityAnalysis.originalHeight} to higher resolution`
+                  scaleFactor: enhancementMetadata.scaleFactor || calculatedScaleFactor,
+                  improvementDescription: `Enhanced from ${qualityAnalysis.originalWidth}×${qualityAnalysis.originalHeight} to ${enhancementMetadata.processedDimensions}`
                 };
                 
-                const storeResult = await this.merchandiseDatabase.storeEnhancedImage(options.originalImageId, enhancementData);
+                // Log the exact record being sent to Firebase for debugging
+                console.log(`\x1b[33m📝 DEBUG: Writing the following record to Firebase cache under key:\x1b[0m '${this._sanitizeFirebaseKey(options.originalImageId)}'`);
+                console.log(JSON.stringify(enhancementData, null, 2));
+
+                const sanitizedImageId = this._sanitizeFirebaseKey(options.originalImageId);
+                const storeResult = await this.merchandiseDatabase.storeEnhancedImage(sanitizedImageId, enhancementData);
                 if (storeResult.success) {
                   console.log(`💾 Stored enhanced image association for ${options.originalImageId}`);
                 } else {
@@ -160,20 +190,22 @@ class EnhancedPrintifyService extends PrintifyService {
       }
       
       // Step 4: Upload to Printify using base class method
+      console.log('🚀 Uploading final image to Printify...');
       const uploadResult = await this.uploadImage(finalImageBuffer, fileName, options.title);
       
-      return {
-        ...uploadResult,
-        autoEnhanced,
-        enhancementSource: autoEnhanced ? 'generated' : 'none',
-        qualityEnhancement: {
-          analysis: qualityAnalysis,
-          enhanced: !!enhancementMetadata,
-          metadata: enhancementMetadata,
-          originalSuitable: qualityAnalysis.suitableForPrint,
-          automatic: true
-        }
-      };
+      if (uploadResult.success) {
+        return {
+          ...uploadResult,
+          autoEnhanced,
+          enhancementSource: autoEnhanced ? 'generated' : 'none',
+          qualityEnhancement: {
+            analysis: qualityAnalysis,
+            enhanced: !!enhancementMetadata,
+            metadata: enhancementMetadata,
+          }
+        };
+      }
+      return uploadResult; // Return the raw upload result if it failed
       
     } catch (error) {
       console.error('Error in auto-enhancement upload:', error);
@@ -519,10 +551,12 @@ class EnhancedPrintifyService extends PrintifyService {
       // Generate enhanced version
       const enhancementResult = await this.upscalingService.upscaleImage(
         imageBuffer,
-        fileName,
+        // Pass fileName in the options object
         {
           targetDimensions: analysis.targetDimensions,
+          fileName: fileName, // Pass the fileName for content type detection
           contentType: this.detectContentType(fileName),
+          originalImageId: options.originalImageId, // Pass originalImageId for storage key
           ...options
         }
       );
@@ -550,6 +584,7 @@ class EnhancedPrintifyService extends PrintifyService {
         originalImageSuitable: false,
         originalDimensions,
         enhancedDimensions,
+        s3Key: storeResult.s3Key, // Return the S3 key
         enhancedImageUrl: storeResult.url,
         enhancementMethod: enhancementResult.metadata?.method || 'AI Upscaling',
         improvementDescription: `Enhanced from ${originalDimensions.width}×${originalDimensions.height} to ${enhancedDimensions.width}×${enhancedDimensions.height}`,
