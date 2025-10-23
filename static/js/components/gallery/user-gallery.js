@@ -298,6 +298,17 @@ class UserGallery {
         });
         actions.appendChild(deleteBtn);
       }
+
+      // Add "Open in Merch Store" button
+      const merchBtn = document.createElement('button');
+      merchBtn.innerHTML = '<span class="icon">🛍️</span>';
+      merchBtn.className = 'merch-store-button';
+      merchBtn.setAttribute('title', 'Create custom merchandise from this image');
+      merchBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.openInMerchStore(image);
+      });
+      actions.appendChild(merchBtn);
       
       item.appendChild(actions);
       galleryGrid.appendChild(item);
@@ -620,6 +631,20 @@ class UserGallery {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  }
+
+  /**
+   * Open image in Merchandise Store for custom product creation
+   * @param {Object} image - The image object to open in merch store
+   */
+  openInMerchStore(image) {
+    // Navigate to merchandise store with pre-selected image
+    // The image ID/path will be passed as a URL parameter for pre-selection
+    const imageId = image.relativePath || image.id || image.fileName;
+    const merchUrl = `/merchandise?preselect=${encodeURIComponent(imageId)}`;
+    
+    // Open in same window to maintain user flow
+    window.location.href = merchUrl;
   }
   
   /**

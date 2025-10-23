@@ -19,6 +19,9 @@ Here are some areas we could enhance or work on:
 
 Improve the merchandise store UI/UX
 Add product preview functionality
+
+
+
 Enhance the shopping cart experience
 💳 Payment Integration
 

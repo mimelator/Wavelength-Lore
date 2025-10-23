@@ -172,13 +172,55 @@ document.addEventListener('DOMContentLoaded', () => {
     images.forEach((image, index) => {
       console.log(`🖼️ Processing image ${index + 1}:`, image);
       const div = document.createElement('div');
+      div.className = 'carousel-item';
+      
       const img = document.createElement('img');
       img.src = image.url;
       img.alt = image.title || '';
       img.dataset.id = image.id;
       img.dataset.caption = image.title || '';
       img.dataset.relativePath = image.relativePath;
+      
+      // Add action buttons for carousel items too
+      const actions = document.createElement('div');
+      actions.className = 'gallery-item-actions carousel-actions';
+      console.log('🎠 Creating action buttons for carousel image:', image.title);
+      
+      // Download button
+      const downloadBtn = document.createElement('button');
+      downloadBtn.innerHTML = '<span class="icon">↓</span>';
+      downloadBtn.className = 'download-button';
+      downloadBtn.setAttribute('title', 'Download image');
+      downloadBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        downloadImage(image);
+      });
+      actions.appendChild(downloadBtn);
+      
+      // Delete button
+      const deleteBtn = document.createElement('button');
+      deleteBtn.innerHTML = '<span class="icon">×</span>';
+      deleteBtn.className = 'delete-button';
+      deleteBtn.setAttribute('title', 'Remove from gallery');
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteImage(image.id, image.relativePath, div);
+      });
+      actions.appendChild(deleteBtn);
+
+      // Merchandise store button
+      const merchBtn = document.createElement('button');
+      merchBtn.innerHTML = '<span class="icon">🛍️</span>';
+      merchBtn.className = 'merch-store-button';
+      merchBtn.setAttribute('title', 'Create custom merchandise from this image');
+      merchBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openInMerchStore(image);
+      });
+      actions.appendChild(merchBtn);
+      
       div.appendChild(img);
+      div.appendChild(actions);
       carouselEl.appendChild(div);
     });
     
@@ -242,7 +284,46 @@ document.addEventListener('DOMContentLoaded', () => {
         item.appendChild(caption);
       }
       
+      // Add action buttons
+      const actions = document.createElement('div');
+      actions.className = 'gallery-item-actions';
+      console.log('🛠️ Creating action buttons for grid image:', image.title);
+      
+      // Download button
+      const downloadBtn = document.createElement('button');
+      downloadBtn.innerHTML = '<span class="icon">↓</span>';
+      downloadBtn.className = 'download-button';
+      downloadBtn.setAttribute('title', 'Download image');
+      downloadBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        downloadImage(image);
+      });
+      actions.appendChild(downloadBtn);
+      
+      // Delete button
+      const deleteBtn = document.createElement('button');
+      deleteBtn.innerHTML = '<span class="icon">×</span>';
+      deleteBtn.className = 'delete-button';
+      deleteBtn.setAttribute('title', 'Remove from gallery');
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteImage(image.id, image.relativePath, item);
+      });
+      actions.appendChild(deleteBtn);
+
+      // Merchandise store button
+      const merchBtn = document.createElement('button');
+      merchBtn.innerHTML = '<span class="icon">🛍️</span>';
+      merchBtn.className = 'merch-store-button';
+      merchBtn.setAttribute('title', 'Create custom merchandise from this image');
+      merchBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openInMerchStore(image);
+      });
+      actions.appendChild(merchBtn);
+      
       item.appendChild(img);
+      item.appendChild(actions);
       gridEl.appendChild(item);
     });
     
@@ -274,6 +355,57 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('grid-layout').classList.add('active');
   }
   
+  // Helper function to download an image
+  function downloadImage(image) {
+    const link = document.createElement('a');
+    link.href = image.url;
+    link.download = image.title || 'gallery-image.jpg';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+  
+  // Helper function to delete an image
+  function deleteImage(imageId, relativePath, itemElement) {
+    if (!confirm('Are you sure you want to remove this image from your gallery?')) {
+      return;
+    }
+    
+    fetch('/api/gallery/user/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({ relativePath })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Remove the item from the DOM
+        if (itemElement && itemElement.parentNode) {
+          itemElement.parentNode.removeChild(itemElement);
+        }
+        console.log('Image deleted successfully');
+      } else {
+        alert('Failed to delete image: ' + (data.error || 'Unknown error'));
+      }
+    })
+    .catch(error => {
+      console.error('Error deleting image:', error);
+      alert('Failed to delete image. Please try again.');
+    });
+  }
+  
+  // Helper function to open image in merchandise store
+  function openInMerchStore(image) {
+    const imageId = image.id;
+    const merchUrl = `/merchandise?preselect=${encodeURIComponent(imageId)}`;
+    console.log('🛍️ Opening merchandise store with image:', imageId);
+    window.location.href = merchUrl;
+  }
+
   // Function to show login button
   function showLoginButton() {
     const loginContainer = document.createElement('div');
@@ -649,7 +781,8 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Initialize gallery
   console.log('🚀 Gallery initialization starting...');
-  console.log('📍 DOM elements found:');
+  console.log('� MERCHANDISE BUTTONS: Updated JavaScript file loaded with action buttons!');
+  console.log('�📍 DOM elements found:');
   console.log('  - Carousel:', carouselEl ? 'Found' : 'NOT FOUND');
   console.log('  - Grid:', gridEl ? 'Found' : 'NOT FOUND');
   

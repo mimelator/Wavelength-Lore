@@ -216,6 +216,14 @@ h1 {
   background-color: #f57c00;
 }
 
+.merch-store-button {
+  background-color: #9c27b0;
+}
+
+.merch-store-button:hover {
+  background-color: #7b1fa2;
+}
+
 .login-button {
   text-align: center;
   margin-top: 30px;

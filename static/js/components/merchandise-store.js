@@ -19,6 +19,10 @@ class MerchandiseStore {
   async init() {
     console.log('🛍️ Initializing Merchandise Store');
     
+    // Check for pre-selected image from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const preselectImageId = urlParams.get('preselect');
+    
     // Check enhancement capabilities
     await this.loadEnhancementStatus();
     
@@ -36,6 +40,14 @@ class MerchandiseStore {
     
     // Render initial state
     this.render();
+    
+    // Pre-select image AFTER rendering if specified in URL
+    if (preselectImageId) {
+      console.log('🎯 Pre-selecting image after render:', preselectImageId);
+      this.preSelectImage(preselectImageId);
+      // Re-render to show the selection
+      this.render();
+    }
   }
   
   async loadEnhancementStatus() {
@@ -581,8 +593,11 @@ class MerchandiseStore {
           </div>
           
           ${this.selectedImage ? `
-          <div class="store-section">
+          <div class="store-section" id="choose-product-section">
             <h2>🎽 Choose Your Product</h2>
+            <div class="selected-image-preview">
+              ${this.renderSelectedImagePreview()}
+            </div>
             <p class="section-description">Pick what you'd like to create - we'll handle the naming and details!</p>
             <div class="product-types-grid">
               ${this.renderProductTypes()}
@@ -1053,6 +1068,119 @@ class MerchandiseStore {
       }, 300);
     }, 3000);
   }
+
+  /**
+   * Pre-select an image based on ID from URL parameter
+   * @param {string} imageId - The image ID to pre-select
+   */
+  preSelectImage(imageId) {
+    if (!this.galleryImages || this.galleryImages.length === 0) {
+      console.warn('Cannot pre-select image: Gallery not loaded yet');
+      return;
+    }
+
+    // Debug: Log all gallery images to see their structure
+    console.log('🔍 Debug: Available gallery images:');
+    this.galleryImages.forEach((img, index) => {
+      console.log(`  ${index + 1}:`, {
+        id: img.id,
+        relativePath: img.relativePath,
+        fileName: img.fileName,
+        title: img.title,
+        url: img.url
+      });
+    });
+    
+    console.log('🔍 Debug: Looking for imageId:', imageId);
+
+    // Find the image by relativePath, id, or fileName
+    const image = this.galleryImages.find(img => {
+      // Extract filename from the full S3 path for comparison
+      const imgFilename = img.id ? img.id.split('/').pop() : null;
+      
+      console.log(`🔍 Checking image: ${img.title} (filename: ${imgFilename}) against ${imageId}`);
+      
+      return (
+        img.relativePath === imageId || 
+        img.id === imageId || 
+        img.fileName === imageId ||
+        img.relativePath?.includes(imageId) ||
+        img.title === imageId ||
+        imgFilename === imageId ||
+        (img.relativePath && img.relativePath.endsWith(imageId)) ||
+        (img.id && img.id.endsWith(imageId))
+      );
+    });
+
+    if (image) {
+      this.selectedImage = image.id;
+      console.log('🎯 Pre-selected image for merchandise:', image.title, 'ID:', image.id);
+      
+      // Update the UI to show the selection - with longer delay for rendering
+      setTimeout(() => {
+        // Try multiple selectors to find the image element
+        let imageElement = document.querySelector(`.gallery-image[data-image-id="${image.id}"]`);
+        
+        if (!imageElement) {
+          // Try with the filename instead
+          const filename = image.id.split('/').pop();
+          imageElement = document.querySelector(`.gallery-image[data-image-id*="${filename}"]`);
+        }
+        
+        if (!imageElement) {
+          // Try finding by image URL or any data attribute containing the filename
+          const filename = image.id.split('/').pop();
+          imageElement = document.querySelector(`[data-image-id="${filename}"], [data-id="${filename}"], img[src*="${filename}"]`);
+        }
+        
+        if (imageElement) {
+          // Remove previous selections
+          document.querySelectorAll('.gallery-image.selected').forEach(el => {
+            el.classList.remove('selected');
+          });
+          
+          // Add selection to the preselected image
+          imageElement.classList.add('selected');
+          
+          // Scroll to the selected image
+          imageElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          
+          console.log('✅ Pre-selected image UI updated successfully');
+        } else {
+          console.warn('Pre-selected image element not found in DOM. Available elements:', 
+            document.querySelectorAll('.gallery-image, [data-image-id], [data-id]').length);
+          
+          // Try to find and log what elements are actually available
+          const allImages = document.querySelectorAll('img, [data-image-id], [data-id]');
+          console.log('Available image elements:', Array.from(allImages).map(el => ({
+            tagName: el.tagName,
+            dataImageId: el.getAttribute('data-image-id'),
+            dataId: el.getAttribute('data-id'),
+            src: el.src
+          })));
+        }
+      }, 500); // Increased delay to ensure DOM is fully rendered
+      
+      // Clear the URL parameter to clean up the URL
+      const url = new URL(window.location);
+      url.searchParams.delete('preselect');
+      window.history.replaceState({}, '', url);
+      
+      // Auto-scroll to the Choose Product section for better UX
+      setTimeout(() => {
+        const chooseProductSection = document.getElementById('choose-product-section');
+        if (chooseProductSection) {
+          chooseProductSection.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+          console.log('📍 Auto-scrolled to Choose Product section');
+        }
+      }, 800); // Delay to ensure DOM updates and previous scrolling completes
+    } else {
+      console.warn('Pre-select image not found:', imageId);
+    }
+  }
   
   formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
@@ -1060,6 +1188,40 @@ class MerchandiseStore {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+  
+  /**
+   * Render a preview of the selected image in the Choose Product section
+   * @returns {string} HTML for the selected image preview
+   */
+  renderSelectedImagePreview() {
+    if (!this.selectedImage) return '';
+    
+    const selectedImg = this.galleryImages.find(img => img.id === this.selectedImage);
+    if (!selectedImg) return '';
+    
+    return `
+      <div class="selected-image-preview-container">
+        <div class="preview-image">
+          <img src="${selectedImg.thumbnailUrl || selectedImg.url}" 
+               alt="${this.cleanImageTitle(selectedImg.title)}"
+               class="preview-thumbnail">
+        </div>
+        <div class="preview-info">
+          <h3 class="preview-title">Selected Image: ${this.cleanImageTitle(selectedImg.title)}</h3>
+          <p class="preview-details">
+            <span class="preview-size">${this.formatFileSize(selectedImg.size || 0)}</span>
+            ${selectedImg.suitableForPrint ? 
+              '<span class="print-ready">✅ Print Ready</span>' : 
+              '<span class="enhancement-needed">🎨 Will be enhanced for printing</span>'
+            }
+          </p>
+          <button class="change-image-btn" onclick="document.querySelector('.gallery-section').scrollIntoView({behavior: 'smooth'})">
+            Change Image
+          </button>
+        </div>
+      </div>
+    `;
   }
   
   /**

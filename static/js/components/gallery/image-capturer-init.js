@@ -155,8 +155,12 @@ document.addEventListener('DOMContentLoaded', () => {
           const data = await response.json();
           console.log('✅ Image saved to gallery:', data);
           
-          // Show success notification with gallery link
-          showNotification('Image saved to your gallery! <a href="/my-gallery" class="gallery-link">View Gallery</a>', 'success');
+          // Show success notification with gallery and merchandise store links
+          const galleryLink = '<a href="/my-gallery" class="gallery-link">View Gallery</a>';
+          const merchLink = data.merchLink ? `<a href="${data.merchLink}" class="merch-link">🛍️ Create Merchandise</a>` : '';
+          const separator = data.merchLink ? ' | ' : '';
+          
+          showNotification(`Image saved to your gallery! ${galleryLink}${separator}${merchLink}`, 'success');
           
         } catch (error) {
           console.error('❌ Error saving image:', error);

@@ -1081,3 +1081,132 @@
     padding: 20px;
   }
 }
+
+/* Selected Image Preview in Choose Product Section */
+.selected-image-preview {
+  margin-bottom: 25px;
+}
+
+.selected-image-preview-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border: 2px solid var(--accent-color);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  animation: fadeInPreview 0.5s ease-out;
+}
+
+@keyframes fadeInPreview {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.preview-image {
+  flex-shrink: 0;
+}
+
+.preview-thumbnail {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 3px solid var(--accent-color);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.preview-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.preview-title {
+  margin: 0 0 10px 0;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.preview-details {
+  margin: 0 0 15px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+}
+
+.preview-size {
+  background: rgba(108, 117, 125, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.print-ready {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.enhancement-needed {
+  background: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.change-image-btn {
+  background: linear-gradient(135deg, var(--secondary-color), #6f42c1);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.change-image-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, #6f42c1, var(--secondary-color));
+}
+
+/* Mobile responsiveness for preview */
+@media (max-width: 768px) {
+  .selected-image-preview-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .preview-thumbnail {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .preview-title {
+    font-size: 1.1rem;
+  }
+  
+  .preview-details {
+    justify-content: center;
+  }
+}

@@ -224,7 +224,7 @@ router.post('/gallery/api/user/save', ensureAuthenticated, async (req, res) => {
       });
     }
     
-    // Return success with image details
+    // Return success with image details and merchandise store link
     res.json({
       success: true,
       message: 'Image saved to gallery',
@@ -234,7 +234,8 @@ router.post('/gallery/api/user/save', ensureAuthenticated, async (req, res) => {
         thumbnailUrl: result.url,
         title: imageData.title || 'Saved Image',
         relativePath: result.relativePath
-      }
+      },
+      merchLink: `/merchandise?preselect=${result.fileName}`
     });
   } catch (error) {
     console.error('Error saving image to gallery:', error);
@@ -293,7 +294,7 @@ router.post('/gallery/api/user/save', ensureAuthenticated, async (req, res) => {
         });
       }
       
-      // Return success with image details
+      // Return success with image details and merchandise store link
       res.json({
         success: true,
         message: 'Image saved to gallery',
@@ -303,7 +304,8 @@ router.post('/gallery/api/user/save', ensureAuthenticated, async (req, res) => {
           thumbnailUrl: result.url,
           title: imageData.title || 'Saved Image',
           relativePath: result.relativePath
-        }
+        },
+        merchLink: `/merchandise?preselect=${result.fileName}`
       });
     } catch (error) {
       console.error('Error saving image to gallery:', error);
