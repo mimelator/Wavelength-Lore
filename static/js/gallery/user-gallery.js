@@ -2,6 +2,7 @@
  * User Gallery JavaScript Module
  * Handles gallery functionality including image display, modal interactions, 
  * carousel/grid views, search, multi-select, and API communications.
+ * Now uses shared screensaver utility for enhanced functionality.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,8 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalCaption = document.getElementById('modalCaption');
   const deleteBtn = document.getElementById('delete-image');
   const actionButtons = document.getElementById('action-buttons');
-  const screensaverModal = document.getElementById('screensaverModal');
-  const screensaverImage = document.getElementById('screensaverImage');
   const downloadAllBtn = document.getElementById('download-all');
   const startScreensaverBtn = document.getElementById('start-screensaver');
   const storageUsedBar = document.getElementById('storage-used-bar');
@@ -24,10 +23,32 @@ document.addEventListener('DOMContentLoaded', () => {
   let userImages = [];
   let currentImageId = null;
   let currentRelativePath = null;
-  let screensaverInterval = null;
-  let currentScreensaverIndex = 0;
   let selectMode = false;
   let selectedImages = [];
+  
+  // Initialize shared screensaver utility
+  let galleryScreensaver = null;
+  
+  // Initialize screensaver when the shared utility is available
+  function initializeScreensaver() {
+    if (typeof WavelengthScreensaver !== 'undefined') {
+      galleryScreensaver = new WavelengthScreensaver({
+        containerId: 'screensaverModal',
+        gallerySelector: '#screensaver-container',
+        autoRotate: true,
+        rotationInterval: 5000,
+        transitionsEnabled: true,
+        exitOnClick: true,
+        exitOnKeypress: true
+      });
+      
+      galleryScreensaver.init();
+      console.log('✅ Gallery screensaver initialized with shared utility');
+    } else {
+      // Fallback to simple screensaver if shared utility not loaded
+      console.warn('⚠️ Shared screensaver utility not available, using fallback');
+    }
+  }
   
   // Function to fetch storage stats
   function fetchStorageStats() {
@@ -311,35 +332,52 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
-  // Start screensaver function
+  // Start screensaver function with shared utility
   startScreensaverBtn.addEventListener('click', () => {
     if (userImages.length === 0) return;
     
-    screensaverModal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
+    // Get image URLs for screensaver
+    const imageUrls = userImages.map(img => img.url);
     
-    // Show first image
-    currentScreensaverIndex = 0;
-    screensaverImage.src = userImages[currentScreensaverIndex].url;
-    
-    // Set up interval to cycle through images
-    screensaverInterval = setInterval(() => {
-      currentScreensaverIndex = (currentScreensaverIndex + 1) % userImages.length;
-      screensaverImage.src = userImages[currentScreensaverIndex].url;
-    }, 5000);
+    if (galleryScreensaver) {
+      // Use enhanced screensaver
+      galleryScreensaver.enter(imageUrls);
+    } else {
+      // Fallback to simple modal screensaver
+      const screensaverModal = document.getElementById('screensaverModal');
+      const screensaverImage = document.getElementById('screensaverImage');
+      
+      if (screensaverModal && screensaverImage) {
+        screensaverModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        let currentIndex = 0;
+        screensaverImage.src = imageUrls[currentIndex];
+        
+        const interval = setInterval(() => {
+          currentIndex = (currentIndex + 1) % imageUrls.length;
+          screensaverImage.src = imageUrls[currentIndex];
+        }, 5000);
+        
+        // Simple exit on click
+        screensaverModal.addEventListener('click', () => {
+          screensaverModal.style.display = 'none';
+          document.body.style.overflow = '';
+          clearInterval(interval);
+        }, { once: true });
+      }
+    }
   });
   
   // Close modal events
   document.querySelectorAll('.modal-close').forEach(closeBtn => {
     closeBtn.addEventListener('click', () => {
       modal.style.display = 'none';
-      screensaverModal.style.display = 'none';
       document.body.style.overflow = '';
       
-      // Clear screensaver interval if active
-      if (screensaverInterval) {
-        clearInterval(screensaverInterval);
-        screensaverInterval = null;
+      // Exit screensaver if active
+      if (galleryScreensaver && galleryScreensaver.active) {
+        galleryScreensaver.exit();
       }
     });
   });
@@ -349,15 +387,8 @@ document.addEventListener('DOMContentLoaded', () => {
       modal.style.display = 'none';
       document.body.style.overflow = '';
     }
-    if (event.target === screensaverModal) {
-      screensaverModal.style.display = 'none';
-      document.body.style.overflow = '';
-      
-      if (screensaverInterval) {
-        clearInterval(screensaverInterval);
-        screensaverInterval = null;
-      }
-    }
+    
+    // The screensaver handles its own click events
   });
   
   // Layout switchers
@@ -569,6 +600,9 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('📍 DOM elements found:');
   console.log('  - Carousel:', carouselEl ? 'Found' : 'NOT FOUND');
   console.log('  - Grid:', gridEl ? 'Found' : 'NOT FOUND');
+  
+  // Initialize screensaver utility
+  initializeScreensaver();
   
   fetchStorageStats();
   fetchUserGallery();

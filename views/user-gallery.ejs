@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="<%= cdnUrl %>/css/modal_styles.css">
   <link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/gallery-buttons.css">
   <link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/user-gallery.css">
+  <link rel="stylesheet" href="<%= cdnUrl %>/css/shared/screensaver.css">
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
   <link rel="stylesheet" href="<%= cdnUrl %>/css/carousel.css">
@@ -76,16 +77,32 @@
     </div>
     
     <!-- Screensaver Modal -->
-    <div id="screensaverModal" class="modal">
+    <div id="screensaverModal" class="screensaver-overlay">
       <span class="modal-close">&times;</span>
-      <div id="screensaver-container" style="width:100%; height:100%; display: flex; justify-content: center; align-items: center;">
-        <img class="modal-content" id="screensaverImage" style="object-fit: contain; max-width: 90%; max-height: 90%;">
+      <div id="screensaver-container" class="screensaver-gallery">
+        <!-- Images will be populated by JavaScript -->
+      </div>
+      
+      <!-- Exit hint -->
+      <div class="screensaver-exit-hint">
+        Click anywhere or press any key to exit screensaver
+      </div>
+      
+      <!-- Optional controls -->
+      <div class="screensaver-controls" style="display: none;">
+        <button class="screensaver-control" onclick="galleryScreensaver?.previousImage()" title="Previous Image">
+          &#8249;
+        </button>
+        <button class="screensaver-control" onclick="galleryScreensaver?.nextImage()" title="Next Image">
+          &#8250;
+        </button>
       </div>
     </div>
   </main>
   
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+  <script src="<%= cdnUrl %>/js/shared/screensaver.js"></script>
   <script src="<%= cdnUrl %>/js/gallery/user-gallery.js"></script>
   
   <!-- Include standard footer -->
