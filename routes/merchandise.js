@@ -870,7 +870,10 @@ router.post('/preview-enhancement', ensureAuthenticated, async (req, res) => {
     const enhancementResult = await printifyService.previewImageEnhancement(
       imageBuffer,
       selectedImage.fileName || selectedImage.originalName,
-      { originalImageId: imageId } // Pass originalImageId for caching
+      { 
+        originalImageId: imageId, // Pass originalImageId for caching
+        userId: userId // Pass userId for proper S3 path organization
+      }
     );
     
     if (!enhancementResult.success) {
