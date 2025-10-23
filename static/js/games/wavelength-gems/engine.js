@@ -1378,6 +1378,41 @@ async function initGame(levelNumber = 1) {
     console.log(`⏱️  Load Time: ${loadTime.toFixed(0)}ms | Viewport: ${window.innerWidth}x${window.innerHeight}px | Mobile: ${isMobile}`);
     console.log(`════════════════════════════════════════`);
 
+    // CRITICAL BUG FIX: Check retry threshold before allowing game to initialize
+    // This prevents users from playing when they're out of retries by navigating back to the game
+    console.log('🔍 RETRY THRESHOLD CHECK:');
+    console.log('   - RetryThresholdManager available:', !!window.RetryThresholdManager);
+    
+    if (window.RetryThresholdManager) {
+        const isThresholdReached = RetryThresholdManager.isThresholdReached();
+        const thresholdInfo = RetryThresholdManager.getThresholdInfo();
+        
+        console.log('   - Threshold reached:', isThresholdReached);
+        console.log('   - Retries remaining:', thresholdInfo.retriesRemaining);
+        console.log('   - Retries total:', thresholdInfo.retriesTotal);
+        console.log('   - Reset time:', thresholdInfo.timeUntilReset);
+        
+        if (isThresholdReached) {
+            console.log('🚫 User has reached retry threshold - showing ad offer instead of initializing game');
+            
+            // Instead of initializing the game, show the ad offer immediately
+            if (typeof offerAdToRetry === 'function') {
+                console.log('   - Calling offerAdToRetry()');
+                offerAdToRetry();
+                return; // Exit early - don't initialize the game
+            } else {
+                console.log('   - offerAdToRetry not available, showing fallback modal');
+                // Fallback: show a basic modal if ad system isn't available
+                showRetryThresholdReachedModal();
+                return; // Exit early - don't initialize the game
+            }
+        } else {
+            console.log('✅ User has retries remaining, continuing with game initialization');
+        }
+    } else {
+        console.log('⚠️ RetryThresholdManager not available, proceeding with game initialization');
+    }
+
     // Disable collectibles while playing (keep radio visible)
     if (window.globalRadioGame && window.globalRadioGame.disableCollectiblesOnly) {
         window.globalRadioGame.disableCollectiblesOnly();
@@ -3204,10 +3239,54 @@ function returnToMenu() {
 }
 
 /**
+ * Show retry threshold reached modal (fallback when ad system unavailable)
+ */
+function showRetryThresholdReachedModal() {
+    const modal = document.createElement('div');
+    modal.id = 'retryThresholdModal';
+    modal.className = 'level-modal';
+    
+    let thresholdInfo = {};
+    if (window.RetryThresholdManager) {
+        thresholdInfo = RetryThresholdManager.getThresholdInfo();
+    }
+    
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>No More Free Retries</h2>
+            <div class="level-stats">
+                <div class="stat-row threshold-warning">
+                    <span class="stat-label">Free Retries:</span>
+                    <span class="stat-value">All used up</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Next Reset:</span>
+                    <span class="stat-value">${thresholdInfo.timeUntilReset || 'Soon'}</span>
+                </div>
+            </div>
+            <p class="modal-description">
+                You've used all your free retries for now. Come back later or watch an ad to continue playing!
+            </p>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="offerAdToRetry()">Watch Ad to Play</button>
+                <button class="btn btn-secondary" onclick="returnToMenu()">← Back to Menu</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Trigger animation
+    setTimeout(() => modal.classList.add('active'), 10);
+}
+
+/**
  * Close level completion modal
  */
 function closeLevelModal() {
-    const modal = document.getElementById('levelCompleteModal') || document.getElementById('levelFailedModal');
+    const modal = document.getElementById('levelCompleteModal') || 
+                 document.getElementById('levelFailedModal') || 
+                 document.getElementById('retryThresholdModal');
     if (modal) {
         modal.classList.remove('active');
         setTimeout(() => modal.remove(), 300);

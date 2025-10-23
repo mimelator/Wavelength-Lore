@@ -559,6 +559,9 @@
     <script src="/js/games/wavelength-gems/engine.js"></script>
     <script src="/js/games/wavelength-gems/ui.js"></script>
     
+    <!-- DEBUG: Retry threshold debugging -->
+    <script src="/debug/retry-threshold-debug.js"></script>
+    
     <!-- Permission checks for restricted features -->
     <script src="/js/games/wavelength-gems/permission-check.js"></script>
     
@@ -627,6 +630,14 @@
 
         // Initialize game on page load
         document.addEventListener('DOMContentLoaded', async () => {
+            // CRITICAL: Initialize RetryThresholdManager before game initialization
+            if (window.RetryThresholdManager) {
+                console.log('🕒 Initializing RetryThresholdManager...');
+                RetryThresholdManager.init();
+            } else {
+                console.error('❌ RetryThresholdManager not available!');
+            }
+            
             await initGame();
             loadUserStats();
         });

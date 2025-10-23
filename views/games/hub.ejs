@@ -10,6 +10,8 @@
             padding: 20px;
             position: relative;
             z-index: 10;
+            /* Ensure container stays above background */
+            background: transparent;
         }
 
         /* Background Gallery Styles */
@@ -23,17 +25,30 @@
             overflow: hidden;
             pointer-events: none;
             background: linear-gradient(135deg, rgba(20, 20, 40, 0.85), rgba(10, 10, 30, 0.9));
+            /* Ensure it doesn't affect document flow */
+            contain: layout style paint;
         }
 
         .games-background-gallery-image {
-            position: absolute;
-            width: 40%;
-            height: 40%;
+            position: absolute !important;
+            width: 40% !important;
+            height: 40% !important;
             object-fit: cover;
             opacity: 0;
             filter: blur(3px) brightness(0.4);
             animation: fadeInOut 20s ease-in-out infinite;
             border-radius: 15px;
+            /* Ensure images don't affect document flow */
+            max-width: 25vw !important;
+            max-height: 25vh !important;
+            pointer-events: none !important;
+            /* Force containment */
+            contain: layout style paint size !important;
+            /* Prevent any layout interference */
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            outline: none !important;
         }
 
         @keyframes fadeInOut {
@@ -298,10 +313,36 @@
 
     <script src="/js/games/wavelength-gems/background-gallery.js"></script>
     <script>
-        // Override container ID for hub page
-        if (window.GameBackgroundGallery) {
-            window.gameBackgroundGallery = new GameBackgroundGallery('games-background-gallery');
-        }
+        // Override container ID for hub page with safety checks
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                if (window.GameBackgroundGallery) {
+                    // Add safety check for viewport size and performance
+                    const isMobile = window.innerWidth <= 768;
+                    const hasSlowConnection = navigator.connection && navigator.connection.effectiveType && 
+                        ['slow-2g', '2g'].includes(navigator.connection.effectiveType);
+                    
+                    // Only load background gallery on larger screens and good connections
+                    if (!isMobile && !hasSlowConnection) {
+                        window.gameBackgroundGallery = new GameBackgroundGallery('games-background-gallery');
+                    } else {
+                        console.log('🔧 Background gallery disabled for mobile/slow connections');
+                        // Hide the gallery container to prevent any layout issues
+                        const gallery = document.getElementById('games-background-gallery');
+                        if (gallery) {
+                            gallery.style.display = 'none';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error initializing background gallery:', error);
+                // Hide gallery on error to prevent layout issues
+                const gallery = document.getElementById('games-background-gallery');
+                if (gallery) {
+                    gallery.style.display = 'none';
+                }
+            }
+        });
     </script>
     <script>
         // Load games data

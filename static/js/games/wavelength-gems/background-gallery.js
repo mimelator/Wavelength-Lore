@@ -141,8 +141,12 @@ class GameBackgroundGallery {
                 img.src = this.cdnUrl + imgPath;
             }
 
-            img.classList.add('game-background-gallery-image');
+            img.classList.add('games-background-gallery-image');
             img.alt = `Background image ${index + 1}`;
+
+            // Ensure proper positioning and containment
+            img.style.position = 'absolute';
+            img.style.pointerEvents = 'none';
 
             // Position images randomly for collage effect
             const randomX = Math.random() * 60; // 0-60%
@@ -151,8 +155,13 @@ class GameBackgroundGallery {
 
             img.style.left = randomX + '%';
             img.style.top = randomY + '%';
-            img.style.width = (50 * randomSize) + '%';
-            img.style.height = (50 * randomSize) + '%';
+            // Use smaller, more controlled sizes to prevent layout issues
+            img.style.width = (30 * randomSize) + '%';
+            img.style.height = (30 * randomSize) + '%';
+            
+            // Add max size limits to prevent huge images
+            img.style.maxWidth = '25vw';
+            img.style.maxHeight = '25vh';
 
             // Stagger animation start
             img.style.animationDelay = (index * 2) + 's';
