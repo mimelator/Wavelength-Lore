@@ -8,6 +8,9 @@
 const admin = require('firebase-admin');
 const path = require('path');
 
+// Ensure environment variables are loaded
+require('dotenv').config();
+
 // Global Firebase Admin instances
 let adminApp;
 let adminDatabase;

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+    <link rel="stylesheet" href="/css/merchandise-store.css">
+    <title>Custom Merchandise Store | Wavelength Lore</title>
+    <meta name="description" content="Create custom merchandise from your favorite Wavelength Lore moments. Turn gallery images into premium t-shirts and more.">
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main class="merchandise-main">
+        <div id="merchandise-store">
+            <!-- Merchandise store interface will be rendered here by JavaScript -->
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>Loading Merchandise Store...</p>
+            </div>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+
+    <!-- Load merchandise store component -->
+    <script src="/js/components/merchandise-store.js"></script>
+    
+    <script>
+        // Initialize store when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🛍️ Merchandise Store page loaded');
+            
+            // Wait for Firebase to be available before checking authentication
+            const checkAuthAndInitialize = () => {
+                if (window.firebaseAuth && window.firebaseUtils) {
+                    console.log('🔥 Firebase available, checking auth state...');
+                    
+                    window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, (user) => {
+                        if (user) {
+                            console.log('👤 User authenticated, initializing store');
+                            // Initialize the merchandise store now that user is authenticated
+                            if (!window.merchandiseStore) {
+                                window.merchandiseStore = new MerchandiseStore();
+                            }
+                        } else {
+                            console.log('❌ User not authenticated, redirecting to home');
+                            // Redirect to home page where users can sign in
+                            window.location.href = '/?redirect=' + encodeURIComponent(window.location.pathname);
+                        }
+                    });
+                } else {
+                    console.log('⏳ Waiting for Firebase to initialize...');
+                    // Retry after a short delay
+                    setTimeout(checkAuthAndInitialize, 500);
+                }
+            };
+            
+            // Start the authentication check
+            checkAuthAndInitialize();
+        });
+    </script>
+</body>
+</html>
