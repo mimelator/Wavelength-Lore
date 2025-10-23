@@ -109,7 +109,7 @@ class ImageUpscalingService {
       preserveStyle = true,
       contentType = 'illustration', // 'photo', 'illustration', 'artwork'
       originalImageId, // If provided, will store the enhanced image in S3
-      userId = 'unknown-user' // User ID for S3 storage
+      userId = 'anonymous' // User ID for S3 storage - should rarely be used
     } = options;
     
     try {
