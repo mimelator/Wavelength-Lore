@@ -175,6 +175,9 @@ router.get('/profile', (req, res) => {
         userId: null, // Will be determined by client-side authentication
         isOwnProfile: true, // This is always the user's own profile
         title: 'My Profile',
+        breadcrumbs: [
+            { name: 'User Profile', url: null }
+        ],
         cdnUrl: process.env.CDN_URL || '',
         version: process.env.VERSION || Date.now()
     });

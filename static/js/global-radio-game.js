@@ -31,6 +31,12 @@ class GlobalRadioGame {
         this.currentTrackIndex = -1;
         this.isPlaying = false;
 
+        // Radio player settings (synchronized with main radio player)
+        this.playMode = localStorage.getItem('wavelength_play_mode') || 'sequential'; // sequential, random, loop
+        this.currentSeasonFilter = localStorage.getItem('wavelength_season_filter') || 'all';
+        this.favorites = JSON.parse(localStorage.getItem('wavelength_favorites') || '[]');
+        this.isShuffle = this.playMode === 'random';
+
         this.init();
     }
 
@@ -62,14 +68,29 @@ class GlobalRadioGame {
 
         // Auto-resume playback if it was playing before navigation
         this.restorePlaybackState();
+
+        // Periodically refresh settings to stay in sync with main radio player
+        this.settingsRefreshInterval = setInterval(() => {
+            this.refreshSettings();
+        }, 5000); // Check every 5 seconds
     }
 
     async loadPlaylist() {
         try {
             const response = await fetch('/api/radio/playlist');
             if (response.ok) {
-                this.playlist = await response.json();
-                console.log(`📻 Loaded ${this.playlist.length} tracks`);
+                const fullPlaylist = await response.json();
+                
+                // Apply season filter (matching main radio player behavior)
+                if (this.currentSeasonFilter && this.currentSeasonFilter !== 'all') {
+                    this.playlist = fullPlaylist
+                        .map((track, index) => ({ ...track, originalIndex: index })) // Store original index for favorites
+                        .filter(track => track.season && track.season.toString() === this.currentSeasonFilter);
+                    console.log(`📻 Loaded ${this.playlist.length} tracks (filtered by season ${this.currentSeasonFilter})`);
+                } else {
+                    this.playlist = fullPlaylist.map((track, index) => ({ ...track, originalIndex: index }));
+                    console.log(`📻 Loaded ${this.playlist.length} tracks (all seasons)`);
+                }
             }
         } catch (error) {
             console.error('Error loading playlist:', error);
@@ -115,6 +136,8 @@ class GlobalRadioGame {
             volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
             this.setVolume(volumeSlider.value);
         }
+
+        this.audio.addEventListener('ended', () => this.onTrackEnd());
 
         if (this.audio) {
             this.audio.addEventListener('ended', () => this.next());
@@ -191,6 +214,16 @@ class GlobalRadioGame {
         }).catch(err => {
             console.error('Error playing audio:', err);
         });
+    }
+
+    // Track end handler
+    onTrackEnd() {
+        if (this.repeatMode === 'one') {
+            this.audio.currentTime = 0;
+            this.audio.play();
+        } else if (this.repeatMode === 'all' || this.currentTrackIndex < this.playlist.length - 1) {
+            this.next();
+        }
     }
 
     savePlaybackState() {
@@ -302,18 +335,136 @@ class GlobalRadioGame {
     }
 
     next() {
-        if (this.currentTrackIndex < this.playlist.length - 1) {
-            this.playTrack(this.currentTrackIndex + 1);
+        let nextIndex;
+
+        if (this.playMode === 'loop' && this.favorites.length > 0) {
+            // Loop through favorites only
+            // Note: favorites indices are from the full playlist, need to find matching tracks in current filtered playlist
+            const currentTrack = this.playlist[this.currentTrackIndex];
+            if (currentTrack) {
+                // Find current track's original index in favorites
+                const currentOriginalIndex = currentTrack.originalIndex || this.currentTrackIndex;
+                const currentFavIndex = this.favorites.indexOf(currentOriginalIndex);
+                
+                if (currentFavIndex !== -1) {
+                    // Move to next favorite
+                    const nextFavOriginalIndex = this.favorites[(currentFavIndex + 1) % this.favorites.length];
+                    // Find this favorite in the current filtered playlist
+                    nextIndex = this.playlist.findIndex(track => 
+                        (track.originalIndex || this.playlist.indexOf(track)) === nextFavOriginalIndex
+                    );
+                    if (nextIndex === -1) {
+                        // Favorite not in current filtered playlist, find first available favorite
+                        for (const favIndex of this.favorites) {
+                            nextIndex = this.playlist.findIndex(track => 
+                                (track.originalIndex || this.playlist.indexOf(track)) === favIndex
+                            );
+                            if (nextIndex !== -1) break;
+                        }
+                    }
+                } else {
+                    // Current track not in favorites, find first available favorite
+                    for (const favIndex of this.favorites) {
+                        nextIndex = this.playlist.findIndex(track => 
+                            (track.originalIndex || this.playlist.indexOf(track)) === favIndex
+                        );
+                        if (nextIndex !== -1) break;
+                    }
+                }
+            }
+            
+            // Fallback to first track if no favorites found in current playlist
+            if (nextIndex === -1 || nextIndex === undefined) {
+                nextIndex = 0;
+            }
+        } else if (this.isShuffle || this.playMode === 'random') {
+            nextIndex = Math.floor(Math.random() * this.playlist.length);
         } else {
-            // Loop back to start
-            this.playTrack(0);
+            // Sequential mode
+            nextIndex = this.currentTrackIndex + 1;
+            if (nextIndex >= this.playlist.length) {
+                nextIndex = 0;
+            }
         }
+
+        this.playTrack(nextIndex);
+    }
+
+    previous() {
+        let prevIndex;
+
+        if (this.playMode === 'loop' && this.favorites.length > 0) {
+            // Loop through favorites only
+            const currentTrack = this.playlist[this.currentTrackIndex];
+            if (currentTrack) {
+                // Find current track's original index in favorites
+                const currentOriginalIndex = currentTrack.originalIndex || this.currentTrackIndex;
+                const currentFavIndex = this.favorites.indexOf(currentOriginalIndex);
+                
+                if (currentFavIndex !== -1) {
+                    // Move to previous favorite
+                    const prevFavIndex = currentFavIndex - 1;
+                    const prevFavOriginalIndex = this.favorites[prevFavIndex < 0 ? this.favorites.length - 1 : prevFavIndex];
+                    // Find this favorite in the current filtered playlist
+                    prevIndex = this.playlist.findIndex(track => 
+                        (track.originalIndex || this.playlist.indexOf(track)) === prevFavOriginalIndex
+                    );
+                    if (prevIndex === -1) {
+                        // Favorite not in current filtered playlist, find last available favorite
+                        for (let i = this.favorites.length - 1; i >= 0; i--) {
+                            prevIndex = this.playlist.findIndex(track => 
+                                (track.originalIndex || this.playlist.indexOf(track)) === this.favorites[i]
+                            );
+                            if (prevIndex !== -1) break;
+                        }
+                    }
+                } else {
+                    // Current track not in favorites, find last available favorite
+                    for (let i = this.favorites.length - 1; i >= 0; i--) {
+                        prevIndex = this.playlist.findIndex(track => 
+                            (track.originalIndex || this.playlist.indexOf(track)) === this.favorites[i]
+                        );
+                        if (prevIndex !== -1) break;
+                    }
+                }
+            }
+            
+            // Fallback to last track if no favorites found in current playlist
+            if (prevIndex === -1 || prevIndex === undefined) {
+                prevIndex = this.playlist.length - 1;
+            }
+        } else {
+            // Normal sequential mode (random mode doesn't make sense for previous)
+            prevIndex = this.currentTrackIndex - 1;
+            if (prevIndex < 0) {
+                prevIndex = this.playlist.length - 1;
+            }
+        }
+
+        this.playTrack(prevIndex);
     }
 
     setVolume(value) {
         if (this.audio) {
             this.audio.volume = value / 100;
         }
+    }
+
+    // Refresh settings from localStorage (in case main radio player changed them)
+    refreshSettings() {
+        const oldSeasonFilter = this.currentSeasonFilter;
+        
+        this.playMode = localStorage.getItem('wavelength_play_mode') || 'sequential';
+        this.currentSeasonFilter = localStorage.getItem('wavelength_season_filter') || 'all';
+        this.favorites = JSON.parse(localStorage.getItem('wavelength_favorites') || '[]');
+        this.isShuffle = this.playMode === 'random';
+        
+        // If season filter changed, reload playlist
+        if (oldSeasonFilter !== this.currentSeasonFilter) {
+            this.loadPlaylist();
+        }
+        
+        console.log(`🔄 Settings refreshed: mode=${this.playMode}, season=${this.currentSeasonFilter}, favorites=${this.favorites.length}`);
     }
 
     toggleWidget() {
@@ -382,6 +533,11 @@ class GlobalRadioGame {
         if (this.spawnInterval) {
             clearInterval(this.spawnInterval);
             this.spawnInterval = null;
+        }
+
+        if (this.settingsRefreshInterval) {
+            clearInterval(this.settingsRefreshInterval);
+            this.settingsRefreshInterval = null;
         }
 
         this.activeElements.forEach(el => el.element.remove());

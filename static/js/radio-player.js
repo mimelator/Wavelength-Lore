@@ -49,6 +49,7 @@ class WavelengthRadio {
         this.bindControls();
         this.bindPlaylist();
         this.bindAudioEvents();
+        this.recalculateTotalPoints(); // Ensure total points are accurate
         this.updateStats();
         this.startMysticalSpawner();
         this.loadFavorites();
@@ -333,6 +334,7 @@ class WavelengthRadio {
                 localStorage.setItem('total_points', this.stats.totalPoints);
                 localStorage.setItem('game_mode_points', this.stats.gameModePoints);
 
+                this.recalculateTotalPoints(); // Ensure total points are accurate after loading
                 this.updateStats();
 
                 console.log('✅ Loaded and merged game stats from Firebase');
@@ -652,12 +654,9 @@ class WavelengthRadio {
         if (this.repeatMode === 'one') {
             this.audio.currentTime = 0;
             this.audio.play();
-        } else if (this.repeatMode === 'all' || this.currentTrackIndex < this.playlist.length - 1) {
-            this.next();
         } else {
-            this.isPlaying = false;
-            this.updatePlayButton();
-            document.querySelector('.album-art').classList.remove('playing');
+            // Always continue to next track (will loop back to start when reaching end)
+            this.next();
         }
     }
 
@@ -1032,6 +1031,7 @@ class WavelengthRadio {
             this.showLevelUpNotification();
         }
 
+        this.recalculateTotalPoints(); // Recalculate total points after collecting
         this.updateStats();
 
         // Save to Firebase if user is authenticated
@@ -1055,15 +1055,77 @@ class WavelengthRadio {
 
     // Update game stats display
     updateStats() {
-        document.getElementById('mushroomCount').textContent = this.stats.mushrooms;
-        document.getElementById('starCount').textContent = this.stats.stars;
-        document.getElementById('horseshoeCount').textContent = this.stats.horseshoes;
-        document.getElementById('sparkleCount').textContent = this.stats.sparkles;
-        document.getElementById('crystalCount').textContent = this.stats.crystals;
-        document.getElementById('moonCount').textContent = this.stats.moons;
-        document.getElementById('goblinCount').textContent = this.stats.goblins;
-        document.getElementById('magicLevel').textContent = this.stats.magicLevel;
-        document.getElementById('totalPoints').textContent = this.stats.totalPoints.toLocaleString();
+        // Update individual stat counters
+        const elements = {
+            'mushroomCount': this.stats.mushrooms,
+            'starCount': this.stats.stars,
+            'horseshoeCount': this.stats.horseshoes,
+            'sparkleCount': this.stats.sparkles,
+            'crystalCount': this.stats.crystals,
+            'moonCount': this.stats.moons,
+            'goblinCount': this.stats.goblins,
+            'magicLevel': this.stats.magicLevel,
+            'totalPoints': this.stats.totalPoints
+        };
+
+        // Update each element if it exists
+        for (const [elementId, value] of Object.entries(elements)) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                if (elementId === 'totalPoints') {
+                    element.textContent = value.toLocaleString();
+                } else {
+                    element.textContent = value;
+                }
+            } else {
+                console.warn(`⚠️ Element not found: ${elementId}`);
+            }
+        }
+
+        console.log('📊 Stats updated:', {
+            totalPoints: this.stats.totalPoints,
+            mushrooms: this.stats.mushrooms,
+            stars: this.stats.stars,
+            horseshoes: this.stats.horseshoes
+        });
+    }
+
+    // Recalculate total points from individual stats
+    recalculateTotalPoints() {
+        // Define point values for each collectible (matching global radio player)
+        const pointValues = {
+            mushrooms: 10,
+            stars: 5,
+            horseshoes: 15,
+            sparkles: 5,
+            crystals: 8,
+            moons: 7,
+            goblins: 25
+        };
+
+        // Calculate total from individual items
+        let calculatedTotal = 0;
+        for (const [stat, count] of Object.entries(this.stats)) {
+            if (pointValues[stat]) {
+                calculatedTotal += count * pointValues[stat];
+            }
+        }
+
+        // Add any bonus game mode points
+        calculatedTotal += this.stats.gameModePoints || 0;
+
+        // Update total points if the calculated value is higher
+        if (calculatedTotal > this.stats.totalPoints) {
+            this.stats.totalPoints = calculatedTotal;
+            localStorage.setItem('total_points', this.stats.totalPoints);
+            console.log('🔄 Recalculated total points:', {
+                from: this.stats.totalPoints,
+                to: calculatedTotal,
+                breakdown: Object.entries(pointValues).map(([key, value]) => 
+                    `${key}: ${this.stats[key]} × ${value} = ${(this.stats[key] || 0) * value}`
+                ).join(', ')
+            });
+        }
     }
 
     // Show level up notification
@@ -1955,6 +2017,8 @@ class WavelengthRadio {
         const statName = iconMap[iconType];
         if (statName && this.stats && this.stats.hasOwnProperty(statName)) {
             this.stats[statName]++;
+            localStorage.setItem(`${statName.slice(0, -1)}_count`, this.stats[statName]); // Update localStorage
+            this.recalculateTotalPoints(); // Recalculate total points
             this.updateStats();
         }
         

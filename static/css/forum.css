@@ -2523,6 +2523,80 @@
     opacity: 0.7;
 }
 
+/* Profile Activity Section */
+.profile-activity {
+    background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 2px solid rgba(52, 152, 219, 0.2);
+}
+
+.profile-activity h3 {
+    color: #3498db;
+    margin-bottom: 20px;
+    font-family: 'AnimeAce', monospace;
+    text-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+}
+
+.activity-content {
+    color: #ecf0f1;
+    line-height: 1.6;
+}
+
+.activity-icon {
+    font-size: 1.2rem;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.activity-title a:hover {
+    color: #5dade2;
+    text-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+.activity-meta {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.activity-stats {
+    display: flex;
+    gap: 15px;
+    font-size: 0.9rem;
+    color: #95a5a6;
+}
+
+.no-activity, .loading-activity {
+    text-align: center;
+    padding: 20px;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+/* Empty Bio Styles */
+.profile-bio.empty {
+    border: 2px dashed rgba(52, 152, 219, 0.3);
+    text-align: center;
+}
+
+.empty-bio {
+    color: #7f8c8d;
+    font-style: italic;
+    margin-bottom: 15px;
+}
+
 /* Responsive Design for Profile */
 @media (max-width: 768px) {
     .profile-header {
