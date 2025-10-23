@@ -808,31 +808,11 @@ class MerchandiseStore {
         <div class="modal-content loading-modal-content">
           <div class="loading-header">
             <div class="loading-spinner"></div>
-            <h3 id="loading-title">Creating Your Product</h3>
+            <h3 id="loading-title">Processing Your Request</h3>
           </div>
-          <div class="loading-progress">
-            <div class="progress-steps">
-              <div class="progress-step active" id="step-1">
-                <div class="step-icon">🎨</div>
-                <span class="step-label">Preparing Image</span>
-              </div>
-              <div class="progress-step" id="step-2">
-                <div class="step-icon">🔍</div>
-                <span class="step-label">Analyzing Quality</span>
-              </div>
-              <div class="progress-step" id="step-3">
-                <div class="step-icon">✨</div>
-                <span class="step-label">Enhancing</span>
-              </div>
-              <div class="progress-step" id="step-4">
-                <div class="step-icon">🎽</div>
-                <span class="step-label">Creating Product</span>
-              </div>
-            </div>
-          </div>
-          <p id="loading-message">Processing...</p>
+          <p id="loading-message">Loading...</p>
           <div class="loading-note">
-            <small>This may take a moment while we optimize your image for the best print quality.</small>
+            <small>This may take a moment while we process your request.</small>
           </div>
         </div>
       </div>
@@ -1035,49 +1015,13 @@ class MerchandiseStore {
     if (isLoading) {
       if (messageEl) messageEl.textContent = message;
       
-      // Update progress steps based on message
-      this.updateProgressSteps(message);
-      
       modal.style.display = 'block';
     } else {
       modal.style.display = 'none';
-      
-      // Reset progress steps
-      this.resetProgressSteps();
     }
   }
   
-  updateProgressSteps(message) {
-    // Reset all steps
-    const steps = document.querySelectorAll('.progress-step');
-    steps.forEach(step => step.classList.remove('active', 'completed'));
-    
-    // Activate appropriate step based on message
-    if (message.includes('Preparing image') || message.includes('🎨')) {
-      document.getElementById('step-1')?.classList.add('active');
-    } else if (message.includes('Analyzing') || message.includes('🔍')) {
-      document.getElementById('step-1')?.classList.add('completed');
-      document.getElementById('step-2')?.classList.add('active');
-    } else if (message.includes('Enhancing') || message.includes('✨')) {
-      document.getElementById('step-1')?.classList.add('completed');
-      document.getElementById('step-2')?.classList.add('completed');
-      document.getElementById('step-3')?.classList.add('active');
-    } else if (message.includes('Creating') || message.includes('🎽')) {
-      document.getElementById('step-1')?.classList.add('completed');
-      document.getElementById('step-2')?.classList.add('completed');
-      document.getElementById('step-3')?.classList.add('completed');
-      document.getElementById('step-4')?.classList.add('active');
-    } else {
-      // Default to first step
-      document.getElementById('step-1')?.classList.add('active');
-    }
-  }
-  
-  resetProgressSteps() {
-    const steps = document.querySelectorAll('.progress-step');
-    steps.forEach(step => step.classList.remove('active', 'completed'));
-    document.getElementById('step-1')?.classList.add('active');
-  }
+
   
   showSuccess(message) {
     // Implement success notification
