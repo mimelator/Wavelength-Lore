@@ -18,7 +18,6 @@ console.log('   - /my-gallery');
 console.log('   - /api/gallery/:category');
 console.log('   - /gallery/api/user/images');
 console.log('   - /gallery/api/user/save');
-console.log('   - /gallery/api/user/delete');
 
 // Gallery demo page
 router.get('/gallery-demo', (req, res) => {
@@ -227,16 +226,21 @@ router.post('/gallery/api/user/save', ensureAuthenticated, async (req, res) => {
       });
     }
     
+    // For bookmarks, use bookmarkId as the ID; for uploaded images, use fileName
+    const imageId = result.bookmarkId || result.fileName;
+    
     // Return success with image details and merchandise store link
     res.json({
       success: true,
       message: 'Image saved to gallery',
       image: {
-        id: result.fileName,
+        id: imageId,
+        bookmarkId: result.bookmarkId, // Include bookmarkId if it's a bookmark
         url: result.url,
         thumbnailUrl: result.url,
         title: imageData.title || 'Saved Image',
-        relativePath: result.relativePath
+        relativePath: result.relativePath,
+        type: result.relativePath ? 'uploaded' : 'bookmark'
       },
       merchLink: `/merchandise?preselect=${result.fileName}`
     });
@@ -297,16 +301,21 @@ router.post('/gallery/api/user/save', ensureAuthenticated, async (req, res) => {
         });
       }
       
+      // For bookmarks, use bookmarkId as the ID; for uploaded images, use fileName
+      const imageId = result.bookmarkId || result.fileName;
+      
       // Return success with image details and merchandise store link
       res.json({
         success: true,
         message: 'Image saved to gallery',
         image: {
-          id: result.fileName,
+          id: imageId,
+          bookmarkId: result.bookmarkId, // Include bookmarkId if it's a bookmark
           url: result.url,
           thumbnailUrl: result.url,
           title: imageData.title || 'Saved Image',
-          relativePath: result.relativePath
+          relativePath: result.relativePath,
+          type: result.relativePath ? 'uploaded' : 'bookmark'
         },
         merchLink: `/merchandise?preselect=${result.fileName}`
       });
@@ -321,29 +330,6 @@ router.post('/gallery/api/user/save', ensureAuthenticated, async (req, res) => {
     // If this is a file upload (not content page URL), redirect to the upload endpoint
     return res.redirect(307, '/api/gallery/user/upload');
   }
-});
-
-// API endpoint to delete an image from the user's gallery (legacy)
-router.post('/gallery/api/user/delete', ensureAuthenticated, (req, res) => {
-  // Forward to the new API endpoint if relativePath is provided
-  if (req.body.relativePath) {
-    return res.redirect(307, '/api/gallery/user/delete');
-  }
-  
-  const userId = req.user.uid;
-  const { imageId } = req.body;
-  
-  if (!imageId) {
-    return res.status(400).json({ error: 'Image ID is required' });
-  }
-  
-  console.log(`Legacy delete request for image ${imageId} from user ${userId}'s gallery`);
-  
-  // Return success for backward compatibility
-  res.json({
-    success: true,
-    message: 'Image deleted from gallery (legacy handler)'
-  });
 });
 
 module.exports = router;

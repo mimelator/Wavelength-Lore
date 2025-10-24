@@ -1,14 +1,14 @@
 /**
  * Gallery Upload Diagnostics
  * 
- * Comprehensive diagnostic tool to troubleshoot issues with the gallery upload process.
- * This script will:
- * 1. Test AWS credentials and S3 connection
- * 2. Check environment variables
- * 3. Test the entire upload flow
- * 4. Verify that files appear in S3 bucket
+ * DISABLED: User upload functionality has been completely removed.
+ * Images are added to galleries via "Save to Gallery" buttons only.
  */
 
+console.log('❌ This diagnostic script is disabled.');
+console.log('User gallery uploads have been removed from the system.');
+console.log('Use "Save to Gallery" functionality throughout the site instead.');
+process.exit(1);
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');

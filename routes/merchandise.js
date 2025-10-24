@@ -114,7 +114,7 @@ router.get('/enhancement-status', (req, res) => {
 
 /**
  * GET /api/merchandise/gallery-images
- * Get user's gallery images suitable for merchandise
+ * Get user's gallery images suitable for merchandise (includes both uploaded and bookmarked)
  */
 router.get('/gallery-images', ensureAuthenticated, async (req, res) => {
   // Check if user has VIP access
@@ -127,10 +127,14 @@ router.get('/gallery-images', ensureAuthenticated, async (req, res) => {
   }
   try {
     const userId = req.user.uid;
-    const images = await galleryStorage.listUserGalleryImages(userId);
     
-    // Filter and format images for merchandise use
-    const merchandiseImages = images.map(image => ({
+    // Get both S3 uploaded images AND Firebase bookmarks
+    const s3Images = await galleryStorage.listUserGalleryImages(userId);
+    const { getUserBookmarks } = require('../services/firebase/galleryService');
+    const bookmarks = await getUserBookmarks(userId);
+    
+    // Format S3 images for merchandise
+    const merchandiseS3Images = s3Images.map(image => ({
       id: image.relativePath,
       url: image.url,
       thumbnailUrl: image.url,
@@ -138,8 +142,28 @@ router.get('/gallery-images', ensureAuthenticated, async (req, res) => {
       size: image.size,
       dimensions: image.dimensions,
       uploadedAt: image.uploadedAt || image.lastModified,
-      suitableForPrint: image.size > 1000000 // Basic size check (>1MB likely good quality)
+      suitableForPrint: image.size > 1000000, // Basic size check (>1MB likely good quality)
+      type: 'uploaded',
+      relativePath: image.relativePath
     }));
+    
+    // Format bookmarks for merchandise
+    const merchandiseBookmarks = bookmarks.map(bookmark => ({
+      id: bookmark.bookmarkId,
+      url: bookmark.url,
+      thumbnailUrl: bookmark.url,
+      title: bookmark.title || bookmark.fileName,
+      size: 0, // Bookmarks don't track size
+      dimensions: null, // Unknown for bookmarks
+      uploadedAt: bookmark.savedAt,
+      suitableForPrint: true, // Content images are assumed to be suitable
+      type: 'bookmark',
+      relativePath: null,
+      bookmarkId: bookmark.bookmarkId
+    }));
+    
+    // Combine both types
+    const merchandiseImages = [...merchandiseS3Images, ...merchandiseBookmarks];
     
     res.json({
       success: true,

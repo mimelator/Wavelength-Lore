@@ -12,6 +12,7 @@ const path = require('path');
 // Use consistent authentication for all environments
 const { ensureAuthenticated } = require('../middleware/auth');
 const galleryStorage = require('../utils/gallery/storage');
+const { getUserBookmarks, deleteBookmark } = require('../services/firebase/galleryService');
 
 // Configure multer for memory storage - DISABLED for upload removal
 /*
@@ -86,11 +87,16 @@ router.get('/api/gallery/user/images', ensureAuthenticated, async (req, res) => 
       console.log(`📝 Tip: Use /debug/gallery-auth endpoint to diagnose authentication issues`);
     }
     
-    const images = await galleryStorage.listUserGalleryImages(userId);
-    console.log(`📊 Gallery API: Found ${images.length} images for user ${userId}`);
+    // Get S3 uploaded images
+    const s3Images = await galleryStorage.listUserGalleryImages(userId);
+    console.log(`📊 Gallery API: Found ${s3Images.length} S3 images for user ${userId}`);
     
-    // Format the response for the frontend
-    const formattedImages = images.map(image => ({
+    // Get Firebase bookmarks (content image references)
+    const bookmarks = await getUserBookmarks(userId);
+    console.log(`📊 Gallery API: Found ${bookmarks.length} bookmarked content images for user ${userId}`);
+    
+    // Format S3 images
+    const formattedS3Images = s3Images.map(image => ({
       id: path.basename(image.relativePath),
       url: image.url,
       thumbnailUrl: image.url, // Use the same URL for thumbnail
@@ -98,13 +104,31 @@ router.get('/api/gallery/user/images', ensureAuthenticated, async (req, res) => 
       size: image.size,
       sizeFormatted: formatBytes(image.size),
       uploadedAt: image.uploadedAt || image.lastModified,
-      relativePath: image.relativePath
+      relativePath: image.relativePath,
+      type: 'uploaded'
     }));
     
-    console.log(`📤 Gallery API: Sending ${formattedImages.length} formatted images to client`);
+    // Format bookmarks
+    const formattedBookmarks = bookmarks.map(bookmark => ({
+      id: bookmark.bookmarkId, // Use bookmarkId as the id for API responses
+      bookmarkId: bookmark.bookmarkId, // Also include bookmarkId explicitly
+      url: bookmark.url,
+      thumbnailUrl: bookmark.url,
+      title: bookmark.title,
+      size: 0, // Bookmarks don't track size
+      sizeFormatted: 'N/A',
+      uploadedAt: bookmark.savedAt,
+      relativePath: null, // Bookmarks are not in S3
+      type: 'bookmark'
+    }));
+    
+    // Combine both types
+    const allImages = [...formattedS3Images, ...formattedBookmarks];
+    console.log(`📤 Gallery API: Sending ${allImages.length} total images (${formattedS3Images.length} uploaded + ${formattedBookmarks.length} bookmarked) to client`);
+    
     res.json({
       success: true,
-      images: formattedImages
+      images: allImages
     });
   } catch (error) {
     console.error('Error getting user gallery images:', error);
@@ -115,153 +139,41 @@ router.get('/api/gallery/user/images', ensureAuthenticated, async (req, res) => 
   }
 });
 
-/**
- * POST /api/gallery/user/upload
- * Upload an image to the user's gallery
- */
-router.post('/api/gallery/user/upload', ensureAuthenticated, async (req, res) => {
-  // Upload functionality is disabled
-  return res.status(501).json({
-    success: false,
-    error: 'Upload functionality is disabled. Use "Save to Gallery" buttons throughout the site to add images.'
-  });
-  
-  try {
-    console.log('🔍 Gallery upload initiated');
-    
-    // Check if S3 connection is available
-    const s3Status = req.app.locals.galleryS3Status;
-    if (s3Status && !s3Status.connected) {
-      console.warn(`⚠️ Gallery API: S3 connection not available`);
-      return res.status(503).json({
-        success: false,
-        error: 'Gallery storage currently unavailable',
-        details: s3Status.error
-      });
-    }
-    
-    // Handle file upload with improved error handling
-    upload.single('file')(req, res, async (uploadError) => {
-      if (uploadError) {
-        console.error('❌ Multer upload error:', uploadError);
-        
-        // Check for file size limits
-        if (uploadError.code === 'LIMIT_FILE_SIZE') {
-          return res.status(413).json({
-            success: false,
-            error: 'File too large. Maximum file size is 10MB.'
-          });
-        }
-        
-        return res.status(400).json({
-          success: false,
-          error: uploadError.message || 'Error processing upload'
-        });
-      }
-      
-      try {
-        if (!req.file) {
-          console.warn('⚠️ No file in request');
-          console.log('Request body:', req.body);
-          console.log('Request headers:', req.headers);
-          
-          return res.status(400).json({
-            success: false,
-            error: 'No file uploaded. Please ensure you selected an image file.'
-          });
-        }
-        
-        // Verify file buffer integrity
-        if (!req.file.buffer || req.file.buffer.length === 0) {
-          console.error('❌ Empty file buffer received');
-          return res.status(400).json({
-            success: false,
-            error: 'Received empty file. Please try again with a valid image file.'
-          });
-        }
-        
-        const userId = req.user.uid;
-        const userGroups = res.locals.userGroups || [];
-        
-        console.log(`📤 Uploading gallery image for user ${userId}`);
-        console.log(`👤 Full user info:`, req.user);
-        console.log(`🔑 Auth method:`, req.headers.authorization ? 'Bearer token' : 
-                                      (req.cookies && (req.cookies.__session || req.cookies.session)) ? 'Session cookie' : 'Unknown');
-        console.log(`   File size: ${(req.file.size / 1024 / 1024).toFixed(2)}MB`);
-        console.log(`   Original name: ${req.file.originalname}`);
-        console.log(`   MIME type: ${req.file.mimetype}`);
-        console.log(`   Buffer size: ${req.file.buffer.length} bytes`);
-        
-        // Extract title and tags from the request
-        const title = req.body.title || req.file.originalname;
-        const tags = req.body.tags || '';
-        
-        console.log(`   Title: ${title}`);
-        console.log(`   Tags: ${tags}`);
-        
-        // Upload to S3 with additional diagnostics
-        console.log('🚀 Calling uploadGalleryImage...');
-        const result = await galleryStorage.uploadGalleryImage(
-          req.file.buffer,
-          req.file.originalname,
-          req.file.mimetype,
-          userId,
-          userGroups,
-          title,
-          tags.split(',').map(tag => tag.trim())
-        );
-        
-        console.log('📥 Upload result:', result);
-        
-        if (!result.success) {
-          return res.status(500).json({
-            success: false,
-            error: result.error
-          });
-        }
-        
-        console.log(`✅ Image successfully uploaded to S3`);
-        console.log(`   URL: ${result.url}`);
-        console.log(`   Path: ${result.relativePath}`);
-        
-        res.json({
-          success: true,
-          image: {
-            id: result.fileName,
-            url: result.url,
-            thumbnailUrl: result.url,
-            title: result.originalName || title,
-            size: result.size,
-            sizeFormatted: formatBytes(result.size),
-            uploadedAt: new Date().toISOString(),
-            relativePath: result.relativePath
-          }
-        });
-      } catch (processingError) {
-        console.error('Error processing upload:', processingError);
-        res.status(500).json({
-          success: false,
-          error: processingError.message || 'Failed to process uploaded image',
-          stack: process.env.NODE_ENV === 'development' ? processingError.stack : undefined
-        });
-      }
-    });
-  } catch (outerError) {
-    console.error('Error in upload route:', outerError);
-    res.status(500).json({
-      success: false,
-      error: outerError.message || 'Failed to upload image',
-      stack: process.env.NODE_ENV === 'development' ? outerError.stack : undefined
-    });
-  }
-});
+// USER UPLOAD REMOVED: User gallery uploads have been completely removed.
+// Images are added to galleries via "Save to Gallery" buttons throughout the site only.
 
 /**
  * POST /api/gallery/user/delete
- * Delete an image from the user's gallery
+ * Delete an image from the user's gallery (either S3 or bookmark)
  */
 router.post('/api/gallery/user/delete', ensureAuthenticated, async (req, res) => {
   try {
+    const userId = req.user.uid;
+    const { relativePath, bookmarkId } = req.body;
+    
+    console.log(`🗑️ Delete request for user ${userId}:`, req.body);
+    
+    // Handle bookmark deletion - bookmarkId can be the main bookmarkId field or just 'id'
+    const actualBookmarkId = bookmarkId || (req.body.id && !relativePath ? req.body.id : null);
+    
+    if (actualBookmarkId) {
+      console.log(`🗑️ Deleting bookmark: ${actualBookmarkId}`);
+      const result = await deleteBookmark(userId, actualBookmarkId);
+      
+      if (!result) {
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to delete bookmark'
+        });
+      }
+      
+      return res.json({
+        success: true,
+        message: 'Bookmark deleted successfully'
+      });
+    }
+    
+    // Handle S3 image deletion
     // Check if S3 connection is available
     const s3Status = req.app.locals.galleryS3Status;
     if (s3Status && !s3Status.connected) {
@@ -272,18 +184,15 @@ router.post('/api/gallery/user/delete', ensureAuthenticated, async (req, res) =>
         details: s3Status.error
       });
     }
-    
-    const userId = req.user.uid;
-    const { relativePath } = req.body;
     
     if (!relativePath) {
       return res.status(400).json({
         success: false,
-        error: 'Image path is required'
+        error: 'Image path or bookmark ID is required'
       });
     }
     
-    console.log(`🗑️ Deleting gallery image for user ${userId}: ${relativePath}`);
+    console.log(`🗑️ Deleting S3 image for user ${userId}: ${relativePath}`);
     
     const result = await galleryStorage.deleteGalleryImage(userId, relativePath);
     

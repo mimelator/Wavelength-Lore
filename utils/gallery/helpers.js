@@ -6,11 +6,13 @@
 
 const express = require('express');
 const router = express.Router();
-const galleryStorage = require('./storage');
+const { saveImageToFirebase } = require('../../services/firebase/galleryService');
 
 /**
- * Save an image from the site to the user's gallery
- * This can be used by other routes to allow saving of content images to user galleries
+ * Save an image REFERENCE from the site to the user's gallery
+ * 
+ * CRITICAL: This does NOT duplicate images to S3. It stores ONLY a reference 
+ * to the original image location in Firebase.
  * 
  * @param {string} imageUrl - The URL of the image to save
  * @param {string} title - The title of the image
@@ -21,7 +23,7 @@ const galleryStorage = require('./storage');
  */
 async function saveContentImageToUserGallery(imageUrl, title, sourceUrl, userId, userGroups) {
   try {
-    console.log(`🖼️ Saving image to gallery for user: ${userId}`);
+    console.log(`🖼️ Saving image REFERENCE to gallery for user: ${userId}`);
     console.log(`🔗 Image URL: ${imageUrl}`);
     console.log(`📝 Title: ${title}`);
     console.log(`👥 User groups:`, userGroups);
@@ -54,131 +56,48 @@ async function saveContentImageToUserGallery(imageUrl, title, sourceUrl, userId,
       };
     }
     
-    // Fetch the image
-    console.log(`⬇️ Fetching image from URL...`);
-    let response;
-    try {
-      response = await fetch(imageUrl);
-    } catch (fetchError) {
-      console.error('❌ Network error fetching image:', fetchError);
-      return {
-        success: false,
-        error: `Network error fetching image: ${fetchError.message}`
-      };
-    }
-    
-    if (!response.ok) {
-      console.error(`❌ Failed to fetch image: ${response.status} ${response.statusText}`);
-      return {
-        success: false,
-        error: `Failed to fetch image: ${response.status} ${response.statusText}`
-      };
-    }
-    
-    // Validate content type
-    const contentType = response.headers.get('content-type');
-    if (contentType && !contentType.startsWith('image/')) {
-      console.error(`❌ Invalid content type: ${contentType} (expected image/*)`);
-      return {
-        success: false,
-        error: `Invalid content type: ${contentType} (expected image/*)`
-      };
-    }
-    
-    console.log(`✅ Image fetched successfully`);
-    console.log(`📊 Content type: ${contentType}`);
-    console.log(`📊 Content length: ${response.headers.get('content-length') || 'unknown'} bytes`);
-    
-    // Get image data as buffer
-    console.log(`📦 Reading image data...`);
-    let imageBuffer;
-    try {
-      imageBuffer = await response.arrayBuffer();
-      console.log(`✅ Successfully read image data: ${imageBuffer.byteLength} bytes`);
-    } catch (bufferError) {
-      console.error('❌ Error reading image data:', bufferError);
-      return {
-        success: false,
-        error: `Error reading image data: ${bufferError.message}`
-      };
-    }
-    
-    if (!imageBuffer || imageBuffer.byteLength === 0) {
-      console.error('❌ Empty image data (zero bytes)');
-      return {
-        success: false,
-        error: 'Empty image data'
-      };
-    }
-    
-    const buffer = Buffer.from(imageBuffer);
-    console.log(`📊 Buffer size: ${buffer.length} bytes`);
-    console.log(`📊 Buffer is valid: ${Buffer.isBuffer(buffer)}`);
-    
-    // Extract file name and extension from URL
+    // Extract filename from URL for reference purposes
     const urlParts = imageUrl.split('/');
     const fileName = urlParts[urlParts.length - 1];
     
-    // Determine content type from URL extension or response header
-    const extension = fileName.split('.').pop().toLowerCase();
-    let mimeType = contentType || 'image/jpeg'; // Use response Content-Type if available
+    console.log(`📄 Filename: ${fileName}`);
     
-    // If we couldn't determine from Content-Type, try to infer from extension
-    if (!mimeType.startsWith('image/')) {
-      if (extension === 'png') {
-        mimeType = 'image/png';
-      } else if (extension === 'gif') {
-        mimeType = 'image/gif';
-      } else if (extension === 'webp') {
-        mimeType = 'image/webp';
-      } else if (extension === 'jpg' || extension === 'jpeg') {
-        mimeType = 'image/jpeg';
-      }
-    }
-    
-    console.log(`📄 Using mime type: ${mimeType}`);
-    
-    // Create a meaningful filename
-    const fileNameWithoutExt = fileName.split('.')[0];
-    const sanitizedTitle = title
-      ? title.toLowerCase().replace(/[^a-z0-9]+/g, '-').substring(0, 30)
-      : fileNameWithoutExt;
-    
-    const finalFileName = `${sanitizedTitle}.${extension}`;
-    console.log(`📄 Final filename: ${finalFileName}`);
-    
-    // Upload to S3 with metadata
-    console.log(`⬆️ Uploading to S3...`);
-    const uploadResult = await galleryStorage.uploadGalleryImage(
-      buffer,
-      finalFileName,
-      mimeType,
+    // Save REFERENCE (bookmark) to Firebase WITHOUT uploading to S3
+    console.log(`💾 Saving bookmark to Firebase (NO S3 DUPLICATION)...`);
+    const firebaseResult = await saveImageToFirebase(
       userId,
-      userGroups,
-      title || sanitizedTitle, // Use title or sanitized version
-      [] // No tags for content images
+      imageUrl, // Original URL - NOT S3
+      title || fileName,
+      null, // No relativePath - this is a content image bookmark
+      fileName,
+      sourceUrl || '',
+      [], // No tags for content images
+      userGroups
     );
     
-    if (!uploadResult.success) {
-      console.error('❌ S3 upload failed:', uploadResult.error);
-      return uploadResult;
+    if (!firebaseResult.success) {
+      console.error('❌ Failed to save bookmark to Firebase:', firebaseResult.error);
+      return firebaseResult;
     }
     
-    console.log(`✅ Image successfully saved to gallery`);
-    console.log(`🔗 CDN URL: ${uploadResult.url}`);
-    console.log(`📁 Path: ${uploadResult.relativePath}`);
+    console.log(`✅ Bookmark saved to Firebase with ID: ${firebaseResult.id}`);
+    console.log(`🔗 Stored original URL (no S3 duplication): ${imageUrl}`);
     
-    // Add metadata about source
-    uploadResult.sourceUrl = sourceUrl;
-    uploadResult.title = title;
-    
-    return uploadResult;
+    // Return reference to original URL WITHOUT uploading to S3
+    return {
+      success: true,
+      url: imageUrl, // Return original URL
+      fileName: fileName,
+      relativePath: null, // No S3 path - not duplicated
+      sourceUrl: sourceUrl,
+      bookmarkId: firebaseResult.id
+    };
   } catch (error) {
-    console.error('Error saving content image to gallery:', error);
+    console.error('Error saving content image reference to gallery:', error);
     console.error('Stack trace:', error.stack);
     return {
       success: false,
-      error: error.message || 'Failed to save image to gallery',
+      error: error.message || 'Failed to save image reference to gallery',
       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     };
   }

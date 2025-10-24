@@ -380,5 +380,7 @@ module.exports = {
   uploadGalleryImage,
   deleteGalleryImage,
   listUserGalleryImages,
-  downloadImageBuffer
+  downloadImageBuffer,
+  s3Client,
+  bucketName
 };

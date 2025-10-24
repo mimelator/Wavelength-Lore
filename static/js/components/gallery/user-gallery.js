@@ -661,7 +661,7 @@ class UserGallery {
     itemElement.classList.add('deleting');
     
     // Call API to delete the image
-    fetch('/gallery/api/user/delete', {
+    fetch('/api/gallery/user/delete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
