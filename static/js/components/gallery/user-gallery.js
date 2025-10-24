@@ -7,6 +7,9 @@
  * @module components/gallery/user-gallery
  */
 
+// Prevent redeclaration if already loaded
+if (typeof window.UserGallery === 'undefined') {
+
 class UserGallery {
   /**
    * Create a new User Gallery instance
@@ -904,6 +907,8 @@ class UserGallery {
     document.body.style.overflow = '';
   }
 }
+
+} // End of UserGallery class guard
 
 // Export the UserGallery class
 if (typeof module !== 'undefined' && module.exports) {

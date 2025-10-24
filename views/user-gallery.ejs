@@ -24,78 +24,8 @@
       <p>Save your favorite images by clicking "Save to Gallery" on any image throughout the site!</p>
     </div>
     
-
-    
-    <!-- Action Buttons -->
-    <section class="action-buttons" id="action-buttons">
-      <button id="download-all" class="action-button download-button">Download All Images</button>
-      <button id="start-screensaver" class="action-button screensaver-button">Start Screensaver</button>
-      <button id="select-mode" class="action-button" style="background-color: #607d8b;">Select Multiple</button>
-      <button id="delete-selected" class="action-button delete-button" style="display: none;">Delete Selected</button>
-      <% 
-      // Check if user has VIP access (same groups that have game_access permission)
-      const userGroups = user?.groups || [];
-      const hasVIPAccess = userGroups.includes('vip') || userGroups.includes('admin') || 
-                          userGroups.includes('content_manager') || userGroups.includes('super_admin');
-      if (hasVIPAccess) { 
-      %>
-      <a href="/merchandise" class="action-button" style="background-color: #8a2be2; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
-        <span>🛍️</span> Merch Shop
-      </a>
-      <% } %>
-    </section>
-    
-    <!-- Carousel Section -->
-    <section class="carousel-section" id="carousel-view" style="display: none;">
-              <!-- Gallery Carousel Section -->
-        <div class="gallery-section">
-            <h2>Your Gallery</h2>
-            <%- include('partials/carousel', {
-                carouselId: 'gallery-carousel',
-                items: null,
-                type: 'user-gallery',
-                options: {
-                    infinite: true,
-                    slidesToShow: 3,
-                    slidesToScroll: 1,
-                    autoplay: false,
-                    dots: true,
-                    arrows: true,
-                    variableWidth: true,
-                    adaptiveHeight: true
-                },
-                showModal: true
-            }) %>
-        </div>
-    </section>
-    
-    <!-- Gallery Controls -->
-    <section class="gallery-controls">
-      <button id="carousel-layout" class="layout-button">Carousel View</button>
-      <button id="grid-layout" class="layout-button active">Grid View</button>
-      
-      <!-- Search Box -->
-      <div class="search-box" style="margin-left: auto; display: flex; align-items: center;">
-        <input type="text" id="gallery-search" placeholder="Search images..." 
-               style="padding: 8px; border-radius: 4px; border: 2px solid #333; margin-right: 10px;">
-        <button id="search-button" class="layout-button">Search</button>
-      </div>
-    </section>
-    
-    <!-- Grid View (Now Default) -->
-    <div id="grid-view" style="display: block;">
-      <div class="gallery-grid" id="gallery-grid">
-        <!-- Images will be populated by JavaScript -->
-      </div>
-    </div>
-    
-    <!-- Modal for Image Viewing -->
-    <div id="imageModal" class="modal">
-      <span class="modal-close">&times;</span>
-      <img class="modal-content" id="fullSizeImage">
-      <div id="modalCaption" class="modal-caption"></div>
-      <button id="delete-image" class="action-button delete-button" style="position: absolute; bottom: 20px; right: 20px;">Delete Image</button>
-    </div>
+    <!-- Gallery will be rendered here by the UserGallery component -->
+    <div id="user-gallery-container"></div>
     
     <!-- Enhanced Screensaver Modal -->
     <!-- Enhanced Screensaver Modal -->
@@ -251,7 +181,7 @@
     // Initialize the UserGallery component
     document.addEventListener('DOMContentLoaded', () => {
       const gallery = new UserGallery({
-        containerId: 'grid-view',
+        containerId: 'user-gallery-container',
         apiEndpoint: '/api/gallery/user/images',
         layout: 'grid',
         enableLightbox: true,
