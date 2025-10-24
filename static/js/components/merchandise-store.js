@@ -435,9 +435,29 @@ class MerchandiseStore {
   setupEventListeners() {
     // Image selection
     document.addEventListener('click', (e) => {
+      // Handle select button click
       if (e.target.classList.contains('gallery-image-select')) {
         const imageId = e.target.dataset.imageId;
         this.selectImage(imageId);
+        return;
+      }
+      
+      // Handle click on image itself or gallery card
+      const galleryCard = e.target.closest('.gallery-image-card');
+      if (galleryCard) {
+        // Don't select if clicking on action buttons
+        if (e.target.closest('.image-actions')) {
+          // Let button handlers deal with it
+          return;
+        }
+        
+        // Find the select button to get the image ID
+        const selectBtn = galleryCard.querySelector('.gallery-image-select');
+        if (selectBtn) {
+          const imageId = selectBtn.dataset.imageId;
+          this.selectImage(imageId);
+          return;
+        }
       }
       
       // Preview enhancement
