@@ -21,6 +21,9 @@ const TEST_USER_ID = '4fdbYxJHjEP4xksk9sgFE3lgYUs2';
 
 class APIProductPreviewBuilder {
     constructor() {
+        // Parse command line arguments
+        this.config = this.parseCommandLineArgs();
+        
         this.runId = `api-preview-${Date.now()}`;
         this.progressFile = path.join(__dirname, '..', 'temp', 'preview-progress.json');
         this.state = {
@@ -31,13 +34,106 @@ class APIProductPreviewBuilder {
             processedBlueprints: [],
             currentBatch: 0
         };
+        
+        // Display configuration info
         console.log('🚀 API-BASED PRODUCT PREVIEW BUILDER');
         console.log('============================================================');
         console.log('Started:', new Date().toISOString());
         console.log('Run ID:', this.runId);
+        console.log(`⚙️ Batch Size: ${this.config.batchSize} blueprints per run`);
         
         // Validate environment and configuration
         this.validateEnvironment();
+    }
+
+    parseCommandLineArgs() {
+        const args = process.argv.slice(2);
+        const config = {
+            batchSize: 10, // Default batch size
+            help: false
+        };
+
+        // Parse arguments
+        for (let i = 0; i < args.length; i++) {
+            const arg = args[i];
+            
+            if (arg === '--help' || arg === '-h') {
+                config.help = true;
+            } else if (arg === '--batch-size' || arg === '-b') {
+                const nextArg = args[i + 1];
+                if (nextArg && !isNaN(nextArg)) {
+                    config.batchSize = parseInt(nextArg, 10);
+                    i++; // Skip next argument since we used it
+                } else {
+                    console.error('❌ Error: --batch-size requires a numeric value');
+                    process.exit(1);
+                }
+            } else if (arg.startsWith('--batch-size=')) {
+                const value = arg.split('=')[1];
+                if (value && !isNaN(value)) {
+                    config.batchSize = parseInt(value, 10);
+                } else {
+                    console.error('❌ Error: --batch-size requires a numeric value');
+                    process.exit(1);
+                }
+            } else if (arg.startsWith('-')) {
+                console.error(`❌ Error: Unknown option '${arg}'`);
+                console.log('💡 Use --help for usage information');
+                process.exit(1);
+            }
+        }
+
+        // Validate batch size
+        if (config.batchSize < 1 || config.batchSize > 50) {
+            console.error('❌ Error: Batch size must be between 1 and 50');
+            process.exit(1);
+        }
+
+        // Show help if requested
+        if (config.help) {
+            this.showHelp();
+            process.exit(0);
+        }
+
+        return config;
+    }
+
+    showHelp() {
+        console.log(`
+🎨 API-Based Product Preview Builder
+
+USAGE:
+  node scripts/api-product-preview-builder.js [OPTIONS]
+
+OPTIONS:
+  -b, --batch-size N    Number of blueprints to process per run (default: 10)
+                        Range: 1-50 blueprints
+  -h, --help           Show this help message
+
+EXAMPLES:
+  node scripts/api-product-preview-builder.js
+    Process 10 blueprints (default batch size)
+    
+  node scripts/api-product-preview-builder.js --batch-size 5
+    Process 5 blueprints per run
+    
+  node scripts/api-product-preview-builder.js -b 20
+    Process 20 blueprints per run
+
+BATCH PROCESSING:
+  The script processes blueprints in configurable batches to manage API rate limits
+  and resource usage. Progress is saved between runs, so you can resume processing
+  by running the script again.
+  
+  Smaller batch sizes (5-10): More frequent progress saves, gentler on APIs
+  Larger batch sizes (15-25): Faster completion, higher resource usage
+
+NOTES:
+  - Progress is automatically saved between batches
+  - The script will resume from where it left off if interrupted
+  - All 11 blueprint types will be processed with variety rotation
+  - Images are enhanced using the global cache system for efficiency
+        `);
     }
 
     validateEnvironment() {
@@ -102,6 +198,11 @@ class APIProductPreviewBuilder {
                     return null;
                 }
                 
+                // NEW: Load recent preview types for variety tracking
+                if (progress.recentPreviewTypes && Array.isArray(progress.recentPreviewTypes)) {
+                    console.log(`📊 Restored preview variety tracking: [${progress.recentPreviewTypes.join(', ')}]`);
+                }
+                
                 // VALIDATION: Check for corrupted data
                 const validProcessed = progress.processedBlueprints.filter(p => 
                     p.blueprintId && p.productTitle
@@ -128,6 +229,7 @@ class APIProductPreviewBuilder {
             const progressData = {
                 currentBatch: this.state.currentBatch,
                 processedBlueprints: this.state.processedBlueprints,
+                recentPreviewTypes: this.state.recentPreviewTypes || [], // NEW: Save preview variety tracking
                 runId: this.runId,
                 lastSaved: new Date().toISOString(),
                 totalOperations: this.state.operations.length,
@@ -602,31 +704,37 @@ class APIProductPreviewBuilder {
             const printifyService = new EnhancedPrintifyService();
             console.log('✅ Enhanced Printify Service initialized');
 
-            // Get available blueprints
-            console.log('📋 Getting available product blueprints...');
-            const blueprintsResult = await printifyService.getBlueprints();
+            // Use only the proven working blueprints
+            console.log('📋 Using proven working blueprints...');
+            const workingBlueprintIds = [5, 6, 9, 10, 12, 14, 15, 18, 26, 31, 32];
             
-            console.log('🔍 Blueprint API result:', blueprintsResult);
+            // Create blueprint objects with IDs and titles
+            const blueprints = workingBlueprintIds.map(id => {
+                const titles = {
+                    5: 'Unisex Cotton Crew Tee',
+                    6: 'Unisex Heavy Cotton Tee', 
+                    9: 'Women\'s Favorite Tee',
+                    10: 'Women\'s Flowy Racerback Tank',
+                    12: 'Unisex Jersey Short Sleeve Tee',
+                    14: 'The Boyfriend Tee for Women',
+                    15: 'Men\'s Very Important Tee',
+                    18: 'Women\'s Ideal Racerback Tank',
+                    26: 'Men\'s Lightweight Fashion Tee',
+                    31: 'Infant Long Sleeve Bodysuit',
+                    32: 'Toddler\'s Fine Jersey Tee'
+                };
+                
+                return {
+                    id: id,
+                    title: titles[id] || `Blueprint ${id}`,
+                    description: `Working blueprint ${id}`,
+                    brand: 'Printify'
+                };
+            });
             
-            // Handle different response formats
-            let blueprints;
-            if (blueprintsResult && blueprintsResult.success && blueprintsResult.blueprints) {
-                blueprints = blueprintsResult.blueprints;
-            } else if (Array.isArray(blueprintsResult)) {
-                blueprints = blueprintsResult;
-            } else {
-                console.error('❌ Invalid blueprints response format:', blueprintsResult);
-                throw new Error('Invalid blueprints response from Printify API');
-            }
-            
-            if (!blueprints || !Array.isArray(blueprints) || blueprints.length === 0) {
-                console.error('❌ Blueprints array is empty or invalid:', blueprints);
-                throw new Error('No blueprints available for product creation');
-            }
-            
-            console.log(`✅ Found ${blueprints.length} available blueprints`);
+            console.log(`✅ Found ${blueprints.length} proven working blueprints`);
             blueprints.slice(0, 3).forEach((bp, i) => {
-                console.log(`  ${i + 1}. ${bp.title || bp.name || bp.id} (ID: ${bp.id})`);
+                console.log(`  ${i + 1}. ${bp.title} (ID: ${bp.id})`);
             });
 
             // Load previous progress
@@ -634,13 +742,19 @@ class APIProductPreviewBuilder {
             if (progress) {
                 this.state.processedBlueprints = progress.processedBlueprints || [];
                 this.state.currentBatch = progress.currentBatch || 0;
+                this.state.recentPreviewTypes = progress.recentPreviewTypes || []; // NEW: Restore preview variety tracking
             }
 
-            // Filter out already processed blueprints AND incompatible ones
-            const incompatibleBlueprints = [11, 68]; // Known incompatible with provider 3
+            // Categorize blueprints by product type for variety
+            const categorizedBlueprints = this.categorizeBlueprints(blueprints);
+            console.log('\n🎯 BLUEPRINT CATEGORIES:');
+            Object.keys(categorizedBlueprints).forEach(category => {
+                console.log(`  ${category}: ${categorizedBlueprints[category].length} blueprints`);
+            });
+
+            // Filter out already processed blueprints (all blueprints are compatible now)
             const remainingBlueprints = blueprints.filter(b => 
-                !this.state.processedBlueprints.some(p => p.blueprintId === b.id) &&
-                !incompatibleBlueprints.includes(b.id)
+                !this.state.processedBlueprints.some(p => p.blueprintId === b.id)
             );
 
             console.log(`📋 Total blueprints: ${blueprints.length}`);
@@ -652,31 +766,43 @@ class APIProductPreviewBuilder {
                 return this.state.processedBlueprints;
             }
 
-            // Process in batches of 1 for testing
-            const batchSize = 1;
-            const currentBatch = remainingBlueprints.slice(0, batchSize);
+            // Determine batch size for this run
+            const batchSize = Math.min(this.config.batchSize, remainingBlueprints.length);
+            console.log(`\n🎨 Processing batch ${this.state.currentBatch + 1}: ${batchSize} blueprint(s)`);
             
-            console.log(`\n🎨 Processing batch ${this.state.currentBatch + 1}: ${currentBatch.length} blueprints`);
-            currentBatch.forEach((b, i) => console.log(`  ${i + 1}. ${b.title}`));
+            // Select blueprints for this batch using category variety
+            const batchBlueprints = [];
+            const availableBlueprints = [...remainingBlueprints];
+            
+            for (let i = 0; i < batchSize && availableBlueprints.length > 0; i++) {
+                const nextBlueprint = this.selectNextBlueprintWithVariety(availableBlueprints, categorizedBlueprints);
+                if (nextBlueprint) {
+                    batchBlueprints.push(nextBlueprint);
+                    // Remove from available list to ensure variety within batch
+                    const index = availableBlueprints.findIndex(b => b.id === nextBlueprint.id);
+                    if (index > -1) {
+                        availableBlueprints.splice(index, 1);
+                    }
+                }
+            }
+            
+            console.log('📋 Blueprints in this batch:');
+            batchBlueprints.forEach((bp, index) => {
+                console.log(`  ${index + 1}. ${bp.title} (${bp.category || 'apparel'})`);
+            });
 
             let successCount = 0;
             let failureCount = 0;
             
-            for (const blueprint of currentBatch) {
+            // Process each blueprint in the batch
+            for (const blueprint of batchBlueprints) {
                 try {
                     // VALIDATION: Ensure blueprint has required properties
                     if (!blueprint.id || !blueprint.title) {
                         throw new Error('Blueprint missing required properties (id, title)');
                     }
                     
-                    // COMPATIBILITY CHECK: Skip blueprints that don't work with provider 3
-                    const incompatibleBlueprints = [11, 68]; // Known incompatible with provider 3
-                    if (incompatibleBlueprints.includes(blueprint.id)) {
-                        console.log(`⚠️ Skipping blueprint ${blueprint.id} (${blueprint.title}) - incompatible with provider 3`);
-                        continue;
-                    }
-                    
-                    // Use random image for each blueprint
+                    // Use random image for the blueprint
                     const randomImage = this.getRandomImage(galleryImages);
                     console.log(`\n🔨 Creating preview for: ${blueprint.title}`);
                     console.log(`🎨 Using random image: ${randomImage.title || randomImage.name}`);
@@ -688,61 +814,66 @@ class APIProductPreviewBuilder {
                     
                     // Download image to buffer for processing
                     const imageResponse = await axios.get(randomImage.url, {
-                        responseType: 'arraybuffer',
-                        timeout: 30000
-                    });
-                    const imageBuffer = Buffer.from(imageResponse.data);
-                    
-                    // Extract filename from URL
-                    const urlParts = randomImage.url.split('/');
-                    const fileName = urlParts[urlParts.length - 1];
-                    
-                    console.log(`🔧 Creating product with blueprint ${blueprint.id} (${blueprint.title})`);
-                    const preview = await printifyService.createProductWithBlueprint(
-                        imageBuffer,
-                        fileName,
-                        blueprint.id,
-                        {
-                            title: `${blueprint.title} - ${randomImage.title || 'Gallery Image'}`,
-                            description: `Custom ${blueprint.title} created with enhanced image`,
-                            providerId: 3, // Use default provider
-                            runId: this.runId
-                        }
-                    );
-                    console.log(`📋 Blueprint ${blueprint.id} result:`, preview?.success ? 'SUCCESS' : 'FAILED', preview?.error || '');
-
-                    // VALIDATION: Ensure preview result is valid
-                    if (!preview || !preview.success) {
-                        throw new Error(`Product creation failed: ${preview.error || 'Unknown error'}`);
+                    responseType: 'arraybuffer',
+                    timeout: 30000
+                });
+                const imageBuffer = Buffer.from(imageResponse.data);
+                
+                // Extract filename from URL
+                const urlParts = randomImage.url.split('/');
+                const fileName = urlParts[urlParts.length - 1];
+                
+                console.log(`🔧 Creating product with blueprint ${blueprint.id} (${blueprint.title})`);
+                const preview = await printifyService.createProductWithBlueprint(
+                    imageBuffer,
+                    fileName,
+                    blueprint.id,
+                    {
+                        title: `${blueprint.title} - ${randomImage.title || 'Gallery Image'}`,
+                        description: `Custom ${blueprint.title} created with enhanced image`,
+                        providerId: 3, // Use default provider
+                        runId: this.runId
                     }
+                );
+                console.log(`📋 Blueprint ${blueprint.id} result:`, preview?.success ? 'SUCCESS' : 'FAILED', preview?.error || '');
 
-
-
-                    const previewResult = {
-                        productTitle: blueprint.title,
-                        blueprintId: blueprint.id,
-                        productId: preview.product?.productId,
-                        success: preview.success,
-                        sourceImage: randomImage.title || randomImage.name,
-                        processedAt: new Date().toISOString(),
-                        enhancementUsed: preview.imageEnhancement?.enhanced || false
-                    };
-
-                    this.state.processedBlueprints.push(previewResult);
-                    successCount++;
-                    console.log(`  ✅ Product created: ${preview.product?.productId || 'ID not available'}`);
-                    
-                    // Save progress after each success to prevent data loss
-                    await this.saveProgress();
-
-                } catch (previewError) {
-                    failureCount++;
-                    console.error(`  ❌ Failed to create preview for ${blueprint.title}:`, previewError.message);
-                    
-                    // Log detailed error for debugging
-                    this.logError(`preview_creation_${blueprint.id}`, previewError);
+                // VALIDATION: Ensure preview result is valid
+                if (!preview || !preview.success) {
+                    throw new Error(`Product creation failed: ${preview.error || 'Unknown error'}`);
                 }
+
+                const previewResult = {
+                    productTitle: blueprint.title,
+                    blueprintId: blueprint.id,
+                    productId: preview.product?.productId,
+                    success: preview.success,
+                    sourceImage: randomImage.title || randomImage.name,
+                    processedAt: new Date().toISOString(),
+                    enhancementUsed: preview.imageEnhancement?.enhanced || false,
+                    category: blueprint.category
+                };
+
+                this.state.processedBlueprints.push(previewResult);
+                successCount++;
+                console.log(`  ✅ Product created: ${preview.product?.productId || 'ID not available'}`);
+                
+                // Save progress after each success to prevent data loss
+                await this.saveProgress();
+
+            } catch (previewError) {
+                failureCount++;
+                console.error(`  ❌ Failed to create preview for ${blueprint.title}:`, previewError.message);
+                
+                // Log detailed error for debugging
+                this.logError(`preview_creation_${blueprint.id}`, previewError);
             }
+            
+            // Add delay between batch items to be gentle on APIs
+            if (batchBlueprints.indexOf(blueprint) < batchBlueprints.length - 1) {
+                console.log('⏱️ Pausing briefly between products...');
+                await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
+            }
+        }
             
             // VALIDATION: Report batch results
             console.log(`\n📋 Batch Results: ${successCount} success, ${failureCount} failures`);
@@ -763,8 +894,8 @@ class APIProductPreviewBuilder {
             console.log(`📈 Progress: ${completionRate.toFixed(1)}%`);
             
             if (this.state.processedBlueprints.length < blueprints.length) {
-                console.log('\n💡 Run the script again to process the next batch of 5 blueprints');
-                console.log(`🕰️ Estimated batches remaining: ${Math.ceil((blueprints.length - this.state.processedBlueprints.length) / batchSize)}`);
+                console.log(`\n💡 Run the script again to process the next batch of ${this.config.batchSize} blueprints`);
+                console.log(`🕰️ Estimated batches remaining: ${Math.ceil((blueprints.length - this.state.processedBlueprints.length) / this.config.batchSize)}`);
             } else {
                 console.log('\n🎉 All blueprints processed! Cleaning up progress file...');
                 try {
@@ -789,10 +920,73 @@ class APIProductPreviewBuilder {
 
         try {
             const printifyService = new EnhancedPrintifyService();
+            
+            // Use the same blueprint variety system as batch processing
+            const workingBlueprintIds = [5, 6, 9, 10, 12, 14, 15, 18, 26, 31, 32];
+            const blueprints = workingBlueprintIds.map(id => {
+                const titles = {
+                    5: 'Unisex Cotton Crew Tee',
+                    6: 'Unisex Heavy Cotton Tee', 
+                    9: 'Women\'s Favorite Tee',
+                    10: 'Women\'s Flowy Racerback Tank',
+                    12: 'Unisex Jersey Short Sleeve Tee',
+                    14: 'The Boyfriend Tee for Women',
+                    15: 'Men\'s Very Important Tee',
+                    18: 'Women\'s Ideal Racerback Tank',
+                    26: 'Men\'s Lightweight Fashion Tee',
+                    31: 'Infant Long Sleeve Bodysuit',
+                    32: 'Toddler\'s Fine Jersey Tee'
+                };
+                
+                return {
+                    id: id,
+                    title: titles[id] || `Blueprint ${id}`,
+                    description: `Working blueprint ${id}`,
+                    brand: 'Printify'
+                };
+            });
+            
+            // Categorize and select a blueprint with variety
+            const categorizedBlueprints = this.categorizeBlueprints(blueprints);
+            
+            // Track usage from recent preview products to ensure variety
+            if (!this.state.recentPreviewTypes) {
+                this.state.recentPreviewTypes = [];
+            }
+            
+            // Select blueprint that hasn't been used recently
+            let selectedBlueprint = null;
+            const maxRecentTrack = 5; // Track last 5 previews
+            
+            // Get blueprints not used recently
+            const availableBlueprints = blueprints.filter(blueprint => 
+                !this.state.recentPreviewTypes.includes(blueprint.id)
+            );
+            
+            if (availableBlueprints.length > 0) {
+                // Randomly select from available blueprints
+                const randomIndex = Math.floor(Math.random() * availableBlueprints.length);
+                selectedBlueprint = availableBlueprints[randomIndex];
+                console.log(`🎲 Randomly selected from ${availableBlueprints.length} unused blueprint(s)`);
+            } else {
+                // If all have been used recently, randomly select any blueprint
+                const randomIndex = Math.floor(Math.random() * blueprints.length);
+                selectedBlueprint = blueprints[randomIndex];
+                console.log(`🔄 All blueprints used recently, randomly selected from all ${blueprints.length} blueprint(s)`);
+            }
+            
+            // Update recent usage tracking
+            this.state.recentPreviewTypes.push(selectedBlueprint.id);
+            if (this.state.recentPreviewTypes.length > maxRecentTrack) {
+                this.state.recentPreviewTypes = this.state.recentPreviewTypes.slice(-maxRecentTrack);
+            }
+            
             const randomImage = this.getRandomImage(galleryImages);
             
             console.log(`🎨 Creating preview product for: ${randomImage.title}`);
             console.log(`🖼️ Image URL: ${randomImage.url}`);
+            console.log(`🔧 Selected product type: ${selectedBlueprint.title} (Blueprint ${selectedBlueprint.id})`);
+            console.log(`🎯 Product category: ${selectedBlueprint.category || 'apparel'}`);
 
             const imageResponse = await axios.get(randomImage.url, {
                 responseType: 'arraybuffer',
@@ -803,14 +997,14 @@ class APIProductPreviewBuilder {
             const urlParts = randomImage.url.split('/');
             const fileName = urlParts[urlParts.length - 1];
             
-            console.log(`🔧 Creating single preview with blueprint 5 (T-Shirt - compatible with provider 3)`);
+            console.log(`🔧 Creating preview with blueprint ${selectedBlueprint.id} (${selectedBlueprint.title})`);
             const preview = await printifyService.createProductWithBlueprint(
                 imageBuffer,
                 fileName,
-                5, // T-Shirt blueprint (compatible with provider 3)
+                selectedBlueprint.id,
                 {
                     title: `Preview: ${randomImage.title || 'Gallery Image'}`,
-                    description: `Custom t-shirt created from gallery image`,
+                    description: `Custom ${selectedBlueprint.title} created from gallery image`,
                     providerId: 3,
                     runId: this.runId
                 }
@@ -832,7 +1026,7 @@ class APIProductPreviewBuilder {
                 
                 const storageResult = await previewHelper.storeVendorPreview(preview, {
                     sourceImage: randomImage.title,
-                    blueprintId: 5,
+                    blueprintId: selectedBlueprint.id, // Use selected blueprint instead of hardcoded 5
                     providerId: 3,
                     runId: this.runId,
                     imageUrl: randomImage.url,
@@ -844,6 +1038,9 @@ class APIProductPreviewBuilder {
                 if (!storageResult.success) {
                     console.error(`   Error: ${storageResult.error}`);
                 }
+                
+                // NEW: Save progress to persist variety tracking
+                await this.saveProgress();
                 
                 await this.validatePreviewProduct(productResult, preview);
                 return productResult;
@@ -881,6 +1078,106 @@ class APIProductPreviewBuilder {
         console.log(`   Printify API product: ✅ Yes`);
         
         console.log(`\n✅ Product validation complete!`);
+    }
+
+    categorizeBlueprints(blueprints) {
+        const categories = {
+            apparel: [],
+            home: [],
+            accessories: [],
+            other: []
+        };
+
+        // Keywords for categorization
+        const categoryKeywords = {
+            apparel: ['tee', 't-shirt', 'shirt', 'hoodie', 'tank', 'sweatshirt', 'jersey', 'dress', 'leggings', 'skirt', 'bikini', 'swimsuit'],
+            home: ['mug', 'cup', 'poster', 'print', 'canvas', 'wall', 'pillow', 'blanket', 'towel', 'curtain', 'clock', 'tapestry'],
+            accessories: ['bag', 'tote', 'phone', 'case', 'sticker', 'decal', 'backpack', 'pouch', 'socks', 'scarf']
+        };
+
+        blueprints.forEach(blueprint => {
+            const title = (blueprint.title || '').toLowerCase();
+            const description = (blueprint.description || '').toLowerCase();
+            const content = `${title} ${description}`;
+            
+            let categorized = false;
+            
+            // Check each category
+            for (const [category, keywords] of Object.entries(categoryKeywords)) {
+                if (keywords.some(keyword => content.includes(keyword))) {
+                    blueprint.category = category;
+                    categories[category].push(blueprint);
+                    categorized = true;
+                    break;
+                }
+            }
+            
+            // If not categorized, put in 'other'
+            if (!categorized) {
+                blueprint.category = 'other';
+                categories.other.push(blueprint);
+            }
+        });
+
+        return categories;
+    }
+
+    selectNextBlueprintWithVariety(remainingBlueprints, categorizedBlueprints) {
+        // Get categories that have remaining blueprints
+        const availableCategories = Object.keys(categorizedBlueprints).filter(category => 
+            categorizedBlueprints[category].some(bp => 
+                remainingBlueprints.some(remaining => remaining.id === bp.id)
+            )
+        );
+
+        if (availableCategories.length === 0) {
+            return null;
+        }
+
+        // Get category counts from processed blueprints
+        const processedCategories = {};
+        this.state.processedBlueprints.forEach(processed => {
+            const category = processed.category || 'other';
+            processedCategories[category] = (processedCategories[category] || 0) + 1;
+        });
+
+        console.log('\n📊 CATEGORY DISTRIBUTION:');
+        availableCategories.forEach(category => {
+            const processed = processedCategories[category] || 0;
+            const available = categorizedBlueprints[category].filter(bp => 
+                remainingBlueprints.some(remaining => remaining.id === bp.id)
+            ).length;
+            console.log(`  ${category}: ${processed} processed, ${available} remaining`);
+        });
+
+        // Find category with least processed items for variety
+        let selectedCategory = availableCategories[0];
+        let minProcessed = processedCategories[selectedCategory] || 0;
+
+        availableCategories.forEach(category => {
+            const processed = processedCategories[category] || 0;
+            if (processed < minProcessed) {
+                minProcessed = processed;
+                selectedCategory = category;
+            }
+        });
+
+        // Get remaining blueprints from selected category
+        const categoryBlueprints = categorizedBlueprints[selectedCategory].filter(bp => 
+            remainingBlueprints.some(remaining => remaining.id === bp.id)
+        );
+
+        if (categoryBlueprints.length === 0) {
+            return null;
+        }
+
+        // Select randomly from the category to add some variation
+        const selectedBlueprint = categoryBlueprints[Math.floor(Math.random() * categoryBlueprints.length)];
+        
+        console.log(`🎯 Selected category: ${selectedCategory} (least processed)`);
+        console.log(`🎲 Random selection from ${categoryBlueprints.length} ${selectedCategory} blueprints`);
+        
+        return selectedBlueprint;
     }
 
     async promptUserToContinue() {
