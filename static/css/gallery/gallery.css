@@ -112,6 +112,11 @@
   opacity: 1;
 }
 
+/* Hide action overlays in select mode to prevent conflicts */
+.gallery-item.selectable .gallery-item-actions {
+  display: none !important;
+}
+
 .gallery-item-actions button {
   width: 32px;
   height: 32px;

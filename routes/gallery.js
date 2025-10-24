@@ -32,11 +32,14 @@ router.get('/gallery-demo', (req, res) => {
 
 // User gallery page (requires authentication)
 router.get('/my-gallery', ensureAuthenticated, (req, res) => {
+  console.log('🎨 Gallery route - req.user:', req.user);
+  console.log('🎨 Gallery route - req.user.groups:', req.user?.groups);
   res.render('user-gallery', {
     title: 'My Gallery | Wavelength Lore',
     cdnUrl: process.env.CDN_URL || '',
     versionInfo: req.app.locals.versionInfo || null,
-    req: req // Pass request object for canonical URLs
+    req: req, // Pass request object for canonical URLs
+    user: req.user // Pass user object for groups check
   });
 });
 

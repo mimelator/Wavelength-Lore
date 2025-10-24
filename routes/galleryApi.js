@@ -54,34 +54,7 @@ const upload = multer({
 */
 
 /**
- * GET /api/gallery/user/storage-stats
- * Get user's gallery storage statistics
- */
-router.get('/api/gallery/user/storage-stats', ensureAuthenticated, async (req, res) => {
-  try {
-    const userId = req.user.uid;
-    const userGroups = res.locals.userGroups || [];
-    
-    const stats = await galleryStorage.getUserStorageStats(userId, userGroups);
-    
-    res.json({
-      success: true,
-      stats: {
-        ...stats,
-        // Format values for human-readable output
-        usedFormatted: formatBytes(stats.used),
-        quotaFormatted: stats.quota === -1 ? 'Unlimited' : formatBytes(stats.quota),
-        remainingFormatted: stats.remaining === -1 ? 'Unlimited' : formatBytes(stats.remaining)
-      }
-    });
-  } catch (error) {
-    console.error('Error getting user storage stats:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get storage statistics'
-    });
-  }
-});
+
 
 /**
  * GET /api/gallery/user/images
@@ -241,21 +214,6 @@ router.post('/api/gallery/user/upload', ensureAuthenticated, async (req, res) =>
         console.log('📥 Upload result:', result);
         
         if (!result.success) {
-          if (result.error === 'Storage quota exceeded') {
-            return res.status(413).json({
-              success: false,
-              error: 'Storage quota exceeded',
-              quota: {
-                total: result.quota,
-                used: result.storageUsed,
-                remaining: result.quotaRemaining,
-                totalFormatted: formatBytes(result.quota),
-                usedFormatted: formatBytes(result.storageUsed),
-                remainingFormatted: formatBytes(result.quotaRemaining)
-              }
-            });
-          }
-          
           return res.status(500).json({
             success: false,
             error: result.error

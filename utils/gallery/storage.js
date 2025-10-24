@@ -36,133 +36,13 @@ console.log('🔑 Using credentials with Access Key ID:', config.ACCESS_KEY_ID ?
 const cdnUrl = config.CDN_URL || `https://${bucketName}.s3.amazonaws.com`;
 console.log('🌐 Gallery CDN URL configured as:', cdnUrl);
 
-// User group storage quotas in bytes
-const GROUP_QUOTAS = {
-  // Anonymous users cannot store gallery images
-  anonymous: 0,
-  // Default registered user (5MB)
-  default: 5 * 1024 * 1024, 
-  // Silver tier (25MB)
-  silver_member: 25 * 1024 * 1024,
-  // Gold tier (100MB)
-  gold_member: 100 * 1024 * 1024,
-  // Premium tier (250MB)
-  premium_member: 250 * 1024 * 1024,
-  // Content creators (500MB)
-  content_creator: 500 * 1024 * 1024,
-  // Content managers (1GB)
-  content_manager: 1024 * 1024 * 1024,
-  // Admins and super admins (unlimited)
-  admin: -1,
-  super_admin: -1
-};
 
-/**
- * Get storage quota for a user based on their group membership
- * 
- * @param {Array<string>} userGroups - Array of user group names
- * @returns {number} Storage quota in bytes (-1 for unlimited)
- */
-function getQuotaForUser(userGroups) {
-  if (!userGroups || !Array.isArray(userGroups) || userGroups.length === 0) {
-    return GROUP_QUOTAS.anonymous;
-  }
 
-  // Find highest quota among user's groups
-  let highestQuota = GROUP_QUOTAS.default;
-  
-  // Check for unlimited quota first (admin, super_admin)
-  if (userGroups.includes('admin') || userGroups.includes('super_admin')) {
-    return -1; // Unlimited quota
-  }
-  
-  // Check other group quotas
-  for (const group of userGroups) {
-    const groupQuota = GROUP_QUOTAS[group] || 0;
-    if (groupQuota > highestQuota) {
-      highestQuota = groupQuota;
-    }
-  }
-  
-  return highestQuota;
-}
 
-/**
- * Calculate total storage used by a user
- * 
- * @param {string} userId - User ID
- * @returns {Promise<number>} Total bytes used
- */
-async function calculateUserStorageUsed(userId) {
-  try {
-    // List all objects in the user's gallery folder
-    const params = {
-      Bucket: bucketName,
-      Prefix: `images/gallery/${userId}/`
-    };
-    
-    const command = new ListObjectsV2Command(params);
-    const response = await s3Client.send(command);
-    
-    // Calculate total size
-    let totalSize = 0;
-    if (response.Contents) {
-      for (const object of response.Contents) {
-        totalSize += object.Size || 0;
-      }
-    }
-    
-    return totalSize;
-  } catch (error) {
-    console.error(`Error calculating storage for user ${userId}:`, error);
-    throw error;
-  }
-}
 
-/**
- * Check if user has enough quota to upload a file
- * 
- * @param {string} userId - User ID
- * @param {Array<string>} userGroups - User's group memberships
- * @param {number} fileSize - Size of file to upload in bytes
- * @returns {Promise<{allowed: boolean, quotaRemaining: number, quota: number}>} Quota check result
- */
-async function checkUserQuota(userId, userGroups, fileSize) {
-  try {
-    // Get user's quota
-    const userQuota = getQuotaForUser(userGroups);
-    
-    // Unlimited quota for admins
-    if (userQuota === -1) {
-      return {
-        allowed: true,
-        quotaRemaining: -1,
-        quota: -1
-      };
-    }
-    
-    // Calculate current storage used
-    const storageUsed = await calculateUserStorageUsed(userId);
-    
-    // Check if user has enough quota
-    const quotaRemaining = userQuota - storageUsed;
-    const allowed = quotaRemaining >= fileSize;
-    
-    return {
-      allowed,
-      quotaRemaining,
-      quota: userQuota,
-      storageUsed
-    };
-  } catch (error) {
-    console.error('Error checking user quota:', error);
-    // On error, default to not allowed for safety
-    return {
-      allowed: false,
-      error: error.message
-    };
-  }
-}
+
+
+
 
 /**
  * Upload an image to S3 for user gallery
@@ -215,23 +95,7 @@ async function uploadGalleryImage(fileBuffer, fileName, mimeType, userId, userGr
       };
     }
     
-    // Check user's quota
-    console.log(`⚖️ Checking user quota...`);
-    const quotaCheck = await checkUserQuota(userId, userGroups, fileSize);
-    console.log(`📊 Quota check result:`, quotaCheck);
-    
-    if (!quotaCheck.allowed) {
-      console.log(`❌ Storage quota exceeded for user: ${userId}`);
-      return {
-        success: false,
-        error: 'Storage quota exceeded',
-        quotaRemaining: quotaCheck.quotaRemaining,
-        quota: quotaCheck.quota,
-        storageUsed: quotaCheck.storageUsed
-      };
-    }
-    
-    console.log(`✅ User has sufficient quota`)
+
     
     // Generate unique filename
     const timestamp = Date.now();
@@ -392,42 +256,7 @@ async function deleteGalleryImage(userId, relativePath) {
   }
 }
 
-/**
- * Get user's gallery storage statistics
- * 
- * @param {string} userId - User ID
- * @param {Array<string>} userGroups - User's group memberships
- * @returns {Promise<{used: number, quota: number, remaining: number, percentage: number}>}
- */
-async function getUserStorageStats(userId, userGroups) {
-  try {
-    const userQuota = getQuotaForUser(userGroups);
-    const storageUsed = await calculateUserStorageUsed(userId);
-    
-    // For unlimited quota
-    if (userQuota === -1) {
-      return {
-        used: storageUsed,
-        quota: -1,
-        remaining: -1,
-        percentage: 0
-      };
-    }
-    
-    const remaining = userQuota - storageUsed;
-    const percentage = (storageUsed / userQuota) * 100;
-    
-    return {
-      used: storageUsed,
-      quota: userQuota,
-      remaining: Math.max(0, remaining),
-      percentage: Math.min(100, Math.max(0, percentage))
-    };
-  } catch (error) {
-    console.error('Error getting user storage stats:', error);
-    throw error;
-  }
-}
+
 
 /**
  * List a user's gallery images
@@ -550,9 +379,6 @@ async function downloadImageBuffer(relativePath) {
 module.exports = {
   uploadGalleryImage,
   deleteGalleryImage,
-  checkUserQuota,
-  getUserStorageStats,
   listUserGalleryImages,
-  downloadImageBuffer,
-  GROUP_QUOTAS
+  downloadImageBuffer
 };

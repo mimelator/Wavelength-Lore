@@ -16,8 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const actionButtons = document.getElementById('action-buttons');
   const downloadAllBtn = document.getElementById('download-all');
   const startScreensaverBtn = document.getElementById('start-screensaver');
-  const storageUsedBar = document.getElementById('storage-used-bar');
-  const storageText = document.getElementById('storage-text');
+
   
   // Application state
   let userImages = [];
@@ -64,55 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  // Function to fetch storage stats
-  function fetchStorageStats() {
-    fetch('/api/gallery/user/storage-stats', {
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json'
-      }
-    })
-    .then(response => {
-      if (response.status === 401) {
-        showLoginButton();
-        throw new Error('Authentication required');
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (data.success) {
-        updateStorageMeter(data.stats);
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching storage stats:', error);
-    });
-  }
-  
-  // Function to update storage meter
-  function updateStorageMeter(stats) {
-    // For unlimited quota
-    if (stats.quota === -1) {
-      storageUsedBar.style.width = '10%';
-      storageText.textContent = `Used: ${stats.usedFormatted} of Unlimited`;
-      storageUsedBar.classList.remove('warning', 'danger');
-      return;
-    }
-    
-    // Update the progress bar
-    storageUsedBar.style.width = `${stats.percentage}%`;
-    
-    // Set color based on usage
-    storageUsedBar.classList.remove('warning', 'danger');
-    if (stats.percentage >= 90) {
-      storageUsedBar.classList.add('danger');
-    } else if (stats.percentage >= 70) {
-      storageUsedBar.classList.add('warning');
-    }
-    
-    // Update text
-    storageText.textContent = `Used: ${stats.usedFormatted} of ${stats.quotaFormatted} (${stats.percentage.toFixed(1)}%)`;
-  }
+
   
   // Function to fetch user's images
   function fetchUserGallery() {
@@ -430,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
     carouselEl.innerHTML = '';
     gridEl.innerHTML = '';
     document.querySelector('.gallery-controls').style.display = 'none';
-    document.getElementById('storage-meter-container').style.display = 'none';
+
     document.getElementById('action-buttons').style.display = 'none';
     
     const mainContainer = document.querySelector('.gallery-main-container');
@@ -476,9 +427,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           showEmptyGallery();
         }
-        
-        // Refresh storage stats
-        fetchStorageStats();
       }
     })
     .catch(error => {
@@ -747,9 +695,6 @@ document.addEventListener('DOMContentLoaded', () => {
           showEmptyGallery();
         }
         
-        // Refresh storage stats
-        fetchStorageStats();
-        
         // Show success message
         alert(`Successfully deleted ${data.message}`);
       } else {
@@ -793,6 +738,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize screensaver utility
   initializeScreensaver();
   
-  fetchStorageStats();
   fetchUserGallery();
 });
