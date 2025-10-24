@@ -33,7 +33,8 @@ class MerchandisePageBrowserTest {
         console.log('Starting Puppeteer browser...\n');
         
         this.browser = await puppeteer.launch({
-            headless: true, // Set to false for debugging
+            headless: false, // Browser window visible for debugging
+            slowMo: 100, // Slow down actions by 100ms for visibility
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox',

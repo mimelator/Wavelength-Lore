@@ -13,6 +13,7 @@ const AutoEnhancedPrintifyService = require('../services/auto-enhanced-printify-
 const MerchandiseDatabase = require('../services/merchandise-database');
 const galleryStorage = require('../utils/gallery/storage');
 const axios = require('axios');
+const { generateProductTitle, prettifyImageName } = require('../utils/product-name-formatter');
 const { 
   ProductTypes, 
   generateProductName, 
@@ -434,8 +435,8 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
       imageBuffer,
       selectedImage.fileName,
       {
-        title: productOptions.title || `Custom ${selectedImage.originalName} T-Shirt`,
-        description: productOptions.description || `Premium custom t-shirt featuring "${selectedImage.originalName}" from your Wavelength Lore collection`,
+        title: generateProductTitle(selectedImage.fileName || selectedImage.originalName, 'T-Shirt'),
+        description: `Premium custom t-shirt featuring "${prettifyImageName(selectedImage.fileName || selectedImage.originalName)}" from your Wavelength Lore collection`,
         tags: ['wavelength', 'custom', 'gallery', ...(productOptions.tags || [])],
         userId: userId,
         originalImageId: imageId

@@ -189,15 +189,15 @@ class ProductCustomizationTester {
         return {
           hasTitle: !!modal.querySelector('h2'),
           hasBorderSelect: !!modal.querySelector('#borderStyleSelect'),
-          hasProductName: !!modal.querySelector('#productName'),
-          hasDescription: !!modal.querySelector('#productDescription'),
+          hasAutoTitleInfo: !!modal.querySelector('.auto-title-info'),
+          hasAutoTitlePreview: !!modal.querySelector('.auto-title-preview'),
           hasSizeSelect: !!modal.querySelector('#defaultSize'),
           hasColorSelect: !!modal.querySelector('#defaultColor'),
           hasCreateButton: !!modal.querySelector('#createProductBtn'),
           hasPreview: !!modal.querySelector('#mockupPreview'),
           hasBorderedPreview: !!modal.querySelector('#borderedImagePreview'),
           borderValue: modal.querySelector('#borderStyleSelect')?.value,
-          productNameValue: modal.querySelector('#productName')?.value,
+          autoTitleText: modal.querySelector('.auto-title-preview')?.textContent,
           priceDisplay: modal.querySelector('.price-value')?.textContent
         };
       });
@@ -210,7 +210,7 @@ class ProductCustomizationTester {
       
       // Verify all required elements exist
       const requiredElements = [
-        'hasTitle', 'hasBorderSelect', 'hasProductName', 'hasDescription',
+        'hasTitle', 'hasBorderSelect', 'hasAutoTitleInfo', 'hasAutoTitlePreview',
         'hasSizeSelect', 'hasColorSelect', 'hasCreateButton', 
         'hasPreview', 'hasBorderedPreview'
       ];
@@ -226,9 +226,9 @@ class ProductCustomizationTester {
         this.results.warnings.push('Default border is not "solid-medium"');
       }
       
-      // Verify product name is pre-filled
-      if (!modalState.productNameValue || modalState.productNameValue.length === 0) {
-        throw new Error('Product name is not pre-filled');
+      // Verify auto-title is displayed
+      if (!modalState.autoTitleText || modalState.autoTitleText.length === 0) {
+        throw new Error('Auto-generated title is not displayed');
       }
       
       // Verify price is displayed
@@ -237,7 +237,7 @@ class ProductCustomizationTester {
       }
       
       console.log('✅ Modal initial state is correct');
-      console.log(`   → Product name: "${modalState.productNameValue}"`);
+      console.log(`   → Auto-generated title: "${modalState.autoTitleText}"`);
       console.log(`   → Price: ${modalState.priceDisplay}`);
       console.log(`   → Border: ${modalState.borderValue}`);
       
@@ -451,11 +451,8 @@ class ProductCustomizationTester {
       await this.page.select('#borderStyleSelect', 'solid-thick');
       await wait(1000);
       
-      await this.page.click('#productName', { clickCount: 3 });
-      await this.page.type('#productName', 'Final Test Product');
-      
-      await this.page.click('#productDescription');
-      await this.page.type('#productDescription', 'Created by automated test');
+      // Product name/description auto-generated - no manual input needed
+      console.log('   → Product title will be auto-generated');
       
       // Click create button
       console.log('   → Clicking Create Product button...');
@@ -571,8 +568,7 @@ async function runTests() {
     await tester.testOpenCustomizationModal();
     await tester.testModalInitialState();
     await tester.testBorderStyleChange();
-    await tester.testEditProductName();
-    await tester.testAddDescription();
+    // testEditProductName and testAddDescription removed - titles auto-generated
     await tester.testSizeColorSelection();
     await tester.testModalClose();
     await tester.testCreateProductWithCustomization();

@@ -6,6 +6,7 @@
  */
 
 const fetch = require('node-fetch');
+const { generateProductTitle, prettifyImageName } = require('../../utils/product-name-formatter');
 
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3001';
 const TEST_USER_ID = '4fdbYxJHjEP4xksk9sgFE3lgYUs2';
@@ -106,6 +107,36 @@ async function testMerchandiseGalleryIntegration() {
       
       console.log(`   ✅ Bookmarks have required fields for merchandise\n`);
     }
+    
+    // STEP 5: Verify product title generation
+    console.log('📋 STEP 5: Verify automatic product title generation');
+    
+    // Test with sample images from gallery
+    const sampleImages = merchData.images.slice(0, 3);
+    for (const image of sampleImages) {
+      const filename = image.fileName || image.originalName || 'unknown.webp';
+      const productTitle = generateProductTitle(filename, 'T-Shirt');
+      const prettyName = prettifyImageName(filename);
+      
+      // Verify title is generated
+      if (!productTitle || productTitle.length === 0) {
+        throw new Error(`Failed to generate product title for ${filename}`);
+      }
+      
+      // Verify title includes prettified name
+      if (!productTitle.includes(prettyName)) {
+        throw new Error(`Product title "${productTitle}" doesn't include prettified name "${prettyName}"`);
+      }
+      
+      // Verify title includes product type
+      if (!productTitle.includes('T-Shirt')) {
+        throw new Error(`Product title "${productTitle}" doesn't include product type`);
+      }
+      
+      console.log(`   ✅ ${filename} → "${productTitle}"`);
+    }
+    
+    console.log(`   ✅ Product titles auto-generated correctly\n`);
     
     console.log('═══════════════════════════════════════');
     console.log('✅ ALL TESTS PASSED');

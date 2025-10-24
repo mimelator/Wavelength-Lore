@@ -14,6 +14,7 @@
  */
 
 const assert = require('assert');
+const { generateProductTitle, prettifyImageName } = require('../../utils/product-name-formatter');
 
 class ProductCustomizationUnitTests {
   constructor() {
@@ -412,6 +413,49 @@ class ProductCustomizationUnitTests {
     }
   }
 
+  testProductNameFormatter() {
+    console.log('\n🏷️  TEST: Product Name Formatter Integration');
+    
+    try {
+      // Test automatic title generation from filename
+      const daphneTitle = generateProductTitle('daphne.webp', 'T-Shirt');
+      assert.strictEqual(daphneTitle, 'Daphne T-Shirt', 'Should generate Daphne T-Shirt');
+      console.log(`   → Generated: "${daphneTitle}"`);
+      
+      const goblinTitle = generateProductTitle('goblin-king.png', 'Mug');
+      assert.strictEqual(goblinTitle, 'Goblin King Mug', 'Should generate Goblin King Mug');
+      console.log(`   → Generated: "${goblinTitle}"`);
+      
+      const iceTitle = generateProductTitle('ice_fortress.jpg', 'Poster');
+      assert.strictEqual(iceTitle, 'Ice Fortress Poster', 'Should generate Ice Fortress Poster');
+      console.log(`   → Generated: "${iceTitle}"`);
+      
+      // Test prettification for descriptions
+      const prettyName = prettifyImageName('battle-scene-for-product-previ.webp');
+      assert.strictEqual(prettyName, 'Battle Scene For Product Previ', 'Should prettify filename');
+      console.log(`   → Prettified: "${prettyName}"`);
+      
+      // Test that no user input is required
+      const autoTitle = generateProductTitle('alexandria.png', 'T-Shirt');
+      assert(autoTitle.length > 0, 'Should generate title without user input');
+      assert(!autoTitle.includes('Custom'), 'Should not use generic "Custom" prefix');
+      assert(autoTitle.includes('Alexandria'), 'Should include prettified image name');
+      assert(autoTitle.includes('T-Shirt'), 'Should include product type');
+      console.log(`   → Auto-generated: "${autoTitle}"`);
+      
+      console.log('✅ Product Name Formatter working correctly');
+      this.results.passed.push('Product Name Formatter Integration');
+      return true;
+    } catch (error) {
+      console.error(`❌ Product Name Formatter failed: ${error.message}`);
+      this.results.failed.push({
+        test: 'Product Name Formatter Integration',
+        error: error.message
+      });
+      return false;
+    }
+  }
+
   testBorderConfigStructure() {
     console.log('\n🏗️  TEST: Border config structure validation');
     
@@ -508,6 +552,7 @@ function runTests() {
   tester.testGenerateProductName();
   tester.testGetBorderConfig();
   tester.testTemplateSubstitution();
+  tester.testProductNameFormatter();
   tester.testBorderConfigStructure();
   
   // Print results

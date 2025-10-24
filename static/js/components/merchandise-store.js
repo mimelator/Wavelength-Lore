@@ -883,15 +883,8 @@ class MerchandiseStore {
         <div class="modal-content">
           <span class="close">&times;</span>
           <h2>Create Custom Product</h2>
+          <p class="modal-info">Product title will be automatically generated from your image name.</p>
           <form id="product-creation-form">
-            <div class="form-group">
-              <label for="product-title">Product Title</label>
-              <input type="text" id="product-title" required />
-            </div>
-            <div class="form-group">
-              <label for="product-description">Description</label>
-              <textarea id="product-description" rows="3"></textarea>
-            </div>
             <div class="form-group">
               <label for="product-tags">Tags (comma-separated)</label>
               <input type="text" id="product-tags" placeholder="custom, art, wavelength" />
@@ -1076,11 +1069,8 @@ class MerchandiseStore {
             
             <div class="option-group">
               <h3>📝 Product Details</h3>
-              <label for="productName">Product Name</label>
-              <input type="text" id="productName" class="product-name-input" value="${defaultName}" />
-              
-              <label for="productDescription">Description (Optional)</label>
-              <textarea id="productDescription" class="product-description-input" rows="3" placeholder="Add a personal description..."></textarea>
+              <p class="auto-title-info">✨ Product title will be automatically generated from your image name and product type.</p>
+              <p class="auto-title-preview"><strong>Title:</strong> ${defaultName}</p>
             </div>
             
             <div class="option-group">
@@ -1186,8 +1176,7 @@ class MerchandiseStore {
       createBtn.textContent = 'Creating...';
       
       const customization = {
-        productName: modal.querySelector('#productName').value,
-        productDescription: modal.querySelector('#productDescription').value,
+        // productName and productDescription auto-generated on server
         borderStyle: borderSelect.value,
         defaultSize: modal.querySelector('#defaultSize').value,
         defaultColor: modal.querySelector('#defaultColor').value
@@ -1305,8 +1294,7 @@ class MerchandiseStore {
       // Prepare product options
       const productOptions = {
         ...imageContext,
-        title: customization.productName,
-        description: customization.productDescription,
+        // title and description auto-generated on server
         borderConfig: customization.borderStyle !== 'none' ? this.getBorderConfig(customization.borderStyle) : null,
         defaultVariant: {
           size: customization.defaultSize,
@@ -1351,9 +1339,8 @@ class MerchandiseStore {
       
       const formData = new FormData(form);
       const productOptions = {
-        title: formData.get('product-title'),
-        description: formData.get('product-description'),
-        tags: formData.get('product-tags').split(',').map(tag => tag.trim())
+        // Title and description will be auto-generated on server
+        tags: formData.get('product-tags') ? formData.get('product-tags').split(',').map(tag => tag.trim()) : []
       };
       
       const product = await this.createProduct(this.selectedImage, productOptions);
