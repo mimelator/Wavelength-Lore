@@ -58,10 +58,24 @@ header nav ul li .dropdown {
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
-  transition: all 0.3s ease;
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
   z-index: 1000;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
+  padding-top: 0;
+  margin-top: 0;
+  /* Add a pseudo-element to bridge the gap between parent and dropdown */
+}
+
+/* Bridge the gap to prevent hover loss */
+header nav ul li .dropdown::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: transparent;
 }
 
 /* Show dropdown on hover */
@@ -70,6 +84,13 @@ header nav ul li.has-dropdown:focus-within .dropdown {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+  transition-delay: 0s;
+}
+
+/* Keep dropdown visible while hovering over it */
+header nav ul li .dropdown:hover {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* Dropdown items */

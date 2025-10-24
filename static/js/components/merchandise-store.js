@@ -718,7 +718,6 @@ class MerchandiseStore {
         <img src="${image.thumbnailUrl}" alt="${this.cleanImageTitle(image.title)}" />
         <div class="image-info">
           <h4>${this.cleanImageTitle(image.title)}</h4>
-          <p class="image-size">${this.formatFileSize(image.size)}</p>
           <div class="image-actions">
             <button class="gallery-image-select" data-image-id="${image.id}">
               ${this.selectedImage === image.id ? 'Selected' : 'Select'}
@@ -1273,7 +1272,7 @@ class MerchandiseStore {
   }
   
   formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
+    if (!bytes || bytes === 0) return 'Content Image';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
