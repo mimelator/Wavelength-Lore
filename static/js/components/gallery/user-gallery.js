@@ -533,58 +533,69 @@ class UserGallery {
       
       if (img && this.enableLightbox) {
         const index = parseInt(img.dataset.index, 10);
+        console.log('Opening lightbox for image index:', index);
         this.openLightbox(index);
       }
     });
     
     // Lightbox navigation
-    if (this.enableLightbox) {
-      // Close button
-      this.lightbox.querySelector('.lightbox-close').addEventListener('click', () => {
-        this.closeLightbox();
-      });
-      
-      // Previous button
-      this.lightbox.querySelector('.lightbox-prev').addEventListener('click', () => {
-        this.showLightboxImage(this.currentIndex - 1);
-      });
-      
-      // Next button
-      this.lightbox.querySelector('.lightbox-next').addEventListener('click', () => {
-        this.showLightboxImage(this.currentIndex + 1);
-      });
-      
-      // Download button
-      if (this.lightboxDownloadButton) {
-        this.lightboxDownloadButton.addEventListener('click', () => {
-          this.downloadImage(this.images[this.currentIndex]);
-        });
-      }
-      
-      // Close on background click
-      this.lightbox.addEventListener('click', (event) => {
-        if (event.target === this.lightbox) {
-          this.closeLightbox();
-        }
-      });
-      
-      // Keyboard navigation
-      document.addEventListener('keydown', (event) => {
-        if (!this.isLightboxOpen) return;
-        
-        switch (event.key) {
-          case 'Escape':
-            this.closeLightbox();
-            break;
-          case 'ArrowLeft':
-            this.showLightboxImage(this.currentIndex - 1);
-            break;
-          case 'ArrowRight':
-            this.showLightboxImage(this.currentIndex + 1);
-            break;
-        }
+    if (this.enableLightbox && this.lightbox) {
+      this.setupLightboxEventListeners();
+    }
+  }
+  
+  /**
+   * Set up event listeners for the lightbox
+   * @private
+   */
+  setupLightboxEventListeners() {
+    if (!this.lightbox) return;
+    
+    // Close button
+    this.lightbox.querySelector('.lightbox-close').addEventListener('click', () => {
+      this.closeLightbox();
+    });
+    
+    // Previous button
+    this.lightbox.querySelector('.lightbox-prev').addEventListener('click', () => {
+      this.showLightboxImage(this.currentIndex - 1);
+    });
+    
+    // Next button
+    this.lightbox.querySelector('.lightbox-next').addEventListener('click', () => {
+      this.showLightboxImage(this.currentIndex + 1);
+    });
+    
+    // Download button
+    if (this.lightboxDownloadButton) {
+      this.lightboxDownloadButton.addEventListener('click', () => {
+        this.downloadImage(this.images[this.currentIndex]);
       });
     }
+    
+    // Close on background click
+    this.lightbox.addEventListener('click', (event) => {
+      if (event.target === this.lightbox) {
+        this.closeLightbox();
+      }
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (event) => {
+      if (!this.isLightboxOpen) return;
+      
+      switch (event.key) {
+        case 'Escape':
+          this.closeLightbox();
+          break;
+        case 'ArrowLeft':
+          this.showLightboxImage(this.currentIndex - 1);
+          break;
+        case 'ArrowRight':
+          this.showLightboxImage(this.currentIndex + 1);
+          break;
+      }
+    });
   }
   
   /**
@@ -592,12 +603,23 @@ class UserGallery {
    * @param {number} index - The index of the image to show
    */
   openLightbox(index) {
+    console.log('openLightbox called with index:', index);
+    console.log('enableLightbox:', this.enableLightbox);
+    console.log('lightbox element:', this.lightbox);
+    
     if (!this.enableLightbox) return;
+    
+    if (!this.lightbox) {
+      console.error('Lightbox element not found! Creating it now...');
+      this.createLightbox();
+      this.setupLightboxEventListeners();
+    }
     
     this.isLightboxOpen = true;
     this.lightbox.style.display = 'flex';
     document.body.style.overflow = 'hidden'; // Prevent scrolling
     
+    console.log('Lightbox should be visible now');
     this.showLightboxImage(index);
   }
   
