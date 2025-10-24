@@ -246,7 +246,21 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
   <script src="<%= cdnUrl %>/js/shared/screensaver.js"></script>
-  <script src="<%= cdnUrl %>/js/gallery/user-gallery.js?v=<%= Date.now() %>"></script>
+  <script src="<%= cdnUrl %>/js/components/gallery/user-gallery.js?v=<%= Date.now() %>"></script>
+  <script>
+    // Initialize the UserGallery component
+    document.addEventListener('DOMContentLoaded', () => {
+      const gallery = new UserGallery({
+        containerId: 'grid-view',
+        apiEndpoint: '/api/gallery/user/images',
+        layout: 'grid',
+        enableLightbox: true,
+        enableDownload: true,
+        enableScreensaver: true,
+        enableDelete: true
+      });
+    });
+  </script>
   
   <!-- Include standard footer -->
   <%- include('partials/footer') %>
