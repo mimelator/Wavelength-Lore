@@ -824,13 +824,13 @@ class MerchandiseStore {
     return this.products.map(product => `
       <div class="product-card">
         <div class="product-image">
-          <img src="${product.images[0]?.src || product.sourceImage.url}" alt="${product.title}" />
+          <img src="${product.images?.[0]?.src || product.sourceImage?.url || ''}" alt="${product.title}" />
         </div>
         <div class="product-info">
           <h4>${product.title}</h4>
-          <p class="product-description">${product.description}</p>
+          <p class="product-description">${product.description || ''}</p>
           <div class="product-variants">
-            ${product.variants.map(variant => `
+            ${(product.variants || []).map(variant => `
               <div class="variant-option">
                 <span class="variant-details">${variant.title}</span>
                 <span class="variant-price">$${(variant.price / 100).toFixed(2)}</span>
@@ -1326,6 +1326,7 @@ class MerchandiseStore {
       );
       
       if (product) {
+        modal.remove();
         this.showSuccess('Product created successfully!');
         this.selectedImage = null;
         this.render();
