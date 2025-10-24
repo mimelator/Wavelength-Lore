@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Error' %> - Wavelength Lore</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="<%= (typeof cdnUrl !== 'undefined' ? cdnUrl : '/') %>/icons/favicon.svg">
+    
+    <!-- CSS Imports -->
+    <link rel="stylesheet" href="<%= (typeof cdnUrl !== 'undefined' ? cdnUrl : '/') %>/css/styles.css">
+    
+    <style>
+        .error-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid #dc3545;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .error-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #dc3545;
+        }
+        
+        .error-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #721c24;
+        }
+        
+        .error-details {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .error-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+            border: 2px solid #007bff;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: 2px solid #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+            transform: translateY(-1px);
+        }
+        
+        .context-info {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        .timestamp {
+            color: #6c757d;
+            font-size: 12px;
+            text-align: right;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('partials/header') %>
+    
+    <div class="main-wrapper">
+        <div class="container">
+            <div class="error-container">
+                <div class="error-header">
+                    <div class="error-icon">⚠️</div>
+                    <h1><%= title || 'Oops! Something went wrong' %></h1>
+                </div>
+                
+                <% if (typeof message !== 'undefined' && message) { %>
+                <div class="error-message">
+                    <strong>Error:</strong> <%= message %>
+                </div>
+                <% } %>
+                
+                <% if (typeof context !== 'undefined' && context) { %>
+                <div class="context-info">
+                    <% if (context.route) { %>
+                        <strong>Route:</strong> <%= context.route %><br>
+                    <% } %>
+                    <% if (context.operation) { %>
+                        <strong>Operation:</strong> <%= context.operation %><br>
+                    <% } %>
+                    <% if (context.timestamp) { %>
+                        <strong>Occurred:</strong> <%= new Date(context.timestamp).toLocaleString() %>
+                    <% } %>
+                </div>
+                <% } %>
+                
+                <% if (typeof error !== 'undefined' && error && (process.env.NODE_ENV !== 'production')) { %>
+                <details>
+                    <summary style="cursor: pointer; font-weight: bold; margin: 15px 0;">🔍 Technical Details (Development Mode)</summary>
+                    <div class="error-details">
+                        <% if (error.message) { %>
+                            <strong>Message:</strong> <%= error.message %><br><br>
+                        <% } %>
+                        <% if (error.stack) { %>
+                            <strong>Stack Trace:</strong><br>
+                            <pre><%= error.stack %></pre>
+                        <% } %>
+                    </div>
+                </details>
+                <% } %>
+                
+                <div class="error-actions">
+                    <a href="javascript:history.back()" class="btn btn-secondary">
+                        ← Go Back
+                    </a>
+                    <a href="/" class="btn btn-primary">
+                        🏠 Home Page
+                    </a>
+                    <% if (typeof req !== 'undefined' && req.user && req.user.isAdmin) { %>
+                    <a href="/admin" class="btn btn-secondary">
+                        🛡️ Admin Panel
+                    </a>
+                    <% } %>
+                </div>
+                
+                <div class="timestamp">
+                    Error ID: ERR-<%= Date.now() %>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-refresh suggestion for transient errors
+        setTimeout(() => {
+            const refreshBtn = document.createElement('button');
+            refreshBtn.className = 'btn btn-secondary';
+            refreshBtn.innerHTML = '🔄 Try Again';
+            refreshBtn.onclick = () => window.location.reload();
+            
+            const actions = document.querySelector('.error-actions');
+            if (actions) {
+                actions.appendChild(refreshBtn);
+            }
+        }, 5000); // Show refresh option after 5 seconds
+    </script>
+</body>
+</html>

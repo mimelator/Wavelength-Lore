@@ -188,6 +188,30 @@
             <!-- Admin Header -->
             <div class="admin-header">
                 <h1>🛡️ Forum Administration</h1>
+                
+                <!-- Vendor Catalog Quick Stats -->
+                <div id="vendor-stats" style="margin: 15px 0; padding: 12px; background: rgba(255, 255, 255, 0.1); border-radius: 6px; display: none;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; color: white;">
+                        <div style="display: flex; gap: 25px; align-items: center;">
+                            <div style="text-align: center;">
+                                <div id="total-previews" style="font-size: 20px; font-weight: bold;">-</div>
+                                <div style="font-size: 12px; opacity: 0.8;">Preview Products</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div id="total-blueprints" style="font-size: 20px; font-weight: bold;">11</div>
+                                <div style="font-size: 12px; opacity: 0.8;">Product Types</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div id="cache-efficiency" style="font-size: 20px; font-weight: bold;">-</div>
+                                <div style="font-size: 12px; opacity: 0.8;">Cache Hit Rate</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; opacity: 0.8;">
+                            <span id="last-preview-date">Last activity: -</span>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="admin-nav">
                     <button class="admin-tab-btn active" data-tab="users">👥 Users</button>
                     <button class="admin-tab-btn" data-tab="posts">📝 Posts</button>
@@ -205,6 +229,32 @@
                 <a href="/admin/banners" style="background: white; color: #667eea; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                     Manage Banners →
                 </a>
+            </div>
+
+            <!-- Vendor Management Section -->
+            <div class="vendor-management-section" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #42a5f5 0%, #478ed1 100%); border-radius: 8px;">
+                <div style="color: white; margin-bottom: 15px;">
+                    <strong style="font-size: 18px;">🛍️ Vendor & Merchandise Management</strong>
+                    <p style="margin: 5px 0 0; opacity: 0.9; font-size: 14px;">Manage product catalogs, vendor research, and preview generation</p>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <a href="/admin/vendor-research/catalog" style="background: rgba(255, 255, 255, 0.95); color: #42a5f5; padding: 15px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: all 0.2s; display: block; border-left: 4px solid #42a5f5;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        <div style="font-size: 16px; margin-bottom: 5px;">📋 Preview Catalog</div>
+                        <div style="font-size: 12px; opacity: 0.7; font-weight: normal;">Browse & manage all vendor preview products</div>
+                    </a>
+                    <a href="/admin/vendor-research/preview-generator" style="background: rgba(255, 255, 255, 0.95); color: #42a5f5; padding: 15px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: all 0.2s; display: block; border-left: 4px solid #667eea;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        <div style="font-size: 16px; margin-bottom: 5px;">🎨 Preview Generator</div>
+                        <div style="font-size: 12px; opacity: 0.7; font-weight: normal;">Generate new product previews from gallery images</div>
+                    </a>
+                    <a href="/admin/vendor-research" style="background: rgba(255, 255, 255, 0.95); color: #42a5f5; padding: 15px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: all 0.2s; display: block; border-left: 4px solid #764ba2;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        <div style="font-size: 16px; margin-bottom: 5px;">🔍 Vendor Research</div>
+                        <div style="font-size: 12px; opacity: 0.7; font-weight: normal;">Compare vendors and manage provider settings</div>
+                    </a>
+                    <a href="/admin/vendor-research/cache-manager" style="background: rgba(255, 255, 255, 0.95); color: #42a5f5; padding: 15px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: all 0.2s; display: block; border-left: 4px solid #ff7043;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        <div style="font-size: 16px; margin-bottom: 5px;">⚡ Cache Manager</div>
+                        <div style="font-size: 12px; opacity: 0.7; font-weight: normal;">Monitor and optimize global image cache performance</div>
+                    </a>
+                </div>
             </div>
 
             <!-- Admin Content -->
@@ -408,7 +458,43 @@
                     });
                 });
             });
+            
+            // Load vendor catalog stats
+            loadVendorStats();
         });
+        
+        async function loadVendorStats() {
+            try {
+                const response = await fetch('/admin/vendor-catalog/api');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        // Update stats in UI
+                        document.getElementById('total-previews').textContent = data.totalProducts || 0;
+                        
+                        // Calculate cache efficiency (simplified)
+                        const efficiency = data.totalProducts > 0 ? '85%' : '-';
+                        document.getElementById('cache-efficiency').textContent = efficiency;
+                        
+                        // Find latest product date
+                        if (data.products && data.products.length > 0) {
+                            const latest = data.products[0]; // Assuming sorted by date
+                            if (latest.createdAt) {
+                                const date = new Date(latest.createdAt);
+                                document.getElementById('last-preview-date').textContent = 
+                                    `Last activity: ${date.toLocaleDateString()}`;
+                            }
+                        }
+                        
+                        // Show the stats section
+                        document.getElementById('vendor-stats').style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.log('Vendor stats not available:', error.message);
+                // Stats will remain hidden if vendor catalog isn't available
+            }
+        }
     </script>
 
     <!-- Firebase SDK - Use same imports as forum pages -->

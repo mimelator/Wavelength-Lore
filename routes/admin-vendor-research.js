@@ -14,6 +14,10 @@ const AutoEnhancedPrintifyService = require('../services/auto-enhanced-printify-
 const GlobalImageCache = require('../services/global-image-cache');
 const enhancedMerchandiseDB = require('../services/enhanced-merchandise-database');
 
+// Enhanced error handling for admin routes
+const AdminRouteErrorHandler = require('../utils/admin-route-error-handler');
+const adminErrorHandler = new AdminRouteErrorHandler();
+
 // Sample vendor research data (to be populated with real API data)
 const VendorResearchData = {
   tshirts: {
@@ -155,18 +159,40 @@ router.get('/vendor-research/preview-generator', ensureAuthenticated, requireAdm
     const vendorPreviewService = new VendorPreviewService();
     const recentComparisons = await vendorPreviewService.merchandiseDB.getVendorComparisons(userId, 5);
     
-    res.render('admin/vendor-preview-generator', {
+    // Use safe render with enhanced error handling
+    adminErrorHandler.safeRender(res, 'admin/vendor-preview-generator', {
       title: 'Vendor Preview Generator',
       userImages: userImages.slice(0, 20), // Limit to recent 20 images
       vendorData: VendorResearchData,
       recentComparisons,
       user: req.user
+    }, (res, error) => {
+      // Fallback for missing view - provide JSON response
+      console.error('🚨 Vendor preview generator view not available, using JSON response');
+      res.json({
+        success: true,
+        title: 'Vendor Preview Generator',
+        data: {
+          userImages: userImages.slice(0, 20),
+          vendorData: VendorResearchData,
+          recentComparisons
+        },
+        viewError: 'Interface not available - data only',
+        timestamp: new Date().toISOString()
+      });
     });
+    
   } catch (error) {
-    console.error('Error loading vendor preview generator:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to load vendor preview generator'
+    console.error('❌ Error loading vendor preview generator:', error);
+    
+    adminErrorHandler.handleRouteError(res, error, {
+      route: '/admin/vendor-research/preview-generator',
+      operation: 'load_preview_generator',
+      userMessage: 'Failed to load vendor preview generator',
+      additionalData: {
+        feature: 'vendor_preview',
+        component: 'generator'
+      }
     });
   }
 });
@@ -281,17 +307,37 @@ router.get('/vendor-research/comparison/:comparisonId', ensureAuthenticated, req
       });
     }
     
-    res.render('admin/vendor-comparison-view', {
+    // Use safe render with enhanced error handling
+    adminErrorHandler.safeRender(res, 'admin/vendor-comparison-view', {
       title: 'Vendor Comparison Results',
       comparison,
       user: req.user
+    }, (res, error) => {
+      // Fallback for missing view - provide JSON response
+      console.error('🚨 Vendor comparison view not available, using JSON response');
+      res.json({
+        success: true,
+        title: 'Vendor Comparison Results',
+        data: {
+          comparison
+        },
+        viewError: 'Interface not available - data only',
+        timestamp: new Date().toISOString()
+      });
     });
     
   } catch (error) {
-    console.error('Error loading vendor comparison:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to load vendor comparison'
+    console.error('❌ Error loading vendor comparison:', error);
+    
+    adminErrorHandler.handleRouteError(res, error, {
+      route: '/admin/vendor-research/comparison/' + req.params.comparisonId,
+      operation: 'load_vendor_comparison',
+      userMessage: 'Failed to load vendor comparison',
+      additionalData: {
+        feature: 'vendor_comparison',
+        component: 'view',
+        comparisonId: req.params.comparisonId
+      }
     });
   }
 });
@@ -323,16 +369,36 @@ router.delete('/vendor-research/comparison/:comparisonId', ensureAuthenticated, 
 });
 router.get('/vendor-research', ensureAuthenticated, requireAdmin, async (req, res) => {
   try {
-    res.render('admin/vendor-research', {
+    // Use safe render with enhanced error handling
+    adminErrorHandler.safeRender(res, 'admin/vendor-research', {
       title: 'Vendor Research Dashboard',
       vendorData: VendorResearchData,
       user: req.user
+    }, (res, error) => {
+      // Fallback for missing view - provide JSON response
+      console.error('🚨 Vendor research dashboard view not available, using JSON response');
+      res.json({
+        success: true,
+        title: 'Vendor Research Dashboard',
+        data: {
+          vendorData: VendorResearchData
+        },
+        viewError: 'Interface not available - data only',
+        timestamp: new Date().toISOString()
+      });
     });
+    
   } catch (error) {
-    console.error('Error loading vendor research:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to load vendor research dashboard'
+    console.error('❌ Error loading vendor research dashboard:', error);
+    
+    adminErrorHandler.handleRouteError(res, error, {
+      route: '/admin/vendor-research',
+      operation: 'load_vendor_dashboard',
+      userMessage: 'Failed to load vendor research dashboard',
+      additionalData: {
+        feature: 'vendor_research',
+        component: 'dashboard'
+      }
     });
   }
 });
@@ -514,6 +580,8 @@ router.get('/vendor-research/api/live-data', ensureAuthenticated, requireAdmin, 
  */
 router.get('/vendor-research/cache-manager', ensureAuthenticated, requireAdmin, async (req, res) => {
   try {
+    console.log('🔧 Loading cache manager interface...');
+    
     const autoEnhancedService = new AutoEnhancedPrintifyService();
     const globalCache = new GlobalImageCache();
     
@@ -531,19 +599,40 @@ router.get('/vendor-research/cache-manager', ensureAuthenticated, requireAdmin, 
     const dbMetrics = await enhancedMerchandiseDB.getCachePerformanceMetrics();
     const recommendations = dbMetrics.recommendations || [];
     
-    res.render('admin/global-cache-manager', {
+    console.log('✅ Cache manager data loaded successfully');
+    
+    // Use safe render with enhanced error handling
+    adminErrorHandler.safeRender(res, 'admin/global-cache-manager', {
       title: 'Global Cache Manager',
       metrics: metrics || { summary: {} },
       cacheStatus,
       recommendations,
       user: req.user
+    }, (res, error) => {
+      // Fallback for missing view
+      console.error('🚨 Cache manager view not available, using JSON response');
+      res.json({
+        success: true,
+        title: 'Global Cache Manager',
+        metrics: metrics || { summary: {} },
+        cacheStatus,
+        recommendations,
+        viewError: 'Interface not available - data only',
+        timestamp: new Date().toISOString()
+      });
     });
     
   } catch (error) {
-    console.error('Error loading cache manager:', error);
-    res.status(500).render('error', { 
-      message: 'Failed to load cache manager',
-      error: error 
+    console.error('❌ Error loading cache manager:', error);
+    
+    adminErrorHandler.handleRouteError(res, error, {
+      route: '/admin/vendor-research/cache-manager',
+      operation: 'load_cache_manager',
+      userMessage: 'Failed to load cache manager interface',
+      additionalData: {
+        feature: 'cache_management',
+        component: 'global_cache'
+      }
     });
   }
 });
@@ -701,20 +790,40 @@ router.get('/vendor-research/catalog', ensureAuthenticated, requireAdmin, async 
     console.log(`✅ Found ${allPreviews.length} existing vendor previews`);
     console.log(`✅ Found ${userImages.length} user gallery images`);
     
-    res.render('admin/vendor-preview-catalog', {
+    // Use safe render with enhanced error handling and logging
+    adminErrorHandler.safeRender(res, 'admin/vendor-preview-catalog', {
       title: 'Vendor Preview Catalog',
       allPreviews: allPreviews,
       userImages: userImages.slice(0, 20), // Limit for UI performance
       vendorData: VendorResearchData,
       user: req.user
+    }, (res, error) => {
+      // Fallback for missing view - provide JSON response
+      console.error('🚨 Vendor catalog view not available, using JSON response');
+      res.json({
+        success: true,
+        title: 'Vendor Preview Catalog',
+        data: {
+          allPreviews: allPreviews,
+          userImages: userImages.slice(0, 20),
+          vendorData: VendorResearchData
+        },
+        viewError: 'Interface not available - data only',
+        timestamp: new Date().toISOString()
+      });
     });
     
   } catch (error) {
-    console.error('Error loading vendor preview catalog:', error);
-    res.status(500).render('error', {
-      title: 'Error',
-      message: 'Failed to load vendor preview catalog',
-      error: error
+    console.error('❌ Error loading vendor preview catalog:', error);
+    
+    adminErrorHandler.handleRouteError(res, error, {
+      route: '/admin/vendor-research/catalog',
+      operation: 'load_vendor_catalog',
+      userMessage: 'Failed to load vendor preview catalog',
+      additionalData: {
+        feature: 'vendor_catalog',
+        component: 'preview_catalog'
+      }
     });
   }
 });
