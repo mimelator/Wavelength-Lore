@@ -142,6 +142,12 @@ class MerchandiseStore {
   
   async createProduct(imageId, productOptions) {
     try {
+      // Get full image data from gallery
+      const imageData = this.galleryImages.find(img => img.id === imageId);
+      if (!imageData) {
+        throw new Error('Image not found in gallery');
+      }
+      
       // Start with progress feedback for product creation
       this.setLoading(true, 'Preparing your image for product creation...');
       
@@ -170,6 +176,8 @@ class MerchandiseStore {
         },
         body: JSON.stringify({
           imageId,
+          imageUrl: imageData.url,
+          imageTitle: imageData.title || imageData.fileName,
           productOptions
         })
       });
@@ -244,6 +252,12 @@ class MerchandiseStore {
 
   async createGuidedProduct(imageId, productType, customOptions = {}) {
     try {
+      // Get full image data from gallery
+      const imageData = this.galleryImages.find(img => img.id === imageId);
+      if (!imageData) {
+        throw new Error('Image not found in gallery');
+      }
+      
       // First, check if the image needs enhancement to show appropriate loading message
       const needsEnhancement = await this.checkIfImageNeedsEnhancement(imageId);
       
@@ -300,6 +314,8 @@ class MerchandiseStore {
         },
         body: JSON.stringify({
           imageId,
+          imageUrl: imageData.url,
+          imageTitle: imageData.title || imageData.fileName,
           productType,
           customOptions
         })
