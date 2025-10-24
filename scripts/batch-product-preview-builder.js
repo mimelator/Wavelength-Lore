@@ -171,21 +171,42 @@ class BatchProductPreviewBuilder extends APIProductPreviewBuilder {
             }
             console.log(`✅ VALIDATION 1: Blueprint valid`);
 
-            // VALIDATION 2: Get gallery images for user
-            const galleryStorage = require('../utils/gallery/storage');
-            const userImages = await galleryStorage.listUserGalleryImages(userId);
+            // VALIDATION 2: Get gallery images for user (both uploaded AND bookmarks)
+            const axios = require('axios');
+            const baseUrl = process.env.CDN_URL || 'http://localhost:3001';
             
-            if (!userImages || userImages.length === 0) {
+            console.log(`📋 Fetching gallery images for user ${userId} via API`);
+            const galleryResponse = await axios.get(`${baseUrl}/api/gallery/user/images`, {
+                headers: {
+                    'X-User-ID': userId,
+                    'X-API-Request': 'batch-builder'
+                }
+            });
+            
+            if (!galleryResponse.data.success || !galleryResponse.data.images || galleryResponse.data.images.length === 0) {
                 throw new Error('VALIDATION 2 FAILED: No gallery images for user');
             }
-            console.log(`✅ VALIDATION 2: Found ${userImages.length} gallery images`);
             
-            // Use relativePath for vendor preview service (needs full S3 path)
-            const imageId = userImages[0].relativePath;
-            if (!imageId) {
-                throw new Error('VALIDATION 2.5 FAILED: Image missing relativePath');
+            const userImages = galleryResponse.data.images;
+            console.log(`✅ VALIDATION 2: Found ${userImages.length} gallery images (uploaded + bookmarks)`);
+            
+            // Use first available image - can be bookmark (url) or uploaded (relativePath)
+            const firstImage = userImages[0];
+            let imageId;
+            
+            if (firstImage.type === 'bookmark' && firstImage.url) {
+                // Bookmark: use original URL
+                imageId = firstImage.url;
+                console.log(`🖼️ Using bookmark: ${firstImage.title || 'Untitled'}`);
+                console.log(`🔗 URL: ${imageId}`);
+            } else if (firstImage.relativePath) {
+                // Uploaded: use relativePath for S3
+                imageId = firstImage.relativePath;
+                console.log(`🖼️ Using uploaded: ${firstImage.title || 'Untitled'}`);
+                console.log(`📁 Path: ${imageId}`);
+            } else {
+                throw new Error('VALIDATION 2.5 FAILED: Image missing both url and relativePath');
             }
-            console.log(`🖼️ Using: ${imageId}`);
             
             // Map blueprint to product type
             const productTypeMap = {

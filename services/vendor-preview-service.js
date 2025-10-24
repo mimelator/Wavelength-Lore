@@ -390,6 +390,32 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
       const axios = require('axios');
       const baseUrl = process.env.CDN_URL || 'http://localhost:3001';
       
+      // Check if imageId is a URL (bookmark) or a path/filename (uploaded)
+      const isUrl = imageId.startsWith('http://') || imageId.startsWith('https://');
+      
+      if (isUrl) {
+        // BOOKMARK: Download directly from original URL
+        console.log(`🔖 Detected bookmark URL, downloading directly: ${imageId}`);
+        
+        try {
+          const response = await axios.get(imageId, {
+            responseType: 'arraybuffer',
+            timeout: 15000
+          });
+          
+          if (response.status === 200 && response.data) {
+            const imageBuffer = Buffer.from(response.data);
+            console.log(`✅ Downloaded bookmark image: ${Math.round(imageBuffer.length / 1024)}KB`);
+            return imageBuffer;
+          } else {
+            throw new Error(`Failed to download bookmark: status ${response.status}`);
+          }
+        } catch (error) {
+          throw new Error(`Failed to download bookmark image from ${imageId}: ${error.message}`);
+        }
+      }
+      
+      // UPLOADED IMAGE: Use gallery API endpoints
       // Step 1: Get image metadata from gallery API to verify user has access
       const path = require('path');
       const imageFilename = path.basename(imageId);

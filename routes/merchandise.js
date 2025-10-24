@@ -634,6 +634,74 @@ router.get('/vendor-preview/:productId', async (req, res) => {
 });
 
 /**
+ * DELETE /api/merchandise/vendor-preview/:productId
+ * Delete a vendor preview product
+ */
+router.delete('/vendor-preview/:productId', async (req, res) => {
+  try {
+    // Ensure database is ready
+    if (!ensureDatabaseReady(res)) {
+      return; // Error response already sent
+    }
+    
+    const { productId } = req.params;
+    console.log(`🗑️ DELETE REQUEST: Vendor preview ${productId}`);
+    
+    // 1. Verify it's a vendor preview (not a user product)
+    const VendorPreviewHelper = require('../utils/vendor-preview-helper');
+    const previewHelper = new VendorPreviewHelper();
+    
+    const lookupResult = await previewHelper.getProductByIdWithFallback(productId, null);
+    
+    if (!lookupResult.found || !lookupResult.isVendorPreview) {
+      console.log(`   ❌ Not a vendor preview or not found`);
+      return res.status(404).json({
+        success: false,
+        error: 'Vendor preview not found'
+      });
+    }
+    
+    console.log(`   ✅ Confirmed: ${productId} is a vendor preview`);
+    
+    // 2. Delete from Printify
+    try {
+      console.log(`   🗑️ Deleting from Printify...`);
+      await printifyService.deleteProduct(productId);
+      console.log(`   ✅ Deleted from Printify`);
+    } catch (printifyError) {
+      console.error(`   ⚠️  Printify deletion failed:`, printifyError.message);
+      // Continue with database deletion even if Printify fails
+    }
+    
+    // 3. Delete from vendor preview database
+    console.log(`   🗑️ Deleting from vendor preview database...`);
+    const dbResult = await merchandiseDB.deleteVendorPreview(productId);
+    
+    if (!dbResult) {
+      console.log(`   ⚠️  Database deletion failed or product not in database`);
+    } else {
+      console.log(`   ✅ Deleted from vendor preview database`);
+    }
+    
+    console.log(`   ✅ DELETE COMPLETE: ${productId}`);
+    
+    res.json({
+      success: true,
+      message: 'Vendor preview deleted successfully',
+      productId: productId
+    });
+    
+  } catch (error) {
+    console.error('Error deleting vendor preview:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete vendor preview',
+      details: error.message
+    });
+  }
+});
+
+/**
  * GET /api/merchandise/product/:productId
  * Get detailed product information including pricing
  */
