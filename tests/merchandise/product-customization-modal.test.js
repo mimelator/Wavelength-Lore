@@ -47,16 +47,34 @@ class ProductCustomizationTester {
       const text = msg.text();
       if (type === 'error') {
         console.log(`❌ Browser Error: ${text}`);
-      } else if (text.includes('✨') || text.includes('🎨') || text.includes('🛍️')) {
+      } else if (type === 'warning') {
+        console.log(`⚠️  Browser Warning: ${text}`);
+      } else if (text.includes('✨') || text.includes('🎨') || text.includes('🛍️') || text.includes('📸')) {
         console.log(`📱 Browser: ${text}`);
       }
+    });
+    
+    // Page errors
+    this.page.on('pageerror', error => {
+      console.log(`💥 Page Error: ${error.message}`);
     });
     
     // Network monitoring
     this.page.on('response', async response => {
       const url = response.url();
+      const status = response.status();
+      
+      if (url.includes('/api/merchandise/gallery-images')) {
+        console.log(`📡 API: gallery-images - Status: ${status}`);
+        if (status === 200) {
+          try {
+            const data = await response.json();
+            console.log(`   → Images returned: ${data.images?.length || 0}`);
+          } catch (e) {}
+        }
+      }
+      
       if (url.includes('/api/border-preview/generate')) {
-        const status = response.status();
         if (status === 200) {
           console.log(`✅ Border preview generated successfully`);
         } else {
@@ -66,8 +84,8 @@ class ProductCustomizationTester {
     });
   }
 
-  async navigateToMerchandise() {
-    console.log('\n📍 Navigating to merchandise store...');
+  async checkAuthentication() {
+    console.log('\n🔐 TEST: Verify authentication session');
     
     try {
       await this.page.goto(`${BASE_URL}/merchandise`, {
@@ -75,6 +93,68 @@ class ProductCustomizationTester {
         timeout: 30000
       });
       
+      // Check if redirected to login
+      const currentUrl = this.page.url();
+      if (currentUrl.includes('/login')) {
+        throw new Error('Not authenticated - redirected to login page');
+      }
+      
+      // Check for auth indicators and user info
+      const authStatus = await this.page.evaluate(() => {
+        // Check if page has user-specific content
+        const hasUserContent = !!document.querySelector('.store-header');
+        const notOnLoginPage = !window.location.pathname.includes('/login');
+        
+        // Check navigation for user info
+        const userNameElement = document.querySelector('.user-name, .user-info, [class*="user"]');
+        const userName = userNameElement ? userNameElement.textContent : 'Not found';
+        
+        // Check for login/logout buttons
+        const hasLogoutButton = !!document.querySelector('a[href*="logout"], button[onclick*="logout"]');
+        const hasLoginButton = !!document.querySelector('a[href*="login"]');
+        
+        return { 
+          hasUserContent, 
+          notOnLoginPage, 
+          url: window.location.href,
+          userName,
+          hasLogoutButton,
+          hasLoginButton
+        };
+      });
+      
+      if (!authStatus.notOnLoginPage) {
+        throw new Error('Redirected to login - no valid session');
+      }
+      
+      console.log('✅ Authentication verified');
+      console.log(`   → URL: ${authStatus.url}`);
+      console.log(`   → User displayed: ${authStatus.userName}`);
+      console.log(`   → Has logout button: ${authStatus.hasLogoutButton}`);
+      console.log(`   → Has login button: ${authStatus.hasLoginButton}`);
+      
+      if (authStatus.hasLoginButton && !authStatus.hasLogoutButton) {
+        this.results.warnings.push('Navigation shows login button - user may not be authenticated in UI');
+      }
+      
+      this.results.passed.push('Verify authentication session');
+      return true;
+    } catch (error) {
+      console.error('❌ Authentication check failed:', error.message);
+      console.error('   💡 TIP: Make sure server is running in development mode on localhost');
+      console.error('   💡 TIP: Middleware should auto-authenticate localhost requests');
+      this.results.failed.push({
+        test: 'Verify authentication session',
+        error: error.message
+      });
+      return false;
+    }
+  }
+  
+  async navigateToMerchandise() {
+    console.log('\n📍 Navigating to merchandise store...');
+    
+    try {
       await this.page.waitForSelector('.gallery-image-card', { timeout: 20000 });
       
       console.log('✅ Merchandise store loaded');
@@ -82,6 +162,7 @@ class ProductCustomizationTester {
       return true;
     } catch (error) {
       console.error('❌ Failed to navigate:', error.message);
+      console.error('   💡 TIP: Test user may not have any gallery images');
       this.results.failed.push({
         test: 'Navigate to merchandise store',
         error: error.message
@@ -439,6 +520,13 @@ class ProductCustomizationTester {
     console.log('\n🎯 TEST: Create product with full customization');
     
     try {
+      // Count existing products before creation
+      const productCountBefore = await this.page.evaluate(() => {
+        const cards = document.querySelectorAll('.product-card');
+        return cards.length;
+      });
+      console.log(`   → Products before: ${productCountBefore}`);
+      
       // Re-open modal
       console.log('   → Re-opening modal...');
       const createButton = await this.page.waitForSelector('.select-product-type-btn', { timeout: 5000 });
@@ -481,7 +569,7 @@ class ProductCustomizationTester {
       
       // Wait for product creation (may take time with border processing)
       console.log('   → Waiting for product creation...');
-      await wait(5000);
+      await wait(10000);
       
       // Check if modal closed (indicates success)
       const modalStillExists = await this.page.evaluate(() => {
@@ -500,6 +588,76 @@ class ProductCustomizationTester {
       console.error('❌ Create product test failed:', error.message);
       this.results.failed.push({
         test: 'Create product with customization',
+        error: error.message
+      });
+      return false;
+    }
+  }
+  
+  async testProductAppearsInList() {
+    console.log('\n📦 TEST: Verify new product appears in products list');
+    
+    try {
+      // Wait for page to re-render
+      await wait(2000);
+      
+      // Check for product cards
+      const productInfo = await this.page.evaluate(() => {
+        const cards = document.querySelectorAll('.product-card');
+        if (cards.length === 0) {
+          return { count: 0, products: [] };
+        }
+        
+        const products = Array.from(cards).map(card => {
+          const title = card.querySelector('.product-info h4')?.textContent || 'No title';
+          const description = card.querySelector('.product-description')?.textContent || 'No description';
+          const variants = card.querySelectorAll('.variant-option').length;
+          const hasAddToCart = !!card.querySelector('.add-to-cart-btn');
+          const image = card.querySelector('.product-image img')?.src || 'No image';
+          
+          return { title, description, variants, hasAddToCart, image };
+        });
+        
+        return { count: cards.length, products };
+      });
+      
+      console.log(`   → Found ${productInfo.count} product(s)`);
+      
+      if (productInfo.count === 0) {
+        throw new Error('No products found in list');
+      }
+      
+      // Display product details
+      productInfo.products.forEach((product, index) => {
+        console.log(`\n   Product ${index + 1}:`);
+        console.log(`      Title: ${product.title}`);
+        console.log(`      Description: ${product.description.substring(0, 60)}...`);
+        console.log(`      Variants: ${product.variants}`);
+        console.log(`      Has Add to Cart: ${product.hasAddToCart ? '✓' : '✗'}`);
+      });
+      
+      // Verify product has required elements
+      const latestProduct = productInfo.products[productInfo.products.length - 1];
+      
+      if (!latestProduct.title || latestProduct.title === 'No title') {
+        throw new Error('Product missing title');
+      }
+      
+      if (latestProduct.variants === 0) {
+        throw new Error('Product has no variants');
+      }
+      
+      if (!latestProduct.hasAddToCart) {
+        throw new Error('Product missing Add to Cart button');
+      }
+      
+      console.log('\n✅ New product appears correctly in products list');
+      this.results.passed.push('Verify new product appears in list');
+      return true;
+    } catch (error) {
+      console.error('❌ Product list verification failed:', error.message);
+      this.results.failed.push({
+        test: 'Verify new product appears in list',
         error: error.message
       });
       return false;
@@ -556,6 +714,14 @@ async function runTests() {
   try {
     await tester.setup();
     
+    // First check authentication
+    const authenticated = await tester.checkAuthentication();
+    if (!authenticated) {
+      console.log('❌ Cannot continue - authentication failed');
+      await tester.cleanup();
+      process.exit(1);
+    }
+    
     const navigated = await tester.navigateToMerchandise();
     if (!navigated) {
       console.log('❌ Cannot continue - failed to navigate to merchandise store');
@@ -572,6 +738,7 @@ async function runTests() {
     await tester.testSizeColorSelection();
     await tester.testModalClose();
     await tester.testCreateProductWithCustomization();
+    await tester.testProductAppearsInList();
     
     // Print results
     const allPassed = tester.printResults();

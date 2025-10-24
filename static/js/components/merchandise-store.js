@@ -264,46 +264,46 @@ class MerchandiseStore {
       let loadingMessage = `Creating your ${productType}...`;
       if (needsEnhancement) {
         loadingMessage = `🎨 Preparing your image for premium print quality...`;
-        this.setLoading(true, loadingMessage);
+        this.setLoading(true, loadingMessage, 10);
         
-        // Show progressive loading messages with more detail and encouragement
+        // Show progressive loading messages with progress bar
         setTimeout(() => {
           if (this.isLoading) {
-            this.setLoading(true, `🔍 Analyzing image resolution and quality...`);
+            this.setLoading(true, `🔍 Analyzing image resolution and quality...`, 20);
           }
         }, 1000);
         
         setTimeout(() => {
           if (this.isLoading) {
-            this.setLoading(true, `🚀 AI enhancement in progress - making your image print-perfect...`);
+            this.setLoading(true, `🚀 AI enhancement in progress - making your image print-perfect...`, 40);
           }
         }, 2500);
         
         setTimeout(() => {
           if (this.isLoading) {
-            this.setLoading(true, `✨ Enhancing details and sharpening for crystal-clear printing...`);
+            this.setLoading(true, `✨ Enhancing details and sharpening for crystal-clear printing...`, 60);
           }
         }, 4500);
         
         setTimeout(() => {
           if (this.isLoading) {
-            this.setLoading(true, `🎯 Optimizing colors and contrast for vibrant merchandise...`);
+            this.setLoading(true, `🎯 Optimizing colors and contrast for vibrant merchandise...`, 75);
           }
         }, 6500);
         
         setTimeout(() => {
           if (this.isLoading) {
-            this.setLoading(true, `🎽 Almost ready! Creating your beautiful ${productType}...`);
+            this.setLoading(true, `🎽 Almost ready! Creating your beautiful ${productType}...`, 85);
           }
         }, 8500);
         
         setTimeout(() => {
           if (this.isLoading) {
-            this.setLoading(true, `🏁 Final touches - your ${productType} will be amazing!`);
+            this.setLoading(true, `🏁 Final touches - your ${productType} will be amazing!`, 95);
           }
         }, 10500);
       } else {
-        this.setLoading(true, `🎽 Creating your ${productType} with your high-quality image...`);
+        this.setLoading(true, `🎽 Creating your ${productType} with your high-quality image...`, 50);
       }
       
       const response = await fetch('/api/merchandise/create-guided-product', {
@@ -932,6 +932,12 @@ class MerchandiseStore {
             <h3 id="loading-title">Processing Your Request</h3>
           </div>
           <p id="loading-message">Loading...</p>
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="loading-progress-bar">
+              <div class="progress-bar-fill" id="loading-progress-fill"></div>
+            </div>
+            <span class="progress-text" id="loading-progress-text">0%</span>
+          </div>
           <div class="loading-note">
             <small>This may take a moment while we process your request.</small>
           </div>
@@ -1445,10 +1451,12 @@ class MerchandiseStore {
     modal.querySelector('.cancel-btn').onclick = () => modal.style.display = 'none';
   }
   
-  setLoading(isLoading, message = 'Loading...') {
+  setLoading(isLoading, message = 'Loading...', progress = null) {
     this.isLoading = isLoading;
     const modal = document.getElementById('loading-modal');
     const messageEl = document.getElementById('loading-message');
+    const progressFill = document.getElementById('loading-progress-fill');
+    const progressText = document.getElementById('loading-progress-text');
     
     // If loading modal doesn't exist, use the basic loading container
     if (!modal) {
@@ -1466,9 +1474,20 @@ class MerchandiseStore {
     if (isLoading) {
       if (messageEl) messageEl.textContent = message;
       
+      // Update progress bar if progress value provided
+      if (progress !== null && progressFill && progressText) {
+        progressFill.style.width = `${progress}%`;
+        progressText.textContent = `${Math.round(progress)}%`;
+      }
+      
       modal.style.display = 'block';
     } else {
       modal.style.display = 'none';
+      // Reset progress bar
+      if (progressFill && progressText) {
+        progressFill.style.width = '0%';
+        progressText.textContent = '0%';
+      }
     }
   }
   
