@@ -492,7 +492,14 @@ class MerchandiseStore {
   }
   
   async previewEnhancement(imageId) {
+    let progressInterval;
     try {
+      console.log('🎨 Starting preview enhancement for imageId:', imageId);
+      
+      if (!imageId) {
+        throw new Error('Image ID is required');
+      }
+      
       // Start with progress feedback
       this.setLoading(true, 'Analyzing image for print quality...');
       
@@ -506,12 +513,14 @@ class MerchandiseStore {
       ];
       
       let currentStep = 0;
-      const progressInterval = setInterval(() => {
+      progressInterval = setInterval(() => {
         if (currentStep < progressMessages.length - 1) {
           currentStep++;
           this.setLoading(true, progressMessages[currentStep]);
         }
       }, 4000); // Update every 4 seconds for ~20 second process
+      
+      console.log('🌐 Making API request to /api/merchandise/preview-enhancement');
       
       const response = await fetch('/api/merchandise/preview-enhancement', {
         method: 'POST',
@@ -523,21 +532,65 @@ class MerchandiseStore {
       });
       
       clearInterval(progressInterval);
+      progressInterval = null;
+      
+      console.log('📡 API response status:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        let errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+          console.error('❌ API error response:', errorData);
+        } catch (parseError) {
+          console.error('❌ Failed to parse error response:', parseError);
+        }
+        throw new Error(errorMessage);
+      }
       
       const data = await response.json();
+      console.log('📦 API response data:', data);
       
       if (data.success) {
+        console.log('✅ Enhancement preview successful');
         this.setLoading(true, 'Enhancement complete! Loading preview...');
         setTimeout(() => {
-          this.showEnhancementPreview(data.original, data.enhanced, data.analysis);
+          // Transform the backend response to match the expected frontend structure
+          const transformedData = {
+            original: data.original || {
+              url: data.originalImageUrl || '',
+              width: data.originalDimensions?.width || 1024,
+              height: data.originalDimensions?.height || 1024,
+              suitableForPrint: data.originalImageSuitable || false
+            },
+            enhanced: data.enhanced || {
+              url: data.enhancedImageUrl || '',
+              width: data.enhancedDimensions?.width || 2048,
+              height: data.enhancedDimensions?.height || 2048
+            },
+            analysis: data.analysis || {
+              method: data.enhancementMethod || 'AI Enhancement',
+              scaleFactor: data.scaleFactor || 2.0,
+              improvementDescription: data.improvementDescription || 'Image enhanced for printing',
+              processingTime: data.processingTime || 0,
+              cached: data.cached || false
+            }
+          };
+          
+          this.showEnhancementPreview(transformedData.original, transformedData.enhanced, transformedData.analysis);
           this.setLoading(false);
         }, 500);
       } else {
+        console.error('❌ API returned success: false', data);
         throw new Error(data.error || 'Failed to generate preview');
       }
       
     } catch (error) {
-      console.error('Error previewing enhancement:', error);
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
+      console.error('❌ Error previewing enhancement:', error);
+      console.error('Error stack:', error.stack);
       this.showError('Failed to preview enhancement: ' + error.message);
       this.setLoading(false);
     }
@@ -578,9 +631,10 @@ class MerchandiseStore {
             <h3>Print Optimization Details</h3>
             <p class="optimization-note">When you create merchandise, the enhanced version will be automatically used for the best print quality.</p>
             <ul>
-              <li><strong>Improvement:</strong> ${analysis.improvementDescription}</li>
-              <li><strong>Scale Factor:</strong> ${analysis.scaleFactor}x</li>
-              <li><strong>Processing Time:</strong> ${analysis.processingTime}ms</li>
+              <li><strong>Improvement:</strong> ${analysis.improvementDescription || 'Enhanced for printing'}</li>
+              <li><strong>Scale Factor:</strong> ${analysis.scaleFactor || 'Auto'}x</li>
+              ${analysis.processingTime ? `<li><strong>Processing Time:</strong> ${analysis.processingTime}ms</li>` : ''}
+              ${analysis.cached ? '<li><strong>Source:</strong> Cached (Previously Enhanced)</li>' : ''}
             </ul>
           </div>
         </div>

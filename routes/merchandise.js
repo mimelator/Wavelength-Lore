@@ -836,14 +836,35 @@ async function processPayment(paymentToken, lineItems, shippingAddress) {
  * Preview AI enhancement for an image before creating products
  */
 router.post('/preview-enhancement', ensureAuthenticated, async (req, res) => {
+  console.log('🔍 ROUTE: /api/merchandise/preview-enhancement called');
+  console.log('🔍 Request body:', req.body);
+  console.log('🔍 User groups:', req.user?.groups);
+  
+  // Check if user has VIP access
+  const userGroups = req.user.groups || [];
+  if (!userGroups.includes('admin') && !userGroups.includes('content_manager')) {
+    console.log('❌ VIP access denied for user groups:', userGroups);
+    return res.status(403).json({
+      success: false,
+      error: 'VIP access required'
+    });
+  }
+  
+  console.log('✅ VIP access granted');
+  
   try {
     // Ensure database is ready
     if (!ensureDatabaseReady(res)) {
+      console.log('❌ Database not ready');
       return; // Error response already sent
     }
     
+    console.log('✅ Database ready');
+    
     const userId = req.user.uid;
     const { imageId } = req.body;
+    
+    console.log('🔍 Processing request for userId:', userId, 'imageId:', imageId);
     
     if (!imageId) {
       return res.status(400).json({
@@ -907,7 +928,9 @@ router.post('/preview-enhancement', ensureAuthenticated, async (req, res) => {
     console.log(`🎨 No cached version found, generating new enhancement for: ${imageId}`);
     
     // Generate enhancement preview
+    console.log(`🎨 Generating enhancement preview for: ${imageId}`);
     const startTime = Date.now();
+    
     const enhancementResult = await printifyService.previewImageEnhancement(
       imageBuffer,
       selectedImage.fileName || selectedImage.originalName,
@@ -917,7 +940,15 @@ router.post('/preview-enhancement', ensureAuthenticated, async (req, res) => {
       }
     );
     
+    console.log('🔍 Enhancement result:', {
+      success: enhancementResult.success,
+      error: enhancementResult.error,
+      hasEnhancedUrl: !!enhancementResult.enhancedImageUrl,
+      originalSuitable: enhancementResult.originalImageSuitable
+    });
+    
     if (!enhancementResult.success) {
+      console.error('❌ Enhancement failed:', enhancementResult.error);
       return res.status(400).json({
         success: false,
         error: enhancementResult.error || 'Enhancement preview failed'
@@ -975,10 +1006,11 @@ router.post('/preview-enhancement', ensureAuthenticated, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error previewing enhancement:', error);
+    console.error('❌ Error previewing enhancement:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
-      error: 'Failed to preview enhancement'
+      error: 'Failed to preview enhancement: ' + error.message
     });
   }
 });
@@ -988,6 +1020,14 @@ router.post('/preview-enhancement', ensureAuthenticated, async (req, res) => {
  * Check if an image has a cached enhanced version
  */
 router.post('/check-enhancement-status', ensureAuthenticated, async (req, res) => {
+  // Check if user has VIP access
+  const userGroups = req.user.groups || [];
+  if (!userGroups.includes('admin') && !userGroups.includes('content_manager')) {
+    return res.status(403).json({
+      success: false,
+      error: 'VIP access required'
+    });
+  }
   try {
     // Ensure database is ready
     if (!ensureDatabaseReady(res)) {

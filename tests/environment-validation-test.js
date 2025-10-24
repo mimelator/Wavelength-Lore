@@ -167,6 +167,34 @@ class EnvironmentValidationTester {
     }
   }
 
+  // Test method signature mismatches that cause runtime errors
+  async testMethodSignatureMismatches() {
+    console.log('🧪 TESTING: Method signature mismatches between services');
+    
+    try {
+      const AutoEnhancedPrintifyService = require('../services/auto-enhanced-printify-service');
+      const CacheOptimizedPrintifyService = require('../services/cache-optimized-printify-service');
+      
+      const autoService = new AutoEnhancedPrintifyService();
+      const cacheService = new CacheOptimizedPrintifyService();
+      
+      // Check if previewEnhancement method exists on cache service
+      if (typeof cacheService.previewEnhancement !== 'function') {
+        console.error('❌ METHOD SIGNATURE BUG DETECTED: CacheOptimizedPrintifyService missing previewEnhancement method');
+        console.error('   AutoEnhancedPrintifyService.previewImageEnhancement calls cacheOptimizedService.previewEnhancement');
+        console.error('   But CacheOptimizedPrintifyService does not have this method!');
+        return { passed: false, errors: ['CacheOptimizedPrintifyService missing previewEnhancement method'] };
+      }
+      
+      console.log('✅ Method signature validation passed');
+      return { passed: true, errors: [] };
+      
+    } catch (error) {
+      console.error('❌ Method signature validation failed:', error.message);
+      return { passed: false, errors: [error.message] };
+    }
+  }
+
   // Enhanced environment diagnostics
   async runEnhancedDiagnostics() {
     console.log('🔍 ENHANCED ENVIRONMENT DIAGNOSTICS');
@@ -205,12 +233,14 @@ class EnvironmentValidationTester {
     const configTest = await this.testPrintifyEnvironmentAccess();
     const serviceTest = await this.testServiceInitialization();
     const scopeTest = await this.testVariableScopeIssues();
+    const methodTest = await this.testMethodSignatureMismatches();
     
     console.log('\n📊 SUMMARY: Environment Validation Test Results');
     console.log('===============================================');
     console.log(`Config Access Test: ${configTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
     console.log(`Service Init Test: ${serviceTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
     console.log(`Variable Scope Test: ${scopeTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
+    console.log(`Method Signature Test: ${methodTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
     
     if (!configTest.passed) {
       console.log('\n❌ Config Errors:', configTest.errors);
@@ -224,7 +254,11 @@ class EnvironmentValidationTester {
       console.log('\n❌ Scope Errors:', scopeTest.errors);
     }
     
-    const allPassed = configTest.passed && serviceTest.passed && scopeTest.passed;
+    if (!methodTest.passed) {
+      console.log('\n❌ Method Signature Errors:', methodTest.errors);
+    }
+    
+    const allPassed = configTest.passed && serviceTest.passed && scopeTest.passed && methodTest.passed;
     console.log(`\n🎯 OVERALL RESULT: ${allPassed ? '✅ ALL TESTS PASSED' : '❌ TESTS FAILED - ENVIRONMENT ISSUE DETECTED'}`);
     
     return allPassed;

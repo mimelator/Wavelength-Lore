@@ -661,6 +661,7 @@ class EnhancedPrintifyService extends PrintifyService {
       }
       
       // Generate enhanced version
+      console.log('🎨 Generating enhanced version for preview...');
       const enhancementResult = await this.upscalingService.upscaleImage(
         imageBuffer,
         // Pass fileName in the options object
@@ -673,15 +674,37 @@ class EnhancedPrintifyService extends PrintifyService {
         }
       );
       
+      console.log('🔍 Enhancement result:', {
+        success: enhancementResult.success,
+        error: enhancementResult.error,
+        hasPrintOptimized: !!enhancementResult.printOptimized,
+        hasUpscaledBuffer: !!enhancementResult.upscaledBuffer,
+        hasMetadata: !!enhancementResult.metadata
+      });
+      
       if (!enhancementResult.success) {
         throw new Error(enhancementResult.error || 'Enhancement failed');
+      }
+      
+      // Validate enhancement result has a buffer
+      const enhancedBuffer = enhancementResult.printOptimized || enhancementResult.upscaledBuffer;
+      console.log('🔍 Buffer validation:', {
+        printOptimized: !!enhancementResult.printOptimized,
+        upscaledBuffer: !!enhancementResult.upscaledBuffer,
+        enhancedBuffer: !!enhancedBuffer,
+        isBuffer: Buffer.isBuffer(enhancedBuffer),
+        bufferLength: enhancedBuffer?.length
+      });
+      
+      if (!enhancedBuffer || !Buffer.isBuffer(enhancedBuffer)) {
+        throw new Error('Enhancement result missing valid image buffer');
       }
       
       // Store the enhanced image in S3 to get a URL
       const storeResult = await this.upscalingService.storeUpscaledImage(
         options.userId || 'preview-user',
         options.originalImageId || 'preview-image',
-        enhancementResult.printOptimized,
+        enhancedBuffer,
         enhancementResult.metadata
       );
 
@@ -690,7 +713,7 @@ class EnhancedPrintifyService extends PrintifyService {
       }
 
       const originalDimensions = await this.getImageDimensions(imageBuffer);
-      const enhancedDimensions = await this.getImageDimensions(enhancementResult.printOptimized);
+      const enhancedDimensions = await this.getImageDimensions(enhancedBuffer);
       
       return {
         originalImageSuitable: false,

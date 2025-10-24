@@ -1,69 +1,73 @@
 /**
- * Auto-Enhanced Printify Service
+ * Refactored Printify Service
  * 
- * Wrapper around PrintifyService that automatically applies AI enhancement
- * when needed with global cache optimization to minimize redundant processing.
- * This makes enhancement completely transparent to users while maximizing efficiency.
+ * Single service with clear separation of concerns using composition over inheritance
  */
 
 const PrintifyService = require('./printify-service');
-const CacheOptimizedPrintifyService = require('./cache-optimized-printify-service');
+const ImageUpscalingService = require('./image-upscaling-service');
 
 class AutoEnhancedPrintifyService extends PrintifyService {
   constructor() {
     super();
-    this.cacheOptimizedService = new CacheOptimizedPrintifyService();
+    
+    // Composition over inheritance
+    this.upscaler = new ImageUpscalingService();
+    this.merchandiseDB = require('./merchandise-database');
+    
+    // Configuration
     this.cacheEnabled = true;
+    this.autoEnhancementEnabled = true;
   }
   
   /**
-   * Upload image with automatic enhancement detection and processing
-   * Now with global cache optimization to minimize redundant enhancement
-   * @param {Buffer} imageBuffer - Image file buffer
-   * @param {string} fileName - Original filename
-   * @param {string} title - Display title for the image
-   * @param {Object} options - Additional options for enhancement
-   * @returns {Object} Upload result with automatic enhancement info
+   * Upload image with automatic enhancement
+   * @param {Buffer} imageBuffer - Image buffer
+   * @param {string} fileName - Filename
+   * @param {string} title - Display title
+   * @param {Object} options - Upload options
+   * @returns {Object} Upload result
    */
   async uploadImage(imageBuffer, fileName, title, options = {}) {
     try {
-      console.log('🔄 Auto-analyzing image for merchandise quality with cache optimization...');
+      console.log('🔄 Auto-enhancement upload for:', fileName);
       
-      // Use the cache-optimized service's auto-enhancement method
-      const result = await this.cacheOptimizedService.uploadImageWithAutoEnhancement(
-        imageBuffer, 
-        fileName, 
-        { title, ...options }
-      );
+      let finalBuffer = imageBuffer;
+      let enhancementInfo = { autoEnhanced: false };
       
-      if (result.autoEnhanced) {
-        if (result.enhancementSource === 'cached') {
-          console.log(`♻️ Image enhancement reused from ${result.cacheSource} - processing time saved!`);
-        } else {
-          console.log(`✨ Image auto-enhanced using ${result.qualityEnhancement.metadata?.method} for better print quality`);
+      // Auto-enhance if enabled
+      if (this.autoEnhancementEnabled) {
+        const preview = await this.previewImageEnhancement(imageBuffer, fileName, options);
+        
+        if (preview.success && !preview.originalImageSuitable) {
+          // Download enhanced image
+          const enhancedBuffer = await this.downloadImageBuffer(preview.enhancedImageUrl);
+          if (enhancedBuffer) {
+            finalBuffer = enhancedBuffer;
+            enhancementInfo = {
+              autoEnhanced: true,
+              enhancementSource: 'generated',
+              qualityEnhancement: {
+                metadata: {
+                  method: preview.enhancementMethod,
+                  scaleFactor: preview.scaleFactor
+                }
+              }
+            };
+          }
         }
-      } else if (result.qualityEnhancement?.originalSuitable) {
-        console.log('✅ Image quality already suitable for professional printing');
-      } else if (result.enhancementSource === 'failed') {
-        console.log('⚠️ Enhancement failed, using original image quality');
       }
       
-      // Add cache performance info to result
-      if (result.cacheOptimization) {
-        console.log('📊 Cache optimization result:', {
-          contentHash: result.cacheOptimization.contentHash?.substring(0, 12) + '...',
-          isFirstOccurrence: result.cacheOptimization.isFirstOccurrence,
-          globalCacheUsed: result.cacheOptimization.globalCacheUsed,
-          newEnhancementStored: result.cacheOptimization.newEnhancementStored
-        });
-      }
+      // Upload to Printify
+      const uploadResult = await super.uploadImage(finalBuffer, fileName, title);
       
-      return result;
+      return {
+        ...uploadResult,
+        ...enhancementInfo
+      };
       
     } catch (error) {
-      console.error('Cache-optimized auto-enhancement failed, falling back to standard upload:', error);
-      
-      // Fallback to standard upload if cache-optimized enhancement system fails
+      console.error('Auto-enhancement upload failed:', error);
       return super.uploadImage(imageBuffer, fileName, title);
     }
   }
@@ -198,78 +202,285 @@ class AutoEnhancedPrintifyService extends PrintifyService {
     }
   }
   
-  /**
-   * Get enhancement status and recommendations for an image buffer
-   * @param {Buffer} imageBuffer - Image buffer to analyze
-   * @returns {Object} Enhancement analysis
-   */
-  async analyzeImageQuality(imageBuffer) {
+  // Helper methods with clear responsibilities
+  
+  async getCachedEnhancement(imageId) {
     try {
-      return await this.cacheOptimizedService.upscalingService.analyzeImageQuality(imageBuffer);
+      const sanitized = this.sanitizeFirebaseKey(imageId);
+      return await this.merchandiseDB.getEnhancedImage(sanitized);
     } catch (error) {
-      console.error('Error analyzing image quality:', error);
-      return {
-        error: error.message,
-        suitableForPrint: null,
-        recommendedAction: 'unknown'
-      };
+      console.warn('Cache lookup failed:', error);
+      return null;
     }
   }
 
-  /**
-   * Get cache performance metrics
-   * @returns {Promise<Object>} Cache performance data
-   */
-  async getCachePerformanceMetrics() {
+  async generateEnhancement(imageBuffer, fileName, options, analysis) {
     try {
-      return await this.cacheOptimizedService.getCachePerformanceMetrics();
-    } catch (error) {
-      console.error('Error getting cache performance metrics:', error);
-      return {
-        error: error.message
+      console.log('🔍 generateEnhancement called with:', {
+        fileName,
+        bufferLength: imageBuffer.length,
+        analysisKeys: Object.keys(analysis),
+        optionsKeys: Object.keys(options)
+      });
+      
+      const upscaleOptions = {
+        fileName,
+        contentType: this.detectContentType(fileName),
+        targetDimensions: analysis.targetDimensions,
+        ...options
       };
+      
+      console.log('🔍 Calling upscaler.upscaleImage with options:', {
+        fileName: upscaleOptions.fileName,
+        contentType: upscaleOptions.contentType,
+        hasTargetDimensions: !!upscaleOptions.targetDimensions
+      });
+      
+      const result = await this.upscaler.upscaleImage(imageBuffer, upscaleOptions);
+      
+      console.log('🔍 Upscaler result:', {
+        success: result.success,
+        error: result.error,
+        method: result.method,
+        hasPrintOptimized: !!result.printOptimized,
+        hasUpscaledBuffer: !!result.upscaledBuffer,
+        hasMetadata: !!result.metadata,
+        resultKeys: Object.keys(result)
+      });
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Enhancement failed');
+      }
+      
+      // Handle cache hit case where buffer is not provided
+      let enhancedBuffer = result.printOptimized || result.upscaledBuffer;
+      const imageUrl = result.upscaledUrl || result.enhancedUrl;
+      
+      console.log('🔍 Buffer validation:', {
+        method: result.method,
+        cached: result.cached,
+        printOptimized: !!result.printOptimized,
+        upscaledBuffer: !!result.upscaledBuffer,
+        enhancedBuffer: !!enhancedBuffer,
+        isBuffer: Buffer.isBuffer(enhancedBuffer),
+        bufferLength: enhancedBuffer?.length,
+        hasUrl: !!imageUrl,
+        imageUrl: imageUrl
+      });
+      
+      // If no buffer but we have a URL (cache hit), download the buffer
+      console.log('🔍 DOWNLOAD CHECK: isBuffer=', Buffer.isBuffer(enhancedBuffer), 'hasUrl=', !!imageUrl, 'url=', imageUrl);
+      if (!Buffer.isBuffer(enhancedBuffer) && imageUrl) {
+        console.log('🔍 Cache hit detected, downloading buffer from URL:', imageUrl);
+        try {
+          enhancedBuffer = await this.downloadImageBuffer(imageUrl);
+          console.log('✅ Successfully downloaded cached image buffer:', enhancedBuffer?.length, 'bytes');
+        } catch (downloadError) {
+          console.error('❌ Failed to download cached image:', downloadError.message);
+          throw new Error('Failed to download cached enhanced image');
+        }
+      }
+      
+      if (!Buffer.isBuffer(enhancedBuffer)) {
+        console.error('❌ BUFFER VALIDATION FAILED:', {
+          printOptimized: result.printOptimized,
+          upscaledBuffer: result.upscaledBuffer,
+          enhancedBuffer: enhancedBuffer,
+          typeOfEnhancedBuffer: typeof enhancedBuffer,
+          method: result.method,
+          cached: result.cached,
+          upscaledUrl: result.upscaledUrl,
+          enhancedUrl: result.enhancedUrl,
+          imageUrl: imageUrl,
+          downloadAttempted: !!imageUrl && !Buffer.isBuffer(result.printOptimized || result.upscaledBuffer)
+        });
+        throw new Error('Enhancement result missing valid image buffer');
+      }
+      
+      // Store enhanced image in S3
+      const storeResult = await this.upscaler.storeUpscaledImage(
+        options.userId || 'preview-user',
+        options.originalImageId || 'preview-image',
+        enhancedBuffer,
+        result.metadata
+      );
+      
+      if (!storeResult?.url) {
+        throw new Error('Failed to store enhanced image');
+      }
+      
+      const originalDims = await this.getImageDimensions(imageBuffer);
+      const enhancedDims = await this.getImageDimensions(enhancedBuffer);
+      
+      return {
+        success: true,
+        originalImageSuitable: false,
+        originalDimensions: originalDims,
+        enhancedDimensions: enhancedDims,
+        enhancedImageUrl: storeResult.url,
+        enhancementMethod: result.metadata?.method || 'AI Upscaling',
+        scaleFactor: Math.round((enhancedDims.width / originalDims.width) * 10) / 10,
+        improvementDescription: `Enhanced from ${originalDims.width}×${originalDims.height} to ${enhancedDims.width}×${enhancedDims.height}`
+      };
+      
+    } catch (error) {
+      console.error('Enhancement generation failed:', error);
+      throw error;
     }
   }
 
-  /**
-   * Enable or disable cache optimization
-   * @param {boolean} enabled - Whether to enable cache optimization
-   */
-  setCacheEnabled(enabled) {
+  formatCachedResult(cached) {
+    return {
+      success: true,
+      originalImageSuitable: false,
+      originalDimensions: cached.originalDimensions || { width: 1024, height: 1024 },
+      enhancedDimensions: cached.enhancedDimensions || { width: 2048, height: 2048 },
+      enhancedImageUrl: cached.enhancedImageUrl,
+      enhancementMethod: cached.enhancementMethod || 'Cached Enhancement',
+      scaleFactor: cached.scaleFactor || 2.0,
+      improvementDescription: cached.improvementDescription || 'Quality enhanced for printing',
+      cached: true
+    };
+  }
+
+  formatOriginalResult(analysis) {
+    const dims = { width: analysis.originalWidth, height: analysis.originalHeight };
+    return {
+      success: true,
+      originalImageSuitable: true,
+      originalDimensions: dims,
+      enhancedDimensions: dims,
+      enhancedImageUrl: '', // Use original
+      enhancementMethod: 'Not needed',
+      scaleFactor: 1.0,
+      improvementDescription: 'Image quality is already suitable for printing'
+    };
+  }
+
+  async storeEnhancementInCache(imageId, enhancement) {
+    try {
+      const data = {
+        enhancedImageUrl: enhancement.enhancedImageUrl,
+        enhancementMethod: enhancement.enhancementMethod,
+        originalDimensions: enhancement.originalDimensions,
+        enhancedDimensions: enhancement.enhancedDimensions,
+        scaleFactor: enhancement.scaleFactor,
+        improvementDescription: enhancement.improvementDescription
+      };
+      
+      const sanitized = this.sanitizeFirebaseKey(imageId);
+      await this.merchandiseDB.storeEnhancedImage(sanitized, data);
+      console.log('✅ Stored enhancement in cache');
+    } catch (error) {
+      console.warn('Failed to store in cache:', error);
+    }
+  }
+
+  // Utility methods
+  
+  sanitizeFirebaseKey(key) {
+    return key.replace(/[.#$\[\]\/]/g, '_');
+  }
+
+  detectContentType(fileName) {
+    const name = fileName.toLowerCase();
+    if (name.includes('photo') || name.includes('portrait')) return 'photo';
+    if (name.includes('art') || name.includes('draw')) return 'artwork';
+    if (name.includes('character')) return 'character';
+    return 'illustration';
+  }
+
+  async getImageDimensions(imageBuffer) {
+    try {
+      const sharp = require('sharp');
+      const metadata = await sharp(imageBuffer).metadata();
+      return { width: metadata.width, height: metadata.height };
+    } catch (error) {
+      console.error('Error getting dimensions:', error);
+      return { width: 0, height: 0 };
+    }
+  }
+
+  async downloadImageBuffer(url) {
+    try {
+      const axios = require('axios');
+      const response = await axios.get(url, { responseType: 'arraybuffer' });
+      return Buffer.from(response.data);
+    } catch (error) {
+      console.error('Error downloading image:', error);
+      throw new Error('Failed to download image from URL');
+    }
+  }
+
+  // Configuration methods
+  
+  setCacheEnabled(enabled = true) {
     this.cacheEnabled = enabled;
-    this.cacheOptimizedService.setCacheEnabled(enabled);
-    console.log(`🔧 Auto-enhanced service cache optimization ${enabled ? 'ENABLED' : 'DISABLED'}`);
+    console.log(`🔧 Cache ${enabled ? 'enabled' : 'disabled'}`);
+  }
+
+  setAutoEnhancementEnabled(enabled = true) {
+    this.autoEnhancementEnabled = enabled;
+    console.log(`🔧 Auto-enhancement ${enabled ? 'enabled' : 'disabled'}`);
   }
   
   /**
-   * Preview image enhancement without actually uploading to Printify
-   * Allows users to see enhancement results before committing to product creation
-   * @param {Buffer} imageBuffer - Image file buffer
+   * Single method for image enhancement preview
+   * @param {Buffer} imageBuffer - Image buffer
    * @param {string} fileName - Original filename
    * @param {Object} options - Enhancement options
-   * @returns {Object} Preview result with original and enhanced image info
+   * @returns {Object} Preview result
    */
   async previewImageEnhancement(imageBuffer, fileName, options = {}) {
     try {
       console.log('🔍 Generating enhancement preview for:', fileName);
       
-      // Use the enhanced service's preview method
-      const result = await this.enhancedService.previewEnhancement(
-        imageBuffer, 
-        fileName, 
-        options
-      );
+      // Validate inputs
+      if (!Buffer.isBuffer(imageBuffer)) {
+        throw new Error('Invalid image buffer');
+      }
       
-      return {
-        success: true,
-        ...result
-      };
+      // Check cache first if enabled
+      if (this.cacheEnabled && options.originalImageId) {
+        const cached = await this.getCachedEnhancement(options.originalImageId);
+        if (cached) {
+          return this.formatCachedResult(cached);
+        }
+      }
+      
+      // Analyze image quality
+      console.log('🔍 Analyzing image quality...');
+      const analysis = await this.upscaler.analyzeImageQuality(imageBuffer);
+      
+      console.log('🔍 Quality analysis result:', {
+        suitableForPrint: analysis.suitableForPrint,
+        originalWidth: analysis.originalWidth,
+        originalHeight: analysis.originalHeight,
+        recommendedAction: analysis.recommendedAction
+      });
+      
+      // If already suitable, return original
+      if (analysis.suitableForPrint) {
+        console.log('🔍 Image already suitable, returning original result');
+        return this.formatOriginalResult(analysis);
+      }
+      
+      // Generate enhancement
+      console.log('🔍 Image needs enhancement, generating...');
+      const enhancement = await this.generateEnhancement(imageBuffer, fileName, options, analysis);
+      
+      // Store in cache if enabled
+      if (this.cacheEnabled && options.originalImageId && enhancement.success) {
+        await this.storeEnhancementInCache(options.originalImageId, enhancement);
+      }
+      
+      return enhancement;
       
     } catch (error) {
       console.error('Enhancement preview failed:', error);
       return {
         success: false,
-        error: error.message || 'Preview generation failed'
+        error: error.message
       };
     }
   }
