@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> - Wavelength Community Forum</title>
+    <%- include('../partials/head', {
+        title: title + ' - Wavelength Community Forum',
+        pageDescription: 'Search the Wavelength Community Forum'
+    }) %>
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="<%= cdnUrl %>/icons/favicon.svg">
-    
-    <!-- Reuse existing styles -->
-    <link rel="stylesheet" href="<%= cdnUrl %>/css/styles.css">
+    <!-- Forum-specific CSS -->
     <link rel="stylesheet" href="<%= cdnUrl %>/css/forum.css">
     
     <!-- Firebase CDN -->

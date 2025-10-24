@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create New Post - Wavelength Community Forum</title>
+    <%- include('../partials/head', {
+        title: 'Create New Post - Wavelength Community Forum',
+        pageDescription: 'Create a new post in the Wavelength Community Forum'
+    }) %>
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="<%= cdnUrl %>/icons/favicon.svg">
-    
-    <!-- Reuse existing styles -->
-    <link rel="stylesheet" href="<%= cdnUrl %>/css/styles.css">
-    <link rel="stylesheet" href="<%= cdnUrl %>/css/carousel.css">
-    <link rel="stylesheet" href="/css/forum.css">
+    <!-- Forum-specific CSS -->
+    <link rel="stylesheet" href="<%= cdnUrl %>/css/forum.css">
     
     <!-- Firebase SDK -->
     <!-- Firebase Configuration -->
@@ -38,7 +34,6 @@
     <script src="/js/forum.js" defer></script>
 </head>
 <body>
-    <!-- Include forum navigation (flat, no dropdowns) -->
     <%- include('../partials/header') %>
     
     <div class="forum-container">

@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forum Admin - Wavelength Lore</title>
+    <%- include('../partials/head', {
+        title: 'Forum Admin - Wavelength Lore',
+        pageDescription: 'Admin panel for managing the Wavelength Community Forum'
+    }) %>
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="<%= cdnUrl %>/icons/favicon.svg">
-    
-    <!-- CSS Imports - Match forum pages -->
-    <link rel="stylesheet" href="<%= cdnUrl %>/css/styles.css">
+    <!-- Forum-specific CSS -->
     <link rel="stylesheet" href="<%= cdnUrl %>/css/forum.css">
     <style>
         /* Admin Panel Custom Styles - Match main site styling */

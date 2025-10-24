@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> - Wavelength Community Forum</title>
+    <%- include('../partials/head', {
+        title: title + ' - Wavelength Community Forum',
+        pageDescription: 'Browse forum topics in the Wavelength Community'
+    }) %>
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="<%= cdnUrl %>/icons/favicon.svg">
-    
-    <!-- Reuse existing styles -->
-    <link rel="stylesheet" href="<%= cdnUrl %>/css/styles.css">
-    <link rel="stylesheet" href="<%= cdnUrl %>/css/carousel.css">
-    <link rel="stylesheet" href="/css/forum.css">
+    <!-- Forum-specific CSS -->
+    <link rel="stylesheet" href="<%= cdnUrl %>/css/forum.css">
     
     <!-- Firebase SDK - Direct imports for better compatibility -->
     <script type="module">
@@ -82,11 +78,7 @@
     <script src="/js/forum.js" defer></script>
 </head>
 <body>
-    <!-- Include forum navigation (flat, no dropdowns) -->
     <%- include('../partials/header') %>
-    
-    <!-- Include existing navigation -->
-    <%- include('../partials/head') %>
     
     <div class="forum-container">
         <!-- Forum Header -->
