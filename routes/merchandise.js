@@ -253,12 +253,12 @@ router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireActi
     }
     
     const userId = req.user.uid;
-    const { imageId, productType, imageContext = {} } = req.body;
+    const { imageId, imageUrl, imageTitle, productType, imageContext = {} } = req.body;
     
-    if (!imageId || !productType) {
+    if (!imageId || !imageUrl || !productType) {
       return res.status(400).json({
         success: false,
-        error: 'Image ID and product type are required'
+        error: 'Image ID, URL, and product type are required'
       });
     }
     
@@ -271,32 +271,21 @@ router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireActi
       });
     }
     
-    // Verify the image belongs to the user
-    const userImages = await galleryStorage.listUserGalleryImages(userId);
-    const selectedImage = userImages.find(img => img.relativePath === imageId);
-    
-    if (!selectedImage) {
-      return res.status(403).json({
-        success: false,
-        error: 'Image not found in your gallery'
-      });
-    }
-    
     // Generate product details automatically
     const productName = generateProductName(productType, {
       ...imageContext,
-      imageTitle: selectedImage.originalName
+      imageTitle: imageTitle || imageId
     });
     
     const productDescription = generateProductDescription(productType, {
       ...imageContext,
-      imageTitle: selectedImage.originalName
+      imageTitle: imageTitle || imageId
     });
     
     const productTags = generateProductTags(productType, imageContext);
     
-    // Download image from S3 for processing with auto-enhancement
-    const imageBuffer = await downloadImageFromS3(selectedImage.url);
+    // Download image from URL for processing with auto-enhancement
+    const imageBuffer = await downloadImageFromS3(imageUrl);
     if (!imageBuffer) {
       return res.status(400).json({
         success: false,
@@ -309,7 +298,7 @@ router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireActi
     // Create product with auto-enhancement
     const productResult = await printifyService.createCustomProductWithBlueprintAndAutoEnhancement(
       imageBuffer,
-      selectedImage.fileName,
+      imageTitle || imageId,
       {
         title: productName,
         description: productDescription,
@@ -332,16 +321,16 @@ router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireActi
     // Store product association with user
     await merchandiseDB.storeUserProduct(userId, {
       productId: productResult.productId,
-      imageId: sanitizeFirebaseKey(selectedImage.relativePath),
+      imageId: sanitizeFirebaseKey(imageId),
       printifyImageId: productResult.uploadedImage?.id,
       title: productName,
       description: productDescription,
       productType: productType,
       productConfig: productConfig,
       sourceImage: {
-        id: sanitizeFirebaseKey(selectedImage.relativePath),
-        title: selectedImage.originalName,
-        url: selectedImage.url
+        id: sanitizeFirebaseKey(imageId),
+        title: imageTitle || imageId,
+        url: imageUrl
       },
       // Add enhancement info
       enhancement: {
@@ -366,7 +355,7 @@ router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireActi
         description: productDescription,
         tags: productTags,
         productType: productType,
-        sourceImage: selectedImage,
+        sourceImage: { id: imageId, title: imageTitle, url: imageUrl },
         variants: productResult.variants,
         images: productResult.images
       },
@@ -399,28 +388,17 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
     }
     
     const userId = req.user.uid;
-    const { imageId, productOptions = {} } = req.body;
+    const { imageId, imageUrl, imageTitle, productOptions = {} } = req.body;
     
-    if (!imageId) {
+    if (!imageId || !imageUrl) {
       return res.status(400).json({
         success: false,
-        error: 'Image ID is required'
+        error: 'Image ID and URL are required'
       });
     }
     
-    // Verify the image belongs to the user
-    const userImages = await galleryStorage.listUserGalleryImages(userId);
-    const selectedImage = userImages.find(img => img.relativePath === imageId);
-    
-    if (!selectedImage) {
-      return res.status(403).json({
-        success: false,
-        error: 'Image not found in your gallery'
-      });
-    }
-    
-    // Download image from S3 for processing
-    const imageBuffer = await downloadImageFromS3(selectedImage.url);
+    // Download image from URL for processing
+    const imageBuffer = await downloadImageFromS3(imageUrl);
     if (!imageBuffer) {
       return res.status(400).json({
         success: false,
@@ -428,15 +406,15 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
       });
     }
     
-    console.log('🎯 Creating merchandise with auto-enhancement for image:', selectedImage.originalName);
+    console.log('🎯 Creating merchandise with auto-enhancement for image:', imageTitle || imageId);
     
     // Create product with auto-enhancement
     const productResult = await printifyService.createCustomProductWithAutoEnhancement(
       imageBuffer,
-      selectedImage.fileName,
+      imageTitle || imageId,
       {
-        title: generateProductTitle(selectedImage.fileName || selectedImage.originalName, 'T-Shirt'),
-        description: `Premium custom t-shirt featuring "${prettifyImageName(selectedImage.fileName || selectedImage.originalName)}" from your Wavelength Lore collection`,
+        title: generateProductTitle(imageTitle || imageId, 'T-Shirt'),
+        description: `Premium custom t-shirt featuring "${prettifyImageName(imageTitle || imageId)}" from your Wavelength Lore collection`,
         tags: ['wavelength', 'custom', 'gallery', ...(productOptions.tags || [])],
         userId: userId,
         originalImageId: imageId
@@ -453,13 +431,13 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
     // Store product association with user
     await merchandiseDB.storeUserProduct(userId, {
       productId: productResult.productId,
-      imageId: sanitizeFirebaseKey(selectedImage.relativePath),
+      imageId: sanitizeFirebaseKey(imageId),
       printifyImageId: productResult.uploadedImage?.id,
       title: productResult.title,
       sourceImage: {
-        id: sanitizeFirebaseKey(selectedImage.relativePath),
-        title: selectedImage.originalName,
-        url: selectedImage.url
+        id: sanitizeFirebaseKey(imageId),
+        title: imageTitle || imageId,
+        url: imageUrl
       },
       // Add enhancement info
       enhancement: {
@@ -484,9 +462,9 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
         variants: productResult.variants,
         images: productResult.images,
         sourceImage: {
-          id: sanitizeFirebaseKey(selectedImage.relativePath),
-          title: selectedImage.originalName,
-          url: selectedImage.url
+          id: sanitizeFirebaseKey(imageId),
+          title: imageTitle || imageId,
+          url: imageUrl
         }
       },
       enhancement: {
