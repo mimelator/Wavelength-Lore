@@ -140,7 +140,7 @@ function checkEnvironmentVariables() {
   
   if (process.env.AWS_SECRET_ACCESS_KEY && !process.env.SECRET_ACCESS_KEY) {
     console.log(`${colors.yellow}⚠ AWS_SECRET_ACCESS_KEY is set but SECRET_ACCESS_KEY is not. Gallery uses SECRET_ACCESS_KEY format.${colors.reset}`);
-    console.log(`  Consider setting SECRET_ACCESS_KEY=${process.env.AWS_SECRET_ACCESS_KEY}`);
+    console.log(`  Consider setting SECRET_ACCESS_KEY=[REDACTED-FOR-SECURITY]`);
   }
   
   if (!allRequiredPresent) {

@@ -32,48 +32,92 @@ class VendorPreviewHelper {
     try {
       console.log('💾 VENDOR PREVIEW STORAGE: Storing preview in cache...');
       
-      // Validate required product data
+      // ENHANCED VALIDATION: Prevent orphaned entries
       if (!productData?.product?.productId) {
         throw new Error('Invalid productData: missing product.productId');
       }
 
+      // Additional validation to prevent orphaned entries
       const productId = productData.product.productId;
+      
+      // Validate productId format and content
+      if (typeof productId !== 'string' || productId.trim() === '' || productId === 'undefined') {
+        throw new Error(`Invalid productId format: ${JSON.stringify(productId)} - must be non-empty string`);
+      }
+      
+      // Validate productId is a valid ObjectId-like string (24 hex characters)
+      const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+      if (!objectIdRegex.test(productId)) {
+        throw new Error(`Invalid productId format: ${productId} - must be 24 character hex string`);
+      }
+      
+      // Validate essential product fields to prevent broken entries
+      if (!productData.product.title || productData.product.title.trim() === '') {
+        throw new Error(`Invalid product title for productId: ${productId} - title required`);
+      }
+      
+      // Check if productId already exists to prevent duplicates
+      try {
+        const existing = await this.getVendorPreview(productId);
+        if (existing.success) {
+          console.log(`⚠️ Product ${productId} already exists - updating existing entry`);
+        }
+      } catch (error) {
+        // Expected for new entries
+      }
       console.log(`   Product ID: ${productId}`);
       console.log(`   Title: ${productData.product.title || 'N/A'}`);
       console.log(`   Source: ${metadata.sourceImage || metadata.imageUrl || 'N/A'}`);
 
-      // Create standardized vendor preview data structure
+      // CRITICAL VALIDATION: imageUrl is REQUIRED for vendor previews
+      const imageUrl = metadata.enhancedImageUrl || metadata.imageUrl || metadata.originalUrl;
+      
+      if (!imageUrl) {
+        console.error('❌ CRITICAL DATA INTEGRITY ERROR: Vendor preview missing imageUrl');
+        console.error('📊 Metadata received:', JSON.stringify(metadata, null, 2));
+        throw new Error('VALIDATION FAILED: imageUrl is required for vendor previews. Cannot create preview without upscaled image URL.');
+      }
+      
+      console.log('✅ VALIDATION PASSED: imageUrl present:', imageUrl.substring(0, 60) + '...');
+      
+      // Create standardized vendor preview data structure (no undefined values allowed)
       const vendorPreviewData = {
         productId: productId,
-        title: productData.product.title,
+        title: productData.product.title || 'Untitled Product',
         sourceImage: metadata.sourceImage || metadata.title || 'Unknown Source',
-        blueprintId: metadata.blueprintId || productData.product.blueprint_id,
-        providerId: metadata.providerId || productData.product.print_provider_id,
+        blueprintId: metadata.blueprintId || productData.product.blueprint_id || 0,
+        providerId: metadata.providerId || productData.product.print_provider_id || 0,
         createdAt: new Date().toISOString(),
         runId: metadata.runId || `vendor-preview-${Date.now()}`,
-        imageUrl: metadata.imageUrl || metadata.originalUrl,
+        imageUrl: imageUrl,
         isVendorPreview: true,
         createdBy: metadata.createdBy || 'system',
-        tags: metadata.tags || ['vendor-preview'],
-        
-        // Store full product data for UI access (filter out undefined values)
-        printifyProduct: {
-          id: productData.product.id || null,
-          title: productData.product.title || null,
-          description: productData.product.description || null,
-          tags: productData.product.tags || [],
-          images: productData.product.images || [],
-          variants: productData.product.variants || [],
-          blueprint_id: productData.product.blueprint_id || null,
-          print_provider_id: productData.product.print_provider_id || null,
-          print_areas: productData.product.print_areas || []
-        }
+        tags: metadata.tags || ['vendor-preview']
       };
+
+      // Only add printifyProduct if we have complete data (avoid undefined values)
+      if (productData.product) {
+        vendorPreviewData.printifyProduct = {};
+        
+        // Only add defined values to avoid Firebase validation errors
+        if (productData.product.id !== undefined) vendorPreviewData.printifyProduct.id = productData.product.id;
+        if (productData.product.title !== undefined) vendorPreviewData.printifyProduct.title = productData.product.title;
+        if (productData.product.description !== undefined) vendorPreviewData.printifyProduct.description = productData.product.description;
+        if (productData.product.tags !== undefined) vendorPreviewData.printifyProduct.tags = productData.product.tags;
+        if (productData.product.images !== undefined) vendorPreviewData.printifyProduct.images = productData.product.images;
+        if (productData.product.variants !== undefined) vendorPreviewData.printifyProduct.variants = productData.product.variants;
+        if (productData.product.blueprint_id !== undefined) vendorPreviewData.printifyProduct.blueprint_id = productData.product.blueprint_id;
+        if (productData.product.print_provider_id !== undefined) vendorPreviewData.printifyProduct.print_provider_id = productData.product.print_provider_id;
+        if (productData.product.print_areas !== undefined) vendorPreviewData.printifyProduct.print_areas = productData.product.print_areas;
+      }
 
       console.log('📊 Vendor preview data structure:');
       console.log(`   Product ID: ${vendorPreviewData.productId}`);
+      console.log(`   Title: ${vendorPreviewData.title}`);
       console.log(`   Blueprint: ${vendorPreviewData.blueprintId}`);
       console.log(`   Provider: ${vendorPreviewData.providerId}`);
+      console.log(`   Image URL: ${vendorPreviewData.imageUrl}`);
+      console.log(`   Source Image: ${vendorPreviewData.sourceImage}`);
       console.log(`   Created By: ${vendorPreviewData.createdBy}`);
 
       // Store in cache using the product ID as key

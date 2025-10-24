@@ -38,6 +38,21 @@ router.get('/test-modal', (req, res) => {
 });
 
 /**
+ * Border Overlay System Demo
+ */
+router.get('/border-demo', (req, res) => {
+  res.render('admin/border-demo', {
+    title: '🎨 Border Overlay System Demo',
+    pageTitle: 'Border Overlay System - Interactive Demo',
+    pageDescription: 'Learn how to use the Wavelength Lore border overlay system to enhance your merchandise images.',
+    pageKeywords: 'wavelength, border, overlay, merchandise, demo, tutorial',
+    ogType: 'website',
+    ogImage: process.env.CDN_URL + '/images/border-demo-og.jpg',
+    ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl,
+  });
+});
+
+/**
  * Contact page route
  */
 router.get('/contact', (req, res) => {

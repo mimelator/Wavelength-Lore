@@ -82,11 +82,11 @@ const ProductTypes = {
     description: 'Items for your living space',
     products: [
       {
-        id: 'mug',
-        name: 'Ceramic Mug',
-        description: 'Premium ceramic mug perfect for your morning coffee or tea',
-        blueprintId: 17,
-        printProviderId: 5,
+        id: 'pillow',
+        name: 'Square Pillow',
+        description: 'Spun polyester square pillow perfect for home decor',
+        blueprintId: 220,
+        printProviderId: 10,
         icon: '☕',
         tags: ['home', 'mug', 'ceramic', 'coffee'],
         basePrice: 1299, // $12.99
@@ -102,11 +102,11 @@ const ProductTypes = {
         ]
       },
       {
-        id: 'poster',
-        name: 'Premium Poster',
-        description: 'High-quality poster print perfect for framing',
-        blueprintId: 7,
-        printProviderId: 1,
+        id: 'womens-tee',
+        name: 'Women\'s Favorite Tee',
+        description: 'Made to feel like a well-loved favorite with feminine fit',
+        blueprintId: 9,
+        printProviderId: 3,
         icon: '🖼️',
         tags: ['home', 'poster', 'wall-art', 'decor'],
         basePrice: 899, // $8.99
@@ -122,11 +122,11 @@ const ProductTypes = {
         ]
       },
       {
-        id: 'canvas',
-        name: 'Canvas Print',
-        description: 'Museum-quality canvas print ready to hang',
-        blueprintId: 165,
-        printProviderId: 1,
+        id: 'heavy-cotton-tee',
+        name: 'Heavy Cotton Tee',
+        description: 'Dependable classic made for everyday wear',
+        blueprintId: 6,
+        printProviderId: 3,
         icon: '🎨',
         tags: ['home', 'canvas', 'art', 'premium'],
         basePrice: 2499, // $24.99
@@ -151,11 +151,11 @@ const ProductTypes = {
     description: 'Bags, accessories, and more',
     products: [
       {
-        id: 'tote-bag',
-        name: 'Tote Bag',
-        description: 'Durable canvas tote bag perfect for everyday use',
+        id: 'infant-tee',
+        name: 'Infant Fine Jersey Tee',
+        description: 'Perfect balance between comfort and toddler-specific durability',
         blueprintId: 34,
-        printProviderId: 7,
+        printProviderId: 29,
         icon: '👜',
         tags: ['accessories', 'bag', 'canvas', 'practical'],
         basePrice: 1599, // $15.99
@@ -171,11 +171,11 @@ const ProductTypes = {
         ]
       },
       {
-        id: 'phone-case',
-        name: 'Phone Case',
-        description: 'Protective phone case with your favorite design',
-        blueprintId: 898,
-        printProviderId: 12,
+        id: 'ultra-cotton-tee',
+        name: 'Ultra Cotton Tee',
+        description: 'Classic unisex ultra cotton tee with quality construction',
+        blueprintId: 36,
+        printProviderId: 3,
         icon: '📱',
         tags: ['accessories', 'phone', 'case', 'protective'],
         basePrice: 1199, // $11.99
@@ -191,11 +191,11 @@ const ProductTypes = {
         ]
       },
       {
-        id: 'sticker',
-        name: 'Die-Cut Sticker',
-        description: 'Waterproof vinyl sticker perfect for laptops and more',
-        blueprintId: 947,
-        printProviderId: 15,
+        id: 'ultra-cotton-alt',
+        name: 'Ultra Cotton Tee (Alt)',
+        description: 'Classic unisex ultra cotton tee with quality construction',
+        blueprintId: 36,
+        printProviderId: 29,
         icon: '🏷️',
         tags: ['accessories', 'sticker', 'vinyl', 'waterproof'],
         basePrice: 299, // $2.99

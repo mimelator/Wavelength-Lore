@@ -21,7 +21,16 @@ const s3Client = new S3Client({
   }
 });
 
-const bucketName = config.GALLERY_S3_BUCKET || 'wavelength-lore-bucket';
+// CRITICAL: Validate gallery bucket configuration
+if (!config.GALLERY_S3_BUCKET) {
+    throw new Error('CRITICAL ERROR: GALLERY_S3_BUCKET environment variable is not set. Gallery operations cannot use lore bucket.');
+}
+
+if (config.GALLERY_S3_BUCKET === 'wavelength-lore-bucket') {
+    throw new Error('CRITICAL ERROR: GALLERY_S3_BUCKET is set to lore bucket. This would contaminate system content with user uploads.');
+}
+
+const bucketName = config.GALLERY_S3_BUCKET;
 console.log('🪣 Gallery S3 Bucket configured as:', bucketName);
 console.log('🔑 Using credentials with Access Key ID:', config.ACCESS_KEY_ID ? config.ACCESS_KEY_ID.substring(0, 5) + '...' : 'undefined');
 const cdnUrl = config.CDN_URL || `https://${bucketName}.s3.amazonaws.com`;
@@ -499,11 +508,51 @@ async function listUserGalleryImages(userId) {
   }
 }
 
+/**
+ * Download image buffer from S3
+ * 
+ * @param {string} relativePath - Relative path of the image in S3
+ * @returns {Promise<Buffer|null>} Image buffer or null if not found
+ */
+async function downloadImageBuffer(relativePath) {
+  try {
+    console.log(`📥 Downloading image buffer from S3: ${relativePath}`);
+    
+    const { GetObjectCommand } = require('@aws-sdk/client-s3');
+    const params = {
+      Bucket: bucketName,
+      Key: relativePath
+    };
+    
+    const command = new GetObjectCommand(params);
+    const response = await s3Client.send(command);
+    
+    if (!response.Body) {
+      console.error(`❌ No body in S3 response for ${relativePath}`);
+      return null;
+    }
+    
+    // Convert stream to buffer
+    const chunks = [];
+    for await (const chunk of response.Body) {
+      chunks.push(chunk);
+    }
+    
+    const buffer = Buffer.concat(chunks);
+    console.log(`✅ Downloaded ${buffer.length} bytes from S3`);
+    return buffer;
+  } catch (error) {
+    console.error(`❌ Error downloading image buffer from ${relativePath}:`, error);
+    return null;
+  }
+}
+
 module.exports = {
   uploadGalleryImage,
   deleteGalleryImage,
   checkUserQuota,
   getUserStorageStats,
   listUserGalleryImages,
+  downloadImageBuffer,
   GROUP_QUOTAS
 };

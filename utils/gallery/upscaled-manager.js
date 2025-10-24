@@ -18,7 +18,16 @@ class UpscaledImageManager {
       }
     });
     
-    this.galleryBucket = galleryConfig.GALLERY_S3_BUCKET || 'wavelength-lore-bucket';
+    // CRITICAL: Validate gallery bucket configuration  
+    if (!galleryConfig.GALLERY_S3_BUCKET) {
+      throw new Error('CRITICAL ERROR: GALLERY_S3_BUCKET environment variable is not set for upscaled manager.');
+    }
+    
+    if (galleryConfig.GALLERY_S3_BUCKET === 'wavelength-lore-bucket') {
+      throw new Error('CRITICAL ERROR: Upscaled manager cannot use lore bucket. This would contaminate system content.');
+    }
+    
+    this.galleryBucket = galleryConfig.GALLERY_S3_BUCKET;
     this.upscaledFolder = 'upscaled';
     this.cdnUrl = galleryConfig.CDN_URL || `https://${this.galleryBucket}.s3.amazonaws.com`;
   }

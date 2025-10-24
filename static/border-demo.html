@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Border System Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        .step { background: #e3f2fd; padding: 20px; margin: 20px 0; border-radius: 5px; border-left: 5px solid #2196f3; }
+        .button { background: #4caf50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 10px 5px; }
+        .demo-card { border: 2px solid #333; padding: 15px; margin: 15px 0; border-radius: 8px; background: #fafafa; }
+        .highlight { background: #fff3e0; padding: 15px; border-radius: 5px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Border Overlay System - How to Use</h1>
+        
+        <div class="step">
+            <h3>📍 Navigation Links</h3>
+            <button class="button" onclick="window.open('/admin', '_blank')">🏠 Admin Dashboard</button>
+            <button class="button" onclick="window.open('/admin/vendor-research', '_blank')">🔬 Vendor Research</button>
+            <button class="button" onclick="window.open('/admin/vendor-research/preview-generator', '_blank')">🎨 Preview Generator</button>
+            <button class="button" onclick="window.open('/admin/vendor-research/catalog', '_blank')">📦 Vendor Catalog</button>
+        </div>
+        
+        <div class="step">
+            <h3>Step 1: Generate Products</h3>
+            <p>First, create some merchandise previews:</p>
+            <ol>
+                <li>Go to <strong>Preview Generator</strong></li>
+                <li>Select images from your gallery</li>
+                <li>Choose product types (T-shirts, mugs, etc.)</li>
+                <li>Click "Generate Previews"</li>
+            </ol>
+        </div>
+        
+        <div class="step">
+            <h3>Step 2: Access Vendor Catalog</h3>
+            <p>View your generated products:</p>
+            <ol>
+                <li>Go to <strong>Vendor Catalog</strong></li>
+                <li>See grid of product cards</li>
+                <li>Each card has product info and preview image</li>
+                <li>Look for <strong>"🎨 Add Border"</strong> button</li>
+            </ol>
+        </div>
+        
+        <div class="demo-card">
+            <h4>Example Product Card:</h4>
+            <div style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); height: 100px; border: 2px solid #333; margin: 10px 0; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                Sample Product Image
+            </div>
+            <p><strong>Product:</strong> T-Shirt Design</p>
+            <p><strong>Provider:</strong> Printify</p>
+            <button class="button" onclick="showBorderDemo()">🎨 Add Border</button>
+        </div>
+        
+        <div class="step">
+            <h3>Step 3: Configure Border</h3>
+            <p>When you click "🎨 Add Border", a modal opens with:</p>
+            <ul>
+                <li><strong>Preview Section:</strong> Before/after comparison</li>
+                <li><strong>Border Types:</strong> Solid, Gradient, Pattern, Wavelength Theme, Blend</li>
+                <li><strong>Configuration:</strong> Colors, width, opacity, effects</li>
+                <li><strong>Quick Presets:</strong> Classic, Fire, Ocean, Goblin, Blend</li>
+                <li><strong>Real-time Updates:</strong> See changes immediately</li>
+            </ul>
+        </div>
+        
+        <div class="highlight">
+            <h4>🎯 What Each Border Type Does:</h4>
+            <ul>
+                <li><strong>🔸 Solid:</strong> Simple colored border with adjustable width</li>
+                <li><strong>🌈 Gradient:</strong> Multi-color gradients (linear, radial, conic)</li>
+                <li><strong>🎨 Pattern:</strong> Repeating designs (dots, stars, stripes)</li>
+                <li><strong>⚡ Wavelength Theme:</strong> Game-themed borders with Lore elements</li>
+                <li><strong>🌊 Blend:</strong> Smooth transitions for fabric blending</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <h3>Step 4: Apply and Save</h3>
+            <ol>
+                <li>Adjust settings until you like the preview</li>
+                <li>Click <strong>"Generate Preview"</strong> for final preview</li>
+                <li>Click <strong>"Apply Border"</strong> to save</li>
+                <li>Modal closes and catalog refreshes</li>
+                <li>Your bordered image is now saved!</li>
+            </ol>
+        </div>
+        
+        <div class="step">
+            <h3>🚀 Ready to Try It?</h3>
+            <p>Click the button below to go directly to the Vendor Catalog:</p>
+            <button class="button" onclick="window.open('/admin/vendor-research/catalog', '_blank')" style="font-size: 18px; padding: 15px 30px;">
+                📦 Open Vendor Catalog
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        function showBorderDemo() {
+            alert('🎨 Border Selection Modal Features:\n\n' +
+                  '✓ Real-time preview of your image with borders\n' +
+                  '✓ 5 different border types to choose from\n' +
+                  '✓ Color pickers, sliders, and controls\n' +
+                  '✓ Quick preset buttons for common styles\n' +
+                  '✓ Before/after comparison view\n' +
+                  '✓ Apply and save functionality\n\n' +
+                  'Go to the Vendor Catalog to see the real interface!');
+        }
+    </script>
+</body>
+</html>

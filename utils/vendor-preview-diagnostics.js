@@ -140,12 +140,43 @@ class VendorPreviewDiagnostics {
       operation.steps.push('Creating backup');
       // In a production system, you might want to backup the preview data first
 
-      // Step 3: Perform deletion
-      operation.steps.push('Performing deletion');
+      // Step 3: Get preview data to find Printify product ID
+      operation.steps.push('Fetching preview data');
+      const preview = await merchandiseDB.getCachedPreview(cacheKey);
+      
+      if (!preview) {
+        return {
+          success: false,
+          error: 'Preview not found',
+          operation
+        };
+      }
+      
+      const printifyProductId = preview.printifyProduct?.id || preview.productId;
+      
+      // Step 4: Delete from Printify FIRST (if product exists)
+      if (printifyProductId) {
+        operation.steps.push(`Deleting from Printify: ${printifyProductId}`);
+        try {
+          const EnhancedPrintifyService = require('../services/enhanced-printify-service');
+          const printifyService = new EnhancedPrintifyService();
+          await printifyService.deleteProduct(printifyProductId);
+          operation.steps.push('Deleted from Printify');
+        } catch (printifyError) {
+          // Log but don't fail if Printify delete fails (product might already be deleted)
+          operation.steps.push(`Printify delete warning: ${printifyError.message}`);
+          console.warn(`⚠️ Printify delete failed for ${printifyProductId}:`, printifyError.message);
+        }
+      } else {
+        operation.steps.push('No Printify product ID found, skipping Printify delete');
+      }
+      
+      // Step 5: Delete from our database
+      operation.steps.push('Deleting from database');
       const deleteResult = await merchandiseDB.deleteVendorPreview(cacheKey);
 
       if (deleteResult.success) {
-        operation.steps.push('Deletion successful');
+        operation.steps.push('Database deletion successful');
         operation.completedAt = new Date().toISOString();
         
         this.log('Enhanced delete operation completed', operation, 'info');
@@ -153,10 +184,10 @@ class VendorPreviewDiagnostics {
         return {
           success: true,
           operation,
-          message: 'Preview deleted successfully with enhanced validation'
+          message: 'Preview deleted from both Printify and database'
         };
       } else {
-        operation.steps.push('Deletion failed');
+        operation.steps.push('Database deletion failed');
         operation.error = deleteResult.error;
         
         this.log('Enhanced delete operation failed', operation, 'error');

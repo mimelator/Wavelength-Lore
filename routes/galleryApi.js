@@ -400,6 +400,189 @@ router.post('/api/gallery/user/batch-delete', ensureAuthenticated, async (req, r
 });
 
 /**
+ * Middleware to support both session and header-based auth for service calls
+ */
+function ensureAuthenticatedOrHeaders(req, res, next) {
+  // Check for header-based auth first (for service-to-service calls)
+  const headerUserId = req.headers['x-user-id'];
+  if (headerUserId && req.headers['x-api-request']) {
+    req.user = { uid: headerUserId };
+    return next();
+  }
+  // Fall back to session auth
+  return ensureAuthenticated(req, res, next);
+}
+
+/**
+ * GET /api/gallery/image/:imageId
+ * Get image metadata and verify user access
+ * Used by merchandise services to validate user permissions
+ */
+router.get('/api/gallery/image/:imageId', ensureAuthenticatedOrHeaders, async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    let { imageId } = req.params;
+    
+    // Handle URL-encoded paths
+    imageId = decodeURIComponent(imageId);
+    
+    console.log(`🔍 Gallery API: Getting metadata for image ${imageId} for user ${userId}`);
+    
+    // Check if user has access to this image
+    const userImages = await galleryStorage.listUserGalleryImages(userId);
+    const image = userImages.find(img => 
+      path.basename(img.relativePath) === imageId ||
+      img.relativePath === imageId ||
+      img.relativePath.includes(imageId)
+    );
+    
+    if (!image) {
+      return res.status(404).json({
+        success: false,
+        error: `Image ${imageId} not found in user ${userId}'s gallery`
+      });
+    }
+    
+    res.json({
+      success: true,
+      image: {
+        id: path.basename(image.relativePath),
+        url: image.url,
+        title: image.originalName || image.fileName,
+        size: image.size,
+        uploadedAt: image.uploadedAt || image.lastModified,
+        relativePath: image.relativePath
+      }
+    });
+  } catch (error) {
+    console.error('Error getting image metadata:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get image metadata'
+    });
+  }
+});
+
+/**
+ * GET /api/gallery/image/:imageId/download
+ * Download image buffer for authenticated user
+ * Used by merchandise services to get image data
+ */
+router.get('/api/gallery/image/:imageId/download', ensureAuthenticatedOrHeaders, async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    let { imageId } = req.params;
+    
+    // Handle URL-encoded paths
+    imageId = decodeURIComponent(imageId);
+    
+    console.log(`📥 Gallery API: Downloading image ${imageId} for user ${userId}`);
+    
+    // Check if user has access to this image
+    const userImages = await galleryStorage.listUserGalleryImages(userId);
+    const image = userImages.find(img => 
+      path.basename(img.relativePath) === imageId ||
+      img.relativePath === imageId ||
+      img.relativePath.includes(imageId)
+    );
+    
+    if (!image) {
+      return res.status(404).json({
+        success: false,
+        error: `Image ${imageId} not found in user ${userId}'s gallery`
+      });
+    }
+    
+    // Download the image buffer from S3
+    const imageBuffer = await galleryStorage.downloadImageBuffer(image.relativePath);
+    
+    if (!imageBuffer) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to download image from storage'
+      });
+    }
+    
+    // Set appropriate headers
+    res.setHeader('Content-Type', 'image/jpeg'); // Default to JPEG
+    res.setHeader('Content-Length', imageBuffer.length);
+    res.setHeader('Content-Disposition', `attachment; filename="${imageId}"`);
+    
+    // Send the image buffer
+    res.send(imageBuffer);
+  } catch (error) {
+    console.error('Error downloading image:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to download image'
+    });
+  }
+});
+
+/**
+ * GET /api/gallery/image/:imageId/enhanced
+ * Download enhanced/upscaled version if available
+ * Used by merchandise services to get high-quality images
+ */
+router.get('/api/gallery/image/:imageId/enhanced', ensureAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    const { imageId } = req.params;
+    
+    console.log(`🔍 Gallery API: Looking for enhanced version of ${imageId} for user ${userId}`);
+    
+    // Check if user has access to the original image first
+    const userImages = await galleryStorage.listUserGalleryImages(userId);
+    const originalImage = userImages.find(img => 
+      path.basename(img.relativePath) === imageId ||
+      img.relativePath.includes(imageId)
+    );
+    
+    if (!originalImage) {
+      return res.status(404).json({
+        success: false,
+        error: `Original image ${imageId} not found in user ${userId}'s gallery`
+      });
+    }
+    
+    // Look for enhanced version in upscaled folder
+    const enhancedPath = `upscaled/${imageId.replace('.webp', '')}_enhanced.png`;
+    
+    try {
+      const enhancedBuffer = await galleryStorage.downloadImageBuffer(enhancedPath);
+      
+      if (enhancedBuffer) {
+        console.log(`✅ Found enhanced version: ${enhancedPath}`);
+        
+        // Set appropriate headers
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Content-Length', enhancedBuffer.length);
+        res.setHeader('Content-Disposition', `attachment; filename="enhanced_${imageId}"`);
+        
+        // Send the enhanced image buffer
+        res.send(enhancedBuffer);
+      } else {
+        res.status(404).json({
+          success: false,
+          error: 'Enhanced version not available'
+        });
+      }
+    } catch (enhancedError) {
+      res.status(404).json({
+        success: false,
+        error: 'Enhanced version not available'
+      });
+    }
+  } catch (error) {
+    console.error('Error getting enhanced image:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get enhanced image'
+    });
+  }
+});
+
+/**
  * Utility function to format bytes into human-readable format
  * @param {number} bytes - Number of bytes
  * @param {number} decimals - Decimal places to round to

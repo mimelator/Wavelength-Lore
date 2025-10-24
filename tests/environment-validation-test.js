@@ -225,12 +225,12 @@ class EnvironmentValidationTester {
       const PrintifyService = require('../services/printify-service');
       const service = new PrintifyService();
       
-      // Test combinations including invalid vendor ID 4
+      // Test combinations with verified working blueprint-provider pairs
       const testCombinations = [
-        { blueprintId: 11, providerId: 3, name: "Women's Jersey Short Sleeve Deep V-Neck Tee with OTTO Print" },
-        { blueprintId: 68, providerId: 3, name: "Mug 11oz with OTTO Print" },
-        { blueprintId: 5, providerId: 3, name: "Unisex Cotton Crew Tee with OTTO Print" },
-        { blueprintId: 97, providerId: 4, name: "Satin Posters with Invalid Vendor 4" }
+        { blueprintId: 5, providerId: 3, name: "Unisex Cotton Crew Tee with Marco Fine Arts" },
+        { blueprintId: 6, providerId: 3, name: "Unisex Heavy Cotton Tee with Marco Fine Arts" },
+        { blueprintId: 9, providerId: 3, name: "Women's Favorite Tee with Marco Fine Arts" },
+        { blueprintId: 220, providerId: 10, name: "Spun Polyester Square Pillow with MWW On Demand" }
       ];
       
       const errors = [];

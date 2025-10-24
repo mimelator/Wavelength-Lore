@@ -592,7 +592,26 @@ class MerchandiseDatabase {
             preview.providerId
           );
           
-          previews.push({
+          // FIX: Include images array for catalog display
+          // Check multiple possible locations for images in cached data
+          let images = [];
+          if (preview.images && Array.isArray(preview.images)) {
+            images = preview.images;
+          } else if (preview.printifyProduct && preview.printifyProduct.images && Array.isArray(preview.printifyProduct.images)) {
+            images = preview.printifyProduct.images;
+          } else if (preview.product && preview.product.images && Array.isArray(preview.product.images)) {
+            images = preview.product.images;
+          } else if (preview.productData && preview.productData.images && Array.isArray(preview.productData.images)) {
+            images = preview.productData.images;
+          } else if (preview.fullProduct && preview.fullProduct.images && Array.isArray(preview.fullProduct.images)) {
+            images = preview.fullProduct.images;
+          }
+          
+          console.log(`🔍 VENDOR PREVIEW [${preview.productId}]: Found ${images.length} images in cache`);
+          console.log(`🔍 Cache structure for ${preview.productId}:`, Object.keys(preview));
+          
+          // FIX: If no images in cache, fetch from database on-demand
+          const previewWithImages = {
             productId: preview.productId,
             title: preview.title || 'Vendor Preview',
             sourceImage: preview.sourceImage || 'Unknown',
@@ -602,13 +621,19 @@ class MerchandiseDatabase {
             createdBy: preview.createdBy || 'system',
             cacheKey: cacheKey,
             viewUrl: `/merchandise/preview/${preview.productId}`,
+            // FIX: Add images array for image resolver
+            images: images,
+            // Add flag to indicate if images need to be fetched
+            needsImageFetch: images.length === 0,
             // Add friendly names
             blueprintName: providerBlueprintInfo.blueprint.display,
             blueprintCategory: providerBlueprintInfo.blueprint.category,
             providerName: providerBlueprintInfo.provider.display,
             providerLocation: providerBlueprintInfo.provider.location,
             providerRating: providerBlueprintInfo.provider.rating
-          });
+          };
+          
+          previews.push(previewWithImages);
         }
       });
       
@@ -618,11 +643,82 @@ class MerchandiseDatabase {
         const dateB = new Date(b.createdAt || 0);
         return dateB - dateA;
       });
+
+      // FIX: Enrich previews with images for those that need it
+      const enrichedPreviews = await this.enrichPreviewsWithImages(previews);
       
-      return previews;
+      return enrichedPreviews;
     } catch (error) {
       console.error('Failed to get all vendor previews:', error);
       return [];
+    }
+  }
+
+  /**
+   * Enrich vendor previews with images for those missing them
+   */
+  async enrichPreviewsWithImages(previews) {
+    const enrichedPreviews = [];
+    
+    // Enrich all previews that need images
+    let enriched = 0;
+    
+    for (const preview of previews) {
+      if (preview.needsImageFetch && preview.images.length === 0) {
+        console.log(`🔄 Fetching images for preview: ${preview.productId}`);
+        
+        try {
+          // Use the same approach as the individual product API - fetch from Printify
+          const EnhancedPrintifyService = require('./enhanced-printify-service');
+          const printifyService = new EnhancedPrintifyService();
+          
+          const productResult = await printifyService.getProduct(preview.productId);
+          
+          if (productResult.success && productResult.product && productResult.product.images) {
+            const images = productResult.product.images;
+            console.log(`✅ Enriched ${preview.productId} with ${images.length} images from Printify API`);
+            preview.images = images;
+            preview.needsImageFetch = false;
+            enriched++;
+          } else {
+            console.log(`⚠️ No images found for ${preview.productId} from Printify API`);
+          }
+        } catch (error) {
+          console.error(`❌ Failed to fetch images for ${preview.productId}:`, error.message);
+        }
+      }
+      
+      enrichedPreviews.push(preview);
+    }
+    
+    if (enriched > 0) {
+      console.log(`🎨 Enriched ${enriched} vendor previews with images`);
+    }
+    
+    return enrichedPreviews;
+  }
+
+  /**
+   * Get product data by ID directly from cache
+   */
+  async getProductByIdFromCache(productId) {
+    this.initializeDatabase();
+    
+    try {
+      const productRef = this.db.ref(`merchandise/products/${productId}`);
+      const snapshot = await productRef.once('value');
+      const product = snapshot.val();
+      
+      if (product) {
+        console.log(`📦 Found cached product ${productId} with ${product.images?.length || 0} images`);
+        return product;
+      }
+      
+      console.log(`❌ Product ${productId} not found in cache`);
+      return null;
+    } catch (error) {
+      console.error(`❌ Error fetching product ${productId} from cache:`, error.message);
+      return null;
     }
   }
 

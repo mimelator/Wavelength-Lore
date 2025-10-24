@@ -848,6 +848,19 @@ class EnhancedPrintifyService extends PrintifyService {
       };
     }
   }
+
+  async deleteProduct(productId) {
+    console.log(`🗑️ Deleting product from Printify: ${productId}`);
+    
+    try {
+      await this.api.delete(`/shops/${this.shopId}/products/${productId}.json`);
+      console.log(`✅ Product ${productId} deleted from Printify`);
+      return { success: true, productId };
+    } catch (error) {
+      console.error(`❌ Failed to delete product ${productId}:`, error.message);
+      throw error;
+    }
+  }
 }
 
 module.exports = EnhancedPrintifyService;

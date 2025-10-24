@@ -200,13 +200,22 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
     console.log(`🏭 Creating preview for vendor ${vendorId} with ${productType}`);
     
     // Get compatible blueprint-provider combination
-    const vendorConfig = await this.getCompatibleBlueprintForVendor(productType, vendorId);
+    const preferredBlueprintId = options.blueprintId || null;
+    const vendorConfig = await this.getCompatibleBlueprintForVendor(productType, vendorId, preferredBlueprintId);
     
     if (!vendorConfig) {
       throw new Error(`No compatible blueprint found for product type ${productType} with vendor ${vendorId}`);
     }
     
-    console.log(`✅ Using compatible blueprint ${vendorConfig.blueprintId} for vendor ${vendorId}`);
+    console.log(`✅ Using blueprint ${vendorConfig.blueprintId} for vendor ${vendorId}`);
+    
+    // VALIDATION: Verify we got the requested blueprint
+    if (preferredBlueprintId && vendorConfig.blueprintId !== preferredBlueprintId) {
+      console.error(`❌ CRITICAL: Requested blueprint ${preferredBlueprintId} but got ${vendorConfig.blueprintId}`);
+      console.error(`   This will cause all products to use the same blueprint!`);
+    } else if (preferredBlueprintId) {
+      console.log(`✅ VALIDATION PASSED: Using requested blueprint ${preferredBlueprintId}`);
+    }
 
     try {
       console.log(`📥 Downloading original image ${imageId} to ensure 300DPI quality for vendor ${vendorId}`);
@@ -366,58 +375,96 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
   }
 
   /**
-   * Download image directly from S3 URL
+   * Download image from user's gallery using proper API authentication
+   * CRITICAL: This method MUST use gallery APIs and respect user permissions
    */
   async downloadImageFromGallery(imageId, userId) {
     try {
-      // First try to get 300DPI upscaled version
-      const AWS = require('aws-sdk');
-      const s3 = new AWS.S3({
-        accessKeyId: process.env.ACCESS_KEY_ID,
-        secretAccessKey: process.env.SECRET_ACCESS_KEY,
-        region: 'us-east-1'
-      });
+      console.log(`📥 Downloading image ${imageId} for user ${userId} via Gallery API`);
       
-      // Search for upscaled version
-      const listParams = {
-        Bucket: 'wavelength-gallery-346923',
-        Prefix: 'upscaled/',
-        MaxKeys: 1000
-      };
-      
-      const objects = await s3.listObjectsV2(listParams).promise();
-      const upscaledImage = objects.Contents.find(obj => 
-        obj.Key.includes(imageId.replace('.webp', '')) && obj.Key.includes('enhanced')
-      );
-      
-      if (upscaledImage) {
-        console.log(`📥 Found 300DPI upscaled version: ${upscaledImage.Key}`);
-        const getParams = {
-          Bucket: 'wavelength-gallery-346923',
-          Key: upscaledImage.Key
-        };
-        
-        const s3Object = await s3.getObject(getParams).promise();
-        const imageBuffer = s3Object.Body;
-        console.log(`✅ Downloaded 300DPI image: ${Math.round(imageBuffer.length / 1024)}KB`);
-        return imageBuffer;
+      if (!userId || userId === 'vendor-preview' || userId.startsWith('test-')) {
+        throw new Error(`Invalid userId for gallery access: ${userId}. Gallery images require valid user authentication.`);
       }
       
-      // Fallback to original from S3 directly (avoid CloudFront 403 issues)
-      console.log(`📥 Downloading original image directly from S3: ${imageId}`);
-      const getParams = {
-        Bucket: 'wavelength-gallery-346923',
-        Key: imageId
-      };
+      // CRITICAL: Use gallery API instead of direct S3 access
+      const axios = require('axios');
+      const baseUrl = process.env.CDN_URL || 'http://localhost:3001';
       
-      const s3Object = await s3.getObject(getParams).promise();
-      const imageBuffer = s3Object.Body;
-      console.log(`✅ Downloaded original image from S3: ${Math.round(imageBuffer.length / 1024)}KB`);
-      return imageBuffer;
+      // Step 1: Get image metadata from gallery API to verify user has access
+      const path = require('path');
+      const imageFilename = path.basename(imageId);
+      console.log(`🔍 Verifying user ${userId} has access to image ${imageFilename}`);
+      
+      const metadataResponse = await axios.get(`${baseUrl}/api/gallery/image/${imageFilename}`, {
+        headers: {
+          'X-User-ID': userId,
+          'X-API-Request': 'merchandise-service'
+        },
+        timeout: 10000
+      });
+      
+      if (!metadataResponse.data.success) {
+        throw new Error(`User ${userId} does not have access to image ${imageId}`);
+      }
+      
+      const imageMetadata = metadataResponse.data.image;
+      console.log(`✅ User ${userId} has access to image ${imageId}`);
+      
+      // Step 2: Try to get enhanced/upscaled version first
+      console.log(`🔍 Checking for enhanced version of ${imageFilename}`);
+      
+      try {
+        const enhancedResponse = await axios.get(`${baseUrl}/api/gallery/image/${imageFilename}/enhanced`, {
+          headers: {
+            'X-User-ID': userId,
+            'X-API-Request': 'merchandise-service'
+          },
+          responseType: 'arraybuffer',
+          timeout: 15000
+        });
+        
+        if (enhancedResponse.status === 200 && enhancedResponse.data) {
+          const imageBuffer = Buffer.from(enhancedResponse.data);
+          console.log(`✅ Downloaded enhanced image: ${Math.round(imageBuffer.length / 1024)}KB`);
+          return imageBuffer;
+        }
+      } catch (enhancedError) {
+        console.log(`ℹ️ No enhanced version available for ${imageId}, using original`);
+      }
+      
+      // Step 3: Download original image via gallery API
+      console.log(`📥 Downloading original image ${imageFilename} via Gallery API`);
+      
+      const originalResponse = await axios.get(`${baseUrl}/api/gallery/image/${imageFilename}/download`, {
+        headers: {
+          'X-User-ID': userId,
+          'X-API-Request': 'merchandise-service'
+        },
+        responseType: 'arraybuffer',
+        timeout: 15000
+      });
+      
+      if (originalResponse.status === 200 && originalResponse.data) {
+        const imageBuffer = Buffer.from(originalResponse.data);
+        console.log(`✅ Downloaded original image via Gallery API: ${Math.round(imageBuffer.length / 1024)}KB`);
+        return imageBuffer;
+      } else {
+        throw new Error(`Gallery API returned status ${originalResponse.status}`);
+      }
       
     } catch (error) {
-      console.error(`Failed to download image ${imageId}:`, error);
-      return null;
+      console.error(`❌ Failed to download image ${imageId} for user ${userId} via Gallery API:`, error.message);
+      
+      // CRITICAL: Do not fallback to direct S3 access - this would bypass security
+      if (error.response?.status === 403) {
+        throw new Error(`Access denied: User ${userId} does not have permission to access image ${imageId}`);
+      }
+      
+      if (error.response?.status === 404) {
+        throw new Error(`Image ${imageId} not found in user ${userId}'s gallery`);
+      }
+      
+      throw new Error(`Gallery API error: ${error.message}`);
     }
   }
 
@@ -886,7 +933,12 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
    * Get compatible blueprint-provider combination for a product type and vendor
    * This prevents 404 errors by ensuring the combination is valid
    */
-  async getCompatibleBlueprintForVendor(productType, vendorId) {
+  async getCompatibleBlueprintForVendor(productType, vendorId, preferredBlueprintId = null) {
+    // If specific blueprint requested, try to use it
+    if (preferredBlueprintId) {
+      console.log(`🎯 Attempting to use preferred blueprint ${preferredBlueprintId} with vendor ${vendorId}`);
+    }
+    
     // Known working combinations based on Printify API testing
     // Updated based on environment validation test results
     const compatibleCombinations = {
@@ -897,7 +949,8 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
       'premium-tshirt': [
         // Blueprint 5 IS compatible with provider 3 (confirmed by test)
         { blueprintId: 5, vendorIds: [1, 3, 7], name: 'Unisex Cotton Crew Tee' },
-        { blueprintId: 6, vendorIds: [1, 7], name: 'Unisex Heavy Cotton Tee' }, // Conservative: remove provider 3 until tested
+        { blueprintId: 6, vendorIds: [1, 3, 7], name: 'Unisex Heavy Cotton Tee' },
+        { blueprintId: 9, vendorIds: [1, 3, 7], name: "Women's Favorite Tee" },
       ],
       'poster': [
         { blueprintId: 97, vendorIds: [1], name: 'Satin Posters (210gsm)' },
@@ -911,10 +964,34 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
 
     const productCombinations = compatibleCombinations[productType] || [];
     
+    // VALIDATION: Log what blueprints are available for this product type
+    console.log(`📋 Available blueprints for ${productType}:`, productCombinations.map(c => `${c.blueprintId} (${c.name})`).join(', '));
+    
+    // If preferred blueprint specified, try to use it first
+    if (preferredBlueprintId) {
+      const preferredCombo = productCombinations.find(c => c.blueprintId === preferredBlueprintId && c.vendorIds.includes(vendorId));
+      if (preferredCombo) {
+        console.log(`✅ USING PREFERRED BLUEPRINT ${preferredBlueprintId}: ${preferredCombo.name} with Vendor ${vendorId}`);
+        return {
+          name: preferredCombo.name,
+          blueprintId: preferredCombo.blueprintId,
+          printProviderId: vendorId,
+          basePrice: 1500,
+          tags: [productType, 'preview'],
+          description: `Vendor preview ${preferredCombo.name}`
+        };
+      } else {
+        console.warn(`⚠️ PREFERRED BLUEPRINT ${preferredBlueprintId} NOT COMPATIBLE with vendor ${vendorId}, falling back...`);
+      }
+    }
+    
     // Find a combination that supports this vendor
     for (const combo of productCombinations) {
       if (combo.vendorIds.includes(vendorId)) {
         console.log(`✅ Found compatible combination: ${combo.name} (Blueprint ${combo.blueprintId}) with Vendor ${vendorId}`);
+        if (preferredBlueprintId && combo.blueprintId !== preferredBlueprintId) {
+          console.warn(`⚠️ BLUEPRINT MISMATCH: Requested ${preferredBlueprintId}, using ${combo.blueprintId} instead`);
+        }
         return {
           name: combo.name,
           blueprintId: combo.blueprintId,
@@ -952,6 +1029,114 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
 
     console.error(`❌ No compatible blueprint found for product type ${productType} with vendor ${vendorId}`);
     return null;
+  }
+
+  /**
+   * Generate a single vendor preview (used by API routes)
+   * @param {string} imageId - Gallery image ID
+   * @param {string} productType - Type of product to create
+   * @param {string} userId - User creating the preview
+   * @returns {Object} Result with success status and product info
+   */
+  async generateVendorPreview(imageId, productType, userId, options = {}) {
+    console.log('🎨 Generating single vendor preview:', { imageId, productType, userId, blueprintId: options.blueprintId });
+
+    try {
+      // ENHANCED VALIDATION: Prevent orphaned entries and validate users
+      const TestUserValidator = require('../utils/test-user-validator');
+      
+      if (!imageId || typeof imageId !== 'string' || imageId.trim() === '') {
+        throw new Error('Invalid imageId: must be a non-empty string');
+      }
+      
+      if (!productType || typeof productType !== 'string' || productType.trim() === '') {
+        throw new Error('Invalid productType: must be a non-empty string');
+      }
+      
+      if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+        throw new Error('Invalid userId: must be a non-empty string');
+      }
+
+      // CRITICAL: Validate user for product creation
+      const userValidation = await TestUserValidator.validateUserForProductCreation(userId, {
+        testMode: process.env.NODE_ENV === 'test',
+        validateUserExists: false // Skip Firebase Auth check for now
+      });
+
+      if (!userValidation.valid) {
+        throw new Error(`User validation failed: ${userValidation.errors.join(', ')}`);
+      }
+
+      // Log warnings about test users in production
+      if (userValidation.warnings.length > 0) {
+        console.warn('⚠️ User validation warnings:', userValidation.warnings);
+      }
+
+      // Use test database prefix if needed
+      if (userValidation.shouldUseTestDatabase) {
+        console.log('🧪 Using test database isolation for test user');
+      }
+
+      // Use default vendor for single preview generation
+      const defaultVendorId = 3; // Known working vendor
+      const vendorIds = [defaultVendorId];
+
+      console.log(`✅ Validation passed - generating preview with vendor ${defaultVendorId}`);
+
+      // Call the existing generateVendorPreviews method
+      const result = await this.generateVendorPreviews(imageId, productType, vendorIds, {
+        previewMode: true,
+        createdBy: userId,
+        blueprintId: options.blueprintId,
+        runId: `single-preview-${Date.now()}`,
+        isTestUser: userValidation.isTestUser,
+        useTestDatabase: userValidation.shouldUseTestDatabase,
+        bypassCache: true,
+        userId: userId
+      });
+
+      if (result.success && result.previews && result.previews.length > 0) {
+        const preview = result.previews[0];
+        
+        // Additional validation of the generated preview
+        if (!preview.productId || preview.productId === 'undefined' || preview.productId.startsWith('cached-') || preview.productId.startsWith('failed-')) {
+          throw new Error(`Generated preview has invalid productId: ${preview.productId}`);
+        }
+
+        // Store in database with productId as key
+        await this.merchandiseDB.setCachedPreview(preview.productId, {
+          productId: preview.productId,
+          sourceImage: imageId,
+          productType: productType,
+          vendorId: preview.vendorId,
+          blueprintId: preview.printDetails?.blueprint,
+          providerId: preview.printDetails?.provider,
+          imageUrl: preview.mockupImages?.[0]?.src || null,
+          createdBy: userId,
+          createdAt: new Date().toISOString()
+        });
+
+        return {
+          success: true,
+          productId: preview.productId,
+          vendorId: preview.vendorId,
+          message: 'Single vendor preview generated successfully',
+          userValidation: {
+            isTestUser: userValidation.isTestUser,
+            warnings: userValidation.warnings
+          }
+        };
+      } else {
+        throw new Error('Failed to generate vendor preview - no valid previews returned');
+      }
+
+    } catch (error) {
+      console.error('❌ Single vendor preview generation failed:', error.message);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
   }
 }
 

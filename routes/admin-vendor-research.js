@@ -67,7 +67,7 @@ const VendorResearchData = {
   },
   mugs: {
     blueprintId: 17,
-    currentProvider: 3, // Use valid vendor ID
+    currentProvider: 1, // Use valid vendor ID
     alternatives: [
       {
         id: 1,
@@ -83,7 +83,7 @@ const VendorResearchData = {
         notes: "Premium ceramic mugs with excellent durability"
       },
       {
-        id: 3,
+        id: 1,
         name: "Standard Mug Provider (Current)",
         location: "North Carolina, USA",
         priceRange: "$6.49 - $9.99",
@@ -96,7 +96,7 @@ const VendorResearchData = {
         notes: "Current provider - good balance of quality and cost"
       },
       {
-        id: 7,
+        id: 3,
         name: "Economy Mug Provider",
         location: "Texas, USA",
         priceRange: "$4.99 - $7.49",
@@ -777,24 +777,44 @@ router.get('/vendor-research/catalog', ensureAuthenticated, requireAdmin, async 
   try {
     console.log('📋 Loading vendor preview catalog for admin...');
     
-    const userId = req.user.uid;
-    
-    // Get user's gallery images for new preview generation
-    const userImages = await galleryStorage.listUserGalleryImages(userId);
-    
-    // Get all existing vendor preview products
+    // Get all existing vendor preview products (no need for user gallery images in catalog view)
     const VendorPreviewHelper = require('../utils/vendor-preview-helper');
     const helper = new VendorPreviewHelper();
     const allPreviews = await helper.getAllVendorPreviews();
     
     console.log(`✅ Found ${allPreviews.length} existing vendor previews`);
-    console.log(`✅ Found ${userImages.length} user gallery images`);
+    
+    // Organize previews into catalog structure
+    const catalogData = {
+      totalProducts: allPreviews.length,
+      byBlueprint: {},
+      byProvider: {},
+      recentProducts: allPreviews.slice(0, 20), // Most recent 20
+      allProducts: allPreviews
+    };
+    
+    // Group by blueprint ID
+    allPreviews.forEach(preview => {
+      const blueprint = preview.blueprintId || 'unknown';
+      if (!catalogData.byBlueprint[blueprint]) {
+        catalogData.byBlueprint[blueprint] = [];
+      }
+      catalogData.byBlueprint[blueprint].push(preview);
+    });
+    
+    // Group by provider ID  
+    allPreviews.forEach(preview => {
+      const provider = preview.providerId || 'unknown';
+      if (!catalogData.byProvider[provider]) {
+        catalogData.byProvider[provider] = [];
+      }
+      catalogData.byProvider[provider].push(preview);
+    });
     
     // Use safe render with enhanced error handling and logging
-    adminErrorHandler.safeRender(res, 'admin/vendor-preview-catalog', {
+    adminErrorHandler.safeRender(res, 'admin/vendor-catalog', {
       title: 'Vendor Preview Catalog',
-      allPreviews: allPreviews,
-      userImages: userImages.slice(0, 20), // Limit for UI performance
+      catalog: catalogData,
       vendorData: VendorResearchData,
       user: req.user
     }, (res, error) => {
@@ -804,8 +824,7 @@ router.get('/vendor-research/catalog', ensureAuthenticated, requireAdmin, async 
         success: true,
         title: 'Vendor Preview Catalog',
         data: {
-          allPreviews: allPreviews,
-          userImages: userImages.slice(0, 20),
+          catalog: catalogData,
           vendorData: VendorResearchData
         },
         viewError: 'Interface not available - data only',
@@ -902,18 +921,60 @@ router.delete('/vendor-research/delete-preview', ensureAuthenticated, requireAdm
     const { cacheKey } = req.body;
     console.log(`🗑️ Deleting preview with cache key: ${cacheKey} (validated)`);
     
-    // Use enhanced delete operation with diagnostics
+    // CRITICAL: Delete from BOTH database AND Printify to prevent orphaned products
     const MerchandiseDatabase = require('../services/merchandise-database');
+    const EnhancedPrintifyService = require('../services/enhanced-printify-service');
+    const printifyService = new EnhancedPrintifyService();
+    
+    // Step 1: Delete from Printify first
+    console.log(`🗑️ Deleting from Printify shop: ${cacheKey}`);
+    let printifyDeleted = false;
+    let printifyError = null;
+    
+    try {
+      await printifyService.deleteProduct(cacheKey);
+      console.log(`✅ Deleted from Printify`);
+      printifyDeleted = true;
+    } catch (error) {
+      printifyError = error.message;
+      console.error(`❌ PRINTIFY DELETE FAILED: ${error.message}`);
+      
+      // VALIDATION: If product exists in Printify but delete failed, throw error
+      if (!error.message.includes('404') && !error.message.includes('not found')) {
+        console.error(`❌ CRITICAL: Product exists in Printify but deletion failed`);
+        console.error(`   This will leave orphaned products in Printify shop`);
+        throw new Error(`Printify deletion failed: ${error.message}`);
+      } else {
+        console.warn(`⚠️ Product not found in Printify (may have been deleted already)`);
+      }
+    }
+    
+    // Step 2: Delete from database
+    console.log(`🗑️ Deleting from database: ${cacheKey}`);
     const result = await diagnostics.enhancedDeletePreview(cacheKey, MerchandiseDatabase);
     
     if (result.success) {
       console.log(`✅ Successfully deleted vendor preview: ${cacheKey}`);
       console.log(`📊 Operation details:`, JSON.stringify(result.operation, null, 2));
       
+      // VALIDATION: Log cleanup status
+      console.log(`📊 Cleanup validation:`);
+      console.log(`   Printify deleted: ${printifyDeleted}`);
+      console.log(`   Firebase deleted: ${result.success}`);
+      
+      if (!printifyDeleted && !printifyError?.includes('404')) {
+        console.warn(`⚠️ WARNING: Printify deletion may have failed`);
+      }
+      
       res.json({
         success: true,
         message: result.message,
         operation: result.operation,
+        cleanup: {
+          printifyDeleted,
+          firebaseDeleted: result.success,
+          printifyError
+        },
         diagnostics: {
           validation,
           routeHealth

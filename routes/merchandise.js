@@ -156,6 +156,33 @@ router.get('/gallery-images', ensureAuthenticated, async (req, res) => {
 });
 
 /**
+ * GET /api/merchandise/categories
+ * Get product categories (public endpoint)
+ */
+router.get('/categories', async (req, res) => {
+  try {
+    const categories = Object.keys(ProductTypes).map(key => ({
+      id: key,
+      name: ProductTypes[key].name,
+      icon: ProductTypes[key].icon,
+      description: ProductTypes[key].description,
+      productCount: ProductTypes[key].products.length
+    }));
+    
+    res.json({
+      success: true,
+      categories: categories
+    });
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch categories'
+    });
+  }
+});
+
+/**
  * GET /api/merchandise/product-types
  * Get available product types for guided creation (public endpoint)
  */

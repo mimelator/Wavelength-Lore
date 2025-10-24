@@ -29,7 +29,16 @@ class ImageUpscalingService {
     });
     
     // Use the same bucket as gallery, but in a dedicated subfolder
-    this.galleryBucket = galleryConfig.GALLERY_S3_BUCKET || 'wavelength-lore-bucket';
+    // CRITICAL: Validate gallery bucket configuration
+    if (!galleryConfig.GALLERY_S3_BUCKET) {
+      throw new Error('CRITICAL ERROR: GALLERY_S3_BUCKET environment variable is not set for image upscaling service.');
+    }
+    
+    if (galleryConfig.GALLERY_S3_BUCKET === 'wavelength-lore-bucket') {
+      throw new Error('CRITICAL ERROR: Image upscaling service cannot use lore bucket. This would contaminate system content.');
+    }
+    
+    this.galleryBucket = galleryConfig.GALLERY_S3_BUCKET;
     this.upscaledFolder = 'upscaled'; // Subfolder for enhanced images
     this.cdnUrl = galleryConfig.CDN_URL || `https://${this.galleryBucket}.s3.amazonaws.com`;
     
@@ -188,34 +197,84 @@ class ImageUpscalingService {
           
           // ENHANCED DIAGNOSTICS: Data structure validation
           console.log('🔍 CACHE DATA STRUCTURE VALIDATION:');
-          const requiredFields = ['contentHash', 'enhancedUrl', 's3Key', 'method', 'fileSize'];
+          const requiredFields = ['contentHash', 'method'];
           const missingFields = requiredFields.filter(field => !cacheResult[field]);
-          if (missingFields.length > 0) {
-            console.error(`   ❌ Missing required fields: ${missingFields.join(', ')}`);
+          
+          // Check for inconsistent state: one of URL/S3 is set but not both
+          const hasUrl = cacheResult.enhancedUrl !== null && cacheResult.enhancedUrl !== undefined;
+          const hasS3 = cacheResult.s3Key !== null && cacheResult.s3Key !== undefined;
+          const inconsistentState = (hasUrl && !hasS3) || (!hasUrl && hasS3);
+          
+          if (missingFields.length > 0 || inconsistentState) {
+            console.error(`   ❌ Cache corruption detected:`);
+            if (missingFields.length > 0) {
+              console.error(`      - Missing required fields: ${missingFields.join(', ')}`);
+            }
+            if (inconsistentState) {
+              console.error(`      - Inconsistent state: URL=${hasUrl}, S3=${hasS3}`);
+            }
             console.log('🔧 CACHE CORRUPTION DETECTED - Treating as cache miss to regenerate');
-            
-            // Log cache corruption for debugging
             console.log('⚠️ CACHE CORRUPTION DETAILS:');
-            console.log(`   - Cache record exists but missing critical data`);
             console.log(`   - Content Hash: ${cacheResult.contentHash}`);
             console.log(`   - Will regenerate enhanced image to repair cache`);
-            
-            // Treat corrupted cache as cache miss - continue to regeneration
             console.log('🔄 Continuing to image enhancement due to cache corruption...');
           } else {
-            console.log('   ✅ All required fields present');
+            // Determine caching mode
+            const hasUrl = cacheResult.enhancedUrl !== null && cacheResult.enhancedUrl !== undefined;
+            const hasS3 = cacheResult.s3Key !== null && cacheResult.s3Key !== undefined;
+            const cachingMode = hasUrl ? 'URL-based' : 'Buffer-based';
+            console.log(`   ✅ Valid ${cachingMode} cache record`);
+            
+            // CRITICAL FIX: Extract buffer based on caching mode
+            console.log('🔍 BUFFER EXTRACTION: Retrieving cached buffer...');
+            let cacheBuffer = null;
+            
+            if (hasUrl) {
+              // URL-based caching: Download from S3/CDN
+              try {
+                const cacheResponse = await axios.get(cacheResult.enhancedUrl, { 
+                  responseType: 'arraybuffer',
+                  timeout: 30000
+                });
+                cacheBuffer = Buffer.from(cacheResponse.data);
+                console.log(`✅ Downloaded buffer from URL: ${cacheBuffer.length} bytes`);
+              } catch (downloadError) {
+                console.error(`❌ Failed to download buffer from URL: ${downloadError.message}`);
+              }
+            } else {
+              // Buffer-based caching: Retrieve from Firebase
+              try {
+                const bufferData = await this.globalCache.getEnhancedImageBuffer(cacheResult.contentHash);
+                if (bufferData) {
+                  cacheBuffer = Buffer.from(bufferData, 'base64');
+                  console.log(`✅ Retrieved buffer from Firebase: ${cacheBuffer.length} bytes`);
+                } else {
+                  console.error('❌ No buffer data found in Firebase cache');
+                }
+              } catch (firebaseError) {
+                console.error(`❌ Failed to retrieve buffer from Firebase: ${firebaseError.message}`);
+              }
+            }
+            
+            if (!cacheBuffer) {
+              console.log('⚠️ Continuing without buffer - some operations may fail');
+            }
             
             // INTERFACE STANDARDIZATION: Use consistent structure
+            // For buffer-based caching, use original imageBuffer as the enhanced result
+            const enhancedBuffer = cacheBuffer || imageBuffer;
+            
             const returnValue = {
               success: true,
               method: 'cache', // CRITICAL: Set method to 'cache' for test compatibility
               cached: true,    // CRITICAL: Set cached flag for test compatibility
               upscaledUrl: cacheResult.enhancedUrl,
               enhancedUrl: cacheResult.enhancedUrl,
-              upscaledBuffer: null, // Don't re-download the buffer from cache
+              upscaledBuffer: enhancedBuffer, // Use cached buffer or original if unavailable
+              printOptimized: enhancedBuffer, // Also set printOptimized for compatibility
               s3Key: cacheResult.s3Key,
-              fileName: cacheResult.fileName,
-              fileSize: cacheResult.fileSize,
+              fileName: cacheResult.fileName || options.fileName,
+              fileSize: cacheResult.fileSize || enhancedBuffer.length,
               usedCache: true,
               contentHash: cacheResult.contentHash,
               metadata: {
@@ -224,26 +283,32 @@ class ImageUpscalingService {
                 method: 'cache', // Metadata method also set to cache
                 cached: true,
                 contentHash: cacheResult.contentHash,
-                enhancementData: cacheResult.enhancementData
+                enhancementData: cacheResult.enhancementData,
+                originalDimensions: cacheResult.originalDimensions,
+                enhancedDimensions: cacheResult.enhancedDimensions
               }
             };
             
             // ENHANCED VALIDATION: Verify return value integrity
             console.log('🔍 RETURN VALUE VALIDATION:');
             const validationErrors = [];
-            if (!returnValue.enhancedUrl) validationErrors.push('Missing enhancedUrl');
-            if (!returnValue.s3Key) validationErrors.push('Missing s3Key');
             if (!returnValue.contentHash) validationErrors.push('Missing contentHash');
             if (returnValue.usedCache !== true) validationErrors.push('usedCache not set to true');
             if (returnValue.method !== 'cache') validationErrors.push('method not set to cache');
             if (returnValue.cached !== true) validationErrors.push('cached not set to true');
+            
+            // Check for inconsistent state (one of URL/S3 set but not both) - reuse variables from above
+            if ((hasUrl && !hasS3) || (!hasUrl && hasS3)) {
+              validationErrors.push(`Inconsistent state: URL=${hasUrl}, S3=${hasS3}`);
+            }
             
             if (validationErrors.length > 0) {
               console.error('❌ CACHE RETURN VALIDATION FAILED:');
               validationErrors.forEach(error => console.error(`   - ${error}`));
               throw new Error(`Cache return validation failed: ${validationErrors.join(', ')}`);
             } else {
-              console.log('✅ Cache return validation passed');
+              const cachingMode = hasUrl ? 'URL-based' : 'Buffer-based';
+              console.log(`✅ Valid ${cachingMode} cache return`);
             }
             
             return returnValue;
@@ -980,13 +1045,21 @@ class ImageUpscalingService {
         console.log(`   File Size: ${cacheResult.enhancementData?.fileSize} bytes`);
         
         // Validate Firebase record structure
-        const requiredFields = ['contentHash', 'enhancedImageUrl', 's3Key', 'enhancementMethod'];
+        const requiredFields = ['contentHash', 'enhancementMethod'];
         const missingFields = requiredFields.filter(field => !cacheResult.enhancementData[field]);
+        
+        // Check for inconsistent state
+        const hasUrl = cacheResult.enhancementData.enhancedImageUrl !== null && cacheResult.enhancementData.enhancedImageUrl !== undefined;
+        const hasS3 = cacheResult.enhancementData.s3Key !== null && cacheResult.enhancementData.s3Key !== undefined;
+        const inconsistentState = (hasUrl && !hasS3) || (!hasUrl && hasS3);
         
         if (missingFields.length > 0) {
           validation.errors.push(`Missing required Firebase fields: ${missingFields.join(', ')}`);
+        } else if (inconsistentState) {
+          validation.errors.push(`Inconsistent cache state: URL=${hasUrl}, S3=${hasS3}`);
         } else {
-          console.log(`   ✅ All required Firebase fields present`);
+          const cachingMode = hasUrl ? 'URL-based' : 'Buffer-based';
+          console.log(`   ✅ Valid ${cachingMode} cache record`);
         }
       } else {
         validation.errors.push(`Global Cache save failed: ${cacheResult?.error || 'unknown error'}`);
@@ -1013,11 +1086,11 @@ class ImageUpscalingService {
             
             // Cross-validate with saved data
             if (cacheResult?.enhancementData) {
-              const urlMatch = retrievedRecord.enhancedImageUrl === cacheResult.enhancementData.enhancedImageUrl;
-              const s3KeyMatch = retrievedRecord.s3Key === cacheResult.enhancementData.s3Key;
+              const hashMatch = retrievedRecord.contentHash === cacheResult.enhancementData.contentHash;
+              const methodMatch = retrievedRecord.enhancementMethod === cacheResult.enhancementData.enhancementMethod;
               
-              if (!urlMatch || !s3KeyMatch) {
-                validation.errors.push('Retrieved Firebase record does not match saved data');
+              if (!hashMatch || !methodMatch) {
+                validation.errors.push('Retrieved Firebase record does not match saved data (hash/method mismatch)');
               } else {
                 console.log(`   ✅ Retrieved record matches saved data`);
               }

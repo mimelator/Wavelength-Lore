@@ -88,7 +88,7 @@ async function main() {
     
     if (copyResponse.toLowerCase() === 'y') {
       process.env.SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
-      console.log(`${colors.green}✓ Set SECRET_ACCESS_KEY = ${process.env.AWS_SECRET_ACCESS_KEY.substring(0, 3)}...${process.env.AWS_SECRET_ACCESS_KEY.substring(process.env.AWS_SECRET_ACCESS_KEY.length - 3)}${colors.reset}`);
+      console.log(`${colors.green}✓ Set SECRET_ACCESS_KEY = ***[REDACTED-FOR-SECURITY]***${colors.reset}`);
       setVars.push('SECRET_ACCESS_KEY');
       missingVars.splice(missingVars.indexOf('SECRET_ACCESS_KEY'), 1);
     }

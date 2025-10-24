@@ -6,6 +6,7 @@
  * for faster preview generation across all available blueprints.
  */
 
+require('dotenv').config();
 const APIProductPreviewBuilder = require('./api-product-preview-builder');
 
 class BatchProductPreviewBuilder extends APIProductPreviewBuilder {
@@ -46,11 +47,8 @@ class BatchProductPreviewBuilder extends APIProductPreviewBuilder {
             
             console.log(`✅ Found ${blueprints.length} available blueprints`);
 
-            // Load previous progress
-            const progress = await this.loadProgress();
-            if (progress) {
-                this.state.processedBlueprints = progress.processedBlueprints || [];
-            }
+            // Initialize state
+            this.state = this.state || { processedBlueprints: [] };
 
             // Filter blueprints based on options
             let targetBlueprints = blueprints;
@@ -69,6 +67,9 @@ class BatchProductPreviewBuilder extends APIProductPreviewBuilder {
             // Filter out known incompatible blueprints
             const incompatibleBlueprints = [11, 68];
             targetBlueprints = targetBlueprints.filter(b => !incompatibleBlueprints.includes(b.id));
+            
+            // LIMIT: Only process batchSize number of blueprints total
+            targetBlueprints = targetBlueprints.slice(0, this.batchSize);
 
             console.log(`📋 Total available: ${blueprints.length}`);
             console.log(`✅ Already processed: ${this.state.processedBlueprints.length}`);
@@ -86,6 +87,17 @@ class BatchProductPreviewBuilder extends APIProductPreviewBuilder {
             }
 
             console.log(`\n🏭 Processing ${batches.length} batches of up to ${this.batchSize} blueprints each`);
+            
+            // Get user ONCE before processing batches
+            const { initializeFirebaseAdmin } = require('../helpers/firebase-admin-utils');
+            initializeFirebaseAdmin(); // Initialize the admin SDK
+            const admin = require('firebase-admin');
+            const listUsersResult = await admin.app('admin').auth().listUsers(1);
+            if (!listUsersResult.users || listUsersResult.users.length === 0) {
+                throw new Error('No users in Firebase Auth');
+            }
+            const userId = listUsersResult.users[0].uid;
+            console.log(`👤 Using user: ${userId}\n`);
 
             let totalSuccesses = 0;
             let totalFailures = 0;
@@ -99,7 +111,7 @@ class BatchProductPreviewBuilder extends APIProductPreviewBuilder {
                 });
 
                 // Process batch in parallel for faster execution
-                const batchPromises = batch.map(blueprint => this.processBlueprintSafely(blueprint));
+                const batchPromises = batch.map(blueprint => this.processBlueprintSafely(blueprint, userId));
                 const batchResults = await Promise.allSettled(batchPromises);
 
                 // Analyze batch results
@@ -113,8 +125,11 @@ class BatchProductPreviewBuilder extends APIProductPreviewBuilder {
                         this.state.processedBlueprints.push(result.value);
                     } else {
                         batchFailures++;
-                        console.error(`❌ Failed to process ${blueprint.title}:`, 
-                            result.reason || result.value?.error || 'Unknown error');
+                        const error = result.reason || result.value?.error || 'Unknown error';
+                        console.error(`❌ CRITICAL FAILURE: ${blueprint.title}`);
+                        console.error(`   Error: ${error}`);
+                        console.error(`❌ STOPPING: Product creation failed validation`);
+                        throw new Error(`Product creation failed for ${blueprint.title}: ${error}`);
                     }
                 });
 
@@ -123,8 +138,7 @@ class BatchProductPreviewBuilder extends APIProductPreviewBuilder {
 
                 console.log(`📊 Batch ${batchIndex + 1} results: ${batchSuccesses} successes, ${batchFailures} failures`);
                 
-                // Save progress after each batch
-                await this.saveProgress();
+                // Progress saved in state
 
                 // Add delay between batches to avoid rate limiting
                 if (batchIndex < batches.length - 1) {
@@ -147,32 +161,100 @@ class BatchProductPreviewBuilder extends APIProductPreviewBuilder {
     /**
      * Safely process a single blueprint with error handling
      */
-    async processBlueprintSafely(blueprint) {
+    async processBlueprintSafely(blueprint, userId) {
         try {
-            console.log(`🔨 Processing: ${blueprint.title}`);
+            console.log(`\n🔨 Processing: ${blueprint.title} (ID: ${blueprint.id})`);
             
-            // VALIDATION: Ensure blueprint has required properties
+            // VALIDATION 1: Blueprint has required properties
             if (!blueprint.id || !blueprint.title) {
-                throw new Error('Blueprint missing required properties (id, title)');
+                throw new Error('VALIDATION 1 FAILED: Blueprint missing required properties');
             }
+            console.log(`✅ VALIDATION 1: Blueprint valid`);
 
-            // Use the existing creation logic from the parent class
-            const result = await this.createSinglePreview(blueprint);
+            // VALIDATION 2: Get gallery images for user
+            const galleryStorage = require('../utils/gallery/storage');
+            const userImages = await galleryStorage.listUserGalleryImages(userId);
             
-            if (result.success) {
-                console.log(`✅ ${blueprint.title} - Product created: ${result.productId}`);
-                return {
-                    success: true,
-                    productTitle: blueprint.title,
-                    blueprintId: blueprint.id,
-                    productId: result.productId,
-                    sourceImage: result.sourceImage,
-                    processedAt: new Date().toISOString(),
-                    enhancementUsed: result.enhancementUsed || false
-                };
-            } else {
-                throw new Error(result.error || 'Unknown creation error');
+            if (!userImages || userImages.length === 0) {
+                throw new Error('VALIDATION 2 FAILED: No gallery images for user');
             }
+            console.log(`✅ VALIDATION 2: Found ${userImages.length} gallery images`);
+            
+            // Use relativePath for vendor preview service (needs full S3 path)
+            const imageId = userImages[0].relativePath;
+            if (!imageId) {
+                throw new Error('VALIDATION 2.5 FAILED: Image missing relativePath');
+            }
+            console.log(`🖼️ Using: ${imageId}`);
+            
+            // Map blueprint to product type
+            const productTypeMap = {
+                5: 'premium-tshirt',
+                6: 'premium-tshirt',
+                77: 'hoodie',
+                49: 'hoodie',
+                97: 'poster',
+                282: 'poster'
+            };
+            
+            const productType = productTypeMap[blueprint.id] || 'premium-tshirt';
+            console.log(`✅ VALIDATION 3: Product type: ${productType}`);
+            
+            // Use VendorPreviewService
+            const VendorPreviewService = require('../services/vendor-preview-service');
+            const vendorService = new VendorPreviewService();
+            
+            const result = await vendorService.generateVendorPreview(
+                imageId,
+                productType,
+                userId,
+                { blueprintId: blueprint.id }
+            );
+            
+            // VALIDATION 4: Service returned success
+            if (!result.success) {
+                throw new Error(`VALIDATION 4 FAILED: ${result.error || 'Service failed'}`);
+            }
+            console.log(`✅ VALIDATION 4: Service success`);
+            
+            // VALIDATION 5: ProductId exists
+            if (!result.productId) {
+                console.log('🔍 DIAGNOSTIC: Full result:', JSON.stringify(result, null, 2));
+                throw new Error('VALIDATION 5 FAILED: No productId returned');
+            }
+            console.log(`✅ VALIDATION 5: ProductId: ${result.productId}`);
+            console.log(`🔍 DIAGNOSTIC: ProductId type: ${typeof result.productId}`);
+            
+            // VALIDATION 6: Product exists in Printify
+            const EnhancedPrintifyService = require('../services/enhanced-printify-service');
+            const printifyService = new EnhancedPrintifyService();
+            const verifyProduct = await printifyService.getProduct(result.productId);
+            
+            if (!verifyProduct) {
+                throw new Error(`VALIDATION 6 FAILED: Product not in Printify`);
+            }
+            console.log(`✅ VALIDATION 6: Product in Printify`);
+            
+            // VALIDATION 7: Product is real (not a cache key)
+            if (result.productId.startsWith('cached-') || result.productId.startsWith('failed-')) {
+                throw new Error(`VALIDATION 7 FAILED: ProductId is cache key, not real product: ${result.productId}`);
+            }
+            console.log(`✅ VALIDATION 7: ProductId is real Printify product`);
+            
+            // VALIDATION 8: Product has mockup images
+            if (!verifyProduct.product || !verifyProduct.product.images || verifyProduct.product.images.length === 0) {
+                throw new Error(`VALIDATION 8 FAILED: Product has no images`);
+            }
+            console.log(`✅ VALIDATION 8: Product has ${verifyProduct.product.images.length} images`);
+            console.log(`🎉 ALL VALIDATIONS PASSED`);
+            
+            return {
+                success: true,
+                productTitle: blueprint.title,
+                blueprintId: blueprint.id,
+                productId: result.productId,
+                processedAt: new Date().toISOString()
+            };
 
         } catch (error) {
             console.error(`❌ Error processing ${blueprint.title}:`, error.message);

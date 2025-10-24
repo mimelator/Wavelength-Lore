@@ -1,0 +1,427 @@
+/**
+ * Border Selection Component for Admin Vendor Catalog
+ * 
+ * Provides real-time border preview and customization capabilities
+ * for the admin vendor catalog interface.
+ */
+
+<!-- Border Selection Modal -->
+<div id="borderSelectionModal" class="modal" style="display: none;">
+    <div class="modal-content border-selection-modal">
+        <div class="modal-header">
+            <h2>🎨 Add Border to Image</h2>
+            <span class="close" onclick="closeBorderModal()">&times;</span>
+        </div>
+        
+        <div class="modal-body">
+            <!-- Image Preview Section -->
+            <div class="preview-section">
+                <div class="preview-container">
+                    <div class="image-preview">
+                        <img id="originalImagePreview" src="" alt="Original Image" />
+                        <div class="preview-label">Original</div>
+                    </div>
+                    <div class="preview-arrow">→</div>
+                    <div class="image-preview">
+                        <img id="borderedImagePreview" src="" alt="Bordered Image" />
+                        <div class="preview-label">With Border</div>
+                        <div id="borderLoadingSpinner" class="loading-spinner" style="display: none;">
+                            <div class="spinner"></div>
+                            <p>Generating border...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Border Configuration Section -->
+            <div class="border-config-section">
+                <h3>Border Configuration</h3>
+                
+                <!-- Border Type Selection -->
+                <div class="config-group">
+                    <label for="borderType">Border Type:</label>
+                    <select id="borderType" onchange="updateBorderType()">
+                        <option value="solid">Solid Color</option>
+                        <option value="gradient">Gradient</option>
+                        <option value="pattern">Pattern Overlay</option>
+                        <option value="wavelength-theme">Wavelength Theme</option>
+                        <option value="blend">Blend Effect</option>
+                    </select>
+                </div>
+                
+                <!-- Solid Border Options -->
+                <div id="solidBorderOptions" class="border-options">
+                    <div class="config-row">
+                        <div class="config-item">
+                            <label for="solidColor">Color:</label>
+                            <input type="color" id="solidColor" value="#000000" onchange="updateBorderPreview()">
+                        </div>
+                        <div class="config-item">
+                            <label for="solidWidth">Width (px):</label>
+                            <input type="range" id="solidWidth" min="1" max="50" value="10" onchange="updateBorderPreview()">
+                            <span id="solidWidthValue">10</span>
+                        </div>
+                        <div class="config-item">
+                            <label for="solidOpacity">Opacity:</label>
+                            <input type="range" id="solidOpacity" min="0" max="1" step="0.1" value="1" onchange="updateBorderPreview()">
+                            <span id="solidOpacityValue">1.0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gradient Border Options -->
+                <div id="gradientBorderOptions" class="border-options" style="display: none;">
+                    <div class="config-row">
+                        <div class="config-item">
+                            <label for="gradientType">Gradient Type:</label>
+                            <select id="gradientType" onchange="updateBorderPreview()">
+                                <option value="linear">Linear</option>
+                                <option value="radial">Radial</option>
+                                <option value="conic">Conic</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label for="gradientDirection">Direction:</label>
+                            <select id="gradientDirection" onchange="updateBorderPreview()">
+                                <option value="45deg">45°</option>
+                                <option value="90deg">90°</option>
+                                <option value="180deg">180°</option>
+                                <option value="270deg">270°</option>
+                                <option value="to right">To Right</option>
+                                <option value="to bottom">To Bottom</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label for="gradientWidth">Width (px):</label>
+                            <input type="range" id="gradientWidth" min="5" max="50" value="15" onchange="updateBorderPreview()">
+                            <span id="gradientWidthValue">15</span>
+                        </div>
+                    </div>
+                    <div class="gradient-colors">
+                        <label>Gradient Colors:</label>
+                        <div class="color-picker-group">
+                            <input type="color" id="gradientColor1" value="#ff0000" onchange="updateBorderPreview()">
+                            <input type="color" id="gradientColor2" value="#00ff00" onchange="updateBorderPreview()">
+                            <button type="button" onclick="addGradientColor()">+ Add Color</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pattern Border Options -->
+                <div id="patternBorderOptions" class="border-options" style="display: none;">
+                    <div class="config-row">
+                        <div class="config-item">
+                            <label for="patternType">Pattern:</label>
+                            <select id="patternType" onchange="updateBorderPreview()">
+                                <option value="polka-dots">Polka Dots</option>
+                                <option value="stars">Stars</option>
+                                <option value="stripes">Stripes</option>
+                                <option value="diagonal">Diagonal</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label for="patternSize">Size:</label>
+                            <select id="patternSize" onchange="updateBorderPreview()">
+                                <option value="small">Small</option>
+                                <option value="medium">Medium</option>
+                                <option value="large">Large</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label for="patternColor">Color:</label>
+                            <input type="color" id="patternColor" value="#ffffff" onchange="updateBorderPreview()">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Wavelength Theme Options -->
+                <div id="wavelengthThemeOptions" class="border-options" style="display: none;">
+                    <div class="config-row">
+                        <div class="config-item">
+                            <label for="wavelengthTheme">Theme:</label>
+                            <select id="wavelengthTheme" onchange="updateBorderPreview()">
+                                <option value="goblin-king">Goblin King</option>
+                                <option value="ice-fortress">Ice Fortress</option>
+                                <option value="shire-sanctuary">Shire Sanctuary</option>
+                                <option value="wavelength-core">Wavelength Core</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label for="themeDensity">Density:</label>
+                            <select id="themeDensity" onchange="updateBorderPreview()">
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label for="themeColorScheme">Color Scheme:</label>
+                            <select id="themeColorScheme" onchange="updateBorderPreview()">
+                                <option value="light">Light</option>
+                                <option value="dark">Dark</option>
+                                <option value="vibrant">Vibrant</option>
+                                <option value="muted">Muted</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Blend Effect Options -->
+                <div id="blendBorderOptions" class="border-options" style="display: none;">
+                    <div class="config-row">
+                        <div class="config-item">
+                            <label for="blendMode">Blend Mode:</label>
+                            <select id="blendMode" onchange="updateBorderPreview()">
+                                <option value="soft-light">Soft Light</option>
+                                <option value="multiply">Multiply</option>
+                                <option value="overlay">Overlay</option>
+                                <option value="hard-light">Hard Light</option>
+                                <option value="screen">Screen</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label for="featherRadius">Feather (px):</label>
+                            <input type="range" id="featherRadius" min="5" max="50" value="20" onchange="updateBorderPreview()">
+                            <span id="featherRadiusValue">20</span>
+                        </div>
+                        <div class="config-item">
+                            <label for="fadeDistance">Fade Distance (px):</label>
+                            <input type="range" id="fadeDistance" min="10" max="100" value="50" onchange="updateBorderPreview()">
+                            <span id="fadeDistanceValue">50</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Presets -->
+                <div class="preset-section">
+                    <h4>Quick Presets</h4>
+                    <div class="preset-buttons">
+                        <button type="button" onclick="applyPreset('classic')" class="preset-btn">Classic Black</button>
+                        <button type="button" onclick="applyPreset('fire')" class="preset-btn">Fire Gradient</button>
+                        <button type="button" onclick="applyPreset('ocean')" class="preset-btn">Ocean Gradient</button>
+                        <button type="button" onclick="applyPreset('goblin')" class="preset-btn">Goblin King</button>
+                        <button type="button" onclick="applyPreset('blend')" class="preset-btn">Soft Blend</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" onclick="generateBorderPreview()" class="btn btn-primary">
+                🎨 Generate Preview
+            </button>
+            <button type="button" onclick="applyBorderToImage()" class="btn btn-success" id="applyBorderBtn" disabled>
+                ✅ Apply Border
+            </button>
+            <button type="button" onclick="closeBorderModal()" class="btn btn-secondary">
+                ❌ Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.border-selection-modal {
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.preview-section {
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.preview-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.image-preview {
+    position: relative;
+    border: 2px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    min-height: 200px;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-preview img {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: contain;
+}
+
+.preview-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    text-align: center;
+    padding: 5px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.preview-arrow {
+    font-size: 24px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.border-config-section {
+    background: #ffffff;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.config-group {
+    margin-bottom: 15px;
+}
+
+.config-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.config-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.config-item label {
+    font-weight: bold;
+    color: #333;
+}
+
+.config-item input, .config-item select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.config-item input[type="range"] {
+    margin: 5px 0;
+}
+
+.gradient-colors {
+    margin-top: 15px;
+}
+
+.color-picker-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.color-picker-group input[type="color"] {
+    width: 50px;
+    height: 40px;
+    border: 2px solid #333;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.preset-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #dee2e6;
+}
+
+.preset-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.preset-btn {
+    padding: 8px 16px;
+    border: 2px solid #007bff;
+    background: #f8f9fa;
+    color: #007bff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s;
+}
+
+.preset-btn:hover {
+    background: #007bff;
+    color: white;
+}
+
+.loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #007bff;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.border-options {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .preview-container {
+        flex-direction: column;
+    }
+    
+    .preview-arrow {
+        transform: rotate(90deg);
+    }
+    
+    .config-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .border-selection-modal {
+        width: 95%;
+        margin: 10px;
+    }
+}
+</style>
