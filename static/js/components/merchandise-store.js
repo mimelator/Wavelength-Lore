@@ -981,7 +981,8 @@ class MerchandiseStore {
     const imageContext = this.extractImageContext(selectedImageData);
     
     // Show customization modal
-    this.showProductCustomizationModal(productType, productConfig, selectedImageData, imageContext);
+    // Show preview modal first, then customization
+    this.showProductPreviewModal(productType, productConfig, selectedImageData, imageContext);
   }
   
   extractImageContext(imageData) {
@@ -1037,6 +1038,122 @@ class MerchandiseStore {
       }
     }
     return null;
+  }
+  
+  showProductPreviewModal(productType, productConfig, imageData, imageContext) {
+    const modal = document.createElement('div');
+    modal.id = 'productPreviewModal';
+    modal.className = 'modal product-preview-modal';
+    modal.style.display = 'block';
+    
+    // Default selections
+    let selectedSize = 'M';
+    let selectedColor = 'Black';
+    
+    modal.innerHTML = `
+      <div class="modal-content preview-modal-content">
+        <span class="close">&times;</span>
+        <h2>Preview Your ${productConfig.name}</h2>
+        
+        <div class="preview-container">
+          <div class="preview-mockup-wrapper">
+            <div class="product-mockup" data-color="${selectedColor}">
+              <img src="/images/mockups/${productType}-${selectedColor.toLowerCase()}.png" 
+                   alt="${productConfig.name} mockup" 
+                   onerror="this.src='/images/mockups/default-tshirt.png'" />
+              <div class="mockup-overlay">
+                <img src="${imageData.url}" alt="Your design" class="preview-user-image" />
+              </div>
+            </div>
+          </div>
+          
+          <div class="preview-options">
+            <h3>Customize Your Product</h3>
+            
+            <div class="option-group">
+              <label>Size:</label>
+              <div class="size-selector">
+                ${['XS', 'S', 'M', 'L', 'XL', '2XL'].map(size => `
+                  <button class="size-option ${size === selectedSize ? 'selected' : ''}" data-size="${size}">
+                    ${size}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+            
+            <div class="option-group">
+              <label>Color:</label>
+              <div class="color-selector">
+                ${['Black', 'White', 'Navy', 'Grey'].map(color => `
+                  <button class="color-option ${color === selectedColor ? 'selected' : ''}" 
+                          data-color="${color}"
+                          style="background-color: ${color.toLowerCase()}; ${color === 'White' ? 'border: 2px solid #ddd;' : ''}">
+                    <span class="color-name">${color}</span>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+            
+            <div class="preview-price">
+              <span class="price-label">Price:</span>
+              <span class="price-value">$${(productConfig.basePrice / 100).toFixed(2)}</span>
+            </div>
+            
+            <div class="preview-actions">
+              <button class="btn-secondary cancel-preview-btn">Cancel</button>
+              <button class="btn-primary confirm-preview-btn">Customize & Create</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Event listeners
+    const closeBtn = modal.querySelector('.close');
+    const cancelBtn = modal.querySelector('.cancel-preview-btn');
+    const confirmBtn = modal.querySelector('.confirm-preview-btn');
+    const sizeOptions = modal.querySelectorAll('.size-option');
+    const colorOptions = modal.querySelectorAll('.color-option');
+    const mockupImg = modal.querySelector('.product-mockup img');
+    
+    // Close handlers
+    const closeModal = () => modal.remove();
+    closeBtn.onclick = closeModal;
+    cancelBtn.onclick = closeModal;
+    
+    // Size selection
+    sizeOptions.forEach(btn => {
+      btn.onclick = () => {
+        sizeOptions.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedSize = btn.dataset.size;
+      };
+    });
+    
+    // Color selection
+    colorOptions.forEach(btn => {
+      btn.onclick = () => {
+        colorOptions.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedColor = btn.dataset.color;
+        
+        // Update mockup image
+        mockupImg.src = `/images/mockups/${productType}-${selectedColor.toLowerCase()}.png`;
+        mockupImg.onerror = () => mockupImg.src = '/images/mockups/default-tshirt.png';
+      };
+    });
+    
+    // Confirm - proceed to customization modal
+    confirmBtn.onclick = () => {
+      modal.remove();
+      this.showProductCustomizationModal(productType, productConfig, imageData, {
+        ...imageContext,
+        selectedSize,
+        selectedColor
+      });
+    };
   }
   
   showProductCustomizationModal(productType, productConfig, imageData, imageContext) {
