@@ -222,28 +222,18 @@ class ProductPreviewTester {
     console.log('📍 TEST: User can change configuration');
     
     try {
-      // Look for "Change" or "Edit" button
-      const changeBtn = await this.page.$('.change-config-btn, .edit-preview-btn, button:has-text("Change")');
-      
-      if (!changeBtn) {
-        this.results.warnings.push('No configuration change button found');
-        return true;
-      }
-      
-      await changeBtn.click();
-      await wait(500);
-      
-      // Verify configuration options are editable
+      // Verify configuration options are present and editable
       const configEditable = await this.page.evaluate(() => {
-        const sizeSelect = document.querySelector('select[name="size"], .size-selector');
-        const colorSelect = document.querySelector('select[name="color"], .color-selector');
-        return {
-          hasSizeOptions: !!sizeSelect,
-          hasColorOptions: !!colorSelect
-        };
+        const sizeOptions = document.querySelectorAll('.size-option');
+        const colorOptions = document.querySelectorAll('.color-option');
+        return sizeOptions.length > 0 && colorOptions.length > 0;
       });
       
-      console.log('   → Configuration is editable');
+      if (!configEditable) {
+        throw new Error('Configuration options not found');
+      }
+      
+      console.log('   → Configuration options are present and editable');
       console.log('✅ Configuration change working\n');
       this.results.passed.push('User can change configuration');
       return true;
@@ -258,7 +248,7 @@ class ProductPreviewTester {
     console.log('📍 TEST: Confirm button creates product with selected config');
     
     try {
-      const confirmBtn = await this.page.$('.confirm-preview-btn, .create-product-btn, button:has-text("Create")');
+      const confirmBtn = await this.page.$('.confirm-preview-btn');
       
       if (!confirmBtn) {
         throw new Error('Confirm button not found');
