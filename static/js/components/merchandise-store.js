@@ -1196,14 +1196,14 @@ class MerchandiseStore {
       const borderConfig = this.getBorderConfig(borderStyle);
       
       // Call border preview API
-      const response = await fetch('/api/border-preview/generate', {
+      const response = await fetch('/api/merchandise/border-preview', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.getAuthToken()}`
         },
         body: JSON.stringify({
-          imageUrl: imageData.url,
+          sourceImageUrl: imageData.url,
           borderConfig: borderConfig,
           options: {
             format: 'webp',
@@ -1213,9 +1213,13 @@ class MerchandiseStore {
       });
       
       if (response.ok) {
-        const blob = await response.blob();
-        const previewUrl = URL.createObjectURL(blob);
-        previewImg.src = previewUrl;
+        const data = await response.json();
+        if (data.success && data.borderedImageUrl) {
+          previewImg.src = data.borderedImageUrl;
+        } else {
+          console.error('Failed to generate border preview:', data.error);
+          previewImg.src = imageData.thumbnailUrl;
+        }
       } else {
         console.error('Failed to generate border preview');
         previewImg.src = imageData.thumbnailUrl;
@@ -1256,13 +1260,17 @@ class MerchandiseStore {
       },
       'gradient-fade': {
         type: 'gradient',
-        colors: ['#000000', 'transparent'],
+        gradientType: 'linear',
+        colors: ['#000000', '#ffffff'],
         width: 20,
-        direction: 'outward'
+        direction: '45deg'
       },
       'wavelength-theme': {
         type: 'wavelength-theme',
-        variant: 'classic',
+        theme: 'goblin-king',
+        elements: ['crowns', 'gems'],
+        density: 'medium',
+        colorScheme: 'dark',
         width: 20
       }
     };
