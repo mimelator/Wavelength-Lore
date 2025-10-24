@@ -276,6 +276,41 @@ class EnvironmentValidationTester {
     }
   }
 
+  // Test AWS credentials to ensure correct IAM user
+  async testAWSCredentials() {
+    console.log('🧪 TESTING: AWS Credentials - Verifying correct IAM user');
+    
+    try {
+      const galleryConfig = require('../utils/gallery/config');
+      
+      console.log('📊 AWS Credential Check:');
+      console.log(`   ACCESS_KEY_ID: ${galleryConfig.ACCESS_KEY_ID ? galleryConfig.ACCESS_KEY_ID.substring(0, 8) + '...' : '[NOT SET]'}`);
+      console.log(`   ACCESS_KEY_ID starts with AKIA: ${galleryConfig.ACCESS_KEY_ID?.startsWith('AKIA') ? 'YES' : 'NO'}`);
+      
+      if (!galleryConfig.ACCESS_KEY_ID) {
+        console.error('❌ ACCESS_KEY_ID not set - gallery operations will fail!');
+        return { passed: false, errors: ['ACCESS_KEY_ID not configured'] };
+      }
+      
+      // Just verify it's set and looks like a valid AWS access key
+      if (!galleryConfig.ACCESS_KEY_ID.startsWith('AKIA')) {
+        console.error('❌ ACCESS_KEY_ID does not appear to be a valid AWS access key (should start with AKIA)');
+        return { 
+          passed: false, 
+          errors: ['ACCESS_KEY_ID format invalid'] 
+        };
+      }
+      
+      console.log('✅ AWS credentials configured correctly');
+      console.log('   ACCESS_KEY_ID is set and appears valid');
+      return { passed: true, errors: [] };
+      
+    } catch (error) {
+      console.error('❌ AWS credential validation failed:', error.message);
+      return { passed: false, errors: [error.message] };
+    }
+  }
+
   // Enhanced environment diagnostics
   async runEnhancedDiagnostics() {
     console.log('🔍 ENHANCED ENVIRONMENT DIAGNOSTICS');
@@ -289,6 +324,8 @@ class EnvironmentValidationTester {
     console.log(`   PRINTIFY_API_TOKEN: ${process.env.PRINTIFY_API_TOKEN ? '[SET]' : '[MISSING]'}`);
     console.log(`   PRINTIFY_SHOP_ID: ${process.env.PRINTIFY_SHOP_ID || '[MISSING]'}`);
     console.log(`   PRINTIFY_API_URL: ${process.env.PRINTIFY_API_URL || '[MISSING]'}`);
+    console.log(`   ACCESS_KEY_ID: ${process.env.ACCESS_KEY_ID ? '[SET]' : '[MISSING]'}`);
+    console.log(`   AWS_ACCESS_KEY_ID: ${process.env.AWS_ACCESS_KEY_ID ? '[SET]' : '[MISSING]'}`);
     
     // Check config module loading
     try {
@@ -311,6 +348,7 @@ class EnvironmentValidationTester {
     await this.runEnhancedDiagnostics();
     console.log('');
     
+    const awsTest = await this.testAWSCredentials();
     const configTest = await this.testPrintifyEnvironmentAccess();
     const serviceTest = await this.testServiceInitialization();
     const scopeTest = await this.testVariableScopeIssues();
@@ -319,11 +357,16 @@ class EnvironmentValidationTester {
     
     console.log('\n📊 SUMMARY: Environment Validation Test Results');
     console.log('===============================================');
+    console.log(`AWS Credentials Test: ${awsTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
     console.log(`Config Access Test: ${configTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
     console.log(`Service Init Test: ${serviceTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
     console.log(`Variable Scope Test: ${scopeTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
     console.log(`Method Signature Test: ${methodTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
     console.log(`Blueprint-Provider Test: ${compatibilityTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
+    
+    if (!awsTest.passed) {
+      console.log('\n❌ AWS Errors:', awsTest.errors);
+    }
     
     if (!configTest.passed) {
       console.log('\n❌ Config Errors:', configTest.errors);
@@ -345,7 +388,7 @@ class EnvironmentValidationTester {
       console.log('\n❌ Blueprint-Provider Compatibility Errors:', compatibilityTest.errors);
     }
     
-    const allPassed = configTest.passed && serviceTest.passed && scopeTest.passed && methodTest.passed && compatibilityTest.passed;
+    const allPassed = awsTest.passed && configTest.passed && serviceTest.passed && scopeTest.passed && methodTest.passed && compatibilityTest.passed;
     console.log(`\n🎯 OVERALL RESULT: ${allPassed ? '✅ ALL TESTS PASSED' : '❌ TESTS FAILED - ENVIRONMENT ISSUE DETECTED'}`);
     
     return allPassed;

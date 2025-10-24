@@ -10,22 +10,32 @@ const express = require('express');
 const router = express.Router();
 const BorderOverlayService = require('../services/border-overlay-service');
 const BorderConfigValidator = require('../utils/border-config-validator');
-const AWS = require('aws-sdk');
 const crypto = require('crypto');
 const fetch = require('node-fetch');
+const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 
 // Initialize services
 const borderService = new BorderOverlayService();
 const borderValidator = new BorderConfigValidator();
 
-// S3 configuration for storing bordered images
-const s3 = new AWS.S3({
-    region: process.env.AWS_REGION || 'us-east-1'
+// Use gallery storage configuration
+const galleryConfig = require('../utils/gallery/config');
+
+// Log which credentials are being used
+console.log(`🔑 Border Preview API: Using AWS credentials ${galleryConfig.ACCESS_KEY_ID?.substring(0, 20)}...`);
+
+// Initialize S3 client with gallery credentials
+const s3Client = new S3Client({
+    region: galleryConfig.AWS_REGION,
+    credentials: {
+        accessKeyId: galleryConfig.ACCESS_KEY_ID,
+        secretAccessKey: galleryConfig.SECRET_ACCESS_KEY
+    }
 });
 
-const BORDERED_IMAGES_BUCKET = process.env.GALLERY_S3_BUCKET || 'wavelength-gallery-346923';
-const BORDERED_IMAGES_PREFIX = 'bordered-images/';
-const CDN_BASE_URL = process.env.GALLERY_CDN_URL || 'https://d3ohg9sf8htmwk.cloudfront.net';
+const BORDERED_IMAGES_BUCKET = galleryConfig.GALLERY_S3_BUCKET;
+const BORDERED_IMAGES_PREFIX = 'images/gallery/system/bordered/'; // Use gallery path structure
+const CDN_BASE_URL = galleryConfig.CDN_URL;
 
 /**
  * POST /api/merchandise/border-preview
@@ -246,11 +256,12 @@ router.delete('/border-preview/:cacheKey', async (req, res) => {
         // Get metadata to find S3 key
         const metadata = await getBorderedImageMetadata(cacheKey);
         if (metadata && metadata.s3Key) {
-            // Delete from S3
-            await s3.deleteObject({
+            // Delete from S3 using AWS SDK v3
+            const deleteCommand = new DeleteObjectCommand({
                 Bucket: BORDERED_IMAGES_BUCKET,
                 Key: metadata.s3Key
-            }).promise();
+            });
+            await s3Client.send(deleteCommand);
             console.log(`✅ Deleted from S3: ${metadata.s3Key}`);
         }
         
@@ -290,6 +301,11 @@ async function downloadImage(imageUrl) {
 }
 
 async function uploadBorderedImage(s3Key, imageBuffer) {
+    console.log(`☁️ Uploading bordered image to S3...`);
+    console.log(`  Bucket: ${BORDERED_IMAGES_BUCKET}`);
+    console.log(`  Key: ${s3Key}`);
+    console.log(`  Size: ${imageBuffer.length} bytes`);
+    
     const uploadParams = {
         Bucket: BORDERED_IMAGES_BUCKET,
         Key: s3Key,
@@ -302,9 +318,30 @@ async function uploadBorderedImage(s3Key, imageBuffer) {
         }
     };
     
-    const result = await s3.upload(uploadParams).promise();
-    console.log(`✅ Uploaded to S3: ${result.Location}`);
-    return result;
+    try {
+        const command = new PutObjectCommand(uploadParams);
+        const result = await s3Client.send(command);
+        
+        console.log(`✅ Uploaded to S3 successfully`);
+        console.log(`  ETag: ${result.ETag}`);
+        
+        const location = `${CDN_BASE_URL}/${s3Key}`;
+        return {
+            Location: location,
+            ETag: result.ETag,
+            Key: s3Key
+        };
+    } catch (error) {
+        console.error('❌ S3 upload failed:', error);
+        console.error(`  Error name: ${error.name}`);
+        console.error(`  Error message: ${error.message}`);
+        
+        if (error.name === 'AccessDenied') {
+            throw new Error(`Access denied to S3 bucket. Check IAM permissions for ${galleryConfig.ACCESS_KEY_ID?.substring(0, 5)}...`);
+        }
+        
+        throw error;
+    }
 }
 
 async function cacheBorderedImageMetadata(cacheKey, metadata) {

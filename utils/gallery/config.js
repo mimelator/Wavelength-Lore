@@ -19,6 +19,8 @@ try {
 }
 
 module.exports = {
+  // ACCESS_KEY_ID is wavelength-lore-app-user (has S3FullAccess)
+  // AWS_ACCESS_KEY_ID is wavelength-backup-user (only has backup bucket access)
   ACCESS_KEY_ID: process.env.ACCESS_KEY_ID,
   SECRET_ACCESS_KEY: process.env.SECRET_ACCESS_KEY,
   GALLERY_S3_BUCKET: process.env.GALLERY_S3_BUCKET,
