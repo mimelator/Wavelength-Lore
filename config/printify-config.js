@@ -10,11 +10,11 @@
 const PrintifyConfig = {
   // API Configuration
   api: {
-    // Base URL for Printify API
-    baseUrl: process.env.PRINTIFY_API_URL || 'https://api.printify.com',
+    // Base URL for Printify API (includes version to prevent double /v1/v1)
+    baseUrl: process.env.PRINTIFY_API_URL || 'https://api.printify.com/v1',
     
-    // API Version
-    version: 'v1',
+    // API Version (already included in baseUrl to prevent duplication)
+    version: null,
     
     // API Token (store in environment variables)
     token: process.env.PRINTIFY_API_TOKEN,

@@ -240,20 +240,33 @@ class PrintifyService {
         throw new Error('Failed to get blueprint details');
       }
       
+      // VARIANT LIMITING: Printify allows maximum 100 variants per product
+      const MAX_VARIANTS = 100;
+      let selectedVariants = blueprintDetails.variants;
+      
+      if (selectedVariants.length > MAX_VARIANTS) {
+        console.log(`⚠️ Blueprint ${blueprintId} has ${selectedVariants.length} variants, limiting to ${MAX_VARIANTS}`);
+        
+        // Smart variant selection: prioritize common sizes and colors
+        selectedVariants = this.selectOptimalVariants(selectedVariants, MAX_VARIANTS);
+        
+        console.log(`✅ Selected ${selectedVariants.length} optimal variants from ${blueprintDetails.variants.length} available`);
+      }
+      
       // Create product payload with specified blueprint
       const productData = {
         title: title || 'Custom Wavelength Merchandise',
         description: description || 'Premium custom merchandise featuring your favorite Wavelength Lore moment',
         blueprint_id: blueprintId,
         print_provider_id: printProviderId,
-        variants: blueprintDetails.variants.map(variant => ({
+        variants: selectedVariants.map(variant => ({
           id: variant.id,
           price: basePrice,
           is_enabled: true
         })),
         print_areas: [
           {
-            variant_ids: blueprintDetails.variants.map(v => v.id),
+            variant_ids: selectedVariants.map(v => v.id),
             placeholders: [
               {
                 position: 'front',
@@ -287,9 +300,25 @@ class PrintifyService {
       
     } catch (error) {
       console.error('Error creating custom product with blueprint:', error);
+      
+      // Enhanced error logging for Printify API errors
+      if (error.response?.data) {
+        console.error('Printify API Response Error:', {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data
+        });
+        
+        // Log specific error details if available
+        if (error.response.data.errors) {
+          console.error('Printify API Error Details:', error.response.data.errors);
+        }
+      }
+      
       return {
         success: false,
-        error: error.message || 'Failed to create custom product'
+        error: error.response?.data?.message || error.message || 'Failed to create custom product',
+        details: error.response?.data
       };
     }
   }
@@ -302,13 +331,12 @@ class PrintifyService {
    */
   async getBlueprintDetails(blueprintId, printProviderId) {
     try {
-      const response = await this.api.get(
-        `/catalog/blueprints/${blueprintId}/print_providers/${printProviderId}/variants.json`
-      );
+      // Use the new getBlueprintVariants method
+      const variants = await this.getBlueprintVariants(blueprintId, printProviderId);
       
       return {
         success: true,
-        variants: response.data.variants || response.data
+        variants: variants
       };
       
     } catch (error) {
@@ -560,6 +588,27 @@ class PrintifyService {
   }
   
   /**
+   * Get variants for a specific blueprint and print provider combination
+   * Used for compatibility testing to prevent 404 errors
+   * @param {number} blueprintId - Blueprint ID
+   * @param {number} printProviderId - Print Provider ID
+   * @returns {Array} Available variants for this combination
+   */
+  async getBlueprintVariants(blueprintId, printProviderId) {
+    try {
+      const response = await this.api.get(
+        `/catalog/blueprints/${blueprintId}/print_providers/${printProviderId}/variants.json`
+      );
+      
+      return response.data.variants || response.data;
+      
+    } catch (error) {
+      // Re-throw the error so the test can catch 404s specifically
+      throw error;
+    }
+  }
+  
+  /**
    * Validate image for printing requirements
    * @param {Buffer} imageBuffer - Image file buffer
    * @param {string} fileName - Original filename
@@ -619,6 +668,98 @@ class PrintifyService {
     }
     
     return { valid: true };
+  }
+  
+  /**
+   * Select optimal variants from a large set, prioritizing common sizes and colors
+   * @param {Array} variants - All available variants
+   * @param {number} maxVariants - Maximum number of variants to select
+   * @returns {Array} Selected variants
+   */
+  selectOptimalVariants(variants, maxVariants) {
+    // Priority order for sizes (most common first)
+    const sizePriority = ['S', 'M', 'L', 'XL', 'XXL', 'XS', '3XL', '4XL', '5XL'];
+    
+    // Priority order for colors (most popular first)
+    const colorPriority = [
+      'Black', 'White', 'Navy', 'Gray', 'Grey', 'Dark Gray', 'Dark Grey',
+      'Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Pink', 'Orange',
+      'Heather Grey', 'Heather Gray', 'Royal Blue', 'Forest Green'
+    ];
+    
+    // Score each variant based on size and color priority
+    const scoredVariants = variants.map(variant => {
+      let score = 0;
+      
+      // Extract size and color from variant title or properties
+      const title = variant.title || variant.name || '';
+      const size = variant.size || this.extractSizeFromTitle(title);
+      const color = variant.color || this.extractColorFromTitle(title);
+      
+      // Size scoring (higher score = higher priority)
+      const sizeIndex = sizePriority.indexOf(size);
+      if (sizeIndex !== -1) {
+        score += (sizePriority.length - sizeIndex) * 10;
+      }
+      
+      // Color scoring (higher score = higher priority)
+      const colorIndex = colorPriority.indexOf(color);
+      if (colorIndex !== -1) {
+        score += (colorPriority.length - colorIndex) * 5;
+      }
+      
+      return { ...variant, score, size, color };
+    });
+    
+    // Sort by score (highest first) and take the top variants
+    const selectedVariants = scoredVariants
+      .sort((a, b) => b.score - a.score)
+      .slice(0, maxVariants);
+    
+    console.log(`🎯 Variant selection summary:`);
+    console.log(`   Total available: ${variants.length}`);
+    console.log(`   Selected: ${selectedVariants.length}`);
+    console.log(`   Top 5 selected: ${selectedVariants.slice(0, 5).map(v => `${v.size || 'N/A'}/${v.color || 'N/A'}`).join(', ')}`);
+    
+    return selectedVariants;
+  }
+  
+  /**
+   * Extract size from variant title
+   * @param {string} title - Variant title
+   * @returns {string} Extracted size or empty string
+   */
+  extractSizeFromTitle(title) {
+    // First try to match full size names
+    const fullSizeMatch = title.match(/\b(Extra Small|Small|Medium|Large|Extra Large)\b/i);
+    if (fullSizeMatch) {
+      const fullSize = fullSizeMatch[1].toLowerCase();
+      const sizeMap = {
+        'extra small': 'XS',
+        'small': 'S',
+        'medium': 'M',
+        'large': 'L',
+        'extra large': 'XL'
+      };
+      return sizeMap[fullSize] || '';
+    }
+    
+    // Then try abbreviated sizes
+    const sizeMatch = title.match(/\b(XS|S|M|L|XL|XXL|2XL|3XL|4XL|5XL)\b/i);
+    return sizeMatch ? sizeMatch[1].toUpperCase() : '';
+  }
+  
+  /**
+   * Extract color from variant title
+   * @param {string} title - Variant title
+   * @returns {string} Extracted color or empty string
+   */
+  extractColorFromTitle(title) {
+    // Single comprehensive regex with longer matches first
+    const colorPattern = /\b(Dark Gray|Dark Grey|Light Gray|Light Grey|Heather Grey|Heather Gray|Royal Blue|Forest Green|Navy Blue|Black|White|Navy|Gray|Grey|Red|Blue|Green|Yellow|Purple|Pink|Orange|Maroon|Burgundy|Teal|Turquoise)\b/i;
+    
+    const match = title.match(colorPattern);
+    return match ? match[1] : '';
   }
   
   /**

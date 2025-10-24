@@ -1,6 +1,6 @@
 {
-  "discoveredAt": "2025-10-23T23:29:55.018Z",
-  "totalBlueprints": 10,
+  "discoveredAt": "2025-10-24T02:21:04.408Z",
+  "totalBlueprints": 11,
   "categories": {
     "apparel": [
       "shirt",
@@ -83,7 +83,7 @@
           "id": 3,
           "title": "Marco Fine Arts",
           "location": "US",
-          "variantCount": 68
+          "variantCount": 67
         }
       ],
       "category": "apparel"
@@ -163,6 +163,21 @@
       "brand": "LAT Apparel",
       "providers": [],
       "category": "apparel"
+    },
+    {
+      "id": 220,
+      "title": "Spun Polyester Square Pillow",
+      "description": "<p class=\"p1\"><span data-sheets-value=\"{&quot;1&quot;:2,&quot;2&quot;:&quot;Room accents shouldn't be underrated. These beautiful indoor pillows in various sizes serve as statement pieces, creating a personalized environment.&quot;}\" data-sheets-userformat=\"{&quot;2&quot;:4867,&quot;3&quot;:[null,0],&quot;4&quot;:[null,2,16773836],&quot;11&quot;:4,&quot;12&quot;:0,&quot;15&quot;:&quot;Roboto&quot;}\">Room accents shouldn't be underrated. These beautiful indoor pillows in various sizes serve as statement pieces, creating a personalized environment.</span></p><div>.:100% Polyester cover</div><br /><div>.:100% Polyester insert</div><br /><div>.:Double sided print</div><br /><div>.:Concealed zipper</div><br /><div>.:Please note: Inserts will be 2-3 inches longer than the covers, providing the pillow with extra volume when assembled</div>",
+      "brand": "Generic brand",
+      "providers": [
+        {
+          "id": 10,
+          "title": "MWW On Demand",
+          "location": "US",
+          "variantCount": 4
+        }
+      ],
+      "category": "home"
     }
   ],
   "metadata": {

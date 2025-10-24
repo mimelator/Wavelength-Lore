@@ -567,6 +567,83 @@ class MerchandiseDatabase {
   }
 
   /**
+   * Get all vendor preview products
+   */
+  async getAllVendorPreviews() {
+    this.initializeDatabase();
+    
+    try {
+      const previewRef = this.db.ref('merchandise/previewCache');
+      const snapshot = await previewRef.once('value');
+      const cacheData = snapshot.val() || {};
+      
+      const previews = [];
+      
+      // Import friendly names utility
+      const friendlyNames = require('../utils/printify-friendly-names');
+      
+      // Convert cache data to preview list
+      Object.keys(cacheData).forEach(cacheKey => {
+        const preview = cacheData[cacheKey];
+        if (preview && preview.productId) {
+          // Get friendly names for this preview
+          const providerBlueprintInfo = friendlyNames.formatProviderBlueprintDisplay(
+            preview.blueprintId,
+            preview.providerId
+          );
+          
+          previews.push({
+            productId: preview.productId,
+            title: preview.title || 'Vendor Preview',
+            sourceImage: preview.sourceImage || 'Unknown',
+            blueprintId: preview.blueprintId || null,
+            providerId: preview.providerId || null,
+            createdAt: preview.createdAt || null,
+            createdBy: preview.createdBy || 'system',
+            cacheKey: cacheKey,
+            viewUrl: `/merchandise/preview/${preview.productId}`,
+            // Add friendly names
+            blueprintName: providerBlueprintInfo.blueprint.display,
+            blueprintCategory: providerBlueprintInfo.blueprint.category,
+            providerName: providerBlueprintInfo.provider.display,
+            providerLocation: providerBlueprintInfo.provider.location,
+            providerRating: providerBlueprintInfo.provider.rating
+          });
+        }
+      });
+      
+      // Sort by creation date (newest first)
+      previews.sort((a, b) => {
+        const dateA = new Date(a.createdAt || 0);
+        const dateB = new Date(b.createdAt || 0);
+        return dateB - dateA;
+      });
+      
+      return previews;
+    } catch (error) {
+      console.error('Failed to get all vendor previews:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Delete a vendor preview product
+   */
+  async deleteVendorPreview(cacheKey) {
+    this.initializeDatabase();
+    
+    try {
+      const previewRef = this.db.ref(`merchandise/previewCache/${cacheKey}`);
+      await previewRef.remove();
+      console.log(`🗑️ Deleted vendor preview: ${cacheKey}`);
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to delete vendor preview:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
    * Delete expired cached preview
    */
   async deleteCachedPreview(cacheKey) {

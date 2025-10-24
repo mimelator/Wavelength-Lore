@@ -25,6 +25,27 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
       previewMode: true
     });
 
+    // RUNTIME VALIDATION: Validate input parameters
+    if (!imageId || typeof imageId !== 'string') {
+      throw new Error('Invalid imageId: must be a non-empty string');
+    }
+    
+    if (!productType || typeof productType !== 'string') {
+      throw new Error('Invalid productType: must be a non-empty string');
+    }
+    
+    if (!Array.isArray(vendorIds) || vendorIds.length === 0) {
+      throw new Error('Invalid vendorIds: must be a non-empty array');
+    }
+    
+    // RUNTIME VALIDATION: Check for valid vendor IDs
+    const invalidVendors = vendorIds.filter(id => !Number.isInteger(id) || id <= 0);
+    if (invalidVendors.length > 0) {
+      throw new Error(`Invalid vendor IDs: ${invalidVendors.join(', ')} - must be positive integers`);
+    }
+    
+    console.log('✅ Input validation passed for vendor preview generation');
+
     // Add cache performance tracking
     const cachePerformance = {
       startTime: Date.now(),
@@ -55,11 +76,44 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
           cachePerformance.previewCacheHits++;
         } else {
           console.log(`🆕 Generating new preview for vendor ${vendorId}`);
-          preview = await this.createVendorPreview(imageId, productType, vendorId, options);
-          cachePerformance.previewCacheMisses++;
           
-          // Cache the preview for future use
-          await this.cachePreview(imageId, productType, vendorId, preview);
+          // RUNTIME DIAGNOSTICS: Log vendor preview generation attempt
+          console.log(`🔍 RUNTIME DIAGNOSTIC: Attempting vendor preview generation`);
+          console.log(`   Image ID: ${imageId}`);
+          console.log(`   Product Type: ${productType}`);
+          console.log(`   Vendor ID: ${vendorId}`);
+          console.log(`   Options: ${JSON.stringify(options, null, 2)}`);
+          
+          try {
+            preview = await this.createVendorPreview(imageId, productType, vendorId, options);
+            cachePerformance.previewCacheMisses++;
+            
+            // RUNTIME VALIDATION: Validate preview result
+            if (!preview || typeof preview !== 'object') {
+              throw new Error('createVendorPreview returned invalid result');
+            }
+            
+            if (!preview.vendorId || preview.vendorId !== vendorId) {
+              console.warn(`⚠️ Preview vendor ID mismatch: expected ${vendorId}, got ${preview.vendorId}`);
+            }
+            
+            console.log(`✅ RUNTIME DIAGNOSTIC: Vendor preview generated successfully`);
+            console.log(`   Status: ${preview.status}`);
+            console.log(`   Mockup Images: ${preview.mockupImages?.length || 0}`);
+            console.log(`   Variants: ${preview.variants?.length || 0}`);
+            
+            // Cache the preview for future use
+            await this.cachePreview(imageId, productType, vendorId, preview);
+            
+          } catch (previewError) {
+            console.error(`❌ RUNTIME DIAGNOSTIC: Vendor preview generation failed`);
+            console.error(`   Vendor ID: ${vendorId}`);
+            console.error(`   Error: ${previewError.message}`);
+            console.error(`   Stack: ${previewError.stack}`);
+            
+            // Re-throw to be handled by the outer catch block
+            throw previewError;
+          }
         }
         
         // Skip cache performance tracking since cacheOptimization is removed
@@ -74,10 +128,38 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
         
       } catch (error) {
         console.error(`❌ Failed to create preview for vendor ${vendorId}:`, error);
-        errors.push({
+        
+        // ENHANCED ERROR LOGGING: Capture detailed error information
+        const errorDetails = {
           vendorId,
-          error: error.message
-        });
+          error: error.message,
+          errorType: error.constructor.name,
+          timestamp: new Date().toISOString(),
+          productType,
+          imageId,
+          httpStatus: error.response?.status,
+          httpStatusText: error.response?.statusText,
+          apiErrorData: error.response?.data
+        };
+        
+        console.error('📊 DETAILED ERROR REPORT:', JSON.stringify(errorDetails, null, 2));
+        
+        // RUNTIME DIAGNOSTICS: Log specific error patterns
+        if (error.response?.status === 404) {
+          console.error('🚫 BLUEPRINT-PROVIDER COMPATIBILITY ERROR DETECTED!');
+          console.error(`   This indicates blueprint-provider combination is not supported`);
+          console.error(`   Vendor ${vendorId} may not support the selected product type`);
+          console.error(`   Consider updating getCompatibleBlueprintForVendor method`);
+        }
+        
+        if (error.message.includes('No compatible blueprint')) {
+          console.error('🚫 COMPATIBILITY CONFIGURATION ERROR!');
+          console.error(`   The compatibility matrix needs to be updated for:`);
+          console.error(`   Product Type: ${productType}`);
+          console.error(`   Vendor ID: ${vendorId}`);
+        }
+        
+        errors.push(errorDetails);
       }
     }
 
@@ -117,18 +199,14 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
   async createVendorPreview(imageId, productType, vendorId, options = {}) {
     console.log(`🏭 Creating preview for vendor ${vendorId} with ${productType}`);
     
-    // Test different vendors to see which ones work
-    console.log(`🧪 Testing vendor ${vendorId} to see if it works...`);
-
-    // Use the working blueprint directly
-    const vendorConfig = {
-      name: 'Mug 11oz',
-      blueprintId: 68,
-      printProviderId: vendorId,
-      basePrice: 1500,
-      tags: ['mug', 'preview'],
-      description: 'Vendor preview mug'
-    };
+    // Get compatible blueprint-provider combination
+    const vendorConfig = await this.getCompatibleBlueprintForVendor(productType, vendorId);
+    
+    if (!vendorConfig) {
+      throw new Error(`No compatible blueprint found for product type ${productType} with vendor ${vendorId}`);
+    }
+    
+    console.log(`✅ Using compatible blueprint ${vendorConfig.blueprintId} for vendor ${vendorId}`);
 
     try {
       console.log(`📥 Downloading original image ${imageId} to ensure 300DPI quality for vendor ${vendorId}`);
@@ -142,7 +220,7 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
       console.log(`✨ Processing image through auto-enhancement for 300DPI print quality`);
       
       // Step 2: Process through auto-enhancement to ensure 300DPI quality
-      const enhancedImageResult = await this.uploadImageWithAutoEnhancement(
+      const enhancedImageResult = await this.previewImageEnhancement(
         originalImageBuffer,
         `vendor-preview-${vendorId}-${Date.now()}.png`,
         {
@@ -157,10 +235,29 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
         throw new Error(`Failed to enhance image for vendor ${vendorId}: ${enhancedImageResult.error}`);
       }
       
-      console.log(`🎯 Using ${enhancedImageResult.autoEnhanced ? 'enhanced' : 'original'} image for vendor ${vendorId} (300DPI ensured)`);
+      console.log(`🎯 Using ${!enhancedImageResult.originalImageSuitable ? 'enhanced' : 'original'} image for vendor ${vendorId} (300DPI ensured)`);
       
-      // Step 3: Create product using the enhanced image
-      const productResult = await this.createCustomProductWithBlueprint(enhancedImageResult.imageId, {
+      // Step 3: Upload the enhanced image to Printify
+      let printifyImageId;
+      if (enhancedImageResult.enhancedImageUrl && !enhancedImageResult.originalImageSuitable) {
+        // Download enhanced image and upload to Printify
+        const enhancedBuffer = await this.downloadImageBuffer(enhancedImageResult.enhancedImageUrl);
+        const uploadResult = await this.uploadImage(enhancedBuffer, `enhanced-${vendorId}.png`, `Enhanced image for vendor ${vendorId}`);
+        if (!uploadResult.success) {
+          throw new Error('Failed to upload enhanced image to Printify');
+        }
+        printifyImageId = uploadResult.imageId;
+      } else {
+        // Use original image
+        const uploadResult = await this.uploadImage(originalImageBuffer, `original-${vendorId}.png`, `Original image for vendor ${vendorId}`);
+        if (!uploadResult.success) {
+          throw new Error('Failed to upload original image to Printify');
+        }
+        printifyImageId = uploadResult.imageId;
+      }
+      
+      // Step 4: Create product using the uploaded image
+      const productResult = await this.createCustomProductWithBlueprint(printifyImageId, {
         title: `${vendorConfig.name} Preview - Vendor ${vendorId}`,
         description: `Preview mockup for vendor comparison - ${vendorConfig.description}`,
         tags: [...(vendorConfig.tags || []), 'preview', 'vendor-comparison'],
@@ -188,9 +285,13 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
           printAreas: productResult.printAreas || []
         },
         imageEnhancement: {
-          autoEnhanced: enhancedImageResult.autoEnhanced,
-          enhancementSource: enhancedImageResult.enhancementSource,
-          qualityInfo: enhancedImageResult.qualityEnhancement,
+          autoEnhanced: !enhancedImageResult.originalImageSuitable,
+          enhancementSource: enhancedImageResult.enhancementMethod || 'preview',
+          qualityInfo: {
+            originalDimensions: enhancedImageResult.originalDimensions,
+            enhancedDimensions: enhancedImageResult.enhancedDimensions,
+            scaleFactor: enhancedImageResult.scaleFactor
+          },
           printQualityEnsured: true, // Always true since we process through enhancement
           dpiOptimized: true // 300DPI optimization applied
         },
@@ -215,7 +316,7 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
         pricing: { min: 0, max: 0, range: 'N/A' },
         qualityMetrics: { overall: 0, details: {} },
         printDetails: {
-          blueprint: vendorConfig.blueprintId,
+          blueprint: vendorConfig?.blueprintId || null,
           provider: vendorId,
           printAreas: []
         },
@@ -245,6 +346,23 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
       contentHash: cacheData.contentHash || null,
       isFirstOccurrence: Boolean(cacheData.isFirstOccurrence)
     };
+  }
+
+  /**
+   * Download image buffer from URL
+   */
+  async downloadImageBuffer(url) {
+    try {
+      const axios = require('axios');
+      const response = await axios.get(url, { 
+        responseType: 'arraybuffer',
+        timeout: 30000
+      });
+      return Buffer.from(response.data);
+    } catch (error) {
+      console.error(`Failed to download image from ${url}:`, error);
+      throw error;
+    }
   }
 
   /**
@@ -285,18 +403,16 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
         return imageBuffer;
       }
       
-      // Fallback to original
-      const cdnUrl = 'https://d3ohg9sf8htmwk.cloudfront.net';
-      const imageUrl = `${cdnUrl}/${imageId}`;
+      // Fallback to original from S3 directly (avoid CloudFront 403 issues)
+      console.log(`📥 Downloading original image directly from S3: ${imageId}`);
+      const getParams = {
+        Bucket: 'wavelength-gallery-346923',
+        Key: imageId
+      };
       
-      const axios = require('axios');
-      const downloadResponse = await axios.get(imageUrl, { 
-        responseType: 'arraybuffer',
-        timeout: 30000
-      });
-      
-      const imageBuffer = Buffer.from(downloadResponse.data);
-      console.log(`✅ Downloaded original image: ${Math.round(imageBuffer.length / 1024)}KB`);
+      const s3Object = await s3.getObject(getParams).promise();
+      const imageBuffer = s3Object.Body;
+      console.log(`✅ Downloaded original image from S3: ${Math.round(imageBuffer.length / 1024)}KB`);
       return imageBuffer;
       
     } catch (error) {
@@ -764,6 +880,78 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
     const crypto = require('crypto');
     const keyData = `${imageId}-${productType}-${vendorId}`;
     return crypto.createHash('md5').update(keyData).digest('hex');
+  }
+
+  /**
+   * Get compatible blueprint-provider combination for a product type and vendor
+   * This prevents 404 errors by ensuring the combination is valid
+   */
+  async getCompatibleBlueprintForVendor(productType, vendorId) {
+    // Known working combinations based on Printify API testing
+    // Updated based on environment validation test results
+    const compatibleCombinations = {
+      'mug': [
+        // Blueprint 68 is NOT compatible with provider 3 (detected by test)
+        { blueprintId: 68, vendorIds: [1, 7], name: 'Mug 11oz' },
+      ],
+      'premium-tshirt': [
+        // Blueprint 5 IS compatible with provider 3 (confirmed by test)
+        { blueprintId: 5, vendorIds: [1, 3, 7], name: 'Unisex Cotton Crew Tee' },
+        { blueprintId: 6, vendorIds: [1, 7], name: 'Unisex Heavy Cotton Tee' }, // Conservative: remove provider 3 until tested
+      ],
+      'poster': [
+        { blueprintId: 97, vendorIds: [1], name: 'Satin Posters (210gsm)' },
+        { blueprintId: 282, vendorIds: [1], name: 'Matte Vertical Posters' },
+      ],
+      'hoodie': [
+        { blueprintId: 77, vendorIds: [1, 7], name: 'Unisex Heavy Blend™ Hooded Sweatshirt' }, // Conservative: remove provider 3 until tested
+        { blueprintId: 49, vendorIds: [1, 7], name: 'Unisex Heavy Blend™ Crewneck Sweatshirt' }, // Conservative: remove provider 3 until tested
+      ]
+    };
+
+    const productCombinations = compatibleCombinations[productType] || [];
+    
+    // Find a combination that supports this vendor
+    for (const combo of productCombinations) {
+      if (combo.vendorIds.includes(vendorId)) {
+        console.log(`✅ Found compatible combination: ${combo.name} (Blueprint ${combo.blueprintId}) with Vendor ${vendorId}`);
+        return {
+          name: combo.name,
+          blueprintId: combo.blueprintId,
+          printProviderId: vendorId,
+          basePrice: 1500,
+          tags: [productType, 'preview'],
+          description: `Vendor preview ${combo.name}`
+        };
+      }
+    }
+
+    // If no exact match, try to find any working combination for this vendor
+    console.warn(`⚠️ No specific combination found for ${productType} with vendor ${vendorId}, trying fallback...`);
+    
+    // Fallback to known working combinations for this vendor
+    // Updated based on test results - removed invalid vendor 4
+    const fallbackCombinations = {
+      1: { blueprintId: 5, name: 'Unisex Cotton Crew Tee' }, // Vendor 1 works with t-shirts
+      3: { blueprintId: 5, name: 'Unisex Cotton Crew Tee' }, // Vendor 3 works with blueprint 5 (confirmed by test)
+      7: { blueprintId: 5, name: 'Unisex Cotton Crew Tee' }, // Vendor 7 works with t-shirts
+    };
+
+    const fallback = fallbackCombinations[vendorId];
+    if (fallback) {
+      console.log(`✅ Using fallback combination: ${fallback.name} (Blueprint ${fallback.blueprintId}) with Vendor ${vendorId}`);
+      return {
+        name: fallback.name,
+        blueprintId: fallback.blueprintId,
+        printProviderId: vendorId,
+        basePrice: 1500,
+        tags: [productType, 'preview', 'fallback'],
+        description: `Vendor preview ${fallback.name} (fallback)`
+      };
+    }
+
+    console.error(`❌ No compatible blueprint found for product type ${productType} with vendor ${vendorId}`);
+    return null;
   }
 }
 

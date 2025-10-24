@@ -515,6 +515,74 @@ router.get('/products', ensureAuthenticated, async (req, res) => {
 });
 
 /**
+ * GET /api/merchandise/vendor-preview/:productId
+ * Get vendor preview product details (public endpoint)
+ */
+router.get('/vendor-preview/:productId', async (req, res) => {
+  try {
+    // Ensure database is ready
+    if (!ensureDatabaseReady(res)) {
+      return; // Error response already sent
+    }
+    
+    const { productId } = req.params;
+    
+    // Use VendorPreviewHelper to lookup vendor preview only
+    console.log(`🔍 VENDOR PREVIEW: Looking for vendor preview ${productId}`);
+    const VendorPreviewHelper = require('../utils/vendor-preview-helper');
+    const previewHelper = new VendorPreviewHelper();
+    
+    // Only check vendor previews (no user context needed)
+    const lookupResult = await previewHelper.getProductByIdWithFallback(productId, null);
+    
+    if (!lookupResult.found || !lookupResult.isVendorPreview) {
+      console.log(`   ❌ RESULT: Vendor preview not found`);
+      return res.status(404).json({
+        success: false,
+        error: 'Vendor preview not found'
+      });
+    }
+    
+    console.log(`   ✅ RESULT: Found vendor preview`);
+    const productSource = lookupResult.productData;
+    
+    // Get current product details from Printify
+    const productResult = await printifyService.getProduct(productId);
+    
+    if (!productResult.success) {
+      console.log(`   ❌ Printify API Error: ${productResult.error}`);
+      return res.status(400).json({
+        success: false,
+        error: productResult.error
+      });
+    }
+    
+    console.log(`   ✅ Printify product data retrieved successfully`);
+    
+    res.json({
+      success: true,
+      product: {
+        ...productResult.product,
+        sourceImage: productSource.sourceImage,
+        isVendorPreview: true,
+        dataSource: 'vendor-preview',
+        // Add vendor preview metadata
+        createdBy: productSource.createdBy,
+        blueprintId: productSource.blueprintId,
+        providerId: productSource.providerId
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error fetching vendor preview details:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch vendor preview details'
+    });
+  }
+});
+
+/**
  * GET /api/merchandise/product/:productId
  * Get detailed product information including pricing
  */
@@ -528,31 +596,45 @@ router.get('/product/:productId', ensureAuthenticated, async (req, res) => {
     const userId = req.user.uid;
     const { productId } = req.params;
     
-    // Verify product belongs to user
-    const userProduct = await merchandiseDB.getUserProduct(userId, productId);
+    // REFACTORED: Use VendorPreviewHelper for consistent product lookup
+    console.log(`🔍 PRODUCT LOOKUP: Using VendorPreviewHelper for product ${productId}`);
+    const VendorPreviewHelper = require('../utils/vendor-preview-helper');
+    const previewHelper = new VendorPreviewHelper();
     
-    if (!userProduct) {
-      return res.status(403).json({
+    const lookupResult = await previewHelper.getProductByIdWithFallback(productId, userId);
+    
+    if (!lookupResult.found) {
+      console.log(`   ❌ RESULT: Product not found via helper`);
+      return res.status(404).json({
         success: false,
-        error: 'Product not found'
+        error: 'Product not found',
+        details: 'Product not found in user collection or vendor previews'
       });
     }
+    
+    console.log(`   ✅ RESULT: Found via ${lookupResult.source}`);
+    const productSource = lookupResult.productData;
     
     // Get current product details from Printify
     const productResult = await printifyService.getProduct(productId);
     
     if (!productResult.success) {
+      console.log(`   ❌ Printify API Error: ${productResult.error}`);
       return res.status(400).json({
         success: false,
         error: productResult.error
       });
     }
     
+    console.log(`   ✅ Printify product data retrieved successfully`);
+    
     res.json({
       success: true,
       product: {
         ...productResult.product,
-        sourceImage: userProduct.sourceImage
+        sourceImage: productSource.sourceImage,
+        isVendorPreview: lookupResult.isVendorPreview,
+        dataSource: lookupResult.source
       }
     });
     
@@ -561,6 +643,79 @@ router.get('/product/:productId', ensureAuthenticated, async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch product details'
+    });
+  }
+});
+
+/**
+ * GET /merchandise/preview/:productId
+ * HTML preview page for vendor preview products
+ */
+router.get('/preview/:productId', async (req, res) => {
+  try {
+    const { productId } = req.params;
+    
+    console.log(`🖼️ Loading HTML preview for product: ${productId}`);
+    
+    // Get product data from vendor preview helper
+    const VendorPreviewHelper = require('../utils/vendor-preview-helper');
+    const previewHelper = new VendorPreviewHelper();
+    
+    // For preview pages, we'll use a simplified lookup that doesn't require authentication
+    const lookupResult = await previewHelper.getVendorPreviewById(productId);
+    
+    if (!lookupResult) {
+      console.log(`❌ Vendor preview not found: ${productId}`);
+      return res.status(404).render('error', {
+        title: 'Product Not Found',
+        message: 'The requested vendor preview product could not be found.',
+        error: { status: 404 }
+      });
+    }
+    
+    // Get current product details from Printify
+    const productResult = await printifyService.getProduct(productId);
+    
+    if (!productResult.success) {
+      console.log(`❌ Printify API Error: ${productResult.error}`);
+      return res.status(500).render('error', {
+        title: 'Product Error',
+        message: 'Failed to load product details from Printify.',
+        error: { status: 500, details: productResult.error }
+      });
+    }
+    
+    const product = productResult.product;
+    
+    console.log(`✅ Rendering preview page for: ${product.title}`);
+    
+    // Get friendly names for blueprint and provider
+    const friendlyNames = require('../utils/printify-friendly-names');
+    const providerBlueprintInfo = friendlyNames.formatProviderBlueprintDisplay(
+      product.blueprint_id,
+      product.print_provider_id
+    );
+    
+    // Render the vendor preview page
+    res.render('vendor-preview', {
+      title: product.title,
+      product: {
+        ...product,
+        sourceImage: lookupResult.sourceImage,
+        createdAt: lookupResult.createdAt,
+        createdBy: lookupResult.createdBy
+      },
+      productId: productId,
+      isPreview: true,
+      friendlyNames: providerBlueprintInfo
+    });
+    
+  } catch (error) {
+    console.error('Error loading vendor preview page:', error);
+    res.status(500).render('error', {
+      title: 'Preview Error',
+      message: 'Failed to load vendor preview page.',
+      error: error
     });
   }
 });
@@ -1078,6 +1233,37 @@ async function downloadImageBuffer(imageUrl) {
     throw new Error('Failed to download image from URL');
   }
 }
+
+/**
+ * GET /api/merchandise/vendor-previews
+ * Get all vendor preview products for catalog display
+ */
+router.get('/vendor-previews', async (req, res) => {
+  try {
+    console.log('📋 Fetching all vendor preview products for catalog...');
+    
+    const VendorPreviewHelper = require('../utils/vendor-preview-helper');
+    const helper = new VendorPreviewHelper();
+    
+    const previews = await helper.getAllVendorPreviews();
+    
+    console.log(`✅ Found ${previews.length} vendor preview products`);
+    
+    res.json({
+      success: true,
+      count: previews.length,
+      previews: previews
+    });
+    
+  } catch (error) {
+    console.error('❌ Error fetching vendor preview catalog:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch vendor preview catalog',
+      details: error.message
+    });
+  }
+});
 
 /**
  * Sanitizes a string to be used as a valid Firebase Realtime Database key.

@@ -680,4 +680,159 @@ router.post('/vendor-research/cache-cleanup', ensureAuthenticated, requireAdmin,
   }
 });
 
+/**
+ * GET /admin/vendor-research/catalog
+ * Complete catalog of all vendor preview products with generation capability
+ */
+router.get('/vendor-research/catalog', ensureAuthenticated, requireAdmin, async (req, res) => {
+  try {
+    console.log('📋 Loading vendor preview catalog for admin...');
+    
+    const userId = req.user.uid;
+    
+    // Get user's gallery images for new preview generation
+    const userImages = await galleryStorage.listUserGalleryImages(userId);
+    
+    // Get all existing vendor preview products
+    const VendorPreviewHelper = require('../utils/vendor-preview-helper');
+    const helper = new VendorPreviewHelper();
+    const allPreviews = await helper.getAllVendorPreviews();
+    
+    console.log(`✅ Found ${allPreviews.length} existing vendor previews`);
+    console.log(`✅ Found ${userImages.length} user gallery images`);
+    
+    res.render('admin/vendor-preview-catalog', {
+      title: 'Vendor Preview Catalog',
+      allPreviews: allPreviews,
+      userImages: userImages.slice(0, 20), // Limit for UI performance
+      vendorData: VendorResearchData,
+      user: req.user
+    });
+    
+  } catch (error) {
+    console.error('Error loading vendor preview catalog:', error);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Failed to load vendor preview catalog',
+      error: error
+    });
+  }
+});
+
+// Route to generate a single vendor preview product
+router.post('/vendor-research/generate-single-preview', ensureAuthenticated, requireAdmin, async (req, res) => {
+  try {
+    console.log('🎨 Starting single preview generation...');
+    const { imageId, productType } = req.body;
+    
+    if (!imageId || !productType) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required parameters: imageId and productType'
+      });
+    }
+    
+    const userId = req.user.uid;
+    console.log(`📸 Generating preview for image: ${imageId}, type: ${productType}, user: ${userId}`);
+    
+    // Use the vendor preview service to generate
+    const VendorPreviewService = require('../services/vendor-preview-service');
+    const result = await VendorPreviewService.generateVendorPreview(
+      imageId,
+      productType,
+      userId
+    );
+    
+    if (result.success) {
+      console.log(`✅ Successfully generated vendor preview: ${result.productId}`);
+      res.json({
+        success: true,
+        productId: result.productId,
+        message: 'Preview product generated successfully'
+      });
+    } else {
+      console.error('❌ Failed to generate vendor preview:', result.error);
+      res.status(500).json({
+        success: false,
+        error: result.error || 'Failed to generate preview'
+      });
+    }
+    
+  } catch (error) {
+    console.error('❌ Error in single preview generation:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Internal server error'
+    });
+  }
+});
+
+// Route to delete a vendor preview product
+router.delete('/vendor-research/delete-preview', ensureAuthenticated, requireAdmin, async (req, res) => {
+  // Initialize enhanced diagnostics
+  const VendorPreviewDiagnostics = require('../utils/vendor-preview-diagnostics');
+  const diagnostics = new VendorPreviewDiagnostics();
+  
+  try {
+    // Enhanced logging and route health check
+    const routeHealth = diagnostics.validateRouteHealth(req, 'delete-preview');
+    console.log('🗑️ Starting enhanced preview deletion...');
+    
+    // Validate delete request
+    const validation = diagnostics.validateDeleteRequest(req);
+    if (!validation.valid) {
+      console.error('❌ Delete request validation failed:', validation.errors);
+      return res.status(400).json({
+        success: false,
+        error: 'Validation failed',
+        details: validation.errors,
+        warnings: validation.warnings
+      });
+    }
+    
+    const { cacheKey } = req.body;
+    console.log(`🗑️ Deleting preview with cache key: ${cacheKey} (validated)`);
+    
+    // Use enhanced delete operation with diagnostics
+    const MerchandiseDatabase = require('../services/merchandise-database');
+    const result = await diagnostics.enhancedDeletePreview(cacheKey, MerchandiseDatabase);
+    
+    if (result.success) {
+      console.log(`✅ Successfully deleted vendor preview: ${cacheKey}`);
+      console.log(`📊 Operation details:`, JSON.stringify(result.operation, null, 2));
+      
+      res.json({
+        success: true,
+        message: result.message,
+        operation: result.operation,
+        diagnostics: {
+          validation,
+          routeHealth
+        }
+      });
+    } else {
+      console.error('❌ Failed to delete vendor preview:', result.error);
+      console.error('📊 Operation details:', JSON.stringify(result.operation, null, 2));
+      
+      res.status(500).json({
+        success: false,
+        error: result.error,
+        operation: result.operation,
+        suggestion: result.suggestion,
+        diagnostics: {
+          validation,
+          routeHealth
+        }
+      });
+    }
+    
+  } catch (error) {
+    console.error('❌ Error in preview deletion:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Internal server error'
+    });
+  }
+});
+
 module.exports = router;

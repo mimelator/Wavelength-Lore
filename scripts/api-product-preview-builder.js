@@ -636,9 +636,11 @@ class APIProductPreviewBuilder {
                 this.state.currentBatch = progress.currentBatch || 0;
             }
 
-            // Filter out already processed blueprints
+            // Filter out already processed blueprints AND incompatible ones
+            const incompatibleBlueprints = [11, 68]; // Known incompatible with provider 3
             const remainingBlueprints = blueprints.filter(b => 
-                !this.state.processedBlueprints.some(p => p.blueprintId === b.id)
+                !this.state.processedBlueprints.some(p => p.blueprintId === b.id) &&
+                !incompatibleBlueprints.includes(b.id)
             );
 
             console.log(`📋 Total blueprints: ${blueprints.length}`);
@@ -665,6 +667,13 @@ class APIProductPreviewBuilder {
                     // VALIDATION: Ensure blueprint has required properties
                     if (!blueprint.id || !blueprint.title) {
                         throw new Error('Blueprint missing required properties (id, title)');
+                    }
+                    
+                    // COMPATIBILITY CHECK: Skip blueprints that don't work with provider 3
+                    const incompatibleBlueprints = [11, 68]; // Known incompatible with provider 3
+                    if (incompatibleBlueprints.includes(blueprint.id)) {
+                        console.log(`⚠️ Skipping blueprint ${blueprint.id} (${blueprint.title}) - incompatible with provider 3`);
+                        continue;
                     }
                     
                     // Use random image for each blueprint
@@ -706,6 +715,8 @@ class APIProductPreviewBuilder {
                     if (!preview || !preview.success) {
                         throw new Error(`Product creation failed: ${preview.error || 'Unknown error'}`);
                     }
+
+
 
                     const previewResult = {
                         productTitle: blueprint.title,
@@ -792,14 +803,14 @@ class APIProductPreviewBuilder {
             const urlParts = randomImage.url.split('/');
             const fileName = urlParts[urlParts.length - 1];
             
-            console.log(`🔧 Creating single preview with blueprint 68 (Mug)`);
+            console.log(`🔧 Creating single preview with blueprint 5 (T-Shirt - compatible with provider 3)`);
             const preview = await printifyService.createProductWithBlueprint(
                 imageBuffer,
                 fileName,
-                68, // Mug blueprint
+                5, // T-Shirt blueprint (compatible with provider 3)
                 {
                     title: `Preview: ${randomImage.title || 'Gallery Image'}`,
-                    description: `Custom mug created from gallery image`,
+                    description: `Custom t-shirt created from gallery image`,
                     providerId: 3,
                     runId: this.runId
                 }
@@ -810,9 +821,29 @@ class APIProductPreviewBuilder {
                 const productResult = {
                     productId: preview.product?.productId,
                     title: preview.product?.title,
-                    viewUrl: `http://localhost:3001/merchandise/product/${preview.product?.productId}`,
+                    viewUrl: `http://localhost:3001/api/merchandise/vendor-preview/${preview.product?.productId}`,
                     sourceImage: randomImage.title
                 };
+                
+                // REFACTORED: Use reusable VendorPreviewHelper for consistent storage
+                console.log('💾 Storing vendor preview using VendorPreviewHelper...');
+                const VendorPreviewHelper = require('../utils/vendor-preview-helper');
+                const previewHelper = new VendorPreviewHelper();
+                
+                const storageResult = await previewHelper.storeVendorPreview(preview, {
+                    sourceImage: randomImage.title,
+                    blueprintId: 5,
+                    providerId: 3,
+                    runId: this.runId,
+                    imageUrl: randomImage.url,
+                    createdBy: 'api-preview-builder',
+                    tags: ['vendor-preview', 'api-generated']
+                });
+                
+                console.log(`   Storage result: ${storageResult.success ? '✅ SUCCESS' : '❌ FAILED'}`);
+                if (!storageResult.success) {
+                    console.error(`   Error: ${storageResult.error}`);
+                }
                 
                 await this.validatePreviewProduct(productResult, preview);
                 return productResult;
@@ -834,6 +865,7 @@ class APIProductPreviewBuilder {
         console.log(`📝 Title: ${productResult.title}`);
         console.log(`🔗 UI URL: ${productResult.viewUrl}`);
         console.log(`🖼️ Source: ${productResult.sourceImage}`);
+        console.log(`📝 Note: Use vendor-preview endpoint for public access`);
         
         if (preview.product) {
             console.log(`\n📦 PRODUCT DETAILS:`);

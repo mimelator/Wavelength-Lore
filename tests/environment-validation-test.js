@@ -186,11 +186,92 @@ class EnvironmentValidationTester {
         return { passed: false, errors: ['CacheOptimizedPrintifyService missing previewEnhancement method'] };
       }
       
+      // Check VendorPreviewService inheritance (skip if env vars missing)
+      try {
+        const VendorPreviewService = require('../services/vendor-preview-service');
+        const vendorService = new VendorPreviewService();
+        
+        if (typeof vendorService.previewImageEnhancement !== 'function') {
+          console.error('❌ METHOD SIGNATURE BUG DETECTED: VendorPreviewService missing previewImageEnhancement method');
+          console.error('   VendorPreviewService.createVendorPreview calls this.previewImageEnhancement');
+          console.error('   But method is not available - inheritance issue!');
+          return { passed: false, errors: ['VendorPreviewService missing previewImageEnhancement method'] };
+        }
+        
+        console.log('✅ VendorPreviewService inheritance validation passed');
+      } catch (error) {
+        if (error.message.includes('environment variable is required')) {
+          console.log('⚠️ Skipping VendorPreviewService test - environment variables missing (expected in test)');
+        } else {
+          console.error('❌ VendorPreviewService initialization failed:', error.message);
+          return { passed: false, errors: [`VendorPreviewService error: ${error.message}`] };
+        }
+      }
+      
       console.log('✅ Method signature validation passed');
       return { passed: true, errors: [] };
       
     } catch (error) {
       console.error('❌ Method signature validation failed:', error.message);
+      return { passed: false, errors: [error.message] };
+    }
+  }
+
+  // Test blueprint-provider compatibility to prevent 404 errors
+  async testBlueprintProviderCompatibility() {
+    console.log('🧪 TESTING: Blueprint-provider compatibility (this should catch 404 errors)');
+    
+    try {
+      const PrintifyService = require('../services/printify-service');
+      const service = new PrintifyService();
+      
+      // Test combinations including invalid vendor ID 4
+      const testCombinations = [
+        { blueprintId: 11, providerId: 3, name: "Women's Jersey Short Sleeve Deep V-Neck Tee with OTTO Print" },
+        { blueprintId: 68, providerId: 3, name: "Mug 11oz with OTTO Print" },
+        { blueprintId: 5, providerId: 3, name: "Unisex Cotton Crew Tee with OTTO Print" },
+        { blueprintId: 97, providerId: 4, name: "Satin Posters with Invalid Vendor 4" }
+      ];
+      
+      const errors = [];
+      
+      for (const combo of testCombinations) {
+        try {
+          console.log(`🔍 Testing ${combo.name}...`);
+          
+          // This should detect the exact 404 error we encountered
+          const variants = await service.getBlueprintVariants(combo.blueprintId, combo.providerId);
+          
+          if (!variants || variants.length === 0) {
+            console.warn(`⚠️ No variants found for ${combo.name} - may not be compatible`);
+          } else {
+            console.log(`✅ ${combo.name}: ${variants.length} variants available`);
+          }
+          
+        } catch (error) {
+          if (error.response?.status === 404) {
+            console.error(`❌ BLUEPRINT-PROVIDER BUG DETECTED: ${combo.name}`);
+            console.error(`   Blueprint ${combo.blueprintId} is not compatible with provider ${combo.providerId}`);
+            console.error(`   This will cause 404 errors in vendor preview generation!`);
+            errors.push(`Blueprint ${combo.blueprintId} incompatible with provider ${combo.providerId}`);
+          } else {
+            console.warn(`⚠️ API error testing ${combo.name}: ${error.message}`);
+          }
+        }
+      }
+      
+      if (errors.length > 0) {
+        console.error('❌ Blueprint-provider compatibility issues detected!');
+        console.error('   These combinations will fail in production with 404 errors.');
+        console.error('   Update the vendor preview service to use compatible combinations.');
+        return { passed: false, errors };
+      }
+      
+      console.log('✅ Blueprint-provider compatibility validation passed');
+      return { passed: true, errors: [] };
+      
+    } catch (error) {
+      console.error('❌ Blueprint-provider compatibility test failed:', error.message);
       return { passed: false, errors: [error.message] };
     }
   }
@@ -234,6 +315,7 @@ class EnvironmentValidationTester {
     const serviceTest = await this.testServiceInitialization();
     const scopeTest = await this.testVariableScopeIssues();
     const methodTest = await this.testMethodSignatureMismatches();
+    const compatibilityTest = await this.testBlueprintProviderCompatibility();
     
     console.log('\n📊 SUMMARY: Environment Validation Test Results');
     console.log('===============================================');
@@ -241,6 +323,7 @@ class EnvironmentValidationTester {
     console.log(`Service Init Test: ${serviceTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
     console.log(`Variable Scope Test: ${scopeTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
     console.log(`Method Signature Test: ${methodTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
+    console.log(`Blueprint-Provider Test: ${compatibilityTest.passed ? '✅ PASSED' : '❌ FAILED'}`);
     
     if (!configTest.passed) {
       console.log('\n❌ Config Errors:', configTest.errors);
@@ -258,7 +341,11 @@ class EnvironmentValidationTester {
       console.log('\n❌ Method Signature Errors:', methodTest.errors);
     }
     
-    const allPassed = configTest.passed && serviceTest.passed && scopeTest.passed && methodTest.passed;
+    if (!compatibilityTest.passed) {
+      console.log('\n❌ Blueprint-Provider Compatibility Errors:', compatibilityTest.errors);
+    }
+    
+    const allPassed = configTest.passed && serviceTest.passed && scopeTest.passed && methodTest.passed && compatibilityTest.passed;
     console.log(`\n🎯 OVERALL RESULT: ${allPassed ? '✅ ALL TESTS PASSED' : '❌ TESTS FAILED - ENVIRONMENT ISSUE DETECTED'}`);
     
     return allPassed;
