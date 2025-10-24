@@ -517,9 +517,22 @@ class UserGallery {
   setupEventListeners() {
     // Image click events
     this.container.addEventListener('click', (event) => {
+      // Don't open lightbox if clicking on action buttons
+      if (event.target.closest('.gallery-item-actions')) {
+        return;
+      }
+      
       const target = event.target;
-      if (target.tagName === 'IMG' && this.enableLightbox) {
-        const index = parseInt(target.dataset.index, 10);
+      // Check if we clicked on an image or inside a gallery-item
+      let img = null;
+      if (target.tagName === 'IMG') {
+        img = target;
+      } else if (target.closest('.gallery-item')) {
+        img = target.closest('.gallery-item').querySelector('img');
+      }
+      
+      if (img && this.enableLightbox) {
+        const index = parseInt(img.dataset.index, 10);
         this.openLightbox(index);
       }
     });
