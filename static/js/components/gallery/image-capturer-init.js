@@ -62,8 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
                          currentPath === '/my-gallery' || 
                          currentPath.includes('/gallery-demo');
     
-    if (isGalleryPage) {
-      console.log('🚫 Gallery page detected - Save to Gallery functionality disabled');
+    // Check if we're on merchandise pages - disable Save to Gallery there too
+    const isMerchandisePage = currentPath.includes('/merchandise') || 
+                             currentPath.startsWith('/enhanced-merchandise');
+    
+    if (isGalleryPage || isMerchandisePage) {
+      console.log(`🚫 ${isMerchandisePage ? 'Merchandise' : 'Gallery'} page detected - Save to Gallery functionality disabled`);
       return;
     }
     

@@ -106,6 +106,7 @@
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: 10;
+  pointer-events: none; /* Don't block clicks on the image */
 }
 
 .gallery-item:hover .gallery-item-actions {
@@ -132,6 +133,7 @@
   font-size: 14px;
   font-weight: normal;
   backdrop-filter: blur(4px);
+  pointer-events: auto; /* But allow clicks on the buttons themselves */
 }
 
 .gallery-item-actions button:hover {
