@@ -934,18 +934,19 @@ class MerchandiseStore {
       return;
     }
     
-    // Auto-generate context from the selected image
+    // Find product configuration
+    const productConfig = this.findProductConfig(productType);
+    if (!productConfig) {
+      this.showError('Product configuration not found');
+      return;
+    }
+    
+    // Get selected image data
     const selectedImageData = this.galleryImages.find(img => img.id === this.selectedImage);
     const imageContext = this.extractImageContext(selectedImageData);
     
-    // Create the product directly (no modal needed)
-    const product = await this.createGuidedProduct(this.selectedImage, productType, imageContext);
-    
-    if (product) {
-      // Clear selection to allow creating another product
-      this.selectedImage = null;
-      this.render();
-    }
+    // Show customization modal
+    this.showProductCustomizationModal(productType, productConfig, selectedImageData, imageContext);
   }
   
   extractImageContext(imageData) {
@@ -990,6 +991,320 @@ class MerchandiseStore {
     }
     
     return context;
+  }
+  
+  findProductConfig(productTypeId) {
+    // Search through all product type categories
+    for (const category of Object.values(this.productTypes)) {
+      const product = category.products.find(p => p.id === productTypeId);
+      if (product) {
+        return product;
+      }
+    }
+    return null;
+  }
+  
+  showProductCustomizationModal(productType, productConfig, imageData, imageContext) {
+    // Generate default product name
+    const defaultName = this.generateProductName(productType, imageContext, imageData);
+    
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = 'modal product-customization-modal';
+    modal.id = 'productCustomizationModal';
+    modal.innerHTML = `
+      <div class="modal-content customization-content">
+        <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+        
+        <h2>✨ Customize Your ${productConfig.name}</h2>
+        
+        <div class="customization-layout">
+          <!-- Left side: Live Preview -->
+          <div class="preview-section">
+            <h3>Live Preview</h3>
+            <div class="preview-container">
+              <div class="product-mockup">
+                <img id="mockupPreview" src="${imageData.thumbnailUrl}" alt="Product Preview" />
+                <div class="mockup-overlay">
+                  <span class="preview-label">${productConfig.name}</span>
+                </div>
+              </div>
+              
+              <div class="image-preview-with-border">
+                <h4>Your Image with Border</h4>
+                <img id="borderedImagePreview" src="${imageData.thumbnailUrl}" alt="Bordered Image" />
+                <div id="borderLoadingSpinner" class="loading-spinner" style="display: none;"></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right side: Customization Options -->
+          <div class="options-section">
+            <div class="option-group">
+              <h3>🎨 Border Style</h3>
+              <select id="borderStyleSelect" class="border-style-select">
+                <option value="none">No Border</option>
+                <option value="solid-thin">Thin Black Border</option>
+                <option value="solid-medium" selected>Medium Black Border</option>
+                <option value="solid-thick">Thick Black Border</option>
+                <option value="solid-white">White Border</option>
+                <option value="gradient-fade">Gradient Fade</option>
+                <option value="wavelength-theme">Wavelength Theme</option>
+              </select>
+              <p class="option-description">Choose a border style to enhance your image</p>
+            </div>
+            
+            <div class="option-group">
+              <h3>📝 Product Details</h3>
+              <label for="productName">Product Name</label>
+              <input type="text" id="productName" class="product-name-input" value="${defaultName}" />
+              
+              <label for="productDescription">Description (Optional)</label>
+              <textarea id="productDescription" class="product-description-input" rows="3" placeholder="Add a personal description..."></textarea>
+            </div>
+            
+            <div class="option-group">
+              <h3>👕 Default Options</h3>
+              <div class="size-color-grid">
+                <div class="option-item">
+                  <label for="defaultSize">Size</label>
+                  <select id="defaultSize" class="option-select">
+                    ${productConfig.popularSizes.map(size => `
+                      <option value="${size}" ${size === 'M' ? 'selected' : ''}>${size}</option>
+                    `).join('')}
+                  </select>
+                </div>
+                
+                <div class="option-item">
+                  <label for="defaultColor">Color</label>
+                  <select id="defaultColor" class="option-select">
+                    ${productConfig.availableColors.map(color => `
+                      <option value="${color}" ${color === 'Black' ? 'selected' : ''}>${color}</option>
+                    `).join('')}
+                  </select>
+                </div>
+              </div>
+              <p class="option-note">All sizes and colors will be available after creation</p>
+            </div>
+            
+            <div class="pricing-section">
+              <div class="price-display">
+                <span class="price-label">Starting Price:</span>
+                <span class="price-value">$${(productConfig.basePrice / 100).toFixed(2)}</span>
+              </div>
+            </div>
+            
+            <div class="modal-actions">
+              <button class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+              <button class="btn-primary" id="createProductBtn">
+                Create Product
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    
+    // Setup event listeners
+    this.setupCustomizationModalListeners(modal, productType, productConfig, imageData, imageContext);
+  }
+  
+  generateProductName(productType, imageContext, imageData) {
+    const productConfig = this.findProductConfig(productType);
+    if (!productConfig || !productConfig.nameTemplates) {
+      return 'Custom Wavelength Product';
+    }
+    
+    // Pick a template based on available context
+    let template = productConfig.nameTemplates[0]; // Default to first template
+    
+    if (imageContext.characterName && productConfig.nameTemplates.some(t => t.includes('{characterName}'))) {
+      template = productConfig.nameTemplates.find(t => t.includes('{characterName}'));
+    } else if (imageContext.episodeNumber && productConfig.nameTemplates.some(t => t.includes('{episodeNumber}'))) {
+      template = productConfig.nameTemplates.find(t => t.includes('{episodeNumber}'));
+    } else if (imageContext.seasonName && productConfig.nameTemplates.some(t => t.includes('{seasonName}'))) {
+      template = productConfig.nameTemplates.find(t => t.includes('{seasonName}'));
+    }
+    
+    // Replace placeholders
+    let name = template
+      .replace('{characterName}', imageContext.characterName || 'Character')
+      .replace('{episodeNumber}', imageContext.episodeNumber || 'X')
+      .replace('{seasonName}', imageContext.seasonName || 'Season')
+      .replace('{locationName}', imageContext.locationName || 'Adventure');
+    
+    return name;
+  }
+  
+  setupCustomizationModalListeners(modal, productType, productConfig, imageData, imageContext) {
+    const borderSelect = modal.querySelector('#borderStyleSelect');
+    const createBtn = modal.querySelector('#createProductBtn');
+    
+    // Border style change listener
+    let borderUpdateTimeout = null;
+    borderSelect.addEventListener('change', async () => {
+      // Clear existing timeout
+      if (borderUpdateTimeout) {
+        clearTimeout(borderUpdateTimeout);
+      }
+      
+      // Debounce border preview updates
+      borderUpdateTimeout = setTimeout(async () => {
+        await this.updateBorderPreview(modal, imageData, borderSelect.value);
+      }, 300);
+    });
+    
+    // Initial border preview
+    this.updateBorderPreview(modal, imageData, borderSelect.value);
+    
+    // Create product button
+    createBtn.addEventListener('click', async () => {
+      createBtn.disabled = true;
+      createBtn.textContent = 'Creating...';
+      
+      const customization = {
+        productName: modal.querySelector('#productName').value,
+        productDescription: modal.querySelector('#productDescription').value,
+        borderStyle: borderSelect.value,
+        defaultSize: modal.querySelector('#defaultSize').value,
+        defaultColor: modal.querySelector('#defaultColor').value
+      };
+      
+      await this.createCustomizedProduct(productType, imageData, imageContext, customization);
+      
+      modal.remove();
+    });
+  }
+  
+  async updateBorderPreview(modal, imageData, borderStyle) {
+    const previewImg = modal.querySelector('#borderedImagePreview');
+    const spinner = modal.querySelector('#borderLoadingSpinner');
+    
+    if (borderStyle === 'none') {
+      previewImg.src = imageData.thumbnailUrl;
+      return;
+    }
+    
+    // Show loading spinner
+    spinner.style.display = 'block';
+    
+    try {
+      // Map border style to configuration
+      const borderConfig = this.getBorderConfig(borderStyle);
+      
+      // Call border preview API
+      const response = await fetch('/api/border-preview/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.getAuthToken()}`
+        },
+        body: JSON.stringify({
+          imageUrl: imageData.url,
+          borderConfig: borderConfig,
+          options: {
+            format: 'webp',
+            quality: 85
+          }
+        })
+      });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const previewUrl = URL.createObjectURL(blob);
+        previewImg.src = previewUrl;
+      } else {
+        console.error('Failed to generate border preview');
+        previewImg.src = imageData.thumbnailUrl;
+      }
+    } catch (error) {
+      console.error('Error generating border preview:', error);
+      previewImg.src = imageData.thumbnailUrl;
+    } finally {
+      spinner.style.display = 'none';
+    }
+  }
+  
+  getBorderConfig(borderStyle) {
+    const configs = {
+      'solid-thin': {
+        type: 'solid',
+        color: '#000000',
+        width: 5,
+        opacity: 1
+      },
+      'solid-medium': {
+        type: 'solid',
+        color: '#000000',
+        width: 15,
+        opacity: 1
+      },
+      'solid-thick': {
+        type: 'solid',
+        color: '#000000',
+        width: 30,
+        opacity: 1
+      },
+      'solid-white': {
+        type: 'solid',
+        color: '#FFFFFF',
+        width: 15,
+        opacity: 1
+      },
+      'gradient-fade': {
+        type: 'gradient',
+        colors: ['#000000', 'transparent'],
+        width: 20,
+        direction: 'outward'
+      },
+      'wavelength-theme': {
+        type: 'wavelength-theme',
+        variant: 'classic',
+        width: 20
+      }
+    };
+    
+    return configs[borderStyle] || configs['solid-medium'];
+  }
+  
+  async createCustomizedProduct(productType, imageData, imageContext, customization) {
+    try {
+      this.setLoading(true, 'Creating your custom product...');
+      
+      // Prepare product options
+      const productOptions = {
+        ...imageContext,
+        title: customization.productName,
+        description: customization.productDescription,
+        borderConfig: customization.borderStyle !== 'none' ? this.getBorderConfig(customization.borderStyle) : null,
+        defaultVariant: {
+          size: customization.defaultSize,
+          color: customization.defaultColor
+        }
+      };
+      
+      // Call the existing createGuidedProduct but with border config
+      const product = await this.createGuidedProduct(
+        this.selectedImage,
+        productType,
+        productOptions
+      );
+      
+      if (product) {
+        this.showSuccess('Product created successfully!');
+        this.selectedImage = null;
+        this.render();
+      }
+      
+    } catch (error) {
+      console.error('Error creating customized product:', error);
+      this.showError('Failed to create product: ' + error.message);
+    } finally {
+      this.setLoading(false);
+    }
   }
   
   showProductCreationModal() {
