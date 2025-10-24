@@ -299,16 +299,23 @@ class UserGallery {
         actions.appendChild(deleteBtn);
       }
 
-      // Add "Open in Merch Store" button
-      const merchBtn = document.createElement('button');
-      merchBtn.innerHTML = '<span class="icon">🛍️</span>';
-      merchBtn.className = 'merch-store-button';
-      merchBtn.setAttribute('title', 'Create custom merchandise from this image');
-      merchBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.openInMerchStore(image);
-      });
-      actions.appendChild(merchBtn);
+      // Add "Open in Merch Store" button (VIP access only)
+      // Check if user has VIP access (same permission as game_access)
+      const userGroups = window.userGroups || [];
+      const hasVIPAccess = userGroups.includes('vip') || userGroups.includes('admin') || 
+                          userGroups.includes('content_manager') || userGroups.includes('super_admin');
+      
+      if (hasVIPAccess) {
+        const merchBtn = document.createElement('button');
+        merchBtn.innerHTML = '<span class="icon">🛍️</span>';
+        merchBtn.className = 'merch-store-button';
+        merchBtn.setAttribute('title', 'Create custom merchandise from this image');
+        merchBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.openInMerchStore(image);
+        });
+        actions.appendChild(merchBtn);
+      }
       
       item.appendChild(actions);
       galleryGrid.appendChild(item);

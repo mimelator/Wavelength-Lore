@@ -8,6 +8,7 @@
 const express = require('express');
 const router = express.Router();
 const { ensureAuthenticated } = require('../middleware/auth');
+const groupAuth = require('../middleware/groupAuth');
 const AutoEnhancedPrintifyService = require('../services/auto-enhanced-printify-service');
 const MerchandiseDatabase = require('../services/merchandise-database');
 const galleryStorage = require('../utils/gallery/storage');
@@ -56,18 +57,9 @@ function ensureDatabaseReady(res) {
 
 /**
  * GET /merchandise
- * Render the merchandise store page (VIP only)
+ * Render the merchandise store page (VIP access required - same as games)
  */
-router.get('/', ensureAuthenticated, async (req, res) => {
-  // Check if user has VIP access
-  const userGroups = req.user.groups || [];
-  if (!userGroups.includes('admin') && !userGroups.includes('content_manager')) {
-    return res.status(403).render('error', {
-      title: 'Access Restricted',
-      message: 'VIP access required for merchandise store',
-      error: {}
-    });
-  }
+router.get('/', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
   try {
     res.render('merchandise-store', {
       title: 'Custom Merchandise Store',
@@ -116,15 +108,7 @@ router.get('/enhancement-status', (req, res) => {
  * GET /api/merchandise/gallery-images
  * Get user's gallery images suitable for merchandise (includes both uploaded and bookmarked)
  */
-router.get('/gallery-images', ensureAuthenticated, async (req, res) => {
-  // Check if user has VIP access
-  const userGroups = req.user.groups || [];
-  if (!userGroups.includes('admin') && !userGroups.includes('content_manager')) {
-    return res.status(403).json({
-      success: false,
-      error: 'VIP access required'
-    });
-  }
+router.get('/gallery-images', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
   try {
     const userId = req.user.uid;
     
@@ -260,15 +244,7 @@ router.get('/product-types/:category', async (req, res) => {
  * POST /api/merchandise/create-guided-product
  * Create a product using guided selection (no user naming required)
  */
-router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
-  // Check if user has VIP access
-  const userGroups = req.user.groups || [];
-  if (!userGroups.includes('admin') && !userGroups.includes('content_manager')) {
-    return res.status(403).json({
-      success: false,
-      error: 'VIP access required'
-    });
-  }
+router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
   try {
     // Ensure database is ready
     if (!ensureDatabaseReady(res)) {
@@ -414,15 +390,7 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
  * POST /api/merchandise/create-product
  * Create a custom product from a gallery image with automatic AI enhancement
  */
-router.post('/create-product', ensureAuthenticated, async (req, res) => {
-  // Check if user has VIP access
-  const userGroups = req.user.groups || [];
-  if (!userGroups.includes('admin') && !userGroups.includes('content_manager')) {
-    return res.status(403).json({
-      success: false,
-      error: 'VIP access required'
-    });
-  }
+router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
   try {
     // Ensure database is ready
     if (!ensureDatabaseReady(res)) {
@@ -1109,20 +1077,10 @@ async function processPayment(paymentToken, lineItems, shippingAddress) {
  * POST /api/merchandise/preview-enhancement
  * Preview AI enhancement for an image before creating products
  */
-router.post('/preview-enhancement', ensureAuthenticated, async (req, res) => {
+router.post('/preview-enhancement', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
   console.log('🔍 ROUTE: /api/merchandise/preview-enhancement called');
   console.log('🔍 Request body:', req.body);
   console.log('🔍 User groups:', req.user?.groups);
-  
-  // Check if user has VIP access
-  const userGroups = req.user.groups || [];
-  if (!userGroups.includes('admin') && !userGroups.includes('content_manager')) {
-    console.log('❌ VIP access denied for user groups:', userGroups);
-    return res.status(403).json({
-      success: false,
-      error: 'VIP access required'
-    });
-  }
   
   console.log('✅ VIP access granted');
   
@@ -1293,15 +1251,7 @@ router.post('/preview-enhancement', ensureAuthenticated, async (req, res) => {
  * POST /api/merchandise/check-enhancement-status
  * Check if an image has a cached enhanced version
  */
-router.post('/check-enhancement-status', ensureAuthenticated, async (req, res) => {
-  // Check if user has VIP access
-  const userGroups = req.user.groups || [];
-  if (!userGroups.includes('admin') && !userGroups.includes('content_manager')) {
-    return res.status(403).json({
-      success: false,
-      error: 'VIP access required'
-    });
-  }
+router.post('/check-enhancement-status', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
   try {
     // Ensure database is ready
     if (!ensureDatabaseReady(res)) {

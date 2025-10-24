@@ -32,9 +32,17 @@
       <button id="start-screensaver" class="action-button screensaver-button">Start Screensaver</button>
       <button id="select-mode" class="action-button" style="background-color: #607d8b;">Select Multiple</button>
       <button id="delete-selected" class="action-button delete-button" style="display: none;">Delete Selected</button>
+      <% 
+      // Check if user has VIP access (same groups that have game_access permission)
+      const userGroups = user?.groups || [];
+      const hasVIPAccess = userGroups.includes('vip') || userGroups.includes('admin') || 
+                          userGroups.includes('content_manager') || userGroups.includes('super_admin');
+      if (hasVIPAccess) { 
+      %>
       <a href="/merchandise" class="action-button" style="background-color: #8a2be2; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
         <span>🛍️</span> Merch Shop
       </a>
+      <% } %>
     </section>
     
     <!-- Carousel Section -->
