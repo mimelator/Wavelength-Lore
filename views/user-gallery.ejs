@@ -24,8 +24,40 @@
       <p>Save your favorite images by clicking "Save to Gallery" on any image throughout the site!</p>
     </div>
     
-    <!-- Gallery will be rendered here by the UserGallery component -->
-    <div id="user-gallery-container"></div>
+    <!-- Gallery Controls -->
+    <div class="gallery-controls">
+      <button id="carousel-layout" class="active">Carousel</button>
+      <button id="grid-layout">Grid</button>
+      <input type="text" id="gallery-search" placeholder="Search images...">
+      <button id="search-button">Search</button>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div id="action-buttons">
+      <button id="select-mode">Select Multiple</button>
+      <button id="delete-selected" style="display: none;">Delete Selected</button>
+      <button id="download-all">Download All</button>
+      <button id="start-screensaver">Start Screensaver</button>
+      <a href="/merchandise" class="merch-link-button">🛍️ Visit Merch Store</a>
+    </div>
+    
+    <!-- Carousel View -->
+    <div id="carousel-view">
+      <div id="gallery-carousel"></div>
+    </div>
+    
+    <!-- Grid View -->
+    <div id="grid-view" style="display: none;">
+      <div id="gallery-grid"></div>
+    </div>
+    
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal" style="display: none;">
+      <span class="modal-close">&times;</span>
+      <img id="fullSizeImage" class="modal-content">
+      <div id="modalCaption"></div>
+      <button id="delete-image">Delete Image</button>
+    </div>
     
     <!-- Enhanced Screensaver Modal -->
     <!-- Enhanced Screensaver Modal -->
@@ -176,21 +208,7 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
   <script src="<%= cdnUrl %>/js/shared/screensaver.js"></script>
-  <script src="<%= cdnUrl %>/js/components/gallery/user-gallery.js?v=<%= Date.now() %>"></script>
-  <script>
-    // Initialize the UserGallery component
-    document.addEventListener('DOMContentLoaded', () => {
-      const gallery = new UserGallery({
-        containerId: 'user-gallery-container',
-        apiEndpoint: '/api/gallery/user/images',
-        layout: 'grid',
-        enableLightbox: true,
-        enableDownload: true,
-        enableScreensaver: true,
-        enableDelete: true
-      });
-    });
-  </script>
+  <script src="<%= cdnUrl %>/js/gallery/user-gallery.js?v=<%= Date.now() %>"></script>
   
   <!-- Include standard footer -->
   <%- include('partials/footer') %>
