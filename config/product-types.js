@@ -87,18 +87,18 @@ const ProductTypes = {
         description: 'Spun polyester square pillow perfect for home decor',
         blueprintId: 220,
         printProviderId: 10,
-        icon: '☕',
-        tags: ['home', 'mug', 'ceramic', 'coffee'],
-        basePrice: 1299, // $12.99
-        popularSizes: ['11oz', '15oz'],
-        availableColors: ['White', 'Black'],
-        printArea: { width: 8.5, height: 3.5 },
+        icon: '🛋️',
+        tags: ['home', 'pillow', 'decor', 'polyester'],
+        basePrice: 2499, // $24.99
+        popularSizes: ['14x14', '16x16', '18x18'],
+        availableColors: ['White'],
+        printArea: { width: 14, height: 14 },
         nameTemplates: [
-          'Wavelength {characterName} Mug',
-          '{characterName} Morning Coffee',
+          'Wavelength {characterName} Pillow',
+          '{characterName} Comfort Collection',
           'Episode {episodeNumber} Memories',
-          'Wavelength Lore Brew',
-          '{seasonName} Season Mug'
+          'Wavelength Lore Decor',
+          '{seasonName} Season Pillow'
         ]
       },
       {
@@ -107,18 +107,18 @@ const ProductTypes = {
         description: 'Made to feel like a well-loved favorite with feminine fit',
         blueprintId: 9,
         printProviderId: 3,
-        icon: '🖼️',
-        tags: ['home', 'poster', 'wall-art', 'decor'],
-        basePrice: 899, // $8.99
-        popularSizes: ['12x18', '16x24', '18x24'],
-        availableColors: ['Matte', 'Glossy'],
-        printArea: { width: 16, height: 24 },
+        icon: '👕',
+        tags: ['apparel', 'tshirt', 'women', 'fitted'],
+        basePrice: 1899, // $18.99
+        popularSizes: ['S', 'M', 'L', 'XL', '2XL'],
+        availableColors: ['Black', 'White', 'Navy', 'Heather'],
+        printArea: { width: 9, height: 11 },
         nameTemplates: [
-          'Wavelength {characterName} Poster',
-          '{characterName} Chronicles Art',
-          'Episode {episodeNumber} Print',
-          'Wavelength Lore Poster',
-          '{seasonName} Season Art'
+          'Wavelength {characterName} Women\'s Tee',
+          '{characterName} Style Collection',
+          'Episode {episodeNumber} Favorite',
+          'Wavelength Lore Women\'s Tee',
+          '{seasonName} Season Style'
         ]
       },
       {
@@ -127,18 +127,18 @@ const ProductTypes = {
         description: 'Dependable classic made for everyday wear',
         blueprintId: 6,
         printProviderId: 3,
-        icon: '🎨',
-        tags: ['home', 'canvas', 'art', 'premium'],
-        basePrice: 2499, // $24.99
-        popularSizes: ['12x16', '16x20', '20x24'],
-        availableColors: ['Canvas'],
-        printArea: { width: 16, height: 20 },
+        icon: '👕',
+        tags: ['apparel', 'tshirt', 'cotton', 'heavy', 'unisex'],
+        basePrice: 1699, // $16.99
+        popularSizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
+        availableColors: ['Black', 'White', 'Navy', 'Grey', 'Red'],
+        printArea: { width: 10, height: 12 },
         nameTemplates: [
-          'Wavelength {characterName} Canvas',
-          '{characterName} Art Collection',
-          'Episode {episodeNumber} Canvas',
-          'Wavelength Memories Canvas',
-          '{seasonName} Season Canvas'
+          'Wavelength {characterName} Heavy Tee',
+          '{characterName} Classic Collection',
+          'Episode {episodeNumber} Tee',
+          'Wavelength Lore Classic',
+          '{seasonName} Season Tee'
         ]
       }
     ]
@@ -156,18 +156,18 @@ const ProductTypes = {
         description: 'Perfect balance between comfort and toddler-specific durability',
         blueprintId: 34,
         printProviderId: 29,
-        icon: '👜',
-        tags: ['accessories', 'bag', 'canvas', 'practical'],
-        basePrice: 1599, // $15.99
-        popularSizes: ['Standard'],
-        availableColors: ['Natural', 'Black'],
-        printArea: { width: 10, height: 12 },
+        icon: '👕',
+        tags: ['apparel', 'infant', 'tshirt', 'baby'],
+        basePrice: 1299, // $12.99
+        popularSizes: ['6M', '12M', '18M', '24M'],
+        availableColors: ['White', 'Pink', 'Blue', 'Yellow'],
+        printArea: { width: 6, height: 8 },
         nameTemplates: [
-          'Wavelength {characterName} Tote',
-          '{characterName} Adventure Bag',
-          'Episode {episodeNumber} Tote',
-          'Wavelength Lore Bag',
-          '{seasonName} Season Tote'
+          'Wavelength {characterName} Baby Tee',
+          '{characterName} Little One',
+          'Episode {episodeNumber} Infant',
+          'Wavelength Lore Baby',
+          '{seasonName} Season Infant'
         ]
       },
       {
@@ -176,18 +176,18 @@ const ProductTypes = {
         description: 'Classic unisex ultra cotton tee with quality construction',
         blueprintId: 36,
         printProviderId: 3,
-        icon: '📱',
-        tags: ['accessories', 'phone', 'case', 'protective'],
-        basePrice: 1199, // $11.99
-        popularSizes: ['iPhone 12', 'iPhone 13', 'iPhone 14', 'iPhone 15'],
-        availableColors: ['Clear', 'Black'],
-        printArea: { width: 2.5, height: 5 },
+        icon: '👕',
+        tags: ['apparel', 'tshirt', 'cotton', 'ultra', 'unisex'],
+        basePrice: 1599, // $15.99
+        popularSizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
+        availableColors: ['Black', 'White', 'Navy', 'Grey', 'Red', 'Royal Blue'],
+        printArea: { width: 10, height: 12 },
         nameTemplates: [
-          'Wavelength {characterName} Case',
-          '{characterName} Phone Protection',
-          'Episode {episodeNumber} Case',
-          'Wavelength Lore Case',
-          '{seasonName} Season Case'
+          'Wavelength {characterName} Ultra Tee',
+          '{characterName} Ultra Collection',
+          'Episode {episodeNumber} Tee',
+          'Wavelength Lore Ultra',
+          '{seasonName} Season Tee'
         ]
       },
       {
@@ -196,18 +196,18 @@ const ProductTypes = {
         description: 'Classic unisex ultra cotton tee with quality construction',
         blueprintId: 36,
         printProviderId: 29,
-        icon: '🏷️',
-        tags: ['accessories', 'sticker', 'vinyl', 'waterproof'],
-        basePrice: 299, // $2.99
-        popularSizes: ['2x2', '3x3', '4x4'],
-        availableColors: ['Clear Background'],
-        printArea: { width: 3, height: 3 },
+        icon: '👕',
+        tags: ['apparel', 'tshirt', 'cotton', 'ultra', 'unisex'],
+        basePrice: 1599, // $15.99
+        popularSizes: ['S', 'M', 'L', 'XL', '2XL'],
+        availableColors: ['Black', 'White', 'Navy', 'Grey'],
+        printArea: { width: 10, height: 12 },
         nameTemplates: [
-          'Wavelength {characterName} Sticker',
-          '{characterName} Mini Art',
-          'Episode {episodeNumber} Sticker',
-          'Wavelength Lore Sticker',
-          '{seasonName} Season Sticker'
+          'Wavelength {characterName} Ultra Tee',
+          '{characterName} Ultra Collection',
+          'Episode {episodeNumber} Tee',
+          'Wavelength Lore Ultra',
+          '{seasonName} Season Tee'
         ]
       }
     ]
