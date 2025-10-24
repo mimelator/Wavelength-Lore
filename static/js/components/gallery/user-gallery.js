@@ -7,8 +7,14 @@
  * @module components/gallery/user-gallery
  */
 
-// Prevent redeclaration if already loaded
-if (typeof window.UserGallery === 'undefined') {
+(function() {
+  'use strict';
+  
+  // Prevent redeclaration if already loaded
+  if (typeof window.UserGallery !== 'undefined') {
+    console.log('UserGallery already loaded, skipping redefinition');
+    return;
+  }
 
 class UserGallery {
   /**
@@ -908,11 +914,11 @@ class UserGallery {
   }
 }
 
-} // End of UserGallery class guard
-
 // Export the UserGallery class
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = UserGallery;
 } else if (typeof window !== 'undefined') {
   window.UserGallery = UserGallery;
 }
+
+})(); // End of IIFE
