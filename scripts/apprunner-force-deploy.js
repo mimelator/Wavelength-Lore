@@ -40,9 +40,9 @@ class AppRunnerDeploymentForcer {
   constructor(serviceArn) {
     this.serviceArn = serviceArn;
     
-    // Try multiple credential sources in order of preference
-    const accessKeyId = process.env.AWS_ACCESS_KEY_ID || process.env.ACCESS_KEY_ID;
-    const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY || process.env.SECRET_ACCESS_KEY;
+    // Try multiple credential sources in order of preference (prioritize dev credentials for deployments)
+    const accessKeyId = process.env.aws_wavelength_dev_access_key_id || process.env.AWS_ACCESS_KEY_ADMIN || process.env.AWS_ACCESS_KEY_ID || process.env.ACCESS_KEY_ID;
+    const secretAccessKey = process.env.aws_wavelength_dev_secret_access_key || process.env.AWS_SECRET_ACCESS_KEY_ADMIN || process.env.AWS_SECRET_ACCESS_KEY || process.env.SECRET_ACCESS_KEY;
     
     if (!accessKeyId || !secretAccessKey) {
       console.log('ℹ️  No explicit credentials found, using default AWS credential chain');
