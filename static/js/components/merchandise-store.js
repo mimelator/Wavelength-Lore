@@ -482,7 +482,129 @@ class MerchandiseStore {
   }
   
   editProduct(productId) {
-    this.showSuccess('Edit functionality coming soon!');
+    const product = this.products.find(p => p.id === productId);
+    if (!product) {
+      this.showError('Product not found');
+      return;
+    }
+    
+    this.showEditProductModal(product);
+  }
+  
+  showEditProductModal(product) {
+    const modal = document.createElement('div');
+    modal.className = 'modal edit-product-modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+        <h2>✏️ Edit Product</h2>
+        
+        <div class="edit-product-content">
+          <div class="product-preview">
+            <img src="${product.images?.[0]?.src || product.sourceImage?.url}" alt="${product.title}" />
+            <h3>${product.title}</h3>
+          </div>
+          
+          <form id="edit-product-form">
+            <div class="form-group">
+              <label for="edit-title">Product Title</label>
+              <input type="text" id="edit-title" value="${product.title}" required />
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-description">Description</label>
+              <textarea id="edit-description" rows="3">${product.description || ''}</textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>Enabled Variants</label>
+              <div class="variants-list">
+                ${(product.variants || []).map(variant => `
+                  <div class="variant-item">
+                    <label>
+                      <input type="checkbox" 
+                             class="variant-checkbox" 
+                             data-variant-id="${variant.id}"
+                             ${variant.is_enabled ? 'checked' : ''}>
+                      ${variant.title} - $${(variant.price / 100).toFixed(2)}
+                    </label>
+                    <input type="number" 
+                           class="variant-price" 
+                           data-variant-id="${variant.id}"
+                           value="${(variant.price / 100).toFixed(2)}"
+                           step="0.01" min="0">
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+              <button type="submit" class="btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    
+    // Setup form submission
+    const form = modal.querySelector('#edit-product-form');
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      await this.saveProductChanges(product.id, modal);
+    };
+  }
+  
+  async saveProductChanges(productId, modal) {
+    try {
+      this.setLoading(true, 'Saving product changes...');
+      
+      const title = modal.querySelector('#edit-title').value;
+      const description = modal.querySelector('#edit-description').value;
+      
+      // Collect variant updates
+      const variantUpdates = [];
+      modal.querySelectorAll('.variant-checkbox').forEach(checkbox => {
+        const variantId = checkbox.dataset.variantId;
+        const priceInput = modal.querySelector(`input[data-variant-id="${variantId}"]`);
+        const price = Math.round(parseFloat(priceInput.value) * 100); // Convert to cents
+        
+        variantUpdates.push({
+          id: parseInt(variantId),
+          is_enabled: checkbox.checked,
+          price: price
+        });
+      });
+      
+      // Update local product data
+      const product = this.products.find(p => p.id === productId);
+      if (product) {
+        product.title = title;
+        product.description = description;
+        
+        // Update variants
+        variantUpdates.forEach(update => {
+          const variant = product.variants.find(v => v.id === update.id);
+          if (variant) {
+            variant.is_enabled = update.is_enabled;
+            variant.price = update.price;
+          }
+        });
+      }
+      
+      this.showSuccess('Product updated successfully!');
+      this.render();
+      modal.remove();
+      
+    } catch (error) {
+      console.error('Error saving product changes:', error);
+      this.showError('Failed to save changes: ' + error.message);
+    } finally {
+      this.setLoading(false);
+    }
   }
   
   async deleteProduct(productId) {
@@ -606,12 +728,6 @@ class MerchandiseStore {
     
     // Product actions
     document.addEventListener('click', (e) => {
-      if (e.target.closest('.view-product-btn')) {
-        const btn = e.target.closest('.view-product-btn');
-        const productId = btn.dataset.productId;
-        this.viewProductDetails(productId);
-      }
-      
       if (e.target.closest('.edit-product-btn')) {
         const btn = e.target.closest('.edit-product-btn');
         const productId = btn.dataset.productId;
@@ -925,10 +1041,7 @@ class MerchandiseStore {
         <div class="product-image">
           <img src="${product.images?.[0]?.src || product.sourceImage?.url || ''}" alt="${product.title}" />
           <div class="product-actions">
-            <button class="action-btn view-product-btn" data-product-id="${product.id}" title="View Details">
-              <span>👁️</span>
-            </button>
-            <button class="action-btn edit-product-btn" data-product-id="${product.id}" title="Edit">
+            <button class="action-btn edit-product-btn" data-product-id="${product.id}" title="Edit Product">
               <span>✏️</span>
             </button>
             <button class="action-btn delete-product-btn" data-product-id="${product.id}" title="Delete">
@@ -1455,6 +1568,7 @@ class MerchandiseStore {
         this.setLoading(true, '✅ Product created successfully!', 100);
         setTimeout(() => {
           this.setLoading(false);
+          // Only show the simple success message, not the verbose enhancement details
           this.showSuccess('Product created successfully!');
           this.selectedImage = null;
           this.render();

@@ -514,12 +514,6 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
       }
     });
     
-    // Prepare response message with enhancement info
-    let successMessage = 'Custom product created successfully!';
-    if (productResult.imageEnhancement?.autoEnhanced) {
-      successMessage += ' Image was automatically enhanced for better print quality.';
-    }
-    
     res.json({
       success: true,
       product: {
@@ -538,8 +532,7 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
         autoEnhanced: productResult.imageEnhancement?.autoEnhanced || false,
         enhancementSource: productResult.imageEnhancement?.enhancementSource || 'none',
         qualityImproved: productResult.imageEnhancement?.autoEnhanced && !productResult.imageEnhancement?.originalImageSuitable
-      },
-      message: successMessage
+      }
     });
     
   } catch (error) {
