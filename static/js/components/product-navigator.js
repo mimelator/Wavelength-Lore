@@ -330,13 +330,27 @@ class ProductNavigator {
   }
   
   selectProduct(blueprintId, providerId) {
-    // Emit custom event for parent components to handle
-    const event = new CustomEvent('productSelected', {
-      detail: { blueprintId, providerId }
-    });
-    this.container.dispatchEvent(event);
+    // Find the product data
+    const product = this.catalog.searchIndex.find(p => 
+      p.blueprint_id == blueprintId && p.provider_id == providerId
+    );
     
-    console.log('Product selected:', { blueprintId, providerId });
+    if (product) {
+      // Call the callback if provided
+      if (this.options.onProductSelect) {
+        this.options.onProductSelect(product);
+      }
+      
+      // Emit custom event for parent components to handle
+      const event = new CustomEvent('productSelected', {
+        detail: { product, blueprintId, providerId }
+      });
+      this.container.dispatchEvent(event);
+      
+      console.log('Product selected:', product);
+    } else {
+      console.error('Product not found:', { blueprintId, providerId });
+    }
   }
   
   renderLoading() {

@@ -1,0 +1,15 @@
+{
+  "name": "tiered-product-test-deps",
+  "description": "Test dependencies for tiered product system",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "puppeteer": "^21.5.0",
+    "@types/jest": "^29.5.8"
+  },
+  "scripts": {
+    "test:tiered": "node tests/run-tiered-tests.js",
+    "test:api": "jest tests/tiered-product-system.test.js",
+    "test:browser": "jest tests/browser/tiered-product-browser.test.js"
+  }
+}

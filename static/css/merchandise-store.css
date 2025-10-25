@@ -693,7 +693,75 @@
   }
 }
 
-/* Product Types Grid Styles */
+/* Product Navigator Integration */
+#product-navigator-container {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 400px;
+}
+
+#product-navigator {
+  /* Override product navigator styles for merchandise store integration */
+}
+
+/* Product Navigator in Merchandise Store Context */
+.merchandise-store .product-navigator {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.merchandise-store .category-card,
+.merchandise-store .subcategory-card,
+.merchandise-store .product-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.merchandise-store .category-card:hover,
+.merchandise-store .subcategory-card:hover,
+.merchandise-store .product-card:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.merchandise-store .select-product-btn {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.merchandise-store .select-product-btn:hover {
+  background: linear-gradient(135deg, #45a049, #4CAF50);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+/* Error state for navigator */
+.error-state {
+  text-align: center;
+  padding: 40px;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(244, 67, 54, 0.1);
+  border: 2px dashed rgba(244, 67, 54, 0.3);
+  border-radius: 12px;
+}
+
+.error-state p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/* Product Types Grid Styles (Legacy - kept for fallback) */
 .product-types-grid {
   display: flex;
   flex-direction: column;

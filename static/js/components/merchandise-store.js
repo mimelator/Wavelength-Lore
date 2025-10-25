@@ -743,10 +743,12 @@ class MerchandiseStore {
         this.showGuidedProductCreationModal();
       }
       
-      // Product type selection
-      if (e.target.classList.contains('select-product-type-btn')) {
+      // Product type selection from navigator
+      if (e.target.classList.contains('select-product-btn')) {
         const productType = e.target.dataset.productType;
-        this.selectProductType(productType);
+        const blueprintId = e.target.dataset.blueprintId;
+        const printProviderId = e.target.dataset.printProviderId;
+        this.selectProductType(productType, blueprintId, printProviderId);
       }
     });
     
@@ -998,9 +1000,9 @@ class MerchandiseStore {
               <div class="selected-image-preview">
                 ${this.renderSelectedImagePreview()}
               </div>
-              <p class="section-description">Choose Your Merch!</p>
-              <div class="product-types-grid">
-                ${this.renderProductTypes()}
+              <p class="section-description">Browse 1,300+ products organized by category</p>
+              <div id="product-navigator-container">
+                <div id="product-navigator"></div>
               </div>
             </div>
             ` : ''}
@@ -1084,64 +1086,36 @@ class MerchandiseStore {
     }
   }
   
-  renderProductTypes() {
-    if (!this.productTypes || Object.keys(this.productTypes).length === 0) {
-      return `
-        <div class="loading-state">
-          <p>Loading product options...</p>
+  initializeProductNavigator() {
+    const container = document.getElementById('product-navigator');
+    if (!container) {
+      console.warn('Product navigator container not found');
+      return;
+    }
+    
+    // Initialize the ProductNavigator component
+    if (typeof ProductNavigator !== 'undefined') {
+      this.productNavigator = new ProductNavigator('product-navigator', {
+        apiEndpoint: '/api/product-catalog',
+        onProductSelect: (product) => {
+          console.log('Product selected from navigator:', product);
+          this.selectProductType(
+            product.blueprint_title,
+            product.blueprint_id,
+            product.provider_id
+          );
+        },
+        showSearch: true,
+        showBreadcrumbs: true
+      });
+    } else {
+      console.error('ProductNavigator class not found. Make sure product-navigator.js is loaded.');
+      container.innerHTML = `
+        <div class="error-state">
+          <p>Product navigator failed to load. Please refresh the page.</p>
         </div>
       `;
     }
-    
-    return Object.entries(this.productTypes).map(([categoryKey, category]) => {
-      if (!category || !category.products) {
-        console.warn('Invalid category:', categoryKey, category);
-        return '';
-      }
-      
-      return `
-        <div class="product-category">
-          <h3 class="category-title">
-            <span class="category-icon">${category.icon || '📦'}</span>
-            ${category.name || 'Products'}
-          </h3>
-          <p class="category-description">${category.description || ''}</p>
-          <div class="category-products">
-            ${category.products.map(product => {
-              if (!product || !product.id) {
-                console.warn('Invalid product:', product);
-                return '';
-              }
-              
-              return `
-                <div class="product-type-card">
-                  ${product.genericImage ? `
-                    <div class="product-type-image">
-                      <img src="${product.genericImage}" alt="${product.name || 'Product'}" 
-                           onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;product-type-icon&quot;>${product.icon || '👕'}</div>';" />
-                    </div>
-                  ` : `
-                    <div class="product-type-icon">${product.icon || '👕'}</div>
-                  `}
-                  <div class="product-type-info">
-                    <h4>${product.name || 'Product'}</h4>
-                    <p class="product-type-description">${product.description || ''}</p>
-                    <div class="product-type-details">
-                      <span class="price">Starting at $${((product.basePrice || 1999) / 100).toFixed(2)}</span>
-                      <span class="colors">${(product.availableColors || []).length} colors</span>
-                    </div>
-                    <button class="select-product-type-btn btn-primary" 
-                            data-product-type="${product.id}">
-                      Design ${product.name || 'Product'}
-                    </button>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
-      `;
-    }).filter(html => html).join('');
   }
   
   renderProducts() {
@@ -1538,8 +1512,11 @@ class MerchandiseStore {
     this.selectedImage = imageId;
     this.render();
     
-    // Auto-scroll to the Choose Product section for better UX (same as preselection)
+    // Initialize the product navigator after rendering
     setTimeout(() => {
+      this.initializeProductNavigator();
+      
+      // Auto-scroll to the Choose Product section for better UX
       const chooseProductSection = document.getElementById('choose-product-section');
       if (chooseProductSection) {
         chooseProductSection.scrollIntoView({ 
@@ -1548,20 +1525,12 @@ class MerchandiseStore {
         });
         console.log('📍 Auto-scrolled to Choose Product section after image selection');
       }
-    }, 300); // Shorter delay since DOM is already rendered
+    }, 300);
   }
   
-  async selectProductType(productType) {
+  async selectProductType(productType, blueprintId, printProviderId) {
     if (!this.selectedImage) {
       this.showError('Please select an image first');
-      return;
-    }
-    
-    // Find product configuration
-    const productConfig = this.findProductConfig(productType);
-    if (!productConfig) {
-      this.showError('Product configuration not found for: ' + productType);
-      console.error('Available product types:', Object.keys(this.productTypes));
       return;
     }
     
@@ -1574,11 +1543,22 @@ class MerchandiseStore {
     
     const imageContext = this.extractImageContext(selectedImageData);
     
+    // Create product configuration from catalog data
+    const productConfig = {
+      id: `${blueprintId}-${printProviderId}`,
+      name: productType,
+      blueprintId: blueprintId,
+      printProviderId: printProviderId,
+      basePrice: 1999, // Default price
+      popularSizes: ['S', 'M', 'L', 'XL'],
+      availableColors: ['Black', 'White', 'Navy', 'Gray']
+    };
+    
     // Show combined customization modal directly
     this.showProductCustomizationModal(productType, productConfig, selectedImageData, {
       ...imageContext,
-      selectedSize: productConfig.popularSizes?.[0] || 'M',
-      selectedColor: productConfig.availableColors?.[0] || 'Black'
+      selectedSize: 'M',
+      selectedColor: 'Black'
     });
   }
   

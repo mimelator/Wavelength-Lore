@@ -167,13 +167,7 @@ async function linkifyCharacterMentions(text) {
   return linkingUtils.linkifyItemMentions(text, characters, 'character');
 }
 
-/**
- * Get all characters list
- * @returns {Promise<Array>} Array of all characters
- */
-async function getAllCharacters() {
-  return await getCharacters();
-}
+
 
 /**
  * Synchronous versions for compatibility (uses cache or fallback)

@@ -1,37 +1,34 @@
+/**
+ * Test Setup Configuration
+ * Global setup for all tests
+ */
 
-// Jest setup file for group management tests
+// Increase timeout for browser tests
+jest.setTimeout(30000);
 
-// Mock Firebase Admin SDK
-jest.mock('firebase-admin', () => ({
-  initializeApp: jest.fn(),
-  credential: {
-    cert: jest.fn()
-  },
-  database: jest.fn(() => ({
-    ref: jest.fn(() => ({
-      once: jest.fn(),
-      set: jest.fn(),
-      update: jest.fn(),
-      push: jest.fn(),
-      remove: jest.fn()
-    }))
-  }))
-}));
+// Mock environment variables for testing
+process.env.NODE_ENV = 'test';
+process.env.PORT = '3002';
 
-// Global test timeout
-jest.setTimeout(10000);
-
-// Console cleanup for cleaner test output
-const originalConsoleError = console.error;
-beforeAll(() => {
-  console.error = (...args) => {
-    if (typeof args[0] === 'string' && args[0].includes('Warning: validateDOMNesting')) {
-      return;
+// Global test utilities
+global.testUtils = {
+  delay: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
+  
+  waitForCondition: async (condition, timeout = 5000) => {
+    const start = Date.now();
+    while (Date.now() - start < timeout) {
+      if (await condition()) return true;
+      await global.testUtils.delay(100);
     }
-    originalConsoleError.call(console, ...args);
-  };
-});
+    throw new Error('Condition not met within timeout');
+  }
+};
 
-afterAll(() => {
-  console.error = originalConsoleError;
-});
+// Console override for cleaner test output
+const originalConsole = console;
+global.console = {
+  ...originalConsole,
+  log: jest.fn(),
+  warn: jest.fn(),
+  error: originalConsole.error // Keep errors visible
+};
