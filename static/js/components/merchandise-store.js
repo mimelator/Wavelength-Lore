@@ -24,22 +24,32 @@ class MerchandiseStore {
     const preselectImageId = urlParams.get('preselect');
     
     // Check enhancement capabilities
+    console.log('🔍 Loading enhancement status...');
     await this.loadEnhancementStatus();
+    console.log('✅ Enhancement status loaded:', this.enhancementStatus);
     
     // Load product types first
+    console.log('🔍 Loading product types...');
     await this.loadProductTypes();
+    console.log('✅ Product types loaded:', Object.keys(this.productTypes).length, 'categories');
     
     // Load user's gallery images
+    console.log('🔍 Loading gallery images...');
     await this.loadGalleryImages();
+    console.log('✅ Gallery images loaded:', this.galleryImages?.length || 0, 'images');
     
     // Load existing products
+    console.log('🔍 Loading user products...');
     await this.loadUserProducts();
+    console.log('✅ User products loaded:', this.products?.length || 0, 'products');
     
     // Setup event listeners
     this.setupEventListeners();
     
     // Render initial state
+    console.log('🎨 Rendering initial state...');
     this.render();
+    console.log('✅ Initial render complete');
     
     // Pre-select image AFTER rendering if specified in URL
     if (preselectImageId) {
