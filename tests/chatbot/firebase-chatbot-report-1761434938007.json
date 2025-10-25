@@ -1,0 +1,44 @@
+{
+  "timestamp": "2025-10-25T23:28:58.006Z",
+  "testSuite": "Firebase Functions Chatbot",
+  "firebaseUrl": "https://us-central1-wavelength-lore.cloudfunctions.net",
+  "baseUrl": "https://wavelengthlore.com",
+  "totalTests": 3,
+  "passedTests": 2,
+  "failedTests": 0,
+  "partialTests": 1,
+  "results": [
+    {
+      "test": "Firebase Functions Health",
+      "status": "PASS",
+      "details": {
+        "status": "ok",
+        "timestamp": "2025-10-25T23:28:53.052Z",
+        "service": "wavelength-chatbot-sso",
+        "version": "1.0.0",
+        "security": {
+          "ssoEnabled": true,
+          "authEnabled": true,
+          "rateLimitEnabled": true,
+          "corsEnabled": true,
+          "membershipRequired": "VIP+"
+        },
+        "sessions": {
+          "active": 0,
+          "activeLastHour": 0,
+          "membershipDistribution": {}
+        }
+      }
+    },
+    {
+      "test": "Authentication Required",
+      "status": "PASS",
+      "details": "Unauthenticated requests properly rejected"
+    },
+    {
+      "test": "Widget Integration",
+      "status": "PARTIAL",
+      "details": "Page loads but chat elements not found"
+    }
+  ]
+}

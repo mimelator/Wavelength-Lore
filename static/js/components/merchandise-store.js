@@ -1704,26 +1704,6 @@ class MerchandiseStore {
           </div>
         </div>
       </div>
-      
-      <!-- Loading Modal -->
-      <div id="loading-modal" class="modal" style="display: none;">
-        <div class="modal-content loading-modal-content">
-          <div class="loading-header">
-            <div class="loading-spinner"></div>
-            <h3 id="loading-title">Processing Your Request</h3>
-          </div>
-          <p id="loading-message">Loading...</p>
-          <div class="progress-bar-container">
-            <div class="progress-bar" id="loading-progress-bar">
-              <div class="progress-bar-fill" id="loading-progress-fill"></div>
-            </div>
-            <span class="progress-text" id="loading-progress-text">0%</span>
-          </div>
-          <div class="loading-note">
-            <small>This may take a moment while we process your request.</small>
-          </div>
-        </div>
-      </div>
     `;
   }
   
@@ -2612,37 +2592,37 @@ class MerchandiseStore {
    * Ensure loading modal exists in DOM before trying to use it
    */
   ensureLoadingModalExists() {
-    let modal = document.getElementById('loading-modal');
-    if (!modal) {
-      const modalHTML = `
-        <div id="loading-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000;">
-          <div class="modal-content loading-modal-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; text-align: center; min-width: 300px;">
-            <div class="loading-header">
-              <div class="loading-spinner" style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
-              <h3 id="loading-title">Processing Your Request</h3>
+    // Remove any existing loading modals first to prevent duplicates
+    document.querySelectorAll('#loading-modal').forEach(el => el.remove());
+    
+    const modalHTML = `
+      <div id="loading-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000;">
+        <div class="modal-content loading-modal-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; text-align: center; min-width: 300px;">
+          <div class="loading-header">
+            <div class="loading-spinner" style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
+            <h3 id="loading-title">Processing Your Request</h3>
+          </div>
+          <p id="loading-message">Loading...</p>
+          <div class="progress-bar-container" style="margin: 15px 0;">
+            <div class="progress-bar" id="loading-progress-bar" style="width: 100%; height: 20px; background: #f0f0f0; border-radius: 10px; overflow: hidden;">
+              <div class="progress-bar-fill" id="loading-progress-fill" style="height: 100%; background: #007bff; width: 0%; transition: width 0.3s ease;"></div>
             </div>
-            <p id="loading-message">Loading...</p>
-            <div class="progress-bar-container" style="margin: 15px 0;">
-              <div class="progress-bar" id="loading-progress-bar" style="width: 100%; height: 20px; background: #f0f0f0; border-radius: 10px; overflow: hidden;">
-                <div class="progress-bar-fill" id="loading-progress-fill" style="height: 100%; background: #007bff; width: 0%; transition: width 0.3s ease;"></div>
-              </div>
-              <span class="progress-text" id="loading-progress-text">0%</span>
-            </div>
-            <div class="loading-note">
-              <small>This may take a moment while we process your request.</small>
-            </div>
+            <span class="progress-text" id="loading-progress-text">0%</span>
+          </div>
+          <div class="loading-note">
+            <small>This may take a moment while we process your request.</small>
           </div>
         </div>
-        <style>
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        </style>
-      `;
-      document.body.insertAdjacentHTML('beforeend', modalHTML);
-      console.log('📱 Loading modal created and added to DOM with proper styling');
-    }
+      </div>
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    console.log('📱 Loading modal created (duplicates removed)');
   }
   
   setLoading(isLoading, message = 'Loading...', progress = null) {
@@ -2654,8 +2634,10 @@ class MerchandiseStore {
       return;
     }
     
-    // CRITICAL FIX: Always ensure modal exists before trying to use it
-    this.ensureLoadingModalExists();
+    if (isLoading) {
+      // Only create modal when needed
+      this.ensureLoadingModalExists();
+    }
     
     // Force a small delay to ensure DOM is ready
     setTimeout(() => {
@@ -2664,34 +2646,28 @@ class MerchandiseStore {
       const progressFill = document.getElementById('loading-progress-fill');
       const progressText = document.getElementById('loading-progress-text');
       
-      // If loading modal still doesn't exist, use fallback
       if (!modal) {
-        console.warn('⚠️ Loading modal not available, using console feedback');
-        console.log(isLoading ? `🔄 ${message}` : '✅ Loading complete');
+        console.warn('⚠️ Loading modal not available');
         return;
       }
       
       if (isLoading) {
         if (messageEl) messageEl.textContent = message;
         
-        // Update progress bar if progress value provided
         if (progress !== null && progressFill && progressText) {
           progressFill.style.width = `${progress}%`;
           progressText.textContent = `${Math.round(progress)}%`;
         }
         
         modal.style.display = 'block';
-        console.log('📱 Progress dialog shown:', message);
       } else {
         modal.style.display = 'none';
-        // Reset progress bar
         if (progressFill && progressText) {
           progressFill.style.width = '0%';
           progressText.textContent = '0%';
         }
-        console.log('📱 Progress dialog hidden');
       }
-    }, 10); // Small delay to ensure DOM readiness
+    }, 10);
   }
   
 

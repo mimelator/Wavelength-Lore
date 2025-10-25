@@ -138,6 +138,19 @@ async function testVariantDisplay() {
         console.log(`   Variant Summary Styles: ${cssStatus.hasVariantSummaryStyles ? '✅' : '❌'}`);
         console.log(`   Compact Variant Styles: ${cssStatus.hasCompactVariantStyles ? '✅' : '❌'}`);
         
+        // Check for duplicate form field IDs
+        console.log('\n🔍 Checking for duplicate form field IDs...');
+        const duplicateIds = await page.evaluate(() => {
+            const allIds = Array.from(document.querySelectorAll('[id]')).map(el => el.id);
+            const duplicates = allIds.filter((id, index) => allIds.indexOf(id) !== index);
+            return [...new Set(duplicates)];
+        });
+        
+        console.log(`   Duplicate IDs Found: ${duplicateIds.length > 0 ? '❌' : '✅'}`);
+        if (duplicateIds.length > 0) {
+            console.log(`   Duplicates: ${duplicateIds.join(', ')}`);
+        }
+        
         // Take screenshot for proof
         await page.screenshot({ 
             path: 'variant-display-test-proof.png',

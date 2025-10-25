@@ -317,10 +317,28 @@ class SSOChatbotTester {
             // Special handling for iframe-based chatbots
             const iframe = await this.page.$('#chatbot-frame, .chatbot-frame');
             if (iframe) {
-              console.log(chalk.blue('🔍 Detected iframe-based chatbot, waiting for load...'));
+              console.log(chalk.blue('🔍 Detected iframe-based chatbot, attempting to activate...'));
               
-              // Wait for iframe to become visible or load content
+              // Try to trigger the chatbot display
               try {
+                // Look for trigger elements
+                const triggers = [
+                  '.vip-chatbot-container',
+                  '#vip-chatbot-dropdown-item',
+                  '.chat-trigger',
+                  '.chatbot-toggle'
+                ];
+                
+                for (const trigger of triggers) {
+                  const element = await this.page.$(trigger);
+                  if (element) {
+                    console.log(chalk.blue(`🔧 Clicking trigger: ${trigger}`));
+                    await element.click();
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                  }
+                }
+                
+                // Wait for iframe to become visible or load content
                 await this.page.waitForFunction(
                   () => {
                     const frame = document.querySelector('#chatbot-frame, .chatbot-frame');
@@ -328,9 +346,9 @@ class SSOChatbotTester {
                   },
                   { timeout: 10000 }
                 );
-                console.log(chalk.green('✅ Iframe chatbot loaded'));
+                console.log(chalk.green('✅ Iframe chatbot activated and loaded'));
               } catch (e) {
-                console.log(chalk.yellow('⚠️ Iframe chatbot may be loading asynchronously'));
+                console.log(chalk.yellow('⚠️ Iframe chatbot activation may need manual interaction'));
               }
             }
             
@@ -491,7 +509,55 @@ class SSOChatbotTester {
       }
 
       if (!inputField) {
-        throw new Error('Chat input field not found');
+        // Check for iframe-based chatbot
+        const iframe = await this.page.$('#chatbot-frame, .chatbot-frame');
+        if (iframe) {
+          console.log(chalk.blue('🔍 Trying iframe-based chatbot input...'));
+          
+          try {
+            const frame = await iframe.contentFrame();
+            if (frame) {
+              // Look for input in iframe
+              for (const selector of inputSelectors) {
+                inputField = await frame.$(selector);
+                if (inputField) {
+                  console.log(chalk.green(`✅ Found input in iframe: ${selector}`));
+                  
+                  // Send message in iframe context
+                  await inputField.click();
+                  await inputField.evaluate(el => el.value = '');
+                  await inputField.type(message);
+                  
+                  // Look for send button in iframe
+                  const sendButtons = [
+                    'button[type="submit"]',
+                    '.send-btn',
+                    '[onclick*="send"]',
+                    'input[type="submit"]'
+                  ];
+                  
+                  for (const btnSelector of sendButtons) {
+                    const sendBtn = await frame.$(btnSelector);
+                    if (sendBtn) {
+                      await sendBtn.click();
+                      console.log(chalk.green('✅ Message sent via iframe'));
+                      return true;
+                    }
+                  }
+                  
+                  // Try Enter key if no send button found
+                  await inputField.press('Enter');
+                  console.log(chalk.green('✅ Message sent via Enter key in iframe'));
+                  return true;
+                }
+              }
+            }
+          } catch (e) {
+            console.log(chalk.yellow('⚠️ Iframe access failed:', e.message));
+          }
+        }
+        
+        throw new Error('Chat input field not found (checked main page and iframe)');
       }
 
       // Clear and type message
