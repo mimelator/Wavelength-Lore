@@ -375,7 +375,7 @@ class MerchandiseStore {
   async addToCart(productId, variantId, quantity = 1) {
     try {
       // Find the product
-      const product = this.products.find(p => p.id === productId);
+      const product = this.products.find(p => (p.id || p.productId) === productId);
       if (!product) {
         throw new Error('Product not found');
       }
@@ -443,7 +443,7 @@ class MerchandiseStore {
   }
   
   viewProductDetails(productId) {
-    const product = this.products.find(p => p.id === productId);
+    const product = this.products.find(p => (p.id || p.productId) === productId);
     if (!product) {
       this.showError('Product not found');
       return;
@@ -482,7 +482,7 @@ class MerchandiseStore {
   }
   
   editProduct(productId) {
-    const product = this.products.find(p => p.id === productId);
+    const product = this.products.find(p => (p.id || p.productId) === productId);
     if (!product) {
       this.showError('Product not found');
       return;
@@ -580,7 +580,7 @@ class MerchandiseStore {
       });
       
       // Update local product data
-      const product = this.products.find(p => p.id === productId);
+      const product = this.products.find(p => (p.id || p.productId) === productId);
       if (product) {
         product.title = title;
         product.description = description;
@@ -616,7 +616,7 @@ class MerchandiseStore {
       this.setLoading(true, 'Deleting product...');
       
       // Remove from local array
-      this.products = this.products.filter(p => p.id !== productId);
+      this.products = this.products.filter(p => (p.id || p.productId) !== productId);
       
       this.showSuccess('Product deleted successfully!');
       this.render();
@@ -935,7 +935,7 @@ class MerchandiseStore {
           ` : ''}
           
           <div class="store-section">
-            <h2>📦 Your Created Products</h2>
+            <h2>🎨 Your Designed Products</h2>
             <div class="products-grid">
               ${this.renderProducts()}
             </div>
@@ -1025,8 +1025,8 @@ class MerchandiseStore {
     if (this.products.length === 0) {
       return `
         <div class="empty-state">
-          <p>No custom products created yet.</p>
-          <p>Select an image from your gallery to create your first product!</p>
+          <p>No custom products designed yet.</p>
+          <p>Select an image from your gallery to design your first product!</p>
           ${this.selectedImage ? `
             <button class="create-product-btn btn-primary">
               Design Product from Selected Image
@@ -1036,38 +1036,47 @@ class MerchandiseStore {
       `;
     }
     
-    return this.products.filter(p => p.id).map(product => `
-      <div class="product-card">
-        <div class="product-image">
-          <img src="${product.images?.[0]?.src || product.sourceImage?.url || ''}" alt="${product.title}" />
-          <div class="product-actions">
-            <button class="action-btn edit-product-btn" data-product-id="${product.id}" title="Edit Product">
-              <span>✏️</span>
-            </button>
-            <button class="action-btn delete-product-btn" data-product-id="${product.id}" title="Delete">
-              <span>🗑️</span>
-            </button>
+    console.log('🔍 Rendering products:', this.products.length, 'total products');
+    console.log('🔍 Products with IDs:', this.products.filter(p => p.id || p.productId).length);
+    
+    return this.products.filter(p => p.id || p.productId).map(product => {
+      const productId = product.id || product.productId;
+      const productTitle = product.title || 'Untitled Product';
+      const productImage = product.images?.[0]?.src || product.sourceImage?.url || '';
+      
+      return `
+        <div class="product-card">
+          <div class="product-image">
+            <img src="${productImage}" alt="${productTitle}" />
+            <div class="product-actions">
+              <button class="action-btn edit-product-btn" data-product-id="${productId}" title="Edit Product">
+                <span>✏️</span>
+              </button>
+              <button class="action-btn delete-product-btn" data-product-id="${productId}" title="Delete">
+                <span>🗑️</span>
+              </button>
+            </div>
+          </div>
+          <div class="product-info">
+            <h4>${productTitle}</h4>
+            <p class="product-description">${product.description || ''}</p>
+            <div class="product-variants">
+              ${(product.variants || []).map(variant => `
+                <div class="variant-option">
+                  <span class="variant-details">${variant.title}</span>
+                  <span class="variant-price">$${(variant.price / 100).toFixed(2)}</span>
+                  <button class="add-to-cart-btn" 
+                          data-product-id="${productId}" 
+                          data-variant-id="${variant.id}">
+                    Add to Cart
+                  </button>
+                </div>
+              `).join('')}
+            </div>
           </div>
         </div>
-        <div class="product-info">
-          <h4>${product.title}</h4>
-          <p class="product-description">${product.description || ''}</p>
-          <div class="product-variants">
-            ${(product.variants || []).map(variant => `
-              <div class="variant-option">
-                <span class="variant-details">${variant.title}</span>
-                <span class="variant-price">$${(variant.price / 100).toFixed(2)}</span>
-                <button class="add-to-cart-btn" 
-                        data-product-id="${product.id}" 
-                        data-variant-id="${variant.id}">
-                  Add to Cart
-                </button>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
   
   renderCart() {
