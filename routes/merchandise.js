@@ -335,7 +335,7 @@ router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireActi
       });
     }
     
-    // Store product association with user
+    // Store product association with user INCLUDING variants and images
     await merchandiseDB.storeUserProduct(userId, {
       productId: productResult.productId,
       imageId: sanitizeFirebaseKey(imageId),
@@ -349,6 +349,9 @@ router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireActi
         title: imageTitle || imageId,
         url: imageUrl
       },
+      // CRITICAL FIX: Store variants and images to prevent "broken" products
+      variants: productResult.variants || [],
+      images: productResult.images || [],
       // Add enhancement info
       enhancement: {
         autoEnhanced: productResult.imageEnhancement?.autoEnhanced || false,
@@ -512,7 +515,7 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
       });
     }
     
-    // Store product association with user
+    // Store product association with user INCLUDING variants and images
     await merchandiseDB.storeUserProduct(userId, {
       productId: productResult.productId,
       imageId: sanitizeFirebaseKey(imageId),
@@ -523,12 +526,16 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
         title: imageTitle || imageId,
         url: imageUrl
       },
+      // CRITICAL FIX: Store variants and images to prevent "broken" products
+      variants: productResult.variants || [],
+      images: productResult.images || [],
       // Add enhancement info
       enhancement: {
         autoEnhanced: productResult.imageEnhancement?.autoEnhanced || false,
         enhancementSource: productResult.imageEnhancement?.enhancementSource || 'none',
         originalSuitable: productResult.imageEnhancement?.originalImageSuitable || false
-      }
+      },
+      generatedAt: new Date().toISOString()
     });
     
     res.json({

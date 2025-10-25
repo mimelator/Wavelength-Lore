@@ -1,11 +1,15 @@
-name: Auto-increment Version
+# DISABLED: Auto-increment Version (now handled in main deployment workflow)
+# This workflow is kept for reference but disabled
+
+name: Auto-increment Version (DISABLED)
 
 on:
-  workflow_run:
-    workflows: ["Build and Deploy to ECR"]
-    types:
-      - completed
-    branches: [ main ]
+  # Disabled - version increment now happens in docker-ecr-deploy.yml workflow
+  # workflow_run:
+  #   workflows: ["Build and Deploy to ECR"]
+  #   types:
+  #     - completed
+  #   branches: [ main ]
 
 permissions:
   contents: write  # Required to push commits and create tags

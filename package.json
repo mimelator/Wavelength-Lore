@@ -1,6 +1,6 @@
 {
   "name": "prototype",
-  "version": "1.0.174",
+  "version": "1.0.175",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -19,6 +19,14 @@
     "deploy:compare": "node scripts/deployment-tracker.js compare",
     "deploy:history": "node scripts/deployment-tracker.js history",
     "deploy:record": "node scripts/deployment-tracker.js record",
+    "gh:monitor": "node scripts/gh-monitor.js",
+    "gh:list": "node scripts/gh-monitor.js list",
+    "gh:status": "node scripts/gh-monitor.js status",
+    "gh:watch": "node scripts/gh-monitor.js watch",
+    "gh:logs": "node scripts/gh-monitor.js logs",
+    "gh:jobs": "node scripts/gh-monitor.js jobs",
+    "gh:compare": "node scripts/gh-monitor.js compare",
+    "gh:dashboard": "node scripts/gh-monitor.js full",
     "deploy:auto-record": "node scripts/deployment-tracker.js auto",
     "deploy:post-hook": "node scripts/post-deploy-hook.js",
     "deploy:force": "node scripts/apprunner-force-deploy.js --force && node scripts/deployment-tracker.js record",

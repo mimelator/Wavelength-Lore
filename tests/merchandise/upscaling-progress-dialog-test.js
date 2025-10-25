@@ -165,8 +165,20 @@ class UpscalingProgressDialogTest {
       // Navigate to product selection
       await this.page.waitForSelector('#choose-product-section');
       
-      // Click first product type (if available)
-      const productButton = await this.page.waitForSelector('.select-product-type-btn, .select-product-btn');
+      // Wait for ProductNavigator to load and show products
+      // First wait for categories to load
+      await this.page.waitForSelector('.category-card', { timeout: 10000 });
+      
+      // Click first category
+      await this.page.click('.category-card');
+      await this.page.waitForSelector('.subcategory-card', { timeout: 5000 });
+      
+      // Click first subcategory
+      await this.page.click('.subcategory-card');
+      await this.page.waitForSelector('.select-product-btn', { timeout: 5000 });
+      
+      // Click first product
+      const productButton = await this.page.waitForSelector('.select-product-btn');
       
       // Start monitoring
       const progressMonitor = this.startProgressMonitoring();

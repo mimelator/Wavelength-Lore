@@ -13,6 +13,81 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Check if Version Increment Needed
+        id: check-version
+        run: |
+          # Skip version increment if commit message contains [skip version]
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          if echo "$COMMIT_MSG" | grep -q "\[skip version\]"; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "::notice::Skipping version increment due to [skip version] in commit message"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "::notice::Version increment will be performed"
+          fi
+
+      - name: Increment Version
+        id: increment-version
+        if: steps.check-version.outputs.skip == 'false'
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
+
+          # Increment patch version
+          npm version patch --no-git-tag-version
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "new=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION"
+
+          # Update version.json
+          COMMIT_HASH="${{ github.sha }}"
+          COMMIT_SHORT="${COMMIT_HASH:0:7}"
+          BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          cat > version.json << EOF
+          {
+            "version": "$NEW_VERSION",
+            "buildDate": "$BUILD_DATE",
+            "commitHash": "$COMMIT_HASH",
+            "commitShort": "$COMMIT_SHORT",
+            "buildNumber": "${{ github.run_number }}",
+            "environment": "production",
+            "workflowId": "${{ github.run_id }}",
+            "deploymentStatus": "building"
+          }
+          EOF
+
+          echo "::notice::Version incremented to $NEW_VERSION"
+
+      - name: Set Version for Deployment
+        id: set-version
+        run: |
+          if [ "${{ steps.check-version.outputs.skip }}" = "true" ]; then
+            # Use existing version when skipping increment
+            VERSION=$(node -p "require('./package.json').version")
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "::notice::Using existing version: $VERSION"
+          else
+            # Use newly incremented version
+            VERSION="${{ steps.increment-version.outputs.new }}"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "::notice::Using incremented version: $VERSION"
+          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -37,12 +112,13 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: wavelength-lore
           COMMIT_SHA: ${{ github.sha }}
+          VERSION: ${{ steps.set-version.outputs.version }}
         run: |
           # Extract short commit SHA
           SHORT_SHA=${COMMIT_SHA:0:8}
           
-          # Get version from package.json for the primary tag
-          VERSION_TAG="v$(cat package.json | grep '"version"' | sed 's/.*"version": "\(.*\)",/\1/')"
+          # Use the version determined in previous step (either incremented or existing)
+          VERSION_TAG="v$VERSION"
 
           echo "Building with tags: $VERSION_TAG and $SHORT_SHA"
 
@@ -151,22 +227,22 @@ jobs:
           APPRUNNER_SERVICE_ARN: ${{ secrets.APPRUNNER_SERVICE_ARN }}
         run: |
           echo "::notice::Waiting for App Runner deployment to complete..."
+          echo "::notice::No timeout - deployment will complete naturally"
 
-          # Maximum wait time: 3 minutes (180 seconds) - fail fast approach
-          MAX_WAIT=180
           ELAPSED=0
-          INTERVAL=10
+          INTERVAL=15
 
-          while [ $ELAPSED -lt $MAX_WAIT ]; do
+          while true; do
             STATUS=$(aws apprunner describe-service \
               --service-arn $APPRUNNER_SERVICE_ARN \
               --query 'Service.Status' \
               --output text)
-
+            
             echo "Current status: $STATUS (${ELAPSED}s elapsed)"
-
+            
             if [ "$STATUS" = "RUNNING" ]; then
               echo "::notice::✅ App Runner service is now RUNNING"
+              echo "::notice::🎉 Deployment completed successfully in ${ELAPSED}s"
               break
             elif [ "$STATUS" = "OPERATION_IN_PROGRESS" ]; then
               echo "Deployment in progress, waiting ${INTERVAL}s..."
@@ -178,13 +254,6 @@ jobs:
               exit 1
             fi
           done
-
-          if [ $ELAPSED -ge $MAX_WAIT ]; then
-            echo "::error::❌ Deployment timed out after ${MAX_WAIT}s (3 minutes)"
-            echo "::error::App Runner deployment is taking longer than expected"
-            echo "::error::Check the App Runner service status manually or retry later"
-            exit 1
-          fi
 
       - name: Health Check
         env:
@@ -325,6 +394,42 @@ jobs:
             echo "::warning::CLOUDFRONT_DISTRIBUTION_ID not set, skipping cache invalidation"
           fi
 
+      - name: Commit Version Changes
+        if: success() && steps.check-version.outputs.skip == 'false'
+        env:
+          NEW_VERSION: ${{ steps.set-version.outputs.version }}
+        run: |
+          echo "::notice::Committing version changes after successful deployment..."
+          
+          # Update version.json with successful deployment status
+          COMMIT_HASH="${{ github.sha }}"
+          COMMIT_SHORT="${COMMIT_HASH:0:7}"
+          BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          cat > version.json << EOF
+          {
+            "version": "$NEW_VERSION",
+            "buildDate": "$BUILD_DATE",
+            "commitHash": "$COMMIT_HASH",
+            "commitShort": "$COMMIT_SHORT",
+            "buildNumber": "${{ github.run_number }}",
+            "environment": "production",
+            "workflowId": "${{ github.run_id }}",
+            "deploymentStatus": "deployed"
+          }
+          EOF
+
+          # Commit the version changes
+          git add package.json version.json
+          git commit -m "🔖 Auto-increment version to v$NEW_VERSION after successful deployment [skip version]"
+          
+          # Create and push tag
+          git tag "v$NEW_VERSION"
+          git push origin main
+          git push origin "v$NEW_VERSION"
+          
+          echo "::notice::✅ Version v$NEW_VERSION committed and tagged"
+
       - name: Deployment Summary
         if: success()
         env:
@@ -338,4 +443,7 @@ jobs:
           echo "::notice::Commit: $SHORT_SHA"
           echo "::notice::Image Digest: ${{ steps.deploy-apprunner.outputs.image_digest }}"
           echo "::notice::Status: Running and healthy"
+          if [ "${{ steps.check-version.outputs.skip }}" = "false" ]; then
+            echo "::notice::Version incremented and committed: v${{ steps.set-version.outputs.version }}"
+          fi
           echo "::notice::========================================="

@@ -64,8 +64,20 @@ class ProductPersistenceTest {
       // Try to create a product
       console.log('🎽 Attempting to create a product...');
       
-      // Click first available product option
-      const productButton = await this.page.waitForSelector('.select-product-btn, .select-product-type-btn');
+      // Navigate through ProductNavigator to select a product
+      // Wait for categories to load
+      await this.page.waitForSelector('.category-card', { timeout: 10000 });
+      
+      // Click first category
+      await this.page.click('.category-card');
+      await this.page.waitForSelector('.subcategory-card', { timeout: 5000 });
+      
+      // Click first subcategory
+      await this.page.click('.subcategory-card');
+      await this.page.waitForSelector('.select-product-btn', { timeout: 5000 });
+      
+      // Click first product
+      const productButton = await this.page.waitForSelector('.select-product-btn');
       await productButton.click();
       
       // Wait for customization modal
