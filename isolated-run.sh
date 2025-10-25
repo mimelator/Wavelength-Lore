@@ -26,9 +26,18 @@ run_isolated() {
     (
         cd "$WORK_DIR"
         
-        # Set clean environment
-        export PATH="/usr/local/bin:/usr/bin:/bin"
+        # Set clean environment with node paths
+        export PATH="/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin:$HOME/.nvm/versions/node/*/bin"
         export PS1="[ISOLATED] \w $ "
+        
+        # Try to find node if not in standard paths
+        if ! command -v node >/dev/null 2>&1; then
+            if [ -f "/usr/local/bin/node" ]; then
+                export PATH="/usr/local/bin:$PATH"
+            elif [ -f "/opt/homebrew/bin/node" ]; then
+                export PATH="/opt/homebrew/bin:$PATH"
+            fi
+        fi
         
         # Create new process group to avoid signal interference (macOS compatible)
         bash -c "$command" 2>&1 | tee "$LOG_FILE"
