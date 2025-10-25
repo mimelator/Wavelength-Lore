@@ -1,7 +1,7 @@
 # Wavelength-Lore
 The Lore Site for the Wavelength Canon
 
-> **Status**: Testing ECR deployment workflow (credentials updated)
+> **Status**: Testing new pre-increment version deployment strategy 🚀
 
 ## 📚 Documentation
 
