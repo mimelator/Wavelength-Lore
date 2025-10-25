@@ -25,7 +25,7 @@ function getUploadMiddleware() {
 }
 
 // Forum post creation endpoint with file upload support
-router.post('/forum/posts', optionalAuth, (req, res, next) => {
+router.post('/forum/posts', verifyToken, (req, res, next) => {
   const upload = getUploadMiddleware();
   upload.array('attachments', 5)(req, res, next);
 }, async (req, res) => {
@@ -66,9 +66,17 @@ router.post('/forum/posts', optionalAuth, (req, res, next) => {
       });
     }
 
+    // Verify authentication
+    if (!req.user || !req.user.uid) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        message: 'You must be signed in to create posts'
+      });
+    }
+
     // Generate post ID
     const postId = `post_${Date.now()}`;
-    const authorId = req.user?.uid || 'anonymous';
+    const authorId = req.user.uid;
 
     // Upload files if any
     let attachments = [];
@@ -122,7 +130,7 @@ router.post('/forum/posts', optionalAuth, (req, res, next) => {
 });
 
 // Forum reply creation endpoint
-router.post('/forum/replies', optionalAuth, async (req, res) => {
+router.post('/forum/replies', verifyToken, async (req, res) => {
   try {
     console.log('💬 Processing forum reply creation...');
     
@@ -148,11 +156,19 @@ router.post('/forum/replies', optionalAuth, async (req, res) => {
       });
     }
 
+    // Verify authentication
+    if (!req.user || !req.user.uid) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        message: 'You must be signed in to create replies'
+      });
+    }
+
     // Save reply to Firebase database
     const forumReply = {
       id: `reply_${Date.now()}`,
       ...validation.sanitized,
-      authorId: req.user?.uid || 'anonymous',
+      authorId: req.user.uid,
       createdAt: Date.now(),
       likeCount: 0
     };
