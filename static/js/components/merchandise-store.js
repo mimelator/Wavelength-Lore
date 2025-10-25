@@ -1216,11 +1216,7 @@ class MerchandiseStore {
               <p class="option-description">Choose a border style to enhance your image</p>
             </div>
             
-            <div class="option-group">
-              <h3>📝 Product Details</h3>
-              <p class="auto-title-info">✨ Product title will be automatically generated from your image name and product type.</p>
-              <p class="auto-title-preview"><strong>Title:</strong> ${defaultName}</p>
-            </div>
+
             
             <div class="pricing-section">
               <div class="price-display">
