@@ -1,0 +1,16 @@
+{
+  "deployments": [
+    {
+      "version": "1.0.171",
+      "buildDate": "2025-10-25T11:54:20Z",
+      "commitHash": "a208a7b5d85011ad9891bea31dedbdc2b80d3f8e",
+      "commitShort": "a208a7b",
+      "buildNumber": "198",
+      "environment": "production",
+      "deploymentWorkflowId": "18802696736",
+      "deploymentStatus": "verified",
+      "recordedAt": "2025-10-25T12:17:38.416Z",
+      "id": "198-a208a7b"
+    }
+  ]
+}

@@ -2283,21 +2283,46 @@ class MerchandiseStore {
   
   setLoading(isLoading, message = 'Loading...', progress = null) {
     this.isLoading = isLoading;
-    const modal = document.getElementById('loading-modal');
+    
+    // Ensure modal exists by checking if it's rendered
+    let modal = document.getElementById('loading-modal');
+    if (!modal && isLoading) {
+      // Force render the modal if it doesn't exist
+      const container = document.getElementById('merchandise-store');
+      if (container && !container.querySelector('#loading-modal')) {
+        const modalHTML = `
+          <div id="loading-modal" class="modal" style="display: none;">
+            <div class="modal-content loading-modal-content">
+              <div class="loading-header">
+                <div class="loading-spinner"></div>
+                <h3 id="loading-title">Processing Your Request</h3>
+              </div>
+              <p id="loading-message">Loading...</p>
+              <div class="progress-bar-container">
+                <div class="progress-bar" id="loading-progress-bar">
+                  <div class="progress-bar-fill" id="loading-progress-fill"></div>
+                </div>
+                <span class="progress-text" id="loading-progress-text">0%</span>
+              </div>
+              <div class="loading-note">
+                <small>This may take a moment while we process your request.</small>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        modal = document.getElementById('loading-modal');
+      }
+    }
+    
     const messageEl = document.getElementById('loading-message');
     const progressFill = document.getElementById('loading-progress-fill');
     const progressText = document.getElementById('loading-progress-text');
     
-    // If loading modal doesn't exist, use the basic loading container
+    // If loading modal still doesn't exist, use fallback
     if (!modal) {
-      const loadingContainer = document.querySelector('.loading-container');
-      if (loadingContainer) {
-        loadingContainer.style.display = isLoading ? 'block' : 'none';
-        const loadingText = loadingContainer.querySelector('p');
-        if (loadingText) {
-          loadingText.textContent = message;
-        }
-      }
+      console.warn('⚠️ Loading modal not available, using console feedback');
+      console.log(isLoading ? `🔄 ${message}` : '✅ Loading complete');
       return;
     }
     
@@ -2311,6 +2336,7 @@ class MerchandiseStore {
       }
       
       modal.style.display = 'block';
+      console.log('📱 Progress dialog shown:', message);
     } else {
       modal.style.display = 'none';
       // Reset progress bar
@@ -2318,6 +2344,7 @@ class MerchandiseStore {
         progressFill.style.width = '0%';
         progressText.textContent = '0%';
       }
+      console.log('📱 Progress dialog hidden');
     }
   }
   

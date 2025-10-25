@@ -29,7 +29,7 @@ class UpscalingProgressDialogTest {
       slowMo: 100
     });
     
-    this.page = await browser.newPage();
+    this.page = await this.browser.newPage();
     await this.page.setViewport({ width: 1920, height: 1080 });
     
     // Monitor console messages

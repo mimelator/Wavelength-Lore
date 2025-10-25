@@ -168,6 +168,11 @@ async function createApp() {
     });
   });
 
+  // Redirect old merchandise-store route to merchandise
+  app.get('/merchandise-store', (req, res) => {
+    res.redirect(301, '/merchandise');
+  });
+
   // Mount admin and utility routes
   app.use('/', adminRoutes);
 

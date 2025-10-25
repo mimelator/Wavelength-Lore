@@ -26,7 +26,7 @@ class SecureDatabaseBackup {
       encryptionEnabled: process.env.BACKUP_ENCRYPTION !== 'false',
       
       // Schedule Configuration
-      dailyBackupTime: process.env.BACKUP_DAILY_TIME || '2 0 * * *', // 2 AM daily
+      dailyBackupTime: process.env.BACKUP_DAILY_TIME || '0 2 * * *', // 2 AM daily
       weeklyBackupTime: process.env.BACKUP_WEEKLY_TIME || '0 3 * * 0', // 3 AM Sunday
       
       // Local temp directory
@@ -54,12 +54,15 @@ class SecureDatabaseBackup {
       console.log('🔧 Initializing Secure Database Backup System...');
       
       // Ensure temp directory exists
+      console.log('📁 Creating temp directory...');
       await this.ensureTempDirectory();
       
       // Verify S3 bucket access
+      console.log('🪣 Verifying S3 access...');
       await this.verifyS3Access();
       
       // Setup automated backup schedule
+      console.log('⏰ Setting up backup schedule...');
       this.setupBackupSchedule();
       
       this.isInitialized = true;
@@ -68,6 +71,7 @@ class SecureDatabaseBackup {
       return true;
     } catch (error) {
       console.error('❌ Failed to initialize backup system:', error.message);
+      console.error('📝 Stack trace:', error.stack);
       throw error;
     }
   }
@@ -186,21 +190,26 @@ class SecureDatabaseBackup {
    * Setup automated backup schedule
    */
   setupBackupSchedule() {
-    // Daily backups
-    cron.schedule(this.config.dailyBackupTime, async () => {
-      console.log('🕐 Scheduled daily backup starting...');
-      await this.performBackup('daily');
-    });
+    try {
+      // Daily backups
+      cron.schedule(this.config.dailyBackupTime, async () => {
+        console.log('🕐 Scheduled daily backup starting...');
+        await this.performBackup('daily');
+      });
 
-    // Weekly backups (with longer retention)
-    cron.schedule(this.config.weeklyBackupTime, async () => {
-      console.log('🕐 Scheduled weekly backup starting...');
-      await this.performBackup('weekly');
-    });
+      // Weekly backups (with longer retention)
+      cron.schedule(this.config.weeklyBackupTime, async () => {
+        console.log('🕐 Scheduled weekly backup starting...');
+        await this.performBackup('weekly');
+      });
 
-    console.log('⏰ Backup schedule configured:');
-    console.log(`   Daily: ${this.config.dailyBackupTime}`);
-    console.log(`   Weekly: ${this.config.weeklyBackupTime}`);
+      console.log('⏰ Backup schedule configured:');
+      console.log(`   Daily: ${this.config.dailyBackupTime}`);
+      console.log(`   Weekly: ${this.config.weeklyBackupTime}`);
+    } catch (error) {
+      console.warn('⚠️  Failed to setup backup schedule:', error.message);
+      console.log('💡 Backup system will function without scheduled backups');
+    }
   }
 
   /**

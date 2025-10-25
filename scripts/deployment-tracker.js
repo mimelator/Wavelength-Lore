@@ -54,7 +54,8 @@ class DeploymentTracker {
       const deployment = {
         ...deploymentInfo,
         recordedAt: new Date().toISOString(),
-        id: `${deploymentInfo.buildNumber}-${deploymentInfo.commitShort}`
+        id: `${deploymentInfo.buildNumber}-${deploymentInfo.commitShort}`,
+        deploymentStatus: 'deployed'
       };
 
       // Don't duplicate entries
@@ -72,6 +73,34 @@ class DeploymentTracker {
       return true;
     } catch (error) {
       console.error('❌ Error recording deployment:', error.message);
+      return false;
+    }
+  }
+
+  /**
+   * Auto-record deployment when version changes
+   */
+  autoRecordIfNew() {
+    try {
+      const current = this.getCurrentDeployment();
+      if (!current) return false;
+
+      const history = this.getDeploymentHistory();
+      const latestRecorded = history.deployments[0];
+      
+      // Check if this is a new deployment
+      const isNew = !latestRecorded || 
+                   latestRecorded.buildNumber !== current.buildNumber ||
+                   latestRecorded.commitHash !== current.commitHash;
+      
+      if (isNew) {
+        console.log('🆕 New deployment detected, auto-recording...');
+        return this.recordDeployment(current);
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('⚠️  Auto-record failed:', error.message);
       return false;
     }
   }
@@ -210,6 +239,11 @@ async function main() {
       } else {
         console.log('❌ No current deployment info found');
       }
+      break;
+
+    case 'auto':
+      const wasRecorded = tracker.autoRecordIfNew();
+      console.log(wasRecorded ? '✅ New deployment auto-recorded' : 'ℹ️  No new deployment to record');
       break;
       
     case 'compare':

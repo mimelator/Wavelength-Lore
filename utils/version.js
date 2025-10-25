@@ -46,7 +46,7 @@ class VersionManager {
 
   getGitCommitHash() {
     try {
-      return execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
+      return execSync('git rev-parse HEAD', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
     } catch (error) {
       return 'unknown';
     }
@@ -54,13 +54,16 @@ class VersionManager {
 
   getGitBranch() {
     try {
-      return execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf8' }).trim();
+      return execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
     } catch (error) {
       return 'unknown';
     }
   }
 
   getVersionInfo() {
+    // Use branch from version.json if available (production), otherwise try git (development)
+    const branch = this.versionJson.branch || this.getGitBranch();
+    
     const versionInfo = {
       version: this.versionJson.version,
       buildDate: this.versionJson.buildDate,
@@ -72,7 +75,7 @@ class VersionManager {
       nodeVersion: process.version,
       platform: process.platform,
       uptime: process.uptime(),
-      branch: this.getGitBranch()
+      branch: branch
     };
 
     return versionInfo;
