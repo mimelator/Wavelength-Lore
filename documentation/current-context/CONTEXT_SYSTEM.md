@@ -18,14 +18,53 @@ This **Multi-Copilot Context Management System** enables **parallel AI developme
 - ✅ **Conflict Prevention:** Built-in coordination to avoid overlapping work
 - ✅ **Comprehensive Coverage:** All aspects of development are covered
 
-### **� CRITICAL AI COPILOT ENTRY POINT - READ THIS FIRST**
+### **🤖 CRITICAL AI COPILOT ENTRY POINT - READ THIS FIRST**
+
+#### **🔄 SEPARATED CONTEXT MANAGEMENT - AI ASSISTANT COORDINATION**
+
+##### **AI ASSISTANT CONTEXT SEPARATION (MANDATORY)**
+```bash
+# EACH AI ASSISTANT HAS DEDICATED CONTEXT FILES:
+# GitHub Copilot Context:
+/documentation/current-context/GITHUB_COPILOT_CONTEXT.md
+
+# Amazon Q Context:  
+/documentation/current-context/AMAZON_Q_CONTEXT.md
+
+# Claude/Anthropic Context:
+/documentation/current-context/CLAUDE_CONTEXT.md
+
+# Custom AI Assistant Context:
+/documentation/current-context/CUSTOM_AI_CONTEXT.md
+```
+
+##### **CONTEXT COORDINATION RULES - ABSOLUTE**
+- 🤖 **WRITE TO YOUR OWN CONTEXT ONLY** - Never modify another AI's context file
+- 🔄 **READ ALL CONTEXTS** - Understand what other AIs have done before starting
+- 📋 **COORDINATE THROUGH SHARED DOCS** - Use shared files for cross-AI coordination
+- 🚫 **NO CONTEXT CONFLICTS** - Respect boundaries between AI assistant contexts
+
+##### **SHARED COORDINATION FILES (ALL AIs USE THESE)**
+```bash
+# Project Status (All AIs update):
+/documentation/current-context/PROJECT_STATUS.md
+
+# Work Queue (Cross-AI task coordination):
+/documentation/current-context/WORK_QUEUE.md
+
+# Conflict Resolution (Cross-AI issue tracking):
+/documentation/current-context/CONFLICT_RESOLUTION.md
+
+# Integration Status (Cross-AI integration tracking):
+/documentation/current-context/INTEGRATION_STATUS.md
+```
 
 #### **🎯 DEVELOPER CODING EXPECTATIONS - NON-NEGOTIABLE**
 
 ##### **EXISTING SCRIPTS - LEARN & USE THEM**
 ```bash
 # MANDATORY: Familiarize yourself with existing scripts BEFORE coding
-ls -la /scripts/unified/          # 3 core tools - USE THESE
+ls -la /scripts/unified/          # 4 core tools - USE THESE FIRST
 ls -la /scripts/organized/        # 85 specialized scripts - LEARN THESE
 cat /documentation/active-references/PHASE_2_CONSOLIDATION_RESULTS.md
 ```

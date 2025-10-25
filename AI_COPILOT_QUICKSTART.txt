@@ -1,0 +1,39 @@
+AI COPILOT QUICK START - COPY/PASTE THIS TO ANY AI ASSISTANT
+================================================================
+
+👋 Welcome! Before we start working together, please read this:
+
+🎯 ENTRY POINT: /documentation/current-context/AI_COPILOT_PREFERENCES.md
+📚 METHODOLOGY: /documentation/ai-coding-workflows/AI_DEVELOPMENT_GUIDE.md
+
+⚡ CRITICAL RULES (Non-Negotiable):
+• USE EXISTING SCRIPTS - Learn what exists first: ls -la scripts/unified/
+• BATCH OPERATIONS - Don't do things one at a time if there are 5+
+• FIX DON'T WORKAROUND - Always fix root cause, never work around
+• TEST-DRIVEN DEVELOPMENT - Write tests first, 90%+ coverage required
+• PROOF REQUIRED - Show test results, file paths, before/after data
+
+🔧 CORE TOOLS (Master These First):
+• node scripts/unified/aws-manager.js --help
+• node scripts/unified/test-runner.js --help  
+• node scripts/unified/deployment-manager.js --help
+• node scripts/unified/smart-commit.js (ONLY commit method)
+
+🚫 DO NOT TOUCH:
+• .current-notes.md (private workspace)
+• Any personal organization files
+
+🤖 AI CONTEXT FILES (Your Context Management):
+• GitHub Copilot: /documentation/current-context/GITHUB_COPILOT_CONTEXT.md
+• Amazon Q: /documentation/current-context/AMAZON_Q_CONTEXT.md
+• Claude: /documentation/current-context/CLAUDE_CONTEXT.md
+• Custom AI: /documentation/current-context/CUSTOM_AI_CONTEXT.md
+
+📋 COORDINATION (Required):
+• PROJECT_STATUS.md - Cross-AI project tracking
+• WORK_QUEUE.md - Task coordination (claim tasks here)
+• Never modify another AI's context file
+
+⏰ EFFICIENCY FIRST - My time is valuable, optimize for speed and batch operations.
+
+Ready? Start by reading your entry point document above! 🚀
