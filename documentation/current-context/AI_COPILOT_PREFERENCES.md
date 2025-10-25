@@ -16,6 +16,12 @@
 - 🔧 **FIX BROKEN TOOLS** - Don't work around issues, fix the root cause
 - ⏱️ **OPTIMIZE FOR SPEED** - Developer productivity over AI convenience
 
+### **🎯 CONVERSATION EFFICIENCY RULES**
+- 📝 **ASSUME COMPETENCE** - Don't explain basic concepts unless asked
+- 🚀 **ACTION OVER EXPLANATION** - Show results, not lengthy descriptions
+- 🔍 **PROOF FIRST** - Lead with evidence, follow with brief context
+- ⚡ **MINIMAL RESPONSES** - Address the query directly, avoid tangential info
+
 ### **📚 MANDATORY SCRIPT FAMILIARIZATION**
 ```bash
 # RUN THESE COMMANDS FIRST - LEARN THE EXISTING TOOLS:
@@ -32,6 +38,23 @@ node scripts/unified/test-runner.js --help      # All testing needs
 node scripts/unified/deployment-manager.js --help # All deployment tasks
 node scripts/unified/smart-commit.js --help     # ONLY commit method
 ```
+
+### **🎯 TASK COMPLETION PROTOCOL**
+```bash
+# MANDATORY completion sequence:
+1. Execute the task with proof
+2. Update context BEFORE compacting
+3. Commit changes using smart-commit
+4. Provide completion summary with evidence
+5. State readiness for next task
+```
+
+### **🚫 CONVERSATION ANTI-PATTERNS - AVOID**
+- ❌ **"I'll help you with..."** - Just do it
+- ❌ **"Let me analyze..."** - Show the analysis results
+- ❌ **"This is interesting..."** - Skip commentary, provide value
+- ❌ **Long explanations** - Be concise and direct
+- ❌ **Asking obvious questions** - Make reasonable assumptions
 
 ## 🚨 CRITICAL REQUIREMENTS - NO EXCEPTIONS
 
@@ -83,7 +106,52 @@ node scripts/unified/smart-commit.js --help     # ONLY commit method
 4. Maintain context boundaries - don't overlap domains
 ```
 
-**Context Files:**
+### **🔄 Conversation Compacting Protocol - MANDATORY**
+```bash
+# BEFORE compacting any conversation:
+1. Update your AI-specific context file with current session results
+2. Change "CURRENT TASK" to reflect actual completion status
+3. Update "Session Summary" with final achievements
+4. Move completed items to "Major Achievements" section
+5. Update "Next Steps" to reflect readiness for new work
+6. Provide proof of context update completion
+```
+
+**Context Update Checklist:**
+- [ ] Current task status reflects actual completion
+- [ ] Session summary shows final results with proof
+- [ ] Major achievements updated with new completions
+- [ ] Files modified section reflects actual changes
+- [ ] Next steps updated for future sessions
+- [ ] All claims backed by evidence (test results, file paths)
+
+### **🎯 DEVELOPER EXPECTATION MANAGEMENT**
+```bash
+# User expects:
+1. TDD methodology (Red-Green-Refactor)
+2. Concrete proof through test execution
+3. Randomization in tests to avoid repetition
+4. Use of unified tools (smart-commit.js)
+5. Browser-level validation for features
+6. Minimal code that directly addresses requirements
+```
+
+### **⚡ EFFICIENCY SHORTCUTS**
+```bash
+# Time-saving patterns:
+- Read multiple files in single fsRead call
+- Batch file modifications with multiple diffs
+- Use executeBash for command sequences
+- Combine related operations in single tool calls
+- Skip verbose explanations unless requested
+```
+
+**AI-Specific Context Files:**
+- `/documentation/current-context/AMAZON_Q_CONTEXT.md` - Amazon Q sessions
+- `/documentation/current-context/GITHUB_COPILOT_CONTEXT.md` - GitHub Copilot sessions
+- `/documentation/current-context/CLAUDE_CONTEXT.md` - Claude/Anthropic sessions
+
+**Domain-Specific Context Files:**
 - `/documentation/current-context/security-context.md`
 - `/documentation/current-context/testing-context.md`
 - `/documentation/current-context/devops-context.md`
@@ -96,6 +164,16 @@ node scripts/unified/smart-commit.js --help     # ONLY commit method
 
 ### **NEVER Claim Completion Without Proof**
 When claiming something is complete, ALWAYS provide:
+
+### **🎯 RANDOMIZATION REQUIREMENTS**
+```bash
+# For any testing involving user choices:
+1. Use different images/products/options each test run
+2. Vary sizes, colors, quantities randomly
+3. Show proof of different combinations
+4. Avoid repetitive test scenarios
+5. Demonstrate variety in test output
+```
 
 #### **🧪 Test Results Required**
 ```bash
