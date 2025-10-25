@@ -18,6 +18,9 @@ class MerchandiseStore {
     
     console.log('🛍️ MerchandiseStore constructor called');
     
+    // Load cart from storage on initialization
+    this.loadCartFromStorage();
+    
     // Add a simple health check
     this.healthCheck();
     
@@ -2871,9 +2874,17 @@ class MerchandiseStore {
   }
   
   loadCartFromStorage() {
-    const saved = localStorage.getItem('merchandise-cart');
-    if (saved) {
-      this.cart = JSON.parse(saved);
+    try {
+      const saved = localStorage.getItem('merchandise-cart');
+      if (saved) {
+        this.cart = JSON.parse(saved);
+        console.log(`🛍️ Loaded ${this.cart.length} items from cart storage`);
+      } else {
+        this.cart = [];
+      }
+    } catch (error) {
+      console.error('Error loading cart from storage:', error);
+      this.cart = [];
     }
   }
 }
