@@ -42,6 +42,7 @@ const productImageApiRoutes = require('./routes/api-product-image');
 const chatbotRoutes = require('./routes/chatbot');
 const authRoutes = require('./routes/auth');
 const apiProductCatalogRoutes = require('./routes/api-product-catalog');
+const diagnosticRoutes = require('./routes/diagnostic');
 
 // Import secure backup system
 const SecureDatabaseBackup = require('./utils/secureBackup');
@@ -128,6 +129,9 @@ async function createApp() {
   
   // Mount VIP chatbot routes (VIP+ access required)
   app.use('/chatbot', chatbotRoutes);
+  
+  // Mount diagnostic routes (for production debugging)
+  app.use('/diagnostic', diagnosticRoutes);
   
   // Mount merchandise routes for custom print-on-demand store (protected by authentication)
   app.use('/api/merchandise', merchandiseRoutes);
