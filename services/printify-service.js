@@ -156,23 +156,25 @@ class PrintifyService {
     try {
       const { title, description, tags = [] } = productOptions;
       
-      // Get blueprint and variants for the initial product
-      const blueprint = PrintifyConfig.products.initial;
+      // Use working blueprint/provider combination from testing
+      const blueprintId = 5; // Unisex Cotton Crew Tee
+      const printProviderId = 61; // Dimona Tee
       
       // Create product payload
       const productData = {
         title: title || 'Custom Wavelength Merchandise',
         description: description || 'Premium custom t-shirt featuring your favorite Wavelength Lore moment',
-        blueprint_id: blueprint.blueprintId,
-        print_provider_id: blueprint.printProviderId,
-        variants: blueprint.variants.map(variant => ({
-          id: variant.id,
-          price: blueprint.pricing.total,
-          is_enabled: true
-        })),
+        blueprint_id: blueprintId,
+        print_provider_id: printProviderId,
+        variants: [
+          { id: 17391, price: 2099, is_enabled: true }, // Heather Grey / S
+          { id: 17392, price: 2099, is_enabled: true }, // Heather Grey / M  
+          { id: 17393, price: 2099, is_enabled: true }, // Heather Grey / L
+          { id: 17394, price: 2099, is_enabled: true }  // Heather Grey / XL
+        ],
         print_areas: [
           {
-            variant_ids: blueprint.variants.map(v => v.id),
+            variant_ids: [17391, 17392, 17393, 17394],
             placeholders: [
               {
                 position: 'front',
@@ -357,13 +359,13 @@ class PrintifyService {
    * @returns {Array} Default variants
    */
   getDefaultVariantsForBlueprint(blueprintId) {
-    // Common variants for different blueprint types
+    // Updated variants based on actual API testing
     const defaultVariants = {
-      5: [ // T-Shirt
-        { id: 17887, title: 'S / Black', size: 'S', color: 'Black' },
-        { id: 17888, title: 'M / Black', size: 'M', color: 'Black' },
-        { id: 17889, title: 'L / Black', size: 'L', color: 'Black' },
-        { id: 17890, title: 'XL / Black', size: 'XL', color: 'Black' }
+      5: [ // T-Shirt (Blueprint 5 with Provider 61)
+        { id: 17391, title: 'Heather Grey / S', size: 'S', color: 'Heather Grey' },
+        { id: 17392, title: 'Heather Grey / M', size: 'M', color: 'Heather Grey' },
+        { id: 17393, title: 'Heather Grey / L', size: 'L', color: 'Heather Grey' },
+        { id: 17394, title: 'Heather Grey / XL', size: 'XL', color: 'Heather Grey' }
       ],
       146: [ // Hoodie
         { id: 32090, title: 'S / Black', size: 'S', color: 'Black' },
