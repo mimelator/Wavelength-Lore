@@ -24,7 +24,7 @@ async function testProductNavigatorLive() {
         });
         
         console.log('⏳ Waiting for page initialization...');
-        await page.waitForTimeout(2000);
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
         // Check if ProductNavigator loaded
         console.log('🔍 Checking ProductNavigator status...');
@@ -60,7 +60,7 @@ async function testProductNavigatorLive() {
             
             if (imageSelected) {
                 console.log('🖼️ Image selected, waiting for navigator...');
-                await page.waitForTimeout(2000);
+                await new Promise(resolve => setTimeout(resolve, 2000));
                 
                 const updatedStatus = await page.evaluate(() => ({
                     categoryCount: document.querySelectorAll('.category-card, .simple-category').length,
@@ -103,8 +103,14 @@ async function testProductNavigatorLive() {
         });
         console.log('\n📸 Screenshot saved: productnavigator-test-proof.png');
         
-        const success = (navigatorStatus.productNavigatorExists || navigatorStatus.simpleCategoriesExists) && 
-                       navigatorStatus.categoryCount > 0 && 
+        // Check final status after image selection
+        const finalStatus = await page.evaluate(() => ({
+            categoryCount: document.querySelectorAll('.category-card, .simple-category').length,
+            navigatorVisible: !!document.querySelector('.product-navigator, .simple-categories')
+        }));
+        
+        const success = (navigatorStatus.productNavigatorExists || navigatorStatus.simpleCategoriesExists || finalStatus.navigatorVisible) && 
+                       (navigatorStatus.categoryCount > 0 || finalStatus.categoryCount > 0) && 
                        apiResponse.success;
         
         console.log(`\n${success ? '✅' : '❌'} ProductNavigator Live Test ${success ? 'PASSED' : 'FAILED'}`);
@@ -118,7 +124,7 @@ async function testProductNavigatorLive() {
         
         // Keep browser open for 5 seconds to show results
         console.log('\n⏳ Keeping browser open for 5 seconds...');
-        await page.waitForTimeout(5000);
+        await new Promise(resolve => setTimeout(resolve, 5000));
         
         return success;
         

@@ -177,3 +177,4 @@ COMMIT_MESSAGE.txt
 .env.test
 .package-backups/
 .package.lock
+*.png

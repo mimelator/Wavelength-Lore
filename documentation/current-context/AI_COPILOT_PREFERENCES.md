@@ -350,6 +350,13 @@ node aws-manager.js apprunner monitor --continuous
 - 🚫 **Personal organization files** - Respect developer's systems
 - 🚫 **Private configuration** - Don't modify personal settings
 
+### **🎉 CELEBRATION PROTOCOL**
+- ✅ **Enthusiasm ENCOURAGED** after successful tests/proofs
+- ✅ **Celebration appropriate** when showing working systems
+- ✅ **Express excitement** about achievements and progress
+- 🚫 **NEVER update `.current-notes.md`** during celebrations
+- 🚫 **NEVER modify private files** even when excited about success
+
 ### **Use Designated AI Collaboration Areas**
 - ✅ **`/documentation/current-context/`** - Multi-AI coordination
 - ✅ **`/documentation/ai-coding-workflows/`** - AI development guides
