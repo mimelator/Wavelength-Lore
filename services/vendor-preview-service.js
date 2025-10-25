@@ -1103,18 +1103,28 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
         console.log('🧪 Using test database isolation for test user');
       }
 
-      // Use default vendor for single preview generation
-      const defaultVendorId = 3; // Known working vendor
-      const vendorIds = [defaultVendorId];
+      // Use appropriate vendor based on product type
+      const vendorMap = {
+        'mug': 1,           // Vendor 1 supports mugs
+        'poster': 1,        // Vendor 1 supports posters  
+        'hoodie': 1,        // Vendor 1 supports hoodies
+        'premium-tshirt': 3, // Vendor 3 supports t-shirts
+        'pillow': 1         // Vendor 1 supports pillows
+      };
+      
+      const selectedVendorId = vendorMap[productType] || 3; // Default to vendor 3
+      const vendorIds = [selectedVendorId];
+      
+      console.log(`🎯 Selected vendor ${selectedVendorId} for product type ${productType}`);
 
-      console.log(`✅ Validation passed - generating preview with vendor ${defaultVendorId}`);
+      console.log(`✅ Validation passed - generating preview with vendor ${selectedVendorId}`);
 
       // Call the existing generateVendorPreviews method
       const result = await this.generateVendorPreviews(imageId, productType, vendorIds, {
         previewMode: true,
         createdBy: userId,
         blueprintId: options.blueprintId,
-        runId: `single-preview-${Date.now()}`,
+        runId: options.runId || `single-preview-${Date.now()}`,
         isTestUser: userValidation.isTestUser,
         useTestDatabase: userValidation.shouldUseTestDatabase,
         bypassCache: true,
