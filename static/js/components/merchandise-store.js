@@ -488,124 +488,32 @@ class MerchandiseStore {
       return;
     }
     
-    this.showEditProductModal(product);
-  }
-  
-  showEditProductModal(product) {
-    const modal = document.createElement('div');
-    modal.className = 'modal edit-product-modal';
-    modal.innerHTML = `
-      <div class="modal-content">
-        <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
-        <h2>✏️ Edit Product</h2>
-        
-        <div class="edit-product-content">
-          <div class="product-preview">
-            <img src="${product.images?.[0]?.src || product.sourceImage?.url}" alt="${product.title}" />
-            <h3>${product.title}</h3>
-          </div>
-          
-          <form id="edit-product-form">
-            <div class="form-group">
-              <label for="edit-title">Product Title</label>
-              <input type="text" id="edit-title" value="${product.title}" required />
-            </div>
-            
-            <div class="form-group">
-              <label for="edit-description">Description</label>
-              <textarea id="edit-description" rows="3">${product.description || ''}</textarea>
-            </div>
-            
-            <div class="form-group">
-              <label>Enabled Variants</label>
-              <div class="variants-list">
-                ${(product.variants || []).map(variant => `
-                  <div class="variant-item">
-                    <label>
-                      <input type="checkbox" 
-                             class="variant-checkbox" 
-                             data-variant-id="${variant.id}"
-                             ${variant.is_enabled ? 'checked' : ''}>
-                      ${variant.title} - $${(variant.price / 100).toFixed(2)}
-                    </label>
-                    <input type="number" 
-                           class="variant-price" 
-                           data-variant-id="${variant.id}"
-                           value="${(variant.price / 100).toFixed(2)}"
-                           step="0.01" min="0">
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-            
-            <div class="form-actions">
-              <button type="button" class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
-              <button type="submit" class="btn-primary">Save Changes</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    `;
-    
-    document.body.appendChild(modal);
-    modal.style.display = 'block';
-    
-    // Setup form submission
-    const form = modal.querySelector('#edit-product-form');
-    form.onsubmit = async (e) => {
-      e.preventDefault();
-      await this.saveProductChanges(product.id, modal);
-    };
-  }
-  
-  async saveProductChanges(productId, modal) {
-    try {
-      this.setLoading(true, 'Saving product changes...');
-      
-      const title = modal.querySelector('#edit-title').value;
-      const description = modal.querySelector('#edit-description').value;
-      
-      // Collect variant updates
-      const variantUpdates = [];
-      modal.querySelectorAll('.variant-checkbox').forEach(checkbox => {
-        const variantId = checkbox.dataset.variantId;
-        const priceInput = modal.querySelector(`input[data-variant-id="${variantId}"]`);
-        const price = Math.round(parseFloat(priceInput.value) * 100); // Convert to cents
-        
-        variantUpdates.push({
-          id: parseInt(variantId),
-          is_enabled: checkbox.checked,
-          price: price
-        });
-      });
-      
-      // Update local product data
-      const product = this.products.find(p => (p.id || p.productId) === productId);
-      if (product) {
-        product.title = title;
-        product.description = description;
-        
-        // Update variants
-        variantUpdates.forEach(update => {
-          const variant = product.variants.find(v => v.id === update.id);
-          if (variant) {
-            variant.is_enabled = update.is_enabled;
-            variant.price = update.price;
-          }
-        });
-      }
-      
-      this.showSuccess('Product updated successfully!');
-      this.render();
-      modal.remove();
-      
-    } catch (error) {
-      console.error('Error saving product changes:', error);
-      this.showError('Failed to save changes: ' + error.message);
-    } finally {
-      this.setLoading(false);
+    // Find the original image and product type
+    const imageData = this.galleryImages.find(img => img.id === product.sourceImage?.id || img.url === product.sourceImage?.url);
+    if (!imageData) {
+      this.showError('Original image not found');
+      return;
     }
+    
+    // Extract product type from existing product
+    const productType = this.extractProductTypeFromProduct(product);
+    const productConfig = this.findProductConfig(productType);
+    
+    if (!productConfig) {
+      this.showError('Product configuration not found');
+      return;
+    }
+    
+    // Extract current settings from product
+    const currentSettings = this.extractCurrentSettings(product);
+    
+    // Show customization modal with current settings
+    this.showProductCustomizationModal(productType, productConfig, imageData, currentSettings, product);
   }
+  
+
+  
+
   
   async deleteProduct(productId) {
     if (!confirm('Are you sure you want to delete this product?')) {
@@ -1265,21 +1173,29 @@ class MerchandiseStore {
   }
   
   findProductConfig(productTypeId) {
+    console.log('🔍 Looking for product config:', productTypeId);
+    console.log('🔍 Available product types:', Object.keys(this.productTypes));
+    
     // Search through all product type categories
-    for (const category of Object.values(this.productTypes)) {
-      const product = category.products.find(p => p.id === productTypeId);
+    for (const [categoryKey, category] of Object.entries(this.productTypes)) {
+      console.log(`🔍 Checking category ${categoryKey}:`, category.products?.map(p => p.id));
+      const product = category.products?.find(p => p.id === productTypeId);
       if (product) {
+        console.log('✅ Found product config:', product);
         return product;
       }
     }
+    
+    console.log('❌ Product config not found for:', productTypeId);
     return null;
   }
   
 
   
-  showProductCustomizationModal(productType, productConfig, imageData, imageContext) {
-    // Generate default product name
-    const defaultName = this.generateProductName(productType, imageContext, imageData);
+  showProductCustomizationModal(productType, productConfig, imageData, imageContext, existingProduct = null) {
+    const isUpdate = !!existingProduct;
+    const modalTitle = isUpdate ? `✏️ Update Your ${productConfig.name}` : `✨ Design Your ${productConfig.name}`;
+    const buttonText = isUpdate ? 'Update Product' : 'Design Product';
     
     // Create modal
     const modal = document.createElement('div');
@@ -1289,7 +1205,7 @@ class MerchandiseStore {
       <div class="modal-content customization-content">
         <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
         
-        <h2>✨ Design Your ${productConfig.name}</h2>
+        <h2>${modalTitle}</h2>
         
         <div class="customization-layout">
           <!-- Left side: Live Preview -->
@@ -1355,7 +1271,7 @@ class MerchandiseStore {
             <div class="modal-actions">
               <button class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
               <button class="btn-primary" id="createProductBtn">
-                Design Product
+                ${buttonText}
               </button>
             </div>
           </div>
@@ -1367,7 +1283,7 @@ class MerchandiseStore {
     modal.style.display = 'block';
     
     // Setup event listeners
-    this.setupCustomizationModalListeners(modal, productType, productConfig, imageData, imageContext);
+    this.setupCustomizationModalListeners(modal, productType, productConfig, imageData, imageContext, existingProduct);
   }
   
   generateProductName(productType, imageContext, imageData) {
@@ -1397,7 +1313,7 @@ class MerchandiseStore {
     return name;
   }
   
-  setupCustomizationModalListeners(modal, productType, productConfig, imageData, imageContext) {
+  setupCustomizationModalListeners(modal, productType, productConfig, imageData, imageContext, existingProduct = null) {
     const borderSelect = modal.querySelector('#borderStyleSelect');
     const createBtn = modal.querySelector('#createProductBtn');
     const sizeSelect = modal.querySelector('#defaultSize');
@@ -1424,13 +1340,15 @@ class MerchandiseStore {
     // Initial border preview
     this.updateBorderPreview(modal, imageData, borderSelect.value);
     
-    // Create product button
+    // Create/Update product button
     createBtn.addEventListener('click', async () => {
-      createBtn.disabled = true;
-      createBtn.textContent = 'Designing...';
+      const isUpdate = !!existingProduct;
+      const buttonText = isUpdate ? 'Updating...' : 'Designing...';
+      const progressText = isUpdate ? '🔄 Updating your product...' : '🎨 Preparing your custom product...';
       
-      // Show progress bar
-      this.setLoading(true, '🎨 Preparing your custom product...', 10);
+      this.setLoading(true, progressText, 10);
+      createBtn.disabled = true;
+      createBtn.textContent = buttonText;
       
       const customization = {
         borderStyle: borderSelect.value,
@@ -1438,12 +1356,11 @@ class MerchandiseStore {
         defaultColor: colorSelect.value
       };
       
-      // Simulate progress updates
-      setTimeout(() => this.setLoading(true, '📸 Processing your image...', 30), 500);
-      setTimeout(() => this.setLoading(true, '🎽 Creating product variants...', 60), 1000);
-      setTimeout(() => this.setLoading(true, '✨ Finalizing your design...', 85), 1500);
-      
-      await this.createCustomizedProduct(productType, imageData, imageContext, customization);
+      if (isUpdate) {
+        await this.updateCustomizedProduct(existingProduct, productType, imageData, imageContext, customization);
+      } else {
+        await this.createCustomizedProduct(productType, imageData, imageContext, customization);
+      }
       
       modal.remove();
     });
@@ -1589,6 +1506,75 @@ class MerchandiseStore {
       this.setLoading(false);
       this.showError('Failed to create product: ' + error.message);
     }
+  }
+  
+  async updateCustomizedProduct(existingProduct, productType, imageData, imageContext, customization) {
+    try {
+      // Delete the existing product first
+      const productId = existingProduct.id || existingProduct.productId;
+      this.products = this.products.filter(p => (p.id || p.productId) !== productId);
+      
+      // Create new product with updated settings
+      await this.createCustomizedProduct(productType, imageData, imageContext, customization);
+      
+    } catch (error) {
+      console.error('Error updating product:', error);
+      this.setLoading(false);
+      this.showError('Failed to update product: ' + error.message);
+    }
+  }
+  
+  extractProductTypeFromProduct(product) {
+    console.log('🔍 Extracting product type from:', product);
+    
+    // Check if we have variants to determine product type
+    if (product.variants && product.variants.length > 0) {
+      const firstVariant = product.variants[0];
+      const variantTitle = firstVariant.title?.toLowerCase() || '';
+      
+      console.log('🔍 First variant title:', variantTitle);
+      
+      // Check variant titles for product type indicators
+      if (variantTitle.includes('hoodie')) {
+        return 'hoodie';
+      }
+      if (variantTitle.includes('tank')) {
+        return 'tank-top';
+      }
+      if (variantTitle.includes('pillow')) {
+        return 'pillow';
+      }
+      // Default to premium t-shirt for clothing items
+      return 'premium-tshirt';
+    }
+    
+    // Fallback to title analysis
+    const title = product.title?.toLowerCase() || '';
+    console.log('🔍 Product title:', title);
+    
+    if (title.includes('hoodie')) {
+      return 'hoodie';
+    }
+    if (title.includes('tank')) {
+      return 'tank-top';
+    }
+    if (title.includes('pillow')) {
+      return 'pillow';
+    }
+    
+    // Default fallback
+    console.log('🔍 Using default product type: premium-tshirt');
+    return 'premium-tshirt';
+  }
+  
+  extractCurrentSettings(product) {
+    // Extract current settings from the product
+    // This is simplified - you might need to store more detailed settings
+    return {
+      selectedSize: 'M', // Default since we don't store this currently
+      selectedColor: 'Black', // Default since we don't store this currently
+      borderStyle: 'solid-medium' // Default since we don't store this currently
+    };
   }
   
   showProductCreationModal() {
