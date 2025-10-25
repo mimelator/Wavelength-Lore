@@ -1,11 +1,47 @@
-# 🤖 AI Development Guide - Enterprise-Grade AI-Assisted Programming
+## 🤖 AI Development Guide - AI COPILOT ENTRY POINT
 
-**Comprehensive Guide for AI-Enhanced Development Workflows**  
-**Version:** 2.0  
+**🚨 CRITICAL: Read This Before Any Development Work**  
+**Version:** 3.0  
 **Last Updated:** October 25, 2025  
-**Status:** ✅ PRODUCTION READY
+**Status:** ✅ PRODUCTION READY - MANDATORY READING
 
 ---
+
+## 🎯 DEVELOPER EXPECTATIONS - AI COPILOT ONBOARDING
+
+### **⚡ EFFICIENCY FIRST - DON'T WASTE TIME**
+```bash
+# WRONG: Individual operations
+git add file1.js
+git commit -m "fix1"
+git add file2.js  
+git commit -m "fix2"
+
+# RIGHT: Batch operations
+git add . && node scripts/unified/smart-commit.js
+# Multiple changes in one efficient commit
+```
+
+### **🛠️ USE EXISTING SCRIPTS - LEARN THE CODEBASE**
+```bash
+# MANDATORY: Survey existing tools before coding
+find scripts/ -name "*.js" | head -20    # See what exists
+ls scripts/unified/                      # Core tools (USE THESE)
+ls scripts/organized/                    # Specialized tools (LEARN THESE)
+```
+
+### **🔧 FIX BROKEN SCRIPTS - DON'T WORK AROUND**
+```bash
+# WRONG: Skip broken script, create workaround
+echo "Script is broken, I'll do it manually..."
+
+# RIGHT: Fix the broken script
+node scripts/unified/test-runner.js health  # If this fails...
+# 1. Identify the error
+# 2. Fix the root cause  
+# 3. Test the fix
+# 4. Document the solution
+```
 
 ## 🎯 Core AI Development Principles
 

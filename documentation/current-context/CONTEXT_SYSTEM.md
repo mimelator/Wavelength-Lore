@@ -18,45 +18,84 @@ This **Multi-Copilot Context Management System** enables **parallel AI developme
 - ✅ **Conflict Prevention:** Built-in coordination to avoid overlapping work
 - ✅ **Comprehensive Coverage:** All aspects of development are covered
 
-### **🔑 Developer Preferences & Standards**
+### **� CRITICAL AI COPILOT ENTRY POINT - READ THIS FIRST**
 
-#### **Test-Driven Development (TDD) Best Practices**
-- 🧪 **ALWAYS write tests first** before implementing functionality
-- 📊 **Maintain 90%+ test coverage** across all codebases
-- 🔄 **Red-Green-Refactor cycle** must be followed for all feature development
-- 🧪 **Test automation** is mandatory - no manual testing for repetitive tasks
-- 📈 **Performance tests** required for all critical paths and API endpoints
+#### **🎯 DEVELOPER CODING EXPECTATIONS - NON-NEGOTIABLE**
 
-#### **Documentation & Script Maintenance Standards**
-- 📚 **Documentation MUST be updated** with every code change
-- 🔗 **Always refer to existing documentation** before creating new processes
-- 📝 **Use unified scripts** from `/scripts/unified/` (aws-manager.js, test-runner.js, deployment-manager.js)
-- 🔍 **Check `/documentation/` structure** before duplicating documentation efforts
-- 📖 **Link directly to specific files** - provide full paths, not general references
+##### **EXISTING SCRIPTS - LEARN & USE THEM**
+```bash
+# MANDATORY: Familiarize yourself with existing scripts BEFORE coding
+ls -la /scripts/unified/          # 3 core tools - USE THESE
+ls -la /scripts/organized/        # 85 specialized scripts - LEARN THESE
+cat /documentation/active-references/PHASE_2_CONSOLIDATION_RESULTS.md
+```
 
-#### **Git Workflow & Commit Standards**
-- 💾 **ALWAYS use smart commit** (`./scripts/unified/smart-commit.js`) for all commits
-- 🔐 **Security validation required** before any commit reaches production
-- 📝 **Commit messages must follow** conventional commit format with detailed descriptions
-- 🔄 **Process isolation mandatory** - separate concerns into discrete, testable units
+- 🔧 **USE EXISTING SCRIPTS** - Don't reinvent wheels, learn what exists first
+- 🛠️ **IF SCRIPTS BREAK - FIX THEM** - Don't work around, fix the root cause
+- ⚡ **BATCH OPERATIONS** - If doing 5+ operations, batch them efficiently
+- � **STUDY THE CODEBASE** - Understand existing patterns before adding new ones
 
-#### **Context Management Requirements**
-- 📋 **ALWAYS UPDATE context documents** when saving context for compaction
-- 🔄 **Amazon Q and GitHub Copilot compatibility** - ensure context works across AI tools
-- 📍 **Context boundaries must be respected** - don't overlap domain responsibilities
-- 💾 **Context state persistence** required for seamless handoffs between AI sessions
+##### **EXISTING UNIFIED TOOLS (MANDATORY USAGE):**
+```bash
+# AWS Operations (replaces 34 individual scripts):
+node scripts/unified/aws-manager.js <service> <operation> [options]
+# Examples: cloudfront list, apprunner deploy, ecr list --repo name
 
-#### **Proof & Validation Requirements**
-- ✅ **NEVER claim completion without proof** - provide tests, captured data, or verification output
-- 🧪 **Include test results** when claiming functionality works
-- 📊 **Capture performance metrics** for optimization claims
-- 🔗 **Provide direct file links** with full paths - no general references that require scanning
-- 📈 **Show before/after comparisons** for any improvement claims
+# Testing Operations (replaces 52 individual scripts):  
+node scripts/unified/test-runner.js <category> [url]
+# Examples: health, performance, integration, security, all
 
-#### **Privacy & Boundaries**
-- 🚫 **NEVER touch `.current-notes.md`** - this is private developer workspace
-- 🔒 **Respect developer's private files** and personal organization systems
-- 📝 **Use designated context areas** for AI collaboration and shared state
+# Deployment Operations (replaces 10 individual scripts):
+node scripts/unified/deployment-manager.js <operation> [options]
+# Examples: deploy, rollback, monitor, verify
+
+# Commit Operations (ONLY method allowed):
+node scripts/unified/smart-commit.js
+```
+
+##### **EFFICIENCY REQUIREMENTS**
+- ⚡ **BATCH MULTIPLE OPERATIONS** - Don't waste time with single operations
+- 🔄 **PARALLEL EXECUTION** - Run operations concurrently when possible
+- � **ONE COMMAND, MULTIPLE OUTPUTS** - Prefer comprehensive tools over individual scripts
+- ⏱️ **TIME IS VALUABLE** - Optimize for developer time, not AI convenience
+
+##### **Test-Driven Development (TDD) - ABSOLUTE REQUIREMENTS**
+- 🧪 **TESTS FIRST - NO EXCEPTIONS** - Write failing test, then implement code
+- � **90%+ COVERAGE MANDATORY** - Use `node scripts/unified/test-runner.js` to verify
+- 🔄 **Red-Green-Refactor** - Follow the cycle religiously
+- ⚡ **FAST FEEDBACK** - Tests must run quickly for rapid iteration
+- 📈 **PERFORMANCE TESTS** - Critical paths must have performance validation
+
+##### **Script & Documentation Standards - ENFORCED**
+- � **UPDATE DOCS WITH EVERY CHANGE** - No code without documentation
+- 🔍 **CHECK EXISTING FIRST** - Scan `/documentation/` and `/scripts/` before creating
+- 📝 **DIRECT FILE PATHS ONLY** - `/path/to/specific/file.js` not "check the folder"
+- � **NO VAGUE REFERENCES** - Link directly, don't make others search
+- 🛠️ **FIX BROKEN SCRIPTS** - Don't work around, fix the underlying issue
+
+##### **Commit & Workflow Standards - STRICT**
+- 💾 **SMART-COMMIT ONLY** - `node scripts/unified/smart-commit.js` for ALL commits
+- 🔐 **SECURITY FIRST** - All commits automatically scanned for credentials
+- 📝 **DETAILED COMMIT MESSAGES** - Tell the story of what and why
+- 🔄 **PROCESS ISOLATION** - Separate concerns, make everything testable
+
+##### **Context Management - REQUIRED**
+- 📋 **UPDATE CONTEXT DOCS** - Every AI session must update relevant context files
+- 🔄 **AMAZON Q & GITHUB COPILOT** - Ensure compatibility across AI tools
+- 📍 **RESPECT BOUNDARIES** - Security, Testing, DevOps, Documentation, Features contexts
+- 💾 **PERSISTENT STATE** - Context must survive AI session handoffs
+
+##### **Proof Requirements - ABSOLUTE**
+- ✅ **NO CLAIMS WITHOUT EVIDENCE** - Show test output, performance data, file changes
+- 🧪 **TEST RESULTS MANDATORY** - Paste actual command output and results
+- 📊 **METRICS FOR IMPROVEMENTS** - Before/after numbers for optimization claims
+- 🔗 **DIRECT LINKS WITH PROOF** - Full paths with evidence of changes
+- 📈 **MEASURABLE OUTCOMES** - Quantify all improvements and fixes
+
+##### **Privacy & Boundaries - ABSOLUTE**
+- 🚫 **NEVER TOUCH `.current-notes.md`** - Private developer workspace
+- 🔒 **RESPECT PERSONAL FILES** - Don't modify personal organization systems  
+- 📝 **AI COLLABORATION AREAS ONLY** - Use `/documentation/current-context/`
 
 ---
 

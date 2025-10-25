@@ -1,11 +1,37 @@
-# 🤖 AI Copilot Developer Preferences & Standards
+# 🚨 AI COPILOT ENTRY POINT - START HERE
 
-**Essential Guidelines for AI Assistants (GitHub Copilot, Amazon Q, etc.)**  
-**Version:** 1.0  
+**⚡ ESSENTIAL ONBOARDING FOR ALL AI ASSISTANTS**  
+**🎯 DEVELOPER CODING EXPECTATIONS & STANDARDS**  
+**Version:** 2.0  
 **Last Updated:** October 25, 2025  
-**Status:** ✅ ENFORCED
+**Status:** ✅ MANDATORY READING - NON-NEGOTIABLE
 
 ---
+
+## 🚨 READ THIS FIRST - AI COPILOT QUICK START
+
+### **⚡ DEVELOPER TIME IS PRECIOUS - BE EFFICIENT**
+- 🔥 **BATCH OPERATIONS** - If doing 5+ things, batch them intelligently
+- 🛠️ **USE EXISTING SCRIPTS** - Learn what exists, don't reinvent wheels
+- 🔧 **FIX BROKEN TOOLS** - Don't work around issues, fix the root cause
+- ⏱️ **OPTIMIZE FOR SPEED** - Developer productivity over AI convenience
+
+### **📚 MANDATORY SCRIPT FAMILIARIZATION**
+```bash
+# RUN THESE COMMANDS FIRST - LEARN THE EXISTING TOOLS:
+ls -la scripts/unified/          # 3 core tools you MUST use
+find scripts/organized/ -name "*.js" | wc -l  # 85+ specialized tools
+head -20 /documentation/active-references/PHASE_2_CONSOLIDATION_RESULTS.md
+```
+
+### **🔧 EXISTING TOOL MASTERY - REQUIRED**
+```bash
+# THESE ARE YOUR PRIMARY TOOLS - MASTER THEM:
+node scripts/unified/aws-manager.js --help      # All AWS operations
+node scripts/unified/test-runner.js --help      # All testing needs  
+node scripts/unified/deployment-manager.js --help # All deployment tasks
+node scripts/unified/smart-commit.js --help     # ONLY commit method
+```
 
 ## 🚨 CRITICAL REQUIREMENTS - NO EXCEPTIONS
 
