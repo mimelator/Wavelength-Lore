@@ -6,13 +6,13 @@
  */
 
 const express = require('express');
-const app = express();
+const router = express.Router();
 
 // Load environment
 require('dotenv').config();
 
 // Simple diagnostic endpoint
-app.get('/diagnostic/firebase', async (req, res) => {
+router.get('/firebase', async (req, res) => {
   const results = {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
@@ -68,7 +68,7 @@ app.get('/diagnostic/firebase', async (req, res) => {
 });
 
 // Health check endpoint
-app.get('/diagnostic/health', (req, res) => {
+router.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -77,4 +77,4 @@ app.get('/diagnostic/health', (req, res) => {
   });
 });
 
-module.exports = app;
+module.exports = router;
