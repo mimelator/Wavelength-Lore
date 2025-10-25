@@ -12,7 +12,7 @@
  */
 
 const { program } = require('commander');
-const { execSync, spawn } = require('child_process');
+const { spawn } = require('child_process');
 const { AppRunnerClient, UpdateServiceCommand, DescribeServiceCommand, 
         ListOperationsCommand } = require('@aws-sdk/client-apprunner');
 const { ECRClient, DescribeRepositoriesCommand, ListImagesCommand } = require('@aws-sdk/client-ecr');
@@ -20,6 +20,54 @@ const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client
 const chalk = require('chalk');
 const fs = require('fs').promises;
 const path = require('path');
+
+// 🛡️ SECURITY: Input Validator
+class InputValidator {
+    static validateCommand(command) {
+        const allowedCommands = ['docker', 'aws', 'git', 'npm'];
+        if (!allowedCommands.includes(command)) {
+            throw new Error(`🚫 Unauthorized command: ${command}`);
+        }
+        return command;
+    }
+    
+    static validateAction(action) {
+        const allowedActions = ['build', 'push', 'deploy', 'update', 'list', 'status', 'rollback', 'tag'];
+        if (!allowedActions.includes(action)) {
+            throw new Error(`🚫 Unauthorized action: ${action}`);
+        }
+        return action;
+    }
+    
+    static sanitizeParameters(parameters) {
+        if (!Array.isArray(parameters)) {
+            parameters = parameters.toString().split(' ').filter(p => p.trim());
+        }
+        
+        // Remove shell metacharacters that could enable injection
+        return parameters.map(param => {
+            const original = param;
+            const sanitized = param
+                .replace(/[;&|`$(){}]/g, '')
+                .replace(/\.\./g, '')  // Prevent directory traversal
+                .trim();
+            
+            if (sanitized !== original) {
+                console.warn(chalk.yellow(`⚠️  Parameter sanitized: "${original}" -> "${sanitized}"`));
+            }
+            return sanitized;
+        }).filter(p => p.length > 0);
+    }
+    
+    static validateImageTag(tag) {
+        // Docker tag validation
+        const tagRegex = /^[a-zA-Z0-9._-]+$/;
+        if (!tagRegex.test(tag)) {
+            throw new Error(`🚫 Invalid Docker tag format: ${tag}`);
+        }
+        return tag;
+    }
+}
 
 // Configuration
 require('dotenv').config();
@@ -98,22 +146,66 @@ class BaseDeploymentManager {
     console.log('');
   }
 
-  async execCommand(command, description) {
-    this.logInfo(`Executing: ${description}`);
+  async execCommand(commandArray, description) {
+    this.logInfo(`🔐 Executing: ${description}`);
     
     try {
-      const output = execSync(command, { 
-        encoding: 'utf8',
-        stdio: 'pipe'
-      });
-      
-      if (output.trim()) {
-        console.log(chalk.gray(output.trim()));
+      // 🛡️ SECURITY: Validate and sanitize command
+      if (!Array.isArray(commandArray)) {
+        commandArray = commandArray.split(' ');
       }
       
-      return output;
+      const [baseCommand, ...args] = commandArray;
+      
+      // Validate command
+      InputValidator.validateCommand(baseCommand);
+      
+      // Sanitize arguments
+      const sanitizedArgs = InputValidator.sanitizeParameters(args);
+      
+      this.logInfo(`Command: ${baseCommand} ${sanitizedArgs.join(' ')}`);
+      
+      // Execute using spawn instead of execSync for security
+      return new Promise((resolve, reject) => {
+        const child = spawn(baseCommand, sanitizedArgs, {
+          stdio: ['pipe', 'pipe', 'pipe'],
+          env: { ...process.env, NODE_ENV: 'production' }
+        });
+        
+        let output = '';
+        let errorOutput = '';
+        
+        child.stdout.on('data', (data) => {
+          const chunk = data.toString();
+          output += chunk;
+          if (chunk.trim()) {
+            console.log(chalk.gray(chunk.trim()));
+          }
+        });
+        
+        child.stderr.on('data', (data) => {
+          const chunk = data.toString();
+          errorOutput += chunk;
+          console.log(chalk.yellow(chunk.trim()));
+        });
+        
+        child.on('close', (code) => {
+          if (code === 0) {
+            resolve(output);
+          } else {
+            this.logError(`Command failed with exit code ${code}`);
+            reject(new Error(`Command failed: ${errorOutput || 'Unknown error'}`));
+          }
+        });
+        
+        child.on('error', (error) => {
+          this.logError(`Command execution failed: ${error.message}`);
+          reject(error);
+        });
+      });
+      
     } catch (error) {
-      this.logError(`Command failed: ${error.message}`);
+      this.logError(`🚫 Command validation failed: ${error.message}`);
       throw error;
     }
   }
@@ -173,7 +265,7 @@ class ApplicationDeploymentManager extends BaseDeploymentManager {
     
     // Check Docker
     try {
-      await this.execCommand('docker --version', 'Checking Docker availability');
+      await this.execCommand(['docker', '--version'], 'Checking Docker availability');
       this.logSuccess('Docker is available');
     } catch (error) {
       throw new Error('Docker is not available or not running');
@@ -213,15 +305,18 @@ class ApplicationDeploymentManager extends BaseDeploymentManager {
     const imageTag = `${CONFIG.ECR_REPOSITORY}:${tag}`;
     const ecrUri = `${process.env.AWS_ACCOUNT_ID}.dkr.ecr.${CONFIG.AWS_REGION}.amazonaws.com/${imageTag}`;
     
+    // 🛡️ Validate Docker tag before use
+    InputValidator.validateImageTag(tag);
+    
     // Build image
     await this.execCommand(
-      `docker build -t ${imageTag} .`,
+      ['docker', 'build', '-t', imageTag, '.'],
       'Building Docker image'
     );
     
     // Tag for ECR
     await this.execCommand(
-      `docker tag ${imageTag} ${ecrUri}`,
+      ['docker', 'tag', imageTag, ecrUri],
       'Tagging image for ECR'
     );
     

@@ -1,14 +1,87 @@
-node_modules
-npm-debug.log
-.git
+# ==============================================
+# Production Deployment - Exclude Dev Tools
+# ==============================================
+
+# 🔴 CRITICAL: Development Tools (NEVER in production)
+scripts/
+debug/
+deployment/
+content-management/
+tests/
+examples/
+
+# 🔴 CRITICAL: Security & Credentials
+.env*
+.aws/
+*.pem
+*.key
+*.p12
+firebaseServiceAccountKey.json
+config/aws-resources.js
+
+# 🔴 CRITICAL: Git and Development
+.git/
+.github/
+.vscode/
+.idea/
 .gitignore
-.env
-.env.local
-*.md
-.DS_Store
-coverage
-.vscode
-.idea
-dist
-build
+.dockerignore
+node_modules/
+
+# 🟡 Development Artifacts
+temp/
+logs/
 *.log
+coverage/
+.cache/
+*.backup
+*.bak
+*.orig
+commit-message.txt
+.commit-message.txt
+COMMIT_MESSAGE.txt
+
+# 📋 Documentation (unless needed)
+docs/
+documentation/
+README.md
+LICENSE
+.current-notes.md
+
+# 🤖 AI Context (development only)
+.amazonq/
+.claude/
+AI_COPILOT_QUICKSTART.txt
+
+# 📊 Analysis & Status Files
+*_RESULTS.md
+*_SUMMARY.md
+*_ANALYSIS.md
+*_AUDIT*.md
+*SECURITY*.md
+*TEST*.md
+*CODING*.md
+*AI*.md
+*COPILOT*.md
+
+# 🧪 Testing & Build Configuration
+jest.config.js
+cypress.config.js
+playwright.config.js
+Dockerfile
+docker-compose.yml
+
+# 🗂️ Development Status Files
+BROWSER_TEST_RESULTS.md
+CACHE_FLAW_ANALYSIS.md
+COMPREHENSIVE_SCRIPTS_AUDIT.md
+DEPLOYMENT-GUIDE.md
+ENTERPRISE_DEVELOPMENT_BEST_PRACTICES.md
+FULL_CATALOG_INTEGRATION.md
+IMMEDIATE_FIXES*.md
+MAP_SUCCESS_SUMMARY.md
+MERCHANDISE_ISSUE_TESTING.md
+SVG_FIX_SUMMARY.md
+TIERED_PRODUCT_*.md
+WORLD_MAP_INTEGRATION_CONTEXT.md
+🛍️*

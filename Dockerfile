@@ -1,49 +1,102 @@
-# Use a Node.js base image with latest security patches
-FROM node:20-bookworm-slim
+# ===============================================
+# Multi-stage Docker Build for Production Security
+# ===============================================
 
-# Set the working directory
+# Stage 1: Build stage (includes dev dependencies for any build steps)
+FROM node:20-alpine AS builder
+
 WORKDIR /app
 
-# Install Nginx first (separate layer for better caching)
-RUN apt-get update && apt-get install -y nginx gettext-base && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Copy package.json and package-lock.json
+# Copy package files
 COPY package*.json ./
 
-# Install ALL dependencies (production + dev)
-# Not using --only=production to ensure no runtime deps are missing
-RUN npm ci || npm install --no-cache
+# Install dependencies (production only for minimal footprint)
+RUN npm ci --only=production && npm cache clean --force
 
-# Copy Nginx configuration template
-COPY config/nginx.conf.template /etc/nginx/nginx.conf.template
+# Stage 2: Production stage (minimal security footprint)
+FROM node:20-alpine AS production
 
-# Copy the application code
-COPY . .
+# Security: Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S appuser -u 1001 -G nodejs
 
-# Expose the ports for Nginx
-EXPOSE 8080
+# Security: Install minimal system dependencies
+RUN apk add --no-cache nginx gettext && \
+    rm -rf /var/cache/apk/*
 
-# Set default environment variables for port configuration
+WORKDIR /app
+
+# Copy production dependencies
+COPY --from=builder --chown=appuser:nodejs /app/node_modules ./node_modules
+
+# Copy package files
+COPY --chown=appuser:nodejs package*.json ./
+
+# Copy ONLY essential application files (filtered by .dockerignore)
+COPY --chown=appuser:nodejs app.js index.js ./
+COPY --chown=appuser:nodejs routes/ ./routes/
+COPY --chown=appuser:nodejs views/ ./views/
+COPY --chown=appuser:nodejs static/ ./static/
+COPY --chown=appuser:nodejs middleware/ ./middleware/
+COPY --chown=appuser:nodejs models/ ./models/
+COPY --chown=appuser:nodejs services/ ./services/
+COPY --chown=appuser:nodejs utils/ ./utils/
+COPY --chown=appuser:nodejs helpers/ ./helpers/
+
+# Copy only production-safe configuration (NO credentials)
+COPY --chown=appuser:nodejs config/database.js ./config/
+COPY --chown=appuser:nodejs config/server.js ./config/
+COPY --chown=appuser:nodejs config/middleware.js ./config/
+COPY --chown=appuser:nodejs config/nginx.conf.template /etc/nginx/nginx.conf.template
+
+# Copy only published content (NO development content)
+COPY --chown=appuser:nodejs content/ ./content/
+
+# Security: Ensure no scripts directory exists
+RUN echo "Verifying security exclusions..." && \
+    test ! -d scripts && echo "✅ scripts/ excluded" || (echo "❌ scripts/ found in production!" && exit 1) && \
+    test ! -f .env && echo "✅ .env excluded" || (echo "❌ .env found in production!" && exit 1) && \
+    test ! -d tests && echo "✅ tests/ excluded" || (echo "❌ tests/ found in production!" && exit 1) && \
+    echo "🛡️ Security validation complete"
+
+# Production environment
+ENV NODE_ENV=production
 ENV NODE_PORT=3001
 ENV NGINX_PORT=8080
-ENV NODE_ENV=production
 
-# Create startup script that starts Node.js in background, then Nginx in foreground
+# Security: Switch to non-root user
+USER appuser
+
+# Create production startup script
 RUN echo '#!/bin/sh\n\
-echo "=== Container Starting ==="\n\
+echo "🚀 Production Container Starting"\n\
+echo "Security: Running as user $(whoami)"\n\
 echo "Environment: NODE_ENV=${NODE_ENV}"\n\
-echo "Ports: NODE_PORT=${NODE_PORT} NGINX_PORT=${NGINX_PORT} PORT=${PORT}"\n\
-echo "Generating nginx config..."\n\
-envsubst '"'"'$NGINX_PORT $NODE_PORT'"'"' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf\n\
-echo "Starting Node.js application in background..."\n\
+echo "Ports: NODE_PORT=${NODE_PORT} NGINX_PORT=${NGINX_PORT}"\n\
+\n\
+# Generate nginx config\n\
+envsubst '"'"'$NGINX_PORT $NODE_PORT'"'"' < /etc/nginx/nginx.conf.template > /tmp/nginx.conf\n\
+sudo cp /tmp/nginx.conf /etc/nginx/nginx.conf\n\
+\n\
+# Start Node.js application\n\
+echo "Starting Node.js application..."\n\
 node index.js &\n\
 NODE_PID=$!\n\
-echo "Node.js started with PID: $NODE_PID"\n\
-echo "Waiting 3 seconds for Node.js to be ready..."\n\
+echo "✅ Node.js started with PID: $NODE_PID"\n\
+\n\
+# Wait for application to be ready\n\
 sleep 3\n\
-echo "Starting Nginx..."\n\
-nginx -g "daemon off;"\n\
+\n\
+# Start Nginx\n\
+echo "Starting Nginx reverse proxy..."\n\
+sudo nginx -g "daemon off;"\n\
 ' > /app/start.sh && chmod +x /app/start.sh
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8080/health || exit 1
 
 CMD ["/app/start.sh"]

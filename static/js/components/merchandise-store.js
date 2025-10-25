@@ -1145,7 +1145,7 @@ class MerchandiseStore {
               <div class="selected-image-preview">
                 ${this.renderSelectedImagePreview()}
               </div>
-              <p class="section-description">Browse 1,300+ products organized by category</p>
+              <p class="section-description">Choose from our curated product selection</p>
               <div id="product-navigator-container">
                 <div id="product-navigator"></div>
               </div>
@@ -1241,17 +1241,9 @@ class MerchandiseStore {
     console.log('🔧 Initializing ProductNavigator...');
     console.log('🔍 Checking ProductNavigator availability:', typeof ProductNavigator);
     
-    // Always use simple categories for reliability in tests
-    // The full ProductNavigator can be enabled later when the API is stable
-    console.log('🔧 Using simple categories for reliable testing');
-    this.renderSimpleCategories(container);
-    return;
-    
-    // ProductNavigator code disabled for now to ensure tests work
-    /*
     // Check if ProductNavigator class is available
     if (typeof ProductNavigator === 'undefined') {
-      console.error('❌ ProductNavigator class not found');
+      console.error('❌ ProductNavigator class not found, using simple categories');
       this.renderSimpleCategories(container);
       return;
     }
@@ -1290,7 +1282,6 @@ class MerchandiseStore {
       console.error('❌ Error creating ProductNavigator:', error);
       this.renderSimpleCategories(container);
     }
-    */
   }
   
   /**
@@ -1300,7 +1291,10 @@ class MerchandiseStore {
     console.log('🔧 Rendering simple categories fallback');
     container.innerHTML = `
       <div class="simple-categories">
-        <h3>📦 Choose Your Product Type</h3>
+        <div class="fallback-notice">
+          <p>🚧 <strong>Loading product catalog...</strong> Showing popular options while we load the full selection.</p>
+        </div>
+        <h3>📦 Popular Products</h3>
         <div class="simple-categories-grid">
           <div class="simple-category" data-type="premium-tshirt">
             <div class="category-icon">👕</div>
@@ -1319,6 +1313,12 @@ class MerchandiseStore {
             <h4>Coffee Mug</h4>
             <p>Ceramic 11oz mug</p>
             <button class="select-simple-product" data-product="mug" data-blueprint="68" data-provider="1">Select</button>
+          </div>
+          <div class="simple-category" data-type="tank-top">
+            <div class="category-icon">🎨</div>
+            <h4>Tank Top</h4>
+            <p>Lightweight summer wear</p>
+            <button class="select-simple-product" data-product="tank-top" data-blueprint="17" data-provider="1">Select</button>
           </div>
         </div>
       </div>
