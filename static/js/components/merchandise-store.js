@@ -906,7 +906,7 @@ class MerchandiseStore {
       `;
     }
     
-    return this.products.map(product => `
+    return this.products.filter(p => p.id).map(product => `
       <div class="product-card">
         <div class="product-image">
           <img src="${product.images?.[0]?.src || product.sourceImage?.url || ''}" alt="${product.title}" />
