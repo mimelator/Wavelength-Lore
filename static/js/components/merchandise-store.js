@@ -1762,15 +1762,11 @@ class MerchandiseStore {
         <div class="preview-info">
           <h3 class="preview-title">Selected Image: ${this.cleanImageTitle(selectedImg.title)}</h3>
           <p class="preview-details">
-            <span class="preview-size">${this.formatFileSize(selectedImg.size || 0)}</span>
             ${selectedImg.suitableForPrint ? 
               '<span class="print-ready">✅ Print Ready</span>' : 
               '<span class="enhancement-needed">🎨 Will be enhanced for printing</span>'
             }
           </p>
-          <button class="change-image-btn" onclick="document.querySelector('.gallery-section').scrollIntoView({behavior: 'smooth'})">
-            Change Image
-          </button>
         </div>
       </div>
     `;
