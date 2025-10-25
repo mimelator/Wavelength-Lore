@@ -1800,6 +1800,11 @@ class MerchandiseStore {
   }
   
   getAuthToken() {
+    // For development/localhost, we don't need a token since server handles auth
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'dev-bypass';
+    }
+    
     // Get authentication token from your auth system
     return localStorage.getItem('authToken') || '';
   }
