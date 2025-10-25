@@ -42,7 +42,10 @@ const getTestUser = () => {
 const ensureAuthenticated = (req, res, next) => {
   // Development authentication bypass for localhost testing
   if (isDevelopmentBypass(req)) {
-    console.log('🚀 Development bypass: Auto-authenticating test user for localhost');
+    // Only log auth bypass for non-API routes to reduce noise
+    if (!req.originalUrl.startsWith('/api/') && !req.originalUrl.includes('/images/')) {
+      console.log('🚀 Development bypass: Auto-authenticating test user for localhost');
+    }
     req.user = getTestUser();
     return next();
   }

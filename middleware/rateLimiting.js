@@ -173,7 +173,10 @@ function createSmartRateLimit() {
   return (req, res, next) => {
     // Bypass rate limiting for localhost development (::1 is IPv6 localhost, 127.0.0.1 is IPv4)
     if (req.ip === '::1' || req.ip === '127.0.0.1' || req.ip === '::ffff:127.0.0.1') {
-      console.log(`🔓 Localhost bypass: Rate limiting skipped for ${req.ip} on ${req.originalUrl}`);
+      // Only log non-static asset requests to reduce noise
+      if (!req.originalUrl.includes('/images/') && !req.originalUrl.includes('/css/') && !req.originalUrl.includes('/js/')) {
+        console.log(`🔓 Localhost bypass: Rate limiting skipped for ${req.ip} on ${req.originalUrl}`);
+      }
       return next(); // Skip rate limiting for localhost requests
     }
 

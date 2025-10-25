@@ -134,7 +134,10 @@ function configureStaticFiles(app) {
     const cloudFrontUrl = 'https://df5sj8f594cdx.cloudfront.net';
     const fullCdnUrl = `${cloudFrontUrl}${req.originalUrl}`;
     
-    console.log(`🔗 Image not found locally, redirecting to CloudFront: ${fullCdnUrl}`);
+    // Only log redirects for non-placeholder images to reduce noise
+    if (!req.originalUrl.includes('/placeholder.jpg')) {
+      console.log(`🔗 Image not found locally, redirecting to CloudFront: ${fullCdnUrl}`);
+    }
     return res.redirect(fullCdnUrl);
   });
   
@@ -176,7 +179,10 @@ function configureTemplateLocals(app) {
         req.user = { uid: decodedToken.uid };
         console.log(`✅ User authenticated: ${decodedToken.uid}`);
       } catch (error) {
-        console.log('⚠️  Invalid or expired Firebase token');
+        // Only log token errors for non-API routes to reduce noise in development
+        if (!req.originalUrl.startsWith('/api/merchandise/')) {
+          console.log('⚠️  Invalid or expired Firebase token');
+        }
         req.user = null;
       }
     }

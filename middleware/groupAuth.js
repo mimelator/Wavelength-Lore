@@ -298,7 +298,10 @@ class GroupAuthentication {
   async getAuthenticatedUser(req) {
     // Development authentication bypass for localhost testing
     if (this.isDevelopmentBypass(req)) {
-      console.log('🚀 Development bypass: Auto-authenticating test user for localhost (groupAuth)');
+      // Only log auth bypass for non-API routes to reduce noise
+      if (!req.originalUrl.startsWith('/api/') && !req.originalUrl.includes('/images/')) {
+        console.log('🚀 Development bypass: Auto-authenticating test user for localhost (groupAuth)');
+      }
       const testUser = this.getTestUser();
       req.user = testUser; // Set it on request for consistency
       return testUser;
