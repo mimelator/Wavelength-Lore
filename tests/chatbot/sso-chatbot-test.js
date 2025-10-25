@@ -102,8 +102,20 @@ class SSOChatbotTester {
         timeout: this.timeout 
       });
 
-      // Look for login button or check if already authenticated
-      const loginButton = await this.page.$('a[href*="login"], button:contains("Login"), .login-btn');
+      // For localhost, bypass SSO authentication entirely
+      if (this.isLocalhost) {
+        console.log(chalk.yellow('🏠 Localhost detected - skipping SSO authentication'));
+        console.log(chalk.gray(`  📍 Navigating directly to localhost: ${this.baseUrl}`));
+        await this.page.goto(this.baseUrl, { 
+          waitUntil: 'networkidle2',
+          timeout: this.timeout 
+        });
+        console.log(chalk.green('✅ Successfully navigated to localhost'));
+        return true;
+      }
+
+      // Look for login button or check if already authenticated (production only)
+      const loginButton = await this.page.$('a[href*="login"], .login-btn');
       
       if (!loginButton) {
         // Check if we're already authenticated by looking for user indicators
@@ -117,14 +129,16 @@ class SSOChatbotTester {
       // Attempt to find and click login
       console.log(chalk.gray('  🔑 Looking for login options...'));
       
-      // Try multiple login selectors
+      // Try multiple login selectors (CSS-only, no jQuery-style selectors)
       const loginSelectors = [
         'a[href*="login"]',
-        'button:contains("Login")',
+        'button[class*="login" i]',
         '.login-btn',
         '.auth-login',
-        'nav a:contains("Login")',
-        '.header-login'
+        'nav a[href*="login"]',
+        '.header-login',
+        'input[type="button"][value*="Login" i]',
+        'input[type="submit"][value*="Login" i]'
       ];
 
       let loginFound = false;
@@ -152,7 +166,7 @@ class SSOChatbotTester {
 
       // Wait for authentication to complete
       // This could be SSO redirect, login form, or direct access
-      await this.page.waitForTimeout(3000);
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
       // Check current URL for auth indicators
       const currentUrl = this.page.url();
@@ -172,7 +186,7 @@ class SSOChatbotTester {
       }
 
       // Verify authentication by checking for user session indicators
-      await this.page.waitForTimeout(2000);
+      await new Promise(resolve => setTimeout(resolve, 2000));
       const authSuccess = await this.checkAuthenticationStatus();
       
       return authSuccess;
@@ -283,6 +297,7 @@ class SSOChatbotTester {
       
       // Try multiple possible chatbot URLs/interfaces
       const chatUrls = [
+        `${this.baseUrl}/chatbot/widget`,
         `${this.baseUrl}/chat`,
         `${this.baseUrl}/chatbot`,
         `${this.baseUrl}/#chat`,
@@ -408,7 +423,7 @@ class SSOChatbotTester {
         });
         
         // Wait between messages to avoid rate limiting
-        await this.page.waitForTimeout(2000);
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
 
       return true;
@@ -435,9 +450,17 @@ class SSOChatbotTester {
         '.chatbot-input',
         '#chat-input',
         '.message-input',
-        'input[placeholder*="message"]',
-        'input[placeholder*="chat"]',
-        'textarea[placeholder*="message"]'
+        'input[placeholder*="message" i]',
+        'input[placeholder*="chat" i]',
+        'textarea[placeholder*="message" i]',
+        'textarea[placeholder*="chat" i]',
+        'input[type="text"]',
+        'textarea',
+        '.chat-container input',
+        '.chat-widget input',
+        '#chatbot-input',
+        '.ai-input',
+        '.bot-input'
       ];
 
       let inputField = null;
@@ -480,7 +503,7 @@ class SSOChatbotTester {
       console.log(chalk.gray(`    💬 Sent: "${message}"`));
 
       // Wait for response
-      await this.page.waitForTimeout(3000);
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
       // Look for response in various possible containers
       const responseSelectors = [

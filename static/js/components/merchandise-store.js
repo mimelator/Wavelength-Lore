@@ -1272,6 +1272,9 @@ class MerchandiseStore {
         const categories = container.querySelectorAll('.category-card');
         if (categories.length > 0) {
           console.log(`✅ Product categories rendered: ${categories.length} categories found`);
+          // Remove any fallback notices since full navigator loaded
+          const fallbackNotices = document.querySelectorAll('.fallback-notice');
+          fallbackNotices.forEach(notice => notice.remove());
         } else {
           console.warn('⚠️ No product categories found, falling back to simple categories');
           this.renderSimpleCategories(container);
@@ -1735,18 +1738,15 @@ class MerchandiseStore {
         console.log('🚀 Initializing product navigator...');
         this.initializeProductNavigator();
         
-        // Verify navigator was created
-        const navigator = document.querySelector('.product-navigator, .simple-categories');
-        if (navigator) {
-          console.log('✅ Product navigator initialized successfully');
-        } else {
-          console.error('❌ Product navigator failed to initialize - element not found');
-          // Try to force re-initialization
-          setTimeout(() => {
-            console.log('🔄 Retrying product navigator initialization...');
-            this.initializeProductNavigator();
-          }, 1000);
-        }
+        // Verify navigator was created with a slight delay for DOM updates
+        setTimeout(() => {
+          const navigator = document.querySelector('.product-navigator, .simple-categories');
+          if (navigator) {
+            console.log('✅ Product navigator verified after DOM update');
+          } else {
+            console.warn('⚠️ Navigator element not found in DOM verification');
+          }
+        }, 100);
         
         // Auto-scroll to the Choose Product section for better UX
         const chooseProductSection = document.getElementById('choose-product-section');

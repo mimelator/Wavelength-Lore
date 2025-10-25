@@ -1,0 +1,28 @@
+{
+  "timestamp": "2025-10-25T23:17:52.977Z",
+  "testSuite": "SSO Chatbot Functionality",
+  "baseUrl": "http://localhost:3001",
+  "totalTests": 2,
+  "passedTests": 0,
+  "failedTests": 2,
+  "results": [
+    {
+      "test": "Chat Test 1",
+      "prompt": "Hello! Can you tell me about the Wavelength universe?",
+      "expectedKeywords": [
+        "wavelength",
+        "universe",
+        "story",
+        "character"
+      ],
+      "status": "FAIL",
+      "error": "Chat input field not found",
+      "timestamp": "2025-10-25T23:17:52.975Z"
+    },
+    {
+      "test": "Chatbot Functionality",
+      "status": "FAIL",
+      "error": "this.page.waitForTimeout is not a function"
+    }
+  ]
+}
