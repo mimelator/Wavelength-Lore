@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs').promises;
 const path = require('path');
-const firebaseUtils = require('../helpers/firebase-utils');
+const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
 const characterHelpers = require('../helpers/character-helpers');
 
 // Radio player playlist - all 33 episode songs
@@ -55,7 +55,7 @@ async function getEnhancedPlaylist() {
 
   const enhancedTracks = await Promise.all(playlist.map(async (track) => {
     try {
-      const episodeData = await firebaseUtils.fetchFromFirebase(`videos/season${track.season}/episodes/episode${track.episode}`);
+      const episodeData = await fetchDataAsAdmin(`videos/season${track.season}/episodes/episode${track.episode}`);
 
       if (episodeData) {
         // Debug logging for summary field
