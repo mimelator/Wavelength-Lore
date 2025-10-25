@@ -947,6 +947,12 @@ class MerchandiseStore {
         const productId = btn.dataset.productId;
         this.retryProductSetup(productId);
       }
+      
+      if (e.target.closest('.view-variants-btn')) {
+        const btn = e.target.closest('.view-variants-btn');
+        const productId = btn.dataset.productId;
+        this.showVariantsModal(productId);
+      }
     });
   }
   
@@ -1391,17 +1397,13 @@ class MerchandiseStore {
               ${productDetails}
             </div>
             <div class="product-variants">
-              ${(product.variants || []).map(variant => `
-                <div class="variant-option">
-                  <span class="variant-details">${variant.title}</span>
-                  <span class="variant-price">$${(variant.price / 100).toFixed(2)}</span>
-                  <button class="add-to-cart-btn" 
-                          data-product-id="${productId}" 
-                          data-variant-id="${variant.id}">
-                    Add to Cart
-                  </button>
-                </div>
-              `).join('')}
+              <div class="variant-summary">
+                <span class="variant-count">${(product.variants || []).length} variants available</span>
+                <span class="price-range">${this.getVariantPriceRange(product.variants)}</span>
+                <button class="view-variants-btn" data-product-id="${productId}">
+                  View Options
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2339,6 +2341,22 @@ class MerchandiseStore {
     return details.join('');
   }
   
+  getVariantPriceRange(variants) {
+    if (!variants || variants.length === 0) {
+      return 'Price TBD';
+    }
+    
+    const prices = variants.map(v => v.price / 100);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    
+    if (minPrice === maxPrice) {
+      return `$${minPrice.toFixed(2)}`;
+    } else {
+      return `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
+    }
+  }
+  
   previewProduct(productId) {
     const product = this.products.find(p => (p.id || p.productId) === productId);
     if (!product) {
@@ -2347,6 +2365,52 @@ class MerchandiseStore {
     }
     
     this.showProductPreviewModal(product);
+  }
+  
+  showVariantsModal(productId) {
+    const product = this.products.find(p => (p.id || p.productId) === productId);
+    if (!product) {
+      this.showError('Product not found');
+      return;
+    }
+    
+    const hasVariants = product.variants && product.variants.length > 0;
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal variants-modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+        <h2>🎽 ${product.title} - Choose Your Style</h2>
+        
+        ${hasVariants ? `
+          <div class="compact-variants-grid">
+            ${product.variants.map(variant => `
+              <div class="compact-variant-card">
+                <div class="variant-info">
+                  <h4>${variant.title}</h4>
+                  <span class="variant-price">$${(variant.price / 100).toFixed(2)}</span>
+                </div>
+                <button class="add-to-cart-btn compact" 
+                        data-product-id="${productId}" 
+                        data-variant-id="${variant.id}"
+                        onclick="merchandiseStore.addToCart('${productId}', '${variant.id}'); this.closest('.modal').remove();">
+                  Add to Cart
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        ` : `
+          <div class="no-variants-message">
+            <p>🚧 This product is still being processed. Variants will be available soon!</p>
+            <button class="btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
+          </div>
+        `}
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
   }
   
   showProductPreviewModal(product) {
