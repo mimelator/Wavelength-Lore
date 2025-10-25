@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merchandise Store Debug Test</title>
+    <link rel="stylesheet" href="/css/merchandise-store.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .debug-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .debug-panel h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .test-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-panel">
+        <h2>🔧 Merchandise Store Debug Test</h2>
+        <p>This page tests the merchandise store functionality to identify issues.</p>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="debug-panel">
+        <h2>📦 Merchandise Store Container</h2>
+        <div id="merchandise-store">
+            <!-- Merchandise store will be rendered here -->
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>Loading Merchandise Store...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load the merchandise store component -->
+    <script src="/js/components/merchandise-store.js"></script>
+    
+    <script>
+        const resultsContainer = document.getElementById('test-results');
+        
+        function addTestResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result test-${type}`;
+            div.textContent = message;
+            resultsContainer.appendChild(div);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        function runTests() {
+            addTestResult('Starting diagnostic tests...', 'info');
+            
+            // Test 1: Check container
+            const container = document.getElementById('merchandise-store');
+            if (container) {
+                addTestResult('✅ Merchandise store container found', 'success');
+            } else {
+                addTestResult('❌ Merchandise store container not found', 'error');
+                return;
+            }
+            
+            // Test 2: Check MerchandiseStore class
+            if (typeof MerchandiseStore !== 'undefined') {
+                addTestResult('✅ MerchandiseStore class is available', 'success');
+            } else {
+                addTestResult('❌ MerchandiseStore class not found', 'error');
+                return;
+            }
+            
+            // Test 3: Try to create instance
+            try {
+                addTestResult('🔧 Creating MerchandiseStore instance...', 'info');
+                window.testStore = new MerchandiseStore();
+                addTestResult('✅ MerchandiseStore instance created successfully', 'success');
+                
+                // Test 4: Check if it rendered
+                setTimeout(() => {
+                    const storeContent = container.innerHTML;
+                    if (storeContent.includes('Create Custom Merchandise')) {
+                        addTestResult('✅ Store content rendered successfully', 'success');
+                    } else if (storeContent.includes('Loading')) {
+                        addTestResult('⏳ Store is still loading...', 'info');
+                    } else {
+                        addTestResult('❌ Store content not rendered properly', 'error');
+                        addTestResult('Container content: ' + storeContent.substring(0, 200) + '...', 'info');
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                addTestResult('❌ Failed to create MerchandiseStore: ' + error.message, 'error');
+                console.error('Full error:', error);
+            }
+            
+            // Test 5: API endpoints
+            addTestResult('🌐 Testing API endpoints...', 'info');
+            
+            fetch('/api/merchandise/product-types')
+                .then(response => {
+                    if (response.ok) {
+                        addTestResult('✅ Product types API responding', 'success');
+                        return response.json();
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                })
+                .then(data => {
+                    if (data.success && data.productTypes) {
+                        addTestResult(`✅ Product types loaded: ${Object.keys(data.productTypes).length} categories`, 'success');
+                    } else {
+                        addTestResult('❌ Product types API returned invalid data', 'error');
+                    }
+                })
+                .catch(error => {
+                    addTestResult('❌ Product types API failed: ' + error.message, 'error');
+                });
+        }
+        
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runTests, 500); // Small delay to ensure everything is loaded
+        });
+    </script>
+</body>
+</html>

@@ -39,6 +39,8 @@ const enhancedMerchandiseRoutes = require('./routes/enhanced-merchandise');
 const adminVendorResearchRoutes = require('./routes/admin-vendor-research');
 const borderPreviewApiRoutes = require('./routes/api-border-preview');
 const productImageApiRoutes = require('./routes/api-product-image');
+const chatbotRoutes = require('./routes/chatbot');
+const authRoutes = require('./routes/auth');
 
 // Import secure backup system
 const SecureDatabaseBackup = require('./utils/secureBackup');
@@ -75,6 +77,10 @@ async function createApp() {
       uptime: process.uptime()
     });
   });
+
+  // Mount authentication routes (public access)
+  console.log('🔐 Mounting authentication routes...');
+  app.use('/', authRoutes);
 
   // Mount prompt API routes (protected by authentication)
   app.use('/api/prompts', promptApiRoutes);
@@ -118,6 +124,9 @@ async function createApp() {
   
   // Mount gallery API routes for S3 storage (protected by authentication)
   app.use('/', galleryApiRoutes);
+  
+  // Mount VIP chatbot routes (VIP+ access required)
+  app.use('/chatbot', chatbotRoutes);
   
   // Mount merchandise routes for custom print-on-demand store (protected by authentication)
   app.use('/api/merchandise', merchandiseRoutes);

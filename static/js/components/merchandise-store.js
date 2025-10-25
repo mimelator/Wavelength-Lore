@@ -12,51 +12,119 @@ class MerchandiseStore {
     this.productTypes = {};
     this.availableProducts = [];
     this.isLoading = false;
+    this.galleryImages = [];
+    this.enhancementStatus = { available: false };
+    
+    console.log('🛍️ MerchandiseStore constructor called');
+    
+    // Add a simple health check
+    this.healthCheck();
     
     this.init();
+  }
+  
+  /**
+   * Simple health check to verify basic functionality
+   */
+  healthCheck() {
+    console.log('🌡️ Running merchandise store health check...');
+    
+    try {
+      // Check if container exists
+      const container = document.getElementById('merchandise-store');
+      if (!container) {
+        console.error('❌ Health check failed: Container not found');
+        return false;
+      }
+      
+      // Check if we can render basic content
+      container.innerHTML = `
+        <div class="merchandise-store">
+          <div class="store-header">
+            <h1>🛍️ Custom Merchandise Store</h1>
+            <p>Initializing store...</p>
+          </div>
+        </div>
+      `;
+      
+      console.log('✅ Health check passed: Basic rendering works');
+      return true;
+      
+    } catch (error) {
+      console.error('❌ Health check failed:', error);
+      return false;
+    }
   }
   
   async init() {
     console.log('🛍️ Initializing Merchandise Store');
     
-    // Check for pre-selected image from URL parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    const preselectImageId = urlParams.get('preselect');
-    
-    // Check enhancement capabilities
-    console.log('🔍 Loading enhancement status...');
-    await this.loadEnhancementStatus();
-    console.log('✅ Enhancement status loaded:', this.enhancementStatus);
-    
-    // Load product types first
-    console.log('🔍 Loading product types...');
-    await this.loadProductTypes();
-    console.log('✅ Product types loaded:', Object.keys(this.productTypes).length, 'categories');
-    
-    // Load user's gallery images
-    console.log('🔍 Loading gallery images...');
-    await this.loadGalleryImages();
-    console.log('✅ Gallery images loaded:', this.galleryImages?.length || 0, 'images');
-    
-    // Load existing products
-    console.log('🔍 Loading user products...');
-    await this.loadUserProducts();
-    console.log('✅ User products loaded:', this.products?.length || 0, 'products');
-    
-    // Setup event listeners
-    this.setupEventListeners();
-    
-    // Render initial state
-    console.log('🎨 Rendering initial state...');
-    this.render();
-    console.log('✅ Initial render complete');
-    
-    // Pre-select image AFTER rendering if specified in URL
-    if (preselectImageId) {
-      console.log('🎯 Pre-selecting image after render:', preselectImageId);
-      this.preSelectImage(preselectImageId);
-      // Re-render to show the selection
+    try {
+      // Check for pre-selected image from URL parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const preselectImageId = urlParams.get('preselect');
+      
+      // Check enhancement capabilities
+      console.log('🔍 Loading enhancement status...');
+      await this.loadEnhancementStatus();
+      console.log('✅ Enhancement status loaded:', this.enhancementStatus);
+      
+      // Load product types first
+      console.log('🔍 Loading product types...');
+      await this.loadProductTypes();
+      console.log('✅ Product types loaded:', Object.keys(this.productTypes || {}).length, 'categories');
+      console.log('🔍 Product types data:', this.productTypes);
+      
+      // Load user's gallery images
+      console.log('🔍 Loading gallery images...');
+      await this.loadGalleryImages();
+      console.log('✅ Gallery images loaded:', this.galleryImages?.length || 0, 'images');
+      
+      // Load existing products
+      console.log('🔍 Loading user products...');
+      await this.loadUserProducts();
+      console.log('✅ User products loaded:', this.products?.length || 0, 'products');
+      
+      // Setup event listeners
+      console.log('🔧 Setting up event listeners...');
+      this.setupEventListeners();
+      console.log('✅ Event listeners setup complete');
+      
+      // Render initial state
+      console.log('🎨 Rendering initial state...');
       this.render();
+      console.log('✅ Initial render complete');
+      
+      // Pre-select image AFTER rendering if specified in URL
+      if (preselectImageId) {
+        console.log('🎯 Pre-selecting image after render:', preselectImageId);
+        this.preSelectImage(preselectImageId);
+        // Re-render to show the selection
+        this.render();
+      }
+      
+      console.log('🎉 Merchandise Store initialization complete!');
+      
+    } catch (error) {
+      console.error('❌ Error during merchandise store initialization:', error);
+      console.error('❌ Error stack:', error.stack);
+      
+      // Show error to user
+      this.showError('Failed to initialize merchandise store: ' + error.message);
+      
+      // Try to render a basic error state
+      const container = document.getElementById('merchandise-store');
+      if (container) {
+        container.innerHTML = `
+          <div class="merchandise-store">
+            <div class="store-header">
+              <h1>🛍️ Merchandise Store</h1>
+              <p style="color: #ff6b6b;">There was an error loading the store. Please refresh the page.</p>
+              <p style="color: #ff6b6b; font-size: 0.9rem;">Error: ${error.message}</p>
+            </div>
+          </div>
+        `;
+      }
     }
   }
   
@@ -110,12 +178,18 @@ class MerchandiseStore {
       
       const response = await fetch('/api/merchandise/product-types');
       
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const data = await response.json();
+      console.log('📋 Product types API response:', data);
       
       if (data.success) {
         this.productTypes = data.productTypes;
         this.availableProducts = data.allProducts;
-        console.log(`📋 Loaded ${this.availableProducts.length} product types`);
+        console.log(`📋 Loaded ${this.availableProducts?.length || 0} product types`);
+        console.log('📋 Product types structure:', Object.keys(this.productTypes || {}));
       } else {
         throw new Error(data.error || 'Failed to load product types');
       }
@@ -123,6 +197,10 @@ class MerchandiseStore {
     } catch (error) {
       console.error('Error loading product types:', error);
       this.showError('Failed to load product options: ' + error.message);
+      
+      // Fallback to prevent complete failure
+      this.productTypes = {};
+      this.availableProducts = [];
     } finally {
       this.setLoading(false);
     }
@@ -141,12 +219,55 @@ class MerchandiseStore {
       if (data.success) {
         this.products = data.products;
         console.log(`📦 Loaded ${this.products.length} user products`);
+        
+        // Clean up broken products
+        await this.cleanupBrokenProducts();
+        
       } else {
         console.warn('No existing products found');
       }
       
     } catch (error) {
       console.error('Error loading user products:', error);
+    }
+  }
+  
+  /**
+   * Detect and remove broken products (0 variants, 0 images)
+   */
+  async cleanupBrokenProducts() {
+    const brokenProducts = this.products.filter(product => {
+      const hasVariants = product.variants && product.variants.length > 0;
+      const hasImages = product.images && product.images.length > 0;
+      return !hasVariants && !hasImages;
+    });
+    
+    if (brokenProducts.length > 0) {
+      console.log(`🧹 Found ${brokenProducts.length} broken products to clean up`);
+      
+      for (const product of brokenProducts) {
+        const productId = product.id || product.productId;
+        console.log(`🗑️ Deleting broken product: ${product.title} (${productId})`);
+        
+        try {
+          // Delete from database
+          await fetch(`/api/merchandise/products/${productId}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${this.getAuthToken()}`
+            }
+          });
+          
+          // Remove from local array
+          this.products = this.products.filter(p => (p.id || p.productId) !== productId);
+          
+        } catch (error) {
+          console.error(`Failed to delete product ${productId}:`, error);
+        }
+      }
+      
+      console.log(`✅ Deleted ${brokenProducts.length} broken products from database`);
+      this.showSuccess(`Automatically removed ${brokenProducts.length} incomplete products`);
     }
   }
   
@@ -523,6 +644,14 @@ class MerchandiseStore {
     try {
       this.setLoading(true, 'Deleting product...');
       
+      // Delete from database
+      await fetch(`/api/merchandise/products/${productId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${this.getAuthToken()}`
+        }
+      });
+      
       // Remove from local array
       this.products = this.products.filter(p => (p.id || p.productId) !== productId);
       
@@ -537,7 +666,19 @@ class MerchandiseStore {
   }
   
   getCartTotal() {
-    return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    try {
+      if (!this.cart || this.cart.length === 0) {
+        return 0;
+      }
+      return this.cart.reduce((total, item) => {
+        const price = item.price || 0;
+        const quantity = item.quantity || 1;
+        return total + (price * quantity);
+      }, 0);
+    } catch (error) {
+      console.error('Error calculating cart total:', error);
+      return 0;
+    }
   }
   
   async checkout() {
@@ -636,6 +777,12 @@ class MerchandiseStore {
     
     // Product actions
     document.addEventListener('click', (e) => {
+      if (e.target.closest('.preview-product-btn')) {
+        const btn = e.target.closest('.preview-product-btn');
+        const productId = btn.dataset.productId;
+        this.previewProduct(productId);
+      }
+      
       if (e.target.closest('.edit-product-btn')) {
         const btn = e.target.closest('.edit-product-btn');
         const productId = btn.dataset.productId;
@@ -646,6 +793,18 @@ class MerchandiseStore {
         const btn = e.target.closest('.delete-product-btn');
         const productId = btn.dataset.productId;
         this.deleteProduct(productId);
+      }
+      
+      if (e.target.closest('.refresh-status-btn')) {
+        const btn = e.target.closest('.refresh-status-btn');
+        const productId = btn.dataset.productId;
+        this.refreshProductStatus(productId);
+      }
+      
+      if (e.target.closest('.retry-setup-btn')) {
+        const btn = e.target.closest('.retry-setup-btn');
+        const productId = btn.dataset.productId;
+        this.retryProductSetup(productId);
       }
     });
   }
@@ -812,82 +971,117 @@ class MerchandiseStore {
   
   render() {
     const container = document.getElementById('merchandise-store');
-    if (!container) return;
+    if (!container) {
+      console.error('Merchandise store container not found!');
+      return;
+    }
     
-    container.innerHTML = `
-      <div class="merchandise-store">
-        <div class="store-header">
-          <h1>🛍️ Create Custom Merchandise</h1>
-          <p>Turn your favorite Wavelength moments into premium merchandise</p>
+    try {
+      container.innerHTML = `
+        <div class="merchandise-store">
+          <div class="store-header">
+            <h1>🛍️ Create Custom Merchandise</h1>
+            <p>Turn your favorite Wavelength moments into premium merchandise</p>
+          </div>
+          
+          <div class="store-content">
+            <div class="store-section">
+              <h2>📸 Select Your Image</h2>
+              <div class="gallery-grid">
+                ${this.renderGalleryImages()}
+              </div>
+            </div>
+            
+            ${this.selectedImage ? `
+            <div class="store-section" id="choose-product-section">
+              <h2>🎽 Choose Your Product</h2>
+              <div class="selected-image-preview">
+                ${this.renderSelectedImagePreview()}
+              </div>
+              <p class="section-description">Choose Your Merch!</p>
+              <div class="product-types-grid">
+                ${this.renderProductTypes()}
+              </div>
+            </div>
+            ` : ''}
+            
+            <div class="store-section">
+              <h2>🎨 Your Designed Products</h2>
+              <div class="products-grid">
+                ${this.renderProducts()}
+              </div>
+            </div>
+            
+            <div class="store-section">
+              <h2>🛒 Shopping Cart</h2>
+              <div class="cart-container">
+                ${this.renderCart()}
+              </div>
+            </div>
+          </div>
         </div>
         
-        <div class="store-content">
-          <div class="store-section">
-            <h2>📸 Select Your Image</h2>
-            <div class="gallery-grid">
-              ${this.renderGalleryImages()}
-            </div>
-          </div>
-          
-          ${this.selectedImage ? `
-          <div class="store-section" id="choose-product-section">
-            <h2>🎽 Choose Your Product</h2>
-            <div class="selected-image-preview">
-              ${this.renderSelectedImagePreview()}
-            </div>
-            <p class="section-description">Choose Your Merch!</p>
-            <div class="product-types-grid">
-              ${this.renderProductTypes()}
-            </div>
-          </div>
-          ` : ''}
-          
-          <div class="store-section">
-            <h2>🎨 Your Designed Products</h2>
-            <div class="products-grid">
-              ${this.renderProducts()}
-            </div>
-          </div>
-          
-          <div class="store-section">
-            <h2>🛒 Shopping Cart</h2>
-            <div class="cart-container">
-              ${this.renderCart()}
-            </div>
-          </div>
-        </div>
-      </div>
+        ${this.renderModals()}
+      `;
       
-      ${this.renderModals()}
-    `;
-  }
-  
-  renderGalleryImages() {
-    if (!this.galleryImages || this.galleryImages.length === 0) {
-      return `
-        <div class="empty-state">
-          <p>No images in your gallery yet.</p>
-          <p>Save images from episodes and content pages to get started!</p>
+      console.log('✅ Merchandise store rendered successfully');
+    } catch (error) {
+      console.error('Error rendering merchandise store:', error);
+      container.innerHTML = `
+        <div class="merchandise-store">
+          <div class="store-header">
+            <h1>🛍️ Merchandise Store</h1>
+            <p style="color: #ff6b6b;">There was an error loading the store. Please refresh the page.</p>
+          </div>
         </div>
       `;
     }
-    
-    return this.galleryImages.map(image => `
-      <div class="gallery-image-card ${this.selectedImage === image.id ? 'selected' : ''}">
-        <img src="${image.thumbnailUrl}" alt="${this.cleanImageTitle(image.title)}" />
-        <div class="image-info">
-          <h4>${this.cleanImageTitle(image.title)}</h4>
-          <div class="image-actions">
-            <button class="gallery-image-select" data-image-id="${image.id}">
-              ${this.selectedImage === image.id ? 'Selected' : 'Select'}
-            </button>
-            <button class="btn-preview-enhancement" data-image-id="${image.id}">
-              🔍 View Printable Image
-            </button>
+  }
+  
+  renderGalleryImages() {
+    try {
+      if (!this.galleryImages || this.galleryImages.length === 0) {
+        return `
+          <div class="empty-state">
+            <p>No images in your gallery yet.</p>
+            <p>Save images from episodes and content pages to get started!</p>
           </div>
+        `;
+      }
+      
+      return this.galleryImages.map(image => {
+        if (!image || !image.id) {
+          console.warn('Invalid image data:', image);
+          return '';
+        }
+        
+        return `
+          <div class="gallery-image-card ${this.selectedImage === image.id ? 'selected' : ''}">
+            <img src="${image.thumbnailUrl || image.url || ''}" alt="${this.cleanImageTitle(image.title)}" 
+                 onerror="this.src='/images/placeholder.jpg'" />
+            <div class="image-info">
+              <h4>${this.cleanImageTitle(image.title)}</h4>
+              <div class="image-actions">
+                <button class="gallery-image-select" data-image-id="${image.id}">
+                  ${this.selectedImage === image.id ? 'Selected' : 'Select'}
+                </button>
+                <button class="btn-preview-enhancement" data-image-id="${image.id}">
+                  🔍 View Printable Image
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).filter(html => html).join('');
+    } catch (error) {
+      console.error('Error rendering gallery images:', error);
+      return `
+        <div class="empty-state">
+          <p>Error loading gallery images.</p>
+          <p>Please refresh the page to try again.</p>
         </div>
-      </div>
-    `).join('');
+      `;
+    }
   }
   
   renderProductTypes() {
@@ -899,64 +1093,102 @@ class MerchandiseStore {
       `;
     }
     
-    return Object.entries(this.productTypes).map(([categoryKey, category]) => `
-      <div class="product-category">
-        <h3 class="category-title">
-          <span class="category-icon">${category.icon}</span>
-          ${category.name}
-        </h3>
-        <p class="category-description">${category.description}</p>
-        <div class="category-products">
-          ${category.products.map(product => `
-            <div class="product-type-card">
-              <div class="product-type-icon">${product.icon}</div>
-              <div class="product-type-info">
-                <h4>${product.name}</h4>
-                <p class="product-type-description">${product.description}</p>
-                <div class="product-type-details">
-                  <span class="price">Starting at $${(product.basePrice / 100).toFixed(2)}</span>
-                  <span class="colors">${product.availableColors.length} colors</span>
+    return Object.entries(this.productTypes).map(([categoryKey, category]) => {
+      if (!category || !category.products) {
+        console.warn('Invalid category:', categoryKey, category);
+        return '';
+      }
+      
+      return `
+        <div class="product-category">
+          <h3 class="category-title">
+            <span class="category-icon">${category.icon || '📦'}</span>
+            ${category.name || 'Products'}
+          </h3>
+          <p class="category-description">${category.description || ''}</p>
+          <div class="category-products">
+            ${category.products.map(product => {
+              if (!product || !product.id) {
+                console.warn('Invalid product:', product);
+                return '';
+              }
+              
+              return `
+                <div class="product-type-card">
+                  ${product.genericImage ? `
+                    <div class="product-type-image">
+                      <img src="${product.genericImage}" alt="${product.name || 'Product'}" 
+                           onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;product-type-icon&quot;>${product.icon || '👕'}</div>';" />
+                    </div>
+                  ` : `
+                    <div class="product-type-icon">${product.icon || '👕'}</div>
+                  `}
+                  <div class="product-type-info">
+                    <h4>${product.name || 'Product'}</h4>
+                    <p class="product-type-description">${product.description || ''}</p>
+                    <div class="product-type-details">
+                      <span class="price">Starting at $${((product.basePrice || 1999) / 100).toFixed(2)}</span>
+                      <span class="colors">${(product.availableColors || []).length} colors</span>
+                    </div>
+                    <button class="select-product-type-btn btn-primary" 
+                            data-product-type="${product.id}">
+                      Design ${product.name || 'Product'}
+                    </button>
+                  </div>
                 </div>
-                <button class="select-product-type-btn btn-primary" 
-                        data-product-type="${product.id}">
-                  Design ${product.name}
-                </button>
-              </div>
-            </div>
-          `).join('')}
+              `;
+            }).join('')}
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).filter(html => html).join('');
   }
   
   renderProducts() {
-    if (this.products.length === 0) {
-      return `
-        <div class="empty-state">
-          <p>No custom products designed yet.</p>
-          <p>Select an image from your gallery to design your first product!</p>
-          ${this.selectedImage ? `
-            <button class="create-product-btn btn-primary">
-              Design Product from Selected Image
-            </button>
-          ` : ''}
-        </div>
-      `;
-    }
+    try {
+      if (!this.products || this.products.length === 0) {
+        return `
+          <div class="empty-state">
+            <p>No custom products designed yet.</p>
+            <p>Select an image from your gallery to design your first product!</p>
+            ${this.selectedImage ? `
+              <button class="create-product-btn btn-primary">
+                Design Product from Selected Image
+              </button>
+            ` : ''}
+          </div>
+        `;
+      }
+      
+      // Separate complete and incomplete products
+    const validProducts = this.products.filter(p => p.id || p.productId);
+    const completeProducts = validProducts.filter(p => this.isProductComplete(p));
+    const incompleteProducts = validProducts.filter(p => !this.isProductComplete(p));
     
-    console.log('🔍 Rendering products:', this.products.length, 'total products');
-    console.log('🔍 Products with IDs:', this.products.filter(p => p.id || p.productId).length);
+    let html = '';
     
-    return this.products.filter(p => p.id || p.productId).map(product => {
+    // Render complete products first
+    if (completeProducts.length > 0) {
+      html += completeProducts.map(product => {
       const productId = product.id || product.productId;
       const productTitle = product.title || 'Untitled Product';
       const productImage = product.images?.[0]?.src || product.sourceImage?.url || '';
+      const productType = this.extractProductTypeFromProduct(product);
+      const productIcon = this.getProductIcon(productType);
+      const productDetails = this.getProductDetails(product);
       
       return `
         <div class="product-card">
+          <div class="product-type-header">
+            <span class="product-type-icon">${productIcon}</span>
+            <span class="product-type-name">${this.getProductTypeName(productType)}</span>
+          </div>
           <div class="product-image">
             <img src="${productImage}" alt="${productTitle}" />
             <div class="product-actions">
+              <button class="action-btn preview-product-btn" data-product-id="${productId}" title="Preview Product">
+                <span>👁️</span>
+              </button>
               <button class="action-btn edit-product-btn" data-product-id="${productId}" title="Edit Product">
                 <span>✏️</span>
               </button>
@@ -967,7 +1199,9 @@ class MerchandiseStore {
           </div>
           <div class="product-info">
             <h4>${productTitle}</h4>
-            <p class="product-description">${product.description || ''}</p>
+            <div class="product-details">
+              ${productDetails}
+            </div>
             <div class="product-variants">
               ${(product.variants || []).map(variant => `
                 <div class="variant-option">
@@ -984,52 +1218,266 @@ class MerchandiseStore {
           </div>
         </div>
       `;
-    }).join('');
-  }
-  
-  renderCart() {
-    if (this.cart.length === 0) {
+      }).join('');
+    }
+    
+    // Render incomplete products with status indicators
+    if (incompleteProducts.length > 0) {
+      html += `<div class="incomplete-products-section">
+        <h3 class="section-divider">🚧 Products Being Processed</h3>
+        ${incompleteProducts.map(product => this.renderIncompleteProduct(product)).join('')}
+      </div>`;
+    }
+    
+      return html;
+    } catch (error) {
+      console.error('Error rendering products:', error);
       return `
-        <div class="empty-cart">
-          <p>Your cart is empty</p>
+        <div class="empty-state">
+          <p>Error loading products.</p>
+          <p>Please refresh the page to try again.</p>
         </div>
       `;
     }
+  }
+  
+  isProductComplete(product) {
+    const hasVariants = product.variants && product.variants.length > 0;
+    const hasImages = product.images && product.images.length > 0;
+    const hasSourceImage = product.sourceImage && product.sourceImage.url;
     
-    const total = this.getCartTotal();
+    // A product is complete if it has:
+    // 1. Variants AND images (normal case for clothing)
+    // 2. OR just images with source image (some products like mugs might work differently)
+    // 3. OR has at least source image and some processing data (minimum viable)
+    return (hasVariants && hasImages) || 
+           (hasImages && hasSourceImage) ||
+           (hasSourceImage && product.title && !this.isProductBroken(product));
+  }
+  
+  /**
+   * Check if a product is broken (completely unusable)
+   */
+  isProductBroken(product) {
+    const hasVariants = product.variants && product.variants.length > 0;
+    const hasImages = product.images && product.images.length > 0;
+    const hasSourceImage = product.sourceImage && product.sourceImage.url;
+    
+    // A product is broken if it has:
+    // 1. No variants AND no images AND no source image (completely empty)
+    // 2. OR if it's been in this state for more than 10 minutes (failed processing)
+    const isCompletelyEmpty = !hasVariants && !hasImages && !hasSourceImage;
+    
+    // Check if product is old and still incomplete (failed processing)
+    const createdAt = product.generatedAt || product.createdAt;
+    const isOldAndIncomplete = createdAt && 
+      (Date.now() - new Date(createdAt).getTime()) > 10 * 60 * 1000 && // 10 minutes
+      !hasVariants && !hasImages;
+    
+    return isCompletelyEmpty || isOldAndIncomplete;
+  }
+  
+  renderIncompleteProduct(product) {
+    const productId = product.id || product.productId;
+    const productTitle = product.title || 'Untitled Product';
+    const productImage = product.sourceImage?.url || '';
+    const productType = this.extractProductTypeFromProduct(product);
+    const productIcon = this.getProductIcon(productType);
+    const status = this.getProductStatus(product);
     
     return `
-      <div class="cart-items">
-        ${this.cart.map(item => `
-          <div class="cart-item">
-            <img src="${item.product.images[0]?.src || item.product.sourceImage.url}" alt="${item.product.title}" />
-            <div class="item-details">
-              <h4>${item.product.title}</h4>
-              <p>${item.variant.title}</p>
-              <div class="quantity-controls">
-                <button onclick="merchandiseStore.updateCartQuantity('${item.productId}', '${item.variantId}', ${item.quantity - 1})">-</button>
-                <span>${item.quantity}</span>
-                <button onclick="merchandiseStore.updateCartQuantity('${item.productId}', '${item.variantId}', ${item.quantity + 1})">+</button>
-              </div>
-            </div>
-            <div class="item-price">
-              <span>$${((item.price * item.quantity) / 100).toFixed(2)}</span>
-              <button class="remove-from-cart" 
-                      data-product-id="${item.productId}" 
-                      data-variant-id="${item.variantId}">
-                Remove
+      <div class="product-card incomplete-product">
+        <div class="product-type-header">
+          <span class="product-type-icon">${productIcon}</span>
+          <span class="product-type-name">${this.getProductTypeName(productType)}</span>
+          <span class="product-status ${status.class}">${status.text}</span>
+        </div>
+        <div class="product-image">
+          <img src="${productImage}" alt="${productTitle}" />
+          <div class="processing-overlay">
+            <div class="processing-spinner"></div>
+            <p>Processing...</p>
+          </div>
+          <div class="product-actions">
+            <button class="action-btn preview-product-btn" data-product-id="${productId}" title="Preview Product">
+              <span>👁️</span>
+            </button>
+            <button class="action-btn edit-product-btn" data-product-id="${productId}" title="Edit Product">
+              <span>✏️</span>
+            </button>
+            <button class="action-btn delete-product-btn" data-product-id="${productId}" title="Delete">
+              <span>🗑️</span>
+            </button>
+          </div>
+        </div>
+        <div class="product-info">
+          <h4>${productTitle}</h4>
+          <div class="incomplete-message">
+            <p>⏳ This product is being set up with print providers. Variants and previews will be available soon.</p>
+            <div class="incomplete-actions">
+              <button class="refresh-status-btn" data-product-id="${productId}">
+                🔄 Check Status
+              </button>
+              <button class="retry-setup-btn" data-product-id="${productId}">
+                🔧 Retry Setup
               </button>
             </div>
           </div>
-        `).join('')}
-      </div>
-      <div class="cart-total">
-        <div class="total-line">
-          <strong>Total: $${(total / 100).toFixed(2)}</strong>
         </div>
-        <button class="checkout-btn btn-primary">Proceed to Checkout</button>
       </div>
     `;
+  }
+  
+  getProductStatus(product) {
+    const hasVariants = product.variants && product.variants.length > 0;
+    const hasImages = product.images && product.images.length > 0;
+    
+    if (!hasVariants && !hasImages) {
+      return { class: 'status-processing', text: 'Setting Up' };
+    }
+    if (!hasVariants) {
+      return { class: 'status-variants', text: 'Loading Variants' };
+    }
+    if (!hasImages) {
+      return { class: 'status-images', text: 'Generating Previews' };
+    }
+    return { class: 'status-complete', text: 'Ready' };
+  }
+  
+  async refreshProductStatus(productId) {
+    try {
+      this.setLoading(true, 'Checking product status...');
+      
+      const response = await fetch(`/api/merchandise/product-status/${productId}`, {
+        headers: {
+          'Authorization': `Bearer ${this.getAuthToken()}`
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Update the product in our local array
+        const productIndex = this.products.findIndex(p => (p.id || p.productId) === productId);
+        if (productIndex >= 0) {
+          this.products[productIndex] = { ...this.products[productIndex], ...data.product };
+        }
+        
+        this.render();
+        
+        if (this.isProductComplete(data.product)) {
+          this.showSuccess('Product is now ready! You can preview and add variants to cart.');
+        } else {
+          this.showSuccess('Status updated. Product is still being processed.');
+        }
+      } else {
+        this.showError(data.error || 'Failed to check product status');
+      }
+      
+    } catch (error) {
+      console.error('Error refreshing product status:', error);
+      this.showError('Failed to check product status');
+    } finally {
+      this.setLoading(false);
+    }
+  }
+  
+  async retryProductSetup(productId) {
+    try {
+      this.setLoading(true, 'Retrying product setup...');
+      
+      const response = await fetch(`/api/merchandise/retry-setup/${productId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.getAuthToken()}`
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Update the product in our local array
+        const productIndex = this.products.findIndex(p => (p.id || p.productId) === productId);
+        if (productIndex >= 0) {
+          this.products[productIndex] = { ...this.products[productIndex], ...data.product };
+        }
+        
+        this.render();
+        this.showSuccess('Product setup restarted. Check back in a few minutes.');
+      } else {
+        this.showError(data.error || 'Failed to retry product setup');
+      }
+      
+    } catch (error) {
+      console.error('Error retrying product setup:', error);
+      this.showError('Failed to retry product setup');
+    } finally {
+      this.setLoading(false);
+    }
+  }
+  
+  renderCart() {
+    try {
+      if (!this.cart || this.cart.length === 0) {
+        return `
+          <div class="empty-cart">
+            <p>Your cart is empty</p>
+          </div>
+        `;
+      }
+    
+
+    
+      const cartTotal = this.getCartTotal();
+      
+      return `
+        <div class="cart-items">
+          ${this.cart.map(item => {
+            if (!item || !item.product) {
+              console.warn('Invalid cart item:', item);
+              return '';
+            }
+            
+            return `
+              <div class="cart-item">
+                <img src="${item.product.images?.[0]?.src || item.product.sourceImage?.url || ''}" alt="${item.product.title || 'Product'}" 
+                     onerror="this.src='/images/placeholder.jpg'" />
+                <div class="item-details">
+                  <h4>${item.product.title || 'Untitled Product'}</h4>
+                  <p>${item.variant?.title || 'Variant'}</p>
+                  <div class="quantity-controls">
+                    <button onclick="merchandiseStore.updateCartQuantity('${item.productId}', '${item.variantId}', ${item.quantity - 1})">-</button>
+                    <span>${item.quantity || 1}</span>
+                    <button onclick="merchandiseStore.updateCartQuantity('${item.productId}', '${item.variantId}', ${item.quantity + 1})">+</button>
+                  </div>
+                </div>
+                <div class="item-price">
+                  <span>$${(((item.price || 0) * (item.quantity || 1)) / 100).toFixed(2)}</span>
+                  <button class="remove-from-cart" 
+                          data-product-id="${item.productId}" 
+                          data-variant-id="${item.variantId}">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            `;
+          }).filter(html => html).join('')}
+        </div>
+        <div class="cart-total">
+          <div class="total-line">
+            <strong>Total: $${((cartTotal || 0) / 100).toFixed(2)}</strong>
+          </div>
+          <button class="checkout-btn btn-primary">Proceed to Checkout</button>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error rendering cart:', error);
+      return `
+        <div class="empty-cart">
+          <p>Error loading cart. Please refresh the page.</p>
+        </div>
+      `;
+    }
   }
   
   renderModals() {
@@ -1112,19 +1560,25 @@ class MerchandiseStore {
     // Find product configuration
     const productConfig = this.findProductConfig(productType);
     if (!productConfig) {
-      this.showError('Product configuration not found');
+      this.showError('Product configuration not found for: ' + productType);
+      console.error('Available product types:', Object.keys(this.productTypes));
       return;
     }
     
     // Get selected image data
     const selectedImageData = this.galleryImages.find(img => img.id === this.selectedImage);
+    if (!selectedImageData) {
+      this.showError('Selected image not found');
+      return;
+    }
+    
     const imageContext = this.extractImageContext(selectedImageData);
     
     // Show combined customization modal directly
     this.showProductCustomizationModal(productType, productConfig, selectedImageData, {
       ...imageContext,
-      selectedSize: 'M',
-      selectedColor: 'Black'
+      selectedSize: productConfig.popularSizes?.[0] || 'M',
+      selectedColor: productConfig.availableColors?.[0] || 'Black'
     });
   }
   
@@ -1577,6 +2031,171 @@ class MerchandiseStore {
     };
   }
   
+  getProductIcon(productType) {
+    const icons = {
+      'premium-tshirt': '👕',
+      'hoodie': '🧥',
+      'tank-top': '🎽',
+      'pillow': '🛏️',
+      'womens-tee': '👚',
+      'heavy-cotton-tee': '👕',
+      'infant-tee': '👶',
+      'ultra-cotton-tee': '👕',
+      'ultra-cotton-alt': '👕'
+    };
+    return icons[productType] || '👕';
+  }
+  
+  getProductTypeName(productType) {
+    const names = {
+      'premium-tshirt': 'Premium T-Shirt',
+      'hoodie': 'Pullover Hoodie',
+      'tank-top': 'Tank Top',
+      'pillow': 'Square Pillow',
+      'womens-tee': "Women's Tee",
+      'heavy-cotton-tee': 'Heavy Cotton Tee',
+      'infant-tee': 'Infant Tee',
+      'ultra-cotton-tee': 'Ultra Cotton Tee',
+      'ultra-cotton-alt': 'Ultra Cotton Tee'
+    };
+    return names[productType] || 'Custom Product';
+  }
+  
+  getProductDetails(product) {
+    const details = [];
+    
+    // Default size (we don't store this currently, so show most common)
+    details.push(`<span class="detail-item"><strong>Size:</strong> M</span>`);
+    
+    // Border style (simplified - we don't store this currently)
+    details.push(`<span class="detail-item"><strong>Border:</strong> Medium Black</span>`);
+    
+    // Price range from variants
+    if (product.variants && product.variants.length > 0) {
+      const prices = product.variants.map(v => v.price / 100);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      
+      if (minPrice === maxPrice) {
+        details.push(`<span class="detail-item"><strong>Price:</strong> $${minPrice.toFixed(2)}</span>`);
+      } else {
+        details.push(`<span class="detail-item"><strong>Price:</strong> $${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}</span>`);
+      }
+    }
+    
+    return details.join('');
+  }
+  
+  previewProduct(productId) {
+    const product = this.products.find(p => (p.id || p.productId) === productId);
+    if (!product) {
+      this.showError('Product not found');
+      return;
+    }
+    
+    this.showProductPreviewModal(product);
+  }
+  
+  showProductPreviewModal(product) {
+    const hasVariants = product.variants && product.variants.length > 0;
+    const hasImages = product.images && product.images.length > 0;
+    const previewImage = hasImages ? product.images[0].src : product.sourceImage?.url;
+    
+    // Helper function to get variant-specific image
+    const getVariantImage = (variant, variantIndex) => {
+      // Try to find variant-specific image by matching variant index to image index
+      if (hasImages && product.images.length > 1) {
+        // If we have multiple images, try to match them to variants
+        const imageIndex = Math.min(variantIndex, product.images.length - 1);
+        return product.images[imageIndex]?.src || previewImage;
+      }
+      // Fallback to main preview image
+      return previewImage;
+    };
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal product-preview-modal';
+    modal.innerHTML = `
+      <div class="modal-content preview-modal-content">
+        <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+        <h2>🎨 ${product.title}</h2>
+        
+        <div class="preview-layout">
+          <div class="preview-gallery">
+            <div class="main-preview">
+              <img id="mainPreviewImage" src="${previewImage}" alt="${product.title}" />
+            </div>
+            ${hasImages ? `
+              <div class="preview-thumbnails">
+                ${product.images.map((img, index) => `
+                  <img class="preview-thumb ${index === 0 ? 'active' : ''}" 
+                       src="${img.src}" 
+                       onclick="this.closest('.modal').querySelector('#mainPreviewImage').src = this.src; 
+                                this.closest('.preview-thumbnails').querySelectorAll('.preview-thumb').forEach(t => t.classList.remove('active')); 
+                                this.classList.add('active');" />
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+          
+          <div class="variant-selector">
+            ${hasVariants ? `
+              <h3>Choose Your Style</h3>
+              <div class="variants-grid">
+                ${product.variants.map((variant, variantIndex) => {
+                  const variantImage = getVariantImage(variant, variantIndex);
+                  return `
+                    <div class="variant-card" data-variant-id="${variant.id}">
+                      <div class="variant-preview">
+                        <img src="${variantImage}" alt="${variant.title}" 
+                             onclick="document.getElementById('mainPreviewImage').src = this.src" 
+                             style="cursor: pointer;" 
+                             title="Click to view larger" />
+                      </div>
+                      <div class="variant-info">
+                        <h4>${variant.title}</h4>
+                        <p class="variant-price">$${(variant.price / 100).toFixed(2)}</p>
+                        <button class="select-variant-btn" 
+                                data-product-id="${product.id || product.productId}" 
+                                data-variant-id="${variant.id}">
+                          Add to Cart
+                        </button>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            ` : `
+              <div class="no-variants-message">
+                <h3>🚧 Product Setup In Progress</h3>
+                <p>This product is still being processed. Variants and detailed previews will be available soon!</p>
+                <p class="product-info">You can still edit this product to make changes to the design.</p>
+                <button class="btn-secondary" onclick="this.closest('.modal').remove()">
+                  Close Preview
+                </button>
+              </div>
+            `}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    
+    // Setup variant selection if variants exist
+    if (hasVariants) {
+      modal.querySelectorAll('.select-variant-btn').forEach(btn => {
+        btn.onclick = (e) => {
+          const productId = e.target.dataset.productId;
+          const variantId = e.target.dataset.variantId;
+          this.addToCart(productId, variantId);
+          modal.remove();
+        };
+      });
+    }
+  }
+  
   showProductCreationModal() {
     if (!this.selectedImage) {
       this.showError('Please select an image first');
@@ -1737,22 +2356,30 @@ class MerchandiseStore {
   }
   
   showToast(message, type = 'info') {
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-    
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-      toast.classList.add('show');
-    }, 100);
-    
-    setTimeout(() => {
-      toast.classList.remove('show');
+    try {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      
+      document.body.appendChild(toast);
+      
       setTimeout(() => {
-        document.body.removeChild(toast);
-      }, 300);
-    }, 3000);
+        toast.classList.add('show');
+      }, 100);
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          if (toast.parentNode) {
+            document.body.removeChild(toast);
+          }
+        }, 300);
+      }, 3000);
+    } catch (error) {
+      console.error('Error showing toast:', error);
+      // Fallback to alert if toast fails
+      alert(`${type.toUpperCase()}: ${message}`);
+    }
   }
 
   /**

@@ -22,12 +22,29 @@
     <%- include('partials/footer') %>
 
     <!-- Load merchandise store component -->
-    <script src="/js/components/merchandise-store.js?v=<%= version %>"></script>
+    <script src="/js/components/merchandise-store.js?v=<%= version %>" onerror="console.error('❌ Failed to load merchandise-store.js')"></script>
     
     <script>
         // Initialize store when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🛍️ Merchandise Store page loaded');
+            
+            // Check if MerchandiseStore class is available
+            if (typeof MerchandiseStore === 'undefined') {
+                console.error('❌ MerchandiseStore class not found! Script may have failed to load.');
+                const container = document.getElementById('merchandise-store');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="merchandise-store">
+                            <div class="store-header">
+                                <h1>🛍️ Merchandise Store</h1>
+                                <p style="color: #ff6b6b;">Failed to load store components. Please refresh the page.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+                return;
+            }
             
             // Check if user was authenticated server-side (development bypass or regular auth)
             const serverAuthenticated = <%= user ? 'true' : 'false' %>;
@@ -36,8 +53,12 @@
                 console.log('✅ Server-side authentication detected, initializing store immediately');
                 // User was authenticated server-side (development bypass or regular auth)
                 // Initialize store without waiting for Firebase
-                if (!window.merchandiseStore) {
-                    window.merchandiseStore = new MerchandiseStore();
+                try {
+                    if (!window.merchandiseStore) {
+                        window.merchandiseStore = new MerchandiseStore();
+                    }
+                } catch (error) {
+                    console.error('❌ Failed to initialize MerchandiseStore:', error);
                 }
             } else {
                 console.log('🔥 No server-side auth, checking Firebase authentication...');
@@ -50,8 +71,12 @@
                             if (user) {
                                 console.log('👤 User authenticated via Firebase, initializing store');
                                 // Initialize the merchandise store now that user is authenticated
-                                if (!window.merchandiseStore) {
-                                    window.merchandiseStore = new MerchandiseStore();
+                                try {
+                                    if (!window.merchandiseStore) {
+                                        window.merchandiseStore = new MerchandiseStore();
+                                    }
+                                } catch (error) {
+                                    console.error('❌ Failed to initialize MerchandiseStore:', error);
                                 }
                             } else {
                                 console.log('❌ User not authenticated, redirecting to home');

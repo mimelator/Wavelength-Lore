@@ -81,6 +81,23 @@ router.get('/', ensureAuthenticated, groupAuth.requireAction('game_access'), asy
 });
 
 /**
+ * GET /merchandise/debug
+ * Debug page for testing merchandise store (development only)
+ */
+router.get('/debug', async (req, res) => {
+  if (process.env.NODE_ENV !== 'development') {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  
+  try {
+    res.sendFile(require('path').join(__dirname, '../debug/test-merchandise-simple.html'));
+  } catch (error) {
+    console.error('Error serving debug page:', error);
+    res.status(500).json({ error: 'Failed to load debug page' });
+  }
+});
+
+/**
  * GET /api/merchandise/enhancement-status
  * Check if AI enhancement is available and configured
  */
@@ -1451,6 +1468,168 @@ router.get('/vendor-previews', async (req, res) => {
 function _sanitizeFirebaseKey(key) {
   return key.replace(/[.#$\[\]\/]/g, '_');
 }
+/**
+ * GET /api/merchandise/product-status/:productId
+ * Check current status of a product and refresh data
+ */
+router.get('/product-status/:productId', ensureAuthenticated, async (req, res) => {
+  try {
+    if (!ensureDatabaseReady(res)) {
+      return;
+    }
+    
+    const userId = req.user.uid;
+    const { productId } = req.params;
+    
+    // Get current product from Printify
+    const productResult = await printifyService.getProduct(productId);
+    
+    if (!productResult.success) {
+      return res.status(400).json({
+        success: false,
+        error: productResult.error
+      });
+    }
+    
+    // Update local database with current data
+    const userProducts = await merchandiseDB.getUserProducts(userId);
+    const existingProduct = userProducts.find(p => (p.id || p.productId) === productId);
+    
+    if (existingProduct) {
+      const updatedProduct = {
+        ...existingProduct,
+        productId: productId, // Ensure productId is set
+        variants: productResult.product.variants,
+        images: productResult.product.images,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      // Re-store the updated product (overwrites existing)
+      await merchandiseDB.storeUserProduct(userId, updatedProduct);
+      
+      res.json({
+        success: true,
+        product: updatedProduct
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: 'Product not found in user collection'
+      });
+    }
+    
+  } catch (error) {
+    console.error('Error checking product status:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to check product status'
+    });
+  }
+});
+
+/**
+ * POST /api/merchandise/retry-setup/:productId
+ * Retry product setup process
+ */
+router.post('/retry-setup/:productId', ensureAuthenticated, async (req, res) => {
+  try {
+    console.log('🔧 RETRY SETUP: Starting for productId:', req.params.productId);
+    
+    if (!ensureDatabaseReady(res)) {
+      console.log('❌ RETRY SETUP: Database not ready');
+      return;
+    }
+    
+    const userId = req.user.uid;
+    const { productId } = req.params;
+    
+    console.log('🔧 RETRY SETUP: userId:', userId, 'productId:', productId);
+    
+    // Get the existing product data
+    const userProducts = await merchandiseDB.getUserProducts(userId);
+    console.log('🔧 RETRY SETUP: Found', userProducts.length, 'user products');
+    
+    const existingProduct = userProducts.find(p => (p.id || p.productId) === productId);
+    console.log('🔧 RETRY SETUP: Existing product found:', !!existingProduct);
+    
+    if (!existingProduct) {
+      return res.status(404).json({
+        success: false,
+        error: 'Product not found'
+      });
+    }
+    
+    // Try to refresh the product from Printify
+    console.log('🔧 RETRY SETUP: Calling Printify API for product:', productId);
+    
+    // MOCK MODE: For testing, simulate successful product refresh
+    let productResult;
+    if (process.env.PRINTIFY_MOCK_MODE === 'true') {
+      console.log('🔧 RETRY SETUP: Using mock mode');
+      productResult = {
+        success: true,
+        product: {
+          variants: [
+            { id: 'mock_variant_1', title: 'M / Black', price: 2099, is_enabled: true },
+            { id: 'mock_variant_2', title: 'L / Black', price: 2099, is_enabled: true }
+          ],
+          images: [{ src: existingProduct.sourceImage?.url || 'mock-image.jpg' }]
+        }
+      };
+    } else {
+      productResult = await printifyService.getProduct(productId);
+    }
+    
+    console.log('🔧 RETRY SETUP: Printify result:', { success: productResult.success, error: productResult.error });
+    
+    if (productResult.success) {
+      // Update with fresh data
+      const updatedProduct = {
+        ...existingProduct,
+        productId: productId, // Ensure productId is set
+        variants: productResult.product.variants,
+        images: productResult.product.images,
+        lastRetry: new Date().toISOString()
+      };
+      
+      // Re-store the updated product (overwrites existing)
+      await merchandiseDB.storeUserProduct(userId, updatedProduct);
+      
+      res.json({
+        success: true,
+        product: updatedProduct,
+        message: 'Product data refreshed successfully'
+      });
+    } else {
+      // If Printify fails, mark for manual review
+      const updatedProduct = {
+        ...existingProduct,
+        productId: productId, // Ensure productId is set
+        status: 'retry_failed',
+        lastRetry: new Date().toISOString(),
+        retryError: productResult.error
+      };
+      
+      // Re-store the updated product (overwrites existing)
+      await merchandiseDB.storeUserProduct(userId, updatedProduct);
+      
+      res.json({
+        success: false,
+        error: 'Product setup retry failed. Please contact support.',
+        product: updatedProduct
+      });
+    }
+    
+  } catch (error) {
+    console.error('❌ RETRY SETUP ERROR:', error);
+    console.error('❌ RETRY SETUP STACK:', error.stack);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to retry product setup: ' + error.message
+    });
+  }
+});
+
 /**
  * Refund payment (integrate with your payment system)
  */

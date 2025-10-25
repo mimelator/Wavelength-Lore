@@ -110,6 +110,61 @@
             letter-spacing: 1px;
         }
 
+        /* VIP Chatbot Button */
+        .chatbot-btn {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chatbot-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .chatbot-btn:hover::before {
+            left: 100%;
+        }
+
+        .chatbot-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .chatbot-btn-subtitle {
+            font-size: 0.85rem;
+            font-weight: normal;
+            opacity: 0.9;
+            margin-top: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .chatbot-btn {
+                font-size: 1rem;
+                padding: 12px 20px;
+            }
+        }
+
         .games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -292,6 +347,14 @@
             <h1>Wavelength Games Hub</h1>
             <p>Exclusive games and interactive experiences for our VIP community members</p>
             <div class="vip-badge">VIP Exclusive Access</div>
+            
+            <!-- VIP Chatbot Access Button -->
+            <div class="vip-chatbot-access" style="margin-top: 20px;">
+                <a href="/chatbot/widget" class="chatbot-btn">
+                    🎵 VIP AI Assistant
+                    <span class="chatbot-btn-subtitle">Ask questions about Wavelength Lore</span>
+                </a>
+            </div>
         </div>
 
         <!-- Info Banner -->

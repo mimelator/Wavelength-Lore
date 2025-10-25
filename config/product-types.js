@@ -19,6 +19,7 @@ const ProductTypes = {
         blueprintId: 5,
         printProviderId: 3,
         icon: '👕',
+        genericImage: 'https://images.printify.com/mockup/5/17391/0/1581405237.jpg',
         tags: ['apparel', 'tshirt', 'cotton', 'premium'],
         basePrice: 2099, // $20.99
         popularSizes: ['S', 'M', 'L', 'XL'],
@@ -39,6 +40,7 @@ const ProductTypes = {
         blueprintId: 146,
         printProviderId: 3,
         icon: '🧥',
+        genericImage: 'https://images.printify.com/mockup/146/32090/0/1581405237.jpg',
         tags: ['apparel', 'hoodie', 'warm', 'comfort'],
         basePrice: 3499, // $34.99
         popularSizes: ['S', 'M', 'L', 'XL'],
@@ -59,6 +61,7 @@ const ProductTypes = {
         blueprintId: 388,
         printProviderId: 3,
         icon: '🎽',
+        genericImage: 'https://images.printify.com/mockup/388/0/1581405237.jpg',
         tags: ['apparel', 'tank', 'summer', 'light'],
         basePrice: 1899, // $18.99
         popularSizes: ['S', 'M', 'L', 'XL'],
@@ -88,6 +91,7 @@ const ProductTypes = {
         blueprintId: 220,
         printProviderId: 10,
         icon: '🛋️',
+        genericImage: 'https://images.printify.com/mockup/220/0/1581405237.jpg',
         tags: ['home', 'pillow', 'decor', 'polyester'],
         basePrice: 2499, // $24.99
         popularSizes: ['14x14', '16x16', '18x18'],
@@ -102,12 +106,64 @@ const ProductTypes = {
         ]
       },
       {
+        id: 'coffee-mug',
+        name: 'Coffee Mug',
+        description: 'Ceramic coffee mug perfect for your morning brew',
+        blueprintId: 263,
+        printProviderId: 5,
+        icon: '☕',
+        genericImage: 'https://images.printify.com/mockup/263/0/1581405237.jpg',
+        tags: ['home', 'mug', 'coffee', 'ceramic'],
+        basePrice: 1599, // $15.99
+        popularSizes: ['11oz', '15oz'],
+        availableColors: ['White', 'Black'],
+        printArea: { width: 8, height: 4 },
+        nameTemplates: [
+          'Wavelength {characterName} Mug',
+          '{characterName} Morning Coffee',
+          'Episode {episodeNumber} Mug',
+          'Wavelength Lore Brew',
+          '{seasonName} Season Mug'
+        ]
+      }
+    ]
+  },
+
+  // Accessories & Specialty
+  accessories: {
+    name: 'Accessories & Specialty',
+    icon: '🎒',
+    description: 'Special items and accessories',
+    products: [
+      {
+        id: 'infant-tee',
+        name: 'Infant Fine Jersey Tee',
+        description: 'Perfect balance between comfort and toddler-specific durability',
+        blueprintId: 34,
+        printProviderId: 29,
+        icon: '👶',
+        genericImage: 'https://images.printify.com/mockup/34/0/1581405237.jpg',
+        tags: ['apparel', 'infant', 'tshirt', 'baby'],
+        basePrice: 1299, // $12.99
+        popularSizes: ['6M', '12M', '18M', '24M'],
+        availableColors: ['White', 'Pink', 'Blue', 'Yellow'],
+        printArea: { width: 6, height: 8 },
+        nameTemplates: [
+          'Wavelength {characterName} Baby Tee',
+          '{characterName} Little One',
+          'Episode {episodeNumber} Infant',
+          'Wavelength Lore Baby',
+          '{seasonName} Season Infant'
+        ]
+      },
+      {
         id: 'womens-tee',
         name: 'Women\'s Favorite Tee',
         description: 'Made to feel like a well-loved favorite with feminine fit',
         blueprintId: 9,
         printProviderId: 3,
-        icon: '👕',
+        icon: '👚',
+        genericImage: 'https://images.printify.com/mockup/9/0/1581405237.jpg',
         tags: ['apparel', 'tshirt', 'women', 'fitted'],
         basePrice: 1899, // $18.99
         popularSizes: ['S', 'M', 'L', 'XL', '2XL'],
@@ -128,6 +184,7 @@ const ProductTypes = {
         blueprintId: 6,
         printProviderId: 3,
         icon: '👕',
+        genericImage: 'https://images.printify.com/mockup/6/0/1581405237.jpg',
         tags: ['apparel', 'tshirt', 'cotton', 'heavy', 'unisex'],
         basePrice: 1699, // $16.99
         popularSizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
@@ -138,75 +195,6 @@ const ProductTypes = {
           '{characterName} Classic Collection',
           'Episode {episodeNumber} Tee',
           'Wavelength Lore Classic',
-          '{seasonName} Season Tee'
-        ]
-      }
-    ]
-  },
-
-  // Accessories
-  accessories: {
-    name: 'Accessories',
-    icon: '🎒',
-    description: 'Bags, accessories, and more',
-    products: [
-      {
-        id: 'infant-tee',
-        name: 'Infant Fine Jersey Tee',
-        description: 'Perfect balance between comfort and toddler-specific durability',
-        blueprintId: 34,
-        printProviderId: 29,
-        icon: '👕',
-        tags: ['apparel', 'infant', 'tshirt', 'baby'],
-        basePrice: 1299, // $12.99
-        popularSizes: ['6M', '12M', '18M', '24M'],
-        availableColors: ['White', 'Pink', 'Blue', 'Yellow'],
-        printArea: { width: 6, height: 8 },
-        nameTemplates: [
-          'Wavelength {characterName} Baby Tee',
-          '{characterName} Little One',
-          'Episode {episodeNumber} Infant',
-          'Wavelength Lore Baby',
-          '{seasonName} Season Infant'
-        ]
-      },
-      {
-        id: 'ultra-cotton-tee',
-        name: 'Ultra Cotton Tee',
-        description: 'Classic unisex ultra cotton tee with quality construction',
-        blueprintId: 36,
-        printProviderId: 3,
-        icon: '👕',
-        tags: ['apparel', 'tshirt', 'cotton', 'ultra', 'unisex'],
-        basePrice: 1599, // $15.99
-        popularSizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-        availableColors: ['Black', 'White', 'Navy', 'Grey', 'Red', 'Royal Blue'],
-        printArea: { width: 10, height: 12 },
-        nameTemplates: [
-          'Wavelength {characterName} Ultra Tee',
-          '{characterName} Ultra Collection',
-          'Episode {episodeNumber} Tee',
-          'Wavelength Lore Ultra',
-          '{seasonName} Season Tee'
-        ]
-      },
-      {
-        id: 'ultra-cotton-alt',
-        name: 'Ultra Cotton Tee (Alt)',
-        description: 'Classic unisex ultra cotton tee with quality construction',
-        blueprintId: 36,
-        printProviderId: 29,
-        icon: '👕',
-        tags: ['apparel', 'tshirt', 'cotton', 'ultra', 'unisex'],
-        basePrice: 1599, // $15.99
-        popularSizes: ['S', 'M', 'L', 'XL', '2XL'],
-        availableColors: ['Black', 'White', 'Navy', 'Grey'],
-        printArea: { width: 10, height: 12 },
-        nameTemplates: [
-          'Wavelength {characterName} Ultra Tee',
-          '{characterName} Ultra Collection',
-          'Episode {episodeNumber} Tee',
-          'Wavelength Lore Ultra',
           '{seasonName} Season Tee'
         ]
       }
