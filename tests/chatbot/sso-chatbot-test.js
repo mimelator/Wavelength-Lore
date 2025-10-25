@@ -309,10 +309,31 @@ class SSOChatbotTester {
         try {
           await this.page.goto(url, { waitUntil: 'networkidle2', timeout: 10000 });
           
-          // Look for chat interface elements
-          const chatElements = await this.page.$$('.chat-widget, .chatbot, .chat-container, .chat-interface, #chat');
+          // Look for chat interface elements (including iframe-based chatbots)
+          const chatElements = await this.page.$$('.chat-widget, .chatbot, .chat-container, .chat-interface, #chat, .vip-chatbot-container, #chatbot-frame');
           if (chatElements.length > 0) {
             console.log(chalk.green(`✅ Found chat interface at: ${url}`));
+            
+            // Special handling for iframe-based chatbots
+            const iframe = await this.page.$('#chatbot-frame, .chatbot-frame');
+            if (iframe) {
+              console.log(chalk.blue('🔍 Detected iframe-based chatbot, waiting for load...'));
+              
+              // Wait for iframe to become visible or load content
+              try {
+                await this.page.waitForFunction(
+                  () => {
+                    const frame = document.querySelector('#chatbot-frame, .chatbot-frame');
+                    return frame && (frame.style.display !== 'none' || frame.offsetHeight > 0);
+                  },
+                  { timeout: 10000 }
+                );
+                console.log(chalk.green('✅ Iframe chatbot loaded'));
+              } catch (e) {
+                console.log(chalk.yellow('⚠️ Iframe chatbot may be loading asynchronously'));
+              }
+            }
+            
             chatFound = true;
             break;
           }

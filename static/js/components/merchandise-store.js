@@ -1738,15 +1738,7 @@ class MerchandiseStore {
         console.log('🚀 Initializing product navigator...');
         this.initializeProductNavigator();
         
-        // Verify navigator was created with a slight delay for DOM updates
-        setTimeout(() => {
-          const navigator = document.querySelector('.product-navigator, .simple-categories');
-          if (navigator) {
-            console.log('✅ Product navigator verified after DOM update');
-          } else {
-            console.warn('⚠️ Navigator element not found in DOM verification');
-          }
-        }, 100);
+        // ProductNavigator initialization complete
         
         // Auto-scroll to the Choose Product section for better UX
         const chooseProductSection = document.getElementById('choose-product-section');
@@ -1898,8 +1890,8 @@ class MerchandiseStore {
               <h3>👕 Product Options</h3>
               <div class="size-color-grid">
                 <div class="option-item">
-                  <label for="defaultSize">Size</label>
-                  <select id="defaultSize" class="option-select">
+                  <label for="productSize">Size</label>
+                  <select id="productSize" class="option-select">
                     ${productConfig.popularSizes.map(size => `
                       <option value="${size}" ${size === (imageContext.selectedSize || 'M') ? 'selected' : ''}>${size}</option>
                     `).join('')}
@@ -1907,8 +1899,8 @@ class MerchandiseStore {
                 </div>
                 
                 <div class="option-item">
-                  <label for="defaultColor">Color</label>
-                  <select id="defaultColor" class="option-select">
+                  <label for="productColor">Color</label>
+                  <select id="productColor" class="option-select">
                     ${productConfig.availableColors.map(color => `
                       <option value="${color}" ${color === (imageContext.selectedColor || 'Black') ? 'selected' : ''}>${color}</option>
                     `).join('')}
@@ -1988,8 +1980,8 @@ class MerchandiseStore {
   setupCustomizationModalListeners(modal, productType, productConfig, imageData, imageContext, existingProduct = null) {
     const borderSelect = modal.querySelector('#borderStyleSelect');
     const createBtn = modal.querySelector('#createProductBtn');
-    const sizeSelect = modal.querySelector('#defaultSize');
-    const colorSelect = modal.querySelector('#defaultColor');
+    const sizeSelect = modal.querySelector('#productSize');
+    const colorSelect = modal.querySelector('#productColor');
 
     
     // Color change listener (mockup removed)
@@ -2018,12 +2010,9 @@ class MerchandiseStore {
       const buttonText = isUpdate ? 'Updating...' : 'Designing...';
       const progressText = isUpdate ? '🔄 Updating your product...' : '🎨 Preparing your custom product...';
       
-      // CRITICAL FIX: Force modal creation and display immediately
+      // Show loading immediately
       this.ensureLoadingModalExists();
-      // Force immediate display with setTimeout to ensure DOM is ready
-      setTimeout(() => {
-        this.setLoading(true, progressText, 10);
-      }, 50);
+      this.setLoading(true, progressText, 10);
       createBtn.disabled = true;
       createBtn.textContent = buttonText;
       
@@ -2040,8 +2029,9 @@ class MerchandiseStore {
           await this.createCustomizedProduct(productType, imageData, imageContext, customization);
         }
         
-        // Fix Issue 3: Ensure modal is removed after successful completion
+        // Close customization modal and show success
         modal.remove();
+        this.setLoading(false);
       } catch (error) {
         console.error('Error in product creation/update:', error);
         this.setLoading(false);

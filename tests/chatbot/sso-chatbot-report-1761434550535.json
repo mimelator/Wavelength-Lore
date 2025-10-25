@@ -1,0 +1,75 @@
+{
+  "timestamp": "2025-10-25T23:22:30.534Z",
+  "testSuite": "SSO Chatbot Functionality",
+  "baseUrl": "http://localhost:3001",
+  "totalTests": 5,
+  "passedTests": 0,
+  "failedTests": 5,
+  "results": [
+    {
+      "test": "Chat Test 1",
+      "prompt": "Hello! Can you tell me about the Wavelength universe?",
+      "expectedKeywords": [
+        "wavelength",
+        "universe",
+        "story",
+        "character"
+      ],
+      "status": "FAIL",
+      "error": "Chat input field not found",
+      "timestamp": "2025-10-25T23:22:20.475Z"
+    },
+    {
+      "test": "Chat Test 2",
+      "prompt": "Who are the main characters in Wavelength?",
+      "expectedKeywords": [
+        "character",
+        "main",
+        "protagonist",
+        "hero"
+      ],
+      "status": "FAIL",
+      "error": "Chat input field not found",
+      "timestamp": "2025-10-25T23:22:22.486Z"
+    },
+    {
+      "test": "Chat Test 3",
+      "prompt": "What happened in Season 1?",
+      "expectedKeywords": [
+        "season",
+        "episode",
+        "story",
+        "plot"
+      ],
+      "status": "FAIL",
+      "error": "Chat input field not found",
+      "timestamp": "2025-10-25T23:22:24.498Z"
+    },
+    {
+      "test": "Chat Test 4",
+      "prompt": "Tell me about the lore of this universe.",
+      "expectedKeywords": [
+        "lore",
+        "world",
+        "universe",
+        "history"
+      ],
+      "status": "FAIL",
+      "error": "Chat input field not found",
+      "timestamp": "2025-10-25T23:22:26.525Z"
+    },
+    {
+      "test": "Chat Test 5",
+      "prompt": "Can you help me understand the story?",
+      "expectedKeywords": [
+        "help",
+        "story",
+        "understand",
+        "explain"
+      ],
+      "status": "FAIL",
+      "error": "Chat input field not found",
+      "timestamp": "2025-10-25T23:22:28.533Z"
+    }
+  ]
+}
