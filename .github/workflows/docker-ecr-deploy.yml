@@ -32,23 +32,26 @@ jobs:
             network=host
 
       - name: Build and Push Docker Image
+        id: build
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: wavelength-lore
-          IMAGE_TAG: latest
           COMMIT_SHA: ${{ github.sha }}
         run: |
           # Extract short commit SHA
           SHORT_SHA=${COMMIT_SHA:0:8}
+          
+          # Get version from package.json for the primary tag
+          VERSION_TAG="v$(cat package.json | grep '"version"' | sed 's/.*"version": "\(.*\)",/\1/')"
 
-          echo "Building with tags: $IMAGE_TAG and $SHORT_SHA"
+          echo "Building with tags: $VERSION_TAG and $SHORT_SHA"
 
           # Build with buildx and push with multiple tags
-          # Using --push flag pushes directly to registry with proper tags
+          # Using specific version tag instead of :latest for better deployment control
           # Use GitHub Actions cache instead of registry cache (more reliable)
           docker buildx build \
             --platform linux/amd64 \
-            --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            --tag $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG \
             --tag $ECR_REGISTRY/$ECR_REPOSITORY:$SHORT_SHA \
             --cache-from type=gha \
             --cache-to type=gha,mode=max \
@@ -56,10 +59,12 @@ jobs:
             --progress=plain \
             .
 
-          echo "::notice::Successfully pushed images with tags: $IMAGE_TAG, $SHORT_SHA"
+          echo "::notice::Successfully pushed images with tags: $VERSION_TAG, $SHORT_SHA"
           echo "::notice::Commit SHA: $COMMIT_SHA"
           echo "::notice::Short SHA: $SHORT_SHA"
-          echo "::notice::Image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "::notice::Version Tag: $VERSION_TAG"
+          echo "::notice::Image: $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG"
+          echo "version_tag=$VERSION_TAG" >> $GITHUB_OUTPUT
 
       - name: Deploy to App Runner
         id: deploy-apprunner
@@ -68,11 +73,12 @@ jobs:
           ECR_REPOSITORY: wavelength-lore
           COMMIT_SHA: ${{ github.sha }}
           APPRUNNER_SERVICE_ARN: ${{ secrets.APPRUNNER_SERVICE_ARN }}
+          VERSION_TAG: ${{ steps.build.outputs.version_tag }}
         run: |
           # Extract short commit SHA
           SHORT_SHA=${COMMIT_SHA:0:8}
 
-          echo "::notice::Deploying commit $SHORT_SHA to App Runner"
+          echo "::notice::Deploying commit $SHORT_SHA (version $VERSION_TAG) to App Runner"
 
           # Check App Runner service status first - fail fast if busy
           CURRENT_STATUS=$(aws apprunner describe-service \
@@ -90,49 +96,55 @@ jobs:
             exit 1
           fi
 
-          # Get the image digest for the commit-tagged image
+          # Get the image digest for the version-tagged image
           IMAGE_DIGEST=$(aws ecr describe-images \
             --repository-name $ECR_REPOSITORY \
-            --image-ids imageTag=$SHORT_SHA \
+            --image-ids imageTag=$VERSION_TAG \
             --query 'imageDetails[0].imageDigest' \
             --output text)
 
           echo "Image digest: $IMAGE_DIGEST"
 
-          # Construct the image identifier using digest for immutability
-          IMAGE_IDENTIFIER="$ECR_REGISTRY/$ECR_REPOSITORY@$IMAGE_DIGEST"
+          # Construct the specific image identifier using version tag
+          IMAGE_IDENTIFIER="$ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG"
 
-          echo "::notice::Updating App Runner to image: $IMAGE_IDENTIFIER"
+          echo "::notice::Updating App Runner to use specific image: $IMAGE_IDENTIFIER"
 
-          # Since App Runner is configured with AutoDeploymentsEnabled and uses :latest,
-          # we need to trigger a deployment by updating the service
-          # The key is: App Runner will pull the CURRENT :latest from ECR during deployment
-
-          echo "::notice::Triggering App Runner deployment to pull latest image from ECR"
-          echo "::notice::Target image digest in ECR: $IMAGE_DIGEST"
-
-          # Start deployment operation - this forces App Runner to pull :latest from ECR
-          # If this fails due to service being busy, we'll fail fast rather than retry
-          OPERATION_ID=$(aws apprunner start-deployment \
+          # Update App Runner service to use the specific version tag
+          # This replaces the :latest approach with deterministic version-based deployment
+          echo "::notice::Updating App Runner service configuration to use $VERSION_TAG"
+          
+          UPDATE_RESULT=$(aws apprunner update-service \
             --service-arn $APPRUNNER_SERVICE_ARN \
+            --source-configuration '{
+              "ImageRepository": {
+                "ImageIdentifier": "'$IMAGE_IDENTIFIER'",
+                "ImageConfiguration": {
+                  "Port": "3000"
+                },
+                "ImageRepositoryType": "ECR"
+              },
+              "AutoDeploymentsEnabled": false
+            }' \
             --query 'OperationId' \
             --output text 2>&1)
 
-          # Check if the deployment command failed
+          # Check if the update command failed
           if [ $? -ne 0 ]; then
-            echo "::error::❌ Failed to start App Runner deployment"
+            echo "::error::❌ Failed to update App Runner service"
             echo "::error::This typically means the service is busy with another operation"
-            echo "::error::Error details: $OPERATION_ID"
+            echo "::error::Error details: $UPDATE_RESULT"
             echo "::error::Please wait a few minutes and retry the deployment"
             exit 1
           fi
 
-          echo "::notice::App Runner deployment initiated with Operation ID: $OPERATION_ID"
-          echo "::notice::App Runner will pull: :latest tag from ECR"
+          echo "::notice::App Runner service update initiated with Operation ID: $UPDATE_RESULT"
+          echo "::notice::App Runner will deploy: $IMAGE_IDENTIFIER"
           echo "::notice::Expected digest: $IMAGE_DIGEST"
-          echo "operation_id=$OPERATION_ID" >> $GITHUB_OUTPUT
+          echo "operation_id=$UPDATE_RESULT" >> $GITHUB_OUTPUT
           echo "image_digest=$IMAGE_DIGEST" >> $GITHUB_OUTPUT
           echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "version_tag=$VERSION_TAG" >> $GITHUB_OUTPUT
 
       - name: Wait for App Runner Deployment
         env:
@@ -265,23 +277,28 @@ jobs:
             exit 0
           fi
 
-          # Check if using :latest tag (acceptable if we just pushed it)
+          # Check if using the expected version tag
+          EXPECTED_VERSION_TAG="${{ steps.deploy-apprunner.outputs.version_tag }}"
+          if echo "$CURRENT_IMAGE" | grep -q ":$EXPECTED_VERSION_TAG"; then
+            echo "::notice::✅ Verified! App Runner is using the correct version tag: $EXPECTED_VERSION_TAG"
+            exit 0
+          fi
+
+          # Check if using :latest tag (deprecated approach)
           if echo "$CURRENT_IMAGE" | grep -q ":latest"; then
-            echo "::warning::⚠️  App Runner is using :latest tag instead of specific digest/tag"
-            echo "::warning::This is less than ideal but acceptable if we just pushed :latest"
+            echo "::warning::⚠️  App Runner is still using :latest tag instead of specific version tag"
+            echo "::warning::This suggests the service update may not have completed yet"
 
             # Verify the :latest tag in ECR has our expected digest
             LATEST_DIGEST=$(aws ecr describe-images \
               --repository-name wavelength-lore \
               --image-ids imageTag=latest \
               --query 'imageDetails[0].imageDigest' \
-              --output text)
-
-            echo "Latest tag digest in ECR: $LATEST_DIGEST"
+              --output text 2>/dev/null)
 
             if [ "$LATEST_DIGEST" = "$EXPECTED_DIGEST" ]; then
-              echo "::notice::✅ Verified! The :latest tag points to our expected digest."
-              echo "::notice::Deployment is correct, though using tag instead of digest reference."
+              echo "::notice::✅ At least the :latest tag points to our expected digest."
+              echo "::notice::Deployment content is correct, but should use version tags going forward."
               exit 0
             else
               echo "::error::❌ The :latest tag points to a different image!"
@@ -312,10 +329,12 @@ jobs:
         if: success()
         env:
           SHORT_SHA: ${{ steps.deploy-apprunner.outputs.short_sha }}
+          VERSION_TAG: ${{ steps.deploy-apprunner.outputs.version_tag }}
         run: |
           echo "::notice::========================================="
           echo "::notice::🚀 Deployment Successful!"
           echo "::notice::========================================="
+          echo "::notice::Version: $VERSION_TAG"
           echo "::notice::Commit: $SHORT_SHA"
           echo "::notice::Image Digest: ${{ steps.deploy-apprunner.outputs.image_digest }}"
           echo "::notice::Status: Running and healthy"
