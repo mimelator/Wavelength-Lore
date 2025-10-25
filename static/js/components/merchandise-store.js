@@ -1266,13 +1266,11 @@ class MerchandiseStore {
     const createBtn = modal.querySelector('#createProductBtn');
     const sizeSelect = modal.querySelector('#defaultSize');
     const colorSelect = modal.querySelector('#defaultColor');
-    const mockupImg = modal.querySelector('#mockupPreview');
+
     
-    // Color change listener - update mockup
+    // Color change listener (mockup removed)
     colorSelect.addEventListener('change', () => {
-      const selectedColor = colorSelect.value;
-      mockupImg.src = `/images/mockups/${productType}-${selectedColor.toLowerCase()}.png`;
-      mockupImg.onerror = () => mockupImg.src = '/images/mockups/default-tshirt.png';
+      // Color selection handled, no mockup to update
     });
     
     // Border style change listener
@@ -1421,10 +1419,9 @@ class MerchandiseStore {
         }
       };
       
-      // Call the existing createGuidedProduct but with border config
-      const product = await this.createGuidedProduct(
+      // Call the existing createProduct with border config
+      const product = await this.createProduct(
         this.selectedImage,
-        productType,
         productOptions
       );
       
