@@ -1160,18 +1160,9 @@ class MerchandiseStore {
           <div class="preview-section">
             <h3>Live Preview</h3>
             <div class="preview-container">
-              <div class="product-mockup">
-                <img id="mockupPreview" src="/images/mockups/${productType}-${imageContext.selectedColor?.toLowerCase() || 'black'}.png" 
-                     alt="Product Preview" 
-                     onerror="this.src='/images/mockups/default-tshirt.png'" />
-                <div class="mockup-overlay">
-                  <img src="${imageData.url}" alt="Your design" class="preview-user-image" />
-                </div>
-              </div>
-              
               <div class="image-preview-with-border">
-                <h4>Your Image with Border</h4>
-                <img id="borderedImagePreview" src="${imageData.thumbnailUrl}" alt="Bordered Image" />
+                <h4>Your Image Preview</h4>
+                <img id="borderedImagePreview" src="${imageData.thumbnailUrl}" alt="Image Preview" />
                 <div id="borderLoadingSpinner" class="loading-spinner" style="display: none;"></div>
               </div>
             </div>
