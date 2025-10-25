@@ -122,6 +122,11 @@ async function createApp() {
   // Mount game API routes (VIP access required)
   app.use('/api/games', gameApiRoutes);
   
+  // Redirect user-gallery to my-gallery for consistency
+  app.get('/user-gallery', (req, res) => {
+    res.redirect(301, '/my-gallery');
+  });
+
   // Mount gallery routes for Photo Gallery feature
   app.use('/', galleryRoutes);
   

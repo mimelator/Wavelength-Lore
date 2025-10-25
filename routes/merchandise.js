@@ -451,8 +451,9 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
     if (process.env.PRINTIFY_MOCK_MODE === 'true') {
       console.log('🔧 MOCK MODE: Simulating successful product creation');
       
+      const mockProductId = `mock_${Date.now()}`;
       const mockProduct = {
-        id: `mock_${Date.now()}`,
+        id: mockProductId,
         title: `Custom ${imageTitle || 'Product'}`,
         description: `Mock product created from ${imageTitle || imageId}`,
         variants: [
@@ -462,6 +463,27 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
         images: [{ src: imageUrl }],
         sourceImage: { id: imageId, title: imageTitle, url: imageUrl }
       };
+      
+      // CRITICAL FIX: Store mock product in database to prevent "broken" products
+      await merchandiseDB.storeUserProduct(userId, {
+        productId: mockProductId,
+        imageId: sanitizeFirebaseKey(imageId),
+        printifyImageId: null,
+        title: mockProduct.title,
+        sourceImage: {
+          id: sanitizeFirebaseKey(imageId),
+          title: imageTitle || imageId,
+          url: imageUrl
+        },
+        variants: mockProduct.variants,
+        images: mockProduct.images,
+        enhancement: {
+          autoEnhanced: false,
+          enhancementSource: 'mock',
+          originalSuitable: true
+        },
+        generatedAt: new Date().toISOString()
+      });
       
       return res.json({
         success: true,
