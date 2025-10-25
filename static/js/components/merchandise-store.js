@@ -428,6 +428,70 @@ class MerchandiseStore {
     }
   }
   
+  viewProductDetails(productId) {
+    const product = this.products.find(p => p.id === productId);
+    if (!product) {
+      this.showError('Product not found');
+      return;
+    }
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal product-detail-modal';
+    modal.style.display = 'block';
+    
+    modal.innerHTML = `
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>${product.title}</h2>
+        <div class="product-detail-content">
+          <div class="detail-image">
+            <img src="${product.images?.[0]?.src || product.sourceImage?.url}" alt="${product.title}" />
+          </div>
+          <div class="detail-info">
+            <p>${product.description || ''}</p>
+            <h3>Available Variants:</h3>
+            <div class="variants-list">
+              ${(product.variants || []).map(v => `
+                <div class="variant-item">
+                  <span>${v.title}</span>
+                  <span>$${(v.price / 100).toFixed(2)}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.querySelector('.close').onclick = () => modal.remove();
+  }
+  
+  editProduct(productId) {
+    this.showSuccess('Edit functionality coming soon!');
+  }
+  
+  async deleteProduct(productId) {
+    if (!confirm('Are you sure you want to delete this product?')) {
+      return;
+    }
+    
+    try {
+      this.setLoading(true, 'Deleting product...');
+      
+      // Remove from local array
+      this.products = this.products.filter(p => p.id !== productId);
+      
+      this.showSuccess('Product deleted successfully!');
+      this.render();
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      this.showError('Failed to delete product');
+    } finally {
+      this.setLoading(false);
+    }
+  }
+  
   getCartTotal() {
     return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   }
@@ -523,6 +587,27 @@ class MerchandiseStore {
     document.addEventListener('click', (e) => {
       if (e.target.classList.contains('checkout-btn')) {
         this.checkout();
+      }
+    });
+    
+    // Product actions
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.view-product-btn')) {
+        const btn = e.target.closest('.view-product-btn');
+        const productId = btn.dataset.productId;
+        this.viewProductDetails(productId);
+      }
+      
+      if (e.target.closest('.edit-product-btn')) {
+        const btn = e.target.closest('.edit-product-btn');
+        const productId = btn.dataset.productId;
+        this.editProduct(productId);
+      }
+      
+      if (e.target.closest('.delete-product-btn')) {
+        const btn = e.target.closest('.delete-product-btn');
+        const productId = btn.dataset.productId;
+        this.deleteProduct(productId);
       }
     });
   }
@@ -825,6 +910,17 @@ class MerchandiseStore {
       <div class="product-card">
         <div class="product-image">
           <img src="${product.images?.[0]?.src || product.sourceImage?.url || ''}" alt="${product.title}" />
+          <div class="product-actions">
+            <button class="action-btn view-product-btn" data-product-id="${product.id}" title="View Details">
+              <span>👁️</span>
+            </button>
+            <button class="action-btn edit-product-btn" data-product-id="${product.id}" title="Edit">
+              <span>✏️</span>
+            </button>
+            <button class="action-btn delete-product-btn" data-product-id="${product.id}" title="Delete">
+              <span>🗑️</span>
+            </button>
+          </div>
         </div>
         <div class="product-info">
           <h4>${product.title}</h4>
