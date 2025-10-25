@@ -201,18 +201,7 @@ class EnhancedProductCustomizationTester {
       console.log(`   → Clicking "${productName}" button`);
       await createButton.click();
       
-      // Wait for preview modal first
-      await this.page.waitForSelector('.product-preview-modal', { timeout: 5000 });
-      console.log('   → Preview modal appeared');
-      await wait(500);
-      
-      // Click "Customize & Create" to proceed to customization modal
-      const confirmBtn = await this.page.waitForSelector('.confirm-preview-btn', { timeout: 5000 });
-      await confirmBtn.click();
-      console.log('   → Clicked Customize & Create');
-      await wait(500);
-      
-      // Wait for customization modal to appear
+      // Wait for customization modal to appear directly (no preview modal step)
       await this.page.waitForSelector('.product-customization-modal', { timeout: 5000 });
       await wait(500);
       
@@ -222,7 +211,7 @@ class EnhancedProductCustomizationTester {
       });
       
       if (modalVisible) {
-        console.log('✅ Customization modal opened successfully');
+        console.log('✅ Customization modal opened successfully (single step)');
         this.results.passed.push('Open customization modal');
         return true;
       } else {

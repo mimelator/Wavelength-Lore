@@ -1076,9 +1076,12 @@ class MerchandiseStore {
     const selectedImageData = this.galleryImages.find(img => img.id === this.selectedImage);
     const imageContext = this.extractImageContext(selectedImageData);
     
-    // Show customization modal
-    // Show preview modal first, then customization
-    this.showProductPreviewModal(productType, productConfig, selectedImageData, imageContext);
+    // Show combined customization modal directly
+    this.showProductCustomizationModal(productType, productConfig, selectedImageData, {
+      ...imageContext,
+      selectedSize: 'M',
+      selectedColor: 'Black'
+    });
   }
   
   extractImageContext(imageData) {
@@ -1136,121 +1139,7 @@ class MerchandiseStore {
     return null;
   }
   
-  showProductPreviewModal(productType, productConfig, imageData, imageContext) {
-    const modal = document.createElement('div');
-    modal.id = 'productPreviewModal';
-    modal.className = 'modal product-preview-modal';
-    modal.style.display = 'block';
-    
-    // Default selections
-    let selectedSize = 'M';
-    let selectedColor = 'Black';
-    
-    modal.innerHTML = `
-      <div class="modal-content preview-modal-content">
-        <span class="close">&times;</span>
-        <h2>Preview Your ${productConfig.name}</h2>
-        
-        <div class="preview-container">
-          <div class="preview-mockup-wrapper">
-            <div class="product-mockup" data-color="${selectedColor}">
-              <img src="/images/mockups/${productType}-${selectedColor.toLowerCase()}.png" 
-                   alt="${productConfig.name} mockup" 
-                   onerror="this.src='/images/mockups/default-tshirt.png'" />
-              <div class="mockup-overlay">
-                <img src="${imageData.url}" alt="Your design" class="preview-user-image" />
-              </div>
-            </div>
-          </div>
-          
-          <div class="preview-options">
-            <h3>Customize Your Product</h3>
-            
-            <div class="option-group">
-              <label>Size:</label>
-              <div class="size-selector">
-                ${['XS', 'S', 'M', 'L', 'XL', '2XL'].map(size => `
-                  <button class="size-option ${size === selectedSize ? 'selected' : ''}" data-size="${size}">
-                    ${size}
-                  </button>
-                `).join('')}
-              </div>
-            </div>
-            
-            <div class="option-group">
-              <label>Color:</label>
-              <div class="color-selector">
-                ${['Black', 'White', 'Navy', 'Grey'].map(color => `
-                  <button class="color-option ${color === selectedColor ? 'selected' : ''}" 
-                          data-color="${color}"
-                          style="background-color: ${color.toLowerCase()}; ${color === 'White' ? 'border: 2px solid #ddd;' : ''}">
-                    <span class="color-name">${color}</span>
-                  </button>
-                `).join('')}
-              </div>
-            </div>
-            
-            <div class="preview-price">
-              <span class="price-label">Price:</span>
-              <span class="price-value">$${(productConfig.basePrice / 100).toFixed(2)}</span>
-            </div>
-            
-            <div class="preview-actions">
-              <button class="btn-secondary cancel-preview-btn">Cancel</button>
-              <button class="btn-primary confirm-preview-btn">Customize & Create</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Event listeners
-    const closeBtn = modal.querySelector('.close');
-    const cancelBtn = modal.querySelector('.cancel-preview-btn');
-    const confirmBtn = modal.querySelector('.confirm-preview-btn');
-    const sizeOptions = modal.querySelectorAll('.size-option');
-    const colorOptions = modal.querySelectorAll('.color-option');
-    const mockupImg = modal.querySelector('.product-mockup img');
-    
-    // Close handlers
-    const closeModal = () => modal.remove();
-    closeBtn.onclick = closeModal;
-    cancelBtn.onclick = closeModal;
-    
-    // Size selection
-    sizeOptions.forEach(btn => {
-      btn.onclick = () => {
-        sizeOptions.forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedSize = btn.dataset.size;
-      };
-    });
-    
-    // Color selection
-    colorOptions.forEach(btn => {
-      btn.onclick = () => {
-        colorOptions.forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedColor = btn.dataset.color;
-        
-        // Update mockup image
-        mockupImg.src = `/images/mockups/${productType}-${selectedColor.toLowerCase()}.png`;
-        mockupImg.onerror = () => mockupImg.src = '/images/mockups/default-tshirt.png';
-      };
-    });
-    
-    // Confirm - proceed to customization modal
-    confirmBtn.onclick = () => {
-      modal.remove();
-      this.showProductCustomizationModal(productType, productConfig, imageData, {
-        ...imageContext,
-        selectedSize,
-        selectedColor
-      });
-    };
-  }
+
   
   showProductCustomizationModal(productType, productConfig, imageData, imageContext) {
     // Generate default product name
@@ -1272,9 +1161,11 @@ class MerchandiseStore {
             <h3>Live Preview</h3>
             <div class="preview-container">
               <div class="product-mockup">
-                <img id="mockupPreview" src="${imageData.thumbnailUrl}" alt="Product Preview" />
+                <img id="mockupPreview" src="/images/mockups/${productType}-${imageContext.selectedColor?.toLowerCase() || 'black'}.png" 
+                     alt="Product Preview" 
+                     onerror="this.src='/images/mockups/default-tshirt.png'" />
                 <div class="mockup-overlay">
-                  <span class="preview-label">${productConfig.name}</span>
+                  <img src="${imageData.url}" alt="Your design" class="preview-user-image" />
                 </div>
               </div>
               
@@ -1288,6 +1179,29 @@ class MerchandiseStore {
           
           <!-- Right side: Customization Options -->
           <div class="options-section">
+            <div class="option-group">
+              <h3>👕 Product Options</h3>
+              <div class="size-color-grid">
+                <div class="option-item">
+                  <label for="defaultSize">Size</label>
+                  <select id="defaultSize" class="option-select">
+                    ${productConfig.popularSizes.map(size => `
+                      <option value="${size}" ${size === (imageContext.selectedSize || 'M') ? 'selected' : ''}>${size}</option>
+                    `).join('')}
+                  </select>
+                </div>
+                
+                <div class="option-item">
+                  <label for="defaultColor">Color</label>
+                  <select id="defaultColor" class="option-select">
+                    ${productConfig.availableColors.map(color => `
+                      <option value="${color}" ${color === (imageContext.selectedColor || 'Black') ? 'selected' : ''}>${color}</option>
+                    `).join('')}
+                  </select>
+                </div>
+              </div>
+            </div>
+            
             <div class="option-group">
               <h3>🎨 Border Style</h3>
               <select id="borderStyleSelect" class="border-style-select">
@@ -1306,30 +1220,6 @@ class MerchandiseStore {
               <h3>📝 Product Details</h3>
               <p class="auto-title-info">✨ Product title will be automatically generated from your image name and product type.</p>
               <p class="auto-title-preview"><strong>Title:</strong> ${defaultName}</p>
-            </div>
-            
-            <div class="option-group">
-              <h3>👕 Default Options</h3>
-              <div class="size-color-grid">
-                <div class="option-item">
-                  <label for="defaultSize">Size</label>
-                  <select id="defaultSize" class="option-select">
-                    ${productConfig.popularSizes.map(size => `
-                      <option value="${size}" ${size === 'M' ? 'selected' : ''}>${size}</option>
-                    `).join('')}
-                  </select>
-                </div>
-                
-                <div class="option-item">
-                  <label for="defaultColor">Color</label>
-                  <select id="defaultColor" class="option-select">
-                    ${productConfig.availableColors.map(color => `
-                      <option value="${color}" ${color === 'Black' ? 'selected' : ''}>${color}</option>
-                    `).join('')}
-                  </select>
-                </div>
-              </div>
-              <p class="option-note">All sizes and colors will be available after creation</p>
             </div>
             
             <div class="pricing-section">
@@ -1387,16 +1277,24 @@ class MerchandiseStore {
   setupCustomizationModalListeners(modal, productType, productConfig, imageData, imageContext) {
     const borderSelect = modal.querySelector('#borderStyleSelect');
     const createBtn = modal.querySelector('#createProductBtn');
+    const sizeSelect = modal.querySelector('#defaultSize');
+    const colorSelect = modal.querySelector('#defaultColor');
+    const mockupImg = modal.querySelector('#mockupPreview');
+    
+    // Color change listener - update mockup
+    colorSelect.addEventListener('change', () => {
+      const selectedColor = colorSelect.value;
+      mockupImg.src = `/images/mockups/${productType}-${selectedColor.toLowerCase()}.png`;
+      mockupImg.onerror = () => mockupImg.src = '/images/mockups/default-tshirt.png';
+    });
     
     // Border style change listener
     let borderUpdateTimeout = null;
     borderSelect.addEventListener('change', async () => {
-      // Clear existing timeout
       if (borderUpdateTimeout) {
         clearTimeout(borderUpdateTimeout);
       }
       
-      // Debounce border preview updates
       borderUpdateTimeout = setTimeout(async () => {
         await this.updateBorderPreview(modal, imageData, borderSelect.value);
       }, 300);
@@ -1411,10 +1309,9 @@ class MerchandiseStore {
       createBtn.textContent = 'Creating...';
       
       const customization = {
-        // productName and productDescription auto-generated on server
         borderStyle: borderSelect.value,
-        defaultSize: modal.querySelector('#defaultSize').value,
-        defaultColor: modal.querySelector('#defaultColor').value
+        defaultSize: sizeSelect.value,
+        defaultColor: colorSelect.value
       };
       
       await this.createCustomizedProduct(productType, imageData, imageContext, customization);
