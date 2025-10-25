@@ -12,7 +12,7 @@
  * Operations: run, check, monitor, validate, analyze
  */
 
-const { program } = require('commander');
+const program = require('commander');
 const puppeteer = require('puppeteer');
 const axios = require('axios');
 const fs = require('fs').promises;
@@ -725,55 +725,54 @@ class UnifiedTestRunner {
   }
 }
 
-// CLI Setup
+// CLI Setup - Compatible with commander v2.x
 program
-  .name('test-runner')
   .description('🧪 Unified Testing & Validation Suite')
   .version('1.0.0');
 
 // Test commands
 program
-  .command('health')
+  .command('health [url]')
   .description('Run health check tests')
-  .option('--url <url>', 'Target URL to test', CONFIG.PRODUCTION_URL)
-  .action(async (options) => {
+  .action(async (url) => {
     const runner = new UnifiedTestRunner();
+    const options = { url: url || CONFIG.PRODUCTION_URL };
     await runner.runTestSuite('health', 'run', options);
   });
 
 program
-  .command('performance')
+  .command('performance [url]')
   .description('Run performance tests')
-  .option('--url <url>', 'Target URL to test', CONFIG.PRODUCTION_URL)
-  .action(async (options) => {
+  .action(async (url) => {
     const runner = new UnifiedTestRunner();
+    const options = { url: url || CONFIG.PRODUCTION_URL };
     await runner.runTestSuite('performance', 'run', options);
   });
 
 program
-  .command('integration')
+  .command('integration [url]')
   .description('Run integration tests')
-  .option('--url <url>', 'Target URL to test', CONFIG.PRODUCTION_URL)
-  .action(async (options) => {
+  .action(async (url) => {
     const runner = new UnifiedTestRunner();
+    const options = { url: url || CONFIG.PRODUCTION_URL };
     await runner.runTestSuite('integration', 'run', options);
   });
 
 program
-  .command('security')
+  .command('security [url]')
   .description('Run security tests')
-  .option('--url <url>', 'Target URL to test', CONFIG.PRODUCTION_URL)
-  .action(async (options) => {
+  .action(async (url) => {
     const runner = new UnifiedTestRunner();
+    const options = { url: url || CONFIG.PRODUCTION_URL };
     await runner.runTestSuite('security', 'run', options);
   });
 
 program
-  .command('all')
+  .command('all [url]')
   .description('Run all test categories')
-  .option('--url <url>', 'Target URL to test', CONFIG.PRODUCTION_URL)
-  .action(async (options) => {
+  .action(async (url) => {
     const runner = new UnifiedTestRunner();
+    const options = { url: url || CONFIG.PRODUCTION_URL };
     await runner.runTestSuite('all', 'run', options);
   });
 
@@ -812,7 +811,7 @@ program
 if (process.argv.length <= 2) {
   program.help();
 } else {
-  program.parse();
+  program.parse(process.argv);
 }
 
 module.exports = { UnifiedTestRunner, HealthCheckRunner, PerformanceTestRunner, IntegrationTestRunner, SecurityTestRunner };
