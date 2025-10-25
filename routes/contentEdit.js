@@ -9,6 +9,7 @@ const router = express.Router();
 
 // Import Firebase utilities
 const firebaseUtils = require('../helpers/firebase-utils');
+const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
 
 // Import helper modules
 const characterHelpers = require('../helpers/character-helpers');
@@ -23,7 +24,7 @@ router.get('/edit/episode/:seasonNumber/:episodeNumber', async (req, res) => {
   const { seasonNumber, episodeNumber } = req.params;
 
   try {
-    const episode = await firebaseUtils.fetchFromFirebase(`videos/season${seasonNumber}/episodes/episode${episodeNumber}`);
+    const episode = await fetchDataAsAdmin(`videos/season${seasonNumber}/episodes/episode${episodeNumber}`);
 
     if (!episode) {
       return res.status(404).send('Episode not found');
@@ -60,7 +61,7 @@ router.get('/edit/character/:characterId', async (req, res) => {
 
   try {
     // Characters are now stored directly by ID (new structure)
-    const charactersData = await firebaseUtils.fetchFromFirebase('characters');
+    const charactersData = await fetchDataAsAdmin('characters');
 
     if (!charactersData) {
       return res.status(404).send('Characters data not found');

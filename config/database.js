@@ -22,10 +22,10 @@ function initializeDatabase() {
   // Initialize Firebase Admin SDK
   firebaseAdminUtils.initializeFirebaseAdmin();
 
-  // Test Firebase connection
+  // Test Firebase connection using admin SDK
   (async () => {
     try {
-      const testData = await firebaseUtils.fetchFromFirebase('videos');
+      const testData = await firebaseAdminUtils.fetchDataAsAdmin('videos');
       if (testData) {
         console.log('🔥 Firebase connection verified');
       } else {

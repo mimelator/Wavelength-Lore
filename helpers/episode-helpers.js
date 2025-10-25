@@ -1,5 +1,6 @@
 // Episode helper functions for generating episode links and references
 const firebaseUtils = require('./firebase-utils');
+const firebaseAdminUtils = require('./firebase-admin-utils');
 const cacheUtils = require('./cache-utils');
 const linkingUtils = require('./linking-utils');
 
@@ -52,7 +53,7 @@ async function fetchEpisodesFromDatabase() {
       firebaseUtils.initializeFirebase('episode-helpers');
     }
 
-    const videosData = await firebaseUtils.fetchFromFirebase('videos');
+    const videosData = await firebaseAdminUtils.fetchDataAsAdmin('videos');
     
     if (videosData) {
       // Extract all episodes from all seasons

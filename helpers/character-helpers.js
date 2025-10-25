@@ -1,6 +1,7 @@
 // Character helper functions for generating character links and references
 const linkingUtils = require('./linking-utils');
 const firebaseUtils = require('./firebase-utils');
+const firebaseAdminUtils = require('./firebase-admin-utils');
 const cacheUtils = require('./cache-utils');
 
 // Create cache manager for characters
@@ -72,11 +73,10 @@ const fallbackCharacters = [
  */
 async function fetchCharactersFromDatabase() {
   try {
-    if (!firebaseUtils.isFirebaseReady()) {
-      firebaseUtils.initializeFirebase('character-helpers');
-    }
+    // Initialize Firebase Admin SDK if not ready
+    firebaseAdminUtils.initializeFirebaseAdmin();
 
-    const charactersData = await firebaseUtils.fetchFromFirebase('characters');
+    const charactersData = await firebaseAdminUtils.fetchDataAsAdmin('characters');
     
     if (charactersData) {
       // Convert characters object to array (new structure: each character stored by ID)

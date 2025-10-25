@@ -7,8 +7,8 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 
-// Import Firebase utilities
-const firebaseUtils = require('../helpers/firebase-utils');
+// Import Firebase utilities (use admin SDK for server-side operations)
+const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
 
 // Import helper modules
 const characterHelpers = require('../helpers/character-helpers');
@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
     res.set('Pragma', 'no-cache');
     res.set('Expires', '0');
     
-    const videos = await firebaseUtils.fetchFromFirebase('videos');
+    const videos = await fetchDataAsAdmin('videos');
     
     res.render('index', {
       title: 'Welcome to Wavelength Lore',
@@ -82,7 +82,7 @@ async function getEpisodeNavigation(seasonNumber, episodeNumber) {
     
     // Previous episode in same season
     if (episode > 1 && seasonBounds[season] && episode - 1 >= seasonBounds[season].min) {
-      fetchPromises.push(firebaseUtils.fetchFromFirebase(`videos/season${season}/episodes/episode${episode - 1}`));
+      fetchPromises.push(fetchDataAsAdmin(`videos/season${season}/episodes/episode${episode - 1}`));
       fetchKeys.push('prevEpisode');
     } else {
       fetchKeys.push('prevEpisode');
@@ -91,7 +91,7 @@ async function getEpisodeNavigation(seasonNumber, episodeNumber) {
     
     // Next episode in same season  
     if (seasonBounds[season] && episode + 1 <= seasonBounds[season].max) {
-      fetchPromises.push(firebaseUtils.fetchFromFirebase(`videos/season${season}/episodes/episode${episode + 1}`));
+      fetchPromises.push(fetchDataAsAdmin(`videos/season${season}/episodes/episode${episode + 1}`));
       fetchKeys.push('nextEpisode');
     } else {
       fetchKeys.push('nextEpisode');
@@ -100,7 +100,7 @@ async function getEpisodeNavigation(seasonNumber, episodeNumber) {
     
     // Previous season first episode
     if (validSeasons.includes(season - 1)) {
-      fetchPromises.push(firebaseUtils.fetchFromFirebase(`videos/season${season - 1}/episodes/episode1`));
+      fetchPromises.push(fetchDataAsAdmin(`videos/season${season - 1}/episodes/episode1`));
       fetchKeys.push('prevSeasonFirst');
     } else {
       fetchKeys.push('prevSeasonFirst');
@@ -109,7 +109,7 @@ async function getEpisodeNavigation(seasonNumber, episodeNumber) {
     
     // Next season first episode
     if (validSeasons.includes(season + 1)) {
-      fetchPromises.push(firebaseUtils.fetchFromFirebase(`videos/season${season + 1}/episodes/episode1`));
+      fetchPromises.push(fetchDataAsAdmin(`videos/season${season + 1}/episodes/episode1`));
       fetchKeys.push('nextSeasonFirst');
     } else {
       fetchKeys.push('nextSeasonFirst');
@@ -162,7 +162,7 @@ router.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
   const { seasonNumber, episodeNumber } = req.params;
 
   try {
-    const episode = await firebaseUtils.fetchFromFirebase(`videos/season${seasonNumber}/episodes/episode${episodeNumber}`);
+    const episode = await fetchDataAsAdmin(`videos/season${seasonNumber}/episodes/episode${episodeNumber}`);
 
     if (episode) {
       // Check visibility - if hidden and user is not a content creator, show 404
@@ -302,7 +302,7 @@ router.get('/character/:characterId', async (req, res) => {
   const { characterId } = req.params;
 
   try {
-    const charactersData = await firebaseUtils.fetchFromFirebase('characters');
+    const charactersData = await fetchDataAsAdmin('characters');
 
     if (charactersData) {
       // Get character directly by ID (new structure)
@@ -585,7 +585,7 @@ router.get('/lore', async (req, res) => {
  */
 router.get('/about', async (req, res) => {
   try {
-    const charactersData = await firebaseUtils.fetchFromFirebase('characters');
+    const charactersData = await fetchDataAsAdmin('characters');
 
     let characterImages = [];
     if (charactersData) {

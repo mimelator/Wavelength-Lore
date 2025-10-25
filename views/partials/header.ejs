@@ -25,6 +25,7 @@
           <li id="profile-dropdown-item" style="display: none;"><a href="/forum/profile">👤 My Profile</a></li>
           <li id="gallery-dropdown-item" style="display: none;"><a href="/my-gallery">🖼️ My Gallery</a></li>
           <li id="games-dropdown-item" style="display: none;"><a href="/games" style="background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #ffd700; font-weight: bold;">🎮 Games</a></li>
+          <li id="vip-chatbot-dropdown-item" style="display: none;"><a href="/chatbot/widget" style="background: linear-gradient(135deg, #667eea, #764ba2); color: #ffd700; font-weight: bold;">🎵 VIP AI Assistant</a></li>
         </ul>
       </li>
       
@@ -111,6 +112,12 @@
                     const gamesItem = document.getElementById('games-dropdown-item');
                     if (gamesItem) {
                       gamesItem.style.display = 'block';
+                    }
+                    
+                    // Show VIP AI Assistant for same access levels as games
+                    const vipChatbotItem = document.getElementById('vip-chatbot-dropdown-item');
+                    if (vipChatbotItem) {
+                      vipChatbotItem.style.display = 'block';
                     }
                   }
 

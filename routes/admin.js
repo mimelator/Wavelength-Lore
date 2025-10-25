@@ -7,8 +7,8 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 
-// Import Firebase utilities
-const firebaseUtils = require('../helpers/firebase-utils');
+// Import Firebase utilities (use admin SDK for server-side operations)
+const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
 
 // Import helper modules
 const characterHelpers = require('../helpers/character-helpers');
@@ -420,7 +420,7 @@ router.get('/sitemap.xml', async (req, res) => {
   </url>`;
 
     // Add episodes to sitemap
-    const videos = await firebaseUtils.fetchFromFirebase('videos');
+    const videos = await fetchDataAsAdmin('videos');
     if (videos) {
       for (const season in videos) {
         if (videos[season].episodes) {
@@ -440,7 +440,7 @@ router.get('/sitemap.xml', async (req, res) => {
     }
 
     // Add characters to sitemap
-    const charactersData = await firebaseUtils.fetchFromFirebase('characters');
+    const charactersData = await fetchDataAsAdmin('characters');
     if (charactersData) {
       for (const category in charactersData) {
         if (Array.isArray(charactersData[category])) {

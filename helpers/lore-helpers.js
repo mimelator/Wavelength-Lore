@@ -1,6 +1,7 @@
 // Lore helper functions for generating lore links and references (places, things, concepts, ideas)
 const linkingUtils = require('./linking-utils');
 const firebaseUtils = require('./firebase-utils');
+const firebaseAdminUtils = require('./firebase-admin-utils');
 const cacheUtils = require('./cache-utils');
 
 // Create cache manager for lore
@@ -84,7 +85,7 @@ async function fetchLoreFromDatabase() {
       firebaseUtils.initializeFirebase('lore-helpers');
     }
 
-    const loreData = await firebaseUtils.fetchFromFirebase('lore');
+    const loreData = await firebaseAdminUtils.fetchDataAsAdmin('lore');
     
     if (loreData) {
       // Handle new structure where each lore item is stored by ID
