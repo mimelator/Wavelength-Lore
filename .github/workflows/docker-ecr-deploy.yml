@@ -74,6 +74,22 @@ jobs:
 
           echo "::notice::Deploying commit $SHORT_SHA to App Runner"
 
+          # Check App Runner service status first - fail fast if busy
+          CURRENT_STATUS=$(aws apprunner describe-service \
+            --service-arn $APPRUNNER_SERVICE_ARN \
+            --query 'Service.Status' \
+            --output text)
+
+          echo "Current App Runner status: $CURRENT_STATUS"
+
+          if [ "$CURRENT_STATUS" != "RUNNING" ]; then
+            echo "::error::❌ App Runner service is not in RUNNING state (current: $CURRENT_STATUS)"
+            echo "::error::This usually means another deployment is in progress or the service is recovering."
+            echo "::error::Please wait for the service to return to RUNNING state and retry the deployment."
+            echo "::error::You can check status with: aws apprunner describe-service --service-arn $APPRUNNER_SERVICE_ARN"
+            exit 1
+          fi
+
           # Get the image digest for the commit-tagged image
           IMAGE_DIGEST=$(aws ecr describe-images \
             --repository-name $ECR_REPOSITORY \
@@ -96,10 +112,20 @@ jobs:
           echo "::notice::Target image digest in ECR: $IMAGE_DIGEST"
 
           # Start deployment operation - this forces App Runner to pull :latest from ECR
+          # If this fails due to service being busy, we'll fail fast rather than retry
           OPERATION_ID=$(aws apprunner start-deployment \
             --service-arn $APPRUNNER_SERVICE_ARN \
             --query 'OperationId' \
-            --output text)
+            --output text 2>&1)
+
+          # Check if the deployment command failed
+          if [ $? -ne 0 ]; then
+            echo "::error::❌ Failed to start App Runner deployment"
+            echo "::error::This typically means the service is busy with another operation"
+            echo "::error::Error details: $OPERATION_ID"
+            echo "::error::Please wait a few minutes and retry the deployment"
+            exit 1
+          fi
 
           echo "::notice::App Runner deployment initiated with Operation ID: $OPERATION_ID"
           echo "::notice::App Runner will pull: :latest tag from ECR"
@@ -114,10 +140,10 @@ jobs:
         run: |
           echo "::notice::Waiting for App Runner deployment to complete..."
 
-          # Maximum wait time: 10 minutes (600 seconds)
-          MAX_WAIT=600
+          # Maximum wait time: 3 minutes (180 seconds) - fail fast approach
+          MAX_WAIT=180
           ELAPSED=0
-          INTERVAL=15
+          INTERVAL=10
 
           while [ $ELAPSED -lt $MAX_WAIT ]; do
             STATUS=$(aws apprunner describe-service \
@@ -136,12 +162,15 @@ jobs:
               ELAPSED=$((ELAPSED + INTERVAL))
             else
               echo "::error::❌ Unexpected status: $STATUS"
+              echo "::error::App Runner deployment failed or service is in an error state"
               exit 1
             fi
           done
 
           if [ $ELAPSED -ge $MAX_WAIT ]; then
-            echo "::error::❌ Deployment timed out after ${MAX_WAIT}s"
+            echo "::error::❌ Deployment timed out after ${MAX_WAIT}s (3 minutes)"
+            echo "::error::App Runner deployment is taking longer than expected"
+            echo "::error::Check the App Runner service status manually or retry later"
             exit 1
           fi
 
@@ -162,16 +191,16 @@ jobs:
           echo "Testing URL: $HEALTH_URL"
 
           # Wait a bit for the service to fully start
-          sleep 10
+          sleep 5
 
-          # Try health check up to 5 times
-          MAX_ATTEMPTS=5
+          # Try health check up to 3 times with shorter intervals - fail fast
+          MAX_ATTEMPTS=3
           ATTEMPT=1
 
           while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
             echo "Health check attempt $ATTEMPT/$MAX_ATTEMPTS..."
 
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$HEALTH_URL" || echo "000")
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$HEALTH_URL" || echo "000")
 
             if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "302" ]; then
               echo "::notice::✅ Health check passed! HTTP $HTTP_CODE"
@@ -180,8 +209,8 @@ jobs:
               echo "::warning::Health check returned HTTP $HTTP_CODE"
 
               if [ $ATTEMPT -lt $MAX_ATTEMPTS ]; then
-                echo "Waiting 15s before retry..."
-                sleep 15
+                echo "Waiting 10s before retry..."
+                sleep 10
               fi
             fi
 
@@ -189,6 +218,7 @@ jobs:
           done
 
           echo "::error::❌ Health checks failed after $MAX_ATTEMPTS attempts"
+          echo "::error::Service may still be starting up - check manually: $HEALTH_URL"
           exit 1
 
       - name: Verify Deployment
