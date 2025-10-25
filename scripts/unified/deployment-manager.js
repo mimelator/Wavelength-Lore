@@ -327,18 +327,42 @@ class ApplicationDeploymentManager extends BaseDeploymentManager {
   async pushToECR() {
     this.logStep('Pushing to ECR');
     
-    // Login to ECR
+    // Login to ECR using secure method
     try {
-      const loginCommand = `aws ecr get-login-password --region ${CONFIG.AWS_REGION} | docker login --username AWS --password-stdin ${process.env.AWS_ACCOUNT_ID}.dkr.ecr.${CONFIG.AWS_REGION}.amazonaws.com`;
-      await this.execCommand(loginCommand, 'Logging into ECR');
-      this.logSuccess('ECR login successful');
+      // Get ECR password securely
+      const ecrPassword = await this.execCommand(
+        ['aws', 'ecr', 'get-login-password', '--region', CONFIG.AWS_REGION],
+        'Getting ECR login password'
+      );
+      
+      // Login to Docker registry
+      const dockerLoginProcess = spawn('docker', [
+        'login',
+        '--username', 'AWS',
+        '--password-stdin',
+        `${process.env.AWS_ACCOUNT_ID}.dkr.ecr.${CONFIG.AWS_REGION}.amazonaws.com`
+      ]);
+      
+      dockerLoginProcess.stdin.write(ecrPassword.trim());
+      dockerLoginProcess.stdin.end();
+      
+      await new Promise((resolve, reject) => {
+        dockerLoginProcess.on('close', (code) => {
+          if (code === 0) {
+            this.logSuccess('ECR login successful');
+            resolve();
+          } else {
+            reject(new Error(`ECR login failed with exit code ${code}`));
+          }
+        });
+      });
     } catch (error) {
       throw new Error(`ECR login failed: ${error.message}`);
     }
     
     // Push image
     await this.execCommand(
-      `docker push ${this.imageUri}`,
+      ['docker', 'push', this.imageUri],
       'Pushing image to ECR'
     );
     
@@ -509,7 +533,7 @@ class ApplicationDeploymentManager extends BaseDeploymentManager {
     try {
       if (this.imageUri) {
         this.logInfo('Cleaning up Docker images...');
-        await this.execCommand('docker system prune -f', 'Cleaning up Docker system');
+        await this.execCommand(['docker', 'system', 'prune', '-f'], 'Cleaning up Docker system');
       }
     } catch (cleanupError) {
       this.logWarning(`Cleanup failed: ${cleanupError.message}`);

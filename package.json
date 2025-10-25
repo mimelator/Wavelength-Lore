@@ -10,5 +10,8 @@
     "commander": "^14.0.2",
     "dotenv": "^17.2.3",
     "puppeteer": "^24.26.1"
+  },
+  "devDependencies": {
+    "glob": "^11.0.3"
   }
 }

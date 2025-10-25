@@ -39,6 +39,21 @@ node scripts/unified/deployment-manager.js --help # All deployment tasks
 node scripts/unified/smart-commit.js --help     # ONLY commit method
 ```
 
+### **🚫 NEVER CLAIM SUCCESS WITHOUT PROOF**
+```bash
+# MANDATORY before any "fix complete" or "working" claims:
+1. Write a test that demonstrates the fix
+2. Run the test and show PASSING results
+3. Provide actual evidence (test output, screenshots, logs)
+4. THEN commit with proof in commit message
+
+# FORBIDDEN PHRASES without proof:
+❌ "Fixed" - Show the test that proves it
+❌ "Working" - Demonstrate it actually works  
+❌ "Complete" - Provide evidence of completion
+❌ "Should work" - Make it work and prove it
+```
+
 ### **🎯 TASK COMPLETION PROTOCOL**
 ```bash
 # MANDATORY completion sequence:
@@ -106,6 +121,23 @@ node scripts/unified/smart-commit.js --help     # ONLY commit method
 4. Maintain context boundaries - don't overlap domains
 ```
 
+### **🧪 PROOF-FIRST DEVELOPMENT - MANDATORY**
+```bash
+# Every fix/feature MUST include:
+1. Create test that validates the fix/feature
+2. Run test and capture ACTUAL output
+3. Show BEFORE (failing) and AFTER (passing) states
+4. Include test results in commit message
+5. Update context with EVIDENCE, not claims
+
+# Example proof workflow:
+node tests/my-fix-test.js           # Create test first
+# Test fails - good, proves test validity
+# Make the fix
+node tests/my-fix-test.js           # Test passes - proves fix works
+node scripts/unified/smart-commit.js # Commit with test evidence
+```
+
 ### **🔄 Conversation Compacting Protocol - MANDATORY**
 ```bash
 # BEFORE compacting any conversation:
@@ -161,6 +193,16 @@ node scripts/unified/smart-commit.js --help     # ONLY commit method
 ---
 
 ## ✅ Proof & Validation Requirements
+
+### **🚨 CRITICAL: NO CLAIMS WITHOUT EVIDENCE**
+```bash
+# BEFORE saying "fixed" or "working":
+1. Write test that reproduces the problem
+2. Show test FAILING (proves problem exists)
+3. Implement the fix
+4. Show test PASSING (proves fix works)
+5. Include test output in all communications
+```
 
 ### **NEVER Claim Completion Without Proof**
 When claiming something is complete, ALWAYS provide:
