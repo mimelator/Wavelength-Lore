@@ -76,11 +76,17 @@ node scripts/unified/test-runner.js health --url https://wavelengthlore.com
 3. Provide actual evidence (test output, screenshots, logs)
 4. THEN commit with proof in commit message
 
+# MANDATORY before creating any dated documents:
+date +"%Y-%m-%d"  # Verify current date FIRST
+date +"%B %d, %Y" # Get formatted date
+# NEVER assume dates - always verify with system commands
+
 # FORBIDDEN PHRASES without proof:
 ❌ "Fixed" - Show the test that proves it
 ❌ "Working" - Demonstrate it actually works  
 ❌ "Complete" - Provide evidence of completion
 ❌ "Should work" - Make it work and prove it
+❌ Wrong dates in documents - VERIFY with date command
 ```
 
 ### **🎯 TASK COMPLETION PROTOCOL**

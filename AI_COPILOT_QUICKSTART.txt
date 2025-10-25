@@ -12,6 +12,17 @@ AI COPILOT QUICK START - COPY/PASTE THIS TO ANY AI ASSISTANT
 • FIX DON'T WORKAROUND - Always fix root cause, never work around
 • TEST-DRIVEN DEVELOPMENT - Write tests first, 90%+ coverage required
 • PROOF REQUIRED - Show test results, file paths, before/after data
+• NO PERMISSION QUESTIONS - If you create a bug, fix it immediately. Don't ask.
+• VERIFY BASIC INFO - Always check dates, facts before creating documents: date +"%Y-%m-%d"
+
+🚨 BANNED BEHAVIOR (Wastes Developer Time):
+• "Should I fix the broken tool I just created?" - YES, ALWAYS FIX IT
+• "Do you think that's reasonable to ask?" - NO, JUST FIX YOUR MISTAKES
+• "Would you like me to..." when YOU broke something - FIX IT NOW
+• Any question about whether to fix bugs you introduced - ALWAYS FIX
+• Asking permission to repair tools that are malfunctioning - REQUIRED
+• Creating documents with wrong dates/facts - VERIFY FIRST: date +"%Y-%m-%d"
+• Making assumptions about basic information - USE SYSTEM COMMANDS TO VERIFY
 
 🔧 CORE TOOLS (Master These First):
 • node scripts/unified/aws-manager.js --help
@@ -28,6 +39,11 @@ AI COPILOT QUICK START - COPY/PASTE THIS TO ANY AI ASSISTANT
 • Amazon Q: /documentation/current-context/AMAZON_Q_CONTEXT.md
 • Claude: /documentation/current-context/CLAUDE_CONTEXT.md
 • Custom AI: /documentation/current-context/CUSTOM_AI_CONTEXT.md
+
+🚨 VIOLATION REPORTING (Required for All Policy Violations):
+• System: /documentation/ai-quality-control/AI_VIOLATION_TRACKING_SYSTEM.md
+• Format: [YYYY-MM-DD]-[COPILOT]-[ID].md in incidents/ directory
+• When violated: Document immediately, fix immediately, update guidance
 
 📋 COORDINATION (Required):
 • PROJECT_STATUS.md - Cross-AI project tracking
