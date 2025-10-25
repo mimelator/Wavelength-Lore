@@ -16,7 +16,7 @@
 const { program } = require('commander');
 const fs = require('fs').promises;
 const path = require('path');
-const glob = require('glob');
+const { glob } = require('glob');
 const chalk = require('chalk');
 
 class MaintenanceAnalyzer {
@@ -371,6 +371,9 @@ class MaintenanceAnalyzer {
     async analyzeRoutePageConnections() {
         this.logInfo('Analyzing route-page connections...');
         
+        // Parse actual route implementations to find template usage
+        await this.parseRouteImplementations();
+        
         // Find orphaned pages (pages without routes)
         this.results.pages.forEach((page, pageKey) => {
             const matchingRoute = this.findRouteForPage(pageKey);
@@ -383,18 +386,32 @@ class MaintenanceAnalyzer {
             }
         });
         
-        // Find dead routes (routes without pages)
+        // Smart route analysis with actual template detection
         this.results.routes.forEach((route, routePath) => {
             if (route.method === 'GET' && route.type === 'endpoint') {
-                const matchingPage = this.findPageForRoute(routePath);
-                if (!matchingPage && !this.isApiRoute(routePath)) {
+                const routeCategory = this.categorizeRoute(routePath, route);
+                const actualTemplate = route.rendersTemplate || null;
+                const hasValidTemplate = actualTemplate && this.results.pages.has(actualTemplate);
+                
+                // Only flag as dead if it should have a template but doesn't
+                if (routeCategory.needsTemplate && !hasValidTemplate) {
                     this.results.issues.deadRoutes.push({
                         route: routePath,
                         method: route.method,
                         file: route.file,
-                        recommendation: `Create template or remove unused route`
+                        category: routeCategory.type,
+                        priority: routeCategory.priority,
+                        actualTemplate: actualTemplate,
+                        recommendation: actualTemplate 
+                            ? `Template '${actualTemplate}' not found for route`
+                            : routeCategory.recommendation
                     });
                 }
+                
+                // Store route analysis data
+                route.category = routeCategory.type;
+                route.needsTemplate = routeCategory.needsTemplate;
+                route.hasValidTemplate = hasValidTemplate;
             }
         });
     }
@@ -457,12 +474,204 @@ class MaintenanceAnalyzer {
                normalizedPage.includes(normalizedRoute);
     }
 
-    isApiRoute(routePath) {
-        return routePath.includes('/api/') || 
-               routePath.includes('/admin/') ||
+    // 🎯 Smart Route Categorization
+    categorizeRoute(routePath, route) {
+        // File responses (should not have templates)
+        if (this.isFileResponse(routePath)) {
+            return {
+                type: 'file-response',
+                needsTemplate: false,
+                priority: 'info',
+                recommendation: 'File response route - no template needed'
+            };
+        }
+        
+        // API endpoints (should return JSON)
+        if (this.isApiEndpoint(routePath)) {
+            return {
+                type: 'api-endpoint',
+                needsTemplate: false,
+                priority: 'info',
+                recommendation: 'API endpoint - returns JSON, no template needed'
+            };
+        }
+        
+        // Debug/Test routes (safe to remove in production)
+        if (this.isDebugRoute(routePath)) {
+            return {
+                type: 'debug-test',
+                needsTemplate: false,
+                priority: 'low',
+                recommendation: 'Debug/test route - consider removing for production'
+            };
+        }
+        
+        // Admin/Management routes (might be API or need templates)
+        if (this.isAdminRoute(routePath)) {
+            return {
+                type: 'admin-management',
+                needsTemplate: this.adminRouteShouldHaveTemplate(routePath),
+                priority: 'medium',
+                recommendation: this.adminRouteShouldHaveTemplate(routePath) 
+                    ? 'Admin route needs template for web interface'
+                    : 'Admin API route - returns JSON, no template needed'
+            };
+        }
+        
+        // Health/Status routes (should return JSON)
+        if (this.isHealthRoute(routePath)) {
+            return {
+                type: 'health-status',
+                needsTemplate: false,
+                priority: 'info',
+                recommendation: 'Health/status route - returns JSON, no template needed'
+            };
+        }
+        
+        // Authentication routes (usually need templates)
+        if (this.isAuthRoute(routePath)) {
+            return {
+                type: 'authentication',
+                needsTemplate: !routePath.includes('/callback'),
+                priority: 'high',
+                recommendation: routePath.includes('/callback') 
+                    ? 'Auth callback - redirects, no template needed'
+                    : 'Authentication route needs template for user interface'
+            };
+        }
+        
+        // Content routes (definitely need templates)
+        if (this.isContentRoute(routePath)) {
+            return {
+                type: 'content-page',
+                needsTemplate: true,
+                priority: 'high',
+                recommendation: 'Content route needs template - user-facing page'
+            };
+        }
+        
+        // Game/Interactive routes (might be API or templates)
+        if (this.isGameRoute(routePath)) {
+            return {
+                type: 'game-interactive',
+                needsTemplate: this.gameRouteShouldHaveTemplate(routePath),
+                priority: 'medium',
+                recommendation: this.gameRouteShouldHaveTemplate(routePath)
+                    ? 'Game route needs template for user interface'
+                    : 'Game API route - returns JSON, no template needed'
+            };
+        }
+        
+        // E-commerce routes (mixed - some API, some templates)
+        if (this.isEcommerceRoute(routePath)) {
+            return {
+                type: 'ecommerce',
+                needsTemplate: this.ecommerceRouteShouldHaveTemplate(routePath),
+                priority: 'medium',
+                recommendation: this.ecommerceRouteShouldHaveTemplate(routePath)
+                    ? 'E-commerce route needs template for customer interface'
+                    : 'E-commerce API route - returns JSON, no template needed'
+            };
+        }
+        
+        // Default: User-facing routes (probably need templates)
+        return {
+            type: 'user-facing',
+            needsTemplate: true,
+            priority: 'high',
+            recommendation: 'User-facing route needs template'
+        };
+    }
+
+    // Route type detection methods
+    isFileResponse(routePath) {
+        return routePath.match(/\.(xml|txt|json|css|js|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$/i) ||
+               routePath.includes('sitemap') ||
+               routePath.includes('robots');
+    }
+
+    isApiEndpoint(routePath) {
+        return routePath.includes('/api/') ||
                routePath.endsWith('.json') ||
-               routePath.includes('/download') ||
-               routePath.includes('/upload');
+               routePath.match(/(stats|metrics|data|export|import)$/i) ||
+               routePath.includes('/catalog/list') ||
+               routePath.includes('/current-user-groups') ||
+               routePath.includes('/admob-config');
+    }
+
+    isDebugRoute(routePath) {
+        return routePath.includes('/debug') ||
+               routePath.includes('/test') ||
+               routePath.includes('test-') ||
+               routePath.includes('/sanitize') ||
+               routePath.includes('enhancement-');
+    }
+
+    isAdminRoute(routePath) {
+        return routePath.includes('/admin') ||
+               routePath.includes('/vendor') ||
+               routePath.includes('/permissions') ||
+               routePath.includes('/hierarchy') ||
+               routePath.includes('/compatibility');
+    }
+
+    adminRouteShouldHaveTemplate(routePath) {
+        // Admin routes that typically need web interfaces
+        return routePath.match(/\/(admin|vendor-catalog|compatibility-tests)$/i) ||
+               routePath.includes('/admin/') && !routePath.includes('/api/');
+    }
+
+    isHealthRoute(routePath) {
+        return routePath.match(/\/(health|status|firebase)$/i);
+    }
+
+    isAuthRoute(routePath) {
+        return routePath.match(/\/(login|logout|auth|access)/) ||
+               routePath.includes('/callback');
+    }
+
+    isContentRoute(routePath) {
+        return routePath.match(/\/(character|episode|lore|season)/) ||
+               routePath.includes('/characters') ||
+               routePath.includes('/edit/');
+    }
+
+    isGameRoute(routePath) {
+        return routePath.includes('wavelength-gems') ||
+               routePath.includes('leaderboard') ||
+               routePath.includes('user-stats') ||
+               routePath.includes('level-progress') ||
+               routePath.match(/^\/:[^\/]+$/); // /:gameId patterns
+    }
+
+    gameRouteShouldHaveTemplate(routePath) {
+        // Game routes that need user interfaces
+        return routePath.includes('/leaderboard') ||
+               routePath.match(/^\/:[^\/]+$/); // Main game pages
+    }
+
+    isEcommerceRoute(routePath) {
+        return routePath.includes('/product') ||
+               routePath.includes('/order') ||
+               routePath.includes('/catalog') ||
+               routePath.includes('/border') ||
+               routePath.includes('/preview');
+    }
+
+    ecommerceRouteShouldHaveTemplate(routePath) {
+        // E-commerce routes that need customer-facing pages
+        return !routePath.includes('/api/') && 
+               !routePath.includes('/stats') &&
+               !routePath.includes('/list') &&
+               (routePath.includes('/catalog') ||
+                routePath.includes('/product/') ||
+                routePath.includes('/order/'));
+    }
+
+    isApiRoute(routePath) {
+        // Legacy method - now uses categorizeRoute
+        const category = this.categorizeRoute(routePath, {});
+        return !category.needsTemplate;
     }
 
     async analyzeContentReachability() {
@@ -636,6 +845,9 @@ class MaintenanceAnalyzer {
         const { stats, issues } = this.results;
         const timestamp = new Date().toISOString();
         
+        // Categorize routes for better reporting
+        const routeCategories = this.categorizeAllRoutes();
+        
         return `# 🔍 Wavelength Lore Maintenance Report
 
 **Generated**: ${timestamp}  
@@ -650,13 +862,28 @@ class MaintenanceAnalyzer {
 | Total Content | ${stats.totalContent} |
 | Total Links | ${stats.totalLinks} |
 
+## 🎯 Route Analysis
+
+### Route Categories
+| Category | Count | Need Templates | Status |
+|----------|-------|----------------|---------|
+| **Content Pages** | ${routeCategories.content.length} | ${routeCategories.content.filter(r => r.needsTemplate).length} | ${routeCategories.content.filter(r => r.needsTemplate).length > 0 ? '⚠️ Action Needed' : '✅ Good'} |
+| **API Endpoints** | ${routeCategories.api.length} | 0 | ✅ No Templates Needed |
+| **Authentication** | ${routeCategories.auth.length} | ${routeCategories.auth.filter(r => r.needsTemplate).length} | ${routeCategories.auth.filter(r => r.needsTemplate).length > 0 ? '⚠️ Action Needed' : '✅ Good'} |
+| **Admin/Management** | ${routeCategories.admin.length} | ${routeCategories.admin.filter(r => r.needsTemplate).length} | ${routeCategories.admin.filter(r => r.needsTemplate).length > 0 ? '💡 Consider' : '✅ Good'} |
+| **E-commerce** | ${routeCategories.ecommerce.length} | ${routeCategories.ecommerce.filter(r => r.needsTemplate).length} | ${routeCategories.ecommerce.filter(r => r.needsTemplate).length > 0 ? '💡 Consider' : '✅ Good'} |
+| **Games/Interactive** | ${routeCategories.games.length} | ${routeCategories.games.filter(r => r.needsTemplate).length} | ${routeCategories.games.filter(r => r.needsTemplate).length > 0 ? '💡 Consider' : '✅ Good'} |
+| **Debug/Test** | ${routeCategories.debug.length} | 0 | 🧹 Safe to Clean |
+| **File Responses** | ${routeCategories.files.length} | 0 | ✅ No Templates Needed |
+| **Health/Status** | ${routeCategories.health.length} | 0 | ✅ No Templates Needed |
+
 ## 🚨 Issues Found
 
 ### Orphaned Pages (${issues.orphanedPages.length})
 ${this.formatIssueList(issues.orphanedPages, 'page')}
 
-### Dead Routes (${issues.deadRoutes.length})
-${this.formatIssueList(issues.deadRoutes, 'route')}
+### Routes Needing Templates
+${this.formatRoutesByPriority(issues.deadRoutes)}
 
 ### Unreachable Content (${issues.unreachableContent.length})
 ${this.formatIssueList(issues.unreachableContent, 'content')}
@@ -667,40 +894,43 @@ ${this.formatIssueList(issues.brokenLinks, 'link')}
 ### Duplicate Routes (${issues.duplicateRoutes.length})
 ${this.formatIssueList(issues.duplicateRoutes, 'route')}
 
-## 🔧 Mitigation Recommendations
+## 🔧 Smart Recommendations
 
-### High Priority
-${this.generatePriorityRecommendations('high')}
+### 🎯 High Priority (User-Facing Content)
+${this.generateSmartRecommendations('high')}
 
-### Medium Priority
-${this.generatePriorityRecommendations('medium')}
+### 💡 Medium Priority (Admin/Business Features)
+${this.generateSmartRecommendations('medium')}
 
-### Low Priority
-${this.generatePriorityRecommendations('low')}
+### 🧹 Low Priority (Cleanup)
+${this.generateSmartRecommendations('low')}
+
+### ℹ️ No Action Needed
+${this.generateSmartRecommendations('info')}
 
 ## 📈 Next Steps
 
-1. **Address Critical Issues**: Fix orphaned pages and dead routes first
-2. **Content Audit**: Review unreachable content for relevance
-3. **Link Cleanup**: Validate and fix broken internal links
-4. **Route Optimization**: Remove duplicate route definitions
+1. **Create Content Templates**: Focus on character, lore, and episode pages
+2. **Review Admin Interfaces**: Decide which admin routes need web UIs
+3. **Clean Debug Routes**: Remove test/debug routes for production
+4. **Validate APIs**: Ensure API routes return proper JSON responses
 5. **Regular Maintenance**: Run this analyzer weekly
 
-## 🛠️ Scripts to Run
+## 🛠️ Commands to Run
 
 \`\`\`bash
-# Fix orphaned pages
-${this.generateFixScripts('orphaned')}
+# Create templates for high-priority routes
+node scripts/unified/maintenance-analyzer.js generate-templates --priority=high
 
-# Clean up dead routes
-${this.generateFixScripts('dead')}
+# Clean up debug routes safely  
+node scripts/unified/maintenance-analyzer.js cleanup --category=debug --dry-run
 
-# Content cleanup
-${this.generateFixScripts('content')}
+# Full analysis with smart categorization
+node scripts/unified/maintenance-analyzer.js analyze --smart
 \`\`\`
 
 ---
-*Generated by Wavelength Lore Maintenance Analyzer*`;
+*Generated by Enhanced Wavelength Lore Maintenance Analyzer v2.0*`;
     }
 
     formatIssueList(issues, type) {
@@ -760,7 +990,8 @@ ${this.generateFixScripts('content')}
         console.log(chalk.cyan.bold('   📋 MAINTENANCE ANALYSIS SUMMARY'));
         console.log(chalk.cyan('━'.repeat(60)));
         
-        console.log(`\n${chalk.white('Health Score:')} ${this.getHealthColor(stats.healthScore)}${stats.healthScore.toFixed(1)}%${chalk.reset()}`);
+        const healthColor = this.getHealthColor(stats.healthScore);
+        console.log(`\n${chalk.white('Health Score:')} ${healthColor(stats.healthScore.toFixed(1) + '%')}`);
         
         console.log(`\n${chalk.white('Discovery:')}`);
         console.log(`  Routes: ${chalk.green(stats.totalRoutes)}`);
@@ -803,7 +1034,214 @@ ${this.generateFixScripts('content')}
         return chalk.red(count);
     }
 
-    // 🛠️ Utility Methods
+    // 📊 Enhanced Reporting Methods
+    categorizeAllRoutes() {
+        const categories = {
+            content: [],
+            api: [],
+            auth: [],
+            admin: [],
+            ecommerce: [],
+            games: [],
+            debug: [],
+            files: [],
+            health: []
+        };
+
+        this.results.routes.forEach((route, routePath) => {
+            const category = this.categorizeRoute(routePath, route);
+            
+            switch (category.type) {
+                case 'content-page':
+                    categories.content.push({ ...route, path: routePath, needsTemplate: category.needsTemplate });
+                    break;
+                case 'api-endpoint':
+                    categories.api.push({ ...route, path: routePath, needsTemplate: category.needsTemplate });
+                    break;
+                case 'authentication':
+                    categories.auth.push({ ...route, path: routePath, needsTemplate: category.needsTemplate });
+                    break;
+                case 'admin-management':
+                    categories.admin.push({ ...route, path: routePath, needsTemplate: category.needsTemplate });
+                    break;
+                case 'ecommerce':
+                    categories.ecommerce.push({ ...route, path: routePath, needsTemplate: category.needsTemplate });
+                    break;
+                case 'game-interactive':
+                    categories.games.push({ ...route, path: routePath, needsTemplate: category.needsTemplate });
+                    break;
+                case 'debug-test':
+                    categories.debug.push({ ...route, path: routePath, needsTemplate: category.needsTemplate });
+                    break;
+                case 'file-response':
+                    categories.files.push({ ...route, path: routePath, needsTemplate: category.needsTemplate });
+                    break;
+                case 'health-status':
+                    categories.health.push({ ...route, path: routePath, needsTemplate: category.needsTemplate });
+                    break;
+            }
+        });
+
+        return categories;
+    }
+
+    formatRoutesByPriority(deadRoutes) {
+        const byPriority = {
+            high: deadRoutes.filter(r => r.priority === 'high'),
+            medium: deadRoutes.filter(r => r.priority === 'medium'),
+            low: deadRoutes.filter(r => r.priority === 'low'),
+            info: deadRoutes.filter(r => r.priority === 'info')
+        };
+
+        let output = '';
+        
+        if (byPriority.high.length > 0) {
+            output += `\n#### 🎯 High Priority - Needs Templates (${byPriority.high.length})\n`;
+            output += byPriority.high.map(r => `- **${r.route}** (${r.category}) - ${r.recommendation}`).join('\n') + '\n';
+        }
+
+        if (byPriority.medium.length > 0) {
+            output += `\n#### 💡 Medium Priority - Consider Templates (${byPriority.medium.length})\n`;
+            output += byPriority.medium.map(r => `- **${r.route}** (${r.category}) - ${r.recommendation}`).join('\n') + '\n';
+        }
+
+        if (byPriority.low.length > 0) {
+            output += `\n#### 🧹 Low Priority - Safe to Clean (${byPriority.low.length})\n`;
+            output += byPriority.low.map(r => `- **${r.route}** (${r.category}) - ${r.recommendation}`).join('\n') + '\n';
+        }
+
+        if (byPriority.info.length > 0) {
+            output += `\n#### ℹ️ Info - No Action Needed (${byPriority.info.length})\n`;
+            output += `These routes are working as intended (APIs, file responses, etc.)\n`;
+        }
+
+        return output || 'None found ✅\n';
+    }
+
+    generateSmartRecommendations(priority) {
+        const deadRoutes = this.results.issues.deadRoutes || [];
+        const routesForPriority = deadRoutes.filter(r => r.priority === priority);
+
+        if (routesForPriority.length === 0) {
+            return 'None\n';
+        }
+
+        const recommendations = new Set();
+        
+        routesForPriority.forEach(route => {
+            switch (route.category) {
+                case 'content-page':
+                    recommendations.add('Create character, episode, and lore page templates');
+                    break;
+                case 'authentication':
+                    recommendations.add('Create login/logout page templates');
+                    break;
+                case 'admin-management':
+                    recommendations.add('Build admin web interfaces or convert to API-only');
+                    break;
+                case 'ecommerce':
+                    recommendations.add('Create product catalog and checkout page templates');
+                    break;
+                case 'game-interactive':
+                    recommendations.add('Build game leaderboard and stats page templates');
+                    break;
+                case 'debug-test':
+                    recommendations.add('Remove debug/test routes from production');
+                    break;
+                default:
+                    recommendations.add(`Review ${route.category} routes for necessity`);
+            }
+        });
+
+        return Array.from(recommendations).map(rec => `- ${rec}`).join('\n') + '\n';
+    }
+
+    // � Parse Route Implementations 
+    async parseRouteImplementations() {
+        this.logInfo('Parsing route implementations for template usage...');
+        
+        const routeFiles = await glob('*.js', { cwd: this.routesDir });
+        
+        for (const file of routeFiles) {
+            const filePath = path.join(this.routesDir, file);
+            const content = await fs.readFile(filePath, 'utf8');
+            
+            // Extract res.render() calls with their corresponding routes
+            await this.extractTemplateUsage(content, file);
+        }
+        
+        this.logSuccess(`Parsed ${routeFiles.length} route files for template usage`);
+    }
+
+    async extractTemplateUsage(content, fileName) {
+        // Match route definitions with their handlers
+        const routeBlocks = this.extractRouteBlocks(content);
+        
+        routeBlocks.forEach(block => {
+            // Find res.render() calls in each route block
+            const renderMatches = block.handler.match(/res\.render\s*\(\s*['"`]([^'"`]+)['"`]/g);
+            
+            if (renderMatches) {
+                renderMatches.forEach(match => {
+                    const templateMatch = match.match(/res\.render\s*\(\s*['"`]([^'"`]+)['"`]/);
+                    if (templateMatch) {
+                        const templateName = templateMatch[1];
+                        
+                        // Find the corresponding route in our results
+                        const routeKey = this.normalizeRoutePath(block.path);
+                        if (this.results.routes.has(routeKey)) {
+                            const route = this.results.routes.get(routeKey);
+                            route.rendersTemplate = templateName;
+                        }
+                    }
+                });
+            }
+            
+            // Also check for res.json(), res.send(), etc. to confirm API routes
+            if (block.handler.match(/res\.(json|send|sendFile|redirect)\s*\(/)) {
+                const routeKey = this.normalizeRoutePath(block.path);
+                if (this.results.routes.has(routeKey)) {
+                    const route = this.results.routes.get(routeKey);
+                    route.isApiResponse = true;
+                }
+            }
+        });
+    }
+
+    extractRouteBlocks(content) {
+        const blocks = [];
+        
+        // Match router.method('/path', handler) patterns
+        const routeRegex = /router\.(get|post|put|delete|patch)\s*\(\s*['"`]([^'"`]+)['"`]\s*,\s*(?:async\s+)?\([^)]*\)\s*=>\s*\{([\s\S]*?)\n\}\s*\)/g;
+        let match;
+        
+        while ((match = routeRegex.exec(content)) !== null) {
+            blocks.push({
+                method: match[1].toUpperCase(),
+                path: match[2],
+                handler: match[3]
+            });
+        }
+        
+        // Also match function-style handlers
+        const functionRouteRegex = /router\.(get|post|put|delete|patch)\s*\(\s*['"`]([^'"`]+)['"`]\s*,\s*(?:async\s+)?function[^{]*\{([\s\S]*?)\n\}\s*\)/g;
+        while ((match = functionRouteRegex.exec(content)) !== null) {
+            blocks.push({
+                method: match[1].toUpperCase(),
+                path: match[2],
+                handler: match[3]
+            });
+        }
+        
+        return blocks;
+    }
+
+    normalizeRoutePath(path) {
+        // Normalize route paths to match how they're stored in results
+        return path.startsWith('/') ? path : `/${path}`;
+    }
+
+    // �🛠️ Utility Methods
     async fileExists(filePath) {
         try {
             await fs.access(filePath);

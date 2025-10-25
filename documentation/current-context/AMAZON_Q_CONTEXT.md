@@ -118,9 +118,39 @@ User requires **functional merchandise page** without testing compromises:
 - ✅ **Product Catalog:** Full ProductNavigator re-enabled
 - ✅ **User Experience:** Space-efficient browsing with graceful fallback
 
+## 🚨 CRITICAL LEARNING: SCRIPT DISCOVERY PROTOCOL
+
+### **VIOLATION CORRECTED: Duplicate Tool Creation**
+**Issue:** AI attempted to create duplicate monitoring tools instead of using existing infrastructure
+**Correction:** Use `test-runner.js` for all production monitoring needs
+
+### **MANDATORY SCRIPT DISCOVERY WORKFLOW**
+```bash
+# BEFORE creating ANY new tool:
+1. find scripts/ -name "*keyword*" -type f
+2. ls -la scripts/unified/
+3. node scripts/unified/test-runner.js --help
+4. Test existing functionality first
+
+# PRODUCTION MONITORING EXAMPLE:
+node scripts/unified/test-runner.js health --url https://wavelengthlore.com
+# ✅ Provides 15 health checks (11/15 passing = 73% success)
+# ✅ All critical pages working (/, /characters, /lore)
+# ✅ Some API 404s expected (normal behavior)
+# ✅ NO NEED for separate monitoring scripts
+```
+
+### **FORBIDDEN DUPLICATE TOOLS**
+- ❌ **monitor-production-build.js** - Use test-runner.js health instead
+- ❌ **monitor-production-simple.js** - Use test-runner.js health instead
+- ❌ **Any monitoring scripts** - test-runner.js handles all monitoring
+- ❌ **Any deployment scripts** - deployment-manager.js handles deployment
+- ❌ **Any AWS scripts** - aws-manager.js handles AWS operations
+
 ## 🎯 NEXT SESSION PRIORITIES
 
 1. **Test Merchandise Page** - Verify ProductNavigator loads properly in browser
 2. **Monitor Fallback Behavior** - Ensure graceful degradation works as expected
 3. **User Feedback** - Gather feedback on compact variant display UX
 4. **Continue Unified Tools Usage** - Maintain smart-commit.js for all commits
+5. **ENFORCE SCRIPT DISCOVERY** - Always check existing tools before creating new ones

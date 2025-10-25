@@ -30,6 +30,28 @@ find scripts/organized/ -name "*.js" | wc -l  # 85+ specialized tools
 head -20 /documentation/active-references/PHASE_2_CONSOLIDATION_RESULTS.md
 ```
 
+### **🚨 SCRIPT DISCOVERY PROTOCOL - MANDATORY BEFORE ANY TOOL CREATION**
+```bash
+# BEFORE creating ANY new script or tool:
+1. Search existing scripts: find scripts/ -name "*keyword*" -type f
+2. Check unified tools: ls -la scripts/unified/
+3. Review organized tools: find scripts/organized/ -name "*.js"
+4. Read tool documentation: head -50 scripts/unified/[tool].js
+5. Test existing functionality: node scripts/unified/[tool].js --help
+
+# FORBIDDEN: Creating duplicate functionality
+❌ NEVER create monitoring tools (use test-runner.js)
+❌ NEVER create deployment scripts (use deployment-manager.js)
+❌ NEVER create AWS tools (use aws-manager.js)
+❌ NEVER create commit scripts (use smart-commit.js)
+
+# REQUIRED: Enhance existing tools instead
+✅ Add features to existing unified scripts
+✅ Fix broken functionality in place
+✅ Extend organized scripts with new capabilities
+✅ Document enhancements in existing tool headers
+```
+
 ### **🔧 EXISTING TOOL MASTERY - REQUIRED**
 ```bash
 # THESE ARE YOUR PRIMARY TOOLS - MASTER THEM:
@@ -37,6 +59,13 @@ node scripts/unified/aws-manager.js --help      # All AWS operations
 node scripts/unified/test-runner.js --help      # All testing needs  
 node scripts/unified/deployment-manager.js --help # All deployment tasks
 node scripts/unified/smart-commit.js --help     # ONLY commit method
+
+# PRODUCTION MONITORING EXAMPLE - USE EXISTING TOOLS:
+node scripts/unified/test-runner.js health --url https://wavelengthlore.com
+# ✅ Provides 15 different health checks (connectivity, pages, APIs)
+# ✅ Includes performance metrics and response times
+# ✅ Handles timeouts and error reporting
+# ✅ NO NEED for separate monitoring scripts
 ```
 
 ### **🚫 NEVER CLAIM SUCCESS WITHOUT PROOF**
