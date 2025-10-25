@@ -20,11 +20,18 @@ npm run env:prod-preview # Preview production config changes
 
 **System Highlights**: ✅ No timeout failures ✅ Perfect version sync ✅ Real-time monitoring ✅ Safe dev/prod separation
 
+## 🏗️ System Architecture & Design
+
+### Architecture Documentation
+- **[WAVELENGTH_SYSTEM_ARCHITECTURE.md](WAVELENGTH_SYSTEM_ARCHITECTURE.md)** - Complete system architecture including external chatbot integration
+- **[Chatbot Integration](../tests/chatbot/CHATBOT_TESTING_SUMMARY.md)** - Firebase Functions chatbot architecture and validation
+
 ## Directory Structure
 
 ```
 docs/
 ├── README.md (this file) - Main documentation hub
+├── WAVELENGTH_SYSTEM_ARCHITECTURE.md - Complete system architecture 
 ├── game-systems/  - Wavelength Gems game documentation
 │   ├── WAVELENGTH_GEMS_GETTING_STARTED.md    (420 lines - Developer onboarding)
 │   ├── GAME_LEVEL_SYSTEM_SUMMARY.md          (510 lines - Project overview)

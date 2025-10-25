@@ -180,13 +180,23 @@ async function testDialogBehavior() {
                     console.log(`     - ID: ${lm.id}, Visible: ${lm.visible}, Class: ${lm.className}`);
                 });
                 
-                // Close the modal
+                // Close the modal with enhanced cleanup
                 await page.evaluate(() => {
                     const closeBtn = document.querySelector('.modal .close');
                     if (closeBtn) closeBtn.click();
+                    
+                    // Force cleanup of any remaining visible modals
+                    setTimeout(() => {
+                        document.querySelectorAll('.modal').forEach(modal => {
+                            if (modal.style.display !== 'none') {
+                                modal.style.display = 'none';
+                                modal.remove();
+                            }
+                        });
+                    }, 100);
                 });
                 
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise(resolve => setTimeout(resolve, 600));
                 await captureModalState('After EDIT Dialog Close');
             }
         } else {

@@ -127,6 +127,14 @@ class MerchandiseStore {
         setTimeout(() => {
           try {
             console.log('🚀 Initializing product navigator for pre-selected image...');
+            
+            // Check if container exists before initializing
+            const container = document.getElementById('product-navigator');
+            if (!container) {
+              console.log('⏭️ Product navigator container not ready yet, will initialize on selectImage');
+              return;
+            }
+            
             this.initializeProductNavigator();
             
             // Verify navigator was created
@@ -134,7 +142,7 @@ class MerchandiseStore {
             if (navigator) {
               console.log('✅ Product navigator initialized successfully for pre-selected image');
             } else {
-              console.error('❌ Product navigator failed to initialize for pre-selected image');
+              console.log('⏭️ Product navigator will be initialized when image is selected');
             }
           } catch (error) {
             console.error('❌ Error initializing product navigator for pre-selected image:', error);
@@ -1276,7 +1284,7 @@ class MerchandiseStore {
           const fallbackNotices = document.querySelectorAll('.fallback-notice');
           fallbackNotices.forEach(notice => notice.remove());
         } else {
-          console.warn('⚠️ No product categories found, falling back to simple categories');
+          console.log('⏭️ Categories still loading, using simple fallback');
           this.renderSimpleCategories(container);
         }
       }, 1000);
@@ -1718,7 +1726,13 @@ class MerchandiseStore {
         console.log('🚀 Initializing product navigator...');
         this.initializeProductNavigator();
         
-        // ProductNavigator initialization complete
+        // Verify initialization success
+        setTimeout(() => {
+          const navigator = document.querySelector('.product-navigator, .simple-categories');
+          if (navigator) {
+            console.log('✅ Product navigator ready for image selection');
+          }
+        }, 200);
         
         // Auto-scroll to the Choose Product section for better UX
         const chooseProductSection = document.getElementById('choose-product-section');

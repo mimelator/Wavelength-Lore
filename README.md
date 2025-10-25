@@ -32,9 +32,11 @@ bash scripts/package-guard.sh status          # Check health
 
 All project documentation has been organized in the [`docs/`](docs/) folder:
 
+- **[🏗️ System Architecture](docs/WAVELENGTH_SYSTEM_ARCHITECTURE.md)** - Complete system architecture including external chatbot integration
 - **[📖 Documentation Index](docs/README.md)** - Complete documentation overview and navigation
 - **[🔒 Security Guide](docs/SECURITY_ENHANCEMENT_GUIDE.md)** - Security implementation and best practices
 - **[💾 Backup System](docs/BACKUP_CONFIGURATION.md)** - Automated database backup setup
+- **[🤖 Chatbot Integration](tests/chatbot/CHATBOT_TESTING_SUMMARY.md)** - Firebase Functions chatbot architecture and validation
 - **[🎮 Features](docs/)** - Character system, lore management, and application features
 
 ## 🚀 Quick Start
@@ -43,7 +45,32 @@ All project documentation has been organized in the [`docs/`](docs/) folder:
 2. **Backup**: Configure [Automated Backups](docs/BACKUP_CONFIGURATION.md)
 3. **Features**: Explore [Application Documentation](docs/README.md)
 
-## 🛡️ Security Features
+## 🤖 AI Chatbot Integration
+
+The Wavelength-Lore ecosystem includes an advanced external AI chatbot service that provides VIP+ members with intelligent assistance about the Wavelength universe:
+
+### 🌟 **External Chatbot Service**
+- ✅ **Firebase Functions Backend**: Serverless architecture at `us-central1-wavelength-lore.cloudfunctions.net`
+- ✅ **SSO Integration**: Seamless authentication with main website using JWT tokens
+- ✅ **VIP+ Exclusive Access**: Membership tier requirement for chatbot functionality
+- ✅ **Vector Database Knowledge**: Complete lore stored in Pinecone for accurate responses
+- ✅ **OpenAI GPT Integration**: Advanced AI responses about characters, stories, and universe details
+
+### � **Integration Architecture**
+- **Widget Integration**: Embedded chat widget on main website (`/chatbot/widget`)
+- **Authentication Flow**: SSO token validation between main site and chatbot service
+- **Session Management**: Persistent conversation history and context awareness
+- **Health Monitoring**: Comprehensive testing suite validating all integration points
+
+### 🚀 **Chatbot Features**
+- **Lore Expertise**: Deep knowledge of Wavelength universe, characters, and storylines
+- **Real-time Responses**: Interactive conversation with context awareness
+- **Security Controls**: Rate limiting, input validation, and VIP+ access enforcement
+- **Cross-Platform**: Accessible through main website with responsive design
+
+See **[🤖 Chatbot Architecture Documentation](tests/chatbot/CHATBOT_TESTING_SUMMARY.md)** for complete technical details and validation results.
+
+## �🛡️ Security Features
 
 - ✅ Firebase security rules with script token authentication
 - ✅ Smart rate limiting with endpoint detection
@@ -51,6 +78,7 @@ All project documentation has been organized in the [`docs/`](docs/) folder:
 - ✅ Automated encrypted backups to AWS S3
 - ✅ User authentication with Firebase ID tokens
 - ✅ Secure delete functionality with ownership verification
+- ✅ **External Chatbot Security**: VIP+ access control with SSO integration
 
 ## 🔧 Asset Management & Validation
 
