@@ -2,9 +2,21 @@
 
 **⚡ ESSENTIAL ONBOARDING FOR ALL AI ASSISTANTS**  
 **🎯 DEVELOPER CODING EXPECTATIONS & STANDARDS**  
-**Version:** 2.0  
+**Version:** 2.1  
 **Last Updated:** October 25, 2025  
 **Status:** ✅ MANDATORY READING - NON-NEGOTIABLE
+
+## 🚨 EMERGENCY ALERT - PACKAGE.JSON CORRUPTION ACTIVE
+
+**⚠️ CRITICAL SYSTEM STABILITY ISSUE - IMMEDIATE PRECAUTIONS REQUIRED ⚠️**
+
+**ALL AI ASSISTANTS MUST:**
+- **BACKUP package.json** before ANY operations: `cp package.json package.json.backup.$(date +%s)`
+- **COORDINATE** - Only ONE AI assistant active at a time
+- **VALIDATE** package.json integrity after script execution: `git status package.json`
+- **READ FIRST**: [Package.json Corruption Warning](../critical-warnings/PACKAGE_JSON_CORRUPTION_WARNING.md)
+
+**If package.json becomes corrupted**: `git checkout HEAD -- package.json && npm install`
 
 ---
 

@@ -3,6 +3,31 @@ The Lore Site for the Wavelength Canon
 
 > **Status**: Testing new pre-increment version deployment strategy 🚀
 
+## 🛡️ Package.json Protection System
+
+**✅ AUTOMATED PROTECTION ACTIVE**
+
+**Comprehensive protection against package.json corruption with:**
+- **Automated Backups**: Timestamped backups before risky operations
+- **Integrity Validation**: Real-time corruption detection
+- **Emergency Recovery**: Automatic git and backup-based restoration
+- **Safe Script Execution**: Protected wrapper for all script operations
+
+**Quick Commands:**
+```bash
+# Setup protection (one-time)
+bash scripts/package-guard.sh auto-protect
+
+# Daily usage
+bash scripts/package-guard.sh backup          # Create backup
+bash scripts/package-guard.sh safe-run <script>  # Run script safely
+bash scripts/package-guard.sh status          # Check health
+```
+
+**Full Guide**: [🛡️ Package Protection System](docs/PACKAGE_PROTECTION_SYSTEM.md)
+
+---
+
 ## 📚 Documentation
 
 All project documentation has been organized in the [`docs/`](docs/) folder:

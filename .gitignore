@@ -175,3 +175,5 @@ COMMIT_MESSAGE.txt
 *.zip
 *.rar
 .env.test
+.package-backups/
+.package.lock

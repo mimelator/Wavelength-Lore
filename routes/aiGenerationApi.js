@@ -6,7 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const { requireGroup } = require('../middleware/groupAuth');
-const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { writeDataAsAdmin } = require('../helpers/firebase-admin-utils');
 const promptHelpers = require('../helpers/prompt-helpers');
 const crypto = require('crypto');
@@ -89,7 +89,7 @@ router.post('/image', requireGroup(['content_manager', 'admin', 'moderator']), a
     }
 
     // Initialize Google GenAI
-    const googleAI = new GoogleGenAI({ apiKey });
+    const googleAI = new GoogleGenerativeAI(apiKey);
     const modelKey = process.env.AI_MODEL_KEY || 'gemini-2.5-flash-image';
 
     // Generate images

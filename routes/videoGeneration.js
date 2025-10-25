@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const https = require('https');
 const http = require('http');
 const fs = require('fs');
@@ -172,7 +172,7 @@ router.post('/api/generate/video', async (req, res) => {
     }
 
     // Initialize Google GenAI
-    const ai = new GoogleGenAI({ apiKey });
+    const ai = new GoogleGenerativeAI(apiKey);
 
     console.log('📥 Downloading image from:', imageUrl);
     

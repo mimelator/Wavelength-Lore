@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const { exec, spawn } = require('child_process');
 const { promisify } = require('util');
+const PackageProtector = require('./package-protector');
 
 const execAsync = promisify(exec);
 
@@ -23,6 +24,7 @@ class SmartCommit {
       'COMMIT_MESSAGE.txt'
     ];
     this.defaultEditor = process.env.EDITOR || process.env.VISUAL || 'nano';
+    this.protector = new PackageProtector();
   }
 
   /**
@@ -262,6 +264,20 @@ This commit adds [brief summary] to improve [area of improvement].
       const hasChanges = await this.checkForChanges();
       if (!hasChanges && !options.force) {
         return;
+      }
+
+      // Validate package.json integrity
+      console.log('🛡️ Validating package.json integrity...');
+      const validation = this.protector.validate();
+      if (!validation.valid) {
+        console.error('❌ package.json corrupted! Attempting recovery...');
+        const recovered = this.protector.emergencyRecover();
+        if (!recovered) {
+          throw new Error('package.json recovery failed. Cannot commit safely.');
+        }
+        console.log('✅ package.json recovered');
+      } else {
+        console.log('✅ package.json is healthy');
       }
 
       // Find or create commit message file

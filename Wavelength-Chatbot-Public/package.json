@@ -1,0 +1,32 @@
+{
+  "name": "@wavelength/chatbot-widget",
+  "version": "1.0.0",
+  "description": "Wavelength Lore AI Chatbot Widget - Public Distribution",
+  "main": "public/chat-widget.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mimelator/Wavelength-Chatbot-Public.git"
+  },
+  "keywords": [
+    "chatbot",
+    "ai",
+    "wavelength",
+    "lore",
+    "widget",
+    "frontend"
+  ],
+  "author": "Wavelength Lore Team",
+  "license": "MIT",
+  "files": [
+    "public/",
+    "docs/",
+    "examples/",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
