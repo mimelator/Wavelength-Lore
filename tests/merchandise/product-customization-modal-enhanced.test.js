@@ -148,16 +148,36 @@ class EnhancedProductCustomizationTester {
   }
 
   async testSelectImage() {
-    console.log('\n🖼️  TEST: Select an image from gallery');
+    console.log('\n🖼️  TEST: Select a random image from gallery');
     
     try {
-      const imageCard = await this.page.waitForSelector('.gallery-image-card', { timeout: 10000 });
-      
-      const selectButton = await imageCard.$('.gallery-image-select');
-      if (!selectButton) {
-        throw new Error('Select button not found');
+      // Get all available image cards
+      const imageCards = await this.page.$$('.gallery-image-card');
+      if (imageCards.length === 0) {
+        throw new Error('No gallery images found');
       }
       
+      // Select a random image card
+      const randomIndex = Math.floor(Math.random() * imageCards.length);
+      const randomImageCard = imageCards[randomIndex];
+      
+      // Get image info for logging
+      const imageInfo = await randomImageCard.evaluate(card => {
+        const title = card.querySelector('h4')?.textContent || 'Unknown';
+        const selectBtn = card.querySelector('.gallery-image-select');
+        return {
+          title,
+          hasSelectBtn: !!selectBtn
+        };
+      });
+      
+      console.log(`   → Randomly selected image ${randomIndex + 1}/${imageCards.length}: "${imageInfo.title}"`);
+      
+      if (!imageInfo.hasSelectBtn) {
+        throw new Error('Select button not found on random image');
+      }
+      
+      const selectButton = await randomImageCard.$('.gallery-image-select');
       await selectButton.click();
       console.log('   → Clicked Select button');
       
@@ -169,16 +189,16 @@ class EnhancedProductCustomizationTester {
       });
       
       if (hasSelectedClass) {
-        console.log('✅ Image selected successfully (card has .selected class)');
-        this.results.passed.push('Select image from gallery');
+        console.log('✅ Random image selected successfully (card has .selected class)');
+        this.results.passed.push('Select random image from gallery');
         return true;
       } else {
         throw new Error('Card does not have selected class');
       }
     } catch (error) {
-      console.error('❌ Select image test failed:', error.message);
+      console.error('❌ Select random image test failed:', error.message);
       this.results.failed.push({
-        test: 'Select image from gallery',
+        test: 'Select random image from gallery',
         error: error.message
       });
       return false;
@@ -186,20 +206,28 @@ class EnhancedProductCustomizationTester {
   }
 
   async testOpenCustomizationModal() {
-    console.log('\n✨ TEST: Open customization modal');
+    console.log('\n✨ TEST: Open customization modal with random product');
     
     try {
       await this.page.waitForSelector('#choose-product-section', { timeout: 5000 });
       console.log('   → Product selection section appeared');
       
-      const createButton = await this.page.waitForSelector('.select-product-type-btn', { timeout: 5000 });
+      // Get all available product buttons
+      const productButtons = await this.page.$$('.select-product-type-btn');
+      if (productButtons.length === 0) {
+        throw new Error('No product type buttons found');
+      }
       
-      const productName = await this.page.evaluate(btn => {
+      // Select a random product button
+      const randomIndex = Math.floor(Math.random() * productButtons.length);
+      const randomProductButton = productButtons[randomIndex];
+      
+      const productName = await randomProductButton.evaluate(btn => {
         return btn.textContent.trim();
-      }, createButton);
+      });
       
-      console.log(`   → Clicking "${productName}" button`);
-      await createButton.click();
+      console.log(`   → Randomly selected product ${randomIndex + 1}/${productButtons.length}: "${productName}"`);
+      await randomProductButton.click();
       
       // Wait for customization modal to appear directly (no preview modal step)
       await this.page.waitForSelector('.product-customization-modal', { timeout: 5000 });
@@ -211,8 +239,8 @@ class EnhancedProductCustomizationTester {
       });
       
       if (modalVisible) {
-        console.log('✅ Customization modal opened successfully (single step)');
-        this.results.passed.push('Open customization modal');
+        console.log('✅ Customization modal opened successfully with random product (single step)');
+        this.results.passed.push('Open customization modal with random product');
         return true;
       } else {
         throw new Error('Modal not visible');
@@ -220,7 +248,7 @@ class EnhancedProductCustomizationTester {
     } catch (error) {
       console.error('❌ Open modal test failed:', error.message);
       this.results.failed.push({
-        test: 'Open customization modal',
+        test: 'Open customization modal with random product',
         error: error.message
       });
       return false;
