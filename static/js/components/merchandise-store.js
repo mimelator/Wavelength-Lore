@@ -161,7 +161,7 @@ class MerchandiseStore {
       ];
       
       let currentStep = 0;
-      const productProgressInterval = setInterval(() => {
+      let productProgressInterval = setInterval(() => {
         if (currentStep < productProgressMessages.length - 1) {
           currentStep++;
           this.setLoading(true, productProgressMessages[currentStep]);
@@ -209,7 +209,9 @@ class MerchandiseStore {
       }
       
     } catch (error) {
-      clearInterval(productProgressInterval);
+      if (productProgressInterval) {
+        clearInterval(productProgressInterval);
+      }
       console.error('Error creating product:', error);
       this.showError('Failed to create product: ' + error.message);
       this.setLoading(false);
