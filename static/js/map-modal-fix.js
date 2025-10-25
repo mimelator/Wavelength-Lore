@@ -390,6 +390,16 @@ if (typeof window !== 'undefined') {
   window.showMapDisambiguationModal = function(locationId) {
     console.log('🎯 showMapDisambiguationModal called with locationId:', locationId);
     
+    // QUICK FIX: Direct navigation for specific locations that should always work
+    if (locationId === 'ice-fortress' && window.allLore) {
+      const iceFortress = window.allLore.find(item => item.id === 'ice-fortress');
+      if (iceFortress) {
+        console.log('✅ Direct navigation to ice-fortress:', iceFortress.url);
+        window.location.href = iceFortress.url;
+        return;
+      }
+    }
+    
     // Location name mapping
     const locationNameMap = {
       'ice-fortress': 'Ice Fortress',
@@ -407,6 +417,8 @@ if (typeof window !== 'undefined') {
     
     // Detect conflicts using available site data
     const conflicts = detectLocationConflicts(locationId, searchTerm);
+    
+    console.log('🔍 Debug: Conflicts detected:', conflicts.length, conflicts);
     
     if (!conflicts || conflicts.length === 0) {
       console.log('No conflicts found for location:', locationId);

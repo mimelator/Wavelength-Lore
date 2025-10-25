@@ -427,8 +427,7 @@
     <!-- Visual marker (non-clickable to avoid conflicts) -->
     <circle class="major-city" cx="235" cy="180" r="12" fill="#2196f3" stroke="#0d47a1" stroke-width="2" pointer-events="none" />
     
-    <!-- Click Target - transparent for clean appearance -->
-    <circle class="click-target clickable" cx="235" cy="180" r="35" fill="transparent" stroke="transparent" stroke-width="0" data-location="ice-fortress" style="cursor: pointer;" />
+    <!-- Click target moved to end of SVG for highest z-index -->
   </g>
 
   <!-- Shield Mountains - Protective shield adjacent to Ice Fortress -->
@@ -751,11 +750,11 @@
 
   <!-- Goblin King's domain in the eastern swamplands - positioned in main swamp area -->
   <g id="goblin-king-domain">
-    <circle class="major-city clickable" cx="720" cy="600" r="12" data-location="goblin-king-lair" 
-            fill="#8b0000" stroke="#2e0e0e" stroke-width="2" opacity="0.9" />
-    <!-- Larger invisible click target for better UX -->
-    <circle class="click-target" cx="720" cy="600" r="22" fill="transparent" stroke="transparent" stroke-width="0" data-location="goblin-king-lair" style="cursor: pointer;" />
-    <text class="location-label" x="720" y="625">Goblin King's Lair</text>
+    <!-- Visual marker (non-clickable to avoid conflicts) -->
+    <circle class="major-city" cx="720" cy="600" r="12" 
+            fill="#8b0000" stroke="#2e0e0e" stroke-width="2" opacity="0.9" pointer-events="none" />
+    <!-- Click target moved to end of SVG for highest z-index -->
+    <text class="location-label" x="720" y="625" pointer-events="none">Goblin King's Lair</text>
   </g>
 
   <!-- Mystic Druids - Large snowy mountain peak -->
@@ -983,10 +982,18 @@
   </g>
 
   <!-- CLICKABLE OVERLAYS (rendered on top of ALL content including text labels) -->
-  <!-- Shire click target positioned at absolute end for highest z-order -->
-  <circle class="click-target clickable" cx="336" cy="372" r="20" fill="transparent" stroke="transparent" stroke-width="0" data-location="the-shire" style="cursor: pointer;" />
+  <!-- ALL CLICK TARGETS - positioned at absolute end for highest z-order -->
   
-  <!-- Shire Sanctuary click target positioned for highest z-order -->
-  <circle class="click-target clickable" cx="275" cy="320" r="18" fill="transparent" stroke="transparent" stroke-width="0" data-location="shire-sanctuary" style="cursor: pointer;" />
+  <!-- Ice Fortress - corrected coordinates for transformed position -->
+  <circle class="click-target clickable" cx="85" cy="166" r="35" fill="transparent" stroke="transparent" stroke-width="0" data-location="ice-fortress" style="cursor: pointer; pointer-events: all;" />
+  
+  <!-- The Shire - enhanced click target -->
+  <circle class="click-target clickable" cx="336" cy="372" r="25" fill="transparent" stroke="transparent" stroke-width="0" data-location="the-shire" style="cursor: pointer; pointer-events: all;" />
+  
+  <!-- Goblin King's Lair - enhanced click target -->
+  <circle class="click-target clickable" cx="720" cy="600" r="25" fill="transparent" stroke="transparent" stroke-width="0" data-location="goblin-king-lair" style="cursor: pointer; pointer-events: all;" />
+  
+  <!-- Shire Sanctuary click target -->
+  <circle class="click-target clickable" cx="275" cy="320" r="18" fill="transparent" stroke="transparent" stroke-width="0" data-location="shire-sanctuary" style="cursor: pointer; pointer-events: all;" />
 
 </svg>

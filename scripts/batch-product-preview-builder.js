@@ -348,15 +348,48 @@ if (require.main === module) {
 
     const builder = new BatchProductPreviewBuilder(options);
     builder.processRemainingBlueprints()
-        .then(report => {
+        .then(async (report) => {
             console.log('\n🎉 SUCCESS: All product previews created!');
             console.log(`📊 Summary: ${report.successfulProducts} products across ${report.productTypes.length} types`);
+            
+            // Cleanup connections to prevent hanging
+            console.log('🔧 Cleaning up connections...');
+            await cleanupConnections();
+            
             process.exit(0);
         })
-        .catch(error => {
+        .catch(async (error) => {
             console.error('\n❌ FAILURE: Batch processing failed:', error.message);
+            
+            // Cleanup connections even on failure
+            console.log('🔧 Cleaning up connections...');
+            await cleanupConnections();
+            
             process.exit(1);
         });
+}
+
+/**
+ * Cleanup all connections to prevent process hanging
+ */
+async function cleanupConnections() {
+    try {
+        // Cleanup Firebase Admin connections
+        const admin = require('firebase-admin');
+        if (admin.apps.length > 0) {
+            await Promise.all(admin.apps.map(app => app.delete()));
+            console.log('   ✅ Firebase connections cleaned up');
+        }
+        
+        // Force garbage collection if available
+        if (global.gc) {
+            global.gc();
+            console.log('   ✅ Garbage collection forced');
+        }
+        
+    } catch (error) {
+        console.warn('   ⚠️ Cleanup warning:', error.message);
+    }
 }
 
 module.exports = BatchProductPreviewBuilder;

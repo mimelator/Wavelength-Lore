@@ -67,7 +67,7 @@ class ProductCardActionsTester {
     console.log('📍 TEST: View Details button opens modal');
     
     try {
-      const viewBtn = await this.page.$('.view-product-btn, .product-details-btn');
+      const viewBtn = await this.page.$('.preview-product-btn, .view-product-btn, .product-details-btn');
       
       if (!viewBtn) {
         throw new Error('View Details button not found');
@@ -77,7 +77,7 @@ class ProductCardActionsTester {
       await wait(500);
       
       const modalOpen = await this.page.evaluate(() => {
-        return !!document.querySelector('.product-detail-modal');
+        return !!document.querySelector('.product-preview-modal, .product-detail-modal');
       });
       
       if (!modalOpen) {
@@ -88,7 +88,7 @@ class ProductCardActionsTester {
       this.results.passed.push('View Details button');
       
       // Close modal
-      await this.page.click('.product-detail-modal .close');
+      await this.page.click('.product-preview-modal .close, .product-detail-modal .close');
       await wait(300);
       
       return true;

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .content { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .section { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #ecf0f1; }
+        .section:last-child { border-bottom: none; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 15px 0; }
+        .info-item { background: #f8f9fa; padding: 15px; border-radius: 4px; }
+        .info-item strong { color: #2c3e50; }
+        .status { padding: 8px 16px; border-radius: 4px; font-weight: bold; display: inline-block; }
+        .status.success { background: #d5f4e6; color: #27ae60; }
+        .status.failed { background: #fadbd8; color: #e74c3c; }
+        .mockup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0; }
+        .mockup { text-align: center; background: #f8f9fa; padding: 10px; border-radius: 4px; }
+        .mockup img { max-width: 100%; height: auto; border-radius: 4px; }
+        .variants { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 15px 0; }
+        .variant { background: #f8f9fa; padding: 10px; border-radius: 4px; font-size: 12px; }
+        .btn { padding: 8px 16px; margin-right: 10px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-secondary { background: #95a5a6; color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 Test Product: <%= testProduct.name %></h1>
+        <p>Compatibility test product details and analysis</p>
+    </div>
+
+    <div class="content">
+        <!-- Test Information -->
+        <div class="section">
+            <h2>📋 Test Information</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>Product Name:</strong><br>
+                    <%= testProduct.name %>
+                </div>
+                <div class="info-item">
+                    <strong>Status:</strong><br>
+                    <span class="status <%= testProduct.status === 'SUCCESS' ? 'success' : 'failed' %>">
+                        <%= testProduct.status %>
+                    </span>
+                </div>
+                <div class="info-item">
+                    <strong>Blueprint ID:</strong><br>
+                    <%= testProduct.blueprintId %>
+                </div>
+                <div class="info-item">
+                    <strong>Vendor ID:</strong><br>
+                    <%= testProduct.vendorId %>
+                </div>
+                <div class="info-item">
+                    <strong>Expected Result:</strong><br>
+                    <%= testProduct.expected %>
+                </div>
+                <div class="info-item">
+                    <strong>Created At:</strong><br>
+                    <%= new Date(testProduct.createdAt).toLocaleString() %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Printify Product Details -->
+        <% if (printifyProduct) { %>
+            <div class="section">
+                <h2>🛍️ Printify Product Details</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Product ID:</strong><br>
+                        <%= printifyProduct.id %>
+                    </div>
+                    <div class="info-item">
+                        <strong>Title:</strong><br>
+                        <%= printifyProduct.title %>
+                    </div>
+                    <div class="info-item">
+                        <strong>Blueprint:</strong><br>
+                        <%= printifyProduct.blueprint_id %>
+                    </div>
+                    <div class="info-item">
+                        <strong>Print Provider:</strong><br>
+                        <%= printifyProduct.print_provider_id %>
+                    </div>
+                    <div class="info-item">
+                        <strong>Variants:</strong><br>
+                        <%= printifyProduct.variants ? printifyProduct.variants.length : 0 %> available
+                    </div>
+                    <div class="info-item">
+                        <strong>Images:</strong><br>
+                        <%= printifyProduct.images ? printifyProduct.images.length : 0 %> mockups
+                    </div>
+                </div>
+
+                <!-- Mockup Images -->
+                <% if (printifyProduct.images && printifyProduct.images.length > 0) { %>
+                    <h3>🖼️ Product Mockups</h3>
+                    <div class="mockup-grid">
+                        <% printifyProduct.images.slice(0, 6).forEach(image => { %>
+                            <div class="mockup">
+                                <img src="<%= image.src %>" alt="Product mockup" loading="lazy">
+                                <p><%= image.variant_ids ? image.variant_ids.length : 0 %> variants</p>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
+
+                <!-- Variants -->
+                <% if (printifyProduct.variants && printifyProduct.variants.length > 0) { %>
+                    <h3>📏 Available Variants</h3>
+                    <div class="variants">
+                        <% printifyProduct.variants.slice(0, 12).forEach(variant => { %>
+                            <div class="variant">
+                                <strong>ID:</strong> <%= variant.id %><br>
+                                <strong>Price:</strong> $<%= (variant.price / 100).toFixed(2) %><br>
+                                <% if (variant.title) { %>
+                                    <strong>Title:</strong> <%= variant.title %><br>
+                                <% } %>
+                                <strong>Enabled:</strong> <%= variant.is_enabled ? 'Yes' : 'No' %>
+                            </div>
+                        <% }); %>
+                    </div>
+                    <% if (printifyProduct.variants.length > 12) { %>
+                        <p><em>... and <%= printifyProduct.variants.length - 12 %> more variants</em></p>
+                    <% } %>
+                <% } %>
+            </div>
+        <% } else { %>
+            <div class="section">
+                <h2>⚠️ Product Not Found</h2>
+                <p>Could not retrieve product details from Printify. The product may have been deleted or there may be an API issue.</p>
+            </div>
+        <% } %>
+
+        <!-- Analysis -->
+        <div class="section">
+            <h2>📊 Compatibility Analysis</h2>
+            <% if (testProduct.status === 'SUCCESS') { %>
+                <div style="background: #d5f4e6; padding: 15px; border-radius: 4px; margin: 15px 0;">
+                    <h4 style="color: #27ae60; margin-top: 0;">✅ Compatibility Confirmed</h4>
+                    <p>This blueprint/vendor combination works successfully and can be offered to customers.</p>
+                    <ul>
+                        <li>Image upload: Successful</li>
+                        <li>Product creation: Successful</li>
+                        <li>Mockups generated: <%= printifyProduct && printifyProduct.images ? printifyProduct.images.length : 'Unknown' %></li>
+                        <li>Variants available: <%= printifyProduct && printifyProduct.variants ? printifyProduct.variants.length : 'Unknown' %></li>
+                    </ul>
+                </div>
+            <% } else { %>
+                <div style="background: #fadbd8; padding: 15px; border-radius: 4px; margin: 15px 0;">
+                    <h4 style="color: #e74c3c; margin-top: 0;">❌ Compatibility Issue</h4>
+                    <p>This blueprint/vendor combination failed and should not be offered to customers.</p>
+                    <% if (testProduct.error) { %>
+                        <p><strong>Error:</strong> <%= testProduct.error %></p>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Actions -->
+        <div class="section">
+            <h2>🔧 Actions</h2>
+            <a href="/admin/compatibility-tests" class="btn btn-secondary">← Back to Tests</a>
+            <% if (printifyProduct) { %>
+                <button onclick="deleteProduct()" class="btn btn-danger">Delete Test Product</button>
+            <% } %>
+            <a href="/admin/export-compatibility" class="btn btn-primary">Export Matrix</a>
+        </div>
+    </div>
+
+    <script>
+        async function deleteProduct() {
+            if (!confirm('Are you sure you want to delete this test product from Printify?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/cleanup-tests', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: '<%= testProduct.productId %>',
+                        deleteProducts: true
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Product deleted successfully');
+                    window.location.href = '/admin/compatibility-tests';
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

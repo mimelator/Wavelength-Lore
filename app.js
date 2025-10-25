@@ -37,7 +37,9 @@ const galleryApiRoutes = require('./routes/galleryApi');
 const merchandiseRoutes = require('./routes/merchandise');
 const enhancedMerchandiseRoutes = require('./routes/enhanced-merchandise');
 const adminVendorResearchRoutes = require('./routes/admin-vendor-research');
+const adminVendorCatalogRoutes = require('./routes/admin-vendor-catalog');
 const adminCleanupRoutes = require('./routes/admin-cleanup');
+const adminCompatibilityRoutes = require('./routes/admin-compatibility');
 const borderPreviewApiRoutes = require('./routes/api-border-preview');
 const productImageApiRoutes = require('./routes/api-product-image');
 const chatbotRoutes = require('./routes/chatbot');
@@ -161,8 +163,14 @@ async function createApp() {
   // Mount admin vendor research routes (admin only)
   app.use('/admin', adminVendorResearchRoutes);
   
+  // Mount admin vendor catalog routes (admin only)
+  app.use('/admin', adminVendorCatalogRoutes);
+  
   // Mount admin cleanup routes (admin only)
   app.use('/admin', adminCleanupRoutes);
+  
+  // Mount admin compatibility test routes (admin only)
+  app.use('/admin', adminCompatibilityRoutes);
 
   // Mount content routes
   app.use('/', contentRoutes);

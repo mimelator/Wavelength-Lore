@@ -71,9 +71,23 @@
       console.log('Found click-target elements:', clickTargets.length);
       console.log('Found fallback clickable elements:', fallbackElements.length);
       
-      // Debug: Log all click targets
+      // Debug: Log all click targets with their coordinates and bounding boxes
       clickTargets.forEach((el, i) => {
-        console.log(`Click target ${i}:`, el.getAttribute('data-location'), 'at', el.getAttribute('cx'), el.getAttribute('cy'));
+        const rect = el.getBoundingClientRect();
+        const cx = el.getAttribute('cx');
+        const cy = el.getAttribute('cy');
+        const r = el.getAttribute('r');
+        
+        console.log(`Click target ${i}:`, {
+          location: el.getAttribute('data-location'),
+          svgCoords: { cx, cy, r },
+          boundingBox: { 
+            left: rect.left.toFixed(1), 
+            top: rect.top.toFixed(1), 
+            width: rect.width.toFixed(1), 
+            height: rect.height.toFixed(1) 
+          }
+        });
       });
       
       const allClickableElements = [...clickTargets, ...fallbackElements];
@@ -84,11 +98,26 @@
         return;
       }
       
+      // Enhance click targets for better accuracy
       allClickableElements.forEach(element => {
         // Remove any existing listeners to prevent duplicates
         element.removeEventListener('click', handleMapClick);
         
-        element.addEventListener('click', handleMapClick);
+        // Add enhanced click handler with coordinate logging
+        element.addEventListener('click', function(e) {
+          console.log('🎯 Click event details:', {
+            location: this.getAttribute('data-location'),
+            clickCoords: { x: e.clientX, y: e.clientY },
+            elementCoords: { 
+              cx: this.getAttribute('cx'), 
+              cy: this.getAttribute('cy'),
+              r: this.getAttribute('r')
+            },
+            boundingBox: this.getBoundingClientRect()
+          });
+          
+          handleMapClick.call(this, e);
+        });
         
         // Add hover effect with improved tooltips
         element.addEventListener('mouseenter', function() {
@@ -96,9 +125,52 @@
           if (location) {
             const title = location.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
             this.setAttribute('title', `Click to explore ${title}`);
+            
+            // Visual feedback for debugging
+            this.style.stroke = '#ff6b6b';
+            this.style.strokeWidth = '2';
+            this.style.strokeOpacity = '0.8';
           }
         });
+        
+        element.addEventListener('mouseleave', function() {
+          // Reset visual feedback
+          this.style.stroke = 'transparent';
+          this.style.strokeWidth = '0';
+          this.style.strokeOpacity = '0';
+        });
       });
+      
+      // Add coordinate system validation
+      validateCoordinateSystem();
+    }
+    
+    function validateCoordinateSystem() {
+      const svg = document.querySelector('#map-display svg');
+      if (!svg) return;
+      
+      const svgRect = svg.getBoundingClientRect();
+      const viewBox = svg.getAttribute('viewBox');
+      
+      console.log('🗺️ SVG Coordinate System Validation:', {
+        viewBox: viewBox,
+        renderedSize: {
+          width: svgRect.width.toFixed(1),
+          height: svgRect.height.toFixed(1)
+        },
+        aspectRatio: (svgRect.width / svgRect.height).toFixed(3),
+        scaleFactor: (svgRect.width / 1024).toFixed(3)
+      });
+      
+      // Check if coordinate system is consistent
+      if (viewBox === '0 0 1024 1024') {
+        const scaleFactor = svgRect.width / 1024;
+        console.log(`✅ SVG scale factor: ${scaleFactor.toFixed(3)}`);
+        
+        if (Math.abs(svgRect.width - svgRect.height) > 1) {
+          console.warn('⚠️ SVG aspect ratio not square - may cause coordinate drift');
+        }
+      }
     }
     
     function handleMapClick(e) {
@@ -112,6 +184,42 @@
         showMapDisambiguationModal(location);
       }
     }
+  </script>
+
+  <!-- Advanced Map Link Management System -->
+  <script src="/js/advanced-map-links.js"></script>
+  
+  <!-- Initialize advanced link system after page load -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add some debugging helpers
+      console.log('🗺️ Map page loaded, advanced link system should initialize automatically');
+      
+      // Add CSS for better map container positioning
+      const mapDisplay = document.getElementById('map-display');
+      if (mapDisplay) {
+        mapDisplay.style.position = 'relative'; // Ensure relative positioning for overlay
+        
+        // Debug helper: show map bounds
+        window.showMapBounds = function() {
+          const svg = mapDisplay.querySelector('svg');
+          const rect = svg.getBoundingClientRect();
+          console.log('📐 Map SVG bounds:', rect);
+          
+          if (window.mapLinkManager) {
+            window.mapLinkManager.showDebugInfo();
+          }
+        };
+        
+        // Debug helper: force position update
+        window.updateMapPositions = function() {
+          if (window.mapLinkManager) {
+            window.mapLinkManager.updatePositions();
+            console.log('🔄 Forced position update');
+          }
+        };
+      }
+    });
   </script>
 
   <!-- Include the site's disambiguation system -->

@@ -210,9 +210,12 @@ router.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
 
       // Match characters AND lore items by keywords for badge display
       let episodeCharacters = [];
+      let hasLocationConnections = false; // Initialize with default value
+      let allCharacters = [];
+      let allLore = [];
       try {
         // Get all characters
-        const allCharacters = characterHelpers.getAllCharactersSync(false);
+        allCharacters = characterHelpers.getAllCharactersSync(false);
         const matchedCharacters = allCharacters.filter(char =>
           episode.keywords?.some(keyword =>
             char.keywords?.some(ck => ck.toLowerCase() === keyword.toLowerCase())
@@ -226,7 +229,7 @@ router.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
         }));
 
         // Get all lore items
-        const allLore = loreHelpers.getAllLoreSync(false);
+        allLore = loreHelpers.getAllLoreSync(false);
         const matchedLore = allLore.filter(lore =>
           episode.keywords?.some(keyword =>
             lore.keywords?.some(lk => lk.toLowerCase() === keyword.toLowerCase())
@@ -238,6 +241,16 @@ router.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
           type: 'lore',
           url: `/lore/${lore.id}`
         }));
+
+        // Check for location connections (any lore item that's a place)
+        hasLocationConnections = allLore.some(lore =>
+          lore.type === 'place' && 
+          episode.keywords?.some(keyword =>
+            lore.keywords?.some(lk => lk.toLowerCase() === keyword.toLowerCase())
+          )
+        );
+        
+
 
         // Combine characters and lore
         episodeCharacters = [...matchedCharacters, ...matchedLore];
@@ -284,6 +297,11 @@ router.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
         previousLink,
         nextLink,
         characters: episodeCharacters,
+        hasLocationConnections: hasLocationConnections,
+        episodeKeywords: episode.keywords || [],
+        allCharacters: allCharacters || [],
+        allLore: allLore || [],
+        allEpisodes: episodeHelpers.getAllEpisodesSync(false) || [],
         req: req
       });
     } else {
@@ -675,6 +693,11 @@ router.get('/map', async (req, res) => {
       mapContent = '<p>Map temporarily unavailable</p>';
     }
     
+    // Get site data for disambiguation system
+    const allCharacters = characterHelpers.getAllCharactersSync(false) || [];
+    const allLore = loreHelpers.getAllLoreSync(false) || [];
+    const allEpisodes = episodeHelpers.getAllEpisodesSync(false) || [];
+
     res.render('map', {
       title: 'World Map - Wavelength Lore',
       pageTitle: 'World Map - Wavelength Lore',
@@ -687,6 +710,9 @@ router.get('/map', async (req, res) => {
       cdnUrl: process.env.CDN_URL,
       version: `v${Date.now()}`,
       mapContent: mapContent,
+      allCharacters: allCharacters,
+      allLore: allLore,
+      allEpisodes: allEpisodes,
       req: req
     });
   } catch (error) {

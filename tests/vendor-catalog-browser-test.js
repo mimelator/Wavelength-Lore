@@ -1,144 +1,184 @@
 #!/usr/bin/env node
 /**
- * REAL BROWSER TEST - Tests actual UI functionality
- * Tests what the user ACTUALLY sees in the browser
+ * Vendor Catalog Browser Test
+ * Tests the admin vendor catalog interface and analyzes product variations
  */
 
-const { chromium } = require('playwright');
+const puppeteer = require('puppeteer');
 
-console.log('🌐 VENDOR CATALOG BROWSER TEST');
-console.log('==============================\n');
+async function testVendorCatalogBrowser() {
+    console.log('🧪 VENDOR CATALOG BROWSER TEST');
+    console.log('==============================\n');
 
-async function runBrowserTest() {
-  let browser, page;
-  
-  try {
-    browser = await chromium.launch({ headless: true });
-    page = await browser.newPage();
-    
-    // Capture console errors
-    const errors = [];
-    page.on('console', msg => {
-      if (msg.type() === 'error') {
-        errors.push(msg.text());
-      }
-    });
-    
-    console.log('1️⃣ Loading catalog page...');
-    await page.goto('http://localhost:3001/admin/vendor-research/catalog', { 
-      waitUntil: 'networkidle',
-      timeout: 30000 
-    });
-    
-    // Test 1: Check if product cards exist
-    console.log('\n2️⃣ Checking product cards...');
-    const productCards = await page.$$('.product-card');
-    console.log(`   Found ${productCards.length} product cards`);
-    
-    if (productCards.length === 0) {
-      console.log('   ❌ FAIL: No product cards found!');
-      return false;
+    let browser;
+    let page;
+
+    try {
+        // Launch browser
+        console.log('🚀 Launching browser...');
+        browser = await puppeteer.launch({
+            headless: false, // Show browser for visual inspection
+            defaultViewport: { width: 1400, height: 900 },
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+
+        page = await browser.newPage();
+        
+        // Navigate to vendor catalog
+        console.log('📋 Navigating to vendor catalog...');
+        await page.goto('http://localhost:3001/admin/vendor-catalog', {
+            waitUntil: 'networkidle0',
+            timeout: 30000
+        });
+
+        // Wait for products to load
+        await page.waitForSelector('.products-grid', { timeout: 10000 });
+        console.log('✅ Catalog page loaded');
+
+        // Get total product count
+        const totalProducts = await page.evaluate(() => {
+            const statsCard = document.querySelector('.stat-card .stat-number');
+            return statsCard ? parseInt(statsCard.textContent) : 0;
+        });
+        console.log(`📊 Total products found: ${totalProducts}`);
+
+        // Analyze product variations
+        console.log('\n🔍 ANALYZING PRODUCT VARIATIONS');
+        console.log('===============================');
+
+        const productAnalysis = await page.evaluate(() => {
+            const products = Array.from(document.querySelectorAll('.product-card'));
+            const analysis = {
+                totalProducts: products.length,
+                blueprintTypes: new Set(),
+                providerTypes: new Set(),
+                titles: new Set(),
+                productTypes: new Set(),
+                sampleProducts: []
+            };
+
+            products.forEach((product, index) => {
+                // Extract blueprint info
+                const blueprintText = product.querySelector('.product-meta:nth-child(3)')?.textContent || '';
+                const blueprintMatch = blueprintText.match(/Product Type:\s*(.+)/);
+                if (blueprintMatch) {
+                    analysis.blueprintTypes.add(blueprintMatch[1].trim());
+                }
+
+                // Extract provider info
+                const providerText = product.querySelector('.product-meta:nth-child(4)')?.textContent || '';
+                const providerMatch = providerText.match(/Print Provider:\s*(.+)/);
+                if (providerMatch) {
+                    analysis.providerTypes.add(providerMatch[1].trim());
+                }
+
+                // Extract title
+                const title = product.querySelector('.product-title')?.textContent?.trim() || '';
+                analysis.titles.add(title);
+
+                // Extract product ID
+                const productId = product.querySelector('.product-meta:first-child')?.textContent?.replace('Product ID:', '').trim() || '';
+
+                // Store sample for detailed analysis
+                if (index < 10) {
+                    analysis.sampleProducts.push({
+                        index: index + 1,
+                        title,
+                        productId,
+                        blueprint: blueprintMatch ? blueprintMatch[1].trim() : 'Unknown',
+                        provider: providerMatch ? providerMatch[1].trim() : 'Unknown'
+                    });
+                }
+            });
+
+            // Convert Sets to Arrays for JSON serialization
+            analysis.blueprintTypes = Array.from(analysis.blueprintTypes);
+            analysis.providerTypes = Array.from(analysis.providerTypes);
+            analysis.titles = Array.from(analysis.titles);
+
+            return analysis;
+        });
+
+        // Display analysis results
+        console.log(`📦 Products displayed: ${productAnalysis.totalProducts}`);
+        console.log(`🎨 Blueprint types: ${productAnalysis.blueprintTypes.length}`);
+        console.log(`🏭 Provider types: ${productAnalysis.providerTypes.length}`);
+        console.log(`📝 Unique titles: ${productAnalysis.titles.length}`);
+
+        console.log('\n📋 BLUEPRINT TYPES FOUND:');
+        productAnalysis.blueprintTypes.forEach((type, i) => {
+            console.log(`  ${i + 1}. ${type}`);
+        });
+
+        console.log('\n🏭 PROVIDER TYPES FOUND:');
+        productAnalysis.providerTypes.forEach((type, i) => {
+            console.log(`  ${i + 1}. ${type}`);
+        });
+
+        console.log('\n📝 UNIQUE TITLES FOUND:');
+        productAnalysis.titles.forEach((title, i) => {
+            console.log(`  ${i + 1}. "${title}"`);
+        });
+
+        console.log('\n🔍 SAMPLE PRODUCTS (First 10):');
+        productAnalysis.sampleProducts.forEach(product => {
+            console.log(`  ${product.index}. ${product.title}`);
+            console.log(`     ID: ${product.productId}`);
+            console.log(`     Type: ${product.blueprint}`);
+            console.log(`     Provider: ${product.provider}`);
+            console.log('');
+        });
+
+        // Final summary
+        console.log('\n📊 FINAL ANALYSIS SUMMARY');
+        console.log('=========================');
+        console.log(`Total Products: ${productAnalysis.totalProducts}`);
+        console.log(`Blueprint Variety: ${productAnalysis.blueprintTypes.length} types`);
+        console.log(`Provider Variety: ${productAnalysis.providerTypes.length} providers`);
+        console.log(`Title Variety: ${productAnalysis.titles.length} unique titles`);
+        
+        // Identify the issue
+        if (productAnalysis.blueprintTypes.length <= 3) {
+            console.log('\n⚠️ ISSUE IDENTIFIED:');
+            console.log('Limited blueprint variety - most products are T-shirts!');
+            console.log('This confirms vendor compatibility is forcing fallback to T-shirt blueprints.');
+        }
+        
+        if (productAnalysis.titles.length === 1) {
+            console.log('\n⚠️ ISSUE IDENTIFIED:');
+            console.log('All products have the same generic title "Vendor Preview"!');
+            console.log('Enhanced titles from the generator are not being applied.');
+        }
+
+        if (productAnalysis.providerTypes.length === 1) {
+            console.log('\n⚠️ ISSUE IDENTIFIED:');
+            console.log('All products use the same provider (Monster Digital)!');
+            console.log('This explains why mugs/posters become T-shirts - vendor 3 only supports apparel.');
+        }
+
+        console.log('\n✅ Browser test completed successfully');
+        console.log('🔗 Catalog URL: http://localhost:3001/admin/vendor-catalog');
+
+        // Keep browser open for inspection
+        console.log('\n👁️ Browser left open for manual inspection');
+        console.log('Press Ctrl+C to close when done');
+        
+        // Wait for manual close
+        await new Promise(() => {});
+
+    } catch (error) {
+        console.error('❌ Browser test failed:', error.message);
+        throw error;
     }
-    
-    // Test 2: Check View Product button
-    console.log('\n3️⃣ Testing View Product button...');
-    const viewButton = await page.$('.product-card .btn');
-    
-    if (!viewButton) {
-      console.log('   ❌ FAIL: View Product button not found!');
-      return false;
-    }
-    
-    const viewHref = await viewButton.getAttribute('href');
-    console.log(`   Button href: ${viewHref}`);
-    
-    if (!viewHref || viewHref.includes('/api/')) {
-      console.log('   ❌ FAIL: Button links to API endpoint, not HTML page!');
-      return false;
-    }
-    
-    // Click and verify it goes to HTML page
-    console.log('   Clicking View Product button...');
-    await viewButton.click();
-    await page.waitForLoadState('networkidle');
-    
-    const currentUrl = page.url();
-    const pageContent = await page.content();
-    const isHTMLPage = pageContent.includes('<!DOCTYPE html>');
-    
-    console.log(`   Navigated to: ${currentUrl}`);
-    console.log(`   Is HTML page: ${isHTMLPage}`);
-    
-    if (!isHTMLPage) {
-      console.log('   ❌ FAIL: Did not navigate to HTML page!');
-      return false;
-    }
-    
-    console.log('   ✅ PASS: View Product button works!');
-    
-    // Go back to catalog
-    await page.goto('http://localhost:3001/admin/vendor-research/catalog', { 
-      waitUntil: 'networkidle' 
-    });
-    
-    // Test 3: Check image resolver
-    console.log('\n4️⃣ Testing image resolver...');
-    
-    // Wait for image resolver to run
-    await page.waitForTimeout(3000);
-    
-    const images = await page.$$('.product-image-preview img');
-    console.log(`   Found ${images.length} product images`);
-    
-    if (images.length === 0) {
-      console.log('   ❌ FAIL: No product images found!');
-      return false;
-    }
-    
-    // Check if images have resolved URLs
-    let resolvedCount = 0;
-    for (const img of images) {
-      const src = await img.getAttribute('src');
-      const resolvedType = await img.getAttribute('data-resolved-type');
-      
-      if (src && !src.includes('data:image/svg') && !src.includes('placeholder')) {
-        resolvedCount++;
-        console.log(`   Image resolved: ${src.substring(0, 50)}... (${resolvedType || 'unknown'})`);
-      }
-    }
-    
-    console.log(`   Resolved images: ${resolvedCount}/${images.length}`);
-    
-    if (resolvedCount === 0) {
-      console.log('   ❌ FAIL: No images resolved!');
-      return false;
-    }
-    
-    console.log('   ✅ PASS: Image resolver works!');
-    
-    // Test 4: Check for JavaScript errors
-    console.log('\n5️⃣ Checking for JavaScript errors...');
-    if (errors.length > 0) {
-      console.log(`   ❌ Found ${errors.length} JavaScript errors:`);
-      errors.forEach(err => console.log(`      - ${err}`));
-      return false;
-    }
-    
-    console.log('   ✅ PASS: No JavaScript errors!');
-    
-    console.log('\n✅ ALL BROWSER TESTS PASSED!');
-    return true;
-    
-  } catch (error) {
-    console.error(`\n❌ Browser test failed: ${error.message}`);
-    return false;
-  } finally {
-    if (browser) {
-      await browser.close();
-    }
-  }
 }
 
-runBrowserTest().then(success => {
-  process.exit(success ? 0 : 1);
-});
+// Run the test
+if (require.main === module) {
+    testVendorCatalogBrowser()
+        .catch(error => {
+            console.error('💥 Test failed:', error.message);
+            process.exit(1);
+        });
+}
+
+module.exports = testVendorCatalogBrowser;

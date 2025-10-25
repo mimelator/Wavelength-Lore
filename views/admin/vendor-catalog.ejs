@@ -77,9 +77,112 @@
         
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
             margin-top: 20px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            gap: 10px;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+            border: 2px solid #333;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .pagination button:hover {
+            background: #f0f0f0;
+        }
+        
+        .pagination button.active {
+            background: #007bff;
+            color: white;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .view-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border: 2px solid #333;
+            border-radius: 6px;
+        }
+        
+        .view-mode {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .view-mode button {
+            padding: 6px 12px;
+            border: 2px solid #333;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .view-mode button.active {
+            background: #007bff;
+            color: white;
+        }
+        
+        .products-grid.compact {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .products-grid.compact .product-card {
+            padding: 10px;
+        }
+        
+        .products-grid.compact .product-image-preview img {
+            height: 100px;
+        }
+        
+        .products-grid.list {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        
+        .products-grid.list .product-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+        }
+        
+        .products-grid.list .product-image-preview {
+            flex-shrink: 0;
+            width: 80px;
+        }
+        
+        .products-grid.list .product-image-preview img {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .products-grid.list .product-content {
+            flex-grow: 1;
+        }
+        
+        .products-grid.list .product-actions {
+            flex-shrink: 0;
+            margin: 0;
         }
         
         .product-card {
@@ -208,48 +311,77 @@
             </div>
             
             <div class="filters">
-                <h3>🔍 Filter Products</h3>
-                <div class="filter-group">
-                    <label>Blueprint:</label>
-                    <select id="blueprint-filter" class="filter-select">
-                        <option value="">All Types</option>
-                        <% if (typeof catalog !== 'undefined' && catalog && catalog.byBlueprint) { %>
-                            <% Object.keys(catalog.byBlueprint).forEach(blueprint => { %>
-                                <option value="<%= blueprint %>">Blueprint <%= blueprint %> (<%= catalog.byBlueprint[blueprint].length %>)</option>
-                            <% }); %>
-                        <% } %>
-                    </select>
+                <h3>🔍 Filter & Search Products</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <div class="filter-group">
+                        <label>Blueprint:</label>
+                        <select id="blueprint-filter" class="filter-select">
+                            <option value="">All Types</option>
+                            <% if (typeof catalog !== 'undefined' && catalog && catalog.byBlueprint) { %>
+                                <% Object.keys(catalog.byBlueprint).forEach(blueprint => { %>
+                                    <option value="<%= blueprint %>">Blueprint <%= blueprint %> (<%= catalog.byBlueprint[blueprint].length %>)</option>
+                                <% }); %>
+                            <% } %>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Provider:</label>
+                        <select id="provider-filter" class="filter-select">
+                            <option value="">All Providers</option>
+                            <% if (typeof catalog !== 'undefined' && catalog && catalog.byProvider) { %>
+                                <% Object.keys(catalog.byProvider).forEach(provider => { %>
+                                    <option value="<%= provider %>">Provider <%= provider %> (<%= catalog.byProvider[provider].length %>)</option>
+                                <% }); %>
+                            <% } %>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Search:</label>
+                        <input type="text" id="search-filter" class="filter-input" placeholder="Search titles...">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Per Page:</label>
+                        <select id="per-page-filter" class="filter-select">
+                            <option value="12">12 per page</option>
+                            <option value="24" selected>24 per page</option>
+                            <option value="48">48 per page</option>
+                            <option value="all">Show All</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn" onclick="clearAllFilters()">🔄 Clear Filters</button>
+                </div>
+            </div>
+            
+            <div class="view-controls">
+                <div class="view-mode">
+                    <button id="grid-view" class="active" onclick="setViewMode('grid')">🔲 Grid</button>
+                    <button id="compact-view" onclick="setViewMode('compact')">📱 Compact</button>
+                    <button id="list-view" onclick="setViewMode('list')">📋 List</button>
                 </div>
                 
-                <div class="filter-group">
-                    <label>Provider:</label>
-                    <select id="provider-filter" class="filter-select">
-                        <option value="">All Providers</option>
-                        <% if (typeof catalog !== 'undefined' && catalog && catalog.byProvider) { %>
-                            <% Object.keys(catalog.byProvider).forEach(provider => { %>
-                                <option value="<%= provider %>">Provider <%= provider %> (<%= catalog.byProvider[provider].length %>)</option>
-                            <% }); %>
-                        <% } %>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label>Search:</label>
-                    <input type="text" id="search-filter" class="filter-input" placeholder="Search titles...">
+                <div class="results-info">
+                    <span id="results-count">Showing 0 products</span>
                 </div>
             </div>
             
             <div id="products-container">
                 <% if (typeof catalog !== 'undefined' && catalog && catalog.allProducts && catalog.allProducts.length > 0) { %>
+                    <div class="pagination" id="top-pagination"></div>
                     <div class="products-grid" id="products-grid">
                         <% catalog.allProducts.forEach(product => { %>
                             <div class="product-card" 
                                  data-blueprint="<%= product.blueprintId || 'unknown' %>"
                                  data-provider="<%= product.providerId || 'unknown' %>"
-                                 data-title="<%= (product.title || '').toLowerCase() %>">
-                                <div class="product-title">
-                                    <%= product.title || 'Untitled Product' %>
-                                </div>
+                                 data-title="<%= (product.title || '').toLowerCase() %>"
+                                 data-created="<%= product.createdAt || '' %>">
+                                <div class="product-content">
+                                    <div class="product-title">
+                                        <%= product.title || 'Untitled Product' %>
+                                    </div>
                                 
                                 <div class="product-meta">
                                     <strong>Product ID:</strong> <%= product.productId || 'N/A' %>
@@ -307,37 +439,39 @@
                                 </div>
                                 <% } %>
                                 
-                                <div class="product-actions">
-                                    <% if (product.productId) { %>
-                                        <a href="/merchandise/preview/<%= product.productId %>" 
-                                           class="btn" target="_blank">
-                                            👁️ View Product
-                                        </a>
-                                    <% } %>
-                                    
-                                    <% 
-                                    const overlayImageUrl = product.mockupUrl || product.imageUrl || (product.images && product.images.length > 0 ? product.images[0].src : null);
-                                    if (overlayImageUrl) { %>
-                                        <button class="btn btn-border" 
-                                                data-image-url="<%= overlayImageUrl %>"
-                                                data-product-id="<%= product.productId %>"
-                                                data-vendor-id="<%= product.providerId %>"
-                                                data-product-type="<%= product.blueprintId %>"
-                                                data-title="<%= product.title || 'Untitled' %>"
-                                                data-border-type="solid"
-                                                onclick="openBorderModalFromCard(this)">
-                                            🎨 Add Overlay
+                                    <div class="product-actions">
+                                        <% if (product.productId) { %>
+                                            <a href="/merchandise/preview/<%= product.productId %>" 
+                                               class="btn" target="_blank">
+                                                👁️ View
+                                            </a>
+                                        <% } %>
+                                        
+                                        <% 
+                                        const overlayImageUrl = product.mockupUrl || product.imageUrl || (product.images && product.images.length > 0 ? product.images[0].src : null);
+                                        if (overlayImageUrl) { %>
+                                            <button class="btn btn-border" 
+                                                    data-image-url="<%= overlayImageUrl %>"
+                                                    data-product-id="<%= product.productId %>"
+                                                    data-vendor-id="<%= product.providerId %>"
+                                                    data-product-type="<%= product.blueprintId %>"
+                                                    data-title="<%= product.title || 'Untitled' %>"
+                                                    data-border-type="solid"
+                                                    onclick="openBorderModalFromCard(this)">
+                                                🎨 Overlay
+                                            </button>
+                                        <% } %>
+                                        
+                                        <button class="btn btn-danger" 
+                                                onclick="if(confirm('Delete this product?')) deleteProduct('<%= product.productId %>', this)">
+                                            🗑️
                                         </button>
-                                    <% } %>
-                                    
-                                    <button class="btn btn-danger" 
-                                            onclick="if(confirm('Are you sure you want to delete this product? This action cannot be undone.')) deleteProduct('<%= product.productId %>', this)">
-                                        🗑️ Delete
-                                    </button>
+                                    </div>
                                 </div>
                             </div>
                         <% }); %>
                     </div>
+                    <div class="pagination" id="bottom-pagination"></div>
                 <% } else { %>
                     <div class="no-products">
                         <h3>📦 No Products Found</h3>
@@ -379,16 +513,26 @@
             window.location.reload();
         }
         
-        // Filter functionality
+        // Pagination and filtering state
+        let currentPage = 1;
+        let itemsPerPage = 24;
+        let filteredProducts = [];
+        let allProducts = [];
+        
+        // Initialize products array
+        document.addEventListener('DOMContentLoaded', function() {
+            allProducts = Array.from(document.querySelectorAll('.product-card'));
+            filteredProducts = [...allProducts];
+            updateDisplay();
+        });
+        
+        // Filter functionality with pagination
         function filterProducts() {
             const blueprintFilter = document.getElementById('blueprint-filter').value;
             const providerFilter = document.getElementById('provider-filter').value;
             const searchFilter = document.getElementById('search-filter').value.toLowerCase();
             
-            const products = document.querySelectorAll('.product-card');
-            let visibleCount = 0;
-            
-            products.forEach(product => {
+            filteredProducts = allProducts.filter(product => {
                 const blueprint = product.dataset.blueprint;
                 const provider = product.dataset.provider;
                 const title = product.dataset.title;
@@ -397,19 +541,46 @@
                 const providerMatch = !providerFilter || provider === providerFilter;
                 const searchMatch = !searchFilter || title.includes(searchFilter);
                 
-                if (blueprintMatch && providerMatch && searchMatch) {
-                    product.style.display = 'block';
-                    visibleCount++;
-                } else {
-                    product.style.display = 'none';
-                }
+                return blueprintMatch && providerMatch && searchMatch;
             });
             
-            // Update no results message
+            currentPage = 1; // Reset to first page
+            updateDisplay();
+        }
+        
+        // Update display with pagination
+        function updateDisplay() {
+            const perPageSelect = document.getElementById('per-page-filter');
+            itemsPerPage = perPageSelect.value === 'all' ? filteredProducts.length : parseInt(perPageSelect.value);
+            
+            // Hide all products first
+            allProducts.forEach(product => product.style.display = 'none');
+            
+            // Calculate pagination
+            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            
+            // Show current page products
+            const currentProducts = filteredProducts.slice(startIndex, endIndex);
+            currentProducts.forEach(product => product.style.display = 'block');
+            
+            // Update results count
+            const resultsCount = document.getElementById('results-count');
+            if (resultsCount) {
+                const start = filteredProducts.length > 0 ? startIndex + 1 : 0;
+                const end = Math.min(endIndex, filteredProducts.length);
+                resultsCount.textContent = `Showing ${start}-${end} of ${filteredProducts.length} products`;
+            }
+            
+            // Update pagination controls
+            updatePagination(totalPages);
+            
+            // Handle no results
             const grid = document.getElementById('products-grid');
             const noResults = document.getElementById('no-results');
             
-            if (visibleCount === 0 && grid) {
+            if (filteredProducts.length === 0) {
                 if (!noResults) {
                     const message = document.createElement('div');
                     message.id = 'no-results';
@@ -422,10 +593,102 @@
             }
         }
         
+        // Update pagination controls
+        function updatePagination(totalPages) {
+            const topPagination = document.getElementById('top-pagination');
+            const bottomPagination = document.getElementById('bottom-pagination');
+            
+            if (totalPages <= 1) {
+                topPagination.style.display = 'none';
+                bottomPagination.style.display = 'none';
+                return;
+            }
+            
+            topPagination.style.display = 'flex';
+            bottomPagination.style.display = 'flex';
+            
+            const paginationHTML = createPaginationHTML(totalPages);
+            topPagination.innerHTML = paginationHTML;
+            bottomPagination.innerHTML = paginationHTML;
+        }
+        
+        // Create pagination HTML
+        function createPaginationHTML(totalPages) {
+            let html = '';
+            
+            // Previous button
+            html += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>`;
+            
+            // Page numbers (show max 7 pages)
+            let startPage = Math.max(1, currentPage - 3);
+            let endPage = Math.min(totalPages, startPage + 6);
+            
+            if (endPage - startPage < 6) {
+                startPage = Math.max(1, endPage - 6);
+            }
+            
+            if (startPage > 1) {
+                html += `<button onclick="changePage(1)">1</button>`;
+                if (startPage > 2) html += '<span>...</span>';
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button onclick="changePage(${i})" ${i === currentPage ? 'class="active"' : ''}>${i}</button>`;
+            }
+            
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) html += '<span>...</span>';
+                html += `<button onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+            
+            // Next button
+            html += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
+            
+            return html;
+        }
+        
+        // Change page
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            
+            currentPage = page;
+            updateDisplay();
+            
+            // Scroll to top
+            document.querySelector('.catalog-container').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // View mode functions
+        function setViewMode(mode) {
+            const grid = document.getElementById('products-grid');
+            const buttons = document.querySelectorAll('.view-mode button');
+            
+            // Remove all view classes
+            grid.className = 'products-grid';
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add new view class and activate button
+            if (mode !== 'grid') {
+                grid.classList.add(mode);
+            }
+            document.getElementById(mode + '-view').classList.add('active');
+        }
+        
+        // Clear all filters
+        function clearAllFilters() {
+            document.getElementById('blueprint-filter').value = '';
+            document.getElementById('provider-filter').value = '';
+            document.getElementById('search-filter').value = '';
+            document.getElementById('per-page-filter').value = '24';
+            filterProducts();
+        }
+        
         // Attach filter event listeners
         document.getElementById('blueprint-filter').addEventListener('change', filterProducts);
         document.getElementById('provider-filter').addEventListener('change', filterProducts);
         document.getElementById('search-filter').addEventListener('input', filterProducts);
+        document.getElementById('per-page-filter').addEventListener('change', updateDisplay);
         
         // Delete product function
         async function deleteProduct(productId, button) {

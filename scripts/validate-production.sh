@@ -37,6 +37,7 @@ if [[ "$1" == "--help" || "$1" == "-h" || $# -eq 0 ]]; then
     echo "  --skip-static    - Skip static resource checking" 
     echo "  --skip-routes    - Skip route link checking"
     echo "  --skip-audio     - Skip audio file checking"
+    echo "  --skip-vendor    - Skip vendor compatibility checking"
     echo ""
     print_color $YELLOW "Examples:"
     echo "  $0 quick                    # Quick validation"
@@ -49,6 +50,7 @@ if [[ "$1" == "--help" || "$1" == "-h" || $# -eq 0 ]]; then
     echo "  ./check_static_resources.js --prod   # Static resources only"
     echo "  ./check_route_links.js --prod        # Routes only"
     echo "  ./check_audio_files.js --prod        # Audio files only"
+    echo "  ./vendor-compatibility-check.js      # Vendor compatibility only"
     exit 0
 fi
 

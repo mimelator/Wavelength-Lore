@@ -641,6 +641,80 @@ router.get('/products', ensureAuthenticated, async (req, res) => {
 });
 
 /**
+ * DELETE /api/merchandise/products/:productId
+ * Delete a user's product
+ */
+router.delete('/products/:productId', ensureAuthenticated, async (req, res) => {
+  try {
+    if (!ensureDatabaseReady(res)) {
+      return;
+    }
+    
+    const userId = req.user.uid;
+    const { productId } = req.params;
+    
+    console.log(`🗑️ DELETE REQUEST: User product ${productId} for user ${userId}`);
+    
+    // 1. Verify product belongs to user
+    const userProducts = await merchandiseDB.getUserProducts(userId);
+    const userProduct = userProducts.find(p => (p.id || p.productId) === productId);
+    
+    if (!userProduct) {
+      console.log(`   ❌ Product not found in user collection`);
+      return res.status(404).json({
+        success: false,
+        error: 'Product not found'
+      });
+    }
+    
+    console.log(`   ✅ Confirmed: ${productId} belongs to user ${userId}`);
+    
+    // 2. Delete from Printify (if not mock mode)
+    if (process.env.PRINTIFY_MOCK_MODE !== 'true') {
+      try {
+        console.log(`   🗑️ Deleting from Printify...`);
+        await printifyService.deleteProduct(productId);
+        console.log(`   ✅ Deleted from Printify`);
+      } catch (printifyError) {
+        console.error(`   ⚠️  Printify deletion failed:`, printifyError.message);
+        // Continue with database deletion even if Printify fails
+      }
+    } else {
+      console.log(`   🔧 Mock mode: Skipping Printify deletion`);
+    }
+    
+    // 3. Delete from user products database
+    console.log(`   🗑️ Deleting from user products database...`);
+    const dbResult = await merchandiseDB.deleteUserProduct(userId, productId);
+    
+    if (!dbResult) {
+      console.log(`   ⚠️  Database deletion failed`);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to delete product from database'
+      });
+    }
+    
+    console.log(`   ✅ Deleted from user products database`);
+    console.log(`   ✅ DELETE COMPLETE: ${productId}`);
+    
+    res.json({
+      success: true,
+      message: 'Product deleted successfully',
+      productId: productId
+    });
+    
+  } catch (error) {
+    console.error('Error deleting user product:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete product',
+      details: error.message
+    });
+  }
+});
+
+/**
  * GET /api/merchandise/vendor-preview/:productId
  * Get vendor preview product details (public endpoint)
  */

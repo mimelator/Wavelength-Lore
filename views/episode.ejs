@@ -5,6 +5,50 @@
     <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css">
     <link rel="stylesheet" href="<%= cdnUrl %>/css/modal_styles.css">
     <link rel="stylesheet" href="<%= cdnUrl %>/css/radio-player.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
+    <style>
+        /* World Map Modal Styles */
+        #worldMapModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+        
+        #worldMapModal .modal-content-map {
+            background: white;
+            margin: 2% auto;
+            padding: 0;
+            width: 95%;
+            max-width: 1200px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        #modalMapContent svg {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #worldMapModal .modal-content-map {
+                width: 98%;
+                margin: 1% auto;
+            }
+            
+            .map-header h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
     <link rel="stylesheet" type="text/css" href="<%= cdnUrl %>/css/carousel.css">
@@ -96,6 +140,20 @@
             <img class="modal-content" id="fullSizeImage">
         </div>
 
+        <!-- World Map Modal -->
+        <div id="worldMapModal" class="modal" style="display: none;">
+            <div class="modal-content-map" style="background: white; margin: 2% auto; padding: 0; width: 95%; max-width: 1200px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: relative;">
+                <span class="modal-close-map" style="position: absolute; right: 15px; top: 10px; font-size: 28px; font-weight: bold; cursor: pointer; z-index: 1000; color: #333;">&times;</span>
+                <div class="map-header" style="padding: 20px; text-align: center; border-bottom: 2px solid #eee;">
+                    <h2 style="color: #4a47a3; margin: 0;">🗺️ World of Wavelength</h2>
+                    <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">Click on locations to explore characters and lore</p>
+                </div>
+                <div id="modalMapContent" style="padding: 20px; min-height: 400px; text-align: center;">
+                    <p>Loading interactive map...</p>
+                </div>
+            </div>
+        </div>
+
         <br /><br />
 
         <section class="summary">
@@ -173,6 +231,272 @@
         </section>
         <% } %>
 
+        <!-- World Map Exploration Section -->
+        <% if (hasLocationConnections) { %>
+        <!-- World Map Sidebar for Desktop -->
+        <div class="episode-world-map-sidebar" style="position: fixed; right: 20px; top: 120px; width: 320px; background: rgba(255, 255, 255, 0.95); padding: 16px; border-radius: 12px; border: 2px solid rgba(74, 71, 163, 0.3); box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 100; backdrop-filter: blur(5px);">
+            <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                <h3 style="color: #4a47a3; margin: 0; font-size: 16px; font-weight: 600; flex-grow: 1;">🗺️ Episode Map</h3>
+                <button id="minimize-map" style="background: none; border: none; font-size: 18px; cursor: pointer; color: #666; padding: 0; width: 24px; height: 24px;">−</button>
+            </div>
+            
+            <!-- Larger Map Preview for Desktop -->
+            <div id="episode-map-preview" style="width: 100%; height: 280px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; margin: 8px 0; position: relative; overflow: hidden; cursor: pointer;" title="Click to view full interactive map">
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #666; font-size: 13px; text-align: center;">
+                    <div style="margin-bottom: 8px;">📍</div>
+                    Loading episode locations...
+                </div>
+            </div>
+            
+            <div style="font-size: 12px; color: #555; line-height: 1.4; text-align: center;">
+                <div style="margin-bottom: 8px;">
+                    <span style="color: #FFD700; font-weight: bold;">●</span> Episode locations highlighted
+                </div>
+                <a href="/map" target="_blank" style="color: #4a47a3; text-decoration: none; font-weight: 500; font-size: 11px;">
+                    🌍 Open Full Interactive Map →
+                </a>
+            </div>
+        </div>
+        
+        <!-- Mobile/Tablet Compact Version -->
+        <section class="episode-world-map-mobile" style="max-width: 400px; margin: 20px auto; background: rgba(74, 71, 163, 0.05); padding: 12px; border-radius: 12px; border: 1px solid rgba(74, 71, 163, 0.2); text-align: center; display: none;">
+            <h3 style="color: #4a47a3; margin: 0 0 8px 0; font-size: 14px; font-weight: 600;">🗺️ Episode Locations</h3>
+            <p style="color: #555; margin: 0 0 12px 0; font-size: 13px;">This episode takes place in highlighted world locations</p>
+            <a href="/map" target="_blank" style="display: inline-block; background-color: #4a47a3; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 500;">
+                🌍 View Episode Map
+            </a>
+        </section>
+        
+        <!-- Responsive CSS -->
+        <style>
+        @media (max-width: 1200px) {
+            .episode-world-map-sidebar {
+                display: none !important;
+            }
+            .episode-world-map-mobile {
+                display: block !important;
+            }
+        }
+        
+        @media (min-width: 1201px) {
+            .episode-world-map-sidebar {
+                display: block !important;
+            }
+            .episode-world-map-mobile {
+                display: none !important;
+            }
+            
+            /* Adjust main content to not overlap with sidebar */
+            .container, .episode-content, main {
+                margin-right: 360px !important;
+            }
+        }
+        
+        .episode-world-map-sidebar.minimized #episode-map-preview,
+        .episode-world-map-sidebar.minimized .episode-map-details {
+            display: none;
+        }
+        
+        .episode-world-map-sidebar.minimized {
+            height: auto;
+            padding-bottom: 16px;
+        }
+        
+        .episode-world-map-sidebar.minimized #minimize-map::after {
+            content: '+';
+        }
+        </style>
+        
+        <script>
+        // Load episode map preview immediately when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEpisodeMapPreview();
+            setupMapSidebar();
+        });
+        
+        function setupMapSidebar() {
+            const minimizeBtn = document.getElementById('minimize-map');
+            const sidebar = document.querySelector('.episode-world-map-sidebar');
+            
+            if (minimizeBtn && sidebar) {
+                minimizeBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('minimized');
+                    this.textContent = sidebar.classList.contains('minimized') ? '+' : '−';
+                });
+            }
+        }
+        
+        function loadEpisodeMapPreview() {
+            const previewContainer = document.getElementById('episode-map-preview');
+            if (!previewContainer) return;
+            
+            // Fetch the full map and create a preview
+            fetch('/map')
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const fullMapSvg = doc.querySelector('#map-display svg');
+                    
+                    if (fullMapSvg) {
+                        // Clone the SVG for preview
+                        const previewSvg = fullMapSvg.cloneNode(true);
+                        
+                        // Resize SVG for preview container
+                        previewSvg.setAttribute('width', '100%');
+                        previewSvg.setAttribute('height', '100%');
+                        previewSvg.setAttribute('viewBox', '0 0 1024 1024');
+                        previewSvg.style.display = 'block';
+                        
+                        // Get episode locations to highlight
+                        const episodeKeywords = <%- JSON.stringify(episodeKeywords) %>;
+                        
+                        // Helper function to calculate bounding box of elements
+                        function calculateBoundingBox(elements) {
+                            if (!elements || elements.length === 0) return null;
+                            
+                            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                            
+                            elements.forEach(element => {
+                                let bounds;
+                                
+                                if (element.tagName.toLowerCase() === 'circle') {
+                                    const cx = parseFloat(element.getAttribute('cx') || 0);
+                                    const cy = parseFloat(element.getAttribute('cy') || 0);
+                                    const r = parseFloat(element.getAttribute('r') || 5);
+                                    bounds = {
+                                        minX: cx - r, maxX: cx + r,
+                                        minY: cy - r, maxY: cy + r
+                                    };
+                                } else if (element.tagName.toLowerCase() === 'rect') {
+                                    const x = parseFloat(element.getAttribute('x') || 0);
+                                    const y = parseFloat(element.getAttribute('y') || 0);
+                                    const width = parseFloat(element.getAttribute('width') || 10);
+                                    const height = parseFloat(element.getAttribute('height') || 10);
+                                    bounds = {
+                                        minX: x, maxX: x + width,
+                                        minY: y, maxY: y + height
+                                    };
+                                } else {
+                                    // Try to get bounding box for other elements
+                                    try {
+                                        const bbox = element.getBBox();
+                                        bounds = {
+                                            minX: bbox.x, maxX: bbox.x + bbox.width,
+                                            minY: bbox.y, maxY: bbox.y + bbox.height
+                                        };
+                                    } catch (e) {
+                                        return; // Skip elements we can't measure
+                                    }
+                                }
+                                
+                                if (bounds) {
+                                    minX = Math.min(minX, bounds.minX);
+                                    minY = Math.min(minY, bounds.minY);
+                                    maxX = Math.max(maxX, bounds.maxX);
+                                    maxY = Math.max(maxY, bounds.maxY);
+                                }
+                            });
+                            
+                            return minX !== Infinity ? { minX, minY, maxX, maxY } : null;
+                        }
+                        
+                        // Highlight locations that match episode keywords
+                        const clickableElements = previewSvg.querySelectorAll('[data-location]');
+                        let highlightedCount = 0;
+                        let highlightedElements = [];
+                        
+                        clickableElements.forEach(element => {
+                            const location = element.getAttribute('data-location');
+                            const shouldHighlight = episodeKeywords.some(keyword => 
+                                location.toLowerCase().includes(keyword.toLowerCase()) ||
+                                keyword.toLowerCase().includes(location.toLowerCase())
+                            );
+                            
+                            if (shouldHighlight) {
+                                // Highlight this location
+                                if (element.tagName.toLowerCase() === 'circle') {
+                                    element.setAttribute('fill', 'rgba(255, 215, 0, 0.7)'); // Gold highlight
+                                    element.setAttribute('stroke', '#4a47a3');
+                                    element.setAttribute('stroke-width', '3');
+                                } else if (element.tagName.toLowerCase() === 'rect') {
+                                    element.setAttribute('fill', 'rgba(255, 215, 0, 0.3)');
+                                    element.setAttribute('stroke', '#4a47a3');
+                                    element.setAttribute('stroke-width', '2');
+                                }
+                                
+                                // Add a pulse animation
+                                element.innerHTML += '<animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite" />';
+                                
+                                highlightedElements.push(element);
+                                highlightedCount++;
+                            } else {
+                                // Fade non-relevant locations
+                                element.style.opacity = '0.3';
+                            }
+                            
+                            // Restore proper click behavior to navigate to lore pages
+                            const locationId = element.getAttribute('data-location');
+                            if (locationId) {
+                                // Add click handler that calls the map disambiguation system
+                                element.style.cursor = 'pointer';
+                                element.onclick = function(e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    // Use the same disambiguation system as the main map
+                                    if (typeof window.showMapDisambiguationModal === 'function') {
+                                        window.showMapDisambiguationModal(locationId);
+                                    } else {
+                                        console.warn('Map disambiguation system not loaded');
+                                    }
+                                };
+                                
+                                // Add hover effect for better UX
+                                element.addEventListener('mouseenter', function() {
+                                    const locationName = locationId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                    this.setAttribute('title', `Click to explore ${locationName}`);
+                                });
+                            }
+                        });
+                        
+                        // Auto-zoom to highlighted regions if any exist
+                        if (highlightedElements.length > 0) {
+                            const bounds = calculateBoundingBox(highlightedElements);
+                            if (bounds) {
+                                // Add padding around the bounds
+                                const padding = 50;
+                                const x = Math.max(0, bounds.minX - padding);
+                                const y = Math.max(0, bounds.minY - padding);
+                                const width = Math.min(1024, bounds.maxX - bounds.minX + padding * 2);
+                                const height = Math.min(1024, bounds.maxY - bounds.minY + padding * 2);
+                                
+                                // Update viewBox to zoom into the highlighted area
+                                previewSvg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
+                                console.log(`🔍 Auto-zoomed to region: ${x},${y} ${width}x${height}`);
+                            }
+                        }
+                        
+                        // Replace loading text with the map
+                        previewContainer.innerHTML = '';
+                        previewContainer.appendChild(previewSvg);
+                        
+                        console.log(`🗺️ Episode map preview loaded with ${highlightedCount} highlighted locations`);
+                        
+                        // Note: Individual location clicks now handled by each clickable element
+                        // Removed container click handler to prevent conflicts
+                        
+                    } else {
+                        previewContainer.innerHTML = '<div style="padding: 20px; color: #666; font-size: 12px;">Map preview unavailable<br><a href="/map" target="_blank" style="color: #4a47a3;">View full map →</a></div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading map preview:', error);
+                    previewContainer.innerHTML = '<div style="padding: 20px; color: #666; font-size: 12px;">Unable to load map preview<br><a href="/map" target="_blank" style="color: #4a47a3;">View full map →</a></div>';
+                });
+        }
+        </script>
+        <% } %>
+
         <section class="lyrics">
             <h2>Lyrics</h2>
             <div class="content-with-links episode-lyrics">
@@ -237,6 +561,138 @@
                 player.playTrack(0);
             }
         });
+        
+        // World Map Modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mapButton = document.getElementById('showWorldMapModal');
+            const mapModal = document.getElementById('worldMapModal');
+            const mapClose = document.querySelector('.modal-close-map');
+            
+            if (mapButton) {
+                mapButton.addEventListener('click', function() {
+                    mapModal.style.display = 'block';
+                    loadMapContent();
+                });
+            }
+            
+            if (mapClose) {
+                mapClose.addEventListener('click', function() {
+                    mapModal.style.display = 'none';
+                });
+            }
+            
+            // Close modal when clicking outside of it
+            window.addEventListener('click', function(event) {
+                if (event.target === mapModal) {
+                    mapModal.style.display = 'none';
+                }
+            });
+        });
+        
+        function loadMapContent() {
+            const mapContainer = document.getElementById('modalMapContent');
+            mapContainer.innerHTML = '<p>Loading interactive map...</p>';
+            
+            // Fetch the map content
+            fetch('/map')
+                .then(response => response.text())
+                .then(html => {
+                    // Extract both the SVG and JavaScript from the full map page
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const mapSvg = doc.querySelector('#map-display');
+                    
+                    if (mapSvg) {
+                        mapContainer.innerHTML = mapSvg.innerHTML;
+                        
+                        // Extract and execute the map JavaScript functions
+                        const scripts = doc.querySelectorAll('script');
+                        scripts.forEach(script => {
+                            if (script.innerHTML.includes('attachClickHandlers') || 
+                                script.innerHTML.includes('handleMapClick') ||
+                                script.innerHTML.includes('showMapDisambiguationModal')) {
+                                // Create and execute the script in current context
+                                const newScript = document.createElement('script');
+                                newScript.innerHTML = script.innerHTML;
+                                document.head.appendChild(newScript);
+                            }
+                        });
+                        
+                        // Initialize map interactivity after a short delay
+                        setTimeout(() => {
+                            if (typeof attachClickHandlers === 'function') {
+                                attachClickHandlers();
+                                console.log('🗺️ Map interactivity initialized with attachClickHandlers');
+                            } else {
+                                console.warn('⚠️ attachClickHandlers function not available, using fallback');
+                                addBasicMapClickHandlers();
+                            }
+                        }, 200);
+                    } else {
+                        mapContainer.innerHTML = '<p>Unable to load map. <a href="/map" target="_blank">View full map →</a></p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading map:', error);
+                    mapContainer.innerHTML = '<p>Error loading map. <a href="/map" target="_blank">View full map →</a></p>';
+                });
+        }
+        
+        // Fallback function to add basic click handlers if main functions don't load
+        function addBasicMapClickHandlers() {
+            const clickableElements = document.querySelectorAll('#modalMapContent [data-location]');
+            console.log(`🔧 Adding basic click handlers to ${clickableElements.length} elements`);
+            
+            clickableElements.forEach(element => {
+                element.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const location = this.getAttribute('data-location');
+                    console.log('🖱️ Clicked location:', location);
+                    
+                    if (location) {
+                        // Simple navigation - go to lore page if it exists
+                        window.location.href = `/lore/${location}`;
+                    }
+                });
+                
+                // Add visual feedback
+                element.style.cursor = 'pointer';
+                element.addEventListener('mouseenter', function() {
+                    this.style.opacity = '0.8';
+                });
+                element.addEventListener('mouseleave', function() {
+                    this.style.opacity = '1';
+                });
+            });
+        }
+        
+        function initializeMapInteractivity() {
+            // Add click handlers to map locations
+            const clickableElements = document.querySelectorAll('#modalMapContent .click-target[data-location], #modalMapContent .clickable[data-location]');
+            
+            clickableElements.forEach(element => {
+                element.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const location = this.getAttribute('data-location');
+                    
+                    if (location) {
+                        // Close modal and navigate to location
+                        document.getElementById('worldMapModal').style.display = 'none';
+                        window.open(`/lore/${location}`, '_blank');
+                    }
+                });
+                
+                // Add hover effect
+                element.addEventListener('mouseenter', function() {
+                    const location = this.getAttribute('data-location');
+                    if (location) {
+                        const title = location.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        this.setAttribute('title', `Click to explore ${title}`);
+                        this.style.cursor = 'pointer';
+                    }
+                });
+            });
+        }
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -262,6 +718,68 @@
             });
         });
     </script>
+    
+    <!-- Advanced Map Link System for Episode Preview -->
+    <script src="/js/advanced-map-links.js"></script>
+    
+    <!-- Episode-specific Map Link Integration -->
+    <script>
+        // Initialize advanced link system for episode map preview
+        function initializeEpisodeMapLinks() {
+            const episodeMapPreview = document.getElementById('episode-map-preview');
+            const previewSvg = episodeMapPreview ? episodeMapPreview.querySelector('svg') : null;
+            
+            if (episodeMapPreview && previewSvg) {
+                console.log('🎯 Initializing episode map link system');
+                
+                // Create episode-specific map link manager
+                window.episodeMapLinkManager = new MapLinkManager(episodeMapPreview, previewSvg);
+                
+                // Add episode-specific styling for smaller preview
+                const overlayContainer = episodeMapPreview.querySelector('.map-overlay-container');
+                if (overlayContainer) {
+                    // Adjust overlay sizing for smaller preview context
+                    overlayContainer.style.fontSize = '10px';
+                    
+                    // Make overlays slightly smaller for compact preview
+                    const overlays = overlayContainer.querySelectorAll('.location-overlay');
+                    overlays.forEach(overlay => {
+                        const currentWidth = parseInt(overlay.style.width) || 30;
+                        const currentHeight = parseInt(overlay.style.height) || 30;
+                        overlay.style.width = Math.max(20, currentWidth * 0.8) + 'px';
+                        overlay.style.height = Math.max(20, currentHeight * 0.8) + 'px';
+                    });
+                }
+                
+                console.log('✅ Episode map link system initialized');
+            }
+        }
+        
+        // Hook into existing loadEpisodeMapPreview function
+        const originalLoadFunction = window.loadEpisodeMapPreview;
+        if (originalLoadFunction) {
+            window.loadEpisodeMapPreview = function() {
+                originalLoadFunction();
+                // Wait for SVG to be added, then initialize link system
+                setTimeout(initializeEpisodeMapLinks, 100);
+            };
+        }
+        
+        // Also try to initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initializeEpisodeMapLinks, 500);
+        });
+    </script>
+    
+    <!-- Map disambiguation system for episode preview clicks -->
+    <script src="/js/map-modal-fix.js"></script>
+    <script>
+        // Make site data available for map disambiguation
+        window.allCharacters = <%- JSON.stringify(allCharacters || []) %>;
+        window.allLore = <%- JSON.stringify(allLore || []) %>;
+        window.allEpisodes = <%- JSON.stringify(allEpisodes || []) %>;
+    </script>
+    
     <%- simpleDisambiguationScript %>
 </body>
 </html>

@@ -17,6 +17,7 @@ Options:
   --skip-static          Skip static resource checking
   --skip-routes          Skip route link checking
   --skip-audio           Skip audio file checking
+  --skip-vendor          Skip vendor compatibility checking
   --help, -h             Show this help message
 
 Examples:
@@ -29,6 +30,7 @@ This suite runs:
   📁 Static Resource Checker (check_static_resources.js --prod) 
   🔗 Route Link Checker (check_route_links.js --prod)
   🎵 Audio File Checker (check_audio_files.js --prod)
+  🛍️  Vendor Compatibility Checker (vendor-compatibility-check.js)
 `);
     process.exit(0);
 }
@@ -43,6 +45,7 @@ const skipImages = args.includes('--skip-images');
 const skipStatic = args.includes('--skip-static');
 const skipRoutes = args.includes('--skip-routes');
 const skipAudio = args.includes('--skip-audio');
+const skipVendor = args.includes('--skip-vendor');
 
 const PROD_URL = 'https://wavelengthlore.com';
 
@@ -225,6 +228,18 @@ const parseResults = (output, scriptName) => {
                     }
                 });
             }
+        } else if (scriptName.includes('vendor')) {
+            // Parse vendor compatibility results
+            const statusMatch = output.match(/Result: (\w+) - (.+)/);
+            if (statusMatch) {
+                const [, status, message] = statusMatch;
+                results.totalChecked = 1;
+                results.totalBroken = status === 'OK' ? 0 : 1;
+                results.successRate = status === 'OK' ? 100 : status === 'WARNING' ? 75 : 0;
+                if (status !== 'OK') {
+                    results.issues.push(message);
+                }
+            }
         }
     } catch (error) {
         console.error('Error parsing results:', error.message);
@@ -243,7 +258,8 @@ const main = async () => {
         !skipImages ? '🖼️ Images' : null,
         !skipStatic ? '📁 Static' : null, 
         !skipRoutes ? '🔗 Routes' : null,
-        !skipAudio ? '🎵 Audio' : null
+        !skipAudio ? '🎵 Audio' : null,
+        !skipVendor ? '🛍️ Vendor' : null
     ].filter(Boolean).join(', ')}`, 'cyan');
     
     const results = {};
@@ -278,6 +294,14 @@ const main = async () => {
             script: 'check_audio_files.js',
             name: 'Audio File Checker',
             key: 'audio'
+        });
+    }
+    
+    if (!skipVendor) {
+        checkers.push({
+            script: 'vendor-compatibility-check.js',
+            name: 'Vendor Compatibility Checker',
+            key: 'vendor'
         });
     }
     
