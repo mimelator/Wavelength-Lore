@@ -30,6 +30,29 @@ npm run deploy:record     # Record deployment manually
 npm run deploy:auto-record # Auto-record deployment info
 ```
 
+## 🛠️ Clean Development Operations
+```bash
+# Process-Isolated Git Operations (NEW)
+./isolated-run.sh git status              # Clean git status without server log interference
+./isolated-run.sh git commit -m "msg"     # Isolated commits with no mixed output
+./isolated-run.sh git push origin main    # Clean push operations
+./isolated-run.sh node tests/test-file.js # Run tests without process interference
+
+# Simple Commit System (NEW)
+./commit.sh "commit message"              # Interactive clean commits with confirmation
+./commit.sh                              # Prompts for commit message if not provided
+
+# Development File Management (NEW)  
+./cleanup.sh                             # Interactive cleanup of untracked development files
+git add -A && ./commit.sh "message"      # Full repository sync with clean commits
+
+# Full Terminal Isolation (Advanced)
+./dev-terminal.sh create                 # Create dedicated isolated tmux session
+./dev-terminal.sh attach                 # Connect to isolated development session  
+./dev-terminal.sh run "command"          # Execute commands in isolated session
+./dev-terminal.sh kill                   # Terminate isolated session
+```
+
 ## 🌍 Environment Management
 ```bash
 npm run env:dev           # Show current environment setup
@@ -80,6 +103,40 @@ npm run deploy:compare && echo "✅ Versions synchronized" || echo "❌ Version 
 5. Fix issue & push again        # Auto-retry same version
 ```
 
+### Git Operation Issues (SOLVED)
+```bash
+# Problem: Mixed server logs interfering with git output
+# Solution: Use process isolation tools
+
+# Clean git operations:
+./isolated-run.sh git status     # Pure git output, no server log mixing
+./isolated-run.sh git diff       # Clean diff display
+./isolated-run.sh git log        # Uncontaminated commit history
+
+# Reliable commits:
+git add <files>                  # Stage changes normally
+./commit.sh "message"            # Clean, interactive commit process
+
+# If commit message too long for command line:
+git add <files>                  # Stage changes
+./commit.sh                      # Will prompt for message interactively
+```
+
+### Development Environment Noise
+```bash
+# Problem: Server processes interfering with development commands
+# Solution: Process isolation system
+
+# Run tests cleanly:
+./isolated-run.sh node tests/simple-test.js
+
+# Security audits without interference:
+./isolated-run.sh node security-audit.js
+
+# Any command with clean output:
+./isolated-run.sh cmd "your-command-here"
+```
+
 ### Health Check Issues
 ```bash
 1. npm run health:quick                              # Run fast health validation
@@ -111,6 +168,8 @@ npm run deploy:compare && echo "✅ Versions synchronized" || echo "❌ Version 
 - Use `npm run gh:watch` for real-time deployment monitoring
 - Use `npm run logs:tail` to watch application logs live  
 - Check `npm run deploy:compare` before major changes
+- Use `./isolated-run.sh` for all git operations to avoid server log interference
+- Stage changes with `git add`, then use `./commit.sh` for clean, reliable commits
 
 ### Production Health Monitoring
 - Run `npm run health:quick` for daily production validation
