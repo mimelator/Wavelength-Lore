@@ -141,6 +141,8 @@ class MerchandiseStore {
   }
   
   async createProduct(imageId, productOptions) {
+    let productProgressInterval = null;
+    
     try {
       // Get full image data from gallery
       const imageData = this.galleryImages.find(img => img.id === imageId);
@@ -161,7 +163,7 @@ class MerchandiseStore {
       ];
       
       let currentStep = 0;
-      let productProgressInterval = setInterval(() => {
+      productProgressInterval = setInterval(() => {
         if (currentStep < productProgressMessages.length - 1) {
           currentStep++;
           this.setLoading(true, productProgressMessages[currentStep]);
