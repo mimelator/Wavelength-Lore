@@ -23,7 +23,7 @@ const path = require('path');
 
 // Configuration
 require('dotenv').config();
-const awsResources = require('../config/aws-resources');
+const awsResources = require('../../config/aws-resources');
 
 const CONFIG = {
   AWS_REGION: 'us-east-1',

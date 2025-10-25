@@ -28,7 +28,7 @@ const path = require('path');
 
 // Load configuration
 require('dotenv').config();
-const awsResources = require('../config/aws-resources');
+const awsResources = require('../../config/aws-resources');
 
 /**
  * Base AWS Manager Class

@@ -12,7 +12,8 @@
  * Operations: run, check, monitor, validate, analyze
  */
 
-const program = require('commander');
+const { Command } = require('commander');
+const program = new Command();
 const puppeteer = require('puppeteer');
 const axios = require('axios');
 const fs = require('fs').promises;
