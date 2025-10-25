@@ -37,6 +37,7 @@ const galleryApiRoutes = require('./routes/galleryApi');
 const merchandiseRoutes = require('./routes/merchandise');
 const enhancedMerchandiseRoutes = require('./routes/enhanced-merchandise');
 const adminVendorResearchRoutes = require('./routes/admin-vendor-research');
+const adminCleanupRoutes = require('./routes/admin-cleanup');
 const borderPreviewApiRoutes = require('./routes/api-border-preview');
 const productImageApiRoutes = require('./routes/api-product-image');
 const chatbotRoutes = require('./routes/chatbot');
@@ -159,6 +160,9 @@ async function createApp() {
 
   // Mount admin vendor research routes (admin only)
   app.use('/admin', adminVendorResearchRoutes);
+  
+  // Mount admin cleanup routes (admin only)
+  app.use('/admin', adminCleanupRoutes);
 
   // Mount content routes
   app.use('/', contentRoutes);
@@ -173,9 +177,10 @@ async function createApp() {
     });
   });
 
-  // Redirect old merchandise-store route to merchandise
+  // Redirect old merchandise-store route to merchandise (preserve query parameters)
   app.get('/merchandise-store', (req, res) => {
-    res.redirect(301, '/merchandise');
+    const queryString = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
+    res.redirect(301, '/merchandise' + queryString);
   });
 
   // Mount admin and utility routes

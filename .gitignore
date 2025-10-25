@@ -9,6 +9,7 @@
 .current-notes.md
 .env
 .env.bak
+.env.local
 
 # Production URLs and domain info (contains service URLs)
 docs/FIREBASE_AUTH_PRODUCTION_FIX.md

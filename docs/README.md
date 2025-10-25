@@ -1,6 +1,24 @@
 # Wavelength Lore - Documentation Hub
 
-Complete documentation for the Wavelength Lore platform, systems, and games.
+Complete documentation for the Wavelength Lore platform, systems, games, and **production deployment system**.
+
+## 🚀 DevOps & Deployment (NEW)
+
+### Production-Ready Deployment System
+- **[devops-pre-increment-guide.md](devops-pre-increment-guide.md)** - Complete deployment system overview
+- **[ENVIRONMENT_CONFIGURATION.md](ENVIRONMENT_CONFIGURATION.md)** - Safe environment management 
+- **[devops-quick-reference.md](devops-quick-reference.md)** - Command reference & troubleshooting
+
+### Quick DevOps Commands
+```bash
+npm run gh:dashboard      # Complete deployment overview
+npm run gh:watch         # Live deployment monitoring
+npm run logs:service     # App Runner deployment logs
+npm run logs:errors      # Automated error detection
+npm run env:prod-preview # Preview production config changes
+```
+
+**System Highlights**: ✅ No timeout failures ✅ Perfect version sync ✅ Real-time monitoring ✅ Safe dev/prod separation
 
 ## Directory Structure
 

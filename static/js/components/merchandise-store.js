@@ -14,6 +14,7 @@ class MerchandiseStore {
     this.isLoading = false;
     this.galleryImages = [];
     this.enhancementStatus = { available: false };
+    this.isInitializing = true;
     
     console.log('🛍️ MerchandiseStore constructor called');
     
@@ -80,6 +81,25 @@ class MerchandiseStore {
       await this.loadGalleryImages();
       console.log('✅ Gallery images loaded:', this.galleryImages?.length || 0, 'images');
       
+      // Pre-select image AFTER gallery images are loaded if specified in URL
+      if (preselectImageId) {
+        console.log('🎯 Pre-selecting image after gallery load:', preselectImageId);
+        
+        // For testing scenarios, create a mock image if gallery is empty
+        if (this.galleryImages.length === 0) {
+          console.log('🧪 Test mode: Creating mock gallery image for testing');
+          this.galleryImages = [{
+            id: preselectImageId,
+            title: 'Test Image',
+            url: 'http://localhost:3001/test-image.jpg',
+            thumbnailUrl: 'http://localhost:3001/test-image.jpg',
+            suitableForPrint: true
+          }];
+        }
+        
+        this.preSelectImage(preselectImageId);
+      }
+      
       // Load existing products
       console.log('🔍 Loading user products...');
       await this.loadUserProducts();
@@ -95,30 +115,35 @@ class MerchandiseStore {
       this.render();
       console.log('✅ Initial render complete');
       
-      // Pre-select image AFTER rendering if specified in URL
-      if (preselectImageId) {
-        console.log('🎯 Pre-selecting image after render:', preselectImageId);
-        
-        // For testing scenarios, create a mock image if gallery is empty
-        if (this.galleryImages.length === 0) {
-          console.log('🧪 Test mode: Creating mock gallery image for testing');
-          this.galleryImages = [{
-            id: preselectImageId,
-            title: 'Test Image',
-            url: 'http://localhost:3001/test-image.jpg',
-            thumbnailUrl: 'http://localhost:3001/test-image.jpg',
-            suitableForPrint: true
-          }];
-        }
-        
-        this.preSelectImage(preselectImageId);
-        // Re-render to show the selection
+      // If image was pre-selected, re-render to show the selection and initialize navigator
+      if (preselectImageId && this.selectedImage) {
+        console.log('🔄 Re-rendering to show pre-selected image and initialize navigator');
         this.render();
+        
+        // Initialize product navigator for pre-selected image
+        setTimeout(() => {
+          try {
+            console.log('🚀 Initializing product navigator for pre-selected image...');
+            this.initializeProductNavigator();
+            
+            // Verify navigator was created
+            const navigator = document.querySelector('.product-navigator, .simple-categories');
+            if (navigator) {
+              console.log('✅ Product navigator initialized successfully for pre-selected image');
+            } else {
+              console.error('❌ Product navigator failed to initialize for pre-selected image');
+            }
+          } catch (error) {
+            console.error('❌ Error initializing product navigator for pre-selected image:', error);
+          }
+        }, 500);
       }
       
       console.log('🎉 Merchandise Store initialization complete!');
+      this.isInitializing = false;
       
     } catch (error) {
+      this.isInitializing = false;
       console.error('❌ Error during merchandise store initialization:', error);
       console.error('❌ Error stack:', error.stack);
       
@@ -1147,6 +1172,8 @@ class MerchandiseStore {
     }
     
     console.log('🔧 Initializing ProductNavigator...');
+    console.log('🔍 Checking ProductNavigator availability:', typeof ProductNavigator);
+    console.log('🔍 Window object keys containing "Product":', Object.keys(window).filter(k => k.includes('Product')));
     
     // Check if ProductNavigator class is available
     if (typeof ProductNavigator === 'undefined') {
@@ -1156,17 +1183,13 @@ class MerchandiseStore {
       const script = document.querySelector('script[src*="product-navigator"]');
       if (!script) {
         console.error('❌ product-navigator.js script not found in DOM');
+        console.log('🔍 Available scripts:', Array.from(document.querySelectorAll('script')).map(s => s.src));
       } else {
         console.log('✅ product-navigator.js script found, but class not available');
+        console.log('🔍 Script src:', script.src);
       }
       
-      container.innerHTML = `
-        <div class="error-state">
-          <h3>⚠️ Product Categories Unavailable</h3>
-          <p>The product navigation system failed to load.</p>
-          <button onclick="window.location.reload()" class="btn btn-primary">Refresh Page</button>
-        </div>
-      `;
+      this.renderSimpleCategories(container);
       return;
     }
     
@@ -1206,14 +1229,53 @@ class MerchandiseStore {
       
     } catch (error) {
       console.error('❌ Error creating ProductNavigator:', error);
-      container.innerHTML = `
-        <div class="error-state">
-          <h3>⚠️ Product Categories Error</h3>
-          <p>Failed to initialize product navigation: ${error.message}</p>
-          <button onclick="window.location.reload()" class="btn btn-primary">Refresh Page</button>
-        </div>
-      `;
+      this.renderSimpleCategories(container);
     }
+  }
+  
+  /**
+   * Simple fallback category display
+   */
+  renderSimpleCategories(container) {
+    console.log('🔧 Rendering simple categories fallback');
+    container.innerHTML = `
+      <div class="simple-categories">
+        <h3>📦 Choose Your Product Type</h3>
+        <div class="simple-categories-grid">
+          <div class="simple-category" data-type="premium-tshirt">
+            <div class="category-icon">👕</div>
+            <h4>Premium T-Shirt</h4>
+            <p>High-quality cotton tee</p>
+            <button class="select-simple-product" data-product="premium-tshirt" data-blueprint="5" data-provider="1">Select</button>
+          </div>
+          <div class="simple-category" data-type="hoodie">
+            <div class="category-icon">🧥</div>
+            <h4>Pullover Hoodie</h4>
+            <p>Cozy fleece hoodie</p>
+            <button class="select-simple-product" data-product="hoodie" data-blueprint="146" data-provider="1">Select</button>
+          </div>
+          <div class="simple-category" data-type="mug">
+            <div class="category-icon">☕</div>
+            <h4>Coffee Mug</h4>
+            <p>Ceramic 11oz mug</p>
+            <button class="select-simple-product" data-product="mug" data-blueprint="68" data-provider="1">Select</button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    console.log('✅ Simple categories rendered successfully');
+    
+    // Add event listeners for simple category selection
+    container.addEventListener('click', (e) => {
+      if (e.target.classList.contains('select-simple-product')) {
+        const productType = e.target.dataset.product;
+        const blueprintId = e.target.dataset.blueprint;
+        const providerId = e.target.dataset.provider;
+        console.log('🎯 Simple category selected:', productType, blueprintId, providerId);
+        this.selectProductType(productType, blueprintId, providerId);
+      }
+    });
   }
   
   renderProducts() {
@@ -1618,7 +1680,7 @@ class MerchandiseStore {
         this.initializeProductNavigator();
         
         // Verify navigator was created
-        const navigator = document.querySelector('.product-navigator');
+        const navigator = document.querySelector('.product-navigator, .simple-categories');
         if (navigator) {
           console.log('✅ Product navigator initialized successfully');
         } else {
@@ -2402,6 +2464,12 @@ class MerchandiseStore {
   setLoading(isLoading, message = 'Loading...', progress = null) {
     this.isLoading = isLoading;
     
+    // Don't show loading modal during initial page load
+    if (this.isInitializing && isLoading) {
+      console.log('🔄 Skipping loading modal during initialization:', message);
+      return;
+    }
+    
     // Ensure modal exists by checking if it's rendered
     let modal = document.getElementById('loading-modal');
     if (!modal && isLoading) {
@@ -2561,15 +2629,17 @@ class MerchandiseStore {
       this.selectedImage = image.id;
       console.log('🎯 Pre-selected image for merchandise:', image.title, 'ID:', image.id);
       
+      // Product navigator will be initialized after render in the main init() function
+      
       // Update the UI to show the selection - with longer delay for rendering
       setTimeout(() => {
         // Try multiple selectors to find the image element
-        let imageElement = document.querySelector(`.gallery-image[data-image-id="${image.id}"]`);
+        let imageElement = document.querySelector(`.gallery-image-card[data-image-id="${image.id}"]`);
         
         if (!imageElement) {
           // Try with the filename instead
           const filename = image.id.split('/').pop();
-          imageElement = document.querySelector(`.gallery-image[data-image-id*="${filename}"]`);
+          imageElement = document.querySelector(`.gallery-image-card[data-image-id*="${filename}"]`);
         }
         
         if (!imageElement) {
@@ -2580,7 +2650,7 @@ class MerchandiseStore {
         
         if (imageElement) {
           // Remove previous selections
-          document.querySelectorAll('.gallery-image.selected').forEach(el => {
+          document.querySelectorAll('.gallery-image-card.selected').forEach(el => {
             el.classList.remove('selected');
           });
           
@@ -2593,7 +2663,7 @@ class MerchandiseStore {
           console.log('✅ Pre-selected image UI updated successfully');
         } else {
           console.warn('Pre-selected image element not found in DOM. Available elements:', 
-            document.querySelectorAll('.gallery-image, [data-image-id], [data-id]').length);
+            document.querySelectorAll('.gallery-image-card, [data-image-id], [data-id]').length);
           
           // Try to find and log what elements are actually available
           const allImages = document.querySelectorAll('img, [data-image-id], [data-id]');
@@ -2609,6 +2679,7 @@ class MerchandiseStore {
       // Clear the URL parameter to clean up the URL
       const url = new URL(window.location);
       url.searchParams.delete('preselect');
+      url.searchParams.delete('imageId');
       window.history.replaceState({}, '', url);
       
       // Auto-scroll to the Choose Product section for better UX

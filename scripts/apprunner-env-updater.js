@@ -27,17 +27,46 @@ class AppRunnerEnvUpdater {
   }
 
   /**
-   * Parse environment variables from .env file
+   * Parse environment variables from .env files with production priority
    */
   async parseEnvFile() {
     try {
-      const envPath = path.join(__dirname, '../.env');
-      const envContent = await fs.readFile(envPath, 'utf8');
+      // Load in order: .env (base) -> .env.production (production overrides)
+      // Skip .env.local (development overrides)
+      const envFiles = [
+        path.join(__dirname, '../.env'),
+        path.join(__dirname, '../.env.production')
+      ];
       
       const envVars = {};
-      const lines = envContent.split('\n');
       
-      for (const line of lines) {
+      for (const envPath of envFiles) {
+        try {
+          const envContent = await fs.readFile(envPath, 'utf8');
+          const fileVars = this.parseEnvContent(envContent);
+          Object.assign(envVars, fileVars);
+          console.log(`✅ Loaded ${Object.keys(fileVars).length} variables from ${path.basename(envPath)}`);
+        } catch (error) {
+          if (error.code !== 'ENOENT') {
+            console.log(`⚠️  Warning reading ${path.basename(envPath)}: ${error.message}`);
+          }
+        }
+      }
+      
+      return envVars;
+    } catch (error) {
+      throw new Error(`Failed to parse environment files: ${error.message}`);
+    }
+  }
+
+  /**
+   * Parse environment content from a string
+   */
+  parseEnvContent(envContent) {
+    const envVars = {};
+    const lines = envContent.split('\n');
+    
+    for (const line of lines) {
         // Skip comments and empty lines
         if (line.trim() === '' || line.trim().startsWith('#')) {
           continue;
@@ -58,11 +87,8 @@ class AppRunnerEnvUpdater {
           envVars[key] = value;
         }
       }
-      
-      return envVars;
-    } catch (error) {
-      throw new Error(`Failed to parse .env file: ${error.message}`);
-    }
+    
+    return envVars;
   }
 
   /**
@@ -219,12 +245,25 @@ class AppRunnerEnvUpdater {
 
       // Update environment variables if we have new ones
       if (newEnvVars && newEnvVars.length > 0) {
+        const envVarsObject = newEnvVars.reduce((acc, env) => {
+          acc[env.Name] = env.Value;
+          return acc;
+        }, {});
+
+        const currentImageConfig = currentService.SourceConfiguration.ImageRepository.ImageConfiguration;
+        const currentPort = currentImageConfig.Port;
+        const targetPort = envVarsObject.PORT || currentPort;
+
+        // Check if we need to update the port configuration
+        const portChanged = currentPort !== targetPort;
+        if (portChanged) {
+          console.log(`🔌 Port Configuration Change: ${currentPort} → ${targetPort}`);
+        }
+
         updateParams.SourceConfiguration.ImageRepository.ImageConfiguration = {
-          ...currentService.SourceConfiguration.ImageRepository.ImageConfiguration,
-          RuntimeEnvironmentVariables: newEnvVars.reduce((acc, env) => {
-            acc[env.Name] = env.Value;
-            return acc;
-          }, {})
+          ...currentImageConfig,
+          Port: targetPort, // Sync ImageConfiguration.Port with PORT environment variable
+          RuntimeEnvironmentVariables: envVarsObject
         };
       }
 
@@ -375,7 +414,20 @@ class AppRunnerEnvUpdater {
       const changes = this.compareEnvironmentVariables(currentEnvVars, productionEnvVars);
       const hasChanges = this.displayChangesSummary(changes);
       
-      if (!hasChanges) {
+      // Check port configuration
+      const currentImageConfig = currentService.SourceConfiguration?.ImageRepository?.ImageConfiguration;
+      const currentPort = currentImageConfig?.Port;
+      const targetPort = envVars.PORT || "8080";
+      const portMismatch = currentPort !== targetPort;
+      
+      if (portMismatch) {
+        console.log(`\n🔌 Port Configuration Mismatch Detected:`);
+        console.log(`   ImageConfiguration.Port: ${currentPort}`);
+        console.log(`   Environment PORT: ${targetPort}`);
+        console.log(`   🔄 Port synchronization required`);
+      }
+      
+      if (!hasChanges && !portMismatch) {
         console.log('✅ No changes detected. Service is up to date!');
         return;
       }

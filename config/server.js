@@ -13,17 +13,30 @@ if (process.env.NODE_ENV !== 'production') {
     const fs = require('fs');
     const path = require('path');
 
-    // Check if .env file actually exists before attempting to load
-    const envPath = path.resolve(process.cwd(), '.env');
-    if (fs.existsSync(envPath)) {
-      const result = dotenv.config({ override: false });
-      if (result.error) {
-        console.log('⚠️  Error loading .env file:', result.error.message);
-      } else {
-        console.log('✅ Loaded environment variables from .env file');
+    // Load environment files in priority order:
+    // 1. .env (base configuration)
+    // 2. .env.local (development overrides - git ignored)
+    const envFiles = [
+      { path: '.env', name: 'base configuration' },
+      { path: '.env.local', name: 'local development overrides' }
+    ];
+    
+    let loadedFiles = 0;
+    for (const { path: envFile, name } of envFiles) {
+      const envPath = path.resolve(process.cwd(), envFile);
+      if (fs.existsSync(envPath)) {
+        const result = dotenv.config({ path: envPath, override: true });
+        if (result.error) {
+          console.log(`⚠️  Error loading ${envFile}: ${result.error.message}`);
+        } else {
+          console.log(`✅ Loaded ${name} from ${envFile}`);
+          loadedFiles++;
+        }
       }
-    } else {
-      console.log('ℹ️  No .env file found - using system environment variables');
+    }
+    
+    if (loadedFiles === 0) {
+      console.log('ℹ️  No .env files found - using system environment variables');
     }
   } catch (error) {
     // dotenv module not found or other error - not critical
