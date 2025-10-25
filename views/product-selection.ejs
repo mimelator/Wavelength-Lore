@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Your Product - Wavelength Lore</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/product-navigator.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-header h1 {
+            text-align: center;
+            margin: 0;
+            color: #333;
+            font-size: 32px;
+            font-weight: 600;
+        }
+        
+        .page-header p {
+            text-align: center;
+            margin: 10px 0 0 0;
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin: 0 20px;
+            min-height: 600px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #667eea;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+        
+        .back-button:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .selection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .selection-status.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 0 10px;
+                border-radius: 15px;
+            }
+            
+            .page-header h1 {
+                font-size: 24px;
+            }
+            
+            .back-button {
+                position: static;
+                margin: 20px;
+                width: fit-content;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/merchandise-store" class="back-button">
+        ← Back to Store
+    </a>
+    
+    <div class="page-header">
+        <h1>🎨 Choose Your Product</h1>
+        <p>Select from 1,300+ available products organized by category</p>
+    </div>
+    
+    <div class="main-container">
+        <div id="product-navigator">
+            <!-- Product navigator will be loaded here -->
+        </div>
+    </div>
+    
+    <div id="selection-status" class="selection-status">
+        <span id="selection-text">Product selected!</span>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="/js/components/product-navigator.js"></script>
+    
+    <script>
+        // Initialize the product navigator
+        let navigator;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            navigator = new ProductNavigator('product-navigator', {
+                showSearch: true,
+                enableFilters: true
+            });
+            
+            // Handle product selection
+            document.getElementById('product-navigator').addEventListener('productSelected', (event) => {
+                const { blueprintId, providerId } = event.detail;
+                handleProductSelection(blueprintId, providerId);
+            });
+        });
+        
+        function handleProductSelection(blueprintId, providerId) {
+            console.log('Product selected:', { blueprintId, providerId });
+            
+            // Show selection status
+            const statusEl = document.getElementById('selection-status');
+            const textEl = document.getElementById('selection-text');
+            
+            textEl.textContent = `Product selected! Blueprint: ${blueprintId}, Provider: ${providerId}`;
+            statusEl.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                statusEl.classList.remove('show');
+            }, 3000);
+            
+            // Here you would typically:
+            // 1. Store the selection in session/localStorage
+            // 2. Redirect to customization page
+            // 3. Or integrate with existing merchandise system
+            
+            // For now, let's store in localStorage and redirect
+            localStorage.setItem('selectedProduct', JSON.stringify({
+                blueprintId,
+                providerId,
+                selectedAt: new Date().toISOString()
+            }));
+            
+            // Redirect after a short delay
+            setTimeout(() => {
+                window.location.href = `/merchandise-store?blueprint=${blueprintId}&provider=${providerId}`;
+            }, 1500);
+        }
+        
+        // Handle browser back button
+        window.addEventListener('popstate', (event) => {
+            // You might want to handle navigation state here
+            console.log('Navigation state changed');
+        });
+        
+        // Add some analytics tracking
+        function trackCategoryView(category) {
+            // Add your analytics tracking here
+            console.log('Category viewed:', category);
+        }
+        
+        function trackProductView(blueprintId) {
+            // Add your analytics tracking here
+            console.log('Product viewed:', blueprintId);
+        }
+        
+        function trackSearch(query) {
+            // Add your analytics tracking here
+            console.log('Search performed:', query);
+        }
+    </script>
+</body>
+</html>

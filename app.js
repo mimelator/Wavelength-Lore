@@ -41,6 +41,7 @@ const borderPreviewApiRoutes = require('./routes/api-border-preview');
 const productImageApiRoutes = require('./routes/api-product-image');
 const chatbotRoutes = require('./routes/chatbot');
 const authRoutes = require('./routes/auth');
+const apiProductCatalogRoutes = require('./routes/api-product-catalog');
 
 // Import secure backup system
 const SecureDatabaseBackup = require('./utils/secureBackup');
@@ -140,11 +141,24 @@ async function createApp() {
   // Mount product image resolution API routes
   app.use('/api/product-image', productImageApiRoutes);
 
+  // Mount product catalog API routes (public access)
+  app.use('/api', apiProductCatalogRoutes);
+
   // Mount admin vendor research routes (admin only)
   app.use('/admin', adminVendorResearchRoutes);
 
   // Mount content routes
   app.use('/', contentRoutes);
+  
+  // Product selection page route
+  app.get('/product-selection', (req, res) => {
+    res.render('product-selection', {
+      title: 'Select Your Product - Wavelength Lore',
+      pageTitle: 'Choose Your Product',
+      pageDescription: 'Select from 1,300+ available products organized by category',
+      req: req
+    });
+  });
 
   // Mount admin and utility routes
   app.use('/', adminRoutes);

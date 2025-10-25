@@ -1,0 +1,442 @@
+{
+  "generatedAt": "2025-10-25T07:45:24.753Z",
+  "totalProducts": 10,
+  "categories": {
+    "apparel": {
+      "name": "Apparel & Clothing",
+      "icon": "👕",
+      "description": "T-shirts, hoodies, and wearable items",
+      "subcategories": {
+        "tshirts": {
+          "name": "T-Shirts & Tops",
+          "products": [
+            {
+              "blueprint_id": 5,
+              "blueprint_title": "Unisex Cotton Crew Tee",
+              "blueprint_brand": "Next Level",
+              "provider_id": 3,
+              "provider_title": "Marco Fine Arts",
+              "tags": [
+                "wavelength",
+                "lore",
+                "cotton",
+                "next level"
+              ],
+              "searchTerms": "unisex cotton crew tee next level marco fine arts wavelength lore cotton next level",
+              "estimatedPrice": 1899,
+              "popularityScore": 69
+            },
+            {
+              "blueprint_id": 6,
+              "blueprint_title": "Unisex Heavy Cotton Tee",
+              "blueprint_brand": "Gildan",
+              "provider_id": 29,
+              "provider_title": "Monster Digital",
+              "tags": [
+                "wavelength",
+                "lore",
+                "cotton",
+                "heavy-duty",
+                "gildan"
+              ],
+              "searchTerms": "unisex heavy cotton tee gildan monster digital wavelength lore cotton heavy-duty gildan",
+              "estimatedPrice": 1899,
+              "popularityScore": 25
+            }
+          ]
+        },
+        "hoodies": {
+          "name": "Hoodies & Sweatshirts",
+          "products": [
+            {
+              "blueprint_id": 533,
+              "blueprint_title": "Unisex Hoodie",
+              "blueprint_brand": "Champion",
+              "provider_id": 8,
+              "provider_title": "Apparel Co",
+              "tags": [
+                "wavelength",
+                "lore",
+                "champion"
+              ],
+              "searchTerms": "unisex hoodie champion apparel co wavelength lore champion",
+              "estimatedPrice": 3499,
+              "popularityScore": 87
+            }
+          ]
+        },
+        "tanks": {
+          "name": "Tank Tops & Sleeveless",
+          "products": []
+        },
+        "polos": {
+          "name": "Polo Shirts",
+          "products": []
+        },
+        "outerwear": {
+          "name": "Jackets & Outerwear",
+          "products": []
+        }
+      },
+      "productCount": 3
+    },
+    "home": {
+      "name": "Home & Living",
+      "icon": "🏠",
+      "description": "Mugs, pillows, wall art, and home decor",
+      "subcategories": {
+        "drinkware": {
+          "name": "Mugs & Drinkware",
+          "products": [
+            {
+              "blueprint_id": 377,
+              "blueprint_title": "Coffee Mug",
+              "blueprint_brand": "Generic",
+              "provider_id": 15,
+              "provider_title": "Print Provider",
+              "tags": [
+                "wavelength",
+                "lore",
+                "generic"
+              ],
+              "searchTerms": "coffee mug generic print provider wavelength lore generic",
+              "estimatedPrice": 1599,
+              "popularityScore": 78
+            },
+            {
+              "blueprint_id": 604,
+              "blueprint_title": "Vacuum Insulated Tumbler",
+              "blueprint_brand": "Generic",
+              "provider_id": 22,
+              "provider_title": "Drinkware Plus",
+              "tags": [
+                "wavelength",
+                "lore",
+                "generic"
+              ],
+              "searchTerms": "vacuum insulated tumbler generic drinkware plus wavelength lore generic",
+              "estimatedPrice": 1599,
+              "popularityScore": 16
+            }
+          ]
+        },
+        "bedding": {
+          "name": "Pillows & Bedding",
+          "products": [
+            {
+              "blueprint_id": 823,
+              "blueprint_title": "Throw Pillow",
+              "blueprint_brand": "Generic",
+              "provider_id": 25,
+              "provider_title": "Home Decor",
+              "tags": [
+                "wavelength",
+                "lore",
+                "generic"
+              ],
+              "searchTerms": "throw pillow generic home decor wavelength lore generic",
+              "estimatedPrice": 2499,
+              "popularityScore": 85
+            }
+          ]
+        },
+        "wall-art": {
+          "name": "Posters & Wall Art",
+          "products": [
+            {
+              "blueprint_id": 468,
+              "blueprint_title": "Canvas Tote Bag",
+              "blueprint_brand": "Generic",
+              "provider_id": 12,
+              "provider_title": "Bag Maker",
+              "tags": [
+                "wavelength",
+                "lore",
+                "generic"
+              ],
+              "searchTerms": "canvas tote bag generic bag maker wavelength lore generic",
+              "estimatedPrice": 1899,
+              "popularityScore": 73
+            },
+            {
+              "blueprint_id": 966,
+              "blueprint_title": "Poster Print",
+              "blueprint_brand": "Generic",
+              "provider_id": 31,
+              "provider_title": "Print Shop",
+              "tags": [
+                "wavelength",
+                "lore",
+                "generic"
+              ],
+              "searchTerms": "poster print generic print shop wavelength lore generic",
+              "estimatedPrice": 1899,
+              "popularityScore": 24
+            }
+          ]
+        },
+        "decor": {
+          "name": "Home Decor",
+          "products": []
+        }
+      },
+      "productCount": 5
+    },
+    "accessories": {
+      "name": "Bags & Accessories",
+      "icon": "🎒",
+      "description": "Bags, hats, and personal accessories",
+      "subcategories": {
+        "bags": {
+          "name": "Bags & Totes",
+          "products": []
+        },
+        "headwear": {
+          "name": "Hats & Headwear",
+          "products": [
+            {
+              "blueprint_id": 888,
+              "blueprint_title": "Baseball Cap",
+              "blueprint_brand": "Generic",
+              "provider_id": 14,
+              "provider_title": "Hat Company",
+              "tags": [
+                "wavelength",
+                "lore",
+                "generic"
+              ],
+              "searchTerms": "baseball cap generic hat company wavelength lore generic",
+              "estimatedPrice": 1899,
+              "popularityScore": 70
+            }
+          ]
+        },
+        "jewelry": {
+          "name": "Jewelry & Personal",
+          "products": []
+        }
+      },
+      "productCount": 1
+    },
+    "tech": {
+      "name": "Tech & Electronics",
+      "icon": "📱",
+      "description": "Phone cases, tech accessories, and gadgets",
+      "subcategories": {
+        "cases": {
+          "name": "Phone & Device Cases",
+          "products": [
+            {
+              "blueprint_id": 758,
+              "blueprint_title": "Phone Case",
+              "blueprint_brand": "Generic",
+              "provider_id": 18,
+              "provider_title": "Tech Cases",
+              "tags": [
+                "wavelength",
+                "lore",
+                "generic"
+              ],
+              "searchTerms": "phone case generic tech cases wavelength lore generic",
+              "estimatedPrice": 1299,
+              "popularityScore": 24
+            }
+          ]
+        },
+        "accessories": {
+          "name": "Tech Accessories",
+          "products": []
+        }
+      },
+      "productCount": 1
+    },
+    "specialty": {
+      "name": "Specialty Items",
+      "icon": "🎁",
+      "description": "Unique and specialty products",
+      "subcategories": {
+        "other": {
+          "name": "Other Items",
+          "products": []
+        }
+      },
+      "productCount": 0
+    }
+  },
+  "searchIndex": [
+    {
+      "blueprint_id": 5,
+      "blueprint_title": "Unisex Cotton Crew Tee",
+      "blueprint_brand": "Next Level",
+      "provider_id": 3,
+      "provider_title": "Marco Fine Arts",
+      "tags": [
+        "wavelength",
+        "lore",
+        "cotton",
+        "next level"
+      ],
+      "searchTerms": "unisex cotton crew tee next level marco fine arts wavelength lore cotton next level",
+      "estimatedPrice": 1899,
+      "popularityScore": 69,
+      "category": "apparel",
+      "subcategory": "tshirts"
+    },
+    {
+      "blueprint_id": 6,
+      "blueprint_title": "Unisex Heavy Cotton Tee",
+      "blueprint_brand": "Gildan",
+      "provider_id": 29,
+      "provider_title": "Monster Digital",
+      "tags": [
+        "wavelength",
+        "lore",
+        "cotton",
+        "heavy-duty",
+        "gildan"
+      ],
+      "searchTerms": "unisex heavy cotton tee gildan monster digital wavelength lore cotton heavy-duty gildan",
+      "estimatedPrice": 1899,
+      "popularityScore": 25,
+      "category": "apparel",
+      "subcategory": "tshirts"
+    },
+    {
+      "blueprint_id": 377,
+      "blueprint_title": "Coffee Mug",
+      "blueprint_brand": "Generic",
+      "provider_id": 15,
+      "provider_title": "Print Provider",
+      "tags": [
+        "wavelength",
+        "lore",
+        "generic"
+      ],
+      "searchTerms": "coffee mug generic print provider wavelength lore generic",
+      "estimatedPrice": 1599,
+      "popularityScore": 78,
+      "category": "home",
+      "subcategory": "drinkware"
+    },
+    {
+      "blueprint_id": 468,
+      "blueprint_title": "Canvas Tote Bag",
+      "blueprint_brand": "Generic",
+      "provider_id": 12,
+      "provider_title": "Bag Maker",
+      "tags": [
+        "wavelength",
+        "lore",
+        "generic"
+      ],
+      "searchTerms": "canvas tote bag generic bag maker wavelength lore generic",
+      "estimatedPrice": 1899,
+      "popularityScore": 73,
+      "category": "home",
+      "subcategory": "wall-art"
+    },
+    {
+      "blueprint_id": 533,
+      "blueprint_title": "Unisex Hoodie",
+      "blueprint_brand": "Champion",
+      "provider_id": 8,
+      "provider_title": "Apparel Co",
+      "tags": [
+        "wavelength",
+        "lore",
+        "champion"
+      ],
+      "searchTerms": "unisex hoodie champion apparel co wavelength lore champion",
+      "estimatedPrice": 3499,
+      "popularityScore": 87,
+      "category": "apparel",
+      "subcategory": "hoodies"
+    },
+    {
+      "blueprint_id": 604,
+      "blueprint_title": "Vacuum Insulated Tumbler",
+      "blueprint_brand": "Generic",
+      "provider_id": 22,
+      "provider_title": "Drinkware Plus",
+      "tags": [
+        "wavelength",
+        "lore",
+        "generic"
+      ],
+      "searchTerms": "vacuum insulated tumbler generic drinkware plus wavelength lore generic",
+      "estimatedPrice": 1599,
+      "popularityScore": 16,
+      "category": "home",
+      "subcategory": "drinkware"
+    },
+    {
+      "blueprint_id": 758,
+      "blueprint_title": "Phone Case",
+      "blueprint_brand": "Generic",
+      "provider_id": 18,
+      "provider_title": "Tech Cases",
+      "tags": [
+        "wavelength",
+        "lore",
+        "generic"
+      ],
+      "searchTerms": "phone case generic tech cases wavelength lore generic",
+      "estimatedPrice": 1299,
+      "popularityScore": 24,
+      "category": "tech",
+      "subcategory": "cases"
+    },
+    {
+      "blueprint_id": 823,
+      "blueprint_title": "Throw Pillow",
+      "blueprint_brand": "Generic",
+      "provider_id": 25,
+      "provider_title": "Home Decor",
+      "tags": [
+        "wavelength",
+        "lore",
+        "generic"
+      ],
+      "searchTerms": "throw pillow generic home decor wavelength lore generic",
+      "estimatedPrice": 2499,
+      "popularityScore": 85,
+      "category": "home",
+      "subcategory": "bedding"
+    },
+    {
+      "blueprint_id": 888,
+      "blueprint_title": "Baseball Cap",
+      "blueprint_brand": "Generic",
+      "provider_id": 14,
+      "provider_title": "Hat Company",
+      "tags": [
+        "wavelength",
+        "lore",
+        "generic"
+      ],
+      "searchTerms": "baseball cap generic hat company wavelength lore generic",
+      "estimatedPrice": 1899,
+      "popularityScore": 70,
+      "category": "accessories",
+      "subcategory": "headwear"
+    },
+    {
+      "blueprint_id": 966,
+      "blueprint_title": "Poster Print",
+      "blueprint_brand": "Generic",
+      "provider_id": 31,
+      "provider_title": "Print Shop",
+      "tags": [
+        "wavelength",
+        "lore",
+        "generic"
+      ],
+      "searchTerms": "poster print generic print shop wavelength lore generic",
+      "estimatedPrice": 1899,
+      "popularityScore": 24,
+      "category": "home",
+      "subcategory": "wall-art"
+    }
+  ],
+  "note": "Sample data - replace with actual 1,302 combinations when available"
+}
