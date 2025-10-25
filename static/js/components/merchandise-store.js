@@ -1855,6 +1855,9 @@ class MerchandiseStore {
     const modalTitle = isUpdate ? `✏️ Update Your ${productTypeName}` : `✨ Design Your ${productTypeName}`;
     const buttonText = isUpdate ? 'Update Product' : 'Design Product';
     
+    // Remove any existing customization modals to prevent duplicate form field IDs
+    document.querySelectorAll('.product-customization-modal, #productCustomizationModal').forEach(el => el.remove());
+    
     // Create modal
     const modal = document.createElement('div');
     modal.className = 'modal product-customization-modal';
