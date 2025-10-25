@@ -5,7 +5,7 @@ Complete documentation for the Wavelength Lore platform, systems, games, and **p
 ## 🚀 DevOps & Deployment (NEW)
 
 ### Production-Ready Deployment System
-- **[devops-pre-increment-guide.md](devops-pre-increment-guide.md)** - Complete deployment system overview
+- **[deployment-guide.md](deployment-guide.md)** - Complete deployment system overview
 - **[ENVIRONMENT_CONFIGURATION.md](ENVIRONMENT_CONFIGURATION.md)** - Safe environment management 
 - **[devops-quick-reference.md](devops-quick-reference.md)** - Command reference & troubleshooting
 

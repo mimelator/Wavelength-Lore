@@ -42,12 +42,28 @@ npm run apprunner:env:force  # Force environment update
 npm run apprunner:env:dry    # Dry run environment update
 ```
 
-## 📊 Production Health Checks
+## 🏥 Production Health Check Suite
+```bash
+# Automated Health Checks (NEW)
+npm run health:quick         # Fast HTTP-based validation (7 tests, ~1-2s)
+npm run health:check         # Comprehensive browser-based testing (~30s)
+
+# Health Check Features:
+# ✓ Home page load and rendering
+# ✓ Radio player functionality  
+# ✓ Hero gallery navigation
+# ✓ Content page accessibility
+# ✓ Cross-site navigation
+# ✓ API endpoint health
+# ✓ Static asset loading
+```
+
+## 📊 Manual Production Checks
 ```bash
 # Quick status checks
 aws apprunner describe-service --service-arn [ARN] --region us-east-1 --query 'Service.Status'
-curl -I https://8k54bjh8gp.us-east-1.awsapprunner.com/
-curl -s https://8k54bjh8gp.us-east-1.awsapprunner.com/api/version
+curl -I https://vh9x3gevev.us-east-1.awsapprunner.com/
+curl -s https://vh9x3gevev.us-east-1.awsapprunner.com/api/version
 
 # Version alignment check
 npm run deploy:compare && echo "✅ Versions synchronized" || echo "❌ Version mismatch detected"
@@ -66,9 +82,11 @@ npm run deploy:compare && echo "✅ Versions synchronized" || echo "❌ Version 
 
 ### Health Check Issues
 ```bash
-1. npm run logs:service | grep -i "health check"     # Check health check logs
-2. npm run env:prod-preview | grep PORT              # Verify port config
-3. npm run logs:app                                  # Check application startup
+1. npm run health:quick                              # Run fast health validation
+2. npm run logs:service | grep -i "health check"    # Check health check logs
+3. npm run env:prod-preview | grep PORT             # Verify port config
+4. npm run logs:app                                 # Check application startup
+5. npm run health:check                             # Full browser-based testing
 ```
 
 ### Version Mismatch
@@ -95,9 +113,11 @@ npm run deploy:compare && echo "✅ Versions synchronized" || echo "❌ Version 
 - Check `npm run deploy:compare` before major changes
 
 ### Production Health Monitoring
+- Run `npm run health:quick` for daily production validation
 - Run `npm run gh:dashboard` for weekly deployment overview
 - Use `npm run logs:errors` to proactively find issues
 - Monitor `npm run deploy:status` for version drift
+- Use `npm run health:check` for comprehensive monthly testing
 
 ### Before Major Releases
 - Run `npm run env:prod-preview` to verify environment changes
@@ -114,12 +134,14 @@ npm run deploy:compare && echo "✅ Versions synchronized" || echo "❌ Version 
 scripts/
 ├── gh-monitor.js            # GitHub Actions monitoring
 ├── cloudwatch-monitor.js    # App Runner CloudWatch logs
+├── production-health-check.js # Comprehensive browser-based health tests
+├── quick-health-check.js    # Fast HTTP-based health validation
 ├── deployment-tracker.js    # Version & deployment tracking
 ├── apprunner-env-updater.js # Environment management
 └── env-helper.js           # Environment utilities
 
 docs/
-├── devops-pre-increment-guide.md     # Complete DevOps guide
+├── deployment-guide.md               # Complete deployment system guide
 ├── ENVIRONMENT_CONFIGURATION.md      # Environment setup guide  
 └── devops-quick-reference.md         # This reference card
 ```
@@ -127,6 +149,9 @@ docs/
 ## ⚡ Emergency Commands
 
 ```bash
+# Quick production health check (FIRST STEP)
+npm run health:quick
+
 # Force immediate deployment (skip checks)
 npm run deploy:force
 
@@ -138,7 +163,10 @@ npm run gh:status && npm run deploy:status
 
 # Full emergency dashboard
 npm run gh:dashboard && npm run logs:errors
+
+# Comprehensive health validation
+npm run health:check
 ```
 
 ---
-💡 **Tip**: Bookmark this reference and use `npm run gh:dashboard` as your daily starting point for deployment monitoring!
+💡 **Daily Workflow**: Start with `npm run health:quick` for production validation, then `npm run gh:dashboard` for deployment monitoring!

@@ -183,13 +183,18 @@ npm run deploy:compare   # Compare local build vs production
 
 ### Health Check Verification  
 ```bash
+# 🏥 AUTOMATED HEALTH CHECKS (NEW - RECOMMENDED)
+npm run health:quick     # Fast validation (7 tests, 1-2s) ⚡
+npm run health:check     # Comprehensive testing (~30s) 🧪
+
+# Manual Health Checks (Legacy)
 # App Runner Service Status
 aws apprunner describe-service \
   --service-arn "arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore-service/829c542fc95c419090494817f7046eaa" \
   --region us-east-1 --query 'Service.Status'
 
 # Production Version Check
-curl -s https://8k54bjh8gp.us-east-1.awsapprunner.com/api/version
+curl -s https://vh9x3gevev.us-east-1.awsapprunner.com/api/version
 
 # Local Version Check  
 cat package.json | grep version
@@ -311,6 +316,9 @@ npm run logs:service     # Check deployment events
 
 #### Health Check Issues  
 ```bash
+# 🏥 FIRST: Run automated health validation
+npm run health:quick                    # Fast 7-test validation (NEW)
+
 # 1. Check current port configuration
 npm run logs:service | grep -i "health check"
 
@@ -318,9 +326,12 @@ npm run logs:service | grep -i "health check"
 npm run env:prod-preview | grep -E "(PORT|NGINX_PORT|NODE_PORT)"
 
 # 3. Test application directly
-curl -I https://8k54bjh8gp.us-east-1.awsapprunner.com/
+curl -I https://vh9x3gevev.us-east-1.awsapprunner.com/
 
-# 4. Check App Runner service configuration
+# 4. Comprehensive health testing if needed
+npm run health:check                    # Full browser-based testing (NEW)
+
+# 5. Check App Runner service configuration
 aws apprunner describe-service [ARN] --query 'Service.SourceConfiguration.ImageRepository.ImageConfiguration.Port'
 ```
 
@@ -363,7 +374,9 @@ npm run deploy:status      # Check current production state
 
 #### Regular Health Checks
 ```bash
-npm run gh:dashboard       # Complete deployment overview
+npm run health:quick       # Daily production validation (NEW - 1-2s)
+npm run gh:dashboard       # Complete deployment overview  
+npm run health:check       # Weekly comprehensive testing (NEW - 30s)
 npm run logs:watch        # Continuous monitoring
 ```
 
@@ -380,6 +393,7 @@ npm run logs:watch        # Continuous monitoring
 - ✅ No more environment variable mix-ups
 
 **Production-Grade Monitoring:**
+- ✅ **NEW**: Automated health validation (`npm run health:quick`, `npm run health:check`)
 - ✅ Real-time GitHub Actions monitoring (`npm run gh:watch`)
 - ✅ CloudWatch log streaming (`npm run logs:service`, `npm run logs:app`)  
 - ✅ Automated error detection (`npm run logs:errors`)
