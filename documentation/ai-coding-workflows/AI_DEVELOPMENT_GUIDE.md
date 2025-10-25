@@ -9,17 +9,43 @@
 
 ## 🎯 Core AI Development Principles
 
-### **Test-Driven AI Development (TDAID)**
+### **🧪 Test-Driven AI Development (TDAID) - MANDATORY**
 All AI-assisted code development must follow **Test-First** methodology:
 
 ```bash
-# Mandatory AI development workflow
-1. BUILD/ENHANCE THE TEST first
-2. RUN THE TEST (should fail initially)  
-3. AI generates/fixes the code
-4. RUN THE TEST (should pass)
-5. VALIDATE with comprehensive test suite
+# REQUIRED AI development workflow - NO EXCEPTIONS
+1. BUILD/ENHANCE THE TEST FIRST (Red Phase)
+2. RUN THE TEST (should fail initially - proves test validity)  
+3. AI generates/fixes the code (Green Phase)
+4. RUN THE TEST (should pass - proves implementation works)
+5. REFACTOR with AI assistance (Clean Phase)
+6. VALIDATE with comprehensive test suite (90%+ coverage required)
 ```
+
+### **📚 Documentation & Script Maintenance - REQUIRED**
+Before any development work:
+- 📖 **Check existing documentation** in `/documentation/` structure first
+- 🔍 **Use existing unified scripts** from `/scripts/unified/`:
+  - `aws-manager.js` for all AWS operations
+  - `test-runner.js` for all testing needs  
+  - `deployment-manager.js` for all deployment tasks
+- 📝 **Update documentation** with every code change
+- 🔗 **Provide direct file paths** - no vague references requiring searches
+
+### **💾 Commit & Process Standards - ENFORCED**
+Every code change must follow:
+- 🔒 **Use smart-commit.js ONLY** - `/scripts/unified/smart-commit.js`
+- 🛡️ **Security validation required** before any production commit
+- 🏗️ **Process isolation mandatory** - separate concerns into testable units
+- 📋 **Context document updates** when saving state for context compaction
+
+### **✅ Proof & Validation Requirements - NO EXCEPTIONS**
+When claiming completion, ALWAYS provide:
+- 🧪 **Test results with output** - show actual test execution results
+- 📊 **Performance metrics** for any optimization claims
+- 📁 **Direct file links** with full paths: `/path/to/specific/file.js`
+- 📈 **Before/after comparisons** for improvement claims
+- 🔄 **Validation commands** that others can run to verify claims
 
 ### **Security-First AI Coding**
 Every AI-generated code change requires:
@@ -27,6 +53,11 @@ Every AI-generated code change requires:
 - ✅ **API Hardening:** No bypassing established APIs or security layers
 - ✅ **Input Validation:** Comprehensive validation for all inputs
 - ✅ **Runtime Logging:** Enhanced logging for debugging and monitoring
+
+### **🔒 Privacy & Boundaries - STRICT**
+- 🚫 **NEVER modify `.current-notes.md`** - private developer workspace
+- 🔒 **Respect private files** and personal organization systems
+- 📝 **Use designated context areas** for AI collaboration only
 
 ### **Quality Validation Standards**
 - ✅ **Full Regression Suite:** Run complete validation, not individual tests

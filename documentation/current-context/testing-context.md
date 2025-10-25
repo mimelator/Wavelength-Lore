@@ -9,20 +9,29 @@
 
 ## 🎯 Current Focus Areas
 
+### **🧪 TDD Enforcement & Standards**
+- 🚫 **NO CODE without tests first** - Red-Green-Refactor cycle mandatory
+- 📊 **90%+ coverage required** - use `/scripts/unified/test-runner.js`
+- ✅ **Proof of testing** - ALL completion claims need test output evidence
+- 📋 **Context updates mandatory** - testing context updated with all changes
+
 ### **AI-Enhanced Testing Workflows**
 - Automated test generation with AI assistance
 - Intelligent test coverage analysis and optimization
 - AI-powered test failure analysis and debugging
+- **Testing tool:** `/scripts/unified/test-runner.js` for all testing needs
 
 ### **Process Isolation & Validation**
 - Comprehensive isolated testing environments
 - Cross-browser and multi-environment validation
 - Performance and load testing automation
+- **Isolation requirement:** Separate concerns into testable units
 
 ### **Quality Assurance Integration**
 - Continuous integration testing pipelines
 - Automated regression testing
 - Real-time quality metrics and reporting
+- **Documentation:** `/documentation/ai-coding-workflows/AI_DEVELOPMENT_GUIDE.md`
 
 ---
 

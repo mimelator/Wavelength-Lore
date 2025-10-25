@@ -9,20 +9,29 @@
 
 ## 🎯 Current Focus Areas
 
+### **🚀 DevOps Standards Enforcement**
+- 🛠️ **Use unified tools ONLY** - `/scripts/unified/aws-manager.js` and `/scripts/unified/deployment-manager.js`
+- 🧪 **Infrastructure tests first** - test deployment scripts before infrastructure changes
+- 📋 **Context updates mandatory** - DevOps context updated with all changes
+- ✅ **Monitoring proof required** - ALL infrastructure claims need monitoring evidence
+
 ### **AI-Enhanced Infrastructure Management**
 - Intelligent AWS resource optimization and monitoring
 - Automated deployment pipelines with AI-powered validation
 - Smart infrastructure scaling and cost optimization
+- **AWS Tool:** `/scripts/unified/aws-manager.js` for all AWS operations
 
 ### **Advanced CI/CD Automation**
 - Multi-stage deployment pipelines with comprehensive validation
 - Automated rollback and disaster recovery procedures
 - Real-time infrastructure health monitoring and alerting
+- **Deployment Tool:** `/scripts/unified/deployment-manager.js` for all deployments
 
 ### **Cloud Architecture Optimization**
 - Multi-cloud strategy implementation and management
 - Container orchestration and serverless architecture
 - Infrastructure as Code (IaC) with automated compliance
+- **Documentation:** `/documentation/ai-coding-workflows/AI_DEVELOPMENT_GUIDE.md`
 
 ---
 

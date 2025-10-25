@@ -9,20 +9,29 @@
 
 ## 🎯 Current Focus Areas
 
+### **Developer Standards Enforcement**
+- 🔒 **MANDATORY smart-commit usage** - enforce `/scripts/unified/smart-commit.js` only
+- 🧪 **TDD Security Validation** - security tests MUST be written first
+- 📋 **Context update requirements** - security context updated with all changes
+- ✅ **Proof requirements** - ALL security claims need verification evidence
+
 ### **Enhanced Git Workflow Security**
 - Security key detection and validation in commit workflows
 - Critical file protection against accidental deletion
 - Real-time security scanning integration
+- **Direct link:** `/scripts/unified/smart-commit.js` for all commits
 
 ### **API Security Hardening**
 - Authentication and authorization validation
 - Input sanitization and injection prevention
 - Secure coding pattern enforcement
+- **Testing requirement:** Security tests written BEFORE implementation
 
 ### **Production Security Posture**
 - Infrastructure security monitoring
 - Vulnerability assessment and remediation
 - Security metrics and reporting
+- **Documentation:** `/documentation/ai-coding-workflows/AI_DEVELOPMENT_GUIDE.md`
 
 ---
 

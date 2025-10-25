@@ -9,20 +9,29 @@
 
 ## 🎯 Current Focus Areas
 
+### **⭐ Feature Development Standards**
+- 🧪 **User tests FIRST** - write user acceptance tests before feature implementation
+- 🔒 **Security review required** - coordinate with Security context for all features
+- 📊 **Performance validation** - all features must meet performance standards
+- 📋 **Context updates mandatory** - Features context updated with all changes
+
 ### **AI-Assisted Feature Development**
 - Intelligent feature planning and requirements analysis
 - AI-powered code generation with security validation
 - Automated testing and quality assurance integration
+- **Testing coordination:** `/scripts/unified/test-runner.js` for feature validation
 
 ### **User Experience & Interface Enhancement**
 - Modern, responsive UI/UX development
 - Accessibility-first design implementation
 - Performance-optimized user interactions
+- **Performance testing:** Performance tests required for all UI changes
 
 ### **Product Integration & Innovation**
 - Seamless third-party service integration
 - API-first development approach
 - Scalable feature architecture
+- **Documentation:** `/documentation/ai-coding-workflows/AI_DEVELOPMENT_GUIDE.md`
 
 ---
 

@@ -9,20 +9,33 @@
 
 ## 🎯 Current Focus Areas
 
+### **📚 Documentation Standards Enforcement**
+- 📖 **Check existing docs FIRST** - scan `/documentation/` before creating new content
+- 🔗 **Direct file links required** - provide full paths like `/path/to/file.md`
+- 📝 **Documentation updated with every change** - no code without doc updates
+- 📋 **Context updates mandatory** - documentation context updated with all changes
+
 ### **Comprehensive Documentation Organization**
 - Rationalization of 416+ scattered documentation files
 - AI-powered documentation generation and maintenance
 - Interactive documentation with live examples and validation
+- **Master guide:** `/documentation/DOCUMENTATION_MASTER_GUIDE.md`
 
 ### **Multi-Copilot Knowledge Management**
 - Context management system for parallel AI development
 - Cross-reference documentation with automated linking
 - Real-time documentation synchronization across contexts
+- **Context system:** `/documentation/current-context/CONTEXT_SYSTEM.md`
 
 ### **Developer Experience Enhancement**
 - API documentation with interactive examples
 - Code-to-documentation automation
 - Searchable knowledge base with AI-powered assistance
+- **AI guide:** `/documentation/ai-coding-workflows/AI_DEVELOPMENT_GUIDE.md`
+
+### **🚫 Privacy Boundaries**
+- **NEVER touch `.current-notes.md`** - private developer workspace
+- Respect personal organization systems and private files
 
 ---
 

@@ -18,6 +18,46 @@ This **Multi-Copilot Context Management System** enables **parallel AI developme
 - ✅ **Conflict Prevention:** Built-in coordination to avoid overlapping work
 - ✅ **Comprehensive Coverage:** All aspects of development are covered
 
+### **🔑 Developer Preferences & Standards**
+
+#### **Test-Driven Development (TDD) Best Practices**
+- 🧪 **ALWAYS write tests first** before implementing functionality
+- 📊 **Maintain 90%+ test coverage** across all codebases
+- 🔄 **Red-Green-Refactor cycle** must be followed for all feature development
+- 🧪 **Test automation** is mandatory - no manual testing for repetitive tasks
+- 📈 **Performance tests** required for all critical paths and API endpoints
+
+#### **Documentation & Script Maintenance Standards**
+- 📚 **Documentation MUST be updated** with every code change
+- 🔗 **Always refer to existing documentation** before creating new processes
+- 📝 **Use unified scripts** from `/scripts/unified/` (aws-manager.js, test-runner.js, deployment-manager.js)
+- 🔍 **Check `/documentation/` structure** before duplicating documentation efforts
+- 📖 **Link directly to specific files** - provide full paths, not general references
+
+#### **Git Workflow & Commit Standards**
+- 💾 **ALWAYS use smart commit** (`./scripts/unified/smart-commit.js`) for all commits
+- 🔐 **Security validation required** before any commit reaches production
+- 📝 **Commit messages must follow** conventional commit format with detailed descriptions
+- 🔄 **Process isolation mandatory** - separate concerns into discrete, testable units
+
+#### **Context Management Requirements**
+- 📋 **ALWAYS UPDATE context documents** when saving context for compaction
+- 🔄 **Amazon Q and GitHub Copilot compatibility** - ensure context works across AI tools
+- 📍 **Context boundaries must be respected** - don't overlap domain responsibilities
+- 💾 **Context state persistence** required for seamless handoffs between AI sessions
+
+#### **Proof & Validation Requirements**
+- ✅ **NEVER claim completion without proof** - provide tests, captured data, or verification output
+- 🧪 **Include test results** when claiming functionality works
+- 📊 **Capture performance metrics** for optimization claims
+- 🔗 **Provide direct file links** with full paths - no general references that require scanning
+- 📈 **Show before/after comparisons** for any improvement claims
+
+#### **Privacy & Boundaries**
+- 🚫 **NEVER touch `.current-notes.md`** - this is private developer workspace
+- 🔒 **Respect developer's private files** and personal organization systems
+- 📝 **Use designated context areas** for AI collaboration and shared state
+
 ---
 
 ## 🏗️ Context Architecture
