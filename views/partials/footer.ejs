@@ -2,19 +2,33 @@
 <% if (typeof cdnUrl !== 'undefined') { %>
   <% // In development, use local server to avoid CDN caching issues %>
   <% const scriptUrl = (process.env.NODE_ENV !== 'production') ? '/js/firebase-config.js' : cdnUrl + '/js/firebase-config.js'; %>
-<script src="<%= scriptUrl %>?v=<%= Date.now() %>"></script>
 <script>
-  if (!window.firebaseAuth && !window.firebaseUtils) {
-    window.initializeWavelengthFirebase({
-      apiKey: "<%= process.env.API_KEY %>",
-      authDomain: "<%= process.env.AUTH_DOMAIN %>",
-      databaseURL: "<%= process.env.DATABASE_URL %>",
-      projectId: "<%= process.env.PROJECT_ID %>",
-      storageBucket: "<%= process.env.STORAGE_BUCKET %>",
-      messagingSenderId: "<%= process.env.MESSAGING_SENDER_ID %>",
-      appId: "<%= process.env.APP_ID %>"
-    });
-  }
+  // Load Firebase config script and initialize when ready
+  (function() {
+    const script = document.createElement('script');
+    script.src = '<%= scriptUrl %>?v=<%= Date.now() %>';
+    script.onload = function() {
+      if (!window.firebaseAuth && !window.firebaseUtils && typeof window.initializeWavelengthFirebase === 'function') {
+        window.initializeWavelengthFirebase({
+          apiKey: "<%= process.env.API_KEY %>",
+          authDomain: "<%= process.env.AUTH_DOMAIN %>",
+          databaseURL: "<%= process.env.DATABASE_URL %>",
+          projectId: "<%= process.env.PROJECT_ID %>",
+          storageBucket: "<%= process.env.STORAGE_BUCKET %>",
+          messagingSenderId: "<%= process.env.MESSAGING_SENDER_ID %>",
+          appId: "<%= process.env.APP_ID %>"
+        }).then(() => {
+          console.log('✅ Firebase initialized successfully');
+        }).catch((error) => {
+          console.error('❌ Firebase initialization failed:', error);
+        });
+      }
+    };
+    script.onerror = function() {
+      console.error('❌ Failed to load Firebase config script from:', script.src);
+    };
+    document.head.appendChild(script);
+  })();
 </script>
 <% } %>
 
@@ -116,7 +130,8 @@
     <% if (versionInfo) { %>
     <div class="version-info">
       <span class="version-badge" title="Version v<%= versionInfo.version %> | Build #<%= versionInfo.buildNumber %> | Commit <%= versionInfo.commitShort %> | Built <%= new Date(versionInfo.buildDate).toLocaleDateString() %>">
-        v<%= versionInfo.version %> (<%= versionInfo.commitShort %>)
+        v<%= versionInfo.version %> 
+        (<a href="https://github.com/mimelator/Wavelength-Lore/commit/<%= versionInfo.commitHash %>" target="_blank" style="color: inherit; text-decoration: none;" title="View commit on GitHub"><%= versionInfo.commitShort %></a>)
       </span>
     </div>
     <% } %>

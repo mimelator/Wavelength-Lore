@@ -191,6 +191,12 @@ window.initializeWavelengthFirebase = function(firebaseConfig) {
                     }, 5 * 60 * 1000); // Check every 5 minutes
                     
                     console.log('✅ Firebase initialized - auth listener active, token storage ready');
+                    
+                    // Mark Firebase as ready if readiness helper is available
+                    if (window.WavelengthFirebase) {
+                        window.WavelengthFirebase.markReady();
+                    }
+                    
                     return { auth, database };
                     
                 }).catch((error) => {

@@ -14,7 +14,12 @@
     "export:seasons": "node scripts/export-firebase-to-yaml.js --type=seasons",
     "export:characters": "node scripts/export-firebase-to-yaml.js --type=characters",
     "export:lore": "node scripts/export-firebase-to-yaml.js --type=lore",
-    "export:prompts": "node scripts/export-firebase-to-yaml.js --type=prompts"
+    "export:prompts": "node scripts/export-firebase-to-yaml.js --type=prompts",
+    "deploy:status": "node scripts/deployment-tracker.js status",
+    "deploy:compare": "node scripts/deployment-tracker.js compare",
+    "deploy:history": "node scripts/deployment-tracker.js history",
+    "deploy:record": "node scripts/deployment-tracker.js record",
+    "deploy:force": "node scripts/apprunner-force-deploy.js"
   },
   "keywords": [],
   "author": "",

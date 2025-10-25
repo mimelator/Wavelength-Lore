@@ -51,6 +51,9 @@
 <link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/gallery-buttons.css">
 <link rel="icon" type="image/svg+xml" href="<%= cdnUrl %>/icons/favicon.svg">
 
+<!-- Firebase Readiness Helper -->
+<script src="<%= cdnUrl %>/js/firebase-readiness.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+
 <!-- Gallery Scripts - Activate image capture functionality -->
 <%- include('gallery-scripts') %>
 

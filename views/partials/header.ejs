@@ -137,9 +137,14 @@
             }
           });
         } else {
-          // Firebase not available, try again in a moment
-          console.log('⏳ Firebase not ready yet, retrying in 500ms...');
-          setTimeout(checkAdminStatus, 500);
+          // Firebase not available, use readiness helper if available
+          if (window.WavelengthFirebase) {
+            console.log('⏳ Waiting for Firebase readiness helper...');
+            window.WavelengthFirebase.onReady(checkAdminStatus);
+          } else {
+            console.log('⏳ Firebase not ready yet, retrying in 500ms...');
+            setTimeout(checkAdminStatus, 500);
+          }
         }
       } catch (error) {
         console.error('❌ Error setting up admin status check:', error);

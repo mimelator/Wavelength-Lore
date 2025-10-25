@@ -395,20 +395,33 @@
         }
         window.CDN_URL = '<%= cdnUrl %>';
     </script>
-    <script src="<%= cdnUrl %>/js/firebase-config.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
     <script>
-        // Initialize Firebase
-        if (!window.firebaseAuth && !window.firebaseUtils) {
-            window.initializeWavelengthFirebase({
-                apiKey: "<%= process.env.API_KEY %>",
-                authDomain: "<%= process.env.AUTH_DOMAIN %>",
-                databaseURL: "<%= process.env.DATABASE_URL %>",
-                projectId: "<%= process.env.PROJECT_ID %>",
-                storageBucket: "<%= process.env.STORAGE_BUCKET %>",
-                messagingSenderId: "<%= process.env.MESSAGING_SENDER_ID %>",
-                appId: "<%= process.env.APP_ID %>"
-            });
-        }
+        // Load Firebase config script and initialize when ready
+        (function() {
+            const script = document.createElement('script');
+            script.src = '<%= cdnUrl %>/js/firebase-config.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>';
+            script.onload = function() {
+                if (!window.firebaseAuth && !window.firebaseUtils && typeof window.initializeWavelengthFirebase === 'function') {
+                    window.initializeWavelengthFirebase({
+                        apiKey: "<%= process.env.API_KEY %>",
+                        authDomain: "<%= process.env.AUTH_DOMAIN %>",
+                        databaseURL: "<%= process.env.DATABASE_URL %>",
+                        projectId: "<%= process.env.PROJECT_ID %>",
+                        storageBucket: "<%= process.env.STORAGE_BUCKET %>",
+                        messagingSenderId: "<%= process.env.MESSAGING_SENDER_ID %>",
+                        appId: "<%= process.env.APP_ID %>"
+                    }).then(() => {
+                        console.log('✅ Firebase initialized successfully on radio player');
+                    }).catch((error) => {
+                        console.error('❌ Firebase initialization failed on radio player:', error);
+                    });
+                }
+            };
+            script.onerror = function() {
+                console.error('❌ Failed to load Firebase config script from:', script.src);
+            };
+            document.head.appendChild(script);
+        })();
     </script>
     <script src="<%= cdnUrl %>/js/radio-screensaver.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
     <script src="<%= cdnUrl %>/js/radio-player.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
