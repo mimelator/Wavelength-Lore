@@ -369,9 +369,31 @@ router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireActi
     
   } catch (error) {
     console.error('Error creating guided product:', error);
+    
+    // Enhanced error logging for debugging
+    if (error.response) {
+      console.error('API Response Error:', {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data,
+        headers: error.response.headers
+      });
+    }
+    
+    // Return more specific error information
+    const errorMessage = error.response?.data?.message || 
+                        error.response?.data?.error || 
+                        error.message || 
+                        'Failed to create product';
+    
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to create product'
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? {
+        originalError: error.message,
+        apiStatus: error.response?.status,
+        apiData: error.response?.data
+      } : undefined
     });
   }
 });
@@ -390,6 +412,14 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
     const userId = req.user.uid;
     const { imageId, imageUrl, imageTitle, productOptions = {} } = req.body;
     
+    console.log('🎯 CREATE PRODUCT REQUEST:', {
+      userId,
+      imageId,
+      imageUrl,
+      imageTitle,
+      productOptions
+    });
+    
     if (!imageId || !imageUrl) {
       return res.status(400).json({
         success: false,
@@ -397,15 +427,46 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
       });
     }
     
+    // DEVELOPMENT BYPASS: If Printify is not properly configured, return mock success
+    if (process.env.PRINTIFY_MOCK_MODE === 'true') {
+      console.log('🔧 MOCK MODE: Simulating successful product creation');
+      
+      const mockProduct = {
+        id: `mock_${Date.now()}`,
+        title: `Custom ${imageTitle || 'Product'}`,
+        description: `Mock product created from ${imageTitle || imageId}`,
+        variants: [
+          { id: 'mock_variant_1', title: 'M / Black', price: 2099 },
+          { id: 'mock_variant_2', title: 'L / Black', price: 2099 }
+        ],
+        images: [{ src: imageUrl }],
+        sourceImage: { id: imageId, title: imageTitle, url: imageUrl }
+      };
+      
+      return res.json({
+        success: true,
+        product: mockProduct,
+        enhancement: {
+          autoEnhanced: false,
+          enhancementSource: 'mock',
+          qualityImproved: false
+        },
+        message: 'Mock product created successfully! (Development mode)'
+      });
+    }
+    
     // Download image from URL for processing
+    console.log('📥 Downloading image from:', imageUrl);
     const imageBuffer = await downloadImageFromS3(imageUrl);
     if (!imageBuffer) {
+      console.error('❌ Failed to download image buffer');
       return res.status(400).json({
         success: false,
         error: 'Failed to process image'
       });
     }
     
+    console.log('✅ Image downloaded successfully, size:', imageBuffer.length, 'bytes');
     console.log('🎯 Creating merchandise with auto-enhancement for image:', imageTitle || imageId);
     
     // Create product with auto-enhancement
@@ -420,6 +481,12 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
         originalImageId: imageId
       }
     );
+    
+    console.log('🔍 Product creation result:', {
+      success: productResult.success,
+      error: productResult.error,
+      hasProductId: !!productResult.productId
+    });
     
     if (!productResult.success) {
       return res.status(400).json({
@@ -477,9 +544,31 @@ router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('gam
     
   } catch (error) {
     console.error('Error creating custom product:', error);
+    
+    // Enhanced error logging for debugging
+    if (error.response) {
+      console.error('API Response Error:', {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data,
+        headers: error.response.headers
+      });
+    }
+    
+    // Return more specific error information
+    const errorMessage = error.response?.data?.message || 
+                        error.response?.data?.error || 
+                        error.message || 
+                        'Failed to create custom product';
+    
     res.status(500).json({
       success: false,
-      error: 'Failed to create custom product'
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? {
+        originalError: error.message,
+        apiStatus: error.response?.status,
+        apiData: error.response?.data
+      } : undefined
     });
   }
 });
@@ -1222,6 +1311,52 @@ router.post('/preview-enhancement', ensureAuthenticated, groupAuth.requireAction
     res.status(500).json({
       success: false,
       error: 'Failed to preview enhancement: ' + error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/test-printify
+ * Test Printify API connection (development only)
+ */
+router.get('/test-printify', async (req, res) => {
+  if (process.env.NODE_ENV !== 'development') {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  
+  try {
+    console.log('🔧 Testing Printify API connection...');
+    
+    // Test basic API connectivity
+    const testResult = await printifyService.getBlueprints();
+    
+    res.json({
+      success: true,
+      message: 'Printify API connection test',
+      config: {
+        apiUrl: process.env.PRINTIFY_API_URL,
+        shopId: process.env.PRINTIFY_SHOP_ID,
+        environment: process.env.PRINTIFY_ENVIRONMENT,
+        hasToken: !!process.env.PRINTIFY_API_TOKEN
+      },
+      testResult: {
+        success: testResult.success,
+        error: testResult.error,
+        blueprintCount: testResult.blueprints?.length || 0
+      }
+    });
+    
+  } catch (error) {
+    console.error('Printify API test failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      config: {
+        apiUrl: process.env.PRINTIFY_API_URL,
+        shopId: process.env.PRINTIFY_SHOP_ID,
+        environment: process.env.PRINTIFY_ENVIRONMENT,
+        hasToken: !!process.env.PRINTIFY_API_TOKEN
+      }
     });
   }
 });

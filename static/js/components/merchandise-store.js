@@ -1307,11 +1307,19 @@ class MerchandiseStore {
       createBtn.disabled = true;
       createBtn.textContent = 'Designing...';
       
+      // Show progress bar
+      this.setLoading(true, '🎨 Preparing your custom product...', 10);
+      
       const customization = {
         borderStyle: borderSelect.value,
         defaultSize: sizeSelect.value,
         defaultColor: colorSelect.value
       };
+      
+      // Simulate progress updates
+      setTimeout(() => this.setLoading(true, '📸 Processing your image...', 30), 500);
+      setTimeout(() => this.setLoading(true, '🎽 Creating product variants...', 60), 1000);
+      setTimeout(() => this.setLoading(true, '✨ Finalizing your design...', 85), 1500);
       
       await this.createCustomizedProduct(productType, imageData, imageContext, customization);
       
@@ -1420,7 +1428,7 @@ class MerchandiseStore {
   
   async createCustomizedProduct(productType, imageData, imageContext, customization) {
     try {
-      this.setLoading(true, 'Creating your custom product...');
+      // Progress already started in button click handler
       
       // Prepare product options
       const productOptions = {
@@ -1433,6 +1441,9 @@ class MerchandiseStore {
         }
       };
       
+      // Final progress update before API call
+      this.setLoading(true, '🚀 Creating your amazing product...', 95);
+      
       // Call the existing createProduct with border config
       const product = await this.createProduct(
         this.selectedImage,
@@ -1440,17 +1451,20 @@ class MerchandiseStore {
       );
       
       if (product) {
-        modal.remove();
-        this.showSuccess('Product created successfully!');
-        this.selectedImage = null;
-        this.render();
+        // Success progress
+        this.setLoading(true, '✅ Product created successfully!', 100);
+        setTimeout(() => {
+          this.setLoading(false);
+          this.showSuccess('Product created successfully!');
+          this.selectedImage = null;
+          this.render();
+        }, 800);
       }
       
     } catch (error) {
       console.error('Error creating customized product:', error);
-      this.showError('Failed to create product: ' + error.message);
-    } finally {
       this.setLoading(false);
+      this.showError('Failed to create product: ' + error.message);
     }
   }
   

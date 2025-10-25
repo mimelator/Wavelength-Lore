@@ -34,24 +34,36 @@ async function debugProductCreation() {
     }
   });
   
-  // Capture responses
+  // Capture responses with detailed error info
   const responses = [];
   page.on('response', async response => {
     if (response.url().includes('/api/merchandise/')) {
       try {
         const responseText = await response.text();
-        responses.push({
+        const responseData = {
           url: response.url(),
           status: response.status(),
           statusText: response.statusText(),
+          headers: response.headers(),
           body: responseText
-        });
+        };
+        
+        // Parse JSON if possible for better error details
+        if (responseText && response.headers()['content-type']?.includes('application/json')) {
+          try {
+            responseData.jsonBody = JSON.parse(responseText);
+          } catch (e) {
+            // Not valid JSON, keep as text
+          }
+        }
+        
+        responses.push(responseData);
       } catch (e) {
         responses.push({
           url: response.url(),
           status: response.status(),
           statusText: response.statusText(),
-          body: 'Could not read response body'
+          body: 'Could not read response body: ' + e.message
         });
       }
     }
@@ -80,10 +92,40 @@ async function debugProductCreation() {
     
     // Click Design Product button
     const designButton = await page.waitForSelector('#createProductBtn');
+    console.log('🔄 Clicking Design Product button...');
     await designButton.click();
     
+    // Monitor button state changes
+    const monitorButton = setInterval(async () => {
+      try {
+        const buttonText = await page.evaluate(() => {
+          const btn = document.querySelector('#createProductBtn');
+          return btn ? btn.textContent.trim() : 'Button not found';
+        });
+        console.log('🔄 Button state:', buttonText);
+      } catch (e) {
+        // Button might be removed or changed
+      }
+    }, 2000);
+    
+    setTimeout(() => clearInterval(monitorButton), 15000);
+    
     console.log('⏳ Waiting for API call...');
-    await wait(5000);
+    
+    // Monitor for create-product response in real-time
+    let createProductFound = false;
+    const checkInterval = setInterval(() => {
+      const createProductResponse = responses.find(r => r.url.includes('create-product'));
+      if (createProductResponse && !createProductFound) {
+        createProductFound = true;
+        console.log('✅ CREATE-PRODUCT RESPONSE RECEIVED:', createProductResponse.status);
+        clearInterval(checkInterval);
+      }
+    }, 500);
+    
+    // Wait longer for the response
+    await wait(15000);
+    clearInterval(checkInterval);
     
     // Analyze requests and responses
     console.log('\n📡 API REQUESTS:');
@@ -99,15 +141,43 @@ async function debugProductCreation() {
       console.log(`\n${i + 1}. ${res.status} ${res.statusText} - ${res.url}`);
       if (res.status !== 200) {
         console.log('   Error Body:', res.body);
+        if (res.jsonBody) {
+          console.log('   Parsed Error:', JSON.stringify(res.jsonBody, null, 2));
+        }
+        console.log('   Response Headers:', res.headers);
       }
     });
     
     // Check for specific create-product call
     const createProductResponse = responses.find(r => r.url.includes('create-product'));
     if (createProductResponse) {
-      console.log('\n🎯 CREATE PRODUCT RESPONSE:');
-      console.log('Status:', createProductResponse.status);
-      console.log('Body:', createProductResponse.body);
+      console.log('\n🎯 CREATE PRODUCT DETAILED ANALYSIS:');
+      console.log('Status:', createProductResponse.status, createProductResponse.statusText);
+      console.log('Raw Body:', createProductResponse.body);
+      if (createProductResponse.jsonBody) {
+        console.log('Parsed Error:', JSON.stringify(createProductResponse.jsonBody, null, 2));
+      }
+      console.log('Response Headers:', createProductResponse.headers);
+      
+      // Find the corresponding request
+      const createProductRequest = requests.find(r => r.url.includes('create-product'));
+      if (createProductRequest) {
+        console.log('\n📤 CORRESPONDING REQUEST:');
+        console.log('Method:', createProductRequest.method);
+        console.log('URL:', createProductRequest.url);
+        console.log('Headers:', createProductRequest.headers);
+        console.log('POST Data:', createProductRequest.postData);
+        
+        // Parse POST data if JSON
+        if (createProductRequest.postData) {
+          try {
+            const parsedData = JSON.parse(createProductRequest.postData);
+            console.log('Parsed POST Data:', JSON.stringify(parsedData, null, 2));
+          } catch (e) {
+            console.log('POST Data (not JSON):', createProductRequest.postData);
+          }
+        }
+      }
     } else {
       console.log('\n❌ No create-product API call found');
     }
