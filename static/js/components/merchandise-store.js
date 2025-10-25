@@ -881,7 +881,7 @@ class MerchandiseStore {
                 </div>
                 <button class="select-product-type-btn btn-primary" 
                         data-product-type="${product.id}">
-                  Create ${product.name}
+                  Design ${product.name}
                 </button>
               </div>
             </div>
@@ -899,7 +899,7 @@ class MerchandiseStore {
           <p>Select an image from your gallery to create your first product!</p>
           ${this.selectedImage ? `
             <button class="create-product-btn btn-primary">
-              Create Product from Selected Image
+              Design Product from Selected Image
             </button>
           ` : ''}
         </div>
@@ -1153,7 +1153,7 @@ class MerchandiseStore {
       <div class="modal-content customization-content">
         <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
         
-        <h2>✨ Customize Your ${productConfig.name}</h2>
+        <h2>✨ Design Your ${productConfig.name}</h2>
         
         <div class="customization-layout">
           <!-- Left side: Live Preview -->
@@ -1219,7 +1219,7 @@ class MerchandiseStore {
             <div class="modal-actions">
               <button class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
               <button class="btn-primary" id="createProductBtn">
-                Create Product
+                Design Product
               </button>
             </div>
           </div>
@@ -1293,7 +1293,7 @@ class MerchandiseStore {
     // Create product button
     createBtn.addEventListener('click', async () => {
       createBtn.disabled = true;
-      createBtn.textContent = 'Creating...';
+      createBtn.textContent = 'Designing...';
       
       const customization = {
         borderStyle: borderSelect.value,
