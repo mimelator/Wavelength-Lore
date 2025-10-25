@@ -38,6 +38,9 @@ class WavelengthRadio {
         this.soundEnabled = localStorage.getItem('radio_sound_enabled') !== 'false'; // Enabled by default
         this.audioContext = null;
 
+        // Screensaver module
+        this.screensaver = null;
+
         // Initialize
         this.init();
     }
@@ -56,8 +59,10 @@ class WavelengthRadio {
         this.initFirebaseSync();
         this.initSoundSystem();
         this.bindSoundToggle();
-        this.initScreenSaver();
         this.initWeatherEffects();
+        
+        // Initialize screensaver module
+        this.screensaver = new RadioScreenSaver(this);
 
         // Restore saved player settings
         this.restorePlayerSettings();
@@ -65,7 +70,18 @@ class WavelengthRadio {
         // Auto-resume from global radio player if it was playing
         this.restoreGlobalPlayerState();
         
+        // Initialize Media Session API for system controls
+        this.initMediaSession();
+        
+        // Initialize page visibility handling
+        this.initVisibilityHandling();
+        
         // Make this instance globally accessible for debugging
+        // Initialize Media Session API for system controls
+        this.initMediaSession();
+        
+        // Initialize page visibility handling
+        this.initVisibilityHandling();
         window.radioPlayer = this;
     }
 
@@ -563,8 +579,8 @@ class WavelengthRadio {
         this.updatePlaylistUI();
 
         // Update screen saver images if active
-        if (this.screensaverActive) {
-            this.updateScreenSaverImages();
+        if (this.screensaver?.active) {
+            this.screensaver.updateImages();
         }
 
         // Play
@@ -1171,734 +1187,12 @@ class WavelengthRadio {
         setTimeout(() => notification.remove(), 2000);
     }
 
-    // ===================================
-    // SCREEN SAVER MODE
-    // ===================================
 
-    saveScreenSaverPreferences() {
-        try {
-            const preferences = {
-                weather: [],
-                imageEffects: [],
-                gameMode: 'off',
-                lyrics: 'off',
-                title: 'on'
-            };
-
-            // Save active weather modes
-            document.querySelectorAll('.weather-btn.active').forEach(btn => {
-                preferences.weather.push(btn.dataset.weather);
-            });
-
-            // Save active image effects
-            document.querySelectorAll('.image-btn.active').forEach(btn => {
-                preferences.imageEffects.push(btn.dataset.effect);
-            });
-
-            // Save game mode
-            const activeGameBtn = document.querySelector('.game-btn.active');
-            if (activeGameBtn) {
-                preferences.gameMode = activeGameBtn.dataset.game;
-            }
-
-            // Save lyrics mode
-            const activeLyricsBtn = document.querySelector('.lyrics-btn.active');
-            if (activeLyricsBtn) {
-                preferences.lyrics = activeLyricsBtn.dataset.lyrics;
-            }
-
-            // Save title display preference
-            const activeTitleBtn = document.querySelector('.title-btn.active');
-            if (activeTitleBtn) {
-                preferences.title = activeTitleBtn.dataset.title;
-            }
-
-            // Save transition preference
-            const activeTransitionBtn = document.querySelector('.transition-btn.active');
-            if (activeTransitionBtn) {
-                preferences.transition = activeTransitionBtn.dataset.transition;
-            }
-
-            // Save animation preference
-            const activeAnimationBtn = document.querySelector('.animation-btn.active');
-            if (activeAnimationBtn) {
-                preferences.animation = activeAnimationBtn.dataset.animation;
-            }
-
-            // Save summary preference
-            const activeSummaryBtn = document.querySelector('.summary-btn.active');
-            if (activeSummaryBtn) {
-                preferences.summary = activeSummaryBtn.dataset.summary;
-            }
-
-            // Save badges preference
-            const activeBadgesBtn = document.querySelector('.badges-btn.active');
-            if (activeBadgesBtn) {
-                preferences.badges = activeBadgesBtn.dataset.badges;
-            }
-
-            localStorage.setItem('wavelength_screensaver_prefs', JSON.stringify(preferences));
-            console.log('💾 Saved screen saver preferences:', preferences);
-        } catch (error) {
-            console.error('Error saving preferences:', error);
-        }
-    }
-
-    loadScreenSaverPreferences() {
-        try {
-            const saved = localStorage.getItem('wavelength_screensaver_prefs');
-            if (!saved) {
-                console.log('📂 No saved preferences found, using defaults');
-                return;
-            }
-
-            const preferences = JSON.parse(saved);
-            console.log('📂 Loading screen saver preferences:', preferences);
-
-            // Restore weather modes
-            document.querySelectorAll('.weather-btn').forEach(btn => {
-                const weather = btn.dataset.weather;
-                if (preferences.weather.includes(weather)) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-
-            // Restore image effects
-            document.querySelectorAll('.image-btn').forEach(btn => {
-                const effect = btn.dataset.effect;
-                if (preferences.imageEffects.includes(effect)) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-
-            // Restore game mode
-            document.querySelectorAll('.game-btn').forEach(btn => {
-                if (btn.dataset.game === preferences.gameMode) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-
-            // Restore lyrics mode
-            document.querySelectorAll('.lyrics-btn').forEach(btn => {
-                if (btn.dataset.lyrics === preferences.lyrics) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-
-            // Restore title display preference
-            document.querySelectorAll('.title-btn').forEach(btn => {
-                if (btn.dataset.title === preferences.title) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-
-            // Restore transition preference
-            if (preferences.transition) {
-                document.querySelectorAll('.transition-btn').forEach(btn => {
-                    if (btn.dataset.transition === preferences.transition) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                });
-            }
-
-            // Restore animation preference (default to 'on')
-            const animationPref = preferences.animation || 'on';
-            document.querySelectorAll('.animation-btn').forEach(btn => {
-                if (btn.dataset.animation === animationPref) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-            // Apply animation state to images
-            this.updateImageAnimation();
-
-            // Restore summary preference
-            if (preferences.summary) {
-                document.querySelectorAll('.summary-btn').forEach(btn => {
-                    if (btn.dataset.summary === preferences.summary) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                });
-            }
-
-            // Restore badges preference (default to 'on')
-            const badgesPref = preferences.badges || 'on';
-            document.querySelectorAll('.badges-btn').forEach(btn => {
-                if (btn.dataset.badges === badgesPref) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-
-            console.log('✅ Screen saver preferences restored');
-        } catch (error) {
-            console.error('Error loading preferences:', error);
-        }
-    }
-
-    initScreenSaver() {
-        this.screensaverActive = false;
-        this.screensaverInterval = null;
-        this.screensaverImages = [];
-        this.currentScreensaverIndex = 0;
-
-        // Load saved preferences
-        this.loadScreenSaverPreferences();
-
-        // Bind toggle button
-        const toggleBtn = document.getElementById('screensaverToggle');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => this.toggleScreenSaver());
-        }
-
-        // Bind minimal controls
-        const screensaverPlayPause = document.getElementById('screensaverPlayPause');
-        const screensaverPrev = document.getElementById('screensaverPrev');
-        const screensaverNext = document.getElementById('screensaverNext');
-
-        if (screensaverPlayPause) {
-            screensaverPlayPause.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.togglePlay();
-            });
-        }
-
-        if (screensaverPrev) {
-            screensaverPrev.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.previous();
-            });
-        }
-
-        if (screensaverNext) {
-            screensaverNext.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.next();
-            });
-        }
-
-        // Bind customization toggle
-        const customizationToggle = document.getElementById('customizationToggle');
-        const customizationPanel = document.getElementById('customizationPanel');
-        
-        if (customizationToggle && customizationPanel) {
-            customizationToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                customizationPanel.classList.toggle('expanded');
-            });
-        }
-
-        // Bind weather mode selector buttons (multi-select support)
-        const weatherBtns = document.querySelectorAll('.weather-btn');
-        weatherBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const weatherMode = btn.dataset.weather;
-                
-                if (weatherMode === 'auto') {
-                    // Auto mode: deselect all others
-                    weatherBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    this.setWeatherMode('auto');
-                } else {
-                    // Toggle this weather effect
-                    btn.classList.toggle('active');
-                    
-                    // If toggling on a weather, remove auto
-                    const autoBtn = document.querySelector('.weather-btn[data-weather="auto"]');
-                    if (btn.classList.contains('active') && autoBtn) {
-                        autoBtn.classList.remove('active');
-                    }
-                    
-                    // Update active weather modes
-                    this.updateActiveWeatherModes();
-                }
-                
-                // Save preferences
-                this.saveScreenSaverPreferences();
-            });
-        });
-
-        // Bind image effect buttons
-        const imageBtns = document.querySelectorAll('.image-btn');
-        imageBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                btn.classList.toggle('active');
-                this.updateActiveImageEffects();
-                this.saveScreenSaverPreferences();
-            });
-        });
-
-        // Bind game mode buttons
-        const gameBtns = document.querySelectorAll('.game-btn');
-        gameBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Remove active class from all game buttons
-                gameBtns.forEach(b => b.classList.remove('active'));
-                // Add active class to clicked button
-                btn.classList.add('active');
-                // Update game mode
-                this.updateGameMode();
-                this.saveScreenSaverPreferences();
-            });
-        });
-
-        // Bind lyrics buttons
-        const lyricsBtns = document.querySelectorAll('.lyrics-btn');
-        lyricsBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Remove active class from all lyrics buttons
-                lyricsBtns.forEach(b => b.classList.remove('active'));
-                // Add active class to clicked button
-                btn.classList.add('active');
-                // Update lyrics display
-                this.updateLyricsDisplay();
-                this.saveScreenSaverPreferences();
-            });
-        });
-
-        // Bind title display buttons
-        const titleBtns = document.querySelectorAll('.title-btn');
-        titleBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Remove active class from all title buttons
-                titleBtns.forEach(b => b.classList.remove('active'));
-                // Add active class to clicked button
-                btn.classList.add('active');
-                this.saveScreenSaverPreferences();
-            });
-        });
-
-        // Bind transition buttons
-        const transitionBtns = document.querySelectorAll('.transition-btn');
-        transitionBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Remove active class from all transition buttons
-                transitionBtns.forEach(b => b.classList.remove('active'));
-                // Add active class to clicked button
-                btn.classList.add('active');
-                // Save transition preference
-                const transition = btn.dataset.transition;
-                localStorage.setItem('wavelength_screensaver_transitions', transition);
-                console.log(`🎞️ Image transitions: ${transition}`);
-                this.saveScreenSaverPreferences();
-            });
-        });
-
-        // Bind animation buttons
-        const animationBtns = document.querySelectorAll('.animation-btn');
-        animationBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Remove active class from all animation buttons
-                animationBtns.forEach(b => b.classList.remove('active'));
-                // Add active class to clicked button
-                btn.classList.add('active');
-                // Save animation preference
-                const animation = btn.dataset.animation;
-                localStorage.setItem('wavelength_screensaver_animation', animation);
-                console.log(`🌈 Image animation: ${animation}`);
-                // Apply animation state to all images
-                this.updateImageAnimation();
-                this.saveScreenSaverPreferences();
-            });
-        });
-
-        // Bind summary buttons
-        const summaryBtns = document.querySelectorAll('.summary-btn');
-        summaryBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Remove active class from all summary buttons
-                summaryBtns.forEach(b => b.classList.remove('active'));
-                // Add active class to clicked button
-                btn.classList.add('active');
-                // Update summary display
-                this.updateEpisodeSummary();
-                this.saveScreenSaverPreferences();
-            });
-        });
-
-        // Bind badges buttons
-        const badgesBtns = document.querySelectorAll('.badges-btn');
-        badgesBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Remove active class from all badges buttons
-                badgesBtns.forEach(b => b.classList.remove('active'));
-                // Add active class to clicked button
-                btn.classList.add('active');
-                // Update badges display
-                this.updateCharacterBadgesDisplay();
-                this.saveScreenSaverPreferences();
-            });
-        });
-
-        // Exit screen saver on any key press or click (except on controls)
-        document.addEventListener('keydown', (e) => {
-            if (this.screensaverActive) {
-                this.exitScreenSaver();
-            }
-        });
-
-        const overlay = document.getElementById('screensaverOverlay');
-        if (overlay) {
-            overlay.addEventListener('click', (e) => {
-                // Check if customization panel is open
-                const customizationPanel = document.getElementById('customizationPanel');
-                const isCustomizationOpen = customizationPanel && customizationPanel.classList.contains('expanded');
-                
-                // If customization is open and click is outside of it, just close customization
-                if (isCustomizationOpen && !e.target.closest('.screensaver-customization')) {
-                    customizationPanel.classList.remove('expanded');
-                    return; // Don't exit screen saver
-                }
-                
-                // Don't exit if clicking on controls or customization
-                if (!e.target.closest('.screensaver-minimal-controls') && 
-                    !e.target.closest('.screensaver-customization')) {
-                    this.exitScreenSaver();
-                }
-            });
-        }
-    }
-
-    updateActiveImageEffects() {
-        // Get all active image effect buttons
-        const activeEffectBtns = document.querySelectorAll('.image-btn.active');
-        const activeEffects = Array.from(activeEffectBtns).map(btn => btn.dataset.effect);
-        
-        console.log(`🖼️ Active image effects:`, activeEffects);
-        
-        // Build custom animation based on selected effects
-        this.applyImageEffects(activeEffects);
-    }
-
-    applyImageEffects(effects) {
-        const gallery = document.querySelector('.screensaver-gallery');
-        if (!gallery) return;
-
-        // Build keyframes based on selected effects
-        let keyframes = '@keyframes customWarpFilter {\n';
-        keyframes += '    0% {\n';
-        keyframes += '        filter:';
-        
-        const filters = [];
-        
-        if (effects.includes('hue')) {
-            filters.push(' hue-rotate(0deg)');
-        }
-        if (effects.includes('brightness')) {
-            filters.push(' brightness(0.9)');
-        }
-        if (effects.includes('contrast')) {
-            filters.push(' contrast(1)');
-        }
-        
-        keyframes += filters.join('') + ';\n';
-        
-        let transform = '        transform:';
-        const transforms = [];
-        
-        if (effects.includes('zoom')) {
-            transforms.push(' scale(1)');
-        }
-        if (effects.includes('rotate')) {
-            transforms.push(' rotate(0deg)');
-        }
-        
-        if (transforms.length > 0) {
-            keyframes += transform + transforms.join('') + ';\n';
-        }
-        
-        keyframes += '    }\n';
-        keyframes += '    50% {\n';
-        keyframes += '        filter:';
-        
-        const filters50 = [];
-        
-        if (effects.includes('hue')) {
-            filters50.push(' hue-rotate(180deg)');
-        }
-        if (effects.includes('brightness')) {
-            filters50.push(' brightness(1.2)');
-        }
-        if (effects.includes('contrast')) {
-            filters50.push(' contrast(1.35)');
-        }
-        
-        keyframes += filters50.join('') + ';\n';
-        
-        if (transforms.length > 0) {
-            keyframes += '        transform:';
-            const transforms50 = [];
-            
-            if (effects.includes('zoom')) {
-                transforms50.push(' scale(1.25)');
-            }
-            if (effects.includes('rotate')) {
-                transforms50.push(' rotate(3deg)');
-            }
-            
-            keyframes += transforms50.join('') + ';\n';
-        }
-        
-        keyframes += '    }\n';
-        keyframes += '    100% {\n';
-        keyframes += '        filter:';
-        
-        const filters100 = [];
-        
-        if (effects.includes('hue')) {
-            filters100.push(' hue-rotate(360deg)');
-        }
-        if (effects.includes('brightness')) {
-            filters100.push(' brightness(0.9)');
-        }
-        if (effects.includes('contrast')) {
-            filters100.push(' contrast(1)');
-        }
-        
-        keyframes += filters100.join('') + ';\n';
-        
-        if (transforms.length > 0) {
-            keyframes += '        transform:';
-            const transforms100 = [];
-            
-            if (effects.includes('zoom')) {
-                transforms100.push(' scale(1)');
-            }
-            if (effects.includes('rotate')) {
-                transforms100.push(' rotate(0deg)');
-            }
-            
-            keyframes += transforms100.join('') + ';\n';
-        }
-        
-        keyframes += '    }\n';
-        keyframes += '}\n';
-
-        // Remove old custom animation style
-        let styleEl = document.getElementById('customImageEffects');
-        if (styleEl) {
-            styleEl.remove();
-        }
-
-        // Add new animation if any effects selected
-        if (effects.length > 0) {
-            styleEl = document.createElement('style');
-            styleEl.id = 'customImageEffects';
-            styleEl.textContent = keyframes + '\n.screensaver-gallery img { animation: customWarpFilter 45s ease-in-out infinite !important; }';
-            document.head.appendChild(styleEl);
-        } else {
-            // Reset to default warpFilter if no effects
-            styleEl = document.createElement('style');
-            styleEl.id = 'customImageEffects';
-            styleEl.textContent = '.screensaver-gallery img { animation: warpFilter 45s ease-in-out infinite !important; }';
-            document.head.appendChild(styleEl);
-        }
-    }
-
-    toggleScreenSaver() {
-        if (this.screensaverActive) {
-            this.exitScreenSaver();
-        } else {
-            this.enterScreenSaver();
-        }
-    }
-
-    enterScreenSaver() {
-        this.screensaverActive = true;
-        const overlay = document.getElementById('screensaverOverlay');
-        const gallery = overlay.querySelector('.screensaver-gallery');
-
-        // Auto-play first song if no song is selected or playing
-        if (this.currentTrackIndex === -1 && this.playlist.length > 0) {
-            console.log('🎵 Auto-playing first song for screen saver mode');
-            this.playTrack(0); // Play the first track (Season 1, Episode 1)
-        }
-
-        // Get images from currently playing episode's gallery
-        this.screensaverImages = [];
-        
-        if (this.currentTrackIndex >= 0 && this.currentTrackIndex < this.playlist.length) {
-            const currentTrack = this.playlist[this.currentTrackIndex];
-            
-            // Get gallery images from the current episode
-            if (currentTrack.images && Array.isArray(currentTrack.images) && currentTrack.images.length > 0) {
-                currentTrack.images.forEach(img => {
-                    this.screensaverImages.push(this.cdnUrl + img);
-                });
-            }
-            
-            // Fallback: include episode main image if no gallery images
-            if (this.screensaverImages.length === 0 && currentTrack.episodeImage) {
-                this.screensaverImages.push(this.cdnUrl + currentTrack.episodeImage);
-            }
-        }
-
-        // If no current track or no images found, collect from all episodes
-        if (this.screensaverImages.length === 0) {
-            this.playlist.forEach(track => {
-                if (track.images && Array.isArray(track.images)) {
-                    track.images.forEach(img => {
-                        this.screensaverImages.push(this.cdnUrl + img);
-                    });
-                } else if (track.episodeImage) {
-                    this.screensaverImages.push(this.cdnUrl + track.episodeImage);
-                }
-            });
-        }
-
-        // Remove duplicates
-        this.screensaverImages = [...new Set(this.screensaverImages)];
-
-        if (this.screensaverImages.length === 0) {
-            console.warn('No images available for screen saver');
-            return;
-        }
-
-        // Clear gallery and populate with images
-        gallery.innerHTML = '';
-        this.screensaverImages.forEach((imgSrc, index) => {
-            const img = document.createElement('img');
-            img.src = imgSrc;
-            img.alt = `Episode gallery image ${index + 1}`;
-            if (index === 0) {
-                img.classList.add('active');
-            }
-            gallery.appendChild(img);
-        });
-
-        // Show overlay
-        overlay.classList.add('active');
-        document.body.classList.add('screensaver-active');
-
-        // Start image rotation
-        this.currentScreensaverIndex = 0;
-        this.startScreenSaverRotation();
-
-        // Start weather effects
-        this.startWeatherEffects();
-
-        // Initialize image effects (all active by default)
-        this.updateActiveImageEffects();
-
-        // Initialize image animation
-        this.updateImageAnimation();
-
-        // Initialize lyrics display
-        this.updateLyricsDisplay();
-
-        // Show song title
-        this.showSongTitle();
-
-        // Show episode summary
-        this.updateEpisodeSummary();
-
-        // Start game if active
-        this.updateGameMode();
-
-        // Start character badges spawning if enabled
-        this.updateCharacterBadgesDisplay();
-
-        // Show exit hint for 5 seconds, then hide it
-        const exitHint = overlay.querySelector('.screensaver-exit-hint');
-        if (exitHint) {
-            exitHint.style.opacity = '1';
-            exitHint.style.visibility = 'visible';
-
-            // Clear any existing timeout
-            if (this.exitHintTimeout) {
-                clearTimeout(this.exitHintTimeout);
-            }
-
-            // Hide after 5 seconds
-            this.exitHintTimeout = setTimeout(() => {
-                exitHint.style.opacity = '0';
-                setTimeout(() => {
-                    exitHint.style.visibility = 'hidden';
-                }, 500); // Wait for fade out transition
-            }, 5000);
-        }
-
-        console.log(`🎨 Screen saver mode activated with ${this.screensaverImages.length} images from current episode`);
-    }
-
-    exitScreenSaver() {
-        this.screensaverActive = false;
-        const overlay = document.getElementById('screensaverOverlay');
-
-        // Hide overlay
-        overlay.classList.remove('active');
-        document.body.classList.remove('screensaver-active');
-
-        // Stop image rotation
-        this.stopScreenSaverRotation();
-
-        // Stop weather effects
-        this.stopWeatherEffects();
-
-        // Stop game
-        this.stopGame();
-
-        // Stop character badges spawning
-        this.stopBadgeSpawning();
-
-        // Clear lyrics display
-        const lyricsContainer = document.querySelector('.screensaver-lyrics');
-        if (lyricsContainer) {
-            lyricsContainer.classList.remove('visible');
-            lyricsContainer.innerHTML = '';
-        }
-
-        // Clear title overlay
-        const titleOverlay = document.querySelector('.screensaver-title-overlay');
-        if (titleOverlay) {
-            titleOverlay.classList.remove('visible', 'fade-out');
-        }
-        if (this.titleFadeTimeout) {
-            clearTimeout(this.titleFadeTimeout);
-            this.titleFadeTimeout = null;
-        }
-
-        // Clear exit hint timeout
-        if (this.exitHintTimeout) {
-            clearTimeout(this.exitHintTimeout);
-            this.exitHintTimeout = null;
-        }
-
-        console.log('🎨 Screen saver mode exited');
-    }
 
     updateGameMode() {
         const activeGameBtn = document.querySelector('.game-btn.active');
         const gameMode = activeGameBtn ? activeGameBtn.dataset.game : 'off';
         
-        console.log(`🎮 Game mode:`, gameMode);
-        
-        // Clear existing game
         this.stopGame();
         
         if (gameMode !== 'off') {
@@ -2122,424 +1416,7 @@ class WavelengthRadio {
         }
     }
 
-    showSongTitle() {
-        const activeTitleBtn = document.querySelector('.title-btn.active');
-        const showTitle = activeTitleBtn ? activeTitleBtn.dataset.title === 'on' : true;
 
-        if (!showTitle) return;
-
-        const titleOverlay = document.querySelector('.screensaver-title-overlay');
-        const titleContent = titleOverlay?.querySelector('.title-content');
-        if (!titleOverlay || !titleContent) return;
-
-        const currentTrack = this.playlist[this.currentTrackIndex];
-        const title = currentTrack?.title || 'Unknown Track';
-
-        // Set title text
-        titleContent.textContent = title;
-
-        // Clear any existing timeout
-        if (this.titleFadeTimeout) {
-            clearTimeout(this.titleFadeTimeout);
-        }
-
-        // Show title with fade in
-        titleOverlay.classList.remove('fade-out');
-        titleOverlay.classList.add('visible');
-
-        // Fade out after 3 seconds
-        this.titleFadeTimeout = setTimeout(() => {
-            titleOverlay.classList.add('fade-out');
-            titleOverlay.classList.remove('visible');
-        }, 3000);
-
-        console.log(`🎼 Showing song title: "${title}"`);
-    }
-
-    updateEpisodeSummary() {
-        const summaryOverlay = document.querySelector('.screensaver-summary-overlay');
-        const summaryContent = summaryOverlay?.querySelector('.summary-content');
-        if (!summaryOverlay || !summaryContent) return;
-
-        const activeSummaryBtn = document.querySelector('.summary-btn.active');
-        const showSummary = activeSummaryBtn ? activeSummaryBtn.dataset.summary === 'on' : false;
-
-        if (!showSummary) {
-            summaryOverlay.classList.remove('visible');
-            summaryContent.innerHTML = '';
-            return;
-        }
-
-        // Get current track summary
-        const currentTrack = this.playlist[this.currentTrackIndex];
-        const summary = currentTrack?.summary || 'No summary available for this episode';
-        const episodeTitle = currentTrack?.episodeTitle || currentTrack?.title || 'Unknown Episode';
-        const season = currentTrack?.season || '?';
-        const episode = currentTrack?.episode || '?';
-
-        // Debug logging
-        console.log(`📖 Current track data:`, {
-            season,
-            episode,
-            title: currentTrack?.title,
-            episodeTitle: currentTrack?.episodeTitle,
-            hasSummary: !!currentTrack?.summary,
-            summaryLength: currentTrack?.summary?.length || 0,
-            summaryPreview: currentTrack?.summary?.substring(0, 100),
-            allTrackKeys: Object.keys(currentTrack || {})
-        });
-        console.log(`📖 Showing episode summary for S${season}E${episode}: "${episodeTitle}"`);
-
-        // Set summary text with season, episode number, and title
-        summaryContent.innerHTML = `<strong>Season ${season}, Episode ${episode}: ${episodeTitle}</strong><br><br>${summary}`;
-
-        // Show summary
-        summaryOverlay.classList.remove('fade-out');
-        summaryOverlay.classList.add('visible');
-    }
-
-    updateCharacterBadgesDisplay() {
-        const activeBadgesBtn = document.querySelector('.badges-btn.active');
-        const showBadges = activeBadgesBtn ? activeBadgesBtn.dataset.badges === 'on' : true;
-
-        console.log(`👥 Character badges: ${showBadges ? 'on' : 'off'}`);
-
-        if (showBadges) {
-            // Start spawning badges if not already running
-            if (!this.badgeSpawnInterval) {
-                this.startBadgeSpawning();
-            }
-        } else {
-            // Stop spawning badges and clear existing ones
-            this.stopBadgeSpawning();
-        }
-    }
-
-    startBadgeSpawning() {
-        if (this.badgeSpawnInterval) {
-            clearInterval(this.badgeSpawnInterval);
-        }
-
-        console.log('👥 Starting character badge spawning');
-
-        // Spawn a badge every 5-10 seconds randomly
-        const spawnBadge = () => {
-            const currentTrack = this.playlist[this.currentTrackIndex];
-            if (!currentTrack) return;
-
-            // Get character data from the track object (not dataset, this is a plain JS object)
-            const characters = currentTrack.characters || [];
-            
-            console.log('🔍 Debug - Current track:', currentTrack.title, 'S' + currentTrack.season + 'E' + currentTrack.episode);
-            console.log('🔍 Debug - Characters:', characters);
-
-            if (!characters || characters.length === 0) {
-                console.log('👥 No characters found for current track, skipping badge spawn');
-                // Still schedule next attempt
-                const nextSpawn = 5000 + Math.random() * 5000;
-                this.badgeSpawnInterval = setTimeout(spawnBadge, nextSpawn);
-                return;
-            }
-
-            // Pick a random character
-            const character = characters[Math.floor(Math.random() * characters.length)];
-            this.spawnFloatingBadge(character);
-
-            // Schedule next spawn randomly between 5-10 seconds
-            const nextSpawn = 5000 + Math.random() * 5000;
-            this.badgeSpawnInterval = setTimeout(spawnBadge, nextSpawn);
-        };
-
-        // Start first spawn after 2 seconds
-        this.badgeSpawnInterval = setTimeout(spawnBadge, 2000);
-    }
-
-    stopBadgeSpawning() {
-        if (this.badgeSpawnInterval) {
-            clearTimeout(this.badgeSpawnInterval);
-            this.badgeSpawnInterval = null;
-        }
-
-        // Remove all existing badges
-        const badgesContainer = document.getElementById('screensaverBadges');
-        if (badgesContainer) {
-            badgesContainer.innerHTML = '';
-        }
-
-        console.log('👥 Stopped character badge spawning');
-    }
-
-    spawnFloatingBadge(character) {
-        const badgesContainer = document.getElementById('screensaverBadges');
-        if (!badgesContainer) return;
-
-        // Create badge wrapper
-        const badgeWrapper = document.createElement('div');
-        badgeWrapper.classList.add('screensaver-floating-badge-wrapper');
-
-        // Create badge image
-        const badge = document.createElement('img');
-        badge.src = this.cdnUrl + character.image;
-        badge.alt = character.title;
-        badge.classList.add('screensaver-floating-badge');
-
-        // Create title label
-        const titleLabel = document.createElement('div');
-        titleLabel.classList.add('screensaver-badge-title');
-        titleLabel.textContent = character.title;
-
-        // Add image and title to wrapper
-        badgeWrapper.appendChild(badge);
-        badgeWrapper.appendChild(titleLabel);
-
-        // Random position (avoid edges)
-        const left = 10 + Math.random() * 80; // 10-90% from left
-        const top = 15 + Math.random() * 70; // 15-85% from top
-        badgeWrapper.style.left = `${left}%`;
-        badgeWrapper.style.top = `${top}%`;
-
-        // Add click handler to open character or lore page in same window
-        badgeWrapper.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const url = character.url || (character.type === 'lore' ? `/lore/${character.id}` : `/character/${character.id}`);
-            window.location.href = url;
-        });
-
-        // Add to container
-        badgesContainer.appendChild(badgeWrapper);
-
-        const badgeType = character.type === 'lore' ? '📜' : '👤';
-        console.log(`${badgeType} Spawned ${character.type || 'character'} badge for ${character.title} at ${left.toFixed(0)}%, ${top.toFixed(0)}%`);
-
-        // Remove after 6-10 seconds with fade out
-        const lifetime = 6000 + Math.random() * 4000;
-        setTimeout(() => {
-            badgeWrapper.classList.add('fading-out');
-            // Remove element after animation completes
-            setTimeout(() => {
-                badgeWrapper.remove();
-            }, 2000);
-        }, lifetime);
-    }
-
-    updateLyricsDisplay() {
-        const lyricsContainer = document.querySelector('.screensaver-lyrics');
-        if (!lyricsContainer) return;
-
-        const activeBtn = document.querySelector('.lyrics-btn.active');
-        const mode = activeBtn ? activeBtn.dataset.lyrics : 'off';
-
-        console.log(`🎵 Lyrics mode:`, mode);
-
-        if (mode === 'off') {
-            lyricsContainer.classList.remove('visible');
-            lyricsContainer.innerHTML = '';
-            return;
-        }
-
-        // Get current track lyrics
-        const currentTrack = this.playlist[this.currentTrackIndex];
-        const lyrics = currentTrack?.lyrics || 'No lyrics available for this track';
-        const trackTitle = currentTrack?.title || 'Unknown';
-
-        console.log(`🎵 Current track index: ${this.currentTrackIndex}, Title: "${trackTitle}"`);
-        console.log(`🎵 Lyrics: "${lyrics.substring(0, 50)}..."`);
-
-        // Show lyrics container
-        lyricsContainer.classList.add('visible');
-
-        // Create or update lyrics content
-        let lyricsContent = lyricsContainer.querySelector('.lyrics-content');
-        if (!lyricsContent) {
-            lyricsContent = document.createElement('div');
-            lyricsContent.className = 'lyrics-content';
-            lyricsContainer.appendChild(lyricsContent);
-        }
-
-        // Update content and styling based on mode
-        lyricsContent.textContent = lyrics;
-        lyricsContent.classList.remove('scrolling', 'static');
-        
-        if (mode === 'scroll') {
-            // Remove animation temporarily to force restart
-            lyricsContent.style.animation = 'none';
-            
-            // Calculate animation duration based on text length
-            // Aim for a comfortable reading speed - about 3-4 characters per second
-            const textLength = lyrics.length;
-            const charsPerSecond = 3.5; // Comfortable reading speed
-            const duration = Math.max(20, textLength / charsPerSecond); // minimum 20s
-            
-            // Force reflow to restart animation
-            void lyricsContent.offsetWidth;
-            
-            // Reapply animation
-            lyricsContent.classList.add('scrolling');
-            lyricsContent.style.animation = '';
-            lyricsContent.style.animationDuration = `${duration}s`;
-            
-            console.log(`🎵 Text length: ${textLength}, Duration: ${duration}s`);
-        } else if (mode === 'static') {
-            lyricsContent.classList.add('static');
-            lyricsContent.style.animationDuration = '';
-        }
-
-        console.log(`✅ Updated lyrics display: ${mode} mode for track "${trackTitle}"`);
-    }
-
-    updateScreenSaverImages() {
-        if (!this.screensaverActive) return;
-        
-        const overlay = document.getElementById('screensaverOverlay');
-        const gallery = overlay?.querySelector('.screensaver-gallery');
-        if (!gallery) return;
-
-        console.log('🔄 Updating screen saver images for new track');
-
-        // Get images from new current track
-        this.screensaverImages = [];
-        
-        if (this.currentTrackIndex >= 0 && this.currentTrackIndex < this.playlist.length) {
-            const currentTrack = this.playlist[this.currentTrackIndex];
-            
-            // Get gallery images from the current episode
-            if (currentTrack.images && Array.isArray(currentTrack.images) && currentTrack.images.length > 0) {
-                currentTrack.images.forEach(img => {
-                    this.screensaverImages.push(this.cdnUrl + img);
-                });
-            }
-            
-            // Fallback: include episode main image if no gallery images
-            if (this.screensaverImages.length === 0 && currentTrack.episodeImage) {
-                this.screensaverImages.push(this.cdnUrl + currentTrack.episodeImage);
-            }
-        }
-
-        // Update gallery with new images
-        if (this.screensaverImages.length > 0) {
-            gallery.innerHTML = '';
-            this.screensaverImages.forEach((imgSrc, index) => {
-                const img = document.createElement('img');
-                img.src = imgSrc;
-                img.alt = `Episode gallery image ${index + 1}`;
-                if (index === 0) {
-                    img.classList.add('active');
-                }
-                gallery.appendChild(img);
-            });
-
-            // Reset rotation to first image
-            this.currentScreensaverIndex = 0;
-
-            // Update lyrics for new track
-            this.updateLyricsDisplay();
-
-            // Show new song title
-            this.showSongTitle();
-
-            // Update episode summary
-            this.updateEpisodeSummary();
-
-            // Apply animation setting to new images
-            this.updateImageAnimation();
-
-            console.log(`✅ Updated screen saver with ${this.screensaverImages.length} images from new episode`);
-        }
-    }
-
-    startScreenSaverRotation() {
-        // Rotate images every 8 seconds
-        this.screensaverInterval = setInterval(() => {
-            this.rotateScreenSaverImage();
-        }, 8000);
-    }
-
-    stopScreenSaverRotation() {
-        if (this.screensaverInterval) {
-            clearInterval(this.screensaverInterval);
-            this.screensaverInterval = null;
-        }
-    }
-
-    rotateScreenSaverImage() {
-        const gallery = document.querySelector('.screensaver-gallery');
-        if (!gallery) return;
-
-        const images = gallery.querySelectorAll('img');
-        if (images.length <= 1) return;
-
-        // Get current and next indices
-        const currentImg = images[this.currentScreensaverIndex];
-        this.currentScreensaverIndex = (this.currentScreensaverIndex + 1) % images.length;
-        const nextImg = images[this.currentScreensaverIndex];
-
-        // Available transitions
-        const transitions = [
-            'transition-fade',
-            'transition-slide-left',
-            'transition-slide-right',
-            'transition-slide-up',
-            'transition-slide-down',
-            'transition-zoom-in',
-            'transition-zoom-out',
-            'transition-rotate-left',
-            'transition-rotate-right',
-            'transition-blur',
-            'transition-diagonal-tl',
-            'transition-diagonal-br'
-        ];
-
-        // Remove old transition classes from all images
-        images.forEach(img => {
-            transitions.forEach(t => {
-                img.classList.remove(t);
-            });
-        });
-
-        // Check if transitions are enabled (default: true)
-        const transitionsSetting = localStorage.getItem('wavelength_screensaver_transitions');
-        const transitionsEnabled = transitionsSetting !== 'off';
-
-        // Apply random transition if enabled
-        if (transitionsEnabled) {
-            const randomIndex = Math.floor(Math.random() * transitions.length);
-            const randomTransition = transitions[randomIndex];
-
-            currentImg.classList.add(randomTransition);
-            nextImg.classList.add(randomTransition);
-        }
-
-        // Fade out current, fade in next
-        currentImg.classList.remove('active');
-        currentImg.classList.add('fading-out');
-
-        nextImg.classList.remove('fading-out');
-        nextImg.classList.add('active');
-
-        // Clean up fading-out class after transition
-        setTimeout(() => {
-            currentImg.classList.remove('fading-out');
-        }, 3000); // Increased to 3s to match transition duration
-    }
-
-    updateImageAnimation() {
-        // Get animation setting from localStorage or active button (default: 'on')
-        const animationSetting = localStorage.getItem('wavelength_screensaver_animation') || 'on';
-        const gallery = document.querySelector('.screensaver-gallery');
-
-        if (!gallery) return;
-
-        const images = gallery.querySelectorAll('img');
-        images.forEach(img => {
-            if (animationSetting === 'off') {
-                img.classList.add('no-animation');
-            } else {
-                img.classList.remove('no-animation');
-            }
-        });
-
-        console.log(`🌈 Image animation ${animationSetting === 'on' ? 'enabled' : 'disabled'}`);
-    }
 
     // Weather Effects System
     initWeatherEffects() {
@@ -3256,7 +2133,107 @@ class WavelengthRadio {
             this.weatherCtx.clearRect(0, 0, this.weatherCanvas.width, this.weatherCanvas.height);
         }
     }
+
+    // ===================================
+    // MEDIA SESSION API & SYSTEM CONTROLS
+    // ===================================
+
+    initMediaSession() {
+        if (!('mediaSession' in navigator)) {
+            console.log('📱 Media Session API not supported');
+            return;
+        }
+
+        console.log('📱 Initializing Media Session API');
+
+        navigator.mediaSession.setActionHandler('play', () => {
+            console.log('📱 Media key: Play');
+            if (!this.isPlaying) this.togglePlay();
+        });
+
+        navigator.mediaSession.setActionHandler('pause', () => {
+            console.log('📱 Media key: Pause');
+            if (this.isPlaying) this.togglePlay();
+        });
+
+        navigator.mediaSession.setActionHandler('previoustrack', () => {
+            console.log('📱 Media key: Previous');
+            this.previous();
+        });
+
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+            console.log('📱 Media key: Next');
+            this.next();
+        });
+
+        navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+            console.log('📱 Media key: Seek backward');
+            this.audio.currentTime = Math.max(0, this.audio.currentTime - (details.seekOffset || 10));
+        });
+
+        navigator.mediaSession.setActionHandler('seekforward', (details) => {
+            console.log('📱 Media key: Seek forward');
+            this.audio.currentTime = Math.min(this.audio.duration, this.audio.currentTime + (details.seekOffset || 10));
+        });
+
+        this.audio.addEventListener('play', () => this.updateMediaSessionMetadata());
+        this.audio.addEventListener('pause', () => {
+            navigator.mediaSession.playbackState = 'paused';
+        });
+
+        console.log('✅ Media Session API initialized');
+    }
+
+    updateMediaSessionMetadata() {
+        if (!('mediaSession' in navigator) || this.currentTrackIndex < 0) return;
+
+        const track = this.playlist[this.currentTrackIndex];
+        if (!track) return;
+
+        const artwork = [];
+        if (track.episodeImage) {
+            const imageUrl = this.cdnUrl + track.episodeImage;
+            artwork.push(
+                { src: imageUrl, sizes: '512x512', type: 'image/jpeg' },
+                { src: imageUrl, sizes: '256x256', type: 'image/jpeg' },
+                { src: imageUrl, sizes: '128x128', type: 'image/jpeg' }
+            );
+        }
+
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: track.title,
+            artist: 'Wavelength Lore',
+            album: `Season ${track.season} • Episode ${track.episode}`,
+            artwork: artwork
+        });
+
+        navigator.mediaSession.playbackState = 'playing';
+
+        console.log(`📱 Updated media session: ${track.title}`);
+    }
+
+    initVisibilityHandling() {
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                console.log('👁️ Page hidden - continuing playback');
+            } else {
+                console.log('👁️ Page visible');
+            }
+        });
+
+        window.addEventListener('blur', () => {
+            console.log('👁️ Window blurred - continuing playback');
+        });
+
+        window.addEventListener('focus', () => {
+            console.log('👁️ Window focused');
+        });
+
+        console.log('✅ Visibility handling initialized');
+    }
 }
+
+// Initialize radio player when DOM is ready
 
 // Initialize radio player when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
