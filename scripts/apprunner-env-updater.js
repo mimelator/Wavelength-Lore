@@ -94,6 +94,22 @@ class AppRunnerEnvUpdater {
       'CLOUDFRONT_DISTRIBUTION_ID',
       'GALLERY_CLOUDFRONT_DISTRIBUTION_ID',
       
+      // Gallery Configuration  
+      'GALLERY_S3_BUCKET',
+      'GALLERY_CDN_URL',
+      
+      // VIP Chatbot Configuration (IMPORTANT!)
+      'CHATBOT_JWT_SECRET',
+      'CHATBOT_API_URL',
+      
+      // AWS Account & Region
+      'AWS_ACCOUNT_ID',
+      'AWS_REGION',
+      'APPRUNNER_SERVICE_ARN',
+      
+      // AI Configuration (for generation features)
+      'OPENAI_API_KEY',
+      
       // Admin Authentication (NEW)
       'ADMIN_SECRET_KEY',
       'ADMIN_ALLOWED_IPS',
@@ -142,8 +158,13 @@ class AppRunnerEnvUpdater {
 
       // Printify Configuration
       'PRINTIFY_API_TOKEN',
-      'PRINTIFY_SHOP_ID',
+      'PRINTIFY_SHOP_ID', 
       'PRINTIFY_API_URL',
+      'PRINTIFY_ENVIRONMENT',
+      'PRINTIFY_MOCK_MODE',
+      
+      // Applixir Ads Configuration
+      'APPLIXIR_API_KEY',
 
     ];
 

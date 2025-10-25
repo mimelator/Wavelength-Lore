@@ -15,28 +15,40 @@ const simpleDisambiguation = require('../helpers/simple-disambiguation');
 /**
  * Initialize Firebase and database connection
  */
-function initializeDatabase() {
-  // Initialize Firebase and database connection
-  const database = firebaseUtils.initializeFirebase('wavelength-lore-main');
-
-  // Initialize Firebase Admin SDK
-  firebaseAdminUtils.initializeFirebaseAdmin();
-
-  // Test Firebase connection using admin SDK
-  (async () => {
+async function initializeDatabase() {
+  try {
+    // Initialize Firebase Admin SDK first (for server-side operations)
+    console.log('🔥 Initializing Firebase Admin SDK...');
+    const adminDb = firebaseAdminUtils.initializeFirebaseAdmin();
+    
+    if (!adminDb) {
+      throw new Error('Failed to initialize Firebase Admin SDK');
+    }
+    
+    console.log('✅ Firebase Admin SDK initialized successfully');
+    
+    // Test Firebase Admin connection
     try {
       const testData = await firebaseAdminUtils.fetchDataAsAdmin('videos');
       if (testData) {
-        console.log('🔥 Firebase connection verified');
+        console.log('🔥 Firebase Admin connection verified - videos data accessible');
       } else {
-        console.log('⚠️ No data available at videos path');
+        console.log('⚠️ No data available at videos path - check database content');
       }
     } catch (error) {
-      console.error('❌ Firebase connection error:', error);
+      console.error('❌ Firebase Admin connection test failed:', error.message);
+      // Don't throw here - app can still function with fallback data
     }
-  })();
 
-  return database;
+    // Initialize Firebase Client SDK (for browser-side operations)
+    const database = firebaseUtils.initializeFirebase('wavelength-lore-main');
+    console.log('✅ Firebase Client SDK initialized');
+
+    return { adminDb, database };
+  } catch (error) {
+    console.error('❌ Firebase initialization failed:', error.message);
+    throw error;
+  }
 }
 
 /**

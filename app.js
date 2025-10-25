@@ -56,8 +56,8 @@ async function createApp() {
   // Configure basic app settings
   configureApp(app);
 
-  // Initialize database
-  const database = initializeDatabase();
+  // Initialize database (now async)
+  const { adminDb, database } = await initializeDatabase();
 
   // Configure middleware
   const { adminRateLimit, adminAuthStrict } = configureMiddleware(app);
