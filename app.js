@@ -166,6 +166,10 @@ async function createApp() {
   // Mount admin vendor catalog routes (admin only)
   app.use('/admin', adminVendorCatalogRoutes);
   
+  // Mount admin catalog API routes (admin only)
+  const adminCatalogApiRoutes = require('./routes/admin-catalog-api');
+  app.use('/admin', adminCatalogApiRoutes);
+  
   // Mount admin cleanup routes (admin only)
   app.use('/admin', adminCleanupRoutes);
   

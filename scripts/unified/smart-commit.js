@@ -15,7 +15,8 @@ const execAsync = promisify(exec);
 
 class SmartCommit {
   constructor() {
-    this.projectRoot = path.resolve(__dirname, '..');
+    // Fix: Point to the actual project root (two levels up from scripts/unified/)
+    this.projectRoot = path.resolve(__dirname, '..', '..');
     this.commitMessageFiles = [
       'commit-message.txt',
       '.commit-message.txt', 

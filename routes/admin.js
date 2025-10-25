@@ -18,6 +18,8 @@ const episodeHelpers = require('../helpers/episode-helpers');
 // Import admin authentication middleware
 const { adminAuth, adminHealthCheck, getSecurityLog } = require('../middleware/adminAuth');
 
+// Test catalog route removed - using forum route instead
+
 // Import rate limiting middleware
 const { admin: adminRateLimit } = require('../middleware/rateLimiting');
 
@@ -121,6 +123,22 @@ router.get('/admin/groups', adminAuth, (req, res) => {
     req: req
   });
 });
+
+/**
+ * Enhanced vendor catalog admin panel route
+ */
+router.get('/admin/enhanced-vendor-catalog', adminAuth, (req, res) => {
+  res.render('admin/enhanced-vendor-catalog', {
+    title: 'Enhanced Vendor Catalog - Wavelength Admin',
+    pageTitle: 'Enhanced Vendor Catalog Preview',
+    pageDescription: 'Comprehensive preview of products from different vendors with overlay options',
+    cdnUrl: process.env.CDN_URL,
+    version: `v${Date.now()}`,
+    req: req
+  });
+});
+
+
 
 /**
  * Security monitoring endpoints

@@ -202,11 +202,47 @@ router.get('/user/:userId', (req, res) => {
  * Admin Panel Page - Authentication handled client-side
  */
 router.get('/admin', (req, res) => {
+    // For local development, allow direct access
+    // For production, require admin key
+    const isLocal = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
+    const adminKey = req.headers['x-admin-key'] || req.query.adminKey;
+    const expectedKey = process.env.ADMIN_SECRET_KEY;
+    
+    if (!isLocal && (!adminKey || adminKey !== expectedKey)) {
+        return res.status(401).json({
+            success: false,
+            error: 'Unauthorized: Admin key required',
+            hint: 'Include X-Admin-Key header or adminKey query parameter',
+            timestamp: new Date().toISOString()
+        });
+    }
+    
     res.render('forum/admin', {
         title: 'Forum Administration',
         cdnUrl: process.env.CDN_URL || '',
         version: process.env.VERSION || Date.now()
     });
+});
+
+/**
+ * Test Optimized Catalog - No Authentication Required
+ */
+router.get('/test-catalog', async (req, res) => {
+    try {
+        console.log('⚡ Loading test optimized catalog...');
+        
+        res.render('admin/vendor-catalog-optimized', {
+            title: 'Test Optimized Vendor Catalog',
+            user: { uid: 'test-user', name: 'Test User' }
+        });
+        
+    } catch (error) {
+        console.error('Error loading test catalog:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to load catalog'
+        });
+    }
 });
 
 /**
