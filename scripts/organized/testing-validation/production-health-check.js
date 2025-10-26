@@ -7,8 +7,8 @@
  * on the live production site without authentication requirements.
  */
 
-const puppeteer = require('puppeteer');
-const axios = require('axios');
+import puppeteer from 'puppeteer';
+import axios from 'axios';
 
 const PRODUCTION_URL = 'https://vh9x3gevev.us-east-1.awsapprunner.com';
 const TEST_TIMEOUT = 30000; // 30 seconds per test
@@ -505,8 +505,11 @@ Options:
   }
 }
 
-if (require.main === module) {
+// ES module compatibility - check if this is the main module
+const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+
+if (isMainModule) {
   main().catch(console.error);
 }
 
-module.exports = ProductionHealthCheck;
+export default ProductionHealthCheck;

@@ -2,6 +2,7 @@
   "name": "wavelength-lore",
   "version": "1.0.176",
   "description": "The Lore Site for the Wavelength Canon",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

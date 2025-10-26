@@ -1,6 +1,6 @@
 {
-  "startTime": "2025-10-26T11:36:29.422Z",
-  "sessionId": "wavelength-20251026-2g0cu1",
+  "startTime": "2025-10-26T11:57:06.564Z",
+  "sessionId": "wavelength-20251026-mpelab",
   "capabilities": {
     "totalSuperPowers": 0,
     "level10Powers": 0,
@@ -63,6 +63,20 @@
       "command": "node wavelength-tools/wavelength-enhanced-build-monitor.js",
       "category": "deployment",
       "priority": 3
+    },
+    {
+      "name": "Memory System Query",
+      "description": "Search WAVELENGTH knowledge base for solutions",
+      "command": "Use MCP: await mcp.callTool(\"wavelength_memory\", {action: \"recall\", query: \"your question\"})",
+      "category": "memory",
+      "priority": 2
+    },
+    {
+      "name": "Initialize Memory System",
+      "description": "Set up vector storage and GitHub history ingestion",
+      "command": "node scripts/initialize-memory-system.js",
+      "category": "memory",
+      "priority": 3
     }
   ],
   "contextSummary": {},
@@ -76,7 +90,7 @@
     "useExistingScripts": true
   },
   "unifiedTools": 11,
-  "wavelengthTools": 58,
+  "wavelengthTools": 59,
   "projectState": {
     "gitStatus": "initialized",
     "buildStatus": "unknown",
@@ -90,5 +104,9 @@
     "proofRequired": true,
     "batchOperations": true,
     "noShellCommands": true
+  },
+  "memorySystem": {
+    "status": "not_installed",
+    "note": "Vector storage system available for installation"
   }
 }

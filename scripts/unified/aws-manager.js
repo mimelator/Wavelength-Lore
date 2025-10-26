@@ -12,23 +12,32 @@
  * Operations: list, deploy, monitor, update, cache-bust, logs, etc.
  */
 
-const { program } = require('commander');
-const { CloudFrontClient, ListDistributionsCommand, GetDistributionCommand, 
-        CreateInvalidationCommand, UpdateDistributionCommand } = require('@aws-sdk/client-cloudfront');
-const { AppRunnerClient, UpdateServiceCommand, DescribeServiceCommand, 
-        ListServicesCommand } = require('@aws-sdk/client-apprunner');
-const { ECRClient, ListImagesCommand, BatchGetImageCommand, 
-        PutImageCommand } = require('@aws-sdk/client-ecr');
-const { S3Client, ListObjectsV2Command, PutObjectCommand, 
-        DeleteObjectCommand } = require('@aws-sdk/client-s3');
-const { IAMClient, PutUserPolicyCommand, GetUserPolicyCommand } = require('@aws-sdk/client-iam');
-const chalk = require('chalk');
-const fs = require('fs').promises;
-const path = require('path');
+import { program } from 'commander';
+import { CloudFrontClient, ListDistributionsCommand, GetDistributionCommand, 
+        CreateInvalidationCommand, UpdateDistributionCommand } from '@aws-sdk/client-cloudfront';
+import { AppRunnerClient, UpdateServiceCommand, DescribeServiceCommand, 
+        ListServicesCommand } from '@aws-sdk/client-apprunner';
+import { ECRClient, ListImagesCommand, BatchGetImageCommand, 
+        PutImageCommand } from '@aws-sdk/client-ecr';
+import { S3Client, ListObjectsV2Command, PutObjectCommand, 
+        DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { IAMClient, PutUserPolicyCommand, GetUserPolicyCommand } from '@aws-sdk/client-iam';
+import chalk from 'chalk';
+import fs from 'fs/promises';
+import path from 'path';
 
 // Load configuration
-require('dotenv').config();
-const awsResources = require('../../config/aws-resources');
+import 'dotenv/config';
+
+// Load AWS resources configuration
+let awsResources;
+try {
+  const module = await import('../../config/aws-resources.js');
+  awsResources = module.default;
+} catch (error) {
+  console.warn('⚠️ AWS resources config not available:', error.message);
+  awsResources = {};
+}
 
 /**
  * Base AWS Manager Class
@@ -650,11 +659,13 @@ program
     console.log('');
   });
 
-// Parse arguments
-if (process.argv.length <= 2) {
-  program.help();
-} else {
-  program.parse();
+// Parse arguments - ES modules check
+if (import.meta.url === `file://${process.argv[1]}`) {
+  if (process.argv.length <= 2) {
+    program.help();
+  } else {
+    program.parse();
+  }
 }
 
-module.exports = { UnifiedAWSManager, CloudFrontManager, AppRunnerManager, ECRManager, IAMManager };
+export { UnifiedAWSManager, CloudFrontManager, AppRunnerManager, ECRManager, IAMManager };

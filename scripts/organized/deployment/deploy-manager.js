@@ -5,8 +5,13 @@
  * Comprehensive deployment workflow with asset sync, cache busting, and deployment
  */
 
-const { execSync, spawn } = require('child_process');
-const path = require('path');
+import { execSync, spawn } from 'child_process';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ES modules compatibility
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ANSI color codes for beautiful output
 const colors = {
@@ -54,9 +59,11 @@ class DeploymentManager {
   async runCommand(command, description) {
     this.info(`Running: ${command}`);
     try {
+      // Run from project root - go up 3 levels from scripts/organized/deployment/
+      const projectRoot = path.resolve(__dirname, '../../..');
       const output = execSync(command, { 
         stdio: 'inherit',
-        cwd: path.resolve(__dirname, '..')
+        cwd: projectRoot
       });
       this.success(`${description} completed successfully`);
       return true;
@@ -68,7 +75,8 @@ class DeploymentManager {
 
   async syncAssets() {
     this.step('Syncing Assets to S3');
-    return await this.runCommand('npm run deploy:assets', 'Asset synchronization');
+    // The sync script changes to project root, so we can run it from anywhere
+    return await this.runCommand('bash scripts/organized/legacy-deprecated/sync-assets.sh', 'Asset synchronization');
   }
 
   async bustLocalCache() {
@@ -273,8 +281,9 @@ async function main() {
   }
 }
 
-if (require.main === module) {
+// ES modules: Check if this is the main module
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
 
-module.exports = DeploymentManager;
+export default DeploymentManager;

@@ -5,9 +5,9 @@
  * Comprehensive backup, validation, and recovery for package.json
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import { execSync } from 'child_process';
 
 class PackageProtector {
     constructor() {
@@ -161,8 +161,8 @@ class PackageProtector {
     }
 }
 
-// CLI Interface
-if (require.main === module) {
+// CLI Interface (ES module detection)
+if (import.meta.url === `file://${process.argv[1]}`) {
     const protector = new PackageProtector();
     const command = process.argv[2];
 
@@ -235,4 +235,4 @@ Commands:
     }
 }
 
-module.exports = PackageProtector;
+export default PackageProtector;

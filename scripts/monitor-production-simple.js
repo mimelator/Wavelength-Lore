@@ -5,7 +5,7 @@
  * Monitors production endpoints without AWS credentials
  */
 
-const chalk = require('chalk');
+import chalk from 'chalk';
 
 class SimpleProductionMonitor {
   constructor() {
@@ -155,7 +155,10 @@ class SimpleProductionMonitor {
   }
 }
 
-if (require.main === module) {
+// ES module compatibility - check if this is the main module
+const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+
+if (isMainModule) {
   const monitor = new SimpleProductionMonitor();
   monitor.monitor().catch(error => {
     console.error('Monitor failed:', error);
@@ -163,4 +166,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = SimpleProductionMonitor;
+export default SimpleProductionMonitor;

@@ -12,13 +12,14 @@
  * Operations: run, check, monitor, validate, analyze
  */
 
-const { Command } = require('commander');
+import { Command } from 'commander';
 const program = new Command();
-const puppeteer = require('puppeteer');
-const axios = require('axios');
-const fs = require('fs').promises;
-const path = require('path');
-const chalk = require('chalk');
+import puppeteer from 'puppeteer';
+import axios from 'axios';
+import fs from 'fs';
+const fsPromises = fs.promises;
+import path from 'path';
+import chalk from 'chalk';
 
 // Configuration
 const CONFIG = {
@@ -815,4 +816,4 @@ if (process.argv.length <= 2) {
   program.parse(process.argv);
 }
 
-module.exports = { UnifiedTestRunner, HealthCheckRunner, PerformanceTestRunner, IntegrationTestRunner, SecurityTestRunner };
+export { UnifiedTestRunner, HealthCheckRunner, PerformanceTestRunner, IntegrationTestRunner, SecurityTestRunner };

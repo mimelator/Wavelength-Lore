@@ -1,0 +1,16 @@
+{
+    "jsonrpc": "2.0",
+    "id": 2002,
+    "method": "tools/call",
+    "params": {
+        "name": "node_execute",
+        "arguments": {
+            "command": "test",
+            "script": "scripts/organized/testing-validation/production-health-check.js",
+            "timeout": 20,
+            "context": "Testing ES module conversion - health check script with Puppeteer",
+            "forceExit": true,
+            "exitDelay": 5
+        }
+    }
+}

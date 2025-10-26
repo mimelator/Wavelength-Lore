@@ -11,15 +11,15 @@
  * Operations: deploy, rollback, monitor, verify, pipeline, optimize
  */
 
-const { program } = require('commander');
-const { spawn } = require('child_process');
-const { AppRunnerClient, UpdateServiceCommand, DescribeServiceCommand, 
-        ListOperationsCommand } = require('@aws-sdk/client-apprunner');
-const { ECRClient, DescribeRepositoriesCommand, ListImagesCommand } = require('@aws-sdk/client-ecr');
-const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client-cloudfront');
-const chalk = require('chalk');
-const fs = require('fs').promises;
-const path = require('path');
+import { program } from 'commander';
+import { spawn } from 'child_process';
+import { AppRunnerClient, UpdateServiceCommand, DescribeServiceCommand, 
+        ListOperationsCommand } from '@aws-sdk/client-apprunner';
+import { ECRClient, DescribeRepositoriesCommand, ListImagesCommand } from '@aws-sdk/client-ecr';
+import { CloudFrontClient, CreateInvalidationCommand } from '@aws-sdk/client-cloudfront';
+import chalk from 'chalk';
+import fs from 'fs/promises';
+import path from 'path';
 
 // 🛡️ SECURITY: Input Validator
 class InputValidator {
@@ -70,9 +70,17 @@ class InputValidator {
 }
 
 // Configuration
-require('dotenv').config();
-const { getAWSConfig } = require('../utils/aws-config-helper');
-const awsResources = getAWSConfig();
+import 'dotenv/config';
+import { getAWSConfig } from '../utils/aws-config-helper.js';
+
+// Initialize AWS config asynchronously
+let awsResources;
+try {
+  awsResources = await getAWSConfig();
+} catch (error) {
+  console.warn('⚠️ AWS config not available:', error.message);
+  awsResources = {};
+}
 
 const CONFIG = {
   AWS_REGION: 'us-east-1',
@@ -452,7 +460,7 @@ class ApplicationDeploymentManager extends BaseDeploymentManager {
       throw new Error('Service URL not available for verification');
     }
     
-    const axios = require('axios');
+    const { default: axios } = await import('axios');
     let attempts = 0;
     const maxAttempts = CONFIG.HEALTH_CHECK_RETRIES;
     
@@ -876,11 +884,13 @@ program
     console.log('');
   });
 
-// Parse arguments
-if (process.argv.length <= 2) {
-  program.help();
-} else {
-  program.parse();
+// Parse arguments - ES modules check
+if (import.meta.url === `file://${process.argv[1]}`) {
+  if (process.argv.length <= 2) {
+    program.help();
+  } else {
+    program.parse();
+  }
 }
 
-module.exports = { UnifiedDeploymentManager, ApplicationDeploymentManager, RollbackManager, PipelineMonitor };
+export { UnifiedDeploymentManager, ApplicationDeploymentManager, RollbackManager, PipelineMonitor };

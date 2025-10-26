@@ -300,6 +300,20 @@ class WavelengthSessionStartup {
         command: 'node wavelength-tools/wavelength-enhanced-build-monitor.js',
         category: 'deployment',
         priority: 3
+      },
+      {
+        name: 'Memory System Query',
+        description: 'Search WAVELENGTH knowledge base for solutions',
+        command: 'Use MCP: await mcp.callTool("wavelength_memory", {action: "recall", query: "your question"})',
+        category: 'memory',
+        priority: 2
+      },
+      {
+        name: 'Initialize Memory System',
+        description: 'Set up vector storage and GitHub history ingestion',
+        command: 'node scripts/initialize-memory-system.js',
+        category: 'memory',
+        priority: 3
       }
     ];
     
@@ -336,6 +350,94 @@ class WavelengthSessionStartup {
       batchOperations: true,
       noShellCommands: true
     };
+  }
+
+  async initializeMemorySystem() {
+    console.log('\\n🧠 INITIALIZING WAVELENGTH MEMORY SYSTEM...\\n');
+    
+    try {
+      // Check if memory system is available
+      const memorySystemFiles = [
+        'lib/vector-storage.js',
+        'mcp/wavelength-memory-server.js',
+        'lib/github-integration.js'
+      ];
+      
+      const memorySystemReady = memorySystemFiles.every(file => {
+        const exists = fs.existsSync(file);
+        if (!exists) console.log(`   ⚠️  Missing: ${file}`);
+        return exists;
+      });
+      
+      if (memorySystemReady) {
+        console.log('✅ WAVELENGTH Memory System components detected');
+        console.log('   🧠 Vector storage integration ready');
+        console.log('   📚 GitHub history ingestion available');
+        console.log('   🔍 Semantic search and correlation active');
+        
+        // Check if memory system is already initialized
+        const { spawn } = require('child_process');
+        
+        // Quick memory system health check
+        console.log('\\n🔍 Checking memory system health...');
+        
+        const healthCheck = spawn('node', ['-e', `
+          import('./lib/vector-storage.js').then(async (module) => {
+            const storage = new module.WavelengthVectorStorage();
+            const result = await storage.initialize();
+            console.log(result.success ? 'HEALTHY' : 'NEEDS_INIT');
+            process.exit(0);
+          }).catch(() => {
+            console.log('NEEDS_INIT');
+            process.exit(0);
+          });
+        `], { stdio: 'pipe' });
+        
+        let healthStatus = 'UNKNOWN';
+        healthCheck.stdout.on('data', (data) => {
+          healthStatus = data.toString().trim();
+        });
+        
+        await new Promise((resolve) => {
+          healthCheck.on('close', () => resolve());
+        });
+        
+        if (healthStatus === 'HEALTHY') {
+          console.log('✅ Memory system operational - ready for intelligent assistance');
+          console.log('   🎯 Use: await mcp.callTool("wavelength_memory", {action: "recall", query: "your question"})');
+          
+          this.sessionData.memorySystem = {
+            status: 'operational',
+            capabilities: ['store', 'recall', 'suggest', 'correlate', 'github_integration'],
+            vectorStorage: 'pinecone',
+            knowledgeBase: 'populated'
+          };
+        } else {
+          console.log('⚠️  Memory system needs initialization');
+          console.log('   💡 Run: node scripts/initialize-memory-system.js');
+          
+          this.sessionData.memorySystem = {
+            status: 'needs_initialization',
+            initCommand: 'node scripts/initialize-memory-system.js'
+          };
+        }
+      } else {
+        console.log('📝 Memory system not yet installed');
+        console.log('   💡 Available for future enhancement');
+        
+        this.sessionData.memorySystem = {
+          status: 'not_installed',
+          note: 'Vector storage system available for installation'
+        };
+      }
+      
+    } catch (error) {
+      console.log(`⚠️  Memory system check failed: ${error.message}`);
+      this.sessionData.memorySystem = {
+        status: 'error',
+        error: error.message
+      };
+    }
   }
 
   async setupSessionMonitoring() {
@@ -387,6 +489,8 @@ class WavelengthSessionStartup {
     console.log('\\n🌊 WAVELENGTH SUPER POWERS ENHANCED:');
     console.log('   🔥 Pure WAVELENGTH methodology (no shell dependencies)');
     console.log('   ⚡ 37+ specialized super power tools');
+    console.log('   🧠 AI Memory System with vector storage');
+    console.log('   📚 GitHub history integration and correlation');
     console.log('   🎯 Predictive AI problem solving');
     console.log('   📚 Continuous learning and pattern recognition');
     console.log('   🚀 Autonomous tool orchestration');

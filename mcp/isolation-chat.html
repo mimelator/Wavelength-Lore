@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WAVELENGTH Agent Isolation Chat</title>
+    <style>
+        body { font-family: monospace; background: #0a0a0a; color: #00ff00; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .chat { height: 400px; overflow-y: scroll; border: 1px solid #333; padding: 10px; margin: 10px 0; }
+        .input-area { display: flex; gap: 10px; }
+        input { flex: 1; background: #111; color: #00ff00; border: 1px solid #333; padding: 10px; }
+        button { background: #333; color: #00ff00; border: none; padding: 10px 20px; cursor: pointer; }
+        .message { margin: 10px 0; }
+        .user { color: #00aaff; }
+        .agent { color: #00ff00; }
+        .tool { color: #ffaa00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌊⚡ WAVELENGTH Agent Isolation Experiment ⚡🌊</h1>
+        <div class="chat" id="chat"></div>
+        <div class="input-area">
+            <input type="text" id="input" placeholder="Enter your message..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+        <div>
+            <h3>Available Tools:</h3>
+            <ul>
+                <li>memory_query - Query WAVELENGTH memory</li>
+                <li>server_control - Control dev server</li>
+                <li>file_read - Read files</li>
+                <li>file_write - Write files</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function addMessage(type, content) {
+            const chat = document.getElementById('chat');
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.textContent = content;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage('user', `You: ${message}`);
+            input.value = '';
+
+            // Simulate agent response (in real implementation, this would call MCP)
+            setTimeout(() => {
+                addMessage('agent', `Agent: I would use WAVELENGTH tools to handle: ${message}`);
+                addMessage('tool', `Tool: memory_query("${message}")`);
+            }, 500);
+        }
+
+        document.getElementById('input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Initial message
+        addMessage('agent', 'WAVELENGTH Agent ready! I can only use memory_query, server_control, file_read, and file_write.');
+    </script>
+</body>
+</html>

@@ -6,17 +6,21 @@
  * Supports different commit message files and templates
  */
 
-const fs = require('fs');
-const path = require('path');
-const { exec, spawn } = require('child_process');
-const { promisify } = require('util');
-const PackageProtector = require('./package-protector');
+import fs from 'fs';
+import path from 'path';
+import { exec, spawn } from 'child_process';
+import { promisify } from 'util';
+import readline from 'readline';
+import PackageProtector from './package-protector.js';
 
 const execAsync = promisify(exec);
 
 class SmartCommit {
   constructor() {
     // Fix: Point to the actual project root (two levels up from scripts/unified/)
+    // ES module __dirname equivalent
+    const __filename = new URL(import.meta.url).pathname;
+    const __dirname = path.dirname(__filename);
     this.projectRoot = path.resolve(__dirname, '..', '..');
     this.commitMessageFiles = [
       'commit-message.txt',
@@ -239,7 +243,6 @@ This commit adds [brief summary] to improve [area of improvement].
    * Confirm action with user
    */
   async confirm(message) {
-    const readline = require('readline');
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout
@@ -410,9 +413,12 @@ Environment Variables:
   await commit.run(options);
 }
 
-// Run if called directly
-if (require.main === module) {
-  main();
+// Run if called directly (ES module detection)
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch(error => {
+    console.error('❌ Smart commit failed:', error.message);
+    process.exit(1);
+  });
 }
 
-module.exports = SmartCommit;
+export default SmartCommit;

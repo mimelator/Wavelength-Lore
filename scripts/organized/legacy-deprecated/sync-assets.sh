@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Navigate to project root
-cd "$(dirname "$0")/.."
+# Navigate to project root (3 levels up from scripts/organized/legacy-deprecated/)
+cd "$(dirname "$0")/../../.."
 
 # Load environment variables safely
 if [ -f .env ]; then

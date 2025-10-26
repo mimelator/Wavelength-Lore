@@ -6,14 +6,20 @@
  * Enterprise-grade error handling and environment variable support
  */
 
-const path = require('path');
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ES modules compatibility
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class AWSConfigHelper {
-    static getConfig() {
+    static async getConfig() {
         // Try to load from the actual config file first
         try {
             const configPath = path.join(__dirname, '../../config/aws-resources.js');
-            return require(configPath);
+            const module = await import(configPath);
+            return module.default;
         } catch (error) {
             // If config file doesn't exist, create from environment variables
             console.log('⚠️  aws-resources.js not found, using environment variables');
@@ -78,13 +84,13 @@ class AWSConfigHelper {
         return missing.length === 0;
     }
 
-    static getConfigWithValidation() {
-        const config = this.getConfig();
+    static async getConfigWithValidation() {
+        const config = await this.getConfig();
         this.validateConfig(config);
         return config;
     }
 }
 
 // Export both the class and a convenient function
-module.exports = AWSConfigHelper;
-module.exports.getAWSConfig = () => AWSConfigHelper.getConfigWithValidation();
+export default AWSConfigHelper;
+export const getAWSConfig = async () => await AWSConfigHelper.getConfigWithValidation();

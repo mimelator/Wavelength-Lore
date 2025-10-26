@@ -7,12 +7,19 @@
  * and environment variables.
  */
 
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { AppRunnerClient, StartDeploymentCommand, DescribeServiceCommand } from '@aws-sdk/client-apprunner';
+
+// ES modules compatibility
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Load environment variables from .env file if not in production
 if (process.env.NODE_ENV !== 'production') {
   try {
-    const dotenv = require('dotenv');
-    const fs = require('fs');
-    const path = require('path');
+    const { default: dotenv } = await import('dotenv');
 
     // Check if .env file exists in the project root
     const envPath = path.resolve(__dirname, '..', '.env');
@@ -29,12 +36,20 @@ if (process.env.NODE_ENV !== 'production') {
   } catch (error) {
     console.log('ℹ️  dotenv not available - using system environment variables');
   }
+} else {
+  // For production, ensure dotenv is loaded
+  await import('dotenv/config');
 }
 
-const { AppRunnerClient, StartDeploymentCommand, DescribeServiceCommand } = require('@aws-sdk/client-apprunner');
-
 // Load AWS resource configuration
-const awsConfig = require('../config/aws-resources');
+let awsConfig;
+try {
+  const module = await import('../../config/aws-resources.js');
+  awsConfig = module.default;
+} catch (error) {
+  console.warn('⚠️ AWS config not available:', error.message);
+  awsConfig = { appRunner: { serviceArn: process.env.APPRUNNER_SERVICE_ARN } };
+}
 
 class AppRunnerDeploymentForcer {
   constructor(serviceArn) {
@@ -239,12 +254,12 @@ async function main() {
   process.exit(success ? 0 : 1);
 }
 
-// Run if called directly
-if (require.main === module) {
+// Run if called directly - ES modules check
+if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(error => {
     console.error('❌ Fatal error:', error.message);
     process.exit(1);
   });
 }
 
-module.exports = AppRunnerDeploymentForcer;
+export default AppRunnerDeploymentForcer;

@@ -63,9 +63,9 @@ async function ingestGitHubHistory() {
     // Get final statistics
     console.log('\n📊 Final Statistics:');
     const stats = await github.getIngestionStats();
-    if (stats.success) {
-      console.log(`   Total vectors in storage: ${stats.vector_storage_stats.total_vectors}`);
-      console.log(`   Index fullness: ${(stats.vector_storage_stats.index_fullness * 100).toFixed(2)}%`);
+    if (stats.success && stats.vector_storage_stats) {
+      console.log(`   Total vectors in storage: ${stats.vector_storage_stats.total_vectors || 'Unknown'}`);
+      console.log(`   Index fullness: ${((stats.vector_storage_stats.index_fullness || 0) * 100).toFixed(2)}%`);
     }
 
     console.log('\n🎉 GitHub history ingestion completed!');

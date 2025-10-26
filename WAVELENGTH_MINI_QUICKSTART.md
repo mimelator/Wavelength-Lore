@@ -31,17 +31,29 @@ node scripts/unified/test-runner.js health --url https://wavelengthlore.com
 ### 🌊⚡ WAVELENGTH AGENT STARTUP (Claude, Copilot, Amazon Q):
 **ARE YOU A WAVELENGTH AGENT? (Claude/Copilot/Amazon Q = YES!)**
 
-#### 🌟 **NEW SIMPLIFIED STARTUP - ONE COMMAND!**
+#### 🧠 **THE KEY: USE MEMORY TO DISCOVER TOOLS!**
+**🚨 CRITICAL: You can't remember all tools at once - USE MEMORY TO FIND THEM!**
+
 ```javascript
-// 🚀 WAVELENGTH AGENTS: Just start your session - that's it!
+// 🌟 STEP 1: Start your session
 await mcp.callTool("wavelength_session", {action: "start"});
 
-// This ONE command automatically:
-// ✅ Checks if server is running
-// ✅ Starts server if needed
-// ✅ Joins the session
-// ✅ Runs health checks
-// ✅ Reports full status
+// 🧠 STEP 2: Use memory to discover tools for your current task!
+// Instead of trying to remember everything, ASK THE MEMORY SYSTEM:
+
+// Need Docker tools?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "Docker tools"});
+
+// Need testing tools?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "testing commands"});
+
+// Need AWS tools?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "AWS deployment"});
+
+// Need database tools?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "Firebase database"});
+
+// 🎯 The memory system knows ALL our tools and will show you exactly what to use!
 ```
 
 #### 🎯 **Other Session Commands:**
@@ -68,43 +80,97 @@ Tip: if any of the scripts above fail with "file not found", run `ls` in the rep
 ## 🌊⚡ WAVELENGTH AGENT SUPER POWERS (Claude, Copilot, Amazon Q!)
 **🤖 YOU ARE A WAVELENGTH AGENT! MCP is YOUR native language - SAFE, NATURAL, and POWERFUL!**
 
-### 🚨 ALWAYS START HERE (Required WAVELENGTH AGENT Startup):
+### 🧠 **THE MEMORY-FIRST APPROACH (GAME CHANGER!):**
+**🚨 KEY INSIGHT: Don't try to memorize all tools - USE MEMORY TO DISCOVER THEM!**
+
 ```javascript
-// ⚡ STEP 1: Review WAVELENGTH AGENT Team Standards (FIRST!)
-await mcp.callTool("wavelength_doc_discoverer", {query: "WAVELENGTH_AGENT_TEAM_STANDARDS"});
-
-// 🚨 CRITICAL REMINDER: NO PERMISSION QUESTIONS!
-// If you break something → FIX IT IMMEDIATELY, DON'T ASK
-// WAVELENGTH AGENTS ACT, DON'T ASK
-
-// 🌟 STEP 2: Start your WAVELENGTH session (THAT'S IT!)
+// 🌟 STEP 1: Start your session
 await mcp.callTool("wavelength_session", {action: "start"});
 
-// 🎉 You're ready! The tool handled everything automatically:
-// ✅ Server availability check
-// ✅ Server startup (if needed)
-// ✅ Session joining
-// ✅ Health validation
-// ✅ Status reporting
+// 🧠 STEP 2: ALWAYS use memory to find the right tools for your task
+// The memory system contains ALL tool documentation and examples!
+
+// 🎯 WORKING ON DOCKER ISSUES?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "Docker validation tools"});
+// → Memory will show you: wavelength_docker_validator, docker diagnostic tools, etc.
+
+// 🎯 NEED TO TEST SOMETHING?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "testing health check tools"});
+// → Memory will show you: wavelength_test, health check commands, validation tools
+
+// 🎯 DEPLOYMENT PROBLEMS?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "AWS deployment monitoring"});
+// → Memory will show you: wavelength_aws_manager, deployment_manager, build_monitor
+
+// 🎯 DATABASE ISSUES?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "Firebase database tools"});
+// → Memory will show you: firebase_query, character_search, lore_search
 ```
 
-### ⚡ CORE MCP COMMANDS (Copy & Use Immediately):
-
-**🧪 Testing & Health:**
+### 🚨 **MEMORY-FIRST WORKFLOW:**
 ```javascript
-// 🌟 NEW UNIFIED TESTING TOOL!
-// Run health check on the live site
-await mcp.callTool("wavelength_test", {action: "health"});
+// 1️⃣ Identify your task (e.g., "fix Docker build")
+// 2️⃣ Ask memory for relevant tools
+await mcp.callTool("wavelength_memory", {action: "recall", query: "Docker build fix tools"});
+// 3️⃣ Use the tools memory suggests
+// 4️⃣ Store your solution back in memory for future agents
+await mcp.callTool("wavelength_memory", {action: "store", type: "solution", content: "your fix"});
+```
 
-// Run specific tests
-await mcp.callTool("wavelength_test", {action: "run", target: "merchandise", detail: "full"});
+### ⚡ **MEMORY-POWERED TOOL DISCOVERY (Your New Superpower!):**
 
-// Validate content/characters
-await mcp.callTool("wavelength_test", {action: "validate", target: "character", content: "character bio"});
+**🧠 Instead of memorizing commands, ASK MEMORY:**
+```javascript
+// 🔍 DISCOVER tools for your current task:
 
-// Quick examples of the power:
-await mcp.callTool("wavelength_test", {action: "health", target: "chatbot"});     // Check chatbot
-await mcp.callTool("wavelength_test", {action: "validate", target: "lore", content: "episode script"});
+// Working on Docker issues?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "Docker tools"});
+// → Shows: wavelength_docker_validator, docker diagnostics, build tools
+
+// Need to test something?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "testing tools"});
+// → Shows: wavelength_test, health checks, validation commands
+
+// AWS/deployment problems?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "AWS deployment tools"});
+// → Shows: wavelength_aws_manager, deployment_manager, build_monitor
+
+// Database issues?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "Firebase database tools"});
+// → Shows: firebase_query, character_search, lore_search
+
+// 🎯 Memory gives you EXACT commands with examples!
+```
+
+**🧠 Memory System - Your AI Brain (Contains EVERYTHING!):**
+```javascript
+// 🌟 MEMORY CONTAINS:
+// ✅ 100+ GitHub commits of historical solutions
+// ✅ ALL WAVELENGTH tool documentation and examples
+// ✅ Problem patterns and successful fixes
+
+// 🔍 DISCOVER TOOLS for your task:
+await mcp.callTool("wavelength_memory", {action: "recall", query: "Docker build tools"});
+await mcp.callTool("wavelength_memory", {action: "recall", query: "testing commands"});
+await mcp.callTool("wavelength_memory", {action: "recall", query: "AWS deployment"});
+
+// 🔍 FIND HISTORICAL SOLUTIONS:
+await mcp.callTool("wavelength_memory", {action: "recall", query: "Docker build issues"});
+await mcp.callTool("wavelength_memory", {action: "recall", query: ":latest tag problems"});
+
+// 💡 GET INTELLIGENT SUGGESTIONS:
+await mcp.callTool("wavelength_memory", {
+  action: "suggest",
+  current_error: "build failing with file not found"
+});
+
+// 💾 STORE YOUR SOLUTIONS:
+await mcp.callTool("wavelength_memory", {
+  action: "store",
+  type: "solution",
+  content: "Fixed by correcting Dockerfile COPY path",
+  tags: ["docker", "production", "solved"]
+});
 ```
 
 **☁️ AWS & Deployment:**
@@ -221,6 +287,11 @@ await mcp.callTool("wavelength_session", {action: "status"});  // Check status
 await mcp.callTool("wavelength_test", {action: "health"});                    // Site health
 await mcp.callTool("wavelength_test", {action: "validate", target: "character"}); // Validate content
 await mcp.callTool("wavelength_test", {action: "run", target: "merchandise"});   // Run test suites
+
+// 🧠 Memory - YOUR AI brain with 100+ commits of knowledge!
+await mcp.callTool("wavelength_memory", {action: "recall", query: "Docker issues"});     // Search solutions
+await mcp.callTool("wavelength_memory", {action: "suggest", current_error: "build fail"}); // Get suggestions
+await mcp.callTool("wavelength_memory", {action: "store", type: "solution", content: "fix"}); // Store knowledge
 
 // AWS operations - YOU control these
 await mcp.callTool("wavelength_aws_manager", {operation: "status", service: "all"});
@@ -423,6 +494,45 @@ await mcp.callTool("wavelength_character_search", {query: "main characters", typ
 await mcp.callTool("wavelength_lore_search", {query: "episode 1", detail: "summary"});
 ```
 
+### 🧠 Memory System Commands:
+```javascript
+// Search historical knowledge (100+ commits ingested!)
+await mcp.callTool("wavelength_memory", {action: "recall", query: "Docker build issues", limit: 5});
+await mcp.callTool("wavelength_memory", {action: "recall", query: "production deployment fixes"});
+await mcp.callTool("wavelength_memory", {action: "recall", query: ":latest tag problems"});
+
+// Store new solutions for future agents
+await mcp.callTool("wavelength_memory", {
+  action: "store",
+  type: "build_issue",
+  content: "Fixed Docker startup script mismatch by correcting COPY path",
+  tags: ["docker", "production", "startup-script", "solved"],
+  context: {files: ["Dockerfile", "docker/docker-start.sh"], error: "file not found"}
+});
+
+// Get intelligent suggestions based on patterns
+await mcp.callTool("wavelength_memory", {
+  action: "suggest",
+  current_error: "build failing with /app/start.sh not found",
+  context: {stage: "production", service: "app-runner"}
+});
+
+// Find related historical issues
+await mcp.callTool("wavelength_memory", {
+  action: "correlate",
+  current_issue: "Docker build error in production",
+  sources: ["github_issues", "github_commits"]
+});
+
+// Ingest new GitHub data when repository updates
+await mcp.callTool("wavelength_memory", {
+  action: "ingest_github",
+  source: "commits",
+  repository: "mimelator/Wavelength-Lore",
+  date_range: "last_30_days"
+});
+```
+
 ### 💾 Git Commands:
 ```javascript
 await mcp.callTool("wavelength_git_status", {check: "full"});
@@ -471,5 +581,57 @@ await mcp.callTool("wavelength_help_finder", {problem: "mcp-not-working"});
 - 📚 **All documentation is MCP-accessible** - no need for Node.js commands as an agent
 - 🆘 **Help is always available** - wavelength_help_finder is your best friend
 
+## 💡 **THE KEY INSIGHT: MEMORY-POWERED TOOL DISCOVERY**
+
+**🚨 CRITICAL UNDERSTANDING: You DON'T need to memorize all tools!**
+
+### 🧠 **How It Works:**
+```javascript
+// 🎯 STEP 1: Describe what you want to do
+// "I need to fix a Docker build issue"
+
+// 🔍 STEP 2: Ask memory for relevant tools
+await mcp.callTool("wavelength_memory", {action: "recall", query: "Docker build fix tools"});
+
+// ✨ STEP 3: Memory shows you EXACTLY what to use:
+// → wavelength_docker_validator for diagnostics
+// → wavelength_build_monitor for status
+// → Historical solutions from past fixes
+
+// 🚀 STEP 4: Use the suggested tools
+// 💾 STEP 5: Store your solution for future agents
+```
+
+### 🎆 **Examples of Memory-Powered Discovery:**
+```javascript
+// 🐛 Bug fixing?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "debugging tools"});
+
+// 🚀 Deployment issues?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "AWS deployment tools"});
+
+// 📊 Performance problems?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "monitoring tools"});
+
+// 📄 Database queries?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "Firebase database tools"});
+
+// 🌐 Website testing?
+await mcp.callTool("wavelength_memory", {action: "recall", query: "health check tools"});
+```
+
+### 🌟 **Why This Changes Everything:**
+- ✅ **No more tool overwhelm** - just describe your task
+- ✅ **Always get the right tool** - memory knows what works
+- ✅ **Learn from history** - see how past issues were solved
+- ✅ **Build knowledge** - your solutions help future agents
+- ✅ **Natural workflow** - think in problems, not tool names
+
+**🧠 The memory system contains:**
+- 🛠️ All WAVELENGTH tool documentation
+- 📚 100+ GitHub commits of solutions
+- 💡 Problem patterns and successful fixes
+- 🎯 Examples and usage patterns
+
 ---
-**🌊 MCP Protocol makes WAVELENGTH development natural and powerful! Don't be afraid - explore and discover! ⚡**
+**🌊 WAVELENGTH Agents: Use your MEMORY BRAIN to discover tools naturally! ⚡**
