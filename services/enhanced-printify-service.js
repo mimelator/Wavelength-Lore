@@ -861,6 +861,165 @@ class EnhancedPrintifyService extends PrintifyService {
       throw error;
     }
   }
+
+  /**
+   * Test blueprint-provider compatibility by fetching variants
+   * This is the most reliable way to test if a combination works
+   */
+  async getBlueprintVariants(blueprintId, providerId) {
+    const endpoint = `/catalog/blueprints/${blueprintId}/print_providers/${providerId}/variants.json`;
+    
+    try {
+      const response = await this.api.get(endpoint);
+      return response.data.variants || response.data || [];
+    } catch (error) {
+      // Handle specific 404 errors for non-existent blueprints
+      if (error.response?.status === 404) {
+        return null; // Clearly indicates blueprint doesn't exist
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Get detailed blueprint information
+   */
+  async getBlueprintDetails(blueprintId, providerId) {
+    const endpoint = `/catalog/blueprints/${blueprintId}/print_providers/${providerId}.json`;
+    const response = await this.api.get(endpoint);
+    return response.data;
+  }
+
+  /**
+   * Get all available print providers
+   */
+  async getAllPrintProviders() {
+    const endpoint = '/catalog/print_providers.json';
+    const response = await this.api.get(endpoint);
+    return response.data;
+  }
+
+  /**
+   * Test basic API connectivity
+   */
+  async testConnection() {
+    try {
+      const endpoint = `/shops/${this.shopId}.json`;
+      const response = await this.api.get(endpoint);
+      return {
+        success: true,
+        shopName: response.data.title,
+        shopId: response.data.id
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Batch validate multiple blueprint-provider combinations
+   * with rate limiting and progress tracking
+   */
+  async batchValidateCombinations(combinations, options = {}) {
+    const {
+      batchSize = 10,
+      delayMs = 500,
+      onProgress = () => {},
+      onBatchComplete = () => {}
+    } = options;
+
+    const results = [];
+    const batches = [];
+    
+    // Split into batches
+    for (let i = 0; i < combinations.length; i += batchSize) {
+      batches.push(combinations.slice(i, i + batchSize));
+    }
+
+    console.log(`🔄 Processing ${combinations.length} combinations in ${batches.length} batches`);
+
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+      const batch = batches[batchIndex];
+      const batchResults = [];
+
+      for (const combo of batch) {
+        try {
+          const variants = await this.getBlueprintVariants(combo.blueprintId, combo.providerId);
+          
+          batchResults.push({
+            blueprintId: combo.blueprintId,
+            providerId: combo.providerId,
+            success: variants !== null && variants.length > 0,
+            variants: variants ? variants.length : 0,
+            metadata: combo.metadata || {}
+          });
+          
+          onProgress({
+            current: results.length + batchResults.length,
+            total: combinations.length,
+            batch: batchIndex + 1,
+            totalBatches: batches.length
+          });
+
+        } catch (error) {
+          batchResults.push({
+            blueprintId: combo.blueprintId,
+            providerId: combo.providerId,
+            success: false,
+            error: error.message,
+            statusCode: error.response?.status,
+            metadata: combo.metadata || {}
+          });
+        }
+
+        // Rate limiting within batch
+        if (delayMs > 0) {
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+        }
+      }
+
+      results.push(...batchResults);
+      onBatchComplete({
+        batchIndex: batchIndex + 1,
+        batchSize: batch.length,
+        completed: results.length,
+        total: combinations.length
+      });
+
+      // Longer delay between batches
+      if (batchIndex < batches.length - 1 && delayMs > 0) {
+        await new Promise(resolve => setTimeout(resolve, delayMs * 2));
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Get comprehensive catalog summary
+   */
+  async getCatalogSummary() {
+    try {
+      const [providers, shipping] = await Promise.all([
+        this.getAllPrintProviders(),
+        this.api.get('/catalog/shipping.json').catch(() => ({ data: { profiles: [] } }))
+      ]);
+
+      return {
+        providers: providers.print_providers || providers || [],
+        shippingProfiles: shipping.data.profiles || [],
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      return {
+        error: error.message,
+        timestamp: new Date().toISOString()
+      };
+    }
+  }
 }
 
 module.exports = EnhancedPrintifyService;

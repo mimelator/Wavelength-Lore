@@ -872,11 +872,7 @@ class MerchandiseStore {
         }
       }
       
-      // Preview enhancement
-      if (e.target.classList.contains('btn-preview-enhancement')) {
-        const imageId = e.target.dataset.imageId;
-        this.previewEnhancement(imageId);
-      }
+
     });
     
     // Product creation
@@ -964,165 +960,9 @@ class MerchandiseStore {
     });
   }
   
-  async previewEnhancement(imageId) {
-    let progressInterval;
-    try {
-      console.log('🎨 Starting preview enhancement for imageId:', imageId);
-      
-      if (!imageId) {
-        throw new Error('Image ID is required');
-      }
-      
-      // Start with progress feedback
-      this.setLoading(true, 'Analyzing image for print quality...');
-      
-      // Show progressive updates during the enhancement process with technical details
-      const progressMessages = [
-        'Analyzing image for print quality and optimal dimensions...',
-        '🎨 AI Enhancement: Targeting 2048×2048px at 300 DPI for premium print quality',
-        '✨ Optimizing colors, contrast, and fine details for merchandise printing',
-        '🖼️ Generating high-resolution artwork - Perfect for t-shirts, mugs & more!',
-        '🎯 Finalizing your professional-grade custom artwork preview...'
-      ];
-      
-      let currentStep = 0;
-      progressInterval = setInterval(() => {
-        if (currentStep < progressMessages.length - 1) {
-          currentStep++;
-          this.setLoading(true, progressMessages[currentStep]);
-        }
-      }, 4000); // Update every 4 seconds for ~20 second process
-      
-      console.log('🌐 Making API request to /api/merchandise/preview-enhancement');
-      
-      const response = await fetch('/api/merchandise/preview-enhancement', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.getAuthToken()}`
-        },
-        body: JSON.stringify({ imageId })
-      });
-      
-      clearInterval(progressInterval);
-      progressInterval = null;
-      
-      console.log('📡 API response status:', response.status, response.statusText);
-      
-      if (!response.ok) {
-        let errorMessage = `Server error: ${response.status} ${response.statusText}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorMessage;
-          console.error('❌ API error response:', errorData);
-        } catch (parseError) {
-          console.error('❌ Failed to parse error response:', parseError);
-        }
-        throw new Error(errorMessage);
-      }
-      
-      const data = await response.json();
-      console.log('📦 API response data:', data);
-      
-      if (data.success) {
-        console.log('✅ Enhancement preview successful');
-        this.setLoading(true, 'Enhancement complete! Loading preview...');
-        setTimeout(() => {
-          // Transform the backend response to match the expected frontend structure
-          const transformedData = {
-            original: data.original || {
-              url: data.originalImageUrl || '',
-              width: data.originalDimensions?.width || 1024,
-              height: data.originalDimensions?.height || 1024,
-              suitableForPrint: data.originalImageSuitable || false
-            },
-            enhanced: data.enhanced || {
-              url: data.enhancedImageUrl || '',
-              width: data.enhancedDimensions?.width || 2048,
-              height: data.enhancedDimensions?.height || 2048
-            },
-            analysis: data.analysis || {
-              method: data.enhancementMethod || 'AI Enhancement',
-              scaleFactor: data.scaleFactor || 2.0,
-              improvementDescription: data.improvementDescription || 'Image enhanced for printing',
-              processingTime: data.processingTime || 0,
-              cached: data.cached || false
-            }
-          };
-          
-          this.showEnhancementPreview(transformedData.original, transformedData.enhanced, transformedData.analysis);
-          this.setLoading(false);
-        }, 500);
-      } else {
-        console.error('❌ API returned success: false', data);
-        throw new Error(data.error || 'Failed to generate preview');
-      }
-      
-    } catch (error) {
-      if (progressInterval) {
-        clearInterval(progressInterval);
-      }
-      console.error('❌ Error previewing enhancement:', error);
-      console.error('Error stack:', error.stack);
-      this.showError('Failed to preview enhancement: ' + error.message);
-      this.setLoading(false);
-    }
-  }
+
   
-  showEnhancementPreview(original, enhanced, analysis) {
-    const modal = document.createElement('div');
-    modal.className = 'modal enhancement-preview-modal';
-    modal.innerHTML = `
-      <div class="modal-content enhancement-preview-content">
-        <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
-        <h2>🎨 Print Quality Preview</h2>
-        <p class="preview-note">This shows how your image will be automatically optimized for high-quality printing.</p>
-        
-        <div class="enhancement-comparison">
-          <div class="image-comparison">
-            <div class="comparison-side">
-              <h3>Original Image</h3>
-              <img src="${original.url}" alt="Original" class="comparison-image" />
-              <div class="image-stats">
-                <p><strong>Size:</strong> ${original.width}×${original.height}</p>
-                <p><strong>Quality:</strong> ${original.suitableForPrint ? '✅ Print Ready' : '⚠️ Low Quality'}</p>
-              </div>
-            </div>
-            
-            <div class="comparison-side">
-              <h3>Enhanced Image</h3>
-              <img src="${enhanced.url}" alt="Enhanced" class="comparison-image" />
-              <div class="image-stats">
-                <p><strong>Size:</strong> ${enhanced.width}×${enhanced.height}</p>
-                <p><strong>Quality:</strong> ✅ Print Ready</p>
-                <p><strong>Method:</strong> ${analysis.method}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div class="enhancement-analysis">
-            <h3>Print Optimization Details</h3>
-            <p class="optimization-note">When you create merchandise, the enhanced version will be automatically used for the best print quality.</p>
-            <ul>
-              <li><strong>Improvement:</strong> ${analysis.improvementDescription || 'Enhanced for printing'}</li>
-              <li><strong>Scale Factor:</strong> ${analysis.scaleFactor || 'Auto'}x</li>
-              ${analysis.processingTime ? `<li><strong>Processing Time:</strong> ${analysis.processingTime}ms</li>` : ''}
-              ${analysis.cached ? '<li><strong>Source:</strong> Cached (Previously Enhanced)</li>' : ''}
-            </ul>
-          </div>
-        </div>
-        
-        <div class="modal-actions">
-          <button class="btn btn-primary" onclick="this.closest('.modal').remove()">
-            Close Preview
-          </button>
-        </div>
-      </div>
-    `;
-    
-    document.body.appendChild(modal);
-    modal.style.display = 'block';
-  }
+
   
   render() {
     const container = document.getElementById('merchandise-store');
@@ -1219,9 +1059,6 @@ class MerchandiseStore {
               <div class="image-actions">
                 <button class="gallery-image-select" data-image-id="${image.id}">
                   ${this.selectedImage === image.id ? 'Selected' : 'Select'}
-                </button>
-                <button class="btn-preview-enhancement" data-image-id="${image.id}">
-                  🔍 View Printable Image
                 </button>
               </div>
             </div>

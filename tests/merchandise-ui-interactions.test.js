@@ -520,7 +520,7 @@ async function runTests() {
     
     // Run tests
     await tester.testSelectButton();
-    await tester.testViewPrintableImageButton();
+    // await tester.testViewPrintableImageButton(); // Removed - View Printable Image functionality removed
     await tester.testMultipleSelections();
     
     // Print results
