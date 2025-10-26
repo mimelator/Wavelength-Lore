@@ -135,7 +135,7 @@ class MerchandiseStore {
               return;
             }
             
-            this.initializeProductNavigator();
+            await this.initializeProductNavigator();
             
             // Verify navigator was created
             const navigator = document.querySelector('.product-navigator, .simple-categories');
@@ -1239,7 +1239,7 @@ class MerchandiseStore {
     }
   }
   
-  initializeProductNavigator() {
+  async initializeProductNavigator() {
     const container = document.getElementById('product-navigator');
     if (!container) {
       console.error('❌ Product navigator container not found');
@@ -1338,7 +1338,7 @@ class MerchandiseStore {
   /**
    * Simple fallback category display
    */
-  renderSimpleCategories(container) {
+  async renderSimpleCategories(container) {
     console.log('🔧 Rendering simple categories fallback');
     
     // Use the loaded product types data if available
@@ -1799,7 +1799,7 @@ class MerchandiseStore {
     setTimeout(() => {
       try {
         console.log('🚀 Initializing product navigator...');
-        this.initializeProductNavigator();
+        await this.initializeProductNavigator();
         
         // Verify initialization success
         setTimeout(() => {
