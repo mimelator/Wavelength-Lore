@@ -62,6 +62,7 @@ router.get('/category/:categoryId', (req, res) => {
  * Forum Post View - Display individual post and replies
  */
 router.get('/post/:postId', async (req, res) => {
+    console.log('🚀 POST ROUTE HIT - PostID:', req.params.postId);
     const postId = req.params.postId;
     console.log('📝 Loading post:', postId);
     
@@ -111,10 +112,11 @@ router.get('/post/:postId', async (req, res) => {
         await db.ref(`forum/posts/${postId}/views`).set((post.views || 0) + 1);
         
         console.log('✅ Rendering post page with data');
+        console.log('📄 Post object keys:', Object.keys(post));
         res.render('forum/simple-post-page', {
             post: post,
             replies: postReplies,
-            title: post.title + ' - Wavelength Forum'
+            title: post.title
         });
         
     } catch (error) {

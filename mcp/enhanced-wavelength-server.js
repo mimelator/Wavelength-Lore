@@ -140,6 +140,31 @@ class EnhancedWavelengthMCPServer {
             },
             required: ["query"]
           }
+        },
+        {
+          name: "http_request",
+          description: "Make HTTP requests to APIs and web services (replaces curl with intelligent response handling)",
+          inputSchema: {
+            type: "object",
+            properties: {
+              url: { type: "string", description: "URL to request" },
+              method: { type: "string", enum: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"], description: "HTTP method", default: "GET" },
+              headers: { type: "object", description: "HTTP headers as key-value pairs" },
+              body: { type: "string", description: "Request body (for POST/PUT/PATCH)" },
+              auth: { 
+                type: "object", 
+                description: "Authentication configuration",
+                properties: {
+                  type: { type: "string", enum: ["bearer", "basic", "api-key"] },
+                  token: { type: "string", description: "Bearer token or API key" },
+                  username: { type: "string", description: "Username for basic auth" },
+                  password: { type: "string", description: "Password for basic auth" },
+                  header: { type: "string", description: "Header name for API key auth" }
+                }
+              }
+            },
+            required: ["url"]
+          }
         }
       ]
     }));
@@ -167,6 +192,8 @@ class EnhancedWavelengthMCPServer {
             return await this.performDeploymentCheck(args.environment);
           case "documentation_navigator":
             return await this.navigateDocumentation(args.query, args.type, args.context);
+          case "http_request":
+            return await this.makeHttpRequest(args.url, args.method, args.headers, args.body, args.auth);
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
@@ -876,6 +903,166 @@ console.log(checkDir(googleDocsPath, 'Google Docs'));
         text: `🚀 Smart Deployment Check (${environment}):\n✅ Firebase connectivity\n✅ Asset validation\n✅ Security checks\n✅ Ready for deployment!`
       }]
     };
+  }
+
+  // Tool 10: HTTP Request (Curl Replacement)
+  async makeHttpRequest(url, method = 'GET', headers = {}, body = null, auth = null) {
+    const https = require('https');
+    const http = require('http');
+    const { URL } = require('url');
+    
+    try {
+      const parsedUrl = new URL(url);
+      const isHttps = parsedUrl.protocol === 'https:';
+      const client = isHttps ? https : http;
+      
+      // Prepare request options
+      const options = {
+        hostname: parsedUrl.hostname,
+        port: parsedUrl.port || (isHttps ? 443 : 80),
+        path: parsedUrl.pathname + parsedUrl.search,
+        method: method.toUpperCase(),
+        headers: {
+          'User-Agent': 'Wavelength-MCP-Server/1.0',
+          'Accept': 'application/json, text/plain, */*',
+          ...headers
+        }
+      };
+      
+      // Handle authentication
+      if (auth) {
+        switch (auth.type) {
+          case 'bearer':
+            options.headers['Authorization'] = `Bearer ${auth.token}`;
+            break;
+          case 'basic':
+            const credentials = Buffer.from(`${auth.username}:${auth.password}`).toString('base64');
+            options.headers['Authorization'] = `Basic ${credentials}`;
+            break;
+          case 'api-key':
+            options.headers[auth.header || 'X-API-Key'] = auth.token;
+            break;
+        }
+      }
+      
+      // Handle request body
+      if (body && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
+        const bodyString = typeof body === 'string' ? body : JSON.stringify(body);
+        options.headers['Content-Length'] = Buffer.byteLength(bodyString);
+        if (!options.headers['Content-Type']) {
+          options.headers['Content-Type'] = 'application/json';
+        }
+      }
+      
+      // Make the request
+      const startTime = Date.now();
+      const response = await new Promise((resolve, reject) => {
+        const req = client.request(options, (res) => {
+          let data = '';
+          res.on('data', chunk => data += chunk);
+          res.on('end', () => {
+            resolve({
+              statusCode: res.statusCode,
+              statusMessage: res.statusMessage,
+              headers: res.headers,
+              body: data
+            });
+          });
+        });
+        
+        req.on('error', reject);
+        
+        if (body && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
+          const bodyString = typeof body === 'string' ? body : JSON.stringify(body);
+          req.write(bodyString);
+        }
+        
+        req.end();
+      });
+      
+      const duration = Date.now() - startTime;
+      
+      // Parse response intelligently
+      let parsedBody = response.body;
+      let contentType = 'text';
+      
+      try {
+        if (response.headers['content-type']?.includes('application/json')) {
+          parsedBody = JSON.parse(response.body);
+          contentType = 'json';
+        }
+      } catch (e) {
+        // Keep as text if JSON parsing fails
+      }
+      
+      // Format response
+      const statusEmoji = response.statusCode < 300 ? '✅' : response.statusCode < 400 ? '⚠️' : '❌';
+      let responseText = `🌐 HTTP Request Results\n\n`;
+      responseText += `${statusEmoji} **${method.toUpperCase()} ${url}**\n`;
+      responseText += `📊 Status: ${response.statusCode} ${response.statusMessage}\n`;
+      responseText += `⏱️ Duration: ${duration}ms\n`;
+      responseText += `📦 Content-Type: ${response.headers['content-type'] || 'unknown'}\n`;
+      responseText += `📏 Size: ${response.body.length} bytes\n\n`;
+      
+      // Add important headers
+      const importantHeaders = ['location', 'set-cookie', 'cache-control', 'x-rate-limit-remaining'];
+      const relevantHeaders = Object.entries(response.headers)
+        .filter(([key]) => importantHeaders.includes(key.toLowerCase()))
+        .map(([key, value]) => `• ${key}: ${value}`)
+        .join('\n');
+      
+      if (relevantHeaders) {
+        responseText += `📋 Important Headers:\n${relevantHeaders}\n\n`;
+      }
+      
+      // Add response body (truncated if too long)
+      responseText += `📄 Response Body:\n`;
+      if (contentType === 'json' && typeof parsedBody === 'object') {
+        const jsonString = JSON.stringify(parsedBody, null, 2);
+        if (jsonString.length > 2000) {
+          responseText += `\`\`\`json\n${jsonString.substring(0, 2000)}...\n[Truncated - ${jsonString.length} total characters]\n\`\`\``;
+        } else {
+          responseText += `\`\`\`json\n${jsonString}\n\`\`\``;
+        }
+      } else {
+        if (response.body.length > 1000) {
+          responseText += `\`\`\`\n${response.body.substring(0, 1000)}...\n[Truncated - ${response.body.length} total characters]\n\`\`\``;
+        } else {
+          responseText += `\`\`\`\n${response.body}\n\`\`\``;
+        }
+      }
+      
+      // Add quick actions based on response
+      responseText += `\n🎯 Quick Actions:\n`;
+      if (response.statusCode >= 400) {
+        responseText += `• Debug: Check authentication and request parameters\n`;
+        responseText += `• Retry: Verify URL and network connectivity\n`;
+      } else if (contentType === 'json' && parsedBody) {
+        if (Array.isArray(parsedBody)) {
+          responseText += `• Found ${parsedBody.length} items in response array\n`;
+        } else if (parsedBody.id) {
+          responseText += `• Resource ID: ${parsedBody.id}\n`;
+        }
+        if (parsedBody.next || parsedBody.pagination) {
+          responseText += `• Has pagination - more data available\n`;
+        }
+      }
+      
+      return {
+        content: [{
+          type: "text",
+          text: responseText
+        }]
+      };
+      
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `❌ HTTP Request failed: ${error.message}\n\n💡 Common issues:\n• Check URL format and network connectivity\n• Verify authentication credentials\n• Ensure proper headers and content type\n• Check for CORS or firewall restrictions`
+        }]
+      };
+    }
   }
 
   async run() {

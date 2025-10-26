@@ -18,6 +18,7 @@ Options:
   --skip-routes          Skip route link checking
   --skip-audio           Skip audio file checking
   --skip-vendor          Skip vendor compatibility checking
+  --skip-forum           Skip forum browser validation
   --help, -h             Show this help message
 
 Examples:
@@ -31,6 +32,7 @@ This suite runs:
   🔗 Route Link Checker (check_route_links.js --prod)
   🎵 Audio File Checker (check_audio_files.js --prod)
   🛍️  Vendor Compatibility Checker (vendor-compatibility-check.js)
+  🌐 Forum Browser Validator (../../forum-browser-validation.js)
 `);
     process.exit(0);
 }
@@ -46,6 +48,7 @@ const skipStatic = args.includes('--skip-static');
 const skipRoutes = args.includes('--skip-routes');
 const skipAudio = args.includes('--skip-audio');
 const skipVendor = args.includes('--skip-vendor');
+const skipForum = args.includes('--skip-forum');
 
 const PROD_URL = 'https://wavelengthlore.com';
 
@@ -240,6 +243,26 @@ const parseResults = (output, scriptName) => {
                     results.issues.push(message);
                 }
             }
+        } else if (scriptName.includes('forum')) {
+            // Parse forum browser validation results
+            const postsMatch = output.match(/Posts Validated: (\d+)/);
+            const totalMatch = output.match(/Total Posts Found: (\d+)/);
+            if (postsMatch && totalMatch) {
+                const validated = parseInt(postsMatch[1]);
+                const total = parseInt(totalMatch[1]);
+                results.totalChecked = total;
+                results.totalBroken = total - validated;
+                results.successRate = total > 0 ? Math.round((validated / total) * 100) : 100;
+            }
+            
+            // Extract forum issues
+            const errorMatches = output.match(/❌ ERRORS \((\d+)\):/g);
+            if (errorMatches) {
+                const errorCount = parseInt(errorMatches[0].match(/\((\d+)\)/)[1]);
+                if (errorCount > 0) {
+                    results.issues.push(`${errorCount} forum validation errors`);
+                }
+            }
         }
     } catch (error) {
         console.error('Error parsing results:', error.message);
@@ -259,7 +282,8 @@ const main = async () => {
         !skipStatic ? '📁 Static' : null, 
         !skipRoutes ? '🔗 Routes' : null,
         !skipAudio ? '🎵 Audio' : null,
-        !skipVendor ? '🛍️ Vendor' : null
+        !skipVendor ? '🛍️ Vendor' : null,
+        !skipForum ? '🌐 Forum' : null
     ].filter(Boolean).join(', ')}`, 'cyan');
     
     const results = {};
@@ -305,6 +329,14 @@ const main = async () => {
         });
     }
     
+    if (!skipForum) {
+        checkers.push({
+            script: '../../forum-browser-validation.js',
+            name: 'Forum Browser Validator',
+            key: 'forum'
+        });
+    }
+    
     // Run all checkers
     for (const checker of checkers) {
         try {
@@ -340,7 +372,10 @@ const main = async () => {
         if (result.success) {
             const rate = result.results?.successRate || 0;
             const status = rate === 100 ? '✅' : rate >= 90 ? '⚠️' : '❌';
-            log(`  ${status} ${checkerName}: ${rate}% success (${result.duration}s)`, 
+            const statusText = key === 'forum' ? 
+                `${result.results?.totalChecked || 0} posts validated` :
+                `${rate}% success`;
+            log(`  ${status} ${checkerName}: ${statusText} (${result.duration}s)`, 
                 rate === 100 ? 'green' : rate >= 90 ? 'yellow' : 'red');
             
             if (result.results) {

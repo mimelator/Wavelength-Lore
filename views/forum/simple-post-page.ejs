@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= post ? post.title : 'Post Not Found' %> - Wavelength Forum</title>
+    <title><%= title || 'Post' %> - Wavelength Community Forum</title>
     <link rel="stylesheet" href="/css/forum.css">
     <style>
         .forum-post-container {
@@ -102,26 +102,26 @@
     <main class="forum-post-container">
         <a href="/forum" class="back-link">← Back to Forum</a>
         
-        <% if (post) { %>
+        <% if (typeof post !== 'undefined' && post) { %>
             <article class="forum-post">
                 <header class="post-header">
                     <img src="<%= post.authorAvatar || '/icons/hero-icon.svg' %>" 
-                         alt="<%= post.authorName %>" 
+                         alt="<%= post.authorName || 'Author' %>" 
                          class="post-avatar"
                          onerror="this.src='/icons/hero-icon.svg'">
                     <div class="post-meta">
-                        <h1 class="post-title"><%= post.title %></h1>
+                        <h1 class="post-title"><%= post.title || 'Untitled Post' %></h1>
                         <div class="post-author">
-                            By <%= post.authorName %> • 
-                            <%= new Date(post.createdAt).toLocaleDateString() %> • 
+                            By <%= post.authorName || 'Unknown Author' %> • 
+                            <%= post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Unknown Date' %> • 
                             <%= post.views || 0 %> views
                         </div>
                     </div>
                 </header>
                 
-                <div class="post-content"><%= post.content %></div>
+                <div class="post-content"><%- post.content ? post.content.replace(/\n/g, '<br>') : 'No content available' %></div>
                 
-                <% if (post.tags && post.tags.length > 0) { %>
+                <% if (typeof post.tags !== 'undefined' && post.tags && post.tags.length > 0) { %>
                     <div class="post-tags">
                         <% post.tags.forEach(tag => { %>
                             <span class="tag">#<%= tag %></span>
@@ -130,18 +130,23 @@
                 <% } %>
             </article>
             
-            <% if (replies && replies.length > 0) { %>
+            <% if (typeof replies !== 'undefined' && replies && replies.length > 0) { %>
                 <section class="replies-section">
                     <h3>Replies (<%= replies.length %>)</h3>
                     <% replies.forEach(reply => { %>
                         <div class="reply">
                             <div class="reply-header">
-                                <strong><%= reply.authorName %></strong> • 
-                                <%= new Date(reply.createdAt).toLocaleDateString() %>
+                                <strong><%= reply.authorName || 'Anonymous' %></strong> • 
+                                <%= reply.createdAt ? new Date(reply.createdAt).toLocaleDateString() : 'Unknown Date' %>
                             </div>
-                            <div class="reply-content"><%= reply.content %></div>
+                            <div class="reply-content"><%- reply.content ? reply.content.replace(/\n/g, '<br>') : 'No content' %></div>
                         </div>
                     <% }); %>
+                </section>
+            <% } else { %>
+                <section class="replies-section">
+                    <h3>No Replies Yet</h3>
+                    <p>Be the first to reply to this post!</p>
                 </section>
             <% } %>
             

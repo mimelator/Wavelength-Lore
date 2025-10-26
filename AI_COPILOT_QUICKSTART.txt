@@ -32,14 +32,16 @@ AI COPILOT QUICK START - COPY/PASTE THIS TO ANY AI ASSISTANT
 
 🚀 MCP SUPERPOWERS (Revolutionary AI Control):
 • 📚 FULL DOCUMENTATION: /docs/MCP_TOOLS_DOCUMENTATION.md
-• Enhanced MCP server: /mcp/enhanced-wavelength-server.js (8 tools operational)
+• Enhanced MCP server: /mcp/enhanced-wavelength-server.js (10 tools operational)
 • Lore management: ./lore-tools (command-line interface)
 • Content search: wavelength_lore_search, character_relationship_map
 • Document pipeline: register_shared_document, lore_ingestion_status  
 • Cross-project sync: content_sync_manager (Lore ↔ Chatbot)
 • Development tools: smart_deployment_check, forum_health_monitor
+• Documentation finder: documentation_navigator (finds docs, scripts, tests instantly)
+• HTTP requests: http_request (replaces curl with intelligent response handling)
 • Setup: Copy mcp/claude-desktop-config.json to ~/Library/Application Support/Claude/
-• Test: Ask AI "Search for Yeti origin" or "Map character relationships"
+• Test: Ask AI "Search for Yeti origin", "Make API call to httpbin.org/get", or "Find deployment scripts"
 
 🚫 DO NOT TOUCH:
 • .current-notes.md (private workspace)

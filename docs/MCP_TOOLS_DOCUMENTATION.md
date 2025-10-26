@@ -2,7 +2,7 @@
 
 ## 📖 Overview
 
-The Wavelength-Lore project features a powerful **Enhanced MCP Server** that provides 8 specialized tools for automating development workflows, managing lore content, and maintaining the sophisticated Wavelength universe. These tools leverage the Model Context Protocol to provide AI assistants with direct access to project-specific functionality.
+The Wavelength-Lore project features a powerful **Enhanced MCP Server** that provides 10 specialized tools for automating development workflows, managing lore content, and maintaining the sophisticated Wavelength universe. These tools leverage the Model Context Protocol to provide AI assistants with direct access to project-specific functionality.
 
 **MCP Server Location:** `/mcp/enhanced-wavelength-server.js`  
 **Access Method:** JSON-RPC 2.0 over stdio  
@@ -65,6 +65,20 @@ The Wavelength-Lore project features a powerful **Enhanced MCP Server** that pro
 **What it does:** Validates Firebase connectivity, asset integrity, security checks  
 **Environments:** Staging and production validation  
 **Safety:** Prevents deployment of broken or insecure code
+
+#### **📚 Documentation Navigator** (`documentation_navigator`)
+**Purpose:** Intelligent discovery of project documentation, scripts, and tests  
+**What it does:** Semantic search through docs, procedures, scripts, tests with file validation  
+**Performance:** Sub-60ms response time with intelligent caching  
+**Features:** Contextual quick actions, file existence checking, categorized results  
+**Categories:** Quickstart, architecture, procedures, features, tools, scripts, tests, reference
+
+#### **🌐 HTTP Request Tool** (`http_request`)
+**Purpose:** Replace curl with intelligent, approval-free HTTP operations  
+**What it does:** Make GET, POST, PUT, DELETE requests with smart response parsing  
+**Authentication:** Bearer tokens, Basic auth, API keys, custom headers  
+**Features:** JSON parsing, response summarization, error handling, performance metrics  
+**Benefits:** No manual approval delays, intelligent error messages, contextual quick actions
 
 ---
 
@@ -258,6 +272,51 @@ const server = new Server({
 }
 ```
 
+#### **`documentation_navigator`**
+```json
+{
+  "name": "documentation_navigator",
+  "description": "Intelligent navigation and discovery of project documentation, procedures, and architecture",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": {"type": "string", "description": "What you're looking for"},
+      "type": {"type": "string", "enum": ["search", "overview", "quickstart", "reference", "architecture", "procedures", "scripts", "tests"]},
+      "context": {"type": "string", "description": "Current task context (optional)"}
+    },
+    "required": ["query"]
+  }
+}
+```
+
+#### **`http_request`**
+```json
+{
+  "name": "http_request",
+  "description": "Make HTTP requests to APIs and web services (replaces curl)",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "url": {"type": "string", "description": "URL to request"},
+      "method": {"type": "string", "enum": ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"], "default": "GET"},
+      "headers": {"type": "object", "description": "HTTP headers as key-value pairs"},
+      "body": {"type": "string", "description": "Request body (for POST/PUT/PATCH)"},
+      "auth": {
+        "type": "object",
+        "properties": {
+          "type": {"type": "string", "enum": ["bearer", "basic", "api-key"]},
+          "token": {"type": "string"},
+          "username": {"type": "string"},
+          "password": {"type": "string"},
+          "header": {"type": "string"}
+        }
+      }
+    },
+    "required": ["url"]
+  }
+}
+```
+
 ### **🚀 Command-Line Integration**
 
 **Direct MCP Access:**
@@ -270,6 +329,31 @@ echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}' | node mcp/enhanced-w
 ./lore-tools search "Yeti origin"
 ./lore-tools register https://docs.google.com/document/d/1ABC.../edit
 ./lore-tools sync
+./lore-tools docs "deployment guide"
+```
+
+**Documentation Navigator Examples:**
+```bash
+# Find deployment resources
+echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "documentation_navigator", "arguments": {"query": "deployment", "context": "Need deployment help"}}}' | node mcp/enhanced-wavelength-server.js
+
+# Find all scripts
+echo '{"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "documentation_navigator", "arguments": {"query": "script", "type": "scripts"}}}' | node mcp/enhanced-wavelength-server.js
+
+# Find MCP documentation
+echo '{"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "documentation_navigator", "arguments": {"query": "MCP tools"}}}' | node mcp/enhanced-wavelength-server.js
+```
+
+**HTTP Request Examples:**
+```bash
+# Simple GET request
+echo '{"jsonrpc": "2.0", "id": 4, "method": "tools/call", "params": {"name": "http_request", "arguments": {"url": "https://api.github.com/user", "method": "GET"}}}' | node mcp/enhanced-wavelength-server.js
+
+# POST with JSON body
+echo '{"jsonrpc": "2.0", "id": 5, "method": "tools/call", "params": {"name": "http_request", "arguments": {"url": "https://httpbin.org/post", "method": "POST", "body": "{\"key\": \"value\"}", "headers": {"Content-Type": "application/json"}}}}' | node mcp/enhanced-wavelength-server.js
+
+# Authenticated request
+echo '{"jsonrpc": "2.0", "id": 6, "method": "tools/call", "params": {"name": "http_request", "arguments": {"url": "https://api.example.com/data", "method": "GET", "auth": {"type": "bearer", "token": "your-token-here"}}}}' | node mcp/enhanced-wavelength-server.js
 ```
 
 **Interactive Mode:**
