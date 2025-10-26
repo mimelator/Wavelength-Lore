@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "wavelength-lore-tools": {
-      "command": "node",
-      "args": ["./mcp/wavelength-mcp-server.js"],
-      "env": {}
-    }
-  }
-}

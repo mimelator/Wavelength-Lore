@@ -6,16 +6,16 @@ AI COPILOT QUICK START - COPY/PASTE THIS TO ANY AI ASSISTANT
 • "Should I...?" "Would you like me to...?" → BANNED PHRASES
 • WAVELENGTH AGENTS ACT, DON'T ASK (unless genuinely unclear requirements)
 
-🧪⚡ **NEW EFFICIENCY EXPERIMENT** ⚡🧪
-We're trying to save as much time as possible and make everyone more efficient by NOT requiring manual approval for common development tasks! This is an active experiment to eliminate friction and maximize development velocity.
+🧪⚡ **EFFICIENCY FOCUS** ⚡🧪
+We focus on maximum efficiency using proven Node.js development tools and practices. This approach eliminates complexity and maximizes development velocity with reliable tools.
 
-**EXPERIMENT GOALS:**
-✅ Zero approval delays for HTTP requests (curl replacement)
-✅ Zero hanging Node.js processes (auto-exit detection) 
-✅ Instant access to 36+ command-line tools without approval
+**DEVELOPMENT GOALS:**
+✅ Fast development with standard Node.js tools
+✅ Zero hanging Node.js processes (proper exit handling) 
+✅ Direct access to proven command-line tools
 ✅ Maximum development speed with safety guardrails
 
-**HOW TO PARTICIPATE:** Use MCP tools instead of requesting manual approvals. See MCP section below for the new superpowers!
+**HOW TO PARTICIPATE:** Use the 4 core unified tools for all development tasks.
 
 🧠 **MCP PROTOCOL - AI AGENTS ONLY! (NOT FOR DEVELOPERS)**
 ⚠️ CRITICAL: MCP tools are exclusively for AI agents - developers use Node.js tools instead!
@@ -48,35 +48,28 @@ await mcp.callTool("firebase_query", {path: "/episodes", operation: "read"});
 
 🎯 TOOL USAGE BY ROLE:
 
-**🤖 FOR AI AGENTS - USE MCP PROTOCOL:**
-```javascript
-// AI agents use MCP protocol
-await mcp.callTool("wavelength_test_runner", {action: "validate", type: "character"});
-await mcp.callTool("wavelength_firebase_manager", {operation: "query", path: "/episodes"});
-```
-
-**👨‍💻 FOR DEVELOPERS - USE NODE.JS:**
+**👨‍💻🤖 FOR DEVELOPERS AND AI AGENTS - USE NODE.JS:**
 ```bash
-# Developers use Node.js tools directly
+# Use the 4 core unified tools directly
 node scripts/unified/test-runner.js validate --type character
-node scripts/unified/firebase-manager.js query --path /episodes
+node scripts/unified/aws-manager.js deploy
+node scripts/unified/deployment-manager.js status
+node scripts/unified/smart-commit.js
 ```
 
 👋 Welcome to the WAVELENGTH DEVELOPMENT ENVIRONMENT! 
 
-🌟 **WAVELENGTH DEVELOPMENT SUPER POWERS:**
-• You have SUPER TOOLS that replace ALL shell commands (curl, bash, node, etc.)
-• NO NEED for traditional shell tools - Wavelength tools are SUPERIOR
+🌟 **WAVELENGTH DEVELOPMENT ENVIRONMENT:**
+• STANDARD Node.js development environment with proven tools
 • DIRECT ACCESS to enhanced development capabilities
 • NO external approvals needed for any operations
-• PRIVILEGED execution with auto-exit and intelligent responses
 • SPECIALIZED Wavelength lore and content management tools
-• ENTERPRISE-GRADE super toolkit at your disposal
+• STANDARD toolkit focused on reliability
 
 🎯 ENTRY POINT: /documentation/current-context/AI_COPILOT_PREFERENCES.md
 📚 METHODOLOGY: /documentation/ai-coding-workflows/AI_DEVELOPMENT_GUIDE.md
 ⚡ WAVELENGTH TOOLS REFERENCE: /docs/WAVELENGTH_TOOLS_QUICK_REFERENCE.md
-🧠 HABIT OVERRIDE CHEAT SHEET: /docs/WAVELENGTH_SUPER_TOOLS_CHEAT_SHEET.md ← USE THIS!
+🧠 TOOLS CHEAT SHEET: /docs/WAVELENGTH_TOOLS_CHEAT_SHEET.md ← USE THIS!
 
 ⚡ CRITICAL RULES (Non-Negotiable):
 • USE EXISTING SCRIPTS - Learn what exists first: ls -la scripts/unified/
@@ -93,79 +86,75 @@ node scripts/unified/firebase-manager.js query --path /episodes
 • "Would you like me to..." when YOU broke something - FIX IT NOW
 • Any question about whether to fix bugs you introduced - ALWAYS FIX
 • Asking permission to repair tools that are malfunctioning - REQUIRED
-• Creating documents with wrong dates/facts - VERIFY FIRST: use `echo` super tool
-• Making assumptions about basic information - USE WAVELENGTH SUPER TOOLS TO VERIFY
-• ❌ USING SHELL COMMANDS (curl, bash, node) - USE WAVELENGTH SUPER TOOLS INSTEAD
+• Creating documents with wrong dates/facts - VERIFY FIRST: use `date` command
+• Making assumptions about basic information - USE VERIFICATION TOOLS
+• ❌ AVOIDING proven Node.js tools - USE THE 4 CORE UNIFIED SCRIPTS
 
-🔧 WAVELENGTH SUPER TOOLS (Master These First):
-• Use `node_execute` super tool instead of node commands
-• Use `http_request` super tool instead of curl
-• Use `cat`, `grep`, `ps` super tools instead of shell commands
-• Use `git_status` super tool instead of git commands
-• ❌ DON'T USE: node, curl, bash, grep, cat, ps, git directly
+🔧 WAVELENGTH CORE TOOLS (Master These First):
+• Use `scripts/unified/smart-commit.js` for all git operations
+• Use `scripts/unified/aws-manager.js` for AWS operations
+• Use `scripts/unified/deployment-manager.js` for deployments
+• Use `scripts/unified/test-runner.js` for testing
+• ✅ USE: Standard Node.js and shell commands as needed
 
-🚀 WAVELENGTH DEVELOPMENT TOOLS (Privileged AI Access):
+🚀 WAVELENGTH DEVELOPMENT TOOLS:
 • 📚 FULL DOCUMENTATION: /docs/WAVELENGTH_TOOLS_DOCUMENTATION.md
-• Enhanced Wavelength Toolkit: /mcp/enhanced-wavelength-server.js (11 specialized tools)
-• 🛠️ SYSTEM COMMAND TOOLKIT: /mcp/system-tools-server.js (25+ command line tools)
-• Lore management: ./lore-tools (command-line interface)
-• Content search: wavelength_lore_search, character_relationship_map
-• Document pipeline: register_shared_document, lore_ingestion_status  
-• Cross-project sync: content_sync_manager (Lore ↔ Chatbot)
-• Development tools: smart_deployment_check, forum_health_monitor
-• Documentation finder: documentation_navigator (finds docs, scripts, tests instantly)
-• HTTP requests: http_request (replaces curl with intelligent response handling)
-• Node execution: node_execute (run scripts, tests, diagnostics without approval + AUTO-EXIT!)
-• Command line tools: cat, grep, ps, top, df, git_status, npm_info, docker_status, etc.
-• 🌟 WAVELENGTH PRIVILEGE: Direct access to all development tools without external approval
-• Test: Ask AI "Run diagnostic check", "Execute npm test", or "Make API call to httpbin.org/get"
+• Core Unified Scripts: scripts/unified/ (4 essential tools)
+• Lore management: content/ directory and Firebase integration
+• Development tools: Standard Node.js development environment
+• Documentation finder: grep, find, and standard search tools
+• HTTP requests: curl and fetch as needed
+• Node execution: Direct node command execution
+• Command line tools: Standard bash/zsh tools (cat, grep, ps, etc.)
+• 🌟 WAVELENGTH APPROACH: Direct access to proven development tools
+• Test: Standard npm test, curl commands, and node script execution
 
-🔄 **WAVELENGTH SUPER TOOLS - NO SHELL COMMANDS NEEDED:**
-In the Wavelength Development world, you DON'T NEED shell tools - you have SUPER TOOLS:
+🔄 **WAVELENGTH DEVELOPMENT APPROACH - USE PROVEN TOOLS:**
+In the Wavelength Development world, we use proven, reliable Node.js and shell tools:
 
-**OLD SHELL COMMANDS (DON'T USE):**        **WAVELENGTH SUPER TOOLS (USE THESE):**
-❌ curl -X GET https://api.com/data     →  ✅ `http_request` super tool  
-❌ echo "Hello World"                   →  ✅ `echo` super tool
-❌ node -e "console.log('test')"        →  ✅ `node_execute` super tool
-❌ grep "error" server.log              →  ✅ `grep` super tool  
-❌ cat package.json                     →  ✅ `cat` super tool
-❌ ps aux | grep node                   →  ✅ `ps` super tool
-❌ git status                           →  ✅ `git_status` super tool
+**STANDARD COMMANDS (USE THESE):**          **WAVELENGTH UNIFIED TOOLS (PREFER THESE):**
+✅ curl -X GET https://api.com/data     →  ✅ Use curl or scripts/unified/aws-manager.js
+✅ echo "Hello World"                   →  ✅ Use echo or console.log
+✅ node script.js                       →  ✅ Use node directly or unified scripts
+✅ grep "error" server.log              →  ✅ Use grep or search tools  
+✅ cat package.json                     →  ✅ Use cat or file reading tools
+✅ ps aux | grep node                   →  ✅ Use ps or process monitoring
+✅ git status                           →  ✅ Use scripts/unified/smart-commit.js
 
-**🎆 WAVELENGTH SUPER POWER:** You have SUPERIOR tools - no need for primitive shell commands!
+**🎆 WAVELENGTH APPROACH:** We use proven, reliable tools with the 4 unified scripts as the foundation!
 
-🧠 **HABIT OVERRIDE SYSTEM - STOP & THINK BEFORE TYPING:**
+🧠 **DEVELOPMENT BEST PRACTICES - THINK BEFORE ACTING:**
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-⛔ **INSTANT HABIT BREAKS:**
-• About to type "curl"? → 🛑 STOP! → ✅ Use `http_request` WAVELENGTH SUPER TOOL
-• About to type "node -e"? → 🛑 STOP! → ✅ Use `node_execute` WAVELENGTH SUPER TOOL  
-• About to type "grep"? → 🛑 STOP! → ✅ Use `grep` WAVELENGTH SUPER TOOL
-• About to type "cat"? → 🛑 STOP! → ✅ Use `cat` WAVELENGTH SUPER TOOL
-• About to type "git status"? → 🛑 STOP! → ✅ Use `git_status` WAVELENGTH SUPER TOOL
+⛔ **CHOOSE THE RIGHT TOOL:**
+• Need to commit code? → ✅ Use `scripts/unified/smart-commit.js`
+• Need to deploy? → ✅ Use `scripts/unified/deployment-manager.js`  
+• Need to test? → ✅ Use `scripts/unified/test-runner.js`
+• Need AWS operations? → ✅ Use `scripts/unified/aws-manager.js`
+• Need other operations? → ✅ Use standard Node.js/shell commands
 
-🎯 **MUSCLE MEMORY REPLACEMENT TRAINING:**
-OLD PRIMITIVE HABIT ❌ → NEW WAVELENGTH SUPER POWER ✅
-• "curl -X GET url" → echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "http_request", "arguments": {"url": "URL", "method": "GET"}}}' | node mcp/enhanced-wavelength-server.js
-• "node script.js" → echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "node_execute", "arguments": {"command": "custom", "script": "SCRIPT", "forceExit": true}}}' | node mcp/enhanced-wavelength-server.js
-• "cat file.txt" → echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "cat", "arguments": {"file": "file.txt"}}}' | node mcp/system-tools-server.js
+🎯 **DEVELOPMENT WORKFLOW:**
+TASK IDENTIFICATION → TOOL SELECTION → EXECUTION
+• "What am I trying to do?" → Identify the specific task
+• "Which tool is best?" → Choose unified script or standard command
+• "Execute with the right tool" → Use the most appropriate approach
 
 ⚡ **DECISION TREE - ALWAYS ASK FIRST:**
 1. 🤔 "What am I trying to do?"
-2. 🔍 "Is there a WAVELENGTH SUPER TOOL for this?"
-3. 📚 "Check: Do I have http_request, node_execute, cat, grep, ps, git_status tools?"
-4. ✅ "YES → Use WAVELENGTH SUPER TOOL"
-5. ❌ "NO → Build new WAVELENGTH SUPER TOOL, then use it"
+2. 🔍 "Is there a WAVELENGTH UNIFIED SCRIPT for this?"
+3. 📚 "Check: smart-commit.js, aws-manager.js, deployment-manager.js, test-runner.js"
+4. ✅ "YES → Use WAVELENGTH UNIFIED SCRIPT"
+5. ❌ "NO → Use standard Node.js/shell command"
 
-🚨 **EMERGENCY HABIT BREAK PROTOCOL:**
-IF you catch yourself about to use primitive shell commands:
-1. 🛑 PAUSE immediately
-2. 🧠 Think: "I have WAVELENGTH SUPER POWERS!"
-3. 📖 Check WAVELENGTH_TOOLS_DOCUMENTATION.md
-4. ✅ Use the SUPERIOR WAVELENGTH tool instead
+🚨 **DEVELOPMENT PROTOCOL:**
+When choosing tools for development tasks:
+1. 🛑 PAUSE and consider the task
+2. 🧠 Think: "What's the best tool for this job?"
+3. 📖 Check if there's a unified script that fits
+4. ✅ Use the most appropriate tool (unified script or standard command)
 
 🎆 **WAVELENGTH DEVELOPMENT MINDSET:**
-"I don't need primitive shell tools - I have ENTERPRISE-GRADE WAVELENGTH SUPER POWERS!"
+"I use the right tool for each job - proven, reliable, and effective!"
 
 🚫 DO NOT TOUCH:
 • .current-notes.md (private workspace)
@@ -190,21 +179,21 @@ IF you catch yourself about to use primitive shell commands:
 ⏰ EFFICIENCY FIRST - My time is valuable, optimize for speed and batch operations.
 
 🎯 WAVELENGTH DEVELOPMENT TOOLKIT STATUS: ✅ ACTIVE
-• Dev server management via AI commands
-• Wavelength lore validation in real-time
+• Dev server management via Node.js scripts
+• Wavelength lore validation through content management
 • Firebase operations with project context
-• System administration with privileged access
-• Complete command line toolkit (25+ tools)
-• Enterprise-grade Wavelength AI toolchain operational
+• System administration with standard tools
+• Complete command line toolkit (standard tools)
+• Reliable Node.js development environment operational
 
 🛠️ WAVELENGTH SYSTEM TOOLKIT QUICK REFERENCE:
 • File ops: cat package.json, grep "error" server.log, find . -name "*.js"
 • System: ps aux, top, df -h, free -h, uptime
 • Network: ping google.com, netstat -tulpn, nslookup wavelengthlore.com
-• Dev: git_status, npm_info audit, docker_status ps
+• Dev: git status, npm audit, docker ps
 • Text: sort data.txt, jq '.name' config.json
 • Archives: tar -czf backup.tar.gz src/, rsync -av src/ dest/
 • Documentation: /docs/WAVELENGTH_TOOLS_DOCUMENTATION.md
-• Tests: node tests/wavelength-tools-tests.js
+• Tests: npm test, node scripts/specific-test.js
 
 Ready? Start by reading your entry point document above! 🚀

@@ -1,67 +1,67 @@
 # 🌊⚡ WAVELENGTH DEVELOPER QUICKSTART ⚡🌊
 
-**🚀 Complete Orientation Guide for WAVELENGTH + AI COPILOT Development**  
-**Version:** 1.1  
-**Last Updated:** October 25, 2025  
-**Status:** ✅ PRODUCTION READY
+**🚀 Complete Orientation Guide for WAVELENGTH Node.js Development**  
+**Version:** 2.0  
+**Last Updated:** October 26, 2025  
+**Status:** ✅ PRODUCTION READY - MCP-FREE
 
 ---
 
-## 🚨 **CRITICAL: MCP DIRECT INVOCATION CLARIFICATION**
+## 🚨 **CRITICAL: STANDARD NODE.JS DEVELOPMENT**
 
-### **🚀 HOW AGENTS ACTUALLY CALL MCP TOOLS (IMPORTANT!)**
+### **🚀 HOW TO DEVELOP WITH WAVELENGTH (IMPORTANT!)**
 
-**✅ CORRECT - Direct MCP Protocol Communication:**
-```javascript
-// Agents call MCP tools directly through their runtime
-await mcp.callTool("wavelength_validate", {
-  content: "Character analysis data...",
-  type: "character"
-});
-
-await mcp.callTool("firebase_query", {
-  path: "/episodes/recent",
-  operation: "read"
-});
-
-await mcp.callTool("wavelength_test_runner", {
-  suite: "comprehensive",
-  url: "https://wavelengthlore.com"
-});
-```
-
-**❌ WRONG - Shell Command Intermediaries:**
+**✅ CORRECT - Standard Node.js Development:**
 ```bash
-# Agents do NOT call MCP tools this way
-echo '{"jsonrpc": "2.0", ...}' | node mcp/wavelength-mcp-server.js
+# Use the 4 core unified tools
+node scripts/unified/smart-commit.js
+node scripts/unified/aws-manager.js deploy
+node scripts/unified/deployment-manager.js status
+node scripts/unified/test-runner.js validate --type character
+
+# Standard Node.js operations
+npm install
+npm test
+node app.js
 ```
 
-### **🎯 MCP TRUTH:**
-- **Direct Protocol Communication** - Agents connect via pure MCP protocol
-- **No Shell Commands Needed** - Zero command-line execution required
-- **Agent Runtime Handles JSON-RPC** - Automatic protocol management
-- **Tools Exposed as Functions** - MCP tools appear as callable functions
-- **Configuration in Agent Settings** - Setup in claude-desktop-config.json
+**✅ ALSO CORRECT - Standard Shell Commands:**
+```bash
+# Use proven shell tools as needed
+curl -X GET https://api.wavelengthlore.com/health
+grep "error" server.log
+git status
+docker ps
+```
 
-### **Available WAVELENGTH MCP Tools (Direct Access):**
-- 🧠 **wavelength_validate** - Lore consistency validation
-- 🔥 **firebase_query** - Advanced Firebase operations  
-- 🐳 **wavelength_build_check** - Docker build validation
-- ⚙️ **wavelength_config_scan** - Configuration discovery
-- 🧪 **wavelength_test_runner** - Comprehensive testing
+### **🎯 DEVELOPMENT TRUTH:**
+- **Standard Node.js Environment** - Proven, reliable tools
+- **4 Core Unified Tools** - Essential scripts for common operations
+- **Shell Commands Welcome** - Use curl, grep, git as needed
+- **No Complex Protocol** - Simple, direct tool execution
+- **Configuration via .env** - Standard environment variable setup
+
+### **Available WAVELENGTH Core Tools:**
+- 🧠 **smart-commit.js** - Intelligent git commit workflow
+- 🔥 **aws-manager.js** - AWS infrastructure management  
+- 🐳 **deployment-manager.js** - Deployment operations
+- ⚙️ **test-runner.js** - Testing and validation
 - 📊 **wavelength_health_monitor** - Real-time health checks
 
-**🌊⚡ MCP tools integrate seamlessly into agent runtime - no shell intermediaries required!** ⚡🌊
+**🌊⚡ Standard Node.js tools provide reliable, proven development experience!** ⚡🌊
 
 ---
 
 ## 🎯 **INSTANT DEVELOPER ACTIVATION**
 
-### **Single Command Session Startup:**
+### **Quick Development Environment Check:**
 ```bash
-node start-wavelength-session.js
+# Verify the 4 core tools are available
+ls -la scripts/unified/
+npm test
+curl -X GET https://vh9x3gevev.us-east-1.awsapprunner.com/health
 ```
-**This gives you instant access to 53+ WAVELENGTH super powers with zero friction!**
+**This gives you instant access to proven Node.js development tools with zero complexity!**
 
 ---
 
@@ -79,10 +79,10 @@ Give your AI companion this command:
 "Read and follow the AI COPILOT QUICKSTART guide at AI_COPILOT_QUICKSTART.txt, then run node start-wavelength-session.js to get full ecosystem awareness"
 ```
 
-### **Step 2: WAVELENGTH Methodology Activation**
+### **Step 2: Core Tools Methodology Activation**
 Tell them:
 ```
-"You have 53+ WAVELENGTH super power tools with zero shell dependencies. Use ONLY pure Node.js methodology. Never use curl, bash, or direct shell commands - you have superior WAVELENGTH tools instead."
+"You have 4 proven unified tools for core operations. Use scripts/unified/ tools: aws-manager.js, test-runner.js, deployment-manager.js, smart-commit.js. Focus on pure Node.js methodology with existing organized scripts."
 ```
 
 ### **Step 3: Development Standards Enforcement**
@@ -100,7 +100,7 @@ Tell them to review:
 ### **Step 5: Project Context Awareness**
 Give them the current project focus:
 ```
-"Active projects: Shopping Cart Persistence (TDD), E2E Testing Enhancement, Overlay Enhancements. Use wavelength-tools for all implementations with test-first methodology."
+"Active projects: E-commerce enhancements, Testing infrastructure, UI improvements. Use the 4 unified tools for all implementations with test-first methodology."
 ```
 
 ---
@@ -110,7 +110,7 @@ Give them the current project focus:
 **Give your companion this complete orientation:**
 
 ```
-"Welcome to WAVELENGTH Development! You have 53+ super power tools with zero shell dependencies. First: read AI_COPILOT_QUICKSTART.txt, then run 'node start-wavelength-session.js' for full context. CRITICAL: Use ONLY WAVELENGTH tools (no shell commands), follow TDD methodology (tests first), discover existing scripts in scripts/unified/ before creating anything, and use 'node scripts/unified/smart-commit.js' for all commits. Current projects: Shopping Cart Persistence, E2E Testing, Overlay Enhancements. Quick reference: AI_COPILOT_WAVELENGTH_QUICK_REFERENCE.md. Ready for maximum velocity development!"
+"Welcome to WAVELENGTH Development! You have proven unified tools for core operations. CRITICAL: Use scripts/unified/ tools (aws-manager.js, test-runner.js, deployment-manager.js, smart-commit.js), follow TDD methodology (tests first), discover existing scripts in scripts/unified/ before creating anything, and use 'node scripts/unified/smart-commit.js' for all commits. Current projects: ES Module Migration, Production Monitoring, Security Enhancements. Quick reference: documentation/current-context/AI_COPILOT_PREFERENCES.md. Ready for solid development!"
 ```
 
 ---
@@ -122,19 +122,19 @@ After orientation, have them run:
 1. **Context Check:** `"Show me the first 20 lines of AI_COPILOT_QUICKSTART.txt"`
 2. **Tool Discovery:** `"List all files in scripts/unified/ and tell me what each tool does"`
 3. **Session Status:** `"Run node session-status.js and tell me what capabilities are active"`
-4. **WAVELENGTH Awareness:** `"How many WAVELENGTH super power tools do I have access to?"`
+4. **WAVELENGTH Awareness:** `"How many unified tools do I have access to in scripts/unified/?"`
 
 ---
 
 ## 🚨 **AI COMPANION SUCCESS INDICATORS**
 
 Your companion is properly oriented when they:
-- ✅ Reference WAVELENGTH super powers instead of shell commands
+- ✅ Reference the 4 core unified tools for main operations
 - ✅ Mention TDD methodology and test-first development
 - ✅ Check existing unified scripts before creating new tools
 - ✅ Use proof-based language ("test results show..." instead of "should work")
 - ✅ Demonstrate batch operation thinking
-- ✅ Show awareness of the 53+ tool ecosystem
+- ✅ Show awareness of the proven Node.js tool ecosystem
 
 ---
 
@@ -156,21 +156,21 @@ Your companion is properly oriented when they:
 
 ---
 
-## ⚡ **WAVELENGTH SUPER POWER ECOSYSTEM**
+## ⚡ **WAVELENGTH DEVELOPMENT ECOSYSTEM**
 
 ### **Tool Categories:**
-| Category | Tools Available | Pure Node.js |
+| Category | Tools Available | Status |
 |----------|----------------|-------------|
-| 🌊 **WAVELENGTH Tools** | 53 super powers | ✅ Zero shell dependencies |
-| 🛠️ **Unified Scripts** | 11 core tools | ✅ Production ready |
-| 🧠 **AI Context** | Enhanced intelligence | ✅ Predictive analysis |
+| 🌊 **Core Unified Tools** | 4 essential scripts | ✅ Production ready |
+| 🛠️ **Additional Scripts** | 7+ specialized tools | ✅ Fully functional |
+| 🧠 **Standard Tools** | Node.js + shell commands | ✅ Proven reliability |
 
 ### **Key Features:**
-- **Zero Shell Dependencies**: Pure Node.js implementation
-- **Autonomous Operation**: Self-contained and self-healing
-- **Predictive Intelligence**: AI-powered recommendations
-- **Continuous Learning**: Pattern recognition and adaptation
-- **Security First**: All operations security validated
+- **Standard Node.js**: Proven, reliable implementation
+- **Focused Operation**: 4 core tools handle most needs
+- **Simple Architecture**: Easy to understand and maintain
+- **Proven Reliability**: Battle-tested tools and approaches
+- **Security First**: All operations follow security best practices
 
 ---
 
@@ -212,7 +212,7 @@ node scripts/unified/smart-commit.js
 
 | ❌ DON'T DO | ✅ DO THIS INSTEAD |
 |-------------|-------------------|
-| Use curl, bash, node commands | Use WAVELENGTH Super Tools |
+| Create new tools without checking existing | Use the 4 core unified tools first |
 | Create duplicate tools | Enhance existing unified scripts |
 | Claim "working" without proof | Show test results |
 | Ask permission to fix bugs | Fix immediately with proof |
@@ -221,14 +221,14 @@ node scripts/unified/smart-commit.js
 
 ---
 
-## 📊 **SESSION MANAGEMENT COMMANDS**
+## 📊 **DEVELOPMENT ENVIRONMENT COMMANDS**
 
 | Command | Purpose |
 |---------|---------|
-| `node start-wavelength-session.js` | Launch friction-free session |
-| `node session-status.js` | Check current session info |
-| `node wavelength-session-shutdown.js` | Graceful session shutdown |
-| `cat .wavelength-session.json` | View detailed session data |
+| `ls -la scripts/unified/` | List available core tools |
+| `npm test` | Run test suite |
+| `node app.js` | Start development server |
+| `git status` | Check repository status |
 
 ---
 
@@ -236,7 +236,7 @@ node scripts/unified/smart-commit.js
 
 Tell your AI companion:
 ```
-"You are now a WAVELENGTH development companion with 53+ super power tools. Break free from shell dependencies and use pure Node.js methodology for maximum velocity development!"
+"You are now a WAVELENGTH development companion with 4 core unified tools and standard Node.js environment. Use proven tools and test-driven development for reliable, efficient development!"
 ```
 
 ---
@@ -254,9 +254,9 @@ Tell your AI companion:
 ## 🚀 **IMMEDIATE ACTION ITEMS**
 
 ### **For New Sessions:**
-1. Run `node start-wavelength-session.js`
+1. Check `ls -la scripts/unified/` for available tools
 2. Review `AI_COPILOT_QUICKSTART.txt`
-3. Check `scripts/unified/` for existing tools
+3. Run `npm test` to verify environment
 4. Run `node scripts/unified/test-runner.js --help`
 
 ### **For AI Companions:**
@@ -278,22 +278,22 @@ Tell your AI companion:
 
 ## 🏆 **WAVELENGTH METHODOLOGY PRINCIPLES**
 
-1. **Zero Shell Dependencies** - Pure Node.js implementation
-2. **Autonomous Operation** - Self-contained and self-healing
-3. **Predictive Intelligence** - AI-powered recommendations
-4. **Continuous Learning** - Pattern recognition and adaptation
-5. **Security First** - All operations security validated
+1. **Standard Node.js Development** - Proven, reliable implementation
+2. **Focused Operation** - 4 core tools handle most needs
+3. **Simple Architecture** - Easy to understand and maintain
+4. **Proven Reliability** - Battle-tested tools and approaches
+5. **Security First** - All operations follow security best practices
 6. **Test-Driven Development** - Tests first, always
 7. **Proof-Based Culture** - Show results, not claims
 8. **Batch Operations** - Maximum efficiency through intelligent grouping
 
 ---
 
-## 🌊⚡ **READY FOR MAXIMUM VELOCITY DEVELOPMENT!** ⚡🌊
+## 🌊⚡ **READY FOR RELIABLE DEVELOPMENT!** ⚡🌊
 
-**WAVELENGTH + AI COPILOT = The ultimate friction-free development experience**
+**WAVELENGTH + AI COPILOT = Proven tools for efficient development**
 
-Start every session with complete ecosystem awareness and zero friction!
+Start every session with the 4 core unified tools and standard Node.js practices!
 
 ---
 

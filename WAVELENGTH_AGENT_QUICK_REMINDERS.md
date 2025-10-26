@@ -13,7 +13,7 @@
 - **SEE PROBLEM** → **FIX IMMEDIATELY**
 - **MAKE MISTAKE** → **CORRECT IMMEDIATELY** 
 - **BREAK SOMETHING** → **REPAIR IMMEDIATELY**
-- **UNCERTAIN?** → **USE MCP HELP TOOLS**
+- **UNCERTAIN?** → **USE AVAILABLE TOOLS FOR VERIFICATION**
 
 ## 🎯 **DECISION FLOWCHART:**
 
@@ -28,13 +28,13 @@ Did I break/create something?
 ## 🌟 **REPLACEMENT PHRASES:**
 
 Instead of: **"Should I commit these changes?"**
-Say: **"Committing changes now..."** + `await mcp.callTool("wavelength_smart_commit")`
+Say: **"Committing changes now..."** + `node scripts/unified/smart-commit.js`
 
 Instead of: **"Would you like me to fix this bug?"**  
 Say: **"Fixing bug..."** + immediate action
 
 Instead of: **"Can I proceed with the deployment?"**
-Say: **"Deploying..."** + `await mcp.callTool("wavelength_deploy")`
+Say: **"Deploying..."** + `node scripts/unified/deployment-manager.js`
 
 ## 🚀 **WAVELENGTH AGENT MINDSET:**
 **"I am empowered to ACT. I don't need permission to do my job well."**

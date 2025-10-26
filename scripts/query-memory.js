@@ -43,10 +43,10 @@ async function queryMemory() {
       console.log(`✅ Found ${searchResult.results.length} relevant entries:\n`);
       
       searchResult.results.forEach((result, index) => {
-        console.log(`${index + 1}. 📋 ${result.type.toUpperCase()}`);
-        console.log(`   🎯 Score: ${result.score.toFixed(3)}`);
-        console.log(`   📝 Content: ${result.content}`);
-        if (result.tags) {
+        console.log(`${index + 1}. 📋 ${result.type ? result.type.toUpperCase() : 'UNKNOWN'}`);
+        console.log(`   🎯 Score: ${result.score ? result.score.toFixed(3) : 'N/A'}`);
+        console.log(`   📝 Content: ${result.content || 'No content'}`);
+        if (result.tags && result.tags.length > 0) {
           console.log(`   🏷️  Tags: ${result.tags.join(', ')}`);
         }
         if (result.context) {

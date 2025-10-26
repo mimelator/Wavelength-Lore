@@ -44,7 +44,7 @@ if (process.env.NODE_ENV !== 'production') {
 // Load AWS resource configuration
 let awsConfig;
 try {
-  const module = await import('../../config/aws-resources.js');
+  const module = await import('../../../config/aws-resources.js');
   awsConfig = module.default;
 } catch (error) {
   console.warn('⚠️ AWS config not available:', error.message);
