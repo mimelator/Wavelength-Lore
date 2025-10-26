@@ -123,13 +123,12 @@ jobs:
           echo "Building with tags: $VERSION_TAG and $SHORT_SHA"
 
           # Build with buildx and push with multiple tags
-          # Include :latest tag for App Runner compatibility while keeping specific version tags
+          # Using specific version tags only - App Runner configured to use specific versions
           # Use GitHub Actions cache instead of registry cache (more reliable)
           docker buildx build \
             --platform linux/amd64 \
             --tag $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG \
             --tag $ECR_REGISTRY/$ECR_REPOSITORY:$SHORT_SHA \
-            --tag $ECR_REGISTRY/$ECR_REPOSITORY:latest \
             --cache-from type=gha \
             --cache-to type=gha,mode=max \
             --push \
