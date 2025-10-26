@@ -385,6 +385,11 @@ router.get('/api/posts/recent', async (req, res) => {
         
         const admin = require('firebase-admin');
         
+        // Load environment if not available
+        if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+            require('dotenv').config();
+        }
+        
         if (admin.apps.length === 0) {
             const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
             admin.initializeApp({
@@ -430,8 +435,21 @@ router.get('/api/posts/popular', async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const page = parseInt(req.query.page) || 1;
         
-        const firebaseService = require('../services/firebase-admin');
-        const db = firebaseService.getDatabase();
+        const admin = require('firebase-admin');
+        
+        if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+            require('dotenv').config();
+        }
+        
+        if (admin.apps.length === 0) {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount),
+                databaseURL: process.env.DATABASE_URL
+            });
+        }
+        
+        const db = admin.database();
         const postsRef = db.ref('forum/posts');
         const snapshot = await postsRef.once('value');
         const allPosts = snapshot.val() || {};
@@ -463,8 +481,21 @@ router.get('/api/posts/popular', async (req, res) => {
 // Get forum statistics
 router.get('/api/stats', async (req, res) => {
     try {
-        const firebaseService = require('../services/firebase-admin');
-        const db = firebaseService.getDatabase();
+        const admin = require('firebase-admin');
+        
+        if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+            require('dotenv').config();
+        }
+        
+        if (admin.apps.length === 0) {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount),
+                databaseURL: process.env.DATABASE_URL
+            });
+        }
+        
+        const db = admin.database();
         
         // Get posts
         const postsSnapshot = await db.ref('forum/posts').once('value');
