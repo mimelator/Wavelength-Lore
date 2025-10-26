@@ -9,7 +9,7 @@ require('dotenv').config();
 const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client-cloudfront');
 
 // Load AWS resource configuration with robust error handling
-const { getAWSConfig } = require('../../utils/aws-config-helper');
+const { getAWSConfig } = require('./utils/aws-config-helper');
 const awsConfig = getAWSConfig();
 
 class CloudFrontCacheBuster {

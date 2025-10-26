@@ -1,15 +1,15 @@
 {
   "totalBlueprints": 708,
-  "validatedCombinations": 111,
-  "invalidCombinations": 597,
+  "validatedCombinations": 142,
+  "invalidCombinations": 566,
   "categories": {
     "t-shirt": {
-      "valid": 38,
-      "invalid": 87
+      "valid": 40,
+      "invalid": 85
     },
     "heavy-cotton-tee": {
-      "valid": 7,
-      "invalid": 27
+      "valid": 9,
+      "invalid": 25
     },
     "tank-top": {
       "valid": 6,
@@ -36,28 +36,28 @@
       "invalid": 41
     },
     "women-tee": {
-      "valid": 5,
-      "invalid": 29
+      "valid": 9,
+      "invalid": 25
     },
     "zip-hoodie": {
-      "valid": 4,
-      "invalid": 14
+      "valid": 5,
+      "invalid": 13
     },
     "water-bottle": {
       "valid": 0,
       "invalid": 19
     },
     "blanket": {
-      "valid": 5,
-      "invalid": 11
+      "valid": 6,
+      "invalid": 10
     },
     "canvas": {
-      "valid": 3,
-      "invalid": 121
+      "valid": 11,
+      "invalid": 113
     },
     "specialty-item": {
-      "valid": 1,
-      "invalid": 12
+      "valid": 3,
+      "invalid": 10
     },
     "poster": {
       "valid": 0,
@@ -72,32 +72,32 @@
       "invalid": 6
     },
     "premium-tshirt": {
-      "valid": 3,
-      "invalid": 19
+      "valid": 8,
+      "invalid": 14
     },
     "tote-bag": {
       "valid": 10,
       "invalid": 15
     },
     "phone-case": {
-      "valid": 2,
-      "invalid": 15
+      "valid": 3,
+      "invalid": 14
     },
     "hat": {
-      "valid": 1,
-      "invalid": 56
+      "valid": 2,
+      "invalid": 55
     },
     "notebook": {
-      "valid": 2,
-      "invalid": 4
+      "valid": 3,
+      "invalid": 3
     },
     "backpack": {
-      "valid": 0,
-      "invalid": 10
+      "valid": 1,
+      "invalid": 9
     },
     "travel-mug": {
-      "valid": 0,
-      "invalid": 12
+      "valid": 2,
+      "invalid": 10
     },
     "fanny-pack": {
       "valid": 1,
@@ -116,7 +116,7 @@
       "invalid": 2
     }
   },
-  "timestamp": "2025-10-26T17:39:28.362Z",
+  "timestamp": "2025-10-26T17:44:30.323Z",
   "details": [
     {
       "blueprintId": 5,
@@ -2544,64 +2544,64 @@
       "blueprintId": 76,
       "title": "Journal - Blank",
       "category": "notebook",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "Printful"
     },
     {
       "blueprintId": 235,
       "title": "Shower Curtains",
       "category": "canvas",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 238,
       "title": "Sherpa Fleece Blanket",
       "category": "blanket",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 254,
       "title": "Bath Mat",
       "category": "specialty-item",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 256,
       "title": "Women's Cut & Sew Casual Leggings (AOP)",
       "category": "women-tee",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 264,
       "title": "Poly Scarf",
       "category": "premium-tshirt",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 276,
       "title": "Women's Cut & Sew Racerback Dress (AOP)",
       "category": "women-tee",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 285,
       "title": "Women's Pencil Skirt (AOP)",
       "category": "women-tee",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 286,
       "title": "Women's Skater Skirt (AOP)",
       "category": "women-tee",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 291,
@@ -2635,8 +2635,8 @@
       "blueprintId": 296,
       "title": "Microfiber Duvet Cover",
       "category": "zip-hoodie",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 346,
@@ -2677,29 +2677,29 @@
       "blueprintId": 352,
       "title": "Beach Towel",
       "category": "heavy-cotton-tee",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "Printful"
     },
     {
       "blueprintId": 353,
       "title": "Tumbler 20oz",
       "category": "travel-mug",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "Printful"
     },
     {
       "blueprintId": 354,
       "title": "Tumbler 10oz",
       "category": "travel-mug",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "Printful"
     },
     {
       "blueprintId": 355,
       "title": "Can Holder",
       "category": "t-shirt",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "Printful"
     },
     {
       "blueprintId": 360,
@@ -2726,22 +2726,22 @@
       "blueprintId": 376,
       "title": "Sublimation Socks",
       "category": "premium-tshirt",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "Printful"
     },
     {
       "blueprintId": 380,
       "title": "Christmas Stockings",
       "category": "canvas",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 381,
       "title": "Christmas Tree Skirts",
       "category": "canvas",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 406,
@@ -2768,15 +2768,15 @@
       "blueprintId": 413,
       "title": "Backpack",
       "category": "backpack",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 416,
       "title": "Comforter",
       "category": "premium-tshirt",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 506,
@@ -2978,8 +2978,8 @@
       "blueprintId": 587,
       "title": "Flip Flops",
       "category": "t-shirt",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "Printful"
     },
     {
       "blueprintId": 588,
@@ -3020,8 +3020,8 @@
       "blueprintId": 601,
       "title": "Wireless Charger",
       "category": "phone-case",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "Printful"
     },
     {
       "blueprintId": 604,
@@ -3048,8 +3048,8 @@
       "blueprintId": 616,
       "title": "Puzzle (120, 252, 500-Piece)",
       "category": "premium-tshirt",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "Printful"
     },
     {
       "blueprintId": 620,
@@ -3069,8 +3069,8 @@
       "blueprintId": 623,
       "title": "Pet Feeding Mats",
       "category": "canvas",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 633,
@@ -3111,8 +3111,8 @@
       "blueprintId": 748,
       "title": "Window Curtain",
       "category": "canvas",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 754,
@@ -3244,8 +3244,8 @@
       "blueprintId": 788,
       "title": "Rubber Yoga Mat",
       "category": "canvas",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "Printful"
     },
     {
       "blueprintId": 789,
@@ -3265,15 +3265,15 @@
       "blueprintId": 796,
       "title": "Face Towel",
       "category": "heavy-cotton-tee",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "Printful"
     },
     {
       "blueprintId": 797,
       "title": "Hand Towel",
       "category": "canvas",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "Printful"
     },
     {
       "blueprintId": 799,
@@ -3489,8 +3489,8 @@
       "blueprintId": 1030,
       "title": "Pennant",
       "category": "canvas",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 1037,
@@ -3545,8 +3545,8 @@
       "blueprintId": 1050,
       "title": "Women’s Capri Leggings (AOP)",
       "category": "hat",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 1051,
@@ -3636,8 +3636,8 @@
       "blueprintId": 1083,
       "title": "Round Rug",
       "category": "premium-tshirt",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 1084,
@@ -3650,8 +3650,8 @@
       "blueprintId": 1085,
       "title": "Outdoor Rug",
       "category": "specialty-item",
-      "validCombinations": 0,
-      "bestProvider": null
+      "validCombinations": 1,
+      "bestProvider": "MWW On Demand"
     },
     {
       "blueprintId": 1086,
