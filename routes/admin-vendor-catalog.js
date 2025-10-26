@@ -11,10 +11,10 @@ const { ensureAuthenticated, requireAdmin } = require('../middleware/auth');
 const VendorPreviewHelper = require('../utils/vendor-preview-helper');
 
 /**
- * GET /admin/vendor-catalog
- * Display complete catalog of all vendor preview products
+ * GET /admin/catalog
+ * Display unified admin catalog explorer
  */
-router.get('/vendor-catalog', (req, res, next) => {
+router.get('/catalog', (req, res, next) => {
   const isLocal = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
   if (isLocal) {
     return next();
@@ -24,15 +24,26 @@ router.get('/vendor-catalog', (req, res, next) => {
   });
 }, async (req, res) => {
   try {
-    // Lightweight admin catalog - redirect to optimized version
-    res.redirect('/forum/test-catalog');
+    console.log('🛍️ Loading unified admin catalog explorer...');
+    
+    res.render('admin/unified-catalog-explorer', {
+      title: 'Admin Product Catalog - Wavelength',
+      user: req.user || { uid: 'admin', name: 'Admin User' }
+    });
   } catch (error) {
-    console.error('Error loading vendor catalog:', error);
+    console.error('Error loading admin catalog:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to load vendor catalog'
+      error: 'Failed to load admin catalog'
     });
   }
+});
+
+/**
+ * Legacy redirect for old vendor-catalog route
+ */
+router.get('/vendor-catalog', (req, res) => {
+  res.redirect('/admin/catalog');
 });
 
 /**
@@ -68,33 +79,14 @@ router.get('/vendor-catalog/api', (req, res, next) => {
 });
 
 /**
- * GET /admin/enhanced-vendor-catalog
- * Enhanced catalog with vendor comparison and overlay options
+ * Legacy redirects for old catalog routes
  */
-router.get('/enhanced-vendor-catalog', (req, res, next) => {
-  const isLocal = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
-  if (isLocal) {
-    return next();
-  }
-  ensureAuthenticated(req, res, () => {
-    requireAdmin(req, res, next);
-  });
-}, async (req, res) => {
-  try {
-    console.log('🎨 Loading enhanced vendor catalog...');
-    
-    res.render('admin/enhanced-vendor-catalog', {
-      title: 'Enhanced Vendor Catalog Preview',
-      user: req.user
-    });
-    
-  } catch (error) {
-    console.error('Error loading enhanced vendor catalog:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to load enhanced catalog'
-    });
-  }
+router.get('/enhanced-vendor-catalog', (req, res) => {
+  res.redirect('/admin/catalog');
+});
+
+router.get('/vendor-catalog-optimized', (req, res) => {
+  res.redirect('/admin/catalog');
 });
 
 module.exports = router;

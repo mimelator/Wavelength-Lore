@@ -227,6 +227,7 @@ class MerchandiseStore {
       
       const response = await fetch('/api/merchandise/product-types');
       
+      
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }

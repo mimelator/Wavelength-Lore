@@ -310,24 +310,10 @@ router.get('/admin', (req, res) => {
 });
 
 /**
- * Test Optimized Catalog - No Authentication Required
+ * Legacy test catalog redirect - now uses unified admin catalog
  */
-router.get('/test-catalog', async (req, res) => {
-    try {
-        console.log('⚡ Loading test optimized catalog...');
-        
-        res.render('admin/vendor-catalog-optimized', {
-            title: 'Test Optimized Vendor Catalog',
-            user: { uid: 'test-user', name: 'Test User' }
-        });
-        
-    } catch (error) {
-        console.error('Error loading test catalog:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to load catalog'
-        });
-    }
+router.get('/test-catalog', (req, res) => {
+    res.redirect('/admin/catalog');
 });
 
 /**

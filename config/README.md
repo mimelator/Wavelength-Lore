@@ -1,6 +1,26 @@
 # Configuration Files
 
-This directory contains all configuration files for the Wavelength Lore application.
+This directory contains configuration files for the Wavelength Lore application.
+
+## Product Catalog System
+
+### Active Files:
+- **`product-types.js`** - Main product catalog with 142 validated blueprint-provider combinations
+- **`printify-blueprints-discovered.json`** - Raw blueprint discovery data (708 blueprints)
+- **`printify-config.js`** - Printify API configuration and credentials
+
+### Backup Files:
+- **`product-types.js.backup`** - Previous version backup
+- **`product-types-master-structured.js.backup`** - Development backup
+
+### System Overview:
+The product catalog uses a sophisticated validation system that tests all Printify blueprints against available print providers to ensure reliable product creation. Only validated combinations are included in the final catalog.
+
+**Total Products Available**: 142 validated combinations  
+**Total Blueprints Tested**: 708  
+**Success Rate**: 20.06%
+
+For detailed documentation, see: `/docs/BLUEPRINT_VENDOR_VALIDATION_SYSTEM.md`
 
 ## 📁 Files Overview
 

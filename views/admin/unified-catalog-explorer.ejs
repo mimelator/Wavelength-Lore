@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Product Catalog - Wavelength</title>
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin-panel.css">
+    
+    <style>
+        .admin-catalog {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .catalog-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .catalog-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .catalog-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .catalog-stats {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .catalog-controls {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            align-items: end;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .control-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .control-group select,
+        .control-group input {
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .control-group select:focus,
+        .control-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+        
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .product-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .product-id {
+            font-size: 0.9rem;
+            color: #666;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .product-category {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .product-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .blueprint-id {
+            color: #007bff;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        
+        .provider-name {
+            color: #28a745;
+        }
+        
+        .product-description {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #555;
+            margin: 15px 0;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .product-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 15px 0;
+        }
+        
+        .tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .validation-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .category-section {
+            margin-bottom: 40px;
+        }
+        
+        .category-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .category-header h2 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .category-header p {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8f9fa;
+            color: #333;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+        }
+        
+        .back-link:hover {
+            background: #e9ecef;
+            transform: translateX(-4px);
+        }
+        
+        .view-toggle {
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .view-toggle button {
+            background: none;
+            border: none;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .view-toggle button.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .view-toggle button:not(.active) {
+            color: #666;
+        }
+        
+        .compact-view .product-card {
+            padding: 15px;
+        }
+        
+        .compact-view .product-title {
+            font-size: 1.1rem;
+        }
+        
+        .compact-view .product-description {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-catalog">
+        <a href="/forum/admin" class="back-link">
+            ← Back to Admin Dashboard
+        </a>
+        
+        <div class="catalog-header">
+            <h1>🛍️ Admin Product Catalog Explorer</h1>
+            <p>Comprehensive view of all validated product types and blueprint combinations</p>
+        </div>
+        
+        <div class="catalog-stats" id="catalog-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-products">-</div>
+                <div class="stat-label">Total Products</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="total-categories">-</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="total-blueprints">-</div>
+                <div class="stat-label">Blueprints</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="total-providers">-</div>
+                <div class="stat-label">Providers</div>
+            </div>
+        </div>
+        
+        <div class="catalog-controls">
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label>Filter by Category:</label>
+                    <select id="category-filter">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>Filter by Provider:</label>
+                    <select id="provider-filter">
+                        <option value="">All Providers</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>Search Products:</label>
+                    <input type="text" id="search-input" placeholder="Search by name, ID, or description...">
+                </div>
+                
+                <div class="control-group">
+                    <label>View Mode:</label>
+                    <div class="view-toggle">
+                        <button id="detailed-view" class="active">Detailed</button>
+                        <button id="compact-view">Compact</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="catalog-content">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading product catalog...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AdminCatalogExplorer {
+            constructor() {
+                this.products = [];
+                this.filteredProducts = [];
+                this.categories = new Set();
+                this.providers = new Set();
+                this.blueprints = new Set();
+                this.isCompactView = false;
+                this.init();
+            }
+            
+            async init() {
+                try {
+                    await this.loadProducts();
+                    this.setupEventListeners();
+                    this.populateFilters();
+                    this.updateStats();
+                    this.renderProducts();
+                } catch (error) {
+                    console.error('Error initializing catalog:', error);
+                    this.showError('Failed to initialize catalog');
+                }
+            }
+            
+            async loadProducts() {
+                try {
+                    const response = await fetch('/api/merchandise/product-types');
+                    const data = await response.json();
+                    
+                    if (data.success && data.allProducts) {
+                        this.products = data.allProducts;
+                        this.filteredProducts = [...this.products];
+                        
+                        // Extract unique values for filters
+                        this.products.forEach(product => {
+                            this.categories.add(product.categoryName || product.category || 'Uncategorized');
+                            this.providers.add(product.provider || 'Unknown Provider');
+                            this.blueprints.add(product.blueprintId);
+                        });
+                        
+                        console.log(`✅ Loaded ${this.products.length} products`);
+                    } else {
+                        throw new Error('Invalid response format');
+                    }
+                } catch (error) {
+                    console.error('Error loading products:', error);
+                    throw error;
+                }
+            }
+            
+            setupEventListeners() {
+                document.getElementById('category-filter').addEventListener('change', () => this.applyFilters());
+                document.getElementById('provider-filter').addEventListener('change', () => this.applyFilters());
+                document.getElementById('search-input').addEventListener('input', () => this.applyFilters());
+                
+                document.getElementById('detailed-view').addEventListener('click', () => this.setViewMode(false));
+                document.getElementById('compact-view').addEventListener('click', () => this.setViewMode(true));
+            }
+            
+            populateFilters() {
+                // Populate category filter
+                const categoryFilter = document.getElementById('category-filter');
+                [...this.categories].sort().forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    categoryFilter.appendChild(option);
+                });
+                
+                // Populate provider filter
+                const providerFilter = document.getElementById('provider-filter');
+                [...this.providers].sort().forEach(provider => {
+                    const option = document.createElement('option');
+                    option.value = provider;
+                    option.textContent = provider;
+                    providerFilter.appendChild(option);
+                });
+            }
+            
+            applyFilters() {
+                const categoryFilter = document.getElementById('category-filter').value;
+                const providerFilter = document.getElementById('provider-filter').value;
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+                
+                this.filteredProducts = this.products.filter(product => {
+                    const matchesCategory = !categoryFilter || 
+                        (product.categoryName || product.category || 'Uncategorized') === categoryFilter;
+                    
+                    const matchesProvider = !providerFilter || 
+                        (product.provider || 'Unknown Provider') === providerFilter;
+                    
+                    const matchesSearch = !searchTerm || 
+                        product.name?.toLowerCase().includes(searchTerm) ||
+                        product.id?.toLowerCase().includes(searchTerm) ||
+                        product.description?.toLowerCase().includes(searchTerm);
+                    
+                    return matchesCategory && matchesProvider && matchesSearch;
+                });
+                
+                this.updateStats();
+                this.renderProducts();
+            }
+            
+            updateStats() {
+                const totalProducts = this.filteredProducts.length;
+                const totalCategories = new Set(this.filteredProducts.map(p => p.categoryName || p.category || 'Uncategorized')).size;
+                const totalBlueprints = new Set(this.filteredProducts.map(p => p.blueprintId)).size;
+                const totalProviders = new Set(this.filteredProducts.map(p => p.provider || 'Unknown Provider')).size;
+                
+                document.getElementById('total-products').textContent = totalProducts;
+                document.getElementById('total-categories').textContent = totalCategories;
+                document.getElementById('total-blueprints').textContent = totalBlueprints;
+                document.getElementById('total-providers').textContent = totalProviders;
+            }
+            
+            setViewMode(compact) {
+                this.isCompactView = compact;
+                const catalogContent = document.getElementById('catalog-content');
+                
+                if (compact) {
+                    catalogContent.classList.add('compact-view');
+                    document.getElementById('compact-view').classList.add('active');
+                    document.getElementById('detailed-view').classList.remove('active');
+                } else {
+                    catalogContent.classList.remove('compact-view');
+                    document.getElementById('detailed-view').classList.add('active');
+                    document.getElementById('compact-view').classList.remove('active');
+                }
+            }
+            
+            renderProducts() {
+                const catalogContent = document.getElementById('catalog-content');
+                
+                if (this.filteredProducts.length === 0) {
+                    catalogContent.innerHTML = `
+                        <div class="error">
+                            <h3>No Products Found</h3>
+                            <p>No products match your current filters. Try adjusting your search criteria.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Group products by category
+                const productsByCategory = {};
+                this.filteredProducts.forEach(product => {
+                    const category = product.categoryName || product.category || 'Uncategorized';
+                    if (!productsByCategory[category]) {
+                        productsByCategory[category] = [];
+                    }
+                    productsByCategory[category].push(product);
+                });
+                
+                let html = '';
+                
+                Object.entries(productsByCategory).forEach(([category, products]) => {
+                    const categoryIcon = products[0]?.categoryIcon || '📦';
+                    
+                    html += `
+                        <div class="category-section">
+                            <div class="category-header">
+                                <h2>${categoryIcon} ${category}</h2>
+                                <p>${products.length} product${products.length !== 1 ? 's' : ''}</p>
+                            </div>
+                            <div class="catalog-grid">
+                                ${products.map(product => this.renderProductCard(product)).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                catalogContent.innerHTML = html;
+            }
+            
+            renderProductCard(product) {
+                const tags = product.tags || [];
+                const tagsHtml = tags.slice(0, 5).map(tag => `<span class="tag">${tag}</span>`).join('');
+                
+                return `
+                    <div class="product-card">
+                        <div class="validation-badge">✅ Validated</div>
+                        
+                        <div class="product-header">
+                            <div>
+                                <div class="product-title">${product.name || product.id}</div>
+                                <div class="product-id">${product.id}</div>
+                            </div>
+                            <div class="product-category">${product.categoryName || product.category || 'Other'}</div>
+                        </div>
+                        
+                        <div class="product-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Blueprint ID</div>
+                                <div class="detail-value blueprint-id">${product.blueprintId}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Provider ID</div>
+                                <div class="detail-value">${product.printProviderId}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Provider</div>
+                                <div class="detail-value provider-name">${product.provider || 'Unknown'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Base Price</div>
+                                <div class="detail-value">$${((product.basePrice || 0) / 100).toFixed(2)}</div>
+                            </div>
+                        </div>
+                        
+                        ${product.description ? `
+                            <div class="product-description">
+                                ${product.description.substring(0, 200)}${product.description.length > 200 ? '...' : ''}
+                            </div>
+                        ` : ''}
+                        
+                        ${tagsHtml ? `<div class="product-tags">${tagsHtml}</div>` : ''}
+                        
+                        <div class="product-actions">
+                            <a href="/merchandise?type=${product.id}" class="btn btn-primary" target="_blank">
+                                🛍️ Create Product
+                            </a>
+                            <button class="btn btn-secondary" onclick="adminCatalog.showProductDetails('${product.id}')">
+                                📋 View Details
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            showProductDetails(productId) {
+                const product = this.filteredProducts.find(p => p.id === productId);
+                if (product) {
+                    const details = JSON.stringify(product, null, 2);
+                    alert(`Product Details for ${product.name}:\n\n${details}`);
+                }
+            }
+            
+            showError(message) {
+                document.getElementById('catalog-content').innerHTML = `
+                    <div class="error">
+                        <h3>Error</h3>
+                        <p>${message}</p>
+                        <button onclick="location.reload()" class="btn btn-primary">Retry</button>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize the admin catalog explorer
+        const adminCatalog = new AdminCatalogExplorer();
+    </script>
+</body>
+</html>
