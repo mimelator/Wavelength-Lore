@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 echo "🌊 WAVELENGTH Production Container Starting"
 echo "⚡ Enhanced startup with robust permission handling"
 echo "Security: Running as user $(whoami)"
