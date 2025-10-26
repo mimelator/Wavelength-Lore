@@ -272,7 +272,7 @@ jobs:
               "ImageRepository": {
                 "ImageIdentifier": "'$IMAGE_IDENTIFIER'",
                 "ImageConfiguration": {
-                  "Port": "3000"
+                  "Port": "8080"
                 },
                 "ImageRepositoryType": "ECR"
               },
