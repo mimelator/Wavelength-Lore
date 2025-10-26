@@ -68,7 +68,8 @@ class LoreToolsManager {
     console.log('5. 🕸️  Character Relationship Map');
     console.log('6. 📊 System Status');
     console.log('7. 🛠️  Direct Chatbot Tools');
-    console.log('8. Exit');
+    console.log('8. 📚 Documentation Navigator');
+    console.log('9. Exit');
   }
 
   async registerDocument() {
@@ -206,6 +207,33 @@ class LoreToolsManager {
     console.log(docStatus);
   }
 
+  async documentationNavigator() {
+    console.log('\n📚 DOCUMENTATION NAVIGATOR');
+    console.log('=========================');
+    
+    const query = await this.askQuestion('🔍 What are you looking for? (e.g., "deployment guide", "MCP tools", "getting started"): ');
+    
+    console.log('\n📋 Documentation types:');
+    console.log('1. search      - General search (default)');
+    console.log('2. quickstart  - Getting started guides');
+    console.log('3. architecture - System design and integration');
+    console.log('4. procedures  - Development and operations');
+    console.log('5. reference   - Documentation indexes');
+    
+    const typeChoice = await this.askQuestion('\n📂 Choose type (1-5 or press Enter for search): ');
+    const typeMap = {
+      '1': 'search', '2': 'quickstart', '3': 'architecture', 
+      '4': 'procedures', '5': 'reference'
+    };
+    const type = typeMap[typeChoice] || 'search';
+    
+    const context = await this.askQuestion('🎯 Current task context (optional): ');
+    
+    console.log('\n🔍 Searching documentation...');
+    const result = await this.callMCPTool('documentation_navigator', { query, type, context });
+    console.log(result);
+  }
+
   async directChatbotTools() {
     console.log('\n🛠️  DIRECT CHATBOT TOOLS');
     console.log('=======================');
@@ -287,11 +315,14 @@ class LoreToolsManager {
             await this.directChatbotTools();
             break;
           case '8':
+            await this.documentationNavigator();
+            break;
+          case '9':
             console.log('👋 Goodbye!');
             continueMenu = false;
             break;
           default:
-            console.log('❌ Invalid choice. Please choose 1-8.');
+            console.log('❌ Invalid choice. Please choose 1-9.');
         }
         
         if (continueMenu) {

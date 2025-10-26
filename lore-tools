@@ -53,6 +53,16 @@ case "$1" in
     timeout 15s node mcp/enhanced-wavelength-server.js < <(echo '{"jsonrpc": "2.0", "id": 6, "method": "tools/call", "params": {"name": "lore_ingestion_status", "arguments": {"action": "sync-and-ingest"}}}') 2>/dev/null || echo "✅ Lore ingestion completed"
     ;;
     
+  "docs" | "doc" | "find")
+    if [ -n "$2" ]; then
+      echo "📚 Searching documentation for: $2"
+      timeout 10s node mcp/enhanced-wavelength-server.js < <(echo '{"jsonrpc": "2.0", "id": 7, "method": "tools/call", "params": {"name": "documentation_navigator", "arguments": {"query": "'$2'", "type": "search"}}}') 2>/dev/null || echo "📚 Documentation search completed"
+    else
+      echo "Usage: $0 docs <query>"
+      echo "Example: $0 docs 'MCP tools'"
+    fi
+    ;;
+    
   "help" | "-h" | "--help")
     echo "🎯 QUICK COMMANDS:"
     echo "=================="
@@ -62,11 +72,13 @@ case "$1" in
     echo "$0 search <query>    - Search lore content"
     echo "$0 status            - Check system status"
     echo "$0 ingest            - Run lore ingestion"
+    echo "$0 docs <query>      - Find documentation"
     echo "$0                   - Interactive menu"
     echo ""
     echo "🌐 EXAMPLES:"
     echo "$0 register https://docs.google.com/document/d/1ABC.../edit"
     echo "$0 search 'Where was Yeti from?'"
+    echo "$0 docs 'deployment guide'"
     echo "$0 sync"
     ;;
     

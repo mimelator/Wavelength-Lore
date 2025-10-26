@@ -127,6 +127,19 @@ class EnhancedWavelengthMCPServer {
             },
             required: ["environment"]
           }
+        },
+        {
+          name: "documentation_navigator",
+          description: "Intelligent navigation and discovery of project documentation, procedures, and architecture",
+          inputSchema: {
+            type: "object",
+            properties: {
+              query: { type: "string", description: "What you're looking for (e.g., 'deployment guide', 'MCP tools', 'character system')" },
+              type: { type: "string", enum: ["search", "overview", "quickstart", "reference", "architecture", "procedures"], description: "Type of documentation needed" },
+              context: { type: "string", description: "Current task context (optional)" }
+            },
+            required: ["query"]
+          }
         }
       ]
     }));
@@ -152,6 +165,8 @@ class EnhancedWavelengthMCPServer {
             return await this.monitorForumHealth(args.timeframe);
           case "smart_deployment_check":
             return await this.performDeploymentCheck(args.environment);
+          case "documentation_navigator":
+            return await this.navigateDocumentation(args.query, args.type, args.context);
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
@@ -565,6 +580,205 @@ console.log(checkDir(googleDocsPath, 'Google Docs'));
         content: [{
           type: "text",
           text: `❌ Content sync operation failed: ${error.message}\n\n💡 Make sure both projects are properly set up and accessible.`
+        }]
+      };
+    }
+  }
+
+  async navigateDocumentation(query, type = "search", context = "") {
+    const fs = require('fs');
+    const path = require('path');
+    
+    try {
+      // Define our documentation structure
+      const documentationMap = {
+        // Quick Start & Getting Started
+        quickstart: {
+          'AI Copilot Quickstart': 'AI_COPILOT_QUICKSTART.txt',
+          'MCP Tools Quick Reference': 'docs/MCP_QUICK_REFERENCE.md',
+          'Package Protection System': 'docs/PACKAGE_PROTECTION_SYSTEM.md',
+          'DevOps Quick Reference': 'docs/devops-quick-reference.md'
+        },
+        
+        // Architecture & System Design
+        architecture: {
+          'System Architecture': 'docs/WAVELENGTH_SYSTEM_ARCHITECTURE.md',
+          'Chatbot Integration': 'tests/chatbot/CHATBOT_TESTING_SUMMARY.md',
+          'MCP Tools Documentation': 'docs/MCP_TOOLS_DOCUMENTATION.md',
+          'Security Enhancement Guide': 'docs/SECURITY_ENHANCEMENT_GUIDE.md'
+        },
+        
+        // Development & Operations
+        procedures: {
+          'Deployment Guide': 'docs/deployment-guide.md',
+          'Environment Configuration': 'docs/ENVIRONMENT_CONFIGURATION.md',
+          'Backup Configuration': 'docs/BACKUP_CONFIGURATION.md',
+          'Smart Commit Quick Reference': 'docs/SMART_COMMIT_QUICK_REFERENCE.md'
+        },
+        
+        // Game Systems & Features
+        features: {
+          'Game Level System Summary': 'docs/game-systems/GAME_LEVEL_SYSTEM_SUMMARY.md',
+          'Wavelength Gems Getting Started': 'docs/game-systems/WAVELENGTH_GEMS_GETTING_STARTED.md',
+          'Level System Guide': 'docs/game-systems/LEVEL_SYSTEM_GUIDE.md'
+        },
+        
+        // Scripts & Tools
+        tools: {
+          'Lore Management Tools': './lore-tools',
+          'Interactive Lore Management': 'scripts/lore-tools.js',
+          'Enhanced MCP Server': 'mcp/enhanced-wavelength-server.js',
+          'Unified Scripts': 'scripts/unified/'
+        },
+        
+        // Documentation Indexes
+        reference: {
+          'Main Documentation Hub': 'docs/README.md',
+          'MCP Documentation Index': 'docs/MCP_DOCUMENTATION_INDEX.md',
+          'Project README': 'README.md'
+        }
+      };
+      
+      const queryLower = query.toLowerCase();
+      let results = [];
+      
+      // Smart search based on query terms
+      const searchTerms = {
+        'mcp': ['architecture', 'tools', 'reference'],
+        'deploy': ['procedures', 'architecture'],
+        'lore': ['tools', 'architecture'],
+        'character': ['features', 'tools'],
+        'chatbot': ['architecture', 'procedures'],
+        'game': ['features'],
+        'security': ['architecture', 'procedures'],
+        'backup': ['procedures'],
+        'git': ['procedures', 'reference'],
+        'documentation': ['reference'],
+        'quickstart': ['quickstart'],
+        'getting started': ['quickstart'],
+        'api': ['architecture', 'reference']
+      };
+      
+      // Determine relevant categories based on query
+      let relevantCategories = [];
+      if (type && type !== 'search') {
+        relevantCategories = [type];
+      } else {
+        for (const [term, categories] of Object.entries(searchTerms)) {
+          if (queryLower.includes(term)) {
+            relevantCategories.push(...categories);
+          }
+        }
+        if (relevantCategories.length === 0) {
+          relevantCategories = Object.keys(documentationMap);
+        }
+      }
+      
+      // Search through relevant categories
+      for (const category of [...new Set(relevantCategories)]) {
+        if (documentationMap[category]) {
+          for (const [title, filePath] of Object.entries(documentationMap[category])) {
+            if (title.toLowerCase().includes(queryLower) || 
+                filePath.toLowerCase().includes(queryLower) ||
+                queryLower.includes(title.toLowerCase().split(' ')[0])) {
+              
+              // Check if file exists and get basic info
+              const fullPath = path.resolve(filePath);
+              let status = '❓';
+              let size = '';
+              let lastModified = '';
+              
+              try {
+                const stats = fs.statSync(fullPath);
+                status = '✅';
+                size = `(${Math.round(stats.size / 1024)}KB)`;
+                lastModified = stats.mtime.toISOString().split('T')[0];
+              } catch (error) {
+                status = '❌';
+                size = '(Not found)';
+              }
+              
+              results.push({
+                category: category.charAt(0).toUpperCase() + category.slice(1),
+                title,
+                path: filePath,
+                status,
+                size,
+                lastModified
+              });
+            }
+          }
+        }
+      }
+      
+      // Generate response based on results
+      if (results.length === 0) {
+        return {
+          content: [{
+            type: "text",
+            text: `🔍 Documentation Navigator - No matches found for "${query}"\n\n📚 Available categories:\n• quickstart - Getting started guides\n• architecture - System design and integration\n• procedures - Development and operations procedures\n• features - Game systems and application features\n• tools - Scripts and development tools\n• reference - Documentation indexes and references\n\n💡 Try: "MCP tools", "deployment guide", "getting started", "system architecture"`
+          }]
+        };
+      }
+      
+      // Format results
+      let response = `📚 Documentation Navigator Results for "${query}"\n`;
+      response += `${context ? `🎯 Context: ${context}\n` : ''}\n`;
+      
+      // Group by category
+      const groupedResults = {};
+      results.forEach(result => {
+        if (!groupedResults[result.category]) {
+          groupedResults[result.category] = [];
+        }
+        groupedResults[result.category].push(result);
+      });
+      
+      for (const [category, items] of Object.entries(groupedResults)) {
+        response += `\n📁 ${category.toUpperCase()}:\n`;
+        items.forEach(item => {
+          response += `  ${item.status} ${item.title}\n`;
+          response += `     📄 ${item.path} ${item.size}\n`;
+          if (item.lastModified) {
+            response += `     📅 Last updated: ${item.lastModified}\n`;
+          }
+        });
+      }
+      
+      // Add contextual recommendations
+      response += `\n🎯 QUICK ACTIONS:\n`;
+      if (queryLower.includes('mcp')) {
+        response += `• Read: docs/MCP_TOOLS_DOCUMENTATION.md\n`;
+        response += `• Try: ./lore-tools help\n`;
+        response += `• Test: echo '{"jsonrpc": "2.0", "method": "tools/list", "id": 1}' | node mcp/enhanced-wavelength-server.js\n`;
+      } else if (queryLower.includes('deploy')) {
+        response += `• Read: docs/deployment-guide.md\n`;
+        response += `• Check: npm run gh:dashboard\n`;
+        response += `• Validate: node scripts/unified/deployment-manager.js --help\n`;
+      } else if (queryLower.includes('lore')) {
+        response += `• Interactive: ./lore-tools\n`;
+        response += `• Search: ./lore-tools search "your query"\n`;
+        response += `• Manage: node scripts/lore-tools.js\n`;
+      } else {
+        response += `• Start with: AI_COPILOT_QUICKSTART.txt\n`;
+        response += `• Overview: docs/README.md\n`;
+        response += `• Architecture: docs/WAVELENGTH_SYSTEM_ARCHITECTURE.md\n`;
+      }
+      
+      response += `\n📊 Found ${results.length} relevant documentation resources`;
+      
+      return {
+        content: [{
+          type: "text",
+          text: response
+        }]
+      };
+      
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `❌ Documentation navigation failed: ${error.message}\n\n💡 Available documentation areas:\n• Quickstart guides\n• System architecture\n• Development procedures\n• Game features\n• Tools & scripts\n• Reference materials`
         }]
       };
     }

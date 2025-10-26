@@ -281,29 +281,22 @@
                 `;
 
                 try {
-                    const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
-                    const query = window.firebaseUtils.query(
-                        postsRef,
-                        window.firebaseUtils.orderByChild('createdAt')
-                    );
-
-                    window.firebaseUtils.onValue(query, (snapshot) => {
-                        const postsData = snapshot.val() || {};
-                        let posts = Object.keys(postsData).map(id => ({
-                            id,
-                            ...postsData[id]
-                        }));
-
+                    const response = await fetch('/forum/api/posts/recent?limit=50');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        let posts = data.posts;
+                        
                         // Apply filters
                         posts = this.applyFilters(posts);
                         
-                        // Sort by creation date (newest first)
-                        posts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
                         this.posts = posts;
                         this.renderPosts();
-                        this.isLoading = false;
-                    });
+                    } else {
+                        throw new Error(data.error || 'Failed to load posts');
+                    }
+                    
+                    this.isLoading = false;
 
                 } catch (error) {
                     console.error('Error loading recent posts:', error);
@@ -348,7 +341,7 @@
 
                 // Category filter
                 if (this.currentFilter.category) {
-                    filtered = filtered.filter(post => post.category === this.currentFilter.category);
+                    filtered = filtered.filter(post => post.forumId === this.currentFilter.category);
                 }
 
                 return filtered;
@@ -396,8 +389,8 @@
                 };
 
                 const timeAgo = this.getTimeAgo(post.createdAt);
-                const categoryIcon = categoryIcons[post.category] || '💬';
-                const categoryName = categoryNames[post.category] || 'Discussion';
+                const categoryIcon = categoryIcons[post.forumId] || '💬';
+                const categoryName = categoryNames[post.forumId] || 'Discussion';
 
                 return `
                     <div class="post-item" onclick="window.location.href='/forum/post/${post.id}'">
