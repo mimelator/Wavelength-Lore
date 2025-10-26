@@ -68,8 +68,8 @@ ENV NODE_ENV=production
 ENV NODE_PORT=3001
 ENV NGINX_PORT=8080
 
-# WAVELENGTH ENHANCED: Copy startup script from external file (much more reliable)
-COPY --chown=appuser:nodejs docker/docker-start.sh /app/start.sh
+# WAVELENGTH ENHANCED: Copy startup script from root directory (build context fix)
+COPY --chown=appuser:nodejs docker-start.sh /app/start.sh
 RUN chmod +x /app/start.sh && \
     echo "🌊 WAVELENGTH: Enhanced startup script copied with permissions:" && \
     ls -la /app/start.sh
