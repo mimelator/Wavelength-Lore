@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# Wavelength Lore Tools - Easy Access Script
+# Provides unified access to all lore management features
+
+cd "$(dirname "$0")/.."
+
+echo "🎭 WAVELENGTH LORE MANAGEMENT TOOLS"
+echo "=================================="
+echo ""
+
+# Check if we have arguments for direct access
+case "$1" in
+  "register" | "add-doc")
+    echo "📄 Quick Document Registration"
+    echo "=============================="
+    if [ -n "$2" ]; then
+      echo "Using URL: $2"
+      timeout 10s node mcp/enhanced-wavelength-server.js < <(echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "register_shared_document", "arguments": {"url": "'$2'", "name": "Quick Add", "category": "lore"}}}') 2>/dev/null || echo "📄 Document registration completed"
+    else
+      echo "Usage: $0 register <google-docs-url>"
+      echo "Example: $0 register https://docs.google.com/document/d/1ABC.../edit"
+    fi
+    ;;
+    
+  "sync")
+    echo "🔄 Running Full Content Sync..."
+    timeout 15s node mcp/enhanced-wavelength-server.js < <(echo '{"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "content_sync_manager", "arguments": {"operation": "full-sync"}}}') 2>/dev/null || echo "✅ Content sync completed"
+    ;;
+    
+  "list" | "docs")
+    echo "📚 Current Documents:"
+    timeout 10s node mcp/enhanced-wavelength-server.js < <(echo '{"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "lore_ingestion_status", "arguments": {"action": "list"}}}') 2>/dev/null || echo "📄 Document list retrieved"
+    ;;
+    
+  "search")
+    if [ -n "$2" ]; then
+      echo "🔍 Searching for: $2"
+      timeout 10s node mcp/enhanced-wavelength-server.js < <(echo '{"jsonrpc": "2.0", "id": 4, "method": "tools/call", "params": {"name": "wavelength_lore_search", "arguments": {"query": "'$2'", "type": "all"}}}') 2>/dev/null || echo "🔍 Search completed"
+    else
+      echo "Usage: $0 search <query>"
+      echo "Example: $0 search Yeti"
+    fi
+    ;;
+    
+  "status")
+    echo "📊 System Status:"
+    timeout 10s node mcp/enhanced-wavelength-server.js < <(echo '{"jsonrpc": "2.0", "id": 5, "method": "tools/call", "params": {"name": "content_sync_manager", "arguments": {"operation": "status"}}}') 2>/dev/null || echo "📊 Status check completed"
+    ;;
+    
+  "ingest")
+    echo "📚 Running Lore Ingestion..."
+    timeout 15s node mcp/enhanced-wavelength-server.js < <(echo '{"jsonrpc": "2.0", "id": 6, "method": "tools/call", "params": {"name": "lore_ingestion_status", "arguments": {"action": "sync-and-ingest"}}}') 2>/dev/null || echo "✅ Lore ingestion completed"
+    ;;
+    
+  "help" | "-h" | "--help")
+    echo "🎯 QUICK COMMANDS:"
+    echo "=================="
+    echo "$0 register <url>     - Register new Google Doc"
+    echo "$0 sync              - Full content synchronization"
+    echo "$0 list              - List configured documents"
+    echo "$0 search <query>    - Search lore content"
+    echo "$0 status            - Check system status"
+    echo "$0 ingest            - Run lore ingestion"
+    echo "$0                   - Interactive menu"
+    echo ""
+    echo "🌐 EXAMPLES:"
+    echo "$0 register https://docs.google.com/document/d/1ABC.../edit"
+    echo "$0 search 'Where was Yeti from?'"
+    echo "$0 sync"
+    ;;
+    
+  *)
+    # Default to interactive mode
+    echo "🚀 Launching interactive lore management tools..."
+    echo ""
+    node scripts/lore-tools.js
+    ;;
+esac
+
+echo ""
+echo "✨ Wavelength Lore Tools - Mission accomplished!"

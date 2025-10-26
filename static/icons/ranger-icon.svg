@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none">
+  <defs>
+    <!-- Darker Bronze Crown Gradient -->
+    <linearGradient id="bronzeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#CD7F32;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#B8860B;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#8B4513;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#654321;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Bronze Highlight -->
+    <linearGradient id="bronzeHighlight" x1="0%" y1="0%" x2="100%" y2="50%">
+      <stop offset="0%" style="stop-color:#DAA520;stop-opacity:0.9" />
+      <stop offset="50%" style="stop-color:#CD7F32;stop-opacity:0.5" />
+      <stop offset="100%" style="stop-color:#B8860B;stop-opacity:0.3" />
+    </linearGradient>
+    
+    <!-- Ruby Gradient -->
+    <radialGradient id="rubyGradient" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.9" />
+      <stop offset="30%" style="stop-color:#FF69B4;stop-opacity:0.8" />
+      <stop offset="70%" style="stop-color:#DC143C;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#8B0000;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- Emerald Gradient -->
+    <radialGradient id="emeraldGradient" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.9" />
+      <stop offset="30%" style="stop-color:#90EE90;stop-opacity:0.8" />
+      <stop offset="70%" style="stop-color:#32CD32;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#006400;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- Sapphire Gradient -->
+    <radialGradient id="sapphireGradient" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.9" />
+      <stop offset="30%" style="stop-color:#87CEEB;stop-opacity:0.8" />
+      <stop offset="70%" style="stop-color:#4169E1;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#191970;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- Diamond Gradient -->
+    <radialGradient id="diamondGradient" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#E6E6FA;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#C0C0C0;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Crown Shadow -->
+  <g opacity="0.4">
+    <path d="M4 16 L20 16 L18.5 14 L5.5 14 Z" fill="#2F1B14"/>
+    <path d="M6 14 L7 10 L8.5 12 L10 8 L12 11 L14 8 L15.5 12 L17 10 L18 14" fill="#2F1B14"/>
+  </g>
+  
+  <!-- Crown Base -->
+  <path d="M4 15 L20 15 L18.5 13 L5.5 13 Z" fill="url(#bronzeGradient)" stroke="#654321" stroke-width="0.8"/>
+  
+  <!-- Crown Points -->
+  <path d="M6 13 L7 9 L8.5 11 L10 7 L12 10 L14 7 L15.5 11 L17 9 L18 13" fill="url(#bronzeGradient)" stroke="#654321" stroke-width="0.8"/>
+  
+  <!-- Crown Highlight -->
+  <path d="M6 13 L7 9 L8.5 11 L10 7 L12 10 L14 7 L15.5 11 L17 9 L18 13" fill="url(#bronzeHighlight)"/>
+  
+  <!-- Central Large Ruby -->
+  <circle cx="12" cy="8.5" r="2" fill="url(#rubyGradient)" stroke="#8B0000" stroke-width="0.5"/>
+  <circle cx="12" cy="8.5" r="1.5" fill="url(#rubyGradient)" opacity="0.8"/>
+  <circle cx="11.3" cy="7.8" r="0.5" fill="#FFFFFF" opacity="0.9"/>
+  <circle cx="11.5" cy="8" r="0.3" fill="#FFFFFF" opacity="0.7"/>
+  
+  <!-- Left Emerald -->
+  <circle cx="8" cy="10" r="1" fill="url(#emeraldGradient)" stroke="#006400" stroke-width="0.4"/>
+  <circle cx="8" cy="10" r="0.7" fill="url(#emeraldGradient)" opacity="0.8"/>
+  <circle cx="7.6" cy="9.6" r="0.25" fill="#FFFFFF" opacity="0.9"/>
+  
+  <!-- Right Sapphire -->
+  <circle cx="16" cy="10" r="1" fill="url(#sapphireGradient)" stroke="#191970" stroke-width="0.4"/>
+  <circle cx="16" cy="10" r="0.7" fill="url(#sapphireGradient)" opacity="0.8"/>
+  <circle cx="15.6" cy="9.6" r="0.25" fill="#FFFFFF" opacity="0.9"/>
+  
+  <!-- Top Crown Point Diamonds -->
+  <circle cx="10" cy="8.5" r="0.7" fill="url(#diamondGradient)" stroke="#C0C0C0" stroke-width="0.3"/>
+  <circle cx="10" cy="8.5" r="0.5" fill="url(#diamondGradient)" opacity="0.9"/>
+  <circle cx="9.7" cy="8.2" r="0.15" fill="#FFFFFF" opacity="1"/>
+  
+  <circle cx="14" cy="8.5" r="0.7" fill="url(#diamondGradient)" stroke="#C0C0C0" stroke-width="0.3"/>
+  <circle cx="14" cy="8.5" r="0.5" fill="url(#diamondGradient)" opacity="0.9"/>
+  <circle cx="13.7" cy="8.2" r="0.15" fill="#FFFFFF" opacity="1"/>
+  
+  <!-- Crown Ornamental Details -->
+  <g stroke="#8B4513" stroke-width="0.4" fill="none">
+    <path d="M7 11.5 Q8 11 9 11.5"/>
+    <path d="M15 11.5 Q16 11 17 11.5"/>
+    <path d="M10.5 9.5 Q12 9 13.5 9.5"/>
+  </g>
+  
+  <!-- Bright Sparkles for Visibility -->
+  <g fill="#FFFF00" opacity="0.9">
+    <circle cx="5" cy="11" r="0.4"/>
+    <circle cx="19" cy="11" r="0.4"/>
+    <circle cx="12" cy="5" r="0.5"/>
+    <circle cx="9" cy="6" r="0.3"/>
+    <circle cx="15" cy="6" r="0.3"/>
+  </g>
+  
+  <!-- Additional Contrast Sparkles -->
+  <g fill="#FFFFFF" opacity="0.8">
+    <circle cx="6" cy="8" r="0.2"/>
+    <circle cx="18" cy="8" r="0.2"/>
+    <circle cx="12" cy="12" r="0.3"/>
+  </g>
+</svg>

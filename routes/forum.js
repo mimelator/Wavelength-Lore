@@ -61,15 +61,57 @@ router.get('/category/:categoryId', (req, res) => {
 /**
  * Forum Post View - Display individual post and replies
  */
-router.get('/post/:postId', (req, res) => {
+router.get('/post/:postId', async (req, res) => {
     const postId = req.params.postId;
     
-    res.render('forum/post-page', {
-        postId: postId,
-        title: 'Post Discussion',
-        cdnUrl: process.env.CDN_URL || '',
-        version: process.env.VERSION || Date.now()
-    });
+    try {
+        const { getAdminDatabase } = require('../helpers/firebase-admin-utils');
+        const db = getAdminDatabase();
+        
+        if (!db) {
+            return res.render('forum/simple-post-page', {
+                post: null,
+                replies: [],
+                title: 'Post Not Found'
+            });
+        }
+        
+        // Fetch post data
+        const postSnapshot = await db.ref(`forum/posts/${postId}`).once('value');
+        const post = postSnapshot.val();
+        
+        if (!post) {
+            return res.render('forum/simple-post-page', {
+                post: null,
+                replies: [],
+                title: 'Post Not Found'
+            });
+        }
+        
+        // Fetch replies
+        const repliesSnapshot = await db.ref('forum/replies').once('value');
+        const allReplies = repliesSnapshot.val() || {};
+        const postReplies = Object.values(allReplies)
+            .filter(reply => reply.postId === postId)
+            .sort((a, b) => a.createdAt - b.createdAt);
+        
+        // Increment view count
+        await db.ref(`forum/posts/${postId}/views`).set((post.views || 0) + 1);
+        
+        res.render('forum/simple-post-page', {
+            post: post,
+            replies: postReplies,
+            title: post.title + ' - Wavelength Forum'
+        });
+        
+    } catch (error) {
+        console.error('Error loading post:', error);
+        res.render('forum/simple-post-page', {
+            post: null,
+            replies: [],
+            title: 'Error Loading Post'
+        });
+    }
 });
 
 /**

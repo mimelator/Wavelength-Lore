@@ -113,26 +113,28 @@ function initializeForumAuth() {
     };
 
     // Handle redirect result from Google OAuth (for when popup is blocked)
-    window.firebaseUtils.getRedirectResult(window.firebaseAuth)
-        .then((result) => {
-            console.log('Checking redirect result...');
-            if (result && result.user) {
-                console.log('Sign-in via redirect successful:', result.user);
-                // Initialize session tracking after successful sign-in
-                if (window.sessionManager) {
-                    window.sessionManager.updateActivity();
+    if (window.firebaseAuth && window.firebaseAuth.getRedirectResult) {
+        window.firebaseAuth.getRedirectResult()
+            .then((result) => {
+                console.log('Checking redirect result...');
+                if (result && result.user) {
+                    console.log('Sign-in via redirect successful:', result.user);
+                    // Initialize session tracking after successful sign-in
+                    if (window.sessionManager) {
+                        window.sessionManager.updateActivity();
+                    }
+                    showNotification('Welcome to Wavelength Forum!', 'success');
+                } else {
+                    console.log('No redirect result found (user likely did not come from redirect)');
                 }
-                showNotification('Welcome to Wavelength Forum!', 'success');
-            } else {
-                console.log('No redirect result found (user likely did not come from redirect)');
-            }
-        })
-        .catch((error) => {
-            console.error('Redirect result error:', error);
-            if (error.code !== 'auth/no-redirect-result') {
-                handleAuthError(error);
-            }
-        });
+            })
+            .catch((error) => {
+                console.error('Redirect result error:', error);
+                if (error.code !== 'auth/no-redirect-result') {
+                    handleAuthError(error);
+                }
+            });
+    }
 
     // Check for expired sessions before setting up auth listener
     if (window.sessionManager && window.sessionManager.clearExpiredSession()) {

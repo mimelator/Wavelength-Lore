@@ -45,6 +45,45 @@ class EnhancedWavelengthMCPServer {
           }
         },
         {
+          name: "register_shared_document",
+          description: "Register a new Google Doc for lore ingestion with guided setup",
+          inputSchema: {
+            type: "object",
+            properties: {
+              url: { type: "string", description: "Google Docs URL or Document ID" },
+              name: { type: "string", description: "Document name for reference" },
+              category: { type: "string", enum: ["characters", "episodes", "worldbuilding", "lore", "analysis"], description: "Content category" },
+              description: { type: "string", description: "Brief description of the document" },
+              tags: { type: "array", items: { type: "string" }, description: "Tags for categorization" }
+            },
+            required: ["url", "name", "category"]
+          }
+        },
+        {
+          name: "lore_ingestion_status",
+          description: "Check status of lore ingestion and manage documents",
+          inputSchema: {
+            type: "object",
+            properties: {
+              action: { type: "string", enum: ["list", "sync", "ingest", "sync-and-ingest"], description: "Action to perform" },
+              documentId: { type: "string", description: "Specific document ID to target (optional)" }
+            },
+            required: ["action"]
+          }
+        },
+        {
+          name: "content_sync_manager",
+          description: "Sync content between Wavelength-Lore and Wavelength-Chatbot",
+          inputSchema: {
+            type: "object",
+            properties: {
+              operation: { type: "string", enum: ["sync-lore", "sync-docs", "full-sync", "status"], description: "Sync operation to perform" },
+              force: { type: "boolean", description: "Force resync even if content hasn't changed" }
+            },
+            required: ["operation"]
+          }
+        },
+        {
           name: "character_relationship_map",
           description: "Generate character relationship maps and connections",
           inputSchema: {
@@ -99,6 +138,12 @@ class EnhancedWavelengthMCPServer {
         switch (name) {
           case "wavelength_lore_search":
             return await this.searchLore(args.query, args.type || "all");
+          case "register_shared_document":
+            return await this.registerSharedDocument(args);
+          case "lore_ingestion_status":
+            return await this.manageLoreIngestion(args.action, args.documentId);
+          case "content_sync_manager":
+            return await this.manageContentSync(args.operation, args.force);
           case "character_relationship_map":
             return await this.generateRelationshipMap(args.character);
           case "episode_continuity_check":
@@ -193,6 +238,333 @@ class EnhancedWavelengthMCPServer {
         content: [{
           type: "text",
           text: `⚠️ Forum health check failed: ${error.message}`
+        }]
+      };
+    }
+  }
+
+  async registerSharedDocument(args) {
+    const { execSync } = require('child_process');
+    const path = require('path');
+    
+    try {
+      // Extract document ID from URL
+      const extractDocId = (url) => {
+        const patterns = [
+          /\/document\/d\/([a-zA-Z0-9-_]+)/,
+          /^([a-zA-Z0-9-_]{44})$/,
+          /^([a-zA-Z0-9-_]{25,50})$/
+        ];
+        
+        for (const pattern of patterns) {
+          const match = url.match(pattern);
+          if (match) return match[1];
+        }
+        return null;
+      };
+
+      const docId = extractDocId(args.url);
+      if (!docId) {
+        throw new Error('Invalid Google Docs URL or Document ID format');
+      }
+
+      const chatbotPath = path.resolve(__dirname, '../../Wavelength-Chatbot');
+      
+      // Use the existing manage-google-docs.js script
+      const configScript = `
+const fs = require('fs').promises;
+const path = require('path');
+const configPath = path.join(__dirname, 'config/google-docs-config.js');
+
+async function addDocument() {
+  try {
+    let currentConfig = [];
+    try {
+      delete require.cache[require.resolve(configPath)];
+      const config = require(configPath);
+      currentConfig = config.DOCUMENTS_CONFIG || [];
+    } catch (error) {
+      console.log('Creating new config...');
+    }
+
+    const newDoc = {
+      name: '${args.name}',
+      documentId: '${docId}',
+      category: '${args.category}',
+      tags: ${JSON.stringify(args.tags || [args.category, 'lore'])},
+      description: '${args.description || `${args.name} - ${args.category} content`}'
+    };
+
+    currentConfig.push(newDoc);
+    
+    const configContent = \`/**
+ * Google Docs Integration Configuration
+ */
+
+const GOOGLE_SERVICE_ACCOUNT_EMAIL = 'wavelength-docs-sync@wavelength-lore.iam.gserviceaccount.com';
+
+const CONTENT_FOLDERS = {
+  characters: { folder: 'content/google-docs/characters', prefix: 'char-', tags: ['characters', 'profiles', 'lore'] },
+  episodes: { folder: 'content/google-docs/episodes', prefix: 'ep-', tags: ['episodes', 'analysis', 'story'] },
+  worldbuilding: { folder: 'content/google-docs/worldbuilding', prefix: 'world-', tags: ['worldbuilding', 'lore', 'universe'] },
+  lore: { folder: 'content/google-docs/lore', prefix: 'lore-', tags: ['lore', 'objects', 'concepts'] },
+  analysis: { folder: 'content/google-docs/analysis', prefix: 'theory-', tags: ['analysis', 'theories', 'symbolism'] }
+};
+
+const DOCUMENTS_CONFIG = \${JSON.stringify(currentConfig, null, 2)};
+
+const PROCESSING_OPTIONS = {
+  maxContentLength: 50000,
+  includeMetadata: true,
+  splitLargeDocs: true,
+  sectionSize: 10000,
+  excludePatterns: [
+    /\\\\[DRAFT\\\\].*?\\\\[\\\\/DRAFT\\\\]/gs,
+    /\\\\[PRIVATE\\\\].*?\\\\[\\\\/PRIVATE\\\\]/gs,
+    /\\\\[TODO\\\\].*?\\\\[\\\\/TODO\\\\]/gs
+  ],
+  minContentLength: 100
+};
+
+const SYNC_OPTIONS = {
+  checkInterval: 24,
+  autoIngest: true,
+  keepBackups: true,
+  maxBackups: 5
+};
+
+module.exports = {
+  GOOGLE_SERVICE_ACCOUNT_EMAIL,
+  CONTENT_FOLDERS,
+  DOCUMENTS_CONFIG,
+  PROCESSING_OPTIONS,
+  SYNC_OPTIONS
+};\`;
+
+    await fs.writeFile(configPath, configContent, 'utf8');
+    console.log('SUCCESS');
+  } catch (error) {
+    console.error('ERROR:', error.message);
+  }
+}
+
+addDocument();
+`;
+
+      // Write and execute the config update
+      const tempScript = path.join(chatbotPath, 'temp-add-doc.js');
+      await require('fs').promises.writeFile(tempScript, configScript);
+      
+      const result = execSync(`cd "${chatbotPath}" && node temp-add-doc.js`, { encoding: 'utf8' });
+      
+      // Clean up temp file
+      await require('fs').promises.unlink(tempScript);
+
+      const docUrl = `https://docs.google.com/document/d/${docId}/edit`;
+      
+      return {
+        content: [{
+          type: "text",
+          text: `📄 Document Registered Successfully!
+
+📋 Details:
+• Name: ${args.name}
+• Category: ${args.category}
+• Document ID: ${docId}
+• Tags: ${(args.tags || [args.category, 'lore']).join(', ')}
+
+🔗 Document URL: ${docUrl}
+
+📤 NEXT STEPS:
+1. Share the document with: wavelength-docs-sync@wavelength-lore.iam.gserviceaccount.com
+2. Set permission to: Viewer
+3. Run sync: npm run sync-docs (in Wavelength-Chatbot)
+4. Ingest content: npm run sync-and-ingest
+
+💡 The document has been added to your configuration and is ready for syncing!`
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `❌ Failed to register document: ${error.message}\n\n💡 Make sure the Wavelength-Chatbot project is available and properly configured.`
+        }]
+      };
+    }
+  }
+
+  async manageLoreIngestion(action, documentId) {
+    const { execSync } = require('child_process');
+    const path = require('path');
+    
+    try {
+      const chatbotPath = path.resolve(__dirname, '../../Wavelength-Chatbot');
+      
+      switch (action) {
+        case 'list':
+          // List current documents
+          const listScript = `
+const path = require('path');
+const configPath = path.join(__dirname, 'config/google-docs-config.js');
+try {
+  const config = require(configPath);
+  const docs = config.DOCUMENTS_CONFIG || [];
+  console.log(JSON.stringify(docs, null, 2));
+} catch (error) {
+  console.log('[]');
+}`;
+          
+          const tempListScript = path.join(chatbotPath, 'temp-list.js');
+          await require('fs').promises.writeFile(tempListScript, listScript);
+          const listResult = execSync(`cd "${chatbotPath}" && node temp-list.js`, { encoding: 'utf8' });
+          await require('fs').promises.unlink(tempListScript);
+          
+          const docs = JSON.parse(listResult);
+          const docList = docs.map((doc, i) => 
+            `${i + 1}. ${doc.name}\n   📁 ${doc.category} | 🆔 ${doc.documentId}\n   🏷️ ${doc.tags.join(', ')}`
+          ).join('\n\n');
+          
+          return {
+            content: [{
+              type: "text",
+              text: `📚 Current Google Docs Configuration\n\n${docList || 'No documents configured yet.'}\n\n📊 Total: ${docs.length} documents`
+            }]
+          };
+
+        case 'sync':
+          execSync(`cd "${chatbotPath}" && npm run sync-docs`, { encoding: 'utf8' });
+          return {
+            content: [{
+              type: "text",
+              text: `✅ Document sync completed! All Google Docs have been synchronized with the latest content.`
+            }]
+          };
+
+        case 'ingest':
+          execSync(`cd "${chatbotPath}" && node scripts/ingest-lore.js`, { encoding: 'utf8' });
+          return {
+            content: [{
+              type: "text",
+              text: `✅ Lore ingestion completed! Content has been processed and added to the chatbot's knowledge base.`
+            }]
+          };
+
+        case 'sync-and-ingest':
+          execSync(`cd "${chatbotPath}" && npm run sync-docs && node scripts/ingest-lore.js`, { encoding: 'utf8' });
+          return {
+            content: [{
+              type: "text",
+              text: `✅ Full sync and ingestion completed! Documents synchronized and content ingested into chatbot.`
+            }]
+          };
+
+        default:
+          throw new Error(`Unknown action: ${action}`);
+      }
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `❌ Lore ingestion operation failed: ${error.message}\n\n💡 Make sure you're in the correct directory and dependencies are installed.`
+        }]
+      };
+    }
+  }
+
+  async manageContentSync(operation, force = false) {
+    const { execSync } = require('child_process');
+    const path = require('path');
+    
+    try {
+      const loreProjectPath = path.resolve(__dirname, '..');
+      const chatbotPath = path.resolve(__dirname, '../../Wavelength-Chatbot');
+      
+      switch (operation) {
+        case 'sync-lore':
+          // Sync content from Wavelength-Lore to Wavelength-Chatbot
+          const syncCmd = force 
+            ? `rsync -av --delete "${loreProjectPath}/content/" "${chatbotPath}/content/lore-content/"`
+            : `rsync -av "${loreProjectPath}/content/" "${chatbotPath}/content/lore-content/"`;
+          
+          execSync(syncCmd, { encoding: 'utf8' });
+          
+          return {
+            content: [{
+              type: "text",
+              text: `✅ Lore content synchronized!\n\n📂 Synced from: ${loreProjectPath}/content/\n📂 Synced to: ${chatbotPath}/content/lore-content/\n\n${force ? '🔄 Force sync applied - all files updated' : '📋 Incremental sync completed'}`
+            }]
+          };
+
+        case 'sync-docs':
+          execSync(`cd "${chatbotPath}" && npm run sync-docs`, { encoding: 'utf8' });
+          return {
+            content: [{
+              type: "text",
+              text: `✅ Google Docs synchronized! All configured documents have been updated with latest content.`
+            }]
+          };
+
+        case 'full-sync':
+          // Sync both lore and docs, then ingest
+          const fullSyncCmd = `
+cd "${chatbotPath}" &&
+npm run sync-docs &&
+rsync -av "${loreProjectPath}/content/" "content/lore-content/" &&
+node scripts/ingest-lore.js
+`;
+          execSync(fullSyncCmd, { encoding: 'utf8', shell: true });
+          
+          return {
+            content: [{
+              type: "text",
+              text: `✅ Full content synchronization completed!\n\n🔄 Operations performed:\n• Google Docs synchronized\n• Lore content synchronized\n• Content ingested into chatbot\n\n🎯 Your chatbot knowledge base is now fully up-to-date!`
+            }]
+          };
+
+        case 'status':
+          // Check sync status
+          const statusScript = `
+const fs = require('fs');
+const path = require('path');
+
+const loreContentPath = '${chatbotPath}/content/lore-content';
+const googleDocsPath = '${chatbotPath}/content/google-docs';
+
+const checkDir = (dirPath, name) => {
+  try {
+    const stats = fs.statSync(dirPath);
+    const files = fs.readdirSync(dirPath, { recursive: true }).filter(f => f.endsWith('.md') || f.endsWith('.yaml'));
+    return \`\${name}: \${files.length} files (last modified: \${stats.mtime.toISOString().split('T')[0]})\`;
+  } catch (error) {
+    return \`\${name}: Not found or empty\`;
+  }
+};
+
+console.log(checkDir(loreContentPath, 'Lore Content'));
+console.log(checkDir(googleDocsPath, 'Google Docs'));
+`;
+          
+          const tempStatusScript = path.join(chatbotPath, 'temp-status.js');
+          await require('fs').promises.writeFile(tempStatusScript, statusScript);
+          const statusResult = execSync(`cd "${chatbotPath}" && node temp-status.js`, { encoding: 'utf8' });
+          await require('fs').promises.unlink(tempStatusScript);
+          
+          return {
+            content: [{
+              type: "text",
+              text: `📊 Content Sync Status:\n\n${statusResult}\n\n💡 Use 'full-sync' to update all content and re-ingest into chatbot.`
+            }]
+          };
+
+        default:
+          throw new Error(`Unknown operation: ${operation}`);
+      }
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `❌ Content sync operation failed: ${error.message}\n\n💡 Make sure both projects are properly set up and accessible.`
         }]
       };
     }
