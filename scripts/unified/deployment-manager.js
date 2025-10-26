@@ -97,33 +97,41 @@ class BaseDeploymentManager {
   constructor() {
     this.startTime = Date.now();
     this.deploymentId = `deploy-${Date.now()}`;
-    this.credentials = {
-      accessKeyId: process.env.aws_wavelength_dev_access_key_id || 
-                   process.env.AWS_ACCESS_KEY_ID || 
-                   process.env.ACCESS_KEY_ID,
-      secretAccessKey: process.env.aws_wavelength_dev_secret_access_key || 
-                       process.env.AWS_SECRET_ACCESS_KEY || 
-                       process.env.SECRET_ACCESS_KEY
-    };
     
+    // 🛡️ SECURITY: Use AWS SDK default credential chain instead of storing credentials
+    this.validateCredentials();
     this.initializeClients();
   }
 
+  validateCredentials() {
+    // Validate required environment variables exist without storing them
+    const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY'];
+    const missing = requiredEnvVars.filter(key => !process.env[key]);
+    
+    if (missing.length > 0) {
+      throw new Error(`🚫 Missing required AWS credentials: ${missing.join(', ')}`);
+    }
+    
+    // Validate credential format without storing
+    if (!process.env.AWS_ACCESS_KEY_ID.match(/^AKIA[0-9A-Z]{16}$/)) {
+      throw new Error('🚫 Invalid AWS Access Key ID format');
+    }
+    
+    if (process.env.AWS_SECRET_ACCESS_KEY.length !== 40) {
+      throw new Error('🚫 Invalid AWS Secret Access Key format');
+    }
+  }
+
   initializeClients() {
-    this.apprunner = new AppRunnerClient({
-      region: CONFIG.AWS_REGION,
-      credentials: this.credentials
-    });
+    // 🛡️ SECURITY: Let AWS SDK handle credentials using default credential chain
+    const clientConfig = {
+      region: CONFIG.AWS_REGION
+      // AWS SDK will automatically use environment variables, IAM roles, etc.
+    };
     
-    this.ecr = new ECRClient({
-      region: CONFIG.AWS_REGION,
-      credentials: this.credentials
-    });
-    
-    this.cloudfront = new CloudFrontClient({
-      region: CONFIG.AWS_REGION,
-      credentials: this.credentials
-    });
+    this.apprunner = new AppRunnerClient(clientConfig);
+    this.ecr = new ECRClient(clientConfig);
+    this.cloudfront = new CloudFrontClient(clientConfig);
   }
 
   logInfo(message) {

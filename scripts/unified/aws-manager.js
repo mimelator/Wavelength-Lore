@@ -45,43 +45,43 @@ try {
 class AWSManager {
   constructor() {
     this.region = 'us-east-1';
-    this.credentials = {
-      accessKeyId: process.env.aws_wavelength_dev_access_key_id || 
-                   process.env.AWS_ACCESS_KEY_ID || 
-                   process.env.ACCESS_KEY_ID,
-      secretAccessKey: process.env.aws_wavelength_dev_secret_access_key || 
-                       process.env.AWS_SECRET_ACCESS_KEY || 
-                       process.env.SECRET_ACCESS_KEY
-    };
     
+    // 🛡️ SECURITY: Use AWS SDK default credential chain instead of storing credentials
+    this.validateCredentials();
     this.initializeClients();
   }
 
+  validateCredentials() {
+    // Validate required environment variables exist without storing them
+    const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY'];
+    const missing = requiredEnvVars.filter(key => !process.env[key]);
+    
+    if (missing.length > 0) {
+      throw new Error(`🚫 Missing required AWS credentials: ${missing.join(', ')}`);
+    }
+    
+    // Validate credential format without storing
+    if (!process.env.AWS_ACCESS_KEY_ID.match(/^AKIA[0-9A-Z]{16}$/)) {
+      throw new Error('🚫 Invalid AWS Access Key ID format');
+    }
+    
+    if (process.env.AWS_SECRET_ACCESS_KEY.length !== 40) {
+      throw new Error('🚫 Invalid AWS Secret Access Key format');
+    }
+  }
+
   initializeClients() {
-    this.cloudfront = new CloudFrontClient({
-      region: this.region,
-      credentials: this.credentials
-    });
+    // 🛡️ SECURITY: Let AWS SDK handle credentials using default credential chain
+    const clientConfig = {
+      region: this.region
+      // AWS SDK will automatically use environment variables, IAM roles, etc.
+    };
     
-    this.apprunner = new AppRunnerClient({
-      region: this.region,
-      credentials: this.credentials
-    });
-    
-    this.ecr = new ECRClient({
-      region: this.region,
-      credentials: this.credentials
-    });
-    
-    this.s3 = new S3Client({
-      region: this.region,
-      credentials: this.credentials
-    });
-    
-    this.iam = new IAMClient({
-      region: this.region,
-      credentials: this.credentials
-    });
+    this.cloudfront = new CloudFrontClient(clientConfig);
+    this.apprunner = new AppRunnerClient(clientConfig);
+    this.ecr = new ECRClient(clientConfig);
+    this.s3 = new S3Client(clientConfig);
+    this.iam = new IAMClient(clientConfig);
   }
 
   logInfo(message) {
@@ -141,12 +141,16 @@ class CloudFrontManager extends AWSManager {
     this.logHeader(`Cache Invalidation: ${distributionId}`);
     
     try {
+      // 🛡️ SECURITY: Validate inputs before use
+      const validatedDistributionId = this.validateDistributionId(distributionId);
+      const validatedPaths = this.validatePaths(paths);
+      
       const command = new CreateInvalidationCommand({
-        DistributionId: distributionId,
+        DistributionId: validatedDistributionId,
         InvalidationBatch: {
           Paths: {
-            Quantity: paths.length,
-            Items: paths
+            Quantity: validatedPaths.length,
+            Items: validatedPaths
           },
           CallerReference: `aws-manager-${Date.now()}`
         }
@@ -154,12 +158,51 @@ class CloudFrontManager extends AWSManager {
       
       const response = await this.cloudfront.send(command);
       this.logSuccess(`Invalidation created: ${response.Invalidation.Id}`);
-      this.logInfo(`Paths: ${paths.join(', ')}`);
+      this.logInfo(`Paths: ${validatedPaths.join(', ')}`);
       
       return response.Invalidation;
     } catch (error) {
       this.logError(`Failed to invalidate cache: ${error.message}`);
     }
+  }
+
+  validateDistributionId(id) {
+    if (!id || typeof id !== 'string') {
+      throw new Error('🚫 Distribution ID is required');
+    }
+    
+    // AWS CloudFront distribution ID format: E + 13 alphanumeric characters
+    if (!id.match(/^E[A-Z0-9]{13}$/)) {
+      throw new Error(`🚫 Invalid CloudFront Distribution ID format: ${id}`);
+    }
+    
+    return id;
+  }
+
+  validatePaths(paths) {
+    if (!Array.isArray(paths)) {
+      throw new Error('🚫 Paths must be an array');
+    }
+    
+    return paths.map(path => {
+      if (typeof path !== 'string') {
+        throw new Error('🚫 Each path must be a string');
+      }
+      
+      // Remove dangerous characters that could enable injection
+      const sanitized = path.replace(/[;&|`$(){}[\]]/g, '').trim();
+      
+      // Validate path format (must start with / and contain only safe characters)
+      if (!sanitized.match(/^\/[a-zA-Z0-9\/.\-_*]*$/)) {
+        throw new Error(`🚫 Invalid path format: ${path}`);
+      }
+      
+      if (sanitized !== path) {
+        this.logWarning(`Path sanitized: "${path}" -> "${sanitized}"`);
+      }
+      
+      return sanitized;
+    });
   }
   
   async analyzeDistribution(distributionId) {
@@ -437,8 +480,8 @@ class IAMManager extends AWSManager {
     console.log('');
     console.log('2. Configure AWS CLI:');
     console.log(chalk.cyan('   aws configure'));
-    console.log('   - AWS Access Key ID: [admin user access key]');
-    console.log('   - AWS Secret Access Key: [admin user secret key]');
+    console.log('   - AWS Access Key ID: [your-access-key-id]');
+    console.log('   - AWS Secret Access Key: [your-secret-access-key]');
     console.log('   - Default region: us-east-1');
     console.log('   - Default output format: json');
     console.log('');
@@ -488,7 +531,7 @@ class UnifiedAWSManager {
           console.error('Distribution ID required: --id <distribution-id>');
           return;
         }
-        const paths = options.paths ? options.paths.split(',') : ['/*'];
+        const paths = options.paths ? options.paths.split(',').map(p => p.trim()) : ['/*'];
         await this.cloudfront.invalidateCache(options.id, paths);
         break;
       default:

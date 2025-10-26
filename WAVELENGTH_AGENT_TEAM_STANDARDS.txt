@@ -41,8 +41,6 @@ node scripts/unified/smart-commit.js
 
 🎯 ENTRY POINT: /documentation/current-context/AI_COPILOT_PREFERENCES.md
 📚 METHODOLOGY: /documentation/ai-coding-workflows/AI_DEVELOPMENT_GUIDE.md
-⚡ WAVELENGTH TOOLS REFERENCE: /docs/WAVELENGTH_TOOLS_QUICK_REFERENCE.md
-🧠 TOOLS CHEAT SHEET: /docs/WAVELENGTH_TOOLS_CHEAT_SHEET.md ← USE THIS!
 
 ⚡ CRITICAL RULES (Non-Negotiable):
 • USE EXISTING SCRIPTS - Learn what exists first: ls -la scripts/unified/

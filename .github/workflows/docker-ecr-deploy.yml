@@ -29,10 +29,12 @@ jobs:
 
       - name: Check if Version Increment Needed
         id: check-version
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
           # Skip version increment if commit message contains [skip version]
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
-          if echo "$COMMIT_MSG" | grep -q "\[skip version\]"; then
+          # Use environment variable to avoid shell escaping issues
+          if echo "$COMMIT_MESSAGE" | grep -q "\[skip version\]"; then
             echo "skip=true" >> $GITHUB_OUTPUT
             echo "::notice::Skipping version increment due to [skip version] in commit message"
           else
@@ -522,57 +524,6 @@ jobs:
             echo "::error::This doesn't mean the ECR build failed - the image exists and is correct"
             exit 1
           fi
-          fi
-
-          # Check if current image contains the expected digest
-          if echo "$CURRENT_IMAGE" | grep -q "$EXPECTED_DIGEST"; then
-            echo "::notice::✅ Deployment verified! Running correct image with digest."
-            exit 0
-          fi
-
-          # If not using digest, check if it's the expected short SHA tag
-          SHORT_SHA="${{ steps.deploy-apprunner.outputs.short_sha }}"
-          if echo "$CURRENT_IMAGE" | grep -q "$SHORT_SHA"; then
-            echo "::notice::✅ Deployment verified! Running correct image with tag $SHORT_SHA."
-            exit 0
-          fi
-
-          # Check if using the expected version tag
-          EXPECTED_VERSION_TAG="${{ steps.deploy-apprunner.outputs.version_tag }}"
-          if echo "$CURRENT_IMAGE" | grep -q ":$EXPECTED_VERSION_TAG"; then
-            echo "::notice::✅ Verified! App Runner is using the correct version tag: $EXPECTED_VERSION_TAG"
-            exit 0
-          fi
-
-          # Check if using :latest tag (deprecated approach)
-          if echo "$CURRENT_IMAGE" | grep -q ":latest"; then
-            echo "::warning::⚠️  App Runner is still using :latest tag instead of specific version tag"
-            echo "::warning::This suggests the service update may not have completed yet"
-
-            # Verify the :latest tag in ECR has our expected digest
-            LATEST_DIGEST=$(aws ecr describe-images \
-              --repository-name wavelength-lore \
-              --image-ids imageTag=latest \
-              --query 'imageDetails[0].imageDigest' \
-              --output text 2>/dev/null)
-
-            if [ "$LATEST_DIGEST" = "$EXPECTED_DIGEST" ]; then
-              echo "::notice::✅ At least the :latest tag points to our expected digest."
-              echo "::notice::Deployment content is correct, but should use version tags going forward."
-              exit 0
-            else
-              echo "::error::❌ The :latest tag points to a different image!"
-              echo "::error::Expected: $EXPECTED_DIGEST"
-              echo "::error::Got: $LATEST_DIGEST"
-              exit 1
-            fi
-          fi
-
-          # Complete mismatch - something is wrong
-          echo "::error::❌ Deployment verification failed! Image mismatch."
-          echo "::error::Expected: Image with digest $EXPECTED_DIGEST or tag $SHORT_SHA"
-          echo "::error::Got: $CURRENT_IMAGE"
-          exit 1
 
       - name: Invalidate CloudFront Cache (Optional)
         env:

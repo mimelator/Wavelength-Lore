@@ -1,9 +1,5 @@
 # 🤖⚡ AI COPILOT + WAVELENGTH QUICK REFERENCE CARD ⚡🌊
 
-## 🚀 ONE-COMMAND SESSION START
-```bash
-node start-wavelength-session.js
-```
 
 ## 🚨 MANDATORY FIRST ACTIONS (Do These First!)
 

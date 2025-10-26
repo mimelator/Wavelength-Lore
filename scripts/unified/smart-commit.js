@@ -131,10 +131,92 @@ This commit adds [brief summary] to improve [area of improvement].
   }
 
   /**
+   * 🛡️ Security Scanner for Credentials
+   */
+  scanForCredentials(text) {
+    const patterns = [
+      { type: 'aws_access_key', pattern: /AKIA[0-9A-Z]{16}/g, description: 'AWS Access Key' },
+      { type: 'aws_secret_key', pattern: /[A-Za-z0-9/+=]{40}/g, description: 'AWS Secret Key' },
+      { type: 'slack_token', pattern: /xox[baprs]-[0-9a-zA-Z-]+/g, description: 'Slack Token' },
+      { type: 'stripe_key', pattern: /sk_live_[0-9a-zA-Z]{24}/g, description: 'Stripe Live Key' },
+      { type: 'google_api_key', pattern: /AIza[0-9A-Za-z-_]{35}/g, description: 'Google API Key' },
+      { type: 'github_token', pattern: /ghp_[A-Za-z0-9]{36}/g, description: 'GitHub Personal Access Token' },
+      { type: 'jwt_token', pattern: /eyJ[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*/g, description: 'JWT Token' }
+    ];
+    
+    const findings = [];
+    patterns.forEach(({ type, pattern, description }) => {
+      const matches = text.match(pattern);
+      if (matches) {
+        findings.push({
+          type,
+          description,
+          count: matches.length,
+          samples: matches.slice(0, 3).map(match => match.substring(0, 10) + '...')
+        });
+      }
+    });
+    
+    return findings;
+  }
+
+  /**
+   * 🛡️ Scan staged files for credentials
+   */
+  async scanStagedFiles() {
+    try {
+      // Get list of staged files
+      const { stdout } = await execAsync('git diff --cached --name-only', {
+        cwd: this.projectRoot
+      });
+      
+      const stagedFiles = stdout.trim().split('\n').filter(f => f.trim());
+      if (stagedFiles.length === 0) {
+        return [];
+      }
+      
+      const allFindings = [];
+      
+      for (const file of stagedFiles) {
+        try {
+          // Get staged content of the file
+          const { stdout: content } = await execAsync(`git show :"${file}"`, {
+            cwd: this.projectRoot
+          });
+          
+          const findings = this.scanForCredentials(content);
+          if (findings.length > 0) {
+            allFindings.push({ file, findings });
+          }
+        } catch (error) {
+          // Skip files that can't be read (binary, deleted, etc.)
+          continue;
+        }
+      }
+      
+      return allFindings;
+    } catch (error) {
+      console.warn('⚠️  Warning: Could not scan staged files for credentials:', error.message);
+      return [];
+    }
+  }
+
+  /**
    * Read and clean the commit message
    */
   readCommitMessage(filePath) {
     const content = fs.readFileSync(filePath, 'utf8');
+    
+    // 🛡️ SECURITY: Scan commit message for credentials
+    const credentialFindings = this.scanForCredentials(content);
+    if (credentialFindings.length > 0) {
+      console.error('🚨 SECURITY ALERT: Potential credentials found in commit message!');
+      credentialFindings.forEach(finding => {
+        console.error(`  - ${finding.description}: ${finding.count} occurrence(s)`);
+        console.error(`    Samples: ${finding.samples.join(', ')}`);
+      });
+      throw new Error('Commit message contains potential credentials. Please remove them before committing.');
+    }
     
     // Remove comment lines and empty lines at the end
     const lines = content.split('\n')
@@ -314,6 +396,33 @@ This commit adds [brief summary] to improve [area of improvement].
         } else {
           throw error;
         }
+      }
+
+      // 🛡️ SECURITY: Scan staged files for credentials
+      console.log('\n🛡️ Scanning staged files for credentials...');
+      const credentialFindings = await this.scanStagedFiles();
+      
+      if (credentialFindings.length > 0) {
+        console.error('\n🚨 SECURITY ALERT: Potential credentials found in staged files!');
+        credentialFindings.forEach(({ file, findings }) => {
+          console.error(`\n  File: ${file}`);
+          findings.forEach(finding => {
+            console.error(`    - ${finding.description}: ${finding.count} occurrence(s)`);
+            console.error(`      Samples: ${finding.samples.join(', ')}`);
+          });
+        });
+        
+        if (options.interactive) {
+          const shouldContinue = await this.confirm('\nCredentials detected! Continue anyway? (NOT RECOMMENDED)');
+          if (!shouldContinue) {
+            console.log('❌ Commit cancelled for security reasons');
+            return;
+          }
+        } else {
+          throw new Error('Staged files contain potential credentials. Use --interactive to override (NOT RECOMMENDED).');
+        }
+      } else {
+        console.log('✅ No credentials detected in staged files');
       }
 
       // Show commit message preview
