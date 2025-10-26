@@ -84,7 +84,7 @@ module.exports = {
 `;
 
 // Write the config file
-const configPath = path.join(__dirname, '../config/aws-resources.js');
+const configPath = path.join(process.cwd(), 'config', 'aws-resources.js');
 
 try {
   fs.writeFileSync(configPath, configContent, 'utf8');

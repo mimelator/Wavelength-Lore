@@ -17,7 +17,7 @@ class AWSConfigHelper {
     static async getConfig() {
         // Try to load from the actual config file first
         try {
-            const configPath = path.join(__dirname, '../../config/aws-resources.js');
+            const configPath = path.join(process.cwd(), 'config', 'aws-resources.js');
             const module = await import(configPath);
             return module.default;
         } catch (error) {
