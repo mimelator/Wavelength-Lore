@@ -1306,8 +1306,6 @@ class MerchandiseStore {
           <div class="product-image">
             <img src="${productImage}" alt="${productTitle}" />
             <div class="product-actions">
-              <button class="action-btn preview-product-btn" data-product-id="${productId}" title="Preview Product">
-                <span>👁️</span>
               </button>
               <button class="action-btn edit-product-btn" data-product-id="${productId}" title="Edit Product">
                 <span>✏️</span>
@@ -1415,9 +1413,6 @@ class MerchandiseStore {
             <p>Processing...</p>
           </div>
           <div class="product-actions">
-            <button class="action-btn preview-product-btn" data-product-id="${productId}" title="Preview Product">
-              <span>👁️</span>
-            </button>
             <button class="action-btn edit-product-btn" data-product-id="${productId}" title="Edit Product">
               <span>✏️</span>
             </button>
