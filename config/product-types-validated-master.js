@@ -5,8 +5,8 @@
  * This file contains ONLY validated blueprint/provider combinations
  * that have been tested against the Printify API.
  * 
- * Generated: 2025-10-26T17:40:40.525Z
- * Total Combinations: 111
+ * Generated: 2025-10-26T17:45:02.259Z
+ * Total Combinations: 142
  */
 
 module.exports = {
@@ -38,7 +38,7 @@ module.exports = {
 
   'tank-top-10': {
     id: 'tank-top-10',
-    name: 'Women's Flowy Racerback Tank',
+    name: 'Women\'s Flowy Racerback Tank',
     blueprintId: 10,
     printProviderId: 3,
     provider: 'OTTO Print',
@@ -92,15 +92,16 @@ module.exports = {
     // Validated: Blueprint 356 + Provider 10
   },
 
-  'women-tee-1110': {
-    id: 'women-tee-1110',
-    name: 'Women's Shorts (AOP)',
-    blueprintId: 1110,
+  'women-tee-256': {
+    id: 'women-tee-256',
+    name: 'Women\'s Cut & Sew Casual Leggings (AOP)',
+    blueprintId: 256,
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'women-tee',
-    description: 'These custom shorts were made to handle heat like champs thanks to their moisture-wicking fabric. Made with 95% Polyester and 5% Spandex, they balance perfectly between comfy and stretchy while remaining super soft to the touch. Each pair comes with white seam color and all-over-print capability. <div>.:Material: 95% moisture-wicking polyester, 5% spandex</div><br /><div>.:Brushed faux suede finish</div><br /><div>.:White thread color</div><br /><div>.:Printed-in size and care label</div><br /><div>.:Skinny fit</div>',
-    // Validated: Blueprint 1110 + Provider 10
+    description: '<p><span data-sheets-value="{&quot;1&quot;:2,&quot;2&quot;:&quot; \nCrisp imagery, vibrant colors and a soft touch - these elastic skinny fit leggings are perfect for any casual occasion in life.&quot;}" data-sheets-userformat="{&quot;2&quot;:9089,&quot;3&quot;:[null,0],&quot;10&quot;:1,&quot;11&quot;:4,&quot;12&quot;:0,&quot;16&quot;:9}">Crisp imagery, vibrant colors and a soft touch - these elastic skinny fit leggings are perfect for any casual occasion in life.</span></p>
+<p>&nbsp;</p><div>.:95% Polyester brushed suede 5% Spandex</div><br /><div>.:Skinny fit</div><br /><div>.:Tagless</div><br /><div>.:White thread color</div><br /><div>.:Runs true to size</div><br /><div>.:NB! Black color prints may appear in a greyish tone</div><br /><div>.:Assembled in the USA from globally sourced parts</div>',
+    // Validated: Blueprint 256 + Provider 10
   },
 
 
@@ -127,26 +128,37 @@ module.exports = {
     // Validated: Blueprint 220 + Provider 10
   },
 
-  'blanket-1091': {
-    id: 'blanket-1091',
-    name: 'Crushed Velvet Blanket',
-    blueprintId: 1091,
+  'canvas-235': {
+    id: 'canvas-235',
+    name: 'Shower Curtains',
+    blueprintId: 235,
+    printProviderId: 10,
+    provider: 'MWW On Demand',
+    category: 'canvas',
+    description: 'This shower curtain is here to add an original touch to any bathroom with your designs. Made with highly durable polyester, this curtain stays like new for a long time to come and is a perfect printing area for your art. Please note: While polyester offers adequate protection against water, a liner might be necessary for full waterproofness.<div>.:100% Polyester</div><br /><div>.:One-sided print</div><br /><div>.:Hooks not included</div><br /><div>.:Please note: Pre-constructed item. Size variance +/- 2"</div>',
+    // Validated: Blueprint 235 + Provider 10
+  },
+
+  'blanket-238': {
+    id: 'blanket-238',
+    name: 'Sherpa Fleece Blanket',
+    blueprintId: 238,
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'blanket',
-    description: 'Super soft, super comfy—this crushed velvet blanket with an original custom design will be the perfect addition to the living room couch. It\'s made from high-quality, durable 100% polyester fabric with zig-zag stitches on its edges.<div>.:100% polyester</div><br /><div>.:One size: 50" × 60" (127cm × 152.4cm )</div><br /><div>.:Thickness: 0.20\'\' (5mm)</div><br /><div>.:One-sided print</div><br /><div>.:Hemmed edges</div><br /><div>.:Shiny finish</div>',
-    // Validated: Blueprint 1091 + Provider 10
+    description: '<p>Wrap yourself—or someone you love—in warmth with our ultra-soft Sherpa Fleece Blanket. Designed for snuggling, this plush blanket is perfect for chilly nights on the couch or staying cozy at outdoor events.&nbsp;<br><br>Featuring thick, high-quality fleece with vibrant, one-sided printing and neatly hemmed edges, it combines luxurious comfort with personalized style. The reverse side offers irresistibly fluffy sherpa texture that feels like a warm hug—perfect for any occasion.</p><div>.:Made with 100% polyester that\'s 1/8\'\' (3mm) thick for extra warmth and a feel that is supremely soft to the touch</div><br /><div>.:Available in 3 sizes</div><br /><div>.:All fleeces come with a one-sided print and a velvety, plush backside for extra coziness</div><br /><div>.:Please note: This is a pre-constructed item. A size variance of +/- 3" is possible</div>',
+    // Validated: Blueprint 238 + Provider 10
   },
 
-  'canvas-1367': {
-    id: 'canvas-1367',
-    name: 'Wrapping Papers',
-    blueprintId: 1367,
+  'travel-mug-353': {
+    id: 'travel-mug-353',
+    name: 'Tumbler 20oz',
+    blueprintId: 353,
     printProviderId: 1,
     provider: 'Printful',
-    category: 'canvas',
-    description: 'Custom wrapping paper printing has never been easier, all thanks to these high-quality 90gsm fine-art wrapping papers. Available in 3x sizes for you to match all your customers\' needs, these wrapping papers come with a matte or glossy finish and feature a high-definition print. Paper comes neatly rolled up for an excellent delivery experience.<div>.:Material: 90 gsm fine art paper</div><br /><div>.:Available in three sizes: 30" × 36", 30" × 72" and 30" x 180"</div><br /><div>.:One-sided print</div><br /><div>.:Matte or glossy finish</div><br /><div>.:Please note: Wrapping paper from SPOKE includes white spaces at top and bottom edges with a bar and QR code</div>',
-    // Validated: Blueprint 1367 + Provider 1
+    category: 'travel-mug',
+    description: 'This tumbler is an excellent choice for daily use to keep 20oz of your favorite beverages hot or cold thanks to the double-wall insulation. Meanwhile, the stainless steel construction provides excellent durability and it\'s dishwasher safe for added convenience.<div>.:Materials: stainless steel (body), plastic and rubber (lid)</div><br /><div>.:One size: 20oz (0.59 l)</div><br /><div>.:Rounded corners</div><br /><div>.:Vacuum insulated steel body with a clear push on lid with a rubber gasket</div><br /><div>.:Glossy finish</div>',
+    // Validated: Blueprint 353 + Provider 1
   },
 
 
@@ -195,6 +207,28 @@ module.exports = {
     // Validated: Blueprint 31 + Provider 3
   },
 
+  'backpack-413': {
+    id: 'backpack-413',
+    name: 'Backpack',
+    blueprintId: 413,
+    printProviderId: 10,
+    provider: 'MWW On Demand',
+    category: 'backpack',
+    description: 'Have you got room for all that? With our roomy and durable backpack, you will! This bag is made from spun polyester and weights 1.3 lbs, just enough to be light, strong and long-lasting. Grab it, stow it, throw it onto the seat next to you, this backpack can take it, and so will you, wherever you go!<div>.:Material: 100% Lightweight Polyester</div><br /><div>.:Adjustable shoulder straps</div><br /><div>.:Blank name tag sewn inside</div><br /><div>.:Please note: Dashed lines used in the cut & sew process may be visible in the front pocket\'s interior</div><br /><div>.:Assembled in the USA from globally sourced parts</div>',
+    // Validated: Blueprint 413 + Provider 10
+  },
+
+  'hat-1050': {
+    id: 'hat-1050',
+    name: 'Women’s Capri Leggings (AOP)',
+    blueprintId: 1050,
+    printProviderId: 10,
+    provider: 'MWW On Demand',
+    category: 'hat',
+    description: 'Capri leggings are comfy, capri leggings are stylish - the perfect chameleon for all occasions can now be fully customized with your designs. Made with anti-microbial polyester spandex that is both moisture-wicking and breathable, these leggings come with a mid-rise waist and are the perfect choice for lounging at home, running, or sweating it out at the gym. <div>.:Material: 95% moisture-wicking polyester, 5% spandex</div><br /><div>.:Printed-in size and care label</div><br /><div>.:White seam stitching</div><br /><div>.:Skinny fit</div><br /><div>.:Assembled in the USA from globally sourced parts</div>',
+    // Validated: Blueprint 1050 + Provider 10
+  },
+
   'fanny-pack-1589': {
     id: 'fanny-pack-1589',
     name: 'Basketball Training Shorts (AOP)',
@@ -204,20 +238,6 @@ module.exports = {
     category: 'fanny-pack',
     description: '<p>Engineered for maximum performance, the Basketball Training Shorts (AOP) are a fusion of style and functionality. Designed with the modern athlete in mind, the Basketball Training Shorts (AOP) boast moisture-wicking performance polyester to keep you cool and dry during even the most intense training sessions. The breathable fabric ensures optimal airflow, while the construction provides unrestricted movement, featuring an extra-wide elastic waistband and super deep pockets.</p><div>.:100% Polyester</div><br /><div>.:Elastic waistband</div><br /><div>.:Breathable fabric</div><br /><div>.:White drawstring</div>',
     // Validated: Blueprint 1589 + Provider 10
-  },
-
-  'hat-1951': {
-    id: 'hat-1951',
-    name: 'Relaxed Classic Dad Cap',
-    blueprintId: 1951,
-    printProviderId: 29,
-    provider: 'TBD',
-    category: 'hat',
-    description: 'Made with 100% cotton twill for a soft, breathable feel and broken-in comfort right out of the box.
-Features a classic unstructured, 6-panel design with a low-profile crown and pre-curved visor.
-Adjustable strap with metal buckle ensures a secure, customizable fit for most head sizes.
-Interior includes a cotton sweatband for added comfort and a clean finish.<div>.:100% cotton twill</div><br /><div>.:Classic unstructured, 6-panel design</div><br /><div>.:Low-profile crown</div><br /><div>.:Pre-curved visor</div><br /><div>.:Fabric strap with antique brass sliding buckle</div>',
-    // Validated: Blueprint 1951 + Provider 29
   },
 
 
@@ -244,21 +264,21 @@ Interior includes a cotton sweatband for added comfort and a clean finish.<div>.
     // Validated: Blueprint 74 + Provider 1
   },
 
-  'specialty-item-1591': {
-    id: 'specialty-item-1591',
-    name: 'Quilted Bed Runner',
-    blueprintId: 1591,
+  'specialty-item-254': {
+    id: 'specialty-item-254',
+    name: 'Bath Mat',
+    blueprintId: 254,
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'specialty-item',
-    description: '<p>Crafted with meticulous attention to detail, the Quilted Bed Runner features your designs and adds a pop of personality to any bedding ensemble. Available in King, Queen, Full, and Twin sizes and made from 100% polyester, the Quilted Bed Runner offers both style and durability, ensuring it withstands the test of time while enhancing the visual charm of your space.</p><div>.:100% Polyester</div><br /><div>.:King, Queen, Twin and Full sizes</div><br /><div>.:Quilted pattern</div>',
-    // Validated: Blueprint 1591 + Provider 10
+    description: 'More personalization options for the most private room in one\'s house. This bath mat is as practical as it is stylish - the anti-slip backing keeps the bath mat firmly in place and reduces the risk of slipping.<div>.:Material: 100% Memory foam microfiber</div><br /><div>.:Binding around the edges</div><br /><div>.:Anti-slip backing</div><br /><div>.:Note: Pre-constructed item. Size variance: 24" × 17" +/- 0.75"; 34" × 21" +/- 1"</div><br /><div>.:Blank product sourced from China</div>',
+    // Validated: Blueprint 254 + Provider 10
   },
 
 };
 
 // VALIDATION SUMMARY:
 // Total Blueprints Analyzed: 708
-// Valid Combinations Found: 111
-// Categories Generated: 21
-// Generated: 2025-10-26T17:40:40.525Z
+// Valid Combinations Found: 142
+// Categories Generated: 23
+// Generated: 2025-10-26T17:45:02.259Z

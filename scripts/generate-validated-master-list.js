@@ -376,7 +376,7 @@ module.exports = {\n`;
           
           fileContent += `  '${bestProduct.id}': {\n`;
           fileContent += `    id: '${bestProduct.id}',\n`;
-          fileContent += `    name: '${bestProduct.name}',\n`;
+          fileContent += `    name: '${bestProduct.name.replace(/'/g, "\\'")}',\n`;
           fileContent += `    blueprintId: ${bestProduct.blueprintId},\n`;
           fileContent += `    printProviderId: ${bestProduct.printProviderId},\n`;
           fileContent += `    provider: '${bestProduct.providerName}',\n`;
