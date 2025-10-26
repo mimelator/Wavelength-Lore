@@ -383,8 +383,17 @@ router.get('/api/posts/recent', async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const page = parseInt(req.query.page) || 1;
         
-        const firebaseService = require('../services/firebase-admin');
-        const db = firebaseService.getDatabase();
+        const admin = require('firebase-admin');
+        
+        if (admin.apps.length === 0) {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount),
+                databaseURL: process.env.DATABASE_URL
+            });
+        }
+        
+        const db = admin.database();
         const postsRef = db.ref('forum/posts');
         const snapshot = await postsRef.once('value');
         const allPosts = snapshot.val() || {};
