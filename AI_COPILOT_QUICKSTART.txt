@@ -12,14 +12,49 @@ We're trying to save as much time as possible and make everyone more efficient b
 
 **HOW TO PARTICIPATE:** Use MCP tools instead of requesting manual approvals. See MCP section below for the new superpowers!
 
-🧠 **MCP PROTOCOL EXAMPLES (Use These Directly):**
+🧠 **MCP PROTOCOL - AI AGENTS ONLY! (NOT FOR DEVELOPERS)**
+⚠️ CRITICAL: MCP tools are exclusively for AI agents - developers use Node.js tools instead!
+
+�‍💻 **DEVELOPER INITIALIZES SESSION (ONE TIME):**
+```bash
+# Developer runs this once to set up the session environment
+node start-wavelength-session.js
+node session-status.js
+```
+
+🤖 **AI AGENTS JOIN ESTABLISHED SESSION:**
 ```javascript
-// Proper MCP protocol calls - agents call these directly
-await mcp.callTool("wavelength_validate", {content: "...", type: "character"});
+// Agents check session status (initialize: false - joining existing session)
+await mcp.callTool("wavelength_server_status", {check: "full", initialize: false});
+```
+
+✅ APPROPRIATE (AI Agents - After Joining Session):
+```javascript
+// AI agents call these internally via Model Context Protocol
+await mcp.callTool("wavelength_validate", {content: "character bio", type: "character"});
 await mcp.callTool("firebase_query", {path: "/episodes", operation: "read"});
-await mcp.callTool("wavelength_character_search", {query: "goblin traits", limit: 5});
-await mcp.callTool("wavelength_content_generate", {type: "episode_summary", theme: "mystery"});
-await mcp.callTool("wavelength_lore_validate", {content: "character backstory", rules: "canon"});
+```
+
+❌ INAPPROPRIATE - NEVER DO THIS:
+- Developers calling mcp.callTool() in regular code
+- Using MCP syntax in Node.js applications
+- Calling MCP from terminal/shell scripts
+- Mixing MCP with regular JavaScript
+
+🎯 TOOL USAGE BY ROLE:
+
+**🤖 FOR AI AGENTS - USE MCP PROTOCOL:**
+```javascript
+// AI agents use MCP protocol
+await mcp.callTool("wavelength_test_runner", {action: "validate", type: "character"});
+await mcp.callTool("wavelength_firebase_manager", {operation: "query", path: "/episodes"});
+```
+
+**👨‍💻 FOR DEVELOPERS - USE NODE.JS:**
+```bash
+# Developers use Node.js tools directly
+node scripts/unified/test-runner.js validate --type character
+node scripts/unified/firebase-manager.js query --path /episodes
 ```
 
 👋 Welcome to the WAVELENGTH DEVELOPMENT ENVIRONMENT! 

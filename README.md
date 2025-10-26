@@ -37,15 +37,56 @@ All project documentation has been organized in the [`docs/`](docs/) folder:
 - **[🛠️ MCP Tools Documentation](docs/MCP_TOOLS_DOCUMENTATION.md)** - Model Context Protocol tools for AI automation
 - **[⚡ MCP Quick Reference](docs/MCP_QUICK_REFERENCE.md)** - Essential MCP commands and usage examples
 
-### 🧠 MCP Protocol Examples
-```javascript
-// Proper MCP protocol calls - agents use these directly
-await mcp.callTool("wavelength_validate", {content: "...", type: "character"});
-await mcp.callTool("firebase_query", {path: "/episodes", operation: "read"});
-await mcp.callTool("wavelength_character_search", {query: "goblin traits", limit: 5});
-await mcp.callTool("wavelength_content_generate", {type: "episode_summary", theme: "mystery"});
-await mcp.callTool("wavelength_lore_validate", {content: "character backstory", rules: "canon"});
+### 🧠 MCP Protocol - Understanding the Difference
+
+**⚠️ CRITICAL: MCP is for AI Agents ONLY - NOT for developers!**
+
+#### � SESSION WORKFLOW:
+
+**👨‍💻 Developer Initializes Session (One Time):**
+```bash
+# Developer runs this once to set up the session environment
+node start-wavelength-session.js
 ```
+
+**🤖 AI Agents Join Established Session:**
+```javascript
+// Agents join existing session (initialize: false)
+await mcp.callTool("wavelength_server_status", {check: "full", initialize: false});
+```
+
+#### ✅ APPROPRIATE - AI Agents (After Joining Session):
+```javascript
+// AI agents use MCP internally to communicate with tools
+await mcp.callTool("wavelength_validate", {content: "character bio", type: "character"});
+await mcp.callTool("firebase_query", {path: "/episodes", operation: "read"});
+```
+
+#### ❌ INAPPROPRIATE - Common Confusion:
+- ❌ Developers calling `mcp.callTool()` in application code
+- ❌ Using MCP syntax in Node.js scripts or terminal
+- ❌ Production applications containing MCP protocol calls
+- ❌ Mixing MCP with regular development workflows
+
+#### 🎯 Tool Usage by Role:
+
+**🤖 AI Agents - Use MCP Protocol:**
+```javascript
+// Agents use MCP protocol exclusively
+await mcp.callTool("wavelength_validate", {content: "character data", type: "character"});
+await mcp.callTool("firebase_query", {path: "/episodes", operation: "read"});
+await mcp.callTool("wavelength_test_runner", {command: "validate", content: "character data"});
+```
+
+**👨‍💻 Developers - Use Node.js Tools:**
+```bash
+# Developers use Node.js tools directly
+node scripts/unified/wavelength-validator.js --type character
+node scripts/unified/firebase-manager.js --operation read --path /episodes
+node scripts/unified/test-runner.js validate --content "character data"
+```
+
+**Key Difference**: MCP = AI agent communication protocol | Node.js tools = actual developer utilities
 - **[�🔒 Security Guide](docs/SECURITY_ENHANCEMENT_GUIDE.md)** - Security implementation and best practices
 - **[💾 Backup System](docs/BACKUP_CONFIGURATION.md)** - Automated database backup setup
 - **[🤖 Chatbot Integration](tests/chatbot/CHATBOT_TESTING_SUMMARY.md)** - Firebase Functions chatbot architecture and validation

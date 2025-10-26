@@ -66,14 +66,48 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 }));
 ```
 
-#### Agent Usage Examples (MCP Protocol)
+#### ⚠️ CRITICAL: AI Agent Usage Only (NOT for Developers)
+
+**Understanding MCP Protocol:**
+- MCP = Model Context Protocol (AI agent ↔ tool communication)
+- **NOT** for developers to call directly in code
+- **NOT** for terminal/shell usage
+- **ONLY** for AI agents communicating with tools
+
+#### 🚨 MANDATORY FIRST ACTION FOR AI AGENTS:
 ```javascript
-// Proper MCP protocol calls - agents use these directly
-await mcp.callTool("wavelength_validate", {content: "...", type: "character"});
-await mcp.callTool("wavelength_character_search", {query: "goblin traits", limit: 5});
-await mcp.callTool("wavelength_lore_validate", {content: "episode script", rules: "canon"});
+// AGENTS MUST INVOKE SERVER STATUS IMMEDIATELY BEFORE ANY OTHER ACTIONS
+await mcp.callTool("wavelength_server_status", {check: "full", initialize: true});
+```
+
+#### ✅ APPROPRIATE - AI Agents Only (After Status Check):
+```javascript
+// AI agents call these internally via MCP protocol
+await mcp.callTool("wavelength_validate", {content: "character bio", type: "character"});
 await mcp.callTool("firebase_query", {path: "/episodes", operation: "read"});
-await mcp.callTool("wavelength_content_generate", {type: "character_bio", theme: "mystery"});
+```
+
+#### ❌ INAPPROPRIATE - Common Mistakes:
+- Developers using `mcp.callTool()` in Node.js applications
+- Shell scripts with MCP syntax
+- Production code containing MCP calls
+- Mixing MCP with regular JavaScript functions
+
+#### 🎯 Tool Usage by Role:
+
+**🤖 AI Agents - Use MCP Protocol:**
+```javascript
+// Agents use MCP protocol exclusively
+await mcp.callTool("wavelength_validate", {content: "character bio", type: "character"});
+await mcp.callTool("firebase_query", {path: "/episodes", operation: "read"});
+await mcp.callTool("wavelength_character_search", {query: "goblin traits", limit: 5});
+```
+
+**👨‍💻 Developers - Use Node.js Tools:**
+```bash
+# Developers use Node.js tools directly
+node scripts/unified/wavelength-validator.js --content "character bio" --type character
+node scripts/unified/firebase-manager.js --path /episodes --operation read
 ```
 
 #### Phase 2: Integration Points
