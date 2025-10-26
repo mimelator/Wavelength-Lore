@@ -1,7 +1,7 @@
 /**
  * Wavelength Gems - Background Diagnostics
  * Automated diagnostics for background visibility issues
- * DISABLED for AdMob testing
+ * Can be disabled for clean testing
  */
 
 class BackgroundDiagnostics {

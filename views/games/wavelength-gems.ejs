@@ -522,31 +522,17 @@
 
     <%- include('../partials/footer') %>
 
-    <!-- Pass environment variables to front-end for AdMob configuration -->
+    <!-- Environment configuration (ad system removed) -->
     <script>
         // Create window.ENV object to store environment variables safely
         window.ENV = window.ENV || {};
-        
-        <% if (typeof adMobEnvVars !== 'undefined') { %>
-            // Populate with AdMob configuration from server environment variables
-            <% for(let key in adMobEnvVars) { %>
-                window.ENV['<%= key %>'] = '<%= adMobEnvVars[key] %>';
-            <% } %>
-        <% } %>
-        
-        console.log('Environment configuration loaded');
+        console.log('Environment configuration loaded (ad-free)');
     </script>
-
-    <!-- Load AdMob configuration before other scripts -->
-    <script src="/js/games/wavelength-gems/admob-config.js"></script>
     <script src="/js/games/wavelength-gems/retry-threshold-manager.js"></script>
     <script src="/js/games/wavelength-gems/retry-threshold-ui.js"></script>
     <script src="/js/games/wavelength-gems/retry-threshold-test.js"></script>
-    <script src="/js/games/wavelength-gems/ad-system.js"></script>
-    
-    <!-- AdMob Test Interface - REMOVE BEFORE PRODUCTION 
-    <script src="/js/games/wavelength-gems/admob-test-interface.js"></script>
-    -->
+
+
     
     <!-- Load level system first (must be before engine.js) -->
     <script src="/js/games/wavelength-gems/levels.js"></script>

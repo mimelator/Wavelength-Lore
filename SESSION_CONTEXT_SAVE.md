@@ -83,7 +83,7 @@ WavelengthGemsUIPolishTests.runAllTests()
 ## 🎮 Game Context
 - **Game:** Wavelength Gems (Match-3 puzzle game)
 - **Architecture:** Canvas-based rendering, YAML level system
-- **Features:** Episode integration, admin panel (Ctrl+Shift+D), AdMob monetization
+- **Features:** Episode integration, admin panel (Ctrl+Shift+D), ad-free VIP experience
 - **Focus:** Mobile-first UI polish with comprehensive testing baseline
 
 ---

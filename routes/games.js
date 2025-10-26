@@ -28,34 +28,6 @@ router.get('/', groupAuth.requireAction('game_access'), (req, res) => {
  * Wavelength Gems - Match-3 Puzzle Game
  */
 router.get('/wavelength-gems', groupAuth.requireAction('game_access'), (req, res) => {
-    // Collect AdMob environment variables
-    const adMobEnvVars = {
-        // App IDs
-        ADMOB_APP_ID_ANDROID: process.env.ADMOB_APP_ID_ANDROID || '',
-        ADMOB_APP_ID_IOS: process.env.ADMOB_APP_ID_IOS || '',
-        ADMOB_APP_ID_WEB: process.env.ADMOB_APP_ID_WEB || '',
-        
-        // Rewarded video ad units
-        ADMOB_REWARDED_VIDEO_PROD: process.env.ADMOB_REWARDED_VIDEO_PROD || '',
-        ADMOB_REWARDED_EXTRA_LIFE_PROD: process.env.ADMOB_REWARDED_EXTRA_LIFE_PROD || '',
-        ADMOB_REWARDED_POWER_GEM_PROD: process.env.ADMOB_REWARDED_POWER_GEM_PROD || '',
-        ADMOB_REWARDED_SCORE_MULTI_PROD: process.env.ADMOB_REWARDED_SCORE_MULTI_PROD || '',
-        
-        // Interstitial ad units
-        ADMOB_INTERSTITIAL_PROD: process.env.ADMOB_INTERSTITIAL_PROD || '',
-        ADMOB_INTERSTITIAL_LEVEL_PROD: process.env.ADMOB_INTERSTITIAL_LEVEL_PROD || '',
-        ADMOB_INTERSTITIAL_GAMEOVER_PROD: process.env.ADMOB_INTERSTITIAL_GAMEOVER_PROD || '',
-        
-        // Settings
-        ADMOB_USE_TEST_ADS: process.env.ADMOB_USE_TEST_ADS || 'true',
-        ADMOB_ENABLED: process.env.ADMOB_ENABLED || 'true',
-        ADMOB_MIN_TIME_BETWEEN_ADS: process.env.ADMOB_MIN_TIME_BETWEEN_ADS || '60000',
-        ADMOB_INTERSTITIAL_FREQUENCY: process.env.ADMOB_INTERSTITIAL_FREQUENCY || '3',
-        ADMOB_MAX_CONTENT_RATING: process.env.ADMOB_MAX_CONTENT_RATING || 'PG',
-        ADMOB_CHILD_DIRECTED: process.env.ADMOB_CHILD_DIRECTED || 'false',
-        ADMOB_UNDER_AGE_CONSENT: process.env.ADMOB_UNDER_AGE_CONSENT || 'false'
-    };
-    
     res.render('games/wavelength-gems', {
         title: 'Wavelength Gems',
         currentPage: 'wavelength-gems',
@@ -65,7 +37,6 @@ router.get('/wavelength-gems', groupAuth.requireAction('game_access'), (req, res
         ],
         cdnUrl: process.env.CDN_URL,
         version: `v${Date.now()}`,
-        adMobEnvVars: adMobEnvVars, // Pass AdMob env vars to the template
         userGroups: req.userGroups || [] // Pass user groups for permission checks
     });
 });

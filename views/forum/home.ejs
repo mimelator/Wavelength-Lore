@@ -137,42 +137,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadForumCategories() {
     try {
-        const categoriesRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/categories');
-        window.firebaseUtils.onValue(categoriesRef, (snapshot) => {
-            const categories = snapshot.val();
-            const container = document.getElementById('forum-categories-container');
-            
-            if (categories) {
-                const categoriesArray = Object.values(categories).sort((a, b) => a.order - b.order);
-                container.innerHTML = categoriesArray.map(category => `
-                    <div class="category-card" onclick="location.href='/forum/category/${category.id}'">
-                        <div class="category-header">
-                            <div class="category-icon">
-                                <img src="${category.iconSvg}" alt="${category.icon}" class="category-icon-svg">
-                            </div>
-                            <div class="category-info">
-                                <h4 class="category-title" style="color: ${category.color}">${category.title}</h4>
-                                <p class="category-description">${category.description}</p>
-                            </div>
+        const response = await fetch('/forum/api/categories');
+        const data = await response.json();
+        const container = document.getElementById('forum-categories-container');
+        
+        if (data.success && data.categories) {
+            const categoriesArray = Object.values(data.categories);
+            container.innerHTML = categoriesArray.map(category => `
+                <div class="category-card" onclick="location.href='/forum/category/${category.id}'">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <span class="category-icon-emoji">${category.icon}</span>
                         </div>
-                        <div class="category-stats">
-                            <div class="stat">
-                                <span class="stat-number">${category.postCount || 0}</span>
-                                <span class="stat-label">Posts</span>
-                            </div>
-                            <div class="category-last-activity">
-                                ${category.lastActivity ? 
-                                    `<span class="last-activity">Latest: ${formatTimeAgo(category.lastActivity)}</span>` : 
-                                    '<span class="no-activity">No posts yet</span>'
-                                }
-                            </div>
+                        <div class="category-info">
+                            <h4 class="category-title" style="color: ${category.color}">${category.title}</h4>
+                            <p class="category-description">${category.description}</p>
                         </div>
                     </div>
-                `).join('');
-            } else {
-                container.innerHTML = '<p class="no-content">No categories found.</p>';
-            }
-        });
+                    <div class="category-stats">
+                        <div class="stat">
+                            <span class="stat-number">${category.postCount || 0}</span>
+                            <span class="stat-label">Posts</span>
+                        </div>
+                        <div class="category-last-activity">
+                            <span class="no-activity">Ready for posts!</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<p class="no-content">No categories found.</p>';
+        }
     } catch (error) {
         console.error('Error loading categories:', error);
         document.getElementById('forum-categories-container').innerHTML = 
@@ -182,20 +177,12 @@ async function loadForumCategories() {
 
 async function loadRecentPosts() {
     try {
-        const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
-        const recentQuery = window.firebaseUtils.query(postsRef, window.firebaseUtils.orderByChild('createdAt'));
+        const response = await fetch('/forum/api/posts/recent?limit=5');
+        const data = await response.json();
+        const container = document.getElementById('recent-posts-container');
         
-        window.firebaseUtils.onValue(recentQuery, (snapshot) => {
-            const posts = snapshot.val();
-            const container = document.getElementById('recent-posts-container');
-            
-            if (posts) {
-                const postsArray = Object.entries(posts)
-                    .map(([id, post]) => ({id, ...post}))
-                    .sort((a, b) => b.createdAt - a.createdAt)
-                    .slice(0, 5);
-                
-                container.innerHTML = postsArray.map(post => `
+        if (data.success && data.posts && data.posts.length > 0) {
+            container.innerHTML = data.posts.map(post => `
                     <div class="recent-post-item" onclick="location.href='/forum/post/${post.id}'">
                         <div class="post-author">
                             <img src="${post.authorAvatar || '/icons/hero-icon.svg'}" alt="${post.authorName}" class="author-avatar">
@@ -223,10 +210,15 @@ async function loadRecentPosts() {
                         </div>
                     </div>
                 `).join('');
-            } else {
-                container.innerHTML = '<p class="no-content">No recent posts found.</p>';
-            }
-        });
+        } else {
+            container.innerHTML = `
+                <div class="no-posts-message">
+                    <h4>🌟 Be the first to start a discussion!</h4>
+                    <p>The forum is ready for your thoughts, theories, and conversations about Wavelength.</p>
+                    <a href="/forum/create" class="btn btn-primary">Create First Post</a>
+                </div>
+            `;
+        }
     } catch (error) {
         console.error('Error loading recent posts:', error);
         document.getElementById('recent-posts-container').innerHTML = 
@@ -273,30 +265,23 @@ async function loadPinnedPosts() {
 
 async function loadForumStats() {
     try {
-        // Load total posts with real-time updates
-        const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
-        window.firebaseUtils.onValue(postsRef, (snapshot) => {
-            const posts = snapshot.val();
-            const totalPosts = posts ? Object.keys(posts).length : 0;
-            document.getElementById('total-posts').textContent = totalPosts;
-        });
+        const response = await fetch('/forum/api/stats');
+        const data = await response.json();
         
-        // Load total members with real-time updates
-        const usersRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/users');
-        window.firebaseUtils.onValue(usersRef, (snapshot) => {
-            const users = snapshot.val();
-            const totalMembers = users ? Object.keys(users).length : 0;
-            document.getElementById('total-members').textContent = totalMembers;
-        });
-        
-        // Load online users (users active in last 5 minutes)
-        loadOnlineUsers();
-        
-        // Update online status every minute
-        setInterval(loadOnlineUsers, 60000);
-        
+        if (data.success && data.stats) {
+            document.getElementById('total-posts').textContent = data.stats.totalPosts || 0;
+            document.getElementById('total-members').textContent = data.stats.totalUsers || 0;
+            document.getElementById('online-users').textContent = data.stats.activeUsers || 0;
+        } else {
+            document.getElementById('total-posts').textContent = '0';
+            document.getElementById('total-members').textContent = '0';
+            document.getElementById('online-users').textContent = '0';
+        }
     } catch (error) {
         console.error('Error loading forum stats:', error);
+        document.getElementById('total-posts').textContent = '0';
+        document.getElementById('total-members').textContent = '0';
+        document.getElementById('online-users').textContent = '0';
     }
 }
 

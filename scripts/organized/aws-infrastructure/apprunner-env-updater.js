@@ -189,8 +189,7 @@ class AppRunnerEnvUpdater {
       'PRINTIFY_ENVIRONMENT',
       'PRINTIFY_MOCK_MODE',
       
-      // Applixir Ads Configuration
-      'APPLIXIR_API_KEY',
+
 
     ];
 

@@ -1,29 +1,29 @@
-# Gem Assets for AdMob Rewards
+# Gem Assets for Game Features
 
-This document explains the gem assets used for the different AdMob reward types in Wavelength Gems.
+This document explains the gem assets used for different game features and UI elements in Wavelength Gems.
 
 ## Available Gem Images
 
-The following SVG images are available for use in the reward system:
+The following SVG images are available for use in the game UI:
 
-1. **Special Gem** (`/static/images/special-gem.svg`): Default gem used for general rewards
-2. **Life Gem** (`/static/images/life-gem.svg`): Used for extra life rewards
-3. **Power Gem** (`/static/images/power-gem.svg`): Used for power-up rewards
-4. **Multiplier Gem** (`/static/images/multiplier-gem.svg`): Used for score multiplier rewards
+1. **Special Gem** (`/static/images/special-gem.svg`): Default gem used for special UI elements
+2. **Life Gem** (`/static/images/life-gem.svg`): Used for extra life indicators
+3. **Power Gem** (`/static/images/power-gem.svg`): Used for power-up indicators
+4. **Multiplier Gem** (`/static/images/multiplier-gem.svg`): Used for score multiplier displays
 
 ## Usage in the Code
 
-The gems are dynamically loaded in the AdMob reward system based on the type of reward being offered:
+The gems are dynamically loaded in the game UI based on the type of feature being displayed:
 
 ```javascript
-// Example for life gem
-const rewardImage = document.getElementById('ad-reward-image');
-if (rewardImage) {
-  rewardImage.src = '/static/images/life-gem.svg';
+// Example for life gem display
+const featureImage = document.getElementById('game-feature-image');
+if (featureImage) {
+  featureImage.src = '/static/images/life-gem.svg';
 }
 ```
 
-Each reward offer method (`offerExtraLife`, `offerSpecialGem`, `offerScoreMultiplier`) updates the image source before showing the dialog.
+Different UI methods can update the image source to show appropriate gem types for various game features.
 
 ## Customizing Gems
 

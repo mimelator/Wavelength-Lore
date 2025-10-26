@@ -403,7 +403,7 @@ const SYSTEM_MODULES = {
     core: ["engine.js", "levels.js", "ui.js"],
     visual: ["background-gallery.js", "level-briefing.js"],
     tools: ["admin-panel.js", "validator.js", "diagnostics.js"],
-    monetization: ["ad-system.js", "retry-threshold-manager.js"],
+    monetization: ["retry-threshold-manager.js"], // Ad system removed for VIP experience
     integration: ["permission-check.js", "analytics.js"]
 };
 ```

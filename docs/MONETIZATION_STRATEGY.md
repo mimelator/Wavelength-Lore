@@ -1,8 +1,12 @@
 # Wavelength Gems Monetization Strategy
 
-## Overview
+> **⚠️ DEPRECATED:** This document is preserved for historical reference. Wavelength Gems now operates as an **ad-free VIP gaming experience**. All advertising systems have been removed in favor of a premium, uninterrupted gameplay experience for VIP+ members.
 
-This document outlines a comprehensive strategy for integrating a commercial/advertising system into the Wavelength Gems game. The goal is to generate revenue to support hosting costs and ongoing development while maintaining an excellent player experience.
+## Overview (Historical)
+
+This document outlined a comprehensive strategy for integrating a commercial/advertising system into the Wavelength Gems game. The goal was to generate revenue to support hosting costs and ongoing development while maintaining an excellent player experience.
+
+**Current Status:** The game has moved to a VIP-only, ad-free model for a superior user experience.
 
 ## Monetization Approaches
 

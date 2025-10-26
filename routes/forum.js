@@ -383,15 +383,33 @@ router.get('/api/posts/recent', async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const page = parseInt(req.query.page) || 1;
         
-        // This would fetch from Firebase in a real implementation
+        const admin = require('firebase-admin');
+        if (!admin.apps.length) {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount),
+                databaseURL: process.env.DATABASE_URL
+            });
+        }
+        
+        const db = admin.database();
+        const postsRef = db.ref('forum/posts');
+        const snapshot = await postsRef.once('value');
+        const allPosts = snapshot.val() || {};
+        
+        const postsArray = Object.entries(allPosts)
+            .map(([id, post]) => ({id, ...post}))
+            .sort((a, b) => b.createdAt - a.createdAt)
+            .slice((page - 1) * limit, page * limit);
+        
         res.json({
             success: true,
-            posts: [],
+            posts: postsArray,
             pagination: {
                 page: page,
                 limit: limit,
-                total: 0,
-                totalPages: 0
+                total: Object.keys(allPosts).length,
+                totalPages: Math.ceil(Object.keys(allPosts).length / limit)
             }
         });
     } catch (error) {
@@ -409,15 +427,33 @@ router.get('/api/posts/popular', async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const page = parseInt(req.query.page) || 1;
         
-        // This would fetch from Firebase in a real implementation
+        const admin = require('firebase-admin');
+        if (!admin.apps.length) {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount),
+                databaseURL: process.env.DATABASE_URL
+            });
+        }
+        
+        const db = admin.database();
+        const postsRef = db.ref('forum/posts');
+        const snapshot = await postsRef.once('value');
+        const allPosts = snapshot.val() || {};
+        
+        const postsArray = Object.entries(allPosts)
+            .map(([id, post]) => ({id, ...post}))
+            .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+            .slice((page - 1) * limit, page * limit);
+        
         res.json({
             success: true,
-            posts: [],
+            posts: postsArray,
             pagination: {
                 page: page,
                 limit: limit,
-                total: 0,
-                totalPages: 0
+                total: Object.keys(allPosts).length,
+                totalPages: Math.ceil(Object.keys(allPosts).length / limit)
             }
         });
     } catch (error) {
@@ -432,20 +468,50 @@ router.get('/api/posts/popular', async (req, res) => {
 // Get forum statistics
 router.get('/api/stats', async (req, res) => {
     try {
-        // This would fetch from Firebase in a real implementation
+        const admin = require('firebase-admin');
+        if (!admin.apps.length) {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount),
+                databaseURL: process.env.DATABASE_URL
+            });
+        }
+        
+        const db = admin.database();
+        
+        // Get posts
+        const postsSnapshot = await db.ref('forum/posts').once('value');
+        const posts = postsSnapshot.val() || {};
+        
+        // Get users
+        const usersSnapshot = await db.ref('forum/users').once('value');
+        const users = usersSnapshot.val() || {};
+        
+        // Get replies
+        const repliesSnapshot = await db.ref('forum/replies').once('value');
+        const replies = repliesSnapshot.val() || {};
+        
+        // Calculate stats
+        const now = Date.now();
+        const oneDayAgo = now - (24 * 60 * 60 * 1000);
+        const fiveMinutesAgo = now - (5 * 60 * 1000);
+        
+        const postsToday = Object.values(posts).filter(post => post.createdAt > oneDayAgo).length;
+        const activeUsers = Object.values(users).filter(user => user.lastSeen > fiveMinutesAgo).length;
+        
         res.json({
             success: true,
             stats: {
-                totalPosts: 0,
-                totalUsers: 0,
-                totalReplies: 0,
-                postsToday: 0,
-                activeUsers: 0,
+                totalPosts: Object.keys(posts).length,
+                totalUsers: Object.keys(users).length,
+                totalReplies: Object.keys(replies).length,
+                postsToday: postsToday,
+                activeUsers: activeUsers,
                 categories: {
-                    general: { posts: 0, replies: 0 },
-                    lore: { posts: 0, replies: 0 },
-                    episodes: { posts: 0, replies: 0 },
-                    fanart: { posts: 0, replies: 0 }
+                    general: { posts: Object.values(posts).filter(p => p.forumId === 'general').length, replies: 0 },
+                    lore: { posts: Object.values(posts).filter(p => p.forumId === 'lore').length, replies: 0 },
+                    episodes: { posts: Object.values(posts).filter(p => p.forumId === 'episodes').length, replies: 0 },
+                    fanart: { posts: Object.values(posts).filter(p => p.forumId === 'fanart').length, replies: 0 }
                 }
             }
         });
@@ -468,36 +534,23 @@ router.get('/api/search', async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
         
-        // Import Firebase functions for search
-        const { initializeApp } = require('firebase/app');
-        const { getDatabase, ref, get, query: firebaseQuery, orderByChild } = require('firebase/database');
+        // Use Firebase Admin SDK for server-side access
+        const admin = require('firebase-admin');
         
-        // Firebase config from environment
-        const firebaseConfig = {
-            apiKey: process.env.API_KEY,
-            authDomain: process.env.AUTH_DOMAIN,
-            databaseURL: process.env.DATABASE_URL,
-            projectId: process.env.PROJECT_ID,
-            storageBucket: process.env.STORAGE_BUCKET,
-            messagingSenderId: process.env.MESSAGING_SENDER_ID,
-            appId: process.env.APP_ID
-        };
-        
-        // Initialize Firebase app for this request
-        let app;
-        try {
-            app = initializeApp(firebaseConfig, `search-${Date.now()}`);
-        } catch (error) {
-            // App might already exist, get existing instance
-            const { getApps, getApp } = require('firebase/app');
-            app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+        // Initialize admin if not already done
+        if (!admin.apps.length) {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount),
+                databaseURL: process.env.DATABASE_URL
+            });
         }
         
-        const database = getDatabase(app);
-        const postsRef = ref(database, 'forum/posts');
+        const db = admin.database();
+        const postsRef = db.ref('forum/posts');
         
         // Get all posts from Firebase
-        const snapshot = await get(postsRef);
+        const snapshot = await postsRef.once('value');
         const allPosts = snapshot.val() || {};
         
         // Convert to array and filter

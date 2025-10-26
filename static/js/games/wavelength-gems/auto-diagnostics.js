@@ -1,8 +1,8 @@
 /**
- * Auto-Diagnostics System for Wavelength Gems - DISABLED FOR ADMOB TESTING
+ * Auto-Diagnostics System for Wavelength Gems
  * Automatically checks for common issues on page load and provides detailed reports
  * 
- * This file has been fully disabled to reduce console noise during AdMob integration testing.
+ * Can be disabled by setting DISABLED flag to reduce console noise during testing.
  */
 
 class AutoDiagnostics {
@@ -14,7 +14,7 @@ class AutoDiagnostics {
     }
 
     /**
-     * Run all diagnostic checks - DISABLED FOR ADMOB TESTING
+     * Run all diagnostic checks (currently disabled)
      */
     async runAll() {
         // Completely disabled - no console output
@@ -438,24 +438,24 @@ class AutoDiagnostics {
     }
 }
 
-// Auto-run diagnostics on page load - DISABLED FOR ADMOB TESTING
+// Auto-run diagnostics on page load (currently disabled)
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         const diagnostics = new AutoDiagnostics();
         // Only run the initialization method, not the additional checks
         diagnostics.runAll();
-        // Don't run checkHeroBadgeAfterLoad() - disabled for AdMob testing
+        // Don't run checkHeroBadgeAfterLoad() - disabled for clean testing
     });
 } else {
     const diagnostics = new AutoDiagnostics();
     // Only run the initialization method, not the additional checks
     diagnostics.runAll();
-    // Don't run checkHeroBadgeAfterLoad() - disabled for AdMob testing
+    // Don't run checkHeroBadgeAfterLoad() - disabled for clean testing
 }
 
 // Export for manual use (but disabled)
 window.AutoDiagnostics = AutoDiagnostics;
 window.runDiagnostics = () => {
-    console.log('Auto-diagnostics are disabled for AdMob testing.');
+    console.log('Auto-diagnostics are disabled for clean testing.');
     return { disabled: true };
 };

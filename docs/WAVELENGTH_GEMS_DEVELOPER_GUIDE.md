@@ -26,15 +26,12 @@ static/js/games/wavelength-gems/
 │   ├── mobile-diagnostics.js  # Mobile viewport debugging
 │   └── auto-diagnostics.js    # Automatic diagnostics on load
 │
-├── 💰 Monetization
-│   ├── ad-system.js           # AdMob integration system
-│   ├── admob-config.js        # AdMob configuration loader
-│   ├── retry-threshold-manager.js  # Ad trigger management
-│   ├── retry-threshold-ui.js  # Ad UI components
-│   └── retry-threshold-test.js     # Ad system testing
+├── 🎮 Retry & Progression
+│   ├── retry-threshold-manager.js  # Retry logic management
+│   ├── retry-threshold-ui.js  # Retry UI components
+│   └── retry-threshold-test.js     # Retry system testing
 │
 └── 📊 Analytics & Performance
-    ├── admob-test-interface.js    # AdMob testing interface
     └── Various diagnostic tools
 ```
 
@@ -138,23 +135,9 @@ diagnoseStuckGame()              // Detect impossible states
 visualizePositionMismatches()    // Debug rendering issues
 ```
 
-## 💰 Monetization Integration
+## 🎮 VIP Gaming Experience
 
-### AdMob System
-Comprehensive advertising integration with configurable thresholds:
-
-- **Rewarded videos** - Extra lives, power-ups, score multipliers
-- **Interstitial ads** - Level transitions and game over screens
-- **Retry threshold management** - Smart ad frequency control
-- **Test interface** - Safe ad testing in development
-
-### Configuration
-```javascript
-// AdMob environment variables
-ADMOB_APP_ID_WEB: process.env.ADMOB_APP_ID_WEB
-ADMOB_REWARDED_VIDEO_PROD: process.env.ADMOB_REWARDED_VIDEO_PROD
-ADMOB_USE_TEST_ADS: process.env.ADMOB_USE_TEST_ADS
-```
+Wavelength Gems provides an ad-free premium gaming experience for all users. The game focuses on pure gameplay without monetization interruptions, creating an immersive narrative experience tied to Wavelength Lore episodes.
 
 ## 🎮 Game Mechanics
 
@@ -213,7 +196,7 @@ if (isMobile) {
 ## 🔧 Development Workflow
 
 ### Setup Process
-1. **Environment Variables** - Configure AdMob and database connections
+1. **Environment Variables** - Configure database connections and game settings
 2. **Permission System** - Ensure `game_access` permission for testing
 3. **Level Configuration** - Load levels from YAML configuration
 4. **Debug Panel** - Use Ctrl+Shift+D for development features
@@ -221,7 +204,7 @@ if (isMobile) {
 ### Testing Strategies
 - **Level Testing** - Use admin panel to jump between levels
 - **Mobile Testing** - Enable mobile diagnostics for viewport issues
-- **Ad Testing** - Use test interface to validate ad integration
+- **Retry System Testing** - Validate retry logic and UI behavior
 - **Performance Testing** - Monitor frame rates and memory usage
 
 ### Code Organization
@@ -242,30 +225,29 @@ try {
 ## 🚀 Deployment Considerations
 
 ### Production Optimizations
-- **Ad configuration** - Switch from test to production ad units
 - **Debug removal** - Disable admin panel and diagnostic tools
 - **Performance monitoring** - Enable analytics and error tracking
 - **CDN optimization** - Ensure assets are properly cached
+- **Game optimization** - Minimize bundle size and optimize loading
 
 ### Environment Configuration
 ```javascript
 // Production environment variables
-ADMOB_USE_TEST_ADS=false
-ADMOB_ENABLED=true
 NODE_ENV=production
+GAME_ANALYTICS_ENABLED=true
 ```
 
 ## 📚 Key Files Reference
 
 ### Essential Game Files
 - **`views/games/wavelength-gems.ejs`** - Main game page template
-- **`routes/games.js`** - Game routing and AdMob configuration
+- **`routes/games.js`** - Game routing and configuration
 - **`static/js/games/wavelength-gems/engine.js`** - Core game engine
 - **`static/js/games/wavelength-gems/levels.js`** - Level management system
 
 ### Configuration Files
 - **Level configurations** - Stored in YAML format on server
-- **AdMob settings** - Environment variables for ad integration
+- **Game settings** - Environment variables for game configuration
 - **Permission system** - Group-based access control
 
 ### Development Tools

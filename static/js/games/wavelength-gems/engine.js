@@ -1398,17 +1398,10 @@ async function initGame(levelNumber = 1) {
         if (isThresholdReached) {
             console.log('🚫 User has reached retry threshold - showing ad offer instead of initializing game');
             
-            // Instead of initializing the game, show the ad offer immediately
-            if (typeof offerAdToRetry === 'function') {
-                console.log('   - Calling offerAdToRetry()');
-                offerAdToRetry();
-                return; // Exit early - don't initialize the game
-            } else {
-                console.log('   - offerAdToRetry not available, showing fallback modal');
-                // Fallback: show a basic modal if ad system isn't available
-                showRetryThresholdReachedModal();
-                return; // Exit early - don't initialize the game
-            }
+            // Show retry threshold modal (ads removed)
+            console.log('   - Showing retry threshold modal');
+            showRetryThresholdReachedModal();
+            return; // Exit early - don't initialize the game
         } else {
             console.log('✅ User has retries remaining, continuing with game initialization');
         }
@@ -3137,7 +3130,7 @@ function showLevelFailedModal() {
         `;
         
         buttonContent = `
-            <button class="btn btn-primary" onclick="offerAdToRetry()">Watch Ad to Retry</button>
+            <button class="btn btn-primary" onclick="retryLevel()">Retry Level</button>
             <button class="btn btn-secondary" onclick="returnToMenu()">← Menu</button>
         `;
     } else {
@@ -3219,8 +3212,8 @@ async function loadNextLevel() {
 async function retryLevel() {
     // Check if we're at the threshold limit for retries
     if (window.RetryThresholdManager && RetryThresholdManager.isThresholdReached()) {
-        // If at threshold, show ad offer instead of directly retrying
-        offerAdToRetry();
+        // Show modal indicating retry limit reached (ads removed)
+        showRetryThresholdReachedModal();
         return;
     }
     
@@ -3268,10 +3261,10 @@ function showRetryThresholdReachedModal() {
                 </div>
             </div>
             <p class="modal-description">
-                You've used all your free retries for now. Come back later or watch an ad to continue playing!
+                You've used all your free retries for now. Come back later to continue playing!
             </p>
             <div class="modal-buttons">
-                <button class="btn btn-primary" onclick="offerAdToRetry()">Watch Ad to Play</button>
+                <button class="btn btn-primary" onclick="retryLevel()">Retry Level</button>
                 <button class="btn btn-secondary" onclick="returnToMenu()">← Back to Menu</button>
             </div>
         </div>
@@ -3387,29 +3380,7 @@ function closeLevelSelectionModal() {
     }
 }
 
-/**
- * Offer ad to retry when threshold is reached
- */
-function offerAdToRetry() {
-    closeLevelModal();
-    
-    // If ad system exists, show ad offer
-    if (window.wavelengthAds && typeof window.wavelengthAds.showAdOfferDialog === 'function') {
-        window.wavelengthAds.showAdOfferDialog(
-            "Need Another Chance?",
-            "Watch a short video to retry this level!",
-            () => {
-                // After ad is watched successfully, bypass threshold check and retry directly
-                closeLevelModal();
-                initGame(gameState.level); // Don't call retryLevel to avoid loop
-            }
-        );
-    } else {
-        console.error("Ad system not available for retry offer");
-        // Fallback - just retry anyway
-        retryLevel();
-    }
-}
+
 
 // Make functions available globally
 window.loadNextLevel = loadNextLevel;
@@ -3418,12 +3389,12 @@ window.returnToMenu = returnToMenu;
 window.startLevel = startLevel;
 window.closeLevelSelectionModal = closeLevelSelectionModal;
 window.showLevelSelectionMenu = showLevelSelectionMenu;
-window.offerAdToRetry = offerAdToRetry;
+
 
 // Create wavelengthGems object for ad rewards implementation
 window.wavelengthGems = {
     /**
-     * Grant extra life after watching an ad
+     * Grant extra life (legacy function for compatibility)
      */
     grantExtraLife: function() {
         console.log('Extra life granted from ad reward!');

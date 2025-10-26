@@ -18,7 +18,7 @@ This directory contains comprehensive documentation for **Wavelength Gems**, a n
 - Canvas rendering system
 - Development tools (admin panel, diagnostics)
 - Mobile optimization strategies
-- Monetization integration (AdMob)
+- Ad-free VIP gaming experience
 - Performance considerations
 
 **Use When:** Setting up development environment, understanding codebase, debugging issues, implementing new features

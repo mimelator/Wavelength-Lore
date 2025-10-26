@@ -11,8 +11,8 @@
  * 
  * SOLUTION IMPLEMENTED:
  * 1. Added retry threshold check at the beginning of initGame() function (line ~1379)
- * 2. If threshold reached, calls offerAdToRetry() instead of initializing game
- * 3. Added fallback showRetryThresholdReachedModal() if ad system unavailable
+ * 2. If threshold reached, calls showRetryThresholdReachedModal() instead of initializing game
+ * 3. Provides clean retry experience without ads
  * 4. Early return prevents game board initialization when out of retries
  * 
  * VERIFICATION:

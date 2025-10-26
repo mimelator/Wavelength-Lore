@@ -224,7 +224,7 @@ const ThresholdTestRunner = {
                     <h3 style="color: #a78bfa;">Automated Tests</h3>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         <button class="test-btn" data-test="basicThresholdCycle">🔄 Basic Threshold Cycle</button>
-                        <button class="test-btn" data-test="watchAdFlow">📺 Watch Ad Flow</button>
+                        <button class="test-btn" data-test="retryFlow">� Retry Flow</button>
                         <button class="test-btn" data-test="resetTimerTest">⏱️ Reset Timer Test</button>
                         <button class="test-btn" data-test="multiSessionTest">👥 Multi-Session Test</button>
                         <button class="test-btn" data-test="resetAllData">🔄 Reset All Data</button>
@@ -288,8 +288,8 @@ const ThresholdTestRunner = {
             case 'basicThresholdCycle':
                 await this.runBasicThresholdCycleTest();
                 break;
-            case 'watchAdFlow':
-                await this.runWatchAdFlowTest();
+            case 'retryFlow':
+                await this.runRetryFlowTest();
                 break;
             case 'resetTimerTest':
                 await this.runResetTimerTest();
@@ -359,13 +359,13 @@ const ThresholdTestRunner = {
     },
     
     /**
-     * Test the watch ad flow
+     * Test the retry flow
      */
-    async runWatchAdFlowTest() {
-        console.log(`${this.config.logPrefix} Running Watch Ad Flow Test`);
+    async runRetryFlowTest() {
+        console.log(`${this.config.logPrefix} Running Retry Flow Test`);
         
         // Check if necessary components are available
-        if (!window.RetryThresholdManager || !window.wavelengthAds) {
+        if (!window.RetryThresholdManager) {
             console.error(`${this.config.logPrefix} Required components not available!`);
             alert('Required components not available!');
             return;
@@ -393,13 +393,13 @@ const ThresholdTestRunner = {
         };
         await this.delay();
         
-        // Step 4: Show ad offer dialog
-        console.log(`${this.config.logPrefix} Step 4: Show ad offer dialog`);
-        wavelengthAds.showAdOfferDialog(
-            "Test Ad Offer",
-            "This is a test ad offer for the threshold system",
-            adCallback
-        );
+        // Step 4: Show retry threshold modal (ads removed)
+        console.log(`${this.config.logPrefix} Step 4: Show retry threshold modal`);
+        if (typeof showRetryThresholdReachedModal === 'function') {
+            showRetryThresholdReachedModal();
+        } else {
+            console.log(`${this.config.logPrefix} Retry threshold modal function not available`);
+        }
         await this.delay(2000);
         
         // Step 5: Simulate clicking the ad accept button
@@ -407,7 +407,7 @@ const ThresholdTestRunner = {
         console.log(`${this.config.logPrefix} (Manual action needed) Click 'Watch Video' in the dialog`);
         alert('Please click "Watch Video" in the dialog to continue the test');
         
-        console.log(`${this.config.logPrefix} Watch Ad Flow Test completed`);
+        console.log(`${this.config.logPrefix} Retry Flow Test completed`);
     },
     
     /**

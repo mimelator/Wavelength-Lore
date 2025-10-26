@@ -596,7 +596,7 @@ class MaintenanceAnalyzer {
                routePath.match(/(stats|metrics|data|export|import)$/i) ||
                routePath.includes('/catalog/list') ||
                routePath.includes('/current-user-groups') ||
-               routePath.includes('/admob-config');
+               routePath.includes('/removed-config'); // Ad system removed
     }
 
     isDebugRoute(routePath) {

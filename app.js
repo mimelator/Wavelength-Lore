@@ -44,6 +44,7 @@ const borderPreviewApiRoutes = require('./routes/api-border-preview');
 const productImageApiRoutes = require('./routes/api-product-image');
 const chatbotRoutes = require('./routes/chatbot');
 const authRoutes = require('./routes/auth');
+const forumRoutes = require('./routes/forum');
 
 const diagnosticRoutes = require('./routes/diagnostic');
 const deploymentApiRoutes = require('./routes/deploymentApi');
@@ -138,6 +139,9 @@ async function createApp() {
   
   // Mount VIP chatbot routes (VIP+ access required)
   app.use('/chatbot', chatbotRoutes);
+  
+  // Mount forum routes (public access with authentication for posting)
+  app.use('/forum', forumRoutes);
   
   // Mount diagnostic routes (for production debugging)
   app.use('/diagnostic', diagnosticRoutes);

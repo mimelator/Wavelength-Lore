@@ -1,8 +1,8 @@
 /**
- * Mobile Diagnostics for Wavelength Gems - DISABLED FOR ADMOB TESTING
+ * Mobile Diagnostics for Wavelength Gems
  * Comprehensive debugging tool for mobile gameplay issues
  * 
- * This file has been fully disabled to reduce console noise during AdMob integration testing.
+ * Can be disabled to reduce console noise during testing.
  */
 
 class MobileDiagnostics {
@@ -438,4 +438,4 @@ if (window.innerWidth <= 768) {
     setTimeout(() => mobileDiagnostics.runFullDiagnostics(), 1000);
 }
 
-// Mobile Diagnostics disabled for AdMob testing
+// Mobile Diagnostics disabled for clean testing
