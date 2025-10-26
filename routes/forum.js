@@ -383,22 +383,13 @@ router.get('/api/posts/recent', async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const page = parseInt(req.query.page) || 1;
         
-        const admin = require('firebase-admin');
+        const { getAdminDatabase } = require('../helpers/firebase-admin-utils');
+        const db = getAdminDatabase();
         
-        // Load environment if not available
-        if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
-            require('dotenv').config();
+        if (!db) {
+            throw new Error('Firebase admin not initialized');
         }
         
-        if (admin.apps.length === 0) {
-            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-            admin.initializeApp({
-                credential: admin.credential.cert(serviceAccount),
-                databaseURL: process.env.DATABASE_URL
-            });
-        }
-        
-        const db = admin.database();
         const postsRef = db.ref('forum/posts');
         const snapshot = await postsRef.once('value');
         const allPosts = snapshot.val() || {};
@@ -435,21 +426,13 @@ router.get('/api/posts/popular', async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const page = parseInt(req.query.page) || 1;
         
-        const admin = require('firebase-admin');
+        const { getAdminDatabase } = require('../helpers/firebase-admin-utils');
+        const db = getAdminDatabase();
         
-        if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
-            require('dotenv').config();
+        if (!db) {
+            throw new Error('Firebase admin not initialized');
         }
         
-        if (admin.apps.length === 0) {
-            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-            admin.initializeApp({
-                credential: admin.credential.cert(serviceAccount),
-                databaseURL: process.env.DATABASE_URL
-            });
-        }
-        
-        const db = admin.database();
         const postsRef = db.ref('forum/posts');
         const snapshot = await postsRef.once('value');
         const allPosts = snapshot.val() || {};
@@ -481,21 +464,12 @@ router.get('/api/posts/popular', async (req, res) => {
 // Get forum statistics
 router.get('/api/stats', async (req, res) => {
     try {
-        const admin = require('firebase-admin');
+        const { getAdminDatabase } = require('../helpers/firebase-admin-utils');
+        const db = getAdminDatabase();
         
-        if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
-            require('dotenv').config();
+        if (!db) {
+            throw new Error('Firebase admin not initialized');
         }
-        
-        if (admin.apps.length === 0) {
-            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-            admin.initializeApp({
-                credential: admin.credential.cert(serviceAccount),
-                databaseURL: process.env.DATABASE_URL
-            });
-        }
-        
-        const db = admin.database();
         
         // Get posts
         const postsSnapshot = await db.ref('forum/posts').once('value');
@@ -553,18 +527,12 @@ router.get('/api/search', async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         
         // Use Firebase Admin SDK for server-side access
-        const admin = require('firebase-admin');
+        const { getAdminDatabase } = require('../helpers/firebase-admin-utils');
+        const db = getAdminDatabase();
         
-        // Initialize admin if not already done
-        if (!admin.apps.length) {
-            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-            admin.initializeApp({
-                credential: admin.credential.cert(serviceAccount),
-                databaseURL: process.env.DATABASE_URL
-            });
+        if (!db) {
+            throw new Error('Firebase admin not initialized');
         }
-        
-        const db = admin.database();
         const postsRef = db.ref('forum/posts');
         
         // Get all posts from Firebase

@@ -44,7 +44,6 @@ const borderPreviewApiRoutes = require('./routes/api-border-preview');
 const productImageApiRoutes = require('./routes/api-product-image');
 const chatbotRoutes = require('./routes/chatbot');
 const authRoutes = require('./routes/auth');
-const forumRoutes = require('./routes/forum');
 
 const diagnosticRoutes = require('./routes/diagnostic');
 const deploymentApiRoutes = require('./routes/deploymentApi');
@@ -141,6 +140,8 @@ async function createApp() {
   app.use('/chatbot', chatbotRoutes);
   
   // Mount forum routes (public access with authentication for posting)
+  // Import forum routes after Firebase is initialized to avoid initialization conflicts
+  const forumRoutes = require('./routes/forum');
   app.use('/forum', forumRoutes);
   
   // Mount diagnostic routes (for production debugging)

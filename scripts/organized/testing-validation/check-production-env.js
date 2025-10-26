@@ -8,9 +8,19 @@
 const { AppRunnerClient, DescribeServiceCommand } = require('@aws-sdk/client-apprunner');
 
 // Load AWS resource configuration
-const awsConfig = require('../config/aws-resources');
+let awsConfig;
+try {
+  awsConfig = require('../../config/aws-resources');
+} catch (error) {
+  console.log('⚠️  aws-resources.js not found, using environment variables');
+  awsConfig = {
+    appRunner: {
+      serviceArn: process.env.APPRUNNER_SERVICE_ARN || 'arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore/be123456789abcdef'
+    }
+  };
+}
 
-const AppRunnerEnvUpdater = require('./apprunner-env-updater');
+const AppRunnerEnvUpdater = require('../aws-infrastructure/apprunner-env-updater');
 
 async function main() {
   try {
