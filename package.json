@@ -6,7 +6,16 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "node scripts/unified/test-runner.js all"
+    "test": "node scripts/unified/test-runner.js all",
+    "wavelength:github": "node wavelength-pure-github-execution.js",
+    "wavelength:monitor": "node wavelength-pure-github-execution.js",
+    "wavelength:investigate": "node wavelength-github-failure-investigator.js",
+    "wavelength:analyze": "node wavelength-direct-failure-analyzer.js",
+    "wavelength:diagnose": "node wavelength-failure-diagnosis.js",
+    "wavelength:docker-test": "node wavelength-docker-validator.js",
+    "wavelength:docker-fix": "node wavelength-docker-fix-plan.js",
+    "wavelength:deploy": "node wavelength-docker-deploy.js",
+    "wavelength:commit": "node wavelength-enhanced-docker-committer.js"
   },
   "dependencies": {
     "@aws-sdk/client-apprunner": "^3.917.0",
