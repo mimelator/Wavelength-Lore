@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title || 'Post' %> - Wavelength Community Forum</title>
-    <link rel="stylesheet" href="/css/forum.css">
+    <%- include('../partials/head', {
+        title: title + ' - Wavelength Community Forum',
+        pageDescription: 'Join the discussion on the Wavelength Community Forum'
+    }) %>
+    
+    <!-- Forum-specific CSS -->
+    <link rel="stylesheet" href="<%= cdnUrl %>/css/forum.css">
     <style>
         .forum-post-container {
             max-width: 800px;

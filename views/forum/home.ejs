@@ -185,7 +185,7 @@ async function loadRecentPosts() {
             container.innerHTML = data.posts.map(post => `
                     <div class="recent-post-item" onclick="location.href='/forum/post/${post.id}'">
                         <div class="post-author">
-                            <img src="${post.authorAvatar || '/icons/hero-icon.svg'}" alt="${post.authorName}" class="author-avatar">
+                            <img src="${post.authorAvatar || '/icons/hero-icon.svg'}" alt="${post.authorName}" class="author-avatar" onerror="this.src='/icons/hero-icon.svg'">
                             <a href="/forum/user/${post.authorId}" class="author-link" onclick="event.stopPropagation()">
                                 <span class="author-name">${post.authorName}</span>
                             </a>
@@ -379,7 +379,7 @@ async function loadPostsByTag(tag) {
                     container.innerHTML = taggedPosts.map(post => `
                         <div class="recent-post-item" onclick="location.href='/forum/post/${post.id}'">
                             <div class="post-author">
-                                <img src="${post.authorAvatar || '/icons/hero-icon.svg'}" alt="${post.authorName}" class="author-avatar">
+                                <img src="${post.authorAvatar || '/icons/hero-icon.svg'}" alt="${post.authorName}" class="author-avatar" onerror="this.src='/icons/hero-icon.svg'">
                                 <a href="/forum/user/${post.authorId}" class="author-link" onclick="event.stopPropagation()">
                                     <span class="author-name">${post.authorName}</span>
                                 </a>

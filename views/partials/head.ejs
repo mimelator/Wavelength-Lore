@@ -44,15 +44,15 @@
 </script>
 <% } %>
 
-<link rel="stylesheet" href="<%= cdnUrl %>/css/styles.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
-<link rel="stylesheet" href="<%= cdnUrl %>/css/nav-dropdown.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
+<link rel="stylesheet" href="/css/styles.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
+<link rel="stylesheet" href="/css/nav-dropdown.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
-<link rel="stylesheet" href="<%= cdnUrl %>/css/gallery/gallery-buttons.css">
-<link rel="icon" type="image/svg+xml" href="<%= cdnUrl %>/icons/favicon.svg">
+<link rel="stylesheet" href="/css/gallery/gallery-buttons.css">
+<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
 
 <!-- Firebase Readiness Helper -->
-<script src="<%= cdnUrl %>/js/firebase-readiness.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+<script src="/js/firebase-readiness.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
 
 <!-- Gallery Scripts - Activate image capture functionality -->
 <%- include('gallery-scripts') %>

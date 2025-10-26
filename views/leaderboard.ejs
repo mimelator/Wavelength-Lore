@@ -354,7 +354,7 @@
         let activeGames = new Set();
 
         // Load leaderboard data from multiple sources
-        function loadLeaderboard() {
+        async function loadLeaderboard() {
             console.log('🏆 loadLeaderboard() called');
             try {
                 // Wait for Firebase to be ready
@@ -365,17 +365,40 @@
                 }
                 
                 console.log('✅ Firebase ready, loading multi-game leaderboard data...');
-                loadMultiGameLeaderboard();
+                console.log('🔍 About to call loadMultiGameLeaderboard');
+                console.log('Function exists:', typeof loadMultiGameLeaderboard);
+                loadMultiGameLeaderboard().then(() => {
+                    console.log('✅ loadMultiGameLeaderboard completed');
+                }).catch(error => {
+                    console.error('❌ loadMultiGameLeaderboard failed:', error);
+                    document.getElementById('leaderboardContent').innerHTML = 
+                        '<div class="no-data">❌ Failed to load leaderboard data.<br><br>Error: ' + error.message + '</div>';
+                });
 
             } catch (error) {
                 console.error('Error setting up leaderboard:', error);
                 document.getElementById('leaderboardContent').innerHTML = 
-                    '<div class="no-data">Failed to initialize leaderboard.</div>';
+                    '<div class="no-data">Failed to initialize leaderboard. Please try refreshing the page.</div>';
             }
         }
 
         async function loadMultiGameLeaderboard() {
+            console.log('🚀 loadMultiGameLeaderboard() START');
+            console.log('Firebase DB:', !!window.firebaseDB);
+            console.log('Firebase Utils:', !!window.firebaseUtils);
             try {
+                console.log('🔄 Loading leaderboard data from multiple sources...');
+                
+                // Test Firebase connection first
+                console.log('🔍 Testing Firebase connection...');
+                const testRef = window.firebaseUtils.ref(window.firebaseDB, '/');
+                const testSnapshot = await window.firebaseUtils.get(testRef);
+                console.log('📊 Firebase root data exists:', testSnapshot.exists());
+                if (testSnapshot.exists()) {
+                    const rootData = testSnapshot.val();
+                    console.log('📊 Firebase root keys:', Object.keys(rootData));
+                }
+                
                 // Load both radio player stats and game scores in parallel
                 const [radioPlayersData, gameScoresData] = await Promise.all([
                     loadRadioPlayerStats(),
@@ -387,15 +410,22 @@
 
                 // Combine all player data
                 const combinedData = combinePlayerData(radioPlayersData, gameScoresData);
+                console.log('🏆 Combined leaderboard data:', combinedData.length, 'total players');
                 
                 allPlayersData = combinedData;
                 updateStats(combinedData);
                 renderLeaderboard(combinedData, currentFilter);
 
+                // If no data found, show helpful message
+                if (combinedData.length === 0) {
+                    document.getElementById('leaderboardContent').innerHTML = 
+                        '<div class="no-data">🎮 No player data found yet!<br><br>Play some games or use the Radio Player to appear on the leaderboard.<br><br><a href="/radio" style="color: #667eea;">🎵 Try the Radio Player</a> or <a href="/games" style="color: #667eea;">🎮 Play Games</a></div>';
+                }
+
             } catch (error) {
                 console.error('Error loading multi-game leaderboard:', error);
                 document.getElementById('leaderboardContent').innerHTML = 
-                    '<div class="no-data">Error loading leaderboard data. Please try again.</div>';
+                    '<div class="no-data">❌ Error loading leaderboard data.<br><br>Please check your internet connection and try refreshing the page.</div>';
             }
         }
 
@@ -403,21 +433,31 @@
             return new Promise((resolve) => {
                 const usersRef = window.firebaseUtils.ref(window.firebaseDB, 'users');
                 
+                // Set a timeout to prevent infinite loading
+                const timeout = setTimeout(() => {
+                    console.warn('Radio player stats loading timed out');
+                    resolve([]);
+                }, 10000);
+                
                 window.firebaseUtils.onValue(usersRef, async (snapshot) => {
                     try {
+                        clearTimeout(timeout);
                         const players = [];
                         
                         if (!snapshot.exists()) {
+                            console.log('No users data found in Firebase');
                             resolve(players);
                             return;
                         }
 
                         const users = snapshot.val();
+                        console.log(`Found ${Object.keys(users).length} users in database`);
                         
                         // Get forum user data for display names
                         const forumUsersRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/users');
                         const forumSnapshot = await window.firebaseUtils.get(forumUsersRef);
                         const forumUsers = forumSnapshot.exists() ? forumSnapshot.val() : {};
+                        console.log(`Found ${Object.keys(forumUsers).length} forum users`);
 
                         Object.keys(users).forEach(userId => {
                             const user = users[userId];
@@ -455,21 +495,32 @@
                             }
                         });
                         
+                        console.log(`Found ${players.length} players with radio stats`);
                         resolve(players);
                     } catch (error) {
+                        clearTimeout(timeout);
                         console.error('Error processing radio player data:', error);
                         resolve([]);
                     }
+                }, (error) => {
+                    clearTimeout(timeout);
+                    console.error('Firebase onValue error:', error);
+                    resolve([]);
                 });
             });
         }
 
         async function loadGameScores() {
             try {
+                console.log('Loading game scores from API...');
                 const response = await fetch('/api/games/leaderboard/global?limit=1000');
                 const data = await response.json();
                 
+                console.log('Game scores API response:', data);
+                
                 if (data.success && data.leaderboard) {
+                    console.log(`Found ${data.leaderboard.length} game players`);
+                    
                     // Track which games are active
                     data.leaderboard.forEach(player => {
                         if (player.gamesPlayed > 0) {
@@ -486,6 +537,7 @@
                         isCurrentUser: window.forumState?.currentUser?.uid === player.userId
                     }));
                 }
+                console.log('No game leaderboard data found');
                 return [];
             } catch (error) {
                 console.error('Error loading game scores:', error);
@@ -674,6 +726,15 @@
             loadLeaderboard();
             setupFilterTabs();
         }
+        
+        // Fallback timeout in case Firebase never loads
+        setTimeout(() => {
+            if (!window.firebaseDB || !window.firebaseUtils) {
+                console.warn('Firebase failed to load within 15 seconds, showing fallback message');
+                document.getElementById('leaderboardContent').innerHTML = 
+                    '<div class="no-data">⚠️ Firebase connection timeout.<br><br>The leaderboard requires a connection to our database.<br>Please check your internet connection and refresh the page.</div>';
+            }
+        }, 15000);
     </script>
 </body>
 </html>
