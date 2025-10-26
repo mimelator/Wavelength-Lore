@@ -82,42 +82,40 @@
     <%- include('../partials/header') %>
     
     <div class="forum-container">
-        <!-- Forum Header -->
-        <header class="forum-header">
-            <h1 class="forum-title">Wavelength Community Forum</h1>
-            <p class="forum-subtitle">Connect with fellow Wavelength fans</p>
-        </header>
-        
-        <!-- Authentication Section -->
-        <section class="auth-section">
-            <div id="forum-auth-container">
-                <div class="guest-message">Sign in to participate in discussions</div>
-                <div class="auth-actions">
-                    <button class="btn btn-primary" onclick="window.forumJS.signInWithGoogle()">Sign in with Google</button>
+        <!-- Consolidated Forum Header -->
+        <div class="forum-page-header">
+            <div class="forum-header-content">
+                <div class="forum-title-section">
+                    <h1 class="forum-page-title">💬 Forum Post</h1>
+                    <div class="breadcrumbs">
+                        <span class="breadcrumb-item">
+                            <a href="/forum" class="breadcrumb-link">Forum</a>
+                        </span>
+                        <span class="breadcrumb-item" id="category-breadcrumb">
+                            <a href="#" class="breadcrumb-link" id="category-link">Loading...</a>
+                        </span>
+                        <span class="breadcrumb-item" id="post-breadcrumb">Loading post...</span>
+                    </div>
+                </div>
+                
+                <div class="forum-header-actions">
+                    <!-- Authentication Status -->
+                    <div id="forum-auth-container" class="auth-status">
+                        <div class="guest-message">Sign in to participate</div>
+                        <div class="auth-actions">
+                            <button class="btn btn-primary btn-small" onclick="window.forumJS.signInWithGoogle()">Sign in</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Navigation -->
+                    <div class="forum-quick-nav">
+                        <a href="/forum" class="quick-nav-btn" title="Forum Home">🏠</a>
+                        <a href="/forum/recent" class="quick-nav-btn" title="Recent Posts">🕒</a>
+                        <a href="/forum/search" class="quick-nav-btn" title="Search">🔍</a>
+                        <a href="/" class="quick-nav-btn" title="Back to Main Site">←</a>
+                    </div>
                 </div>
             </div>
-        </section>
-        
-        <!-- Forum Navigation -->
-        <nav class="forum-nav">
-            <div class="forum-nav-links">
-                <a href="/forum" class="forum-nav-link">🏠 Home</a>
-                <a href="/forum/recent" class="forum-nav-link">🕒 Recent Posts</a>
-                <a href="/forum/popular" class="forum-nav-link">🔥 Popular</a>
-                <a href="/forum/search" class="forum-nav-link">🔍 Search</a>
-                <a href="/" class="forum-nav-link">← Back to Wavelength Lore</a>
-            </div>
-        </nav>
-        
-        <!-- Breadcrumbs -->
-        <div class="breadcrumbs">
-            <span class="breadcrumb-item">
-                <a href="/forum" class="breadcrumb-link">Forum</a>
-            </span>
-            <span class="breadcrumb-item" id="category-breadcrumb">
-                <a href="#" class="breadcrumb-link" id="category-link">Loading...</a>
-            </span>
-            <span class="breadcrumb-item" id="post-breadcrumb">Loading post...</span>
         </div>
         
         <!-- Post Content -->

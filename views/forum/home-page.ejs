@@ -109,32 +109,34 @@
     <%- include('../partials/header') %>
     
     <div class="forum-container">
-        <!-- Forum Header -->
-        <header class="forum-header">
-            <h1 class="forum-title">Wavelength Community Forum</h1>
-            <p class="forum-subtitle">Connect with fellow Wavelength fans</p>
-        </header>
-        
-        <!-- Authentication Section -->
-        <section class="auth-section">
-            <div id="forum-auth-container">
-                <div class="guest-message">Sign in to participate in discussions</div>
-                <div class="auth-actions">
-                    <button class="btn btn-primary" onclick="window.forumJS.signInWithGoogle()">Sign in with Google</button>
+        <!-- Consolidated Forum Header -->
+        <div class="forum-page-header">
+            <div class="forum-header-content">
+                <div class="forum-title-section">
+                    <h1 class="forum-page-title">💬 Community Forum</h1>
+                    <p class="forum-subtitle">Connect with fellow Wavelength fans</p>
+                </div>
+                
+                <div class="forum-header-actions">
+                    <!-- Authentication Status -->
+                    <div id="forum-auth-container" class="auth-status">
+                        <div class="guest-message">Sign in to participate</div>
+                        <div class="auth-actions">
+                            <button class="btn btn-primary btn-small" onclick="window.forumJS.signInWithGoogle()">Sign in</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Navigation -->
+                    <div class="forum-quick-nav">
+                        <a href="/forum" class="quick-nav-btn <%= currentPage === 'home' ? 'active' : '' %>" title="Forum Home">🏠</a>
+                        <a href="/forum/recent" class="quick-nav-btn <%= currentPage === 'recent' ? 'active' : '' %>" title="Recent Posts">🕒</a>
+                        <a href="/forum/popular" class="quick-nav-btn <%= currentPage === 'popular' ? 'active' : '' %>" title="Popular">🔥</a>
+                        <a href="/forum/search" class="quick-nav-btn <%= currentPage === 'search' ? 'active' : '' %>" title="Search">🔍</a>
+                        <a href="/" class="quick-nav-btn" title="Back to Main Site">←</a>
+                    </div>
                 </div>
             </div>
-        </section>
-        
-        <!-- Forum Navigation -->
-        <nav class="forum-nav">
-            <div class="forum-nav-links">
-                <a href="/forum" class="forum-nav-link <%= currentPage === 'home' ? 'active' : '' %>">🏠 Home</a>
-                <a href="/forum/recent" class="forum-nav-link <%= currentPage === 'recent' ? 'active' : '' %>">🕒 Recent Posts</a>
-                <a href="/forum/popular" class="forum-nav-link <%= currentPage === 'popular' ? 'active' : '' %>">🔥 Popular</a>
-                <a href="/forum/search" class="forum-nav-link <%= currentPage === 'search' ? 'active' : '' %>">🔍 Search</a>
-                <a href="/" class="forum-nav-link">← Back to Wavelength Lore</a>
-            </div>
-        </nav>
+        </div>
         
         <!-- Forum Content -->
         <%- include('home') %>

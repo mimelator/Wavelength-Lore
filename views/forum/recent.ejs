@@ -79,48 +79,44 @@
     <%- include('../partials/header') %>
     
     <div class="forum-container">
-        <!-- Forum Header -->
-        <header class="forum-header">
-            <div class="container">
-                <div class="forum-header-content">
-                    <div class="forum-branding">
-                        <h1>
-                            <span class="forum-icon">🕒</span>
-                            Recent Posts
-                        </h1>
-                        <p class="forum-tagline">Latest discussions in the community</p>
+        <!-- Consolidated Forum Header -->
+        <div class="forum-page-header">
+            <div class="forum-header-content">
+                <div class="forum-title-section">
+                    <h1 class="forum-page-title">🕒 Recent Posts</h1>
+                    <p class="forum-subtitle">Latest discussions in the community</p>
+                </div>
+                
+                <div class="forum-header-actions">
+                    <!-- Authentication Status -->
+                    <div id="forum-auth-container" class="auth-status">
+                        <div class="guest-message">Sign in to participate</div>
+                        <div class="auth-actions">
+                            <button class="btn btn-primary btn-small" onclick="window.forumJS.signInWithGoogle()">Sign in</button>
+                        </div>
                     </div>
                     
-                    <div class="forum-auth">
-                        <div id="forum-auth-container">
-                            <!-- Auth buttons will be inserted here by JavaScript -->
-                        </div>
+                    <!-- Quick Navigation -->
+                    <div class="forum-quick-nav">
+                        <a href="/forum" class="quick-nav-btn" title="Forum Home">🏠</a>
+                        <a href="/forum/recent" class="quick-nav-btn active" title="Recent Posts">🕒</a>
+                        <a href="/forum/popular" class="quick-nav-btn" title="Popular">🔥</a>
+                        <a href="/forum/search" class="quick-nav-btn" title="Search">🔍</a>
+                        <a href="/" class="quick-nav-btn" title="Back to Main Site">←</a>
                     </div>
                 </div>
             </div>
-        </header>
-        
-        <!-- Forum Navigation -->
-        <nav class="forum-nav">
-            <div class="container">
-                <ul class="forum-nav-list">
-                    <li><a href="/forum">🏠 Home</a></li>
-                    <li><a href="/forum/recent" class="active">🕒 Recent Posts</a></li>
-                    <li><a href="/forum/popular">🔥 Popular</a></li>
-                    <li><a href="/forum/search">🔍 Search</a></li>
-                    <li><a href="/forum/create" class="create-post-btn">➕ New Post</a></li>
-                </ul>
-            </div>
-        </nav>
+        </div>
         
         <!-- Main Forum Content -->
         <main class="forum-main">
             <div class="container">
                 <!-- Breadcrumb -->
-                <div class="forum-breadcrumb">
-                    <a href="/forum">Forum</a>
-                    <span class="breadcrumb-separator">›</span>
-                    <span>Recent Posts</span>
+                <div class="breadcrumbs">
+                    <span class="breadcrumb-item">
+                        <a href="/forum" class="breadcrumb-link">Forum</a>
+                    </span>
+                    <span class="breadcrumb-item">Recent Posts</span>
                 </div>
 
                 <!-- Community Links (visible to all users) -->
