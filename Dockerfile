@@ -67,70 +67,11 @@ ENV NODE_ENV=production
 ENV NODE_PORT=3001
 ENV NGINX_PORT=8080
 
-# WAVELENGTH ENHANCED: Comprehensive startup script creation with robust permissions
-RUN echo '#!/bin/sh\n\
-echo "🌊 WAVELENGTH Production Container Starting"\n\
-echo "⚡ Enhanced startup with robust permission handling"\n\
-echo "Security: Running as user $(whoami)"\n\
-echo "Environment: NODE_ENV=${NODE_ENV}"\n\
-echo "Ports: NODE_PORT=${NODE_PORT} NGINX_PORT=${NGINX_PORT}"\n\
-\n\
-# Verify script permissions\n\
-echo "🔍 Verifying startup script permissions..."\n\
-ls -la /app/start.sh\n\
-\n\
-# Generate nginx config with enhanced error handling\n\
-echo "🔧 Generating Nginx configuration..."\n\
-if [ -f /etc/nginx/nginx.conf.template ]; then\n\
-    envsubst '"'"'$NGINX_PORT $NODE_PORT'"'"' < /etc/nginx/nginx.conf.template > /tmp/nginx.conf\n\
-    if sudo cp /tmp/nginx.conf /etc/nginx/nginx.conf; then\n\
-        echo "✅ Nginx configuration generated successfully"\n\
-    else\n\
-        echo "❌ Failed to copy Nginx configuration"\n\
-        exit 1\n\
-    fi\n\
-else\n\
-    echo "❌ Nginx template not found!"\n\
-    exit 1\n\
-fi\n\
-\n\
-# Start Node.js application with enhanced monitoring\n\
-echo "🚀 Starting Node.js application..."\n\
-if node index.js & then\n\
-    NODE_PID=$!\n\
-    echo "✅ Node.js started successfully with PID: $NODE_PID"\n\
-else\n\
-    echo "❌ Failed to start Node.js application"\n\
-    exit 1\n\
-fi\n\
-\n\
-# Enhanced application readiness check\n\
-echo "🔍 Waiting for application readiness..."\n\
-for i in 1 2 3 4 5; do\n\
-    sleep 1\n\
-    if curl -s http://localhost:${NODE_PORT}/health >/dev/null 2>&1; then\n\
-        echo "✅ Application is ready after ${i} seconds"\n\
-        break\n\
-    fi\n\
-    if [ $i -eq 5 ]; then\n\
-        echo "⚠️ Application health check timeout, proceeding anyway"\n\
-    fi\n\
-done\n\
-\n\
-# Start Nginx with enhanced error handling\n\
-echo "🌐 Starting Nginx reverse proxy..."\n\
-if nginx -t; then\n\
-    echo "✅ Nginx configuration valid"\n\
-    sudo nginx -g "daemon off;"\n\
-else\n\
-    echo "❌ Nginx configuration invalid"\n\
-    exit 1\n\
-fi\n\
-' > /app/start.sh && \
-chmod +x /app/start.sh && \
-chown appuser:nodejs /app/start.sh && \
-echo "🌊 WAVELENGTH: Enhanced startup script created with permissions:" && \
-ls -la /app/start.sh
+# WAVELENGTH ENHANCED: Copy startup script from external file (much more reliable)
+COPY --chown=appuser:nodejs docker-start.sh /app/start.sh
+RUN chmod +x /app/start.sh && \
+    echo "🌊 WAVELENGTH: Enhanced startup script copied with permissions:" && \
+    ls -la /app/start.sh
 
 # WAVELENGTH BUILD VERIFICATION: Test permissions before switching users
 RUN echo "🔍 WAVELENGTH: Verifying build integrity..." && \
