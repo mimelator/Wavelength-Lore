@@ -36,6 +36,24 @@ await mcp.callTool("wavelength_memory", {
 - Extend current embedding pipeline
 - Reuse authentication and API patterns
 
+### **GitHub Integration**
+```javascript
+// Ingest historical GitHub data
+await mcp.callTool("wavelength_memory", {
+  action: "ingest_github",
+  source: "issues|prs|commits",
+  repository: "wavelength-lore",
+  date_range: "last_6_months|all_time"
+});
+
+// Query GitHub knowledge
+await mcp.callTool("wavelength_memory", {
+  action: "recall",
+  query: "Docker build issues",
+  sources: ["github_issues", "current_session"]
+});
+```
+
 ### **Data Types to Store**
 ```javascript
 {
@@ -44,7 +62,10 @@ await mcp.callTool("wavelength_memory", {
   "configuration_changes": "What was changed and why",
   "tool_usage_patterns": "Successful MCP command sequences",
   "debugging_sessions": "Investigation steps and outcomes",
-  "performance_optimizations": "What improved speed/efficiency"
+  "performance_optimizations": "What improved speed/efficiency",
+  "github_issues": "Historical issues, solutions, discussions, patterns",
+  "github_prs": "Pull request changes, code reviews, merge patterns",
+  "github_commits": "Commit messages, file changes, fix patterns"
 }
 ```
 
@@ -78,15 +99,21 @@ await mcp.callTool("wavelength_memory", {
 - Basic store/recall functionality
 - Integration with existing vector DB
 
-### **Phase 2: Auto-Capture (3-5 days)**
+### **Phase 2: GitHub Integration (2-3 days)**
+- GitHub API integration for issues/PRs/commits
+- Historical data ingestion pipeline
+- Cross-reference current issues with past solutions
+
+### **Phase 3: Auto-Capture (3-5 days)**
 - Hook into existing MCP tools
 - Auto-store successful operations
 - Error pattern recognition
 
-### **Phase 3: Smart Suggestions (1 week)**
+### **Phase 4: Smart Suggestions (1 week)**
 - Context-aware recommendations
 - Pattern matching for similar issues
 - Proactive problem prevention
+- GitHub history-informed suggestions
 
 ## 💡 **IMMEDIATE BENEFITS**
 
@@ -95,6 +122,9 @@ await mcp.callTool("wavelength_memory", {
 - **Faster Problem Solving**: "We solved this before" → immediate solution
 - **Better Decision Making**: Historical success patterns guide choices
 - **Reduced Cognitive Load**: Don't need to remember everything
+- **GitHub Knowledge**: "Issue #127 had same Docker error - here's how it was fixed"
+- **Pattern Recognition**: "This type of build failure happened 3 times - here's the root cause"
+- **Developer Insights**: "@developer solved similar issues - here's their approach"
 
 ### **For Development Process:**
 - **Knowledge Persistence**: Solutions don't get lost between sessions
@@ -129,6 +159,56 @@ await mcp.callTool("wavelength_memory", {
 - **Auto-Capture Hooks**: Integrate with existing MCP tools
 - **Search Interface**: Semantic search for development knowledge
 
+## 🐙 **GITHUB INTEGRATION DETAILS**
+
+### **Historical Knowledge Mining**
+```javascript
+// Ingest all past issues and solutions
+await mcp.callTool("wavelength_memory", {
+  action: "ingest_github",
+  source: "issues",
+  filters: {
+    "state": "closed",
+    "labels": ["bug", "enhancement", "production"],
+    "since": "2023-01-01"
+  }
+});
+```
+
+### **Real-Time Issue Correlation**
+```javascript
+// When agent encounters Docker error
+await mcp.callTool("wavelength_memory", {
+  action: "correlate",
+  current_issue: "Docker build failing - /app/start.sh not found",
+  sources: ["github_issues", "github_commits", "current_session"]
+});
+// Returns: "GitHub Issue #127: Similar Docker path issue resolved by @developer"
+```
+
+### **GitHub Data Schema**
+```json
+{
+  "github_issue_data": {
+    "id": "github_issue_127",
+    "title": "Production Docker build failing",
+    "body": "Error: /app/start.sh not found...",
+    "labels": ["bug", "docker", "production"],
+    "state": "closed",
+    "resolution": "Fixed Dockerfile COPY path",
+    "files_changed": ["Dockerfile"],
+    "discussion_summary": "Path mismatch after file move",
+    "solution_pattern": "dockerfile_path_fix"
+  }
+}
+```
+
+### **Learning from Past Patterns**
+- **Issue Classification**: Auto-tag similar problem types
+- **Solution Effectiveness**: Track which fixes actually worked
+- **Recurring Problems**: Identify patterns that keep happening
+- **Developer Expertise**: Learn who solved what types of issues
+
 ## 📊 **SUCCESS METRICS**
 
 ### **Efficiency Gains**
@@ -154,8 +234,15 @@ await mcp.callTool("wavelength_memory", {
 
 ### **Development Time**
 - **Phase 1**: 1-2 days (core tool)
-- **Phase 2**: 3-5 days (auto-capture)
-- **Phase 3**: 1 week (smart features)
+- **Phase 2**: 2-3 days (GitHub integration)
+- **Phase 3**: 3-5 days (auto-capture)
+- **Phase 4**: 1 week (smart features)
+
+### **GitHub Integration Requirements**
+- **GitHub API Access**: Repository read permissions
+- **Data Processing**: Issue/PR/commit parsing and embedding
+- **Storage Schema**: Extend vector DB for GitHub data types
+- **Correlation Engine**: Match current issues with historical patterns
 
 ### **Infrastructure**
 - **Vector Storage**: Extend existing (minimal cost)

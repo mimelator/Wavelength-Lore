@@ -128,68 +128,67 @@ jobs:
           echo "🌐 SERVICE URL: https://$SERVICE_URL"  
           echo "🐳 CURRENT IMAGE: $CURRENT_IMAGE"
           
-          # 🎯 ROLLBACK DETECTION & AUTO-RECOVERY
+          # 🚨 LOUD ROLLBACK DETECTION
           if echo "$CURRENT_IMAGE" | grep -q ":latest"; then
-            echo "🚨 ROLLBACK DETECTED: Service is using :latest tag instead of specific version"
+            echo ""
+            echo "🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨"
+            echo "🚨                    ROLLBACK DETECTED                      🚨"
+            echo "🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨"
+            echo ""
+            echo "🎯 ISSUE: App Runner reverted to :latest tag instead of specific version"
+            echo "📊 CURRENT IMAGE: $CURRENT_IMAGE"
+            echo "⚠️  EXPECTED: Specific version tag (e.g., d7064e09, v1.0.177)"
+            echo ""
+            echo "🔍 POSSIBLE CAUSES:"
+            echo "   • Health check failures on new image deployment"
+            echo "   • Port configuration mismatch (should be 8080)"
+            echo "   • Docker container startup issues"
+            echo "   • App Runner automatic rollback after failed deployment"
+            echo ""
+            echo "🎯 CURRENT STRATEGY:"
+            echo "   • Build new image with latest fixes"
+            echo "   • Deploy with correct port configuration (8080)"
+            echo "   • Monitor for successful deployment without rollback"
+            echo ""
             
-            # Check recent rollback operations
+            # Skip auto-recovery to avoid deployment race conditions
+            echo "🤖 SMART DECISION: Skipping auto-recovery to prevent deployment conflicts"
+            echo "💡 STRATEGY: Build new image first, then let normal deployment update App Runner"
+            echo "🎯 BENEFIT: Avoids race condition between auto-recovery deployment and new build deployment"
+            
+            # Log rollback detection for troubleshooting
+            echo "::warning::⚠️  App Runner has reverted to :latest tag - likely due to recent rollback"
+            echo "::notice::🔧 This build will create a new image and deploy it properly"
+            echo "::notice::📊 Monitor App Runner operations for deployment success"
+            
+            # Optional: Check for recent rollbacks (if permissions allow)
             RECENT_ROLLBACKS=$(aws apprunner list-operations \
               --service-arn "$APPRUNNER_SERVICE_ARN" \
               --query 'length(OperationSummaryList[?Status==`ROLLBACK_SUCCEEDED` && StartedAt >= `2025-10-26`])' \
-              --output text)
+              --output text 2>/dev/null || echo "Permission denied - skipping rollback count")
             
-            echo "📊 RECENT ROLLBACKS: $RECENT_ROLLBACKS operations since today"
-            
-            if [ "$RECENT_ROLLBACKS" -gt "0" ]; then
-              echo "🔧 AUTO-RECOVERY: Updating App Runner to use latest ECR image before building"
-              
-              # Get the most recent successful ECR image (not :latest)
-              LATEST_ECR_IMAGE=$(aws ecr describe-images \
-                --repository-name wavelength-lore \
-                --query 'sort_by(imageDetails[?imageTags!=`null` && !contains(imageTags[0], `latest`)], &imagePushedAt)[-1].imageTags[0]' \
-                --output text)
-              
-              if [ "$LATEST_ECR_IMAGE" != "None" ] && [ "$LATEST_ECR_IMAGE" != "" ]; then
-                echo "🎯 RECOVERY TARGET: wavelength-lore:$LATEST_ECR_IMAGE"
-                
-                # Update App Runner to use the latest non-:latest image
-                RECOVERY_RESULT=$(aws apprunner update-service \
-                  --service-arn "$APPRUNNER_SERVICE_ARN" \
-                  --source-configuration '{
-                    "ImageRepository": {
-                      "ImageIdentifier": "170023515523.dkr.ecr.us-east-1.amazonaws.com/wavelength-lore:'$LATEST_ECR_IMAGE'",
-                      "ImageConfiguration": {
-                        "Port": "8080"
-                      },
-                      "ImageRepositoryType": "ECR"
-                    },
-                    "AutoDeploymentsEnabled": false
-                  }' \
-                  --query 'OperationId' \
-                  --output text 2>/dev/null)
-                
-                if [ $? -eq 0 ]; then
-                  echo "✅ RECOVERY INITIATED: Operation $RECOVERY_RESULT"
-                  echo "⏳ Waiting 30 seconds for recovery deployment to stabilize..."
-                  sleep 30
-                  
-                  # Verify recovery
-                  NEW_STATUS=$(aws apprunner describe-service \
-                    --service-arn "$APPRUNNER_SERVICE_ARN" \
-                    --query 'Service.Status' \
-                    --output text)
-                  echo "📊 RECOVERY STATUS: $NEW_STATUS"
-                else
-                  echo "::warning::⚠️  Auto-recovery failed, continuing with build anyway"
-                fi
-              else
-                echo "::warning::⚠️  No suitable recovery image found, continuing with build"
+            if [ "$RECENT_ROLLBACKS" != "Permission denied - skipping rollback count" ]; then
+              echo "📊 RECENT ROLLBACKS: $RECENT_ROLLBACKS operations since today"
+              if [ "$RECENT_ROLLBACKS" -gt "3" ]; then
+                echo "::error::🔥 CRITICAL: High rollback count suggests persistent deployment issue"
+                echo "::error::🔍 Manual investigation may be required after this deployment"
               fi
             else
-              echo "::notice::ℹ️  Using :latest tag but no recent rollbacks detected"
+              echo "📊 ROLLBACK COUNT: Unable to check (need apprunner:ListOperations permission)"
             fi
+            
+            echo ""
+            echo "🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨"
+            echo ""
+            
+            # GitHub Actions annotations for visibility
+            echo "::error::🚨 ROLLBACK DETECTED: App Runner using :latest instead of specific version"
+            echo "::warning::📊 Current Image: $CURRENT_IMAGE"
+            echo "::notice::🎯 Strategy: Build new image and deploy with correct configuration"
+            
           else
             echo "✅ Service using specific version tag - no rollback detected"
+            echo "🎯 CURRENT IMAGE: $CURRENT_IMAGE"
           fi
           
           # Check if service is in a healthy state for deployment
@@ -296,19 +295,21 @@ jobs:
 
           echo "::notice::Deploying commit $SHORT_SHA (version $VERSION_TAG) to App Runner"
 
-          # Check App Runner service status first - fail fast if busy
+          # 🎯 SIMPLE: Fail fast if deployment already in progress
           CURRENT_STATUS=$(aws apprunner describe-service \
             --service-arn $APPRUNNER_SERVICE_ARN \
             --query 'Service.Status' \
             --output text)
 
-          echo "Current App Runner status: $CURRENT_STATUS"
+          echo "📊 Current App Runner status: $CURRENT_STATUS"
 
-          if [ "$CURRENT_STATUS" != "RUNNING" ]; then
-            echo "::error::❌ App Runner service is not in RUNNING state (current: $CURRENT_STATUS)"
-            echo "::error::This usually means another deployment is in progress or the service is recovering."
-            echo "::error::Please wait for the service to return to RUNNING state and retry the deployment."
-            echo "::error::You can check status with: aws apprunner describe-service --service-arn $APPRUNNER_SERVICE_ARN"
+          if [ "$CURRENT_STATUS" = "RUNNING" ]; then
+            echo "✅ Service ready for deployment"
+          else
+            echo "::error::❌ App Runner service is not ready: $CURRENT_STATUS"
+            echo "::error::Current deployment/operation in progress - failing fast to avoid conflicts"
+            echo "::error::Please retry when service returns to RUNNING state"
+            echo "::notice::💡 This prevents deployment race conditions and ensures clean deployments"
             exit 1
           fi
 
