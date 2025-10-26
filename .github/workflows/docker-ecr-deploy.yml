@@ -128,6 +128,70 @@ jobs:
           echo "🌐 SERVICE URL: https://$SERVICE_URL"  
           echo "🐳 CURRENT IMAGE: $CURRENT_IMAGE"
           
+          # 🎯 ROLLBACK DETECTION & AUTO-RECOVERY
+          if echo "$CURRENT_IMAGE" | grep -q ":latest"; then
+            echo "🚨 ROLLBACK DETECTED: Service is using :latest tag instead of specific version"
+            
+            # Check recent rollback operations
+            RECENT_ROLLBACKS=$(aws apprunner list-operations \
+              --service-arn "$APPRUNNER_SERVICE_ARN" \
+              --query 'length(OperationSummaryList[?Status==`ROLLBACK_SUCCEEDED` && StartedAt >= `2025-10-26`])' \
+              --output text)
+            
+            echo "📊 RECENT ROLLBACKS: $RECENT_ROLLBACKS operations since today"
+            
+            if [ "$RECENT_ROLLBACKS" -gt "0" ]; then
+              echo "🔧 AUTO-RECOVERY: Updating App Runner to use latest ECR image before building"
+              
+              # Get the most recent successful ECR image (not :latest)
+              LATEST_ECR_IMAGE=$(aws ecr describe-images \
+                --repository-name wavelength-lore \
+                --query 'sort_by(imageDetails[?imageTags!=`null` && !contains(imageTags[0], `latest`)], &imagePushedAt)[-1].imageTags[0]' \
+                --output text)
+              
+              if [ "$LATEST_ECR_IMAGE" != "None" ] && [ "$LATEST_ECR_IMAGE" != "" ]; then
+                echo "🎯 RECOVERY TARGET: wavelength-lore:$LATEST_ECR_IMAGE"
+                
+                # Update App Runner to use the latest non-:latest image
+                RECOVERY_RESULT=$(aws apprunner update-service \
+                  --service-arn "$APPRUNNER_SERVICE_ARN" \
+                  --source-configuration '{
+                    "ImageRepository": {
+                      "ImageIdentifier": "170023515523.dkr.ecr.us-east-1.amazonaws.com/wavelength-lore:'$LATEST_ECR_IMAGE'",
+                      "ImageConfiguration": {
+                        "Port": "8080"
+                      },
+                      "ImageRepositoryType": "ECR"
+                    },
+                    "AutoDeploymentsEnabled": false
+                  }' \
+                  --query 'OperationId' \
+                  --output text 2>/dev/null)
+                
+                if [ $? -eq 0 ]; then
+                  echo "✅ RECOVERY INITIATED: Operation $RECOVERY_RESULT"
+                  echo "⏳ Waiting 30 seconds for recovery deployment to stabilize..."
+                  sleep 30
+                  
+                  # Verify recovery
+                  NEW_STATUS=$(aws apprunner describe-service \
+                    --service-arn "$APPRUNNER_SERVICE_ARN" \
+                    --query 'Service.Status' \
+                    --output text)
+                  echo "📊 RECOVERY STATUS: $NEW_STATUS"
+                else
+                  echo "::warning::⚠️  Auto-recovery failed, continuing with build anyway"
+                fi
+              else
+                echo "::warning::⚠️  No suitable recovery image found, continuing with build"
+              fi
+            else
+              echo "::notice::ℹ️  Using :latest tag but no recent rollbacks detected"
+            fi
+          else
+            echo "✅ Service using specific version tag - no rollback detected"
+          fi
+          
           # Check if service is in a healthy state for deployment
           case $SERVICE_STATUS in
             "RUNNING")
