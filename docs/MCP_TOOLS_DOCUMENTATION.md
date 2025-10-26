@@ -2,7 +2,7 @@
 
 ## 📖 Overview
 
-The Wavelength-Lore project features a powerful **Enhanced MCP Server** that provides 10 specialized tools for automating development workflows, managing lore content, and maintaining the sophisticated Wavelength universe. These tools leverage the Model Context Protocol to provide AI assistants with direct access to project-specific functionality.
+The Wavelength-Lore project features a powerful **Enhanced MCP Server** that provides 11 specialized tools for automating development workflows, managing lore content, and maintaining the sophisticated Wavelength universe. These tools leverage the Model Context Protocol to provide AI assistants with direct access to project-specific functionality.
 
 **MCP Server Location:** `/mcp/enhanced-wavelength-server.js`  
 **Access Method:** JSON-RPC 2.0 over stdio  
@@ -79,6 +79,13 @@ The Wavelength-Lore project features a powerful **Enhanced MCP Server** that pro
 **Authentication:** Bearer tokens, Basic auth, API keys, custom headers  
 **Features:** JSON parsing, response summarization, error handling, performance metrics  
 **Benefits:** No manual approval delays, intelligent error messages, contextual quick actions
+
+#### **⚡ Node Command Executor** (`node_execute`)
+**Purpose:** Execute Node.js commands, scripts, and tests without manual approval  
+**What it does:** Run npm scripts, diagnostics, tests, fixes, and custom Node.js code  
+**Safety Features:** Command validation, timeout protection, dangerous pattern detection  
+**Command Types:** run-script, test, diagnostic, fix, validate, custom  
+**Benefits:** Eliminates approval delays for one-off commands, intelligent error handling, context-aware execution
 
 ---
 

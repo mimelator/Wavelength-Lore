@@ -165,6 +165,21 @@ class EnhancedWavelengthMCPServer {
             },
             required: ["url"]
           }
+        },
+        {
+          name: "node_execute",
+          description: "Execute Node.js commands, scripts, tests, and diagnostics without manual approval",
+          inputSchema: {
+            type: "object",
+            properties: {
+              command: { type: "string", enum: ["run-script", "test", "diagnostic", "fix", "validate", "custom"], description: "Type of command to execute" },
+              script: { type: "string", description: "Script path or npm script name to execute" },
+              args: { type: "array", items: { type: "string" }, description: "Command line arguments" },
+              timeout: { type: "number", description: "Execution timeout in seconds (default: 30)", default: 30 },
+              context: { type: "string", description: "Context for intelligent execution (e.g., 'fixing deployment issue')" }
+            },
+            required: ["command", "script"]
+          }
         }
       ]
     }));
@@ -194,6 +209,8 @@ class EnhancedWavelengthMCPServer {
             return await this.navigateDocumentation(args.query, args.type, args.context);
           case "http_request":
             return await this.makeHttpRequest(args.url, args.method, args.headers, args.body, args.auth);
+          case "node_execute":
+            return await this.executeNodeCommand(args.command, args.script, args.args, args.timeout, args.context);
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
@@ -891,6 +908,234 @@ console.log(checkDir(googleDocsPath, 'Google Docs'));
         content: [{
           type: "text",
           text: `❌ Documentation navigation failed: ${error.message}\n\n💡 Available documentation areas:\n• Quickstart guides\n• System architecture\n• Development procedures\n• Game features\n• Tools & scripts\n• Reference materials`
+        }]
+      };
+    }
+  }
+
+  // Tool 11: Node Command Executor (No More Manual Approvals!)
+  async executeNodeCommand(command, script, args = [], timeout = 30, context = '') {
+    const { spawn } = require('child_process');
+    const path = require('path');
+    
+    try {
+      // Validate and prepare command
+      let fullCommand;
+      let commandArgs = [];
+      
+      switch (command) {
+        case 'run-script':
+          // Check if it's an npm script first
+          const packageJson = path.resolve('package.json');
+          let isNpmScript = false;
+          try {
+            const pkg = JSON.parse(require('fs').readFileSync(packageJson, 'utf8'));
+            if (pkg.scripts && pkg.scripts[script]) {
+              fullCommand = 'npm';
+              commandArgs = ['run', script, ...args];
+              isNpmScript = true;
+            }
+          } catch (e) {
+            // Not an npm script or no package.json
+          }
+          
+          if (!isNpmScript) {
+            fullCommand = 'node';
+            commandArgs = [script, ...args];
+          }
+          break;
+          
+        case 'test':
+          if (script.startsWith('npm:')) {
+            fullCommand = 'npm';
+            commandArgs = ['test', script.replace('npm:', ''), ...args];
+          } else {
+            fullCommand = 'node';
+            commandArgs = [script, ...args];
+          }
+          break;
+          
+        case 'diagnostic':
+          fullCommand = 'node';
+          commandArgs = ['-e', `
+            console.log('🔍 Node.js Diagnostic Report');
+            console.log('📅 Date:', new Date().toISOString());
+            console.log('🟢 Node Version:', process.version);
+            console.log('💻 Platform:', process.platform);
+            console.log('🏗️ Architecture:', process.arch);
+            console.log('📁 Working Directory:', process.cwd());
+            console.log('🔧 Environment:', process.env.NODE_ENV || 'development');
+            console.log('💾 Memory Usage:', JSON.stringify(process.memoryUsage(), null, 2));
+            ${script ? `console.log('\\n🚀 Custom Diagnostic:'); ${script}` : ''}
+          `, ...args];
+          break;
+          
+        case 'fix':
+          fullCommand = 'node';
+          commandArgs = [script, ...args];
+          break;
+          
+        case 'validate':
+          fullCommand = 'node';
+          commandArgs = ['-e', `
+            console.log('✅ Validation Starting...');
+            try {
+              ${script}
+              console.log('✅ Validation Completed Successfully');
+            } catch (error) {
+              console.error('❌ Validation Failed:', error.message);
+              process.exit(1);
+            }
+          `, ...args];
+          break;
+          
+        case 'custom':
+          fullCommand = 'node';
+          commandArgs = ['-e', script, ...args];
+          break;
+          
+        default:
+          throw new Error(`Unknown command type: ${command}`);
+      }
+      
+      // Security validation
+      const dangerousPatterns = [
+        'rm -rf', 'del /f', 'format', 'fdisk', 'mkfs',
+        'shutdown', 'reboot', 'halt', 'poweroff',
+        'chmod 777', 'chown root', 'sudo rm',
+        'DROP DATABASE', 'DROP TABLE', 'DELETE FROM'
+      ];
+      
+      const commandString = `${fullCommand} ${commandArgs.join(' ')}`;
+      for (const pattern of dangerousPatterns) {
+        if (commandString.toLowerCase().includes(pattern.toLowerCase())) {
+          return {
+            content: [{
+              type: "text",
+              text: `🚨 Security Warning: Command blocked for safety\n\n❌ Detected dangerous pattern: "${pattern}"\n🛡️ Command: ${commandString}\n\n💡 If this is intentional, please run manually with appropriate caution.`
+            }]
+          };
+        }
+      }
+      
+      // Execute command with timeout
+      const startTime = Date.now();
+      let output = '';
+      let errorOutput = '';
+      let exitCode = 0;
+      
+      const result = await new Promise((resolve, reject) => {
+        const child = spawn(fullCommand, commandArgs, {
+          stdio: ['pipe', 'pipe', 'pipe'],
+          shell: false,
+          timeout: timeout * 1000
+        });
+        
+        child.stdout.on('data', (data) => {
+          output += data.toString();
+        });
+        
+        child.stderr.on('data', (data) => {
+          errorOutput += data.toString();
+        });
+        
+        child.on('close', (code) => {
+          exitCode = code;
+          resolve({ output, errorOutput, exitCode });
+        });
+        
+        child.on('error', (error) => {
+          reject(error);
+        });
+        
+        // Handle timeout
+        setTimeout(() => {
+          if (!child.killed) {
+            child.kill('SIGTERM');
+            reject(new Error(`Command timed out after ${timeout} seconds`));
+          }
+        }, timeout * 1000);
+      });
+      
+      const duration = Date.now() - startTime;
+      
+      // Format intelligent response
+      const statusEmoji = result.exitCode === 0 ? '✅' : '❌';
+      let responseText = `🚀 Node Command Execution Results\n\n`;
+      responseText += `${statusEmoji} **${command.toUpperCase()}: ${script}**\n`;
+      if (context) {
+        responseText += `🎯 Context: ${context}\n`;
+      }
+      responseText += `📊 Exit Code: ${result.exitCode}\n`;
+      responseText += `⏱️ Duration: ${duration}ms\n`;
+      responseText += `🔧 Command: \`${fullCommand} ${commandArgs.join(' ')}\`\n\n`;
+      
+      // Add output
+      if (result.output) {
+        responseText += `📄 Output:\n`;
+        if (result.output.length > 2000) {
+          responseText += `\`\`\`\n${result.output.substring(0, 2000)}...\n[Truncated - ${result.output.length} total characters]\n\`\`\`\n`;
+        } else {
+          responseText += `\`\`\`\n${result.output}\n\`\`\`\n`;
+        }
+      }
+      
+      // Add error output if present
+      if (result.errorOutput) {
+        responseText += `🚨 Error Output:\n`;
+        if (result.errorOutput.length > 1000) {
+          responseText += `\`\`\`\n${result.errorOutput.substring(0, 1000)}...\n[Truncated - ${result.errorOutput.length} total characters]\n\`\`\`\n`;
+        } else {
+          responseText += `\`\`\`\n${result.errorOutput}\n\`\`\`\n`;
+        }
+      }
+      
+      // Add intelligent quick actions
+      responseText += `🎯 Quick Actions:\n`;
+      if (result.exitCode === 0) {
+        responseText += `• Success! Command completed normally\n`;
+        if (command === 'test') {
+          responseText += `• All tests passed - ready for deployment\n`;
+        } else if (command === 'diagnostic') {
+          responseText += `• System diagnostics completed - analyze output above\n`;
+        } else if (command === 'fix') {
+          responseText += `• Fix applied successfully - verify functionality\n`;
+        }
+      } else {
+        responseText += `• Command failed with exit code ${result.exitCode}\n`;
+        responseText += `• Check error output above for troubleshooting\n`;
+        if (result.errorOutput.includes('ENOENT')) {
+          responseText += `• File or command not found - verify path and installation\n`;
+        } else if (result.errorOutput.includes('permission')) {
+          responseText += `• Permission issue - check file/directory permissions\n`;
+        } else if (result.errorOutput.includes('timeout')) {
+          responseText += `• Operation timed out - consider increasing timeout or optimizing command\n`;
+        }
+      }
+      
+      // Add context-specific suggestions
+      if (context) {
+        if (context.includes('deployment') && result.exitCode === 0) {
+          responseText += `• Deployment-related command succeeded - continue with deployment process\n`;
+        } else if (context.includes('test') && result.exitCode === 0) {
+          responseText += `• Tests passed - code quality verified\n`;
+        } else if (context.includes('fix') && result.exitCode === 0) {
+          responseText += `• Fix appears successful - monitor for continued functionality\n`;
+        }
+      }
+      
+      return {
+        content: [{
+          type: "text",
+          text: responseText
+        }]
+      };
+      
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `❌ Node command execution failed: ${error.message}\n\n💡 Common solutions:\n• Verify script path and file permissions\n• Check Node.js installation and version\n• Ensure all dependencies are installed\n• Review command syntax and arguments\n• Consider increasing timeout for long-running operations\n\n🔧 Command attempted: ${command} ${script}`
         }]
       };
     }

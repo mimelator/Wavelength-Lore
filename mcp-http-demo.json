@@ -1,0 +1,11 @@
+{
+  "jsonrpc": "2.0",
+  "method": "tools/call",
+  "params": {
+    "name": "http_request",
+    "arguments": {
+      "url": "https://httpbin.org/json"
+    }
+  },
+  "id": 1
+}
