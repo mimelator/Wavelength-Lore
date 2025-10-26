@@ -1,0 +1,24 @@
+{
+  "quickAccess": {
+    "sessionStart": "node start-wavelength-session.js",
+    "sessionStatus": "node session-status.js",
+    "aiContext": "node wavelength-tools/wavelength-ai-context-manager-enhanced.js",
+    "testRunner": "node scripts/unified/test-runner.js --help"
+  },
+  "documentation": {
+    "quickstart": "WAVELENGTH_MINI_QUICKSTART.md",
+    "fullGuides": "node wavelength-tools/wavelength-doc-discoverer.js",
+    "toolReference": "node wavelength-tools/wavelength-tool-finder.js [query]",
+    "troubleshooting": "node wavelength-tools/wavelength-help-finder.js [issue]"
+  },
+  "tools": {
+    "discover": "ls wavelength-tools/ | grep \".js\"",
+    "unified": "ls scripts/unified/",
+    "findTool": "node wavelength-tools/wavelength-tool-finder.js [keyword]"
+  },
+  "emergency": {
+    "dockerIssues": "node wavelength-tools/wavelength-docker-build-validator.js",
+    "buildFailures": "node wavelength-tools/wavelength-enhanced-build-monitor.js",
+    "configProblems": "node wavelength-tools/wavelength-config-discovery.js"
+  }
+}

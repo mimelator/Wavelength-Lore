@@ -1,9 +1,57 @@
 # 🌊⚡ WAVELENGTH DEVELOPER QUICKSTART ⚡🌊
 
 **🚀 Complete Orientation Guide for WAVELENGTH + AI COPILOT Development**  
-**Version:** 1.0  
+**Version:** 1.1  
 **Last Updated:** October 25, 2025  
 **Status:** ✅ PRODUCTION READY
+
+---
+
+## 🚨 **CRITICAL: MCP DIRECT INVOCATION CLARIFICATION**
+
+### **🚀 HOW AGENTS ACTUALLY CALL MCP TOOLS (IMPORTANT!)**
+
+**✅ CORRECT - Direct MCP Protocol Communication:**
+```javascript
+// Agents call MCP tools directly through their runtime
+await mcp.callTool("wavelength_validate", {
+  content: "Character analysis data...",
+  type: "character"
+});
+
+await mcp.callTool("firebase_query", {
+  path: "/episodes/recent",
+  operation: "read"
+});
+
+await mcp.callTool("wavelength_test_runner", {
+  suite: "comprehensive",
+  url: "https://wavelengthlore.com"
+});
+```
+
+**❌ WRONG - Shell Command Intermediaries:**
+```bash
+# Agents do NOT call MCP tools this way
+echo '{"jsonrpc": "2.0", ...}' | node mcp/wavelength-mcp-server.js
+```
+
+### **🎯 MCP TRUTH:**
+- **Direct Protocol Communication** - Agents connect via pure MCP protocol
+- **No Shell Commands Needed** - Zero command-line execution required
+- **Agent Runtime Handles JSON-RPC** - Automatic protocol management
+- **Tools Exposed as Functions** - MCP tools appear as callable functions
+- **Configuration in Agent Settings** - Setup in claude-desktop-config.json
+
+### **Available WAVELENGTH MCP Tools (Direct Access):**
+- 🧠 **wavelength_validate** - Lore consistency validation
+- 🔥 **firebase_query** - Advanced Firebase operations  
+- 🐳 **wavelength_build_check** - Docker build validation
+- ⚙️ **wavelength_config_scan** - Configuration discovery
+- 🧪 **wavelength_test_runner** - Comprehensive testing
+- 📊 **wavelength_health_monitor** - Real-time health checks
+
+**🌊⚡ MCP tools integrate seamlessly into agent runtime - no shell intermediaries required!** ⚡🌊
 
 ---
 
