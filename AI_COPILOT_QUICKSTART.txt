@@ -30,6 +30,15 @@ AI COPILOT QUICK START - COPY/PASTE THIS TO ANY AI ASSISTANT
 • node scripts/unified/deployment-manager.js --help
 • node scripts/unified/smart-commit.js (ONLY commit method)
 
+🚀 MCP SUPERPOWERS (Revolutionary AI Control):
+• Custom Wavelength MCP servers in /mcp/ directory
+• AI can control dev server: start/stop/restart/status/logs
+• AI can validate lore: characters/episodes/content consistency
+• AI can query Firebase: direct database access with admin privileges
+• Setup: Copy mcp/claude-desktop-config.json to ~/Library/Application Support/Claude/
+• Test: Ask AI "Check server status" or "Validate this character: Lucky"
+• 12 custom tools available: wavelength_validate, firebase_query, dev_server_*, etc.
+
 🚫 DO NOT TOUCH:
 • .current-notes.md (private workspace)
 • Any personal organization files
@@ -51,5 +60,11 @@ AI COPILOT QUICK START - COPY/PASTE THIS TO ANY AI ASSISTANT
 • Never modify another AI's context file
 
 ⏰ EFFICIENCY FIRST - My time is valuable, optimize for speed and batch operations.
+
+🎯 MCP INTEGRATION STATUS: ✅ ACTIVE
+• Dev server management via AI commands
+• Wavelength lore validation in real-time
+• Firebase operations with project context
+• Enterprise-grade AI toolchain operational
 
 Ready? Start by reading your entry point document above! 🚀

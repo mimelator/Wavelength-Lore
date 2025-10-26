@@ -71,7 +71,8 @@ class InputValidator {
 
 // Configuration
 require('dotenv').config();
-const awsResources = require('../../config/aws-resources');
+const { getAWSConfig } = require('../utils/aws-config-helper');
+const awsResources = getAWSConfig();
 
 const CONFIG = {
   AWS_REGION: 'us-east-1',
@@ -374,7 +375,7 @@ class ApplicationDeploymentManager extends BaseDeploymentManager {
     
     const serviceArn = awsResources.apprunner?.serviceArn;
     if (!serviceArn) {
-      throw new Error('App Runner service ARN not configured in aws-resources.js');
+      throw new Error('App Runner service ARN not configured. Please set APPRUNNER_SERVICE_ARN environment variable or create config/aws-resources.js');
     }
     
     try {

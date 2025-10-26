@@ -17,12 +17,11 @@ class CloudFrontCacheBuster {
     // Set distribution ID based on type
     if (distributionType === 'gallery') {
       this.distributionId = process.env.GALLERY_CLOUDFRONT_DISTRIBUTION_ID || 
-                          (awsConfig.cloudFront.gallery && awsConfig.cloudFront.gallery.distributionId);
+                          awsConfig.cloudfront.galleryDistributionId;
       this.distributionName = 'Gallery';
     } else {
       this.distributionId = process.env.CLOUDFRONT_DISTRIBUTION_ID || 
-                          (awsConfig.cloudFront.primary && awsConfig.cloudFront.primary.distributionId) ||
-                          awsConfig.cloudFront.distributionId;
+                          awsConfig.cloudfront.distributionId;
       this.distributionName = 'Primary';
     }
     
@@ -115,7 +114,11 @@ async function main() {
   
   try {
     // Validate environment first
-    envHelper.validateEnvironment('aws');
+    // Environment validation handled by aws-config-helper
+    if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
+      console.log('⚠️  AWS credentials not found in environment variables');
+      console.log('   Please set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY');
+    }
     
     // Determine which distribution to use
     const distIndex = args.indexOf('--distribution');
