@@ -156,6 +156,19 @@ await mcp.callTool("wavelength_smart_commit", {action: "prepare"});
 await mcp.callTool("wavelength_git_status", {check: "full"});
 ```
 
+**🎯 NEW! Issue Generator for Vector Store:**
+```javascript
+// Generate completed GitHub issues for knowledge base
+await mcp.callTool("wavelength_issue_generator", {
+  title: "Docker startup script mismatch causing production failures",
+  problem: "Production builds failing with /app/start.sh not found",
+  solution: "Switched to correct template-based startup script",
+  technical_details: "Two startup scripts existed - used wrong one",
+  files_modified: ["Dockerfile", "docker/docker-start.sh"],
+  prevention: "Enhanced documentation and validation"
+});
+```
+
 ### 🎯 HOW TO GET MORE INFO VIA MCP:
 ```javascript
 // Need more details on ANY tool? Ask for help:
@@ -416,6 +429,23 @@ await mcp.callTool("wavelength_git_status", {check: "full"});
 await mcp.callTool("wavelength_git_status", {check: "changes-only"});
 await mcp.callTool("wavelength_smart_commit", {action: "prepare"});
 await mcp.callTool("wavelength_smart_commit", {action: "validate"});
+```
+
+### 🎯 Knowledge Base Commands:
+```javascript
+// Generate completed GitHub issues for vector store knowledge base
+await mcp.callTool("wavelength_issue_generator", {
+  title: "Issue title for knowledge base",
+  problem: "Problem description and context", 
+  solution: "Solution implemented by WAVELENGTH AGENT",
+  technical_details: "Root cause analysis and technical investigation",
+  files_modified: ["file1.js", "file2.md", "file3.json"],
+  prevention: "Prevention measures and monitoring",
+  category: "Infrastructure", // Infrastructure|Bug|Feature|Documentation
+  priority: "High", // Critical|High|Medium|Low  
+  technology: ["docker", "aws", "github-actions"], // Tech tags for indexing
+  custom_tags: ["rollback-detection", "startup-scripts"] // Custom vector store tags
+});
 ```
 
 ## 🆘 MCP HELP & DISCOVERY SYSTEM

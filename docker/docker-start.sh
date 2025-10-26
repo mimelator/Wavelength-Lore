@@ -13,7 +13,7 @@ ls -la /app/start.sh
 echo "🔧 Generating Nginx configuration..."
 if [ -f /etc/nginx/nginx.conf.template ]; then
     envsubst '$NGINX_PORT $NODE_PORT' < /etc/nginx/nginx.conf.template > /tmp/nginx.conf
-    if sudo cp /tmp/nginx.conf /etc/nginx/nginx.conf; then
+    if cp /tmp/nginx.conf /etc/nginx/nginx.conf; then
         echo "✅ Nginx configuration generated successfully"
     else
         echo "❌ Failed to copy Nginx configuration"
@@ -48,8 +48,8 @@ done
 echo "🔧 Setting up nginx directories..."
 mkdir -p /run/nginx
 mkdir -p /var/lib/nginx/logs
-chown -R appuser:nginx /run/nginx 2>/dev/null || true
-chown -R appuser:nginx /var/lib/nginx 2>/dev/null || true
+chown -R appuser:appuser /run/nginx 2>/dev/null || true
+chown -R appuser:appuser /var/lib/nginx 2>/dev/null || true
 chmod 755 /run/nginx
 chmod 755 /var/lib/nginx/logs
 
