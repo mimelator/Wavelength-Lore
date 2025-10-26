@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <circle cx="32" cy="32" r="30" fill="#4a47a3" stroke="#6a4c93" stroke-width="2"/>
+  <path d="M32 8 L36 20 L48 16 L40 28 L52 32 L40 36 L48 48 L36 44 L32 56 L28 44 L16 48 L24 36 L12 32 L24 28 L16 16 L28 20 Z" fill="#e74c3c" opacity="0.8"/>
+  <circle cx="32" cy="32" r="8" fill="#f39c12"/>
+  <text x="32" y="38" text-anchor="middle" fill="white" font-size="8" font-weight="bold">⚡</text>
+</svg>

@@ -63,12 +63,14 @@ router.get('/category/:categoryId', (req, res) => {
  */
 router.get('/post/:postId', async (req, res) => {
     const postId = req.params.postId;
+    console.log('📝 Loading post:', postId);
     
     try {
         const { getAdminDatabase } = require('../helpers/firebase-admin-utils');
         const db = getAdminDatabase();
         
         if (!db) {
+            console.log('❌ Firebase not initialized');
             return res.render('forum/simple-post-page', {
                 post: null,
                 replies: [],
@@ -77,10 +79,17 @@ router.get('/post/:postId', async (req, res) => {
         }
         
         // Fetch post data
+        console.log('🔍 Fetching post data from Firebase...');
         const postSnapshot = await db.ref(`forum/posts/${postId}`).once('value');
         const post = postSnapshot.val();
         
+        console.log('📊 Post data retrieved:', post ? 'Found' : 'Not found');
+        if (post) {
+            console.log('📝 Post title:', post.title);
+        }
+        
         if (!post) {
+            console.log('❌ Post not found in database');
             return res.render('forum/simple-post-page', {
                 post: null,
                 replies: [],
@@ -89,15 +98,19 @@ router.get('/post/:postId', async (req, res) => {
         }
         
         // Fetch replies
+        console.log('💬 Fetching replies...');
         const repliesSnapshot = await db.ref('forum/replies').once('value');
         const allReplies = repliesSnapshot.val() || {};
         const postReplies = Object.values(allReplies)
             .filter(reply => reply.postId === postId)
             .sort((a, b) => a.createdAt - b.createdAt);
         
+        console.log('💬 Found replies:', postReplies.length);
+        
         // Increment view count
         await db.ref(`forum/posts/${postId}/views`).set((post.views || 0) + 1);
         
+        console.log('✅ Rendering post page with data');
         res.render('forum/simple-post-page', {
             post: post,
             replies: postReplies,
@@ -105,7 +118,7 @@ router.get('/post/:postId', async (req, res) => {
         });
         
     } catch (error) {
-        console.error('Error loading post:', error);
+        console.error('💥 Error loading post:', error);
         res.render('forum/simple-post-page', {
             post: null,
             replies: [],

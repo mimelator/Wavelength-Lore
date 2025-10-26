@@ -590,6 +590,18 @@ console.log(checkDir(googleDocsPath, 'Google Docs'));
     const path = require('path');
     
     try {
+      // Performance optimization: Initialize file stats cache
+      if (!this.fileStatsCache) {
+        this.fileStatsCache = new Map();
+        this.cacheTimestamp = Date.now();
+      }
+      
+      // Clear cache every 5 minutes to ensure freshness
+      if (Date.now() - this.cacheTimestamp > 300000) {
+        this.fileStatsCache.clear();
+        this.cacheTimestamp = Date.now();
+      }
+      
       // Define our documentation structure
       const documentationMap = {
         // Quick Start & Getting Started
@@ -631,6 +643,37 @@ console.log(checkDir(googleDocsPath, 'Google Docs'));
           'Unified Scripts': 'scripts/unified/'
         },
         
+        // Scripts & Automation
+        scripts: {
+          'Lore Ingestion Script': 'scripts/ingest-lore.js',
+          'Smart Commit (MCP)': 'scripts/mcp-smart-commit.js',
+          'Smart Commit (Unified)': 'scripts/unified/smart-commit.js',
+          'Deployment Manager': 'scripts/unified/deployment-manager.js',
+          'Content Sync Manager': 'scripts/unified/content-sync-manager.js',
+          'Security Scanner': 'scripts/unified/security-scanner.js',
+          'System Health Check': 'scripts/unified/system-health-check.js',
+          'AWS CLI Helper': 'scripts/aws-cli-helper.js',
+          'Environment Setup': 'scripts/setup-environment.js',
+          'Database Migration': 'scripts/migrate-database.js',
+          'Backup Manager': 'scripts/backup-manager.js',
+          'Log Analyzer': 'scripts/log-analyzer.js'
+        },
+        
+        // Testing & Validation
+        tests: {
+          'MCP Server Tests': 'tests/mcp-server-tests.js',
+          'Lore Integration Tests': 'tests/lore-integration-tests.js',
+          'Chatbot Testing Summary': 'tests/chatbot/CHATBOT_TESTING_SUMMARY.md',
+          'API Tests': 'tests/api-tests.js',
+          'Security Tests': 'tests/security-tests.js',
+          'Performance Tests': 'tests/performance-tests.js',
+          'Database Tests': 'tests/database-tests.js',
+          'Deployment Tests': 'tests/deployment-tests.js',
+          'Content Sync Tests': 'tests/content-sync-tests.js',
+          'Character System Tests': 'tests/character-system-tests.js',
+          'Episode Management Tests': 'tests/episode-management-tests.js'
+        },
+        
         // Documentation Indexes
         reference: {
           'Main Documentation Hub': 'docs/README.md',
@@ -644,19 +687,30 @@ console.log(checkDir(googleDocsPath, 'Google Docs'));
       
       // Smart search based on query terms
       const searchTerms = {
-        'mcp': ['architecture', 'tools', 'reference'],
-        'deploy': ['procedures', 'architecture'],
-        'lore': ['tools', 'architecture'],
-        'character': ['features', 'tools'],
-        'chatbot': ['architecture', 'procedures'],
-        'game': ['features'],
-        'security': ['architecture', 'procedures'],
-        'backup': ['procedures'],
-        'git': ['procedures', 'reference'],
+        'mcp': ['architecture', 'tools', 'reference', 'scripts', 'tests'],
+        'deploy': ['procedures', 'architecture', 'scripts', 'tests'],
+        'lore': ['tools', 'architecture', 'scripts', 'tests'],
+        'character': ['features', 'tools', 'tests'],
+        'chatbot': ['architecture', 'procedures', 'tests'],
+        'game': ['features', 'tests'],
+        'security': ['architecture', 'procedures', 'scripts', 'tests'],
+        'backup': ['procedures', 'scripts'],
+        'git': ['procedures', 'reference', 'scripts'],
         'documentation': ['reference'],
         'quickstart': ['quickstart'],
         'getting started': ['quickstart'],
-        'api': ['architecture', 'reference']
+        'api': ['architecture', 'reference', 'tests'],
+        'script': ['scripts'],
+        'automation': ['scripts'],
+        'test': ['tests'],
+        'testing': ['tests'],
+        'validation': ['tests'],
+        'health': ['scripts', 'tests'],
+        'migration': ['scripts'],
+        'sync': ['scripts', 'tests'],
+        'performance': ['tests', 'scripts'],
+        'log': ['scripts'],
+        'analyze': ['scripts', 'tests']
       };
       
       // Determine relevant categories based on query
@@ -682,20 +736,35 @@ console.log(checkDir(googleDocsPath, 'Google Docs'));
                 filePath.toLowerCase().includes(queryLower) ||
                 queryLower.includes(title.toLowerCase().split(' ')[0])) {
               
-              // Check if file exists and get basic info
+              // Check if file exists and get basic info (with caching)
               const fullPath = path.resolve(filePath);
               let status = '❓';
               let size = '';
               let lastModified = '';
               
-              try {
-                const stats = fs.statSync(fullPath);
-                status = '✅';
-                size = `(${Math.round(stats.size / 1024)}KB)`;
-                lastModified = stats.mtime.toISOString().split('T')[0];
-              } catch (error) {
-                status = '❌';
-                size = '(Not found)';
+              // Check cache first
+              if (this.fileStatsCache.has(fullPath)) {
+                const cached = this.fileStatsCache.get(fullPath);
+                status = cached.status;
+                size = cached.size;
+                lastModified = cached.lastModified;
+              } else {
+                // Get fresh stats and cache them
+                try {
+                  const stats = fs.statSync(fullPath);
+                  status = '✅';
+                  size = `(${Math.round(stats.size / 1024)}KB)`;
+                  lastModified = stats.mtime.toISOString().split('T')[0];
+                  
+                  // Cache the results
+                  this.fileStatsCache.set(fullPath, { status, size, lastModified });
+                } catch (error) {
+                  status = '❌';
+                  size = '(Not found)';
+                  
+                  // Cache the not-found result too
+                  this.fileStatsCache.set(fullPath, { status, size, lastModified: '' });
+                }
               }
               
               results.push({
@@ -716,7 +785,7 @@ console.log(checkDir(googleDocsPath, 'Google Docs'));
         return {
           content: [{
             type: "text",
-            text: `🔍 Documentation Navigator - No matches found for "${query}"\n\n📚 Available categories:\n• quickstart - Getting started guides\n• architecture - System design and integration\n• procedures - Development and operations procedures\n• features - Game systems and application features\n• tools - Scripts and development tools\n• reference - Documentation indexes and references\n\n💡 Try: "MCP tools", "deployment guide", "getting started", "system architecture"`
+            text: `🔍 Documentation Navigator - No matches found for "${query}"\n\n📚 Available categories:\n• quickstart - Getting started guides\n• architecture - System design and integration\n• procedures - Development and operations procedures\n• features - Game systems and application features\n• tools - Scripts and development tools\n• scripts - Automation and utility scripts\n• tests - Testing and validation suites\n• reference - Documentation indexes and references\n\n💡 Try: "MCP tools", "deployment script", "security tests", "lore ingestion", "smart commit"`
           }]
         };
       }
@@ -751,14 +820,30 @@ console.log(checkDir(googleDocsPath, 'Google Docs'));
         response += `• Read: docs/MCP_TOOLS_DOCUMENTATION.md\n`;
         response += `• Try: ./lore-tools help\n`;
         response += `• Test: echo '{"jsonrpc": "2.0", "method": "tools/list", "id": 1}' | node mcp/enhanced-wavelength-server.js\n`;
+      } else if (queryLower.includes('script') || queryLower.includes('automation')) {
+        response += `• List scripts: ls -la scripts/\n`;
+        response += `• Unified tools: ls scripts/unified/\n`;
+        response += `• Run script: node scripts/[script-name].js --help\n`;
+      } else if (queryLower.includes('test') || queryLower.includes('validation')) {
+        response += `• Run tests: npm test\n`;
+        response += `• List tests: ls -la tests/\n`;
+        response += `• Specific test: node tests/[test-name].js\n`;
       } else if (queryLower.includes('deploy')) {
         response += `• Read: docs/deployment-guide.md\n`;
-        response += `• Check: npm run gh:dashboard\n`;
-        response += `• Validate: node scripts/unified/deployment-manager.js --help\n`;
+        response += `• Script: node scripts/unified/deployment-manager.js --help\n`;
+        response += `• Test: node tests/deployment-tests.js\n`;
+      } else if (queryLower.includes('security')) {
+        response += `• Scanner: node scripts/unified/security-scanner.js\n`;
+        response += `• Tests: node tests/security-tests.js\n`;
+        response += `• Guide: docs/SECURITY_ENHANCEMENT_GUIDE.md\n`;
       } else if (queryLower.includes('lore')) {
         response += `• Interactive: ./lore-tools\n`;
-        response += `• Search: ./lore-tools search "your query"\n`;
-        response += `• Manage: node scripts/lore-tools.js\n`;
+        response += `• Script: node scripts/ingest-lore.js\n`;
+        response += `• Tests: node tests/lore-integration-tests.js\n`;
+      } else if (queryLower.includes('commit')) {
+        response += `• MCP Smart Commit: node scripts/mcp-smart-commit.js\n`;
+        response += `• Unified Smart Commit: node scripts/unified/smart-commit.js\n`;
+        response += `• Guide: docs/SMART_COMMIT_QUICK_REFERENCE.md\n`;
       } else {
         response += `• Start with: AI_COPILOT_QUICKSTART.txt\n`;
         response += `• Overview: docs/README.md\n`;

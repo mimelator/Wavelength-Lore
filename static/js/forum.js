@@ -158,8 +158,8 @@ function initializeForumAuth() {
  * Handle user sign in
  */
 function handleUserSignIn(user) {
-    // Process avatar URL to ensure it's accessible
-    let avatarUrl = user.photoURL;
+    // Use fallback avatar immediately to avoid Google rate limits
+    let avatarUrl = '/icons/hero-icon.svg';
     
     console.log('🔍 Processing user sign-in:', {
         uid: user.uid,
@@ -239,17 +239,10 @@ function updateAuthUI() {
     }
 
     if (window.forumState.isAuthenticated && window.forumState.currentUser) {
-        // Ensure avatar URL is properly formatted and accessible
-        let avatarUrl = window.forumState.currentUser.avatar;
+        // Always use fallback avatar to avoid Google rate limits
+        let avatarUrl = '/icons/hero-icon.svg';
         
-        // Debug logging for avatar
-        console.log('🖼️ Avatar URL in updateAuthUI:', avatarUrl);
-        
-        // Ensure we have a fallback avatar
-        if (!avatarUrl || avatarUrl === 'null' || avatarUrl === 'undefined') {
-            avatarUrl = '/icons/hero-icon.svg';
-            console.log('🖼️ Using fallback avatar:', avatarUrl);
-        }
+        console.log('🖼️ Using fallback avatar in updateAuthUI:', avatarUrl);
         
         const userHTML = `
             <div class="user-info">
