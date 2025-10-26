@@ -3,6 +3,7 @@
  * Integrates with existing Express application
  */
 
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 
@@ -383,16 +384,8 @@ router.get('/api/posts/recent', async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const page = parseInt(req.query.page) || 1;
         
-        const admin = require('firebase-admin');
-        if (!admin.apps.length) {
-            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-            admin.initializeApp({
-                credential: admin.credential.cert(serviceAccount),
-                databaseURL: process.env.DATABASE_URL
-            });
-        }
-        
-        const db = admin.database();
+        const firebaseService = require('../services/firebase-admin');
+        const db = firebaseService.getDatabase();
         const postsRef = db.ref('forum/posts');
         const snapshot = await postsRef.once('value');
         const allPosts = snapshot.val() || {};
@@ -413,10 +406,12 @@ router.get('/api/posts/recent', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching recent posts:', error);
+        console.error('Error fetching recent posts:', error.message);
+        console.error('Full error:', error);
         res.status(500).json({
             success: false,
-            error: 'Failed to fetch recent posts'
+            error: 'Failed to fetch recent posts',
+            details: error.message
         });
     }
 });
@@ -427,16 +422,8 @@ router.get('/api/posts/popular', async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const page = parseInt(req.query.page) || 1;
         
-        const admin = require('firebase-admin');
-        if (!admin.apps.length) {
-            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-            admin.initializeApp({
-                credential: admin.credential.cert(serviceAccount),
-                databaseURL: process.env.DATABASE_URL
-            });
-        }
-        
-        const db = admin.database();
+        const firebaseService = require('../services/firebase-admin');
+        const db = firebaseService.getDatabase();
         const postsRef = db.ref('forum/posts');
         const snapshot = await postsRef.once('value');
         const allPosts = snapshot.val() || {};
@@ -468,16 +455,8 @@ router.get('/api/posts/popular', async (req, res) => {
 // Get forum statistics
 router.get('/api/stats', async (req, res) => {
     try {
-        const admin = require('firebase-admin');
-        if (!admin.apps.length) {
-            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-            admin.initializeApp({
-                credential: admin.credential.cert(serviceAccount),
-                databaseURL: process.env.DATABASE_URL
-            });
-        }
-        
-        const db = admin.database();
+        const firebaseService = require('../services/firebase-admin');
+        const db = firebaseService.getDatabase();
         
         // Get posts
         const postsSnapshot = await db.ref('forum/posts').once('value');

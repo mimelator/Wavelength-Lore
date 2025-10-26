@@ -113,6 +113,9 @@ function configureStaticFiles(app) {
   // Also serve static files under /static/ path for CDN compatibility in local development
   app.use('/static', express.static(path.join(__dirname, '../static')));
 
+  // Serve debug files for development and testing
+  app.use('/debug', express.static(path.join(__dirname, '../debug')));
+
   // Handle gallery images in local development via S3 proxy
   if (process.env.CDN_URL && process.env.CDN_URL.includes('localhost')) {
     console.log('🖼️ Using Gallery S3 Proxy for local development');

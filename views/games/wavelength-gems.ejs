@@ -528,7 +528,7 @@
         window.ENV = window.ENV || {};
         console.log('Environment configuration loaded (ad-free)');
     </script>
-    <script src="/js/games/wavelength-gems/retry-threshold-manager.js"></script>
+    <script src="/js/games/wavelength-gems/vip-game-experience.js"></script>
     <script src="/js/games/wavelength-gems/retry-threshold-ui.js"></script>
     <script src="/js/games/wavelength-gems/retry-threshold-test.js"></script>
 
@@ -629,12 +629,12 @@
 
         // Initialize game on page load
         document.addEventListener('DOMContentLoaded', async () => {
-            // CRITICAL: Initialize RetryThresholdManager before game initialization
-            if (window.RetryThresholdManager) {
-                console.log('🕒 Initializing RetryThresholdManager...');
-                RetryThresholdManager.init();
+            // Initialize VIP Game Experience for unlimited retries
+            if (window.VipGameExperience) {
+                console.log('🌟 Initializing VIP Game Experience...');
+                VipGameExperience.init();
             } else {
-                console.error('❌ RetryThresholdManager not available!');
+                console.warn('⚠️ VipGameExperience not available, using standard experience');
             }
             
             await initGame();
