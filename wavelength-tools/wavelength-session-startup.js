@@ -52,10 +52,13 @@ class WavelengthSessionStartup {
     // 4. Provide Instant Action Menu
     await this.createInstantActionMenu();
     
-    // 5. Set Up Session Monitoring
+    // 5. Initialize Memory System
+    await this.initializeMemorySystem();
+    
+    // 6. Set Up Session Monitoring
     await this.setupSessionMonitoring();
     
-    // 6. Save Session Context
+    // 7. Save Session Context
     this.saveSessionContext();
     
     console.log('\\n🏁 FRICTION-FREE SESSION STARTUP COMPLETE!');

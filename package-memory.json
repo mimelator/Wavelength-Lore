@@ -1,0 +1,31 @@
+{
+  "name": "wavelength-memory-system",
+  "version": "1.0.0",
+  "description": "WAVELENGTH Agent Memory System with Vector Storage",
+  "type": "module",
+  "main": "mcp/wavelength-memory-server.js",
+  "scripts": {
+    "start": "node mcp/wavelength-memory-server.js",
+    "test": "node test/memory-system-test.js",
+    "ingest-github": "node scripts/ingest-github-data.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "@pinecone-database/pinecone": "^3.0.0",
+    "@octokit/rest": "^20.0.0",
+    "openai": "^4.0.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  },
+  "keywords": [
+    "wavelength",
+    "ai-memory",
+    "vector-storage",
+    "mcp",
+    "github-integration"
+  ],
+  "author": "WAVELENGTH Development Team",
+  "license": "MIT"
+}
