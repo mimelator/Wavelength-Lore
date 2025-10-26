@@ -1253,8 +1253,22 @@ class MerchandiseStore {
     // Check if we have product types data first
     if (!this.productTypes || Object.keys(this.productTypes).length === 0) {
       console.error('❌ No product types data available, cannot initialize ProductNavigator');
-      this.renderSimpleCategories(container);
-      return;
+      console.log('🔄 Attempting to reload product types...');
+      
+      // Try to reload product types once
+      try {
+        await this.loadProductTypes();
+        if (!this.productTypes || Object.keys(this.productTypes).length === 0) {
+          console.error('❌ Still no product types after reload');
+          this.renderSimpleCategories(container);
+          return;
+        }
+        console.log('✅ Product types reloaded successfully');
+      } catch (error) {
+        console.error('❌ Failed to reload product types:', error);
+        this.renderSimpleCategories(container);
+        return;
+      }
     }
     
     // Check if ProductNavigator class is available
@@ -1368,8 +1382,23 @@ class MerchandiseStore {
         </div>
       `;
     } else {
-      // If no product types loaded, show error instead of hardcoded fallback
-      console.log('❌ No product types loaded, showing error message');
+      // If no product types loaded, try to reload once more
+      console.log('⚠️ No product types loaded for fallback, attempting final reload...');
+      
+      try {
+        await this.loadProductTypes();
+        
+        if (this.productTypes && Object.keys(this.productTypes).length > 0) {
+          console.log('✅ Product types loaded on retry, re-rendering fallback');
+          this.renderSimpleCategories(container);
+          return;
+        }
+      } catch (error) {
+        console.error('❌ Final reload attempt failed:', error);
+      }
+      
+      // If still no product types, show error
+      console.log('❌ No product types loaded after all attempts, showing error message');
       container.innerHTML = `
         <div class="simple-categories">
           <div class="error-notice">
