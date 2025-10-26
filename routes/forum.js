@@ -3,7 +3,6 @@
  * Integrates with existing Express application
  */
 
-require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 
