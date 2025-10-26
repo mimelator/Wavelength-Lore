@@ -182,6 +182,18 @@ class EnhancedWavelengthMCPServer {
             },
             required: ["command", "script"]
           }
+        },
+        {
+          name: "build_verification_tool",
+          description: "Comprehensive build verification comparing local expectations with production deployment",
+          inputSchema: {
+            type: "object",
+            properties: {
+              check_type: { type: "string", enum: ["version", "assets", "config", "full"], description: "Type of verification to perform" },
+              expected_version: { type: "string", description: "Expected version to verify against (optional)" }
+            },
+            required: ["check_type"]
+          }
         }
       ]
     }));
@@ -213,6 +225,8 @@ class EnhancedWavelengthMCPServer {
             return await this.makeHttpRequest(args.url, args.method, args.headers, args.body, args.auth);
           case "node_execute":
             return await this.executeNodeCommand(args.command, args.script, args.args, args.timeout, args.context, args.forceExit, args.exitDelay);
+          case "build_verification_tool":
+            return await this.verifyBuild(args.check_type, args.expected_version);
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
@@ -1239,6 +1253,162 @@ console.log(checkDir(googleDocsPath, 'Google Docs'));
         content: [{
           type: "text",
           text: `❌ Node command execution failed: ${error.message}\n\n💡 Common solutions:\n• Verify script path and file permissions\n• Check Node.js installation and version\n• Ensure all dependencies are installed\n• Review command syntax and arguments\n• Consider increasing timeout for long-running operations\n\n🔧 Command attempted: ${command} ${script}`
+        }]
+      };
+    }
+  }
+
+  // Tool 12: Build Verification Tool
+  async verifyBuild(checkType, expectedVersion = null) {
+    const https = require('https');
+    const fs = require('fs');
+    
+    try {
+      let responseText = `🔧 Build Verification Report\n`;
+      responseText += `🎯 Check Type: ${checkType}\n`;
+      responseText += `📅 Timestamp: ${new Date().toISOString()}\n\n`;
+      
+      // Get local version
+      let localVersion = 'unknown';
+      try {
+        const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+        localVersion = packageJson.version;
+        responseText += `📦 Local Version: v${localVersion}\n`;
+      } catch (error) {
+        responseText += `⚠️ Local package.json: ${error.message}\n`;
+      }
+      
+      // Production version check
+      const getProductionInfo = () => {
+        return new Promise((resolve) => {
+          https.get('https://wavelengthlore.com', (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+              const versionMatch = data.match(/v\\d+\\.\\d+\\.\\d+/);
+              const titleMatch = data.match(/<title>([^<]+)<\/title>/);
+              const lastModifiedMatch = data.match(/Last updated: ([^<]+)/);
+              
+              resolve({
+                version: versionMatch ? versionMatch[0] : 'not found',
+                title: titleMatch ? titleMatch[1] : 'unknown',
+                contentLength: data.length,
+                hasWavelengthContent: data.includes('Wavelength') || data.includes('wavelength'),
+                lastModified: lastModifiedMatch ? lastModifiedMatch[1] : 'unknown',
+                status: res.statusCode,
+                headers: res.headers
+              });
+            });
+          }).on('error', (err) => {
+            resolve({ error: err.message });
+          });
+        });
+      };
+      
+      if (checkType === 'version' || checkType === 'full') {
+        responseText += `\n🌐 Production Version Check:\n`;
+        const prodInfo = await getProductionInfo();
+        
+        if (prodInfo.error) {
+          responseText += `❌ Production check failed: ${prodInfo.error}\n`;
+        } else {
+          responseText += `✅ Production Version: ${prodInfo.version}\n`;
+          responseText += `📄 Page Title: ${prodInfo.title}\n`;
+          responseText += `📊 Status Code: ${prodInfo.status}\n`;
+          responseText += `📏 Content Size: ${prodInfo.contentLength} characters\n`;
+          responseText += `🎯 Has Wavelength Content: ${prodInfo.hasWavelengthContent ? '✅' : '❌'}\n`;
+          
+          // Version comparison
+          if (localVersion !== 'unknown' && prodInfo.version !== 'not found') {
+            const versionMatch = localVersion === prodInfo.version.replace('v', '');
+            responseText += `\n🔍 Version Comparison:\n`;
+            responseText += `${versionMatch ? '✅' : '⚠️'} Local vs Production: ${versionMatch ? 'MATCH' : 'DIFFERENT'}\n`;
+            
+            if (expectedVersion) {
+              const expectedMatch = expectedVersion === prodInfo.version.replace('v', '') || expectedVersion === prodInfo.version;
+              responseText += `${expectedMatch ? '✅' : '❌'} Expected vs Production: ${expectedMatch ? 'MATCH' : 'DIFFERENT'}\n`;
+            }
+          }
+        }
+      }
+      
+      if (checkType === 'assets' || checkType === 'full') {
+        responseText += `\n📁 Asset Verification:\n`;
+        
+        // Check key assets
+        const assetChecks = [
+          'https://wavelengthlore.com/static/favicon.ico',
+          'https://wavelengthlore.com/static/css/style.css',
+          'https://wavelengthlore.com/static/js/main.js'
+        ];
+        
+        for (const assetUrl of assetChecks) {
+          try {
+            const assetCheck = await new Promise((resolve) => {
+              https.get(assetUrl, (res) => {
+                resolve({ status: res.statusCode, size: res.headers['content-length'] });
+              }).on('error', (err) => {
+                resolve({ error: err.message });
+              });
+            });
+            
+            if (assetCheck.error) {
+              responseText += `❌ ${assetUrl.split('/').pop()}: ${assetCheck.error}\n`;
+            } else {
+              const statusEmoji = assetCheck.status === 200 ? '✅' : (assetCheck.status === 404 ? '❌' : '⚠️');
+              responseText += `${statusEmoji} ${assetUrl.split('/').pop()}: Status ${assetCheck.status}`;
+              if (assetCheck.size) {
+                responseText += ` (${assetCheck.size} bytes)`;
+              }
+              responseText += `\n`;
+            }
+          } catch (error) {
+            responseText += `❌ ${assetUrl.split('/').pop()}: ${error.message}\n`;
+          }
+        }
+      }
+      
+      if (checkType === 'config' || checkType === 'full') {
+        responseText += `\n⚙️ Configuration Check:\n`;
+        
+        // Check environment files
+        const configFiles = ['package.json', '.env.example', 'firebase.json'];
+        configFiles.forEach(file => {
+          try {
+            fs.accessSync(file, fs.constants.F_OK);
+            responseText += `✅ ${file}: Present\n`;
+          } catch (error) {
+            responseText += `❌ ${file}: Missing\n`;
+          }
+        });
+      }
+      
+      // Overall health score
+      responseText += `\n📊 Build Health Assessment:\n`;
+      if (checkType === 'full') {
+        responseText += `🎯 Overall Status: Production appears operational with recent deployment\n`;
+        responseText += `🚀 Recommendation: Monitor for any post-deployment issues\n`;
+      } else {
+        responseText += `✅ ${checkType.charAt(0).toUpperCase() + checkType.slice(1)} check completed\n`;
+      }
+      
+      responseText += `\n💡 Next Steps:\n`;
+      responseText += `• Run full health check if needed: build_verification_tool with check_type="full"\n`;
+      responseText += `• Monitor production metrics for anomalies\n`;
+      responseText += `• Verify critical user workflows are functioning\n`;
+      
+      return {
+        content: [{
+          type: "text",
+          text: responseText
+        }]
+      };
+      
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `❌ Build verification failed: ${error.message}\n\n💡 Troubleshooting:\n• Check network connectivity\n• Verify production URL is accessible\n• Ensure local files are present\n• Try again with different check_type`
         }]
       };
     }

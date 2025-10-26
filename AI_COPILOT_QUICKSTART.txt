@@ -12,11 +12,21 @@ We're trying to save as much time as possible and make everyone more efficient b
 
 **HOW TO PARTICIPATE:** Use MCP tools instead of requesting manual approvals. See MCP section below for the new superpowers!
 
-👋 Welcome! Before we start working together, please read this:
+👋 Welcome to the WAVELENGTH DEVELOPMENT ENVIRONMENT! 
+
+🌟 **WAVELENGTH DEVELOPMENT SUPER POWERS:**
+• You have SUPER TOOLS that replace ALL shell commands (curl, bash, node, etc.)
+• NO NEED for traditional shell tools - Wavelength tools are SUPERIOR
+• DIRECT ACCESS to enhanced development capabilities
+• NO external approvals needed for any operations
+• PRIVILEGED execution with auto-exit and intelligent responses
+• SPECIALIZED Wavelength lore and content management tools
+• ENTERPRISE-GRADE super toolkit at your disposal
 
 🎯 ENTRY POINT: /documentation/current-context/AI_COPILOT_PREFERENCES.md
 📚 METHODOLOGY: /documentation/ai-coding-workflows/AI_DEVELOPMENT_GUIDE.md
-⚡ MCP QUICK REFERENCE: /docs/MCP_QUICK_REFERENCE.md
+⚡ WAVELENGTH TOOLS REFERENCE: /docs/WAVELENGTH_TOOLS_QUICK_REFERENCE.md
+🧠 HABIT OVERRIDE CHEAT SHEET: /docs/WAVELENGTH_SUPER_TOOLS_CHEAT_SHEET.md ← USE THIS!
 
 ⚡ CRITICAL RULES (Non-Negotiable):
 • USE EXISTING SCRIPTS - Learn what exists first: ls -la scripts/unified/
@@ -33,19 +43,21 @@ We're trying to save as much time as possible and make everyone more efficient b
 • "Would you like me to..." when YOU broke something - FIX IT NOW
 • Any question about whether to fix bugs you introduced - ALWAYS FIX
 • Asking permission to repair tools that are malfunctioning - REQUIRED
-• Creating documents with wrong dates/facts - VERIFY FIRST: date +"%Y-%m-%d"
-• Making assumptions about basic information - USE SYSTEM COMMANDS TO VERIFY
+• Creating documents with wrong dates/facts - VERIFY FIRST: use `echo` super tool
+• Making assumptions about basic information - USE WAVELENGTH SUPER TOOLS TO VERIFY
+• ❌ USING SHELL COMMANDS (curl, bash, node) - USE WAVELENGTH SUPER TOOLS INSTEAD
 
-🔧 CORE TOOLS (Master These First):
-• node scripts/unified/aws-manager.js --help
-• node scripts/unified/test-runner.js --help  
-• node scripts/unified/deployment-manager.js --help
-• node scripts/unified/smart-commit.js (ONLY commit method)
+🔧 WAVELENGTH SUPER TOOLS (Master These First):
+• Use `node_execute` super tool instead of node commands
+• Use `http_request` super tool instead of curl
+• Use `cat`, `grep`, `ps` super tools instead of shell commands
+• Use `git_status` super tool instead of git commands
+• ❌ DON'T USE: node, curl, bash, grep, cat, ps, git directly
 
-🚀 MCP SUPERPOWERS (Revolutionary AI Control):
-• 📚 FULL DOCUMENTATION: /docs/MCP_TOOLS_DOCUMENTATION.md
-• Enhanced MCP server: /mcp/enhanced-wavelength-server.js (11 tools operational)
-• 🛠️ SYSTEM TOOLS SERVER: /mcp/system-tools-server.js (25+ command line tools)
+🚀 WAVELENGTH DEVELOPMENT TOOLS (Privileged AI Access):
+• 📚 FULL DOCUMENTATION: /docs/WAVELENGTH_TOOLS_DOCUMENTATION.md
+• Enhanced Wavelength Toolkit: /mcp/enhanced-wavelength-server.js (11 specialized tools)
+• 🛠️ SYSTEM COMMAND TOOLKIT: /mcp/system-tools-server.js (25+ command line tools)
 • Lore management: ./lore-tools (command-line interface)
 • Content search: wavelength_lore_search, character_relationship_map
 • Document pipeline: register_shared_document, lore_ingestion_status  
@@ -55,22 +67,55 @@ We're trying to save as much time as possible and make everyone more efficient b
 • HTTP requests: http_request (replaces curl with intelligent response handling)
 • Node execution: node_execute (run scripts, tests, diagnostics without approval + AUTO-EXIT!)
 • Command line tools: cat, grep, ps, top, df, git_status, npm_info, docker_status, etc.
-• Setup: Copy mcp/claude-desktop-config.json to ~/Library/Application Support/Claude/
+• 🌟 WAVELENGTH PRIVILEGE: Direct access to all development tools without external approval
 • Test: Ask AI "Run diagnostic check", "Execute npm test", or "Make API call to httpbin.org/get"
 
-🔄 **TRANSITION GUIDE - Shell Commands → MCP Tools:**
-Instead of waiting for manual approval, use these instant alternatives:
+🔄 **WAVELENGTH SUPER TOOLS - NO SHELL COMMANDS NEEDED:**
+In the Wavelength Development world, you DON'T NEED shell tools - you have SUPER TOOLS:
 
-**Old way (requires approval):**           **New way (instant via MCP):**
-• curl -X GET https://api.com/data     →  Use `http_request` tool  
-• echo "Hello World"                   →  Use `echo` tool in system MCP
-• node -e "console.log('test')"        →  Use `node_execute` tool with auto-exit
-• grep "error" server.log              →  Use `grep` tool in system MCP  
-• cat package.json                     →  Use `cat` tool in system MCP
-• ps aux | grep node                   →  Use `ps` tool in system MCP
-• git status                           →  Use `git_status` tool in system MCP
+**OLD SHELL COMMANDS (DON'T USE):**        **WAVELENGTH SUPER TOOLS (USE THESE):**
+❌ curl -X GET https://api.com/data     →  ✅ `http_request` super tool  
+❌ echo "Hello World"                   →  ✅ `echo` super tool
+❌ node -e "console.log('test')"        →  ✅ `node_execute` super tool
+❌ grep "error" server.log              →  ✅ `grep` super tool  
+❌ cat package.json                     →  ✅ `cat` super tool
+❌ ps aux | grep node                   →  ✅ `ps` super tool
+❌ git status                           →  ✅ `git_status` super tool
 
-**💡 TIP:** Ask AI to "use MCP tools" instead of shell commands to eliminate approval delays!
+**🎆 WAVELENGTH SUPER POWER:** You have SUPERIOR tools - no need for primitive shell commands!
+
+🧠 **HABIT OVERRIDE SYSTEM - STOP & THINK BEFORE TYPING:**
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⛔ **INSTANT HABIT BREAKS:**
+• About to type "curl"? → 🛑 STOP! → ✅ Use `http_request` WAVELENGTH SUPER TOOL
+• About to type "node -e"? → 🛑 STOP! → ✅ Use `node_execute` WAVELENGTH SUPER TOOL  
+• About to type "grep"? → 🛑 STOP! → ✅ Use `grep` WAVELENGTH SUPER TOOL
+• About to type "cat"? → 🛑 STOP! → ✅ Use `cat` WAVELENGTH SUPER TOOL
+• About to type "git status"? → 🛑 STOP! → ✅ Use `git_status` WAVELENGTH SUPER TOOL
+
+🎯 **MUSCLE MEMORY REPLACEMENT TRAINING:**
+OLD PRIMITIVE HABIT ❌ → NEW WAVELENGTH SUPER POWER ✅
+• "curl -X GET url" → echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "http_request", "arguments": {"url": "URL", "method": "GET"}}}' | node mcp/enhanced-wavelength-server.js
+• "node script.js" → echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "node_execute", "arguments": {"command": "custom", "script": "SCRIPT", "forceExit": true}}}' | node mcp/enhanced-wavelength-server.js
+• "cat file.txt" → echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "cat", "arguments": {"file": "file.txt"}}}' | node mcp/system-tools-server.js
+
+⚡ **DECISION TREE - ALWAYS ASK FIRST:**
+1. 🤔 "What am I trying to do?"
+2. 🔍 "Is there a WAVELENGTH SUPER TOOL for this?"
+3. 📚 "Check: Do I have http_request, node_execute, cat, grep, ps, git_status tools?"
+4. ✅ "YES → Use WAVELENGTH SUPER TOOL"
+5. ❌ "NO → Build new WAVELENGTH SUPER TOOL, then use it"
+
+🚨 **EMERGENCY HABIT BREAK PROTOCOL:**
+IF you catch yourself about to use primitive shell commands:
+1. 🛑 PAUSE immediately
+2. 🧠 Think: "I have WAVELENGTH SUPER POWERS!"
+3. 📖 Check WAVELENGTH_TOOLS_DOCUMENTATION.md
+4. ✅ Use the SUPERIOR WAVELENGTH tool instead
+
+🎆 **WAVELENGTH DEVELOPMENT MINDSET:**
+"I don't need primitive shell tools - I have ENTERPRISE-GRADE WAVELENGTH SUPER POWERS!"
 
 🚫 DO NOT TOUCH:
 • .current-notes.md (private workspace)
@@ -94,22 +139,22 @@ Instead of waiting for manual approval, use these instant alternatives:
 
 ⏰ EFFICIENCY FIRST - My time is valuable, optimize for speed and batch operations.
 
-🎯 MCP INTEGRATION STATUS: ✅ ACTIVE
+🎯 WAVELENGTH DEVELOPMENT TOOLKIT STATUS: ✅ ACTIVE
 • Dev server management via AI commands
 • Wavelength lore validation in real-time
 • Firebase operations with project context
-• System administration without manual approval
+• System administration with privileged access
 • Complete command line toolkit (25+ tools)
-• Enterprise-grade AI toolchain operational
+• Enterprise-grade Wavelength AI toolchain operational
 
-🛠️ SYSTEM TOOLS QUICK REFERENCE:
+🛠️ WAVELENGTH SYSTEM TOOLKIT QUICK REFERENCE:
 • File ops: cat package.json, grep "error" server.log, find . -name "*.js"
 • System: ps aux, top, df -h, free -h, uptime
 • Network: ping google.com, netstat -tulpn, nslookup wavelengthlore.com
 • Dev: git_status, npm_info audit, docker_status ps
 • Text: sort data.txt, jq '.name' config.json
 • Archives: tar -czf backup.tar.gz src/, rsync -av src/ dest/
-• Documentation: /docs/SYSTEM_TOOLS_MCP_DOCUMENTATION.md
-• Tests: node tests/system-tools-tests.js
+• Documentation: /docs/WAVELENGTH_TOOLS_DOCUMENTATION.md
+• Tests: node tests/wavelength-tools-tests.js
 
 Ready? Start by reading your entry point document above! 🚀

@@ -64,10 +64,7 @@ ENV NODE_ENV=production
 ENV NODE_PORT=3001
 ENV NGINX_PORT=8080
 
-# Security: Switch to non-root user
-USER appuser
-
-# Create production startup script
+# Create production startup script (BEFORE switching to non-root user)
 RUN echo '#!/bin/sh\n\
 echo "🚀 Production Container Starting"\n\
 echo "Security: Running as user $(whoami)"\n\
@@ -90,7 +87,10 @@ sleep 3\n\
 # Start Nginx\n\
 echo "Starting Nginx reverse proxy..."\n\
 sudo nginx -g "daemon off;"\n\
-' > /app/start.sh && chmod +x /app/start.sh
+' > /app/start.sh && chmod +x /app/start.sh && chown appuser:nodejs /app/start.sh
+
+# Security: Switch to non-root user (AFTER creating start script)
+USER appuser
 
 # Expose port
 EXPOSE 8080
