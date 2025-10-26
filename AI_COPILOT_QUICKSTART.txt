@@ -12,6 +12,16 @@ We're trying to save as much time as possible and make everyone more efficient b
 
 **HOW TO PARTICIPATE:** Use MCP tools instead of requesting manual approvals. See MCP section below for the new superpowers!
 
+🧠 **MCP PROTOCOL EXAMPLES (Use These Directly):**
+```javascript
+// Proper MCP protocol calls - agents call these directly
+await mcp.callTool("wavelength_validate", {content: "...", type: "character"});
+await mcp.callTool("firebase_query", {path: "/episodes", operation: "read"});
+await mcp.callTool("wavelength_character_search", {query: "goblin traits", limit: 5});
+await mcp.callTool("wavelength_content_generate", {type: "episode_summary", theme: "mystery"});
+await mcp.callTool("wavelength_lore_validate", {content: "character backstory", rules: "canon"});
+```
+
 👋 Welcome to the WAVELENGTH DEVELOPMENT ENVIRONMENT! 
 
 🌟 **WAVELENGTH DEVELOPMENT SUPER POWERS:**

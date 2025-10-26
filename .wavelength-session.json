@@ -92,5 +92,8 @@
     "proofRequired": true,
     "batchOperations": true,
     "noShellCommands": true
-  }
+  },
+  "shutdownTime": "2025-10-26T06:38:25.719Z",
+  "sessionDuration": 27,
+  "status": "completed"
 }

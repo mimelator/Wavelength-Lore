@@ -34,8 +34,18 @@ All project documentation has been organized in the [`docs/`](docs/) folder:
 
 - **[🏗️ System Architecture](docs/WAVELENGTH_SYSTEM_ARCHITECTURE.md)** - Complete system architecture including external chatbot integration
 - **[📖 Documentation Index](docs/README.md)** - Complete documentation overview and navigation
-- **[� MCP Tools Documentation](docs/MCP_TOOLS_DOCUMENTATION.md)** - Model Context Protocol tools for AI automation
+- **[🛠️ MCP Tools Documentation](docs/MCP_TOOLS_DOCUMENTATION.md)** - Model Context Protocol tools for AI automation
 - **[⚡ MCP Quick Reference](docs/MCP_QUICK_REFERENCE.md)** - Essential MCP commands and usage examples
+
+### 🧠 MCP Protocol Examples
+```javascript
+// Proper MCP protocol calls - agents use these directly
+await mcp.callTool("wavelength_validate", {content: "...", type: "character"});
+await mcp.callTool("firebase_query", {path: "/episodes", operation: "read"});
+await mcp.callTool("wavelength_character_search", {query: "goblin traits", limit: 5});
+await mcp.callTool("wavelength_content_generate", {type: "episode_summary", theme: "mystery"});
+await mcp.callTool("wavelength_lore_validate", {content: "character backstory", rules: "canon"});
+```
 - **[�🔒 Security Guide](docs/SECURITY_ENHANCEMENT_GUIDE.md)** - Security implementation and best practices
 - **[💾 Backup System](docs/BACKUP_CONFIGURATION.md)** - Automated database backup setup
 - **[🤖 Chatbot Integration](tests/chatbot/CHATBOT_TESTING_SUMMARY.md)** - Firebase Functions chatbot architecture and validation

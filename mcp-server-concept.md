@@ -66,6 +66,16 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 }));
 ```
 
+#### Agent Usage Examples (MCP Protocol)
+```javascript
+// Proper MCP protocol calls - agents use these directly
+await mcp.callTool("wavelength_validate", {content: "...", type: "character"});
+await mcp.callTool("wavelength_character_search", {query: "goblin traits", limit: 5});
+await mcp.callTool("wavelength_lore_validate", {content: "episode script", rules: "canon"});
+await mcp.callTool("firebase_query", {path: "/episodes", operation: "read"});
+await mcp.callTool("wavelength_content_generate", {type: "character_bio", theme: "mystery"});
+```
+
 #### Phase 2: Integration Points
 - **Firebase Integration**: Direct database access with admin privileges
 - **AI Services**: Connect to OpenAI/Claude for content analysis

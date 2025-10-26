@@ -36,6 +36,16 @@ Add to your MCP client configuration:
 }
 ```
 
+### Agent Usage Examples (MCP Protocol)
+```javascript
+// Proper MCP protocol calls - agents use these directly
+await mcp.callTool("wavelength_validate", {content: "...", type: "character"});
+await mcp.callTool("firebase_query", {path: "/episodes", operation: "read"});
+await mcp.callTool("wavelength_character_search", {query: "goblin traits", limit: 5});
+await mcp.callTool("wavelength_content_generate", {type: "episode_summary", theme: "mystery"});
+await mcp.callTool("wavelength_lore_validate", {content: "character backstory", rules: "canon"});
+```
+
 ## 🔧 Development
 
 The server uses stdio transport and integrates directly with:
