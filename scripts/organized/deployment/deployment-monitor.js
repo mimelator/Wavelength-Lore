@@ -5,33 +5,31 @@
  * Monitors App Runner deployment, Firebase updates, and CDN cache status
  */
 
-const { initScriptEnv } = require('./utils/env-loader');
-
-// Initialize environment with required AWS variables
-initScriptEnv(['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']);
+require('dotenv').config();
 
 const { AppRunnerClient, DescribeServiceCommand } = require('@aws-sdk/client-apprunner');
 const { CloudFrontClient, CreateInvalidationCommand, GetInvalidationCommand } = require('@aws-sdk/client-cloudfront');
 const axios = require('axios');
 
-// Load AWS resource configuration
-const awsConfig = require('../config/aws-resources');
+// Load AWS resource configuration with robust error handling
+const { getAWSConfig } = require('../../utils/aws-config-helper');
+const awsConfig = getAWSConfig();
 
 class DeploymentMonitor {
   constructor() {
     this.appRunnerClient = new AppRunnerClient({
-      region: awsConfig.aws.region,
+      region: awsConfig.region,
       credentials: {
-        accessKeyId: process.env.ACCESS_KEY_ID,
-        secretAccessKey: process.env.SECRET_ACCESS_KEY
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
       }
     });
     
     this.cloudFrontClient = new CloudFrontClient({
-      region: awsConfig.aws.region,
+      region: awsConfig.region,
       credentials: {
-        accessKeyId: process.env.ACCESS_KEY_ID,
-        secretAccessKey: process.env.SECRET_ACCESS_KEY
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
       }
     });
     

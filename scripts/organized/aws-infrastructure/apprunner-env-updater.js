@@ -5,11 +5,20 @@
  * Updates App Runner service configuration with environment variables from .env file
  */
 
-const envHelper = require('./env-helper');
+const envHelper = require('../development-tools/env-helper');
 const { AppRunnerClient, DescribeServiceCommand, UpdateServiceCommand } = require('@aws-sdk/client-apprunner');
 
 // Load AWS resource configuration
-const awsConfig = require('../config/aws-resources');
+let awsConfig;
+try {
+  awsConfig = require('../../config/aws-resources');
+} catch (error) {
+  awsConfig = {
+    appRunner: {
+      serviceArn: process.env.APPRUNNER_SERVICE_ARN || 'arn:aws:apprunner:us-east-1:170023515523:service/wavelength-lore/be123456789abcdef'
+    }
+  };
+}
 
 const fs = require('fs').promises;
 const path = require('path');

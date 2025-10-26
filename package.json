@@ -16,6 +16,7 @@
     "@aws-sdk/client-s3": "^3.917.0",
     "@aws-sdk/credential-providers": "^3.916.0",
     "@google/generative-ai": "^0.2.1",
+    "@modelcontextprotocol/sdk": "^1.20.2",
     "archiver": "^7.0.1",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.12.2",

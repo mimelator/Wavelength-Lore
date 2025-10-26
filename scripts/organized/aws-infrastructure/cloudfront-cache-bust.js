@@ -5,11 +5,12 @@
  * Uses environment variables for AWS credentials
  */
 
-const envHelper = require('./env-helper');
+require('dotenv').config();
 const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client-cloudfront');
 
-// Load AWS resource configuration
-const awsConfig = require('../config/aws-resources');
+// Load AWS resource configuration with robust error handling
+const { getAWSConfig } = require('../../utils/aws-config-helper');
+const awsConfig = getAWSConfig();
 
 class CloudFrontCacheBuster {
   constructor(distributionType = 'primary') {

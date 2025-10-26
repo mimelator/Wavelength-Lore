@@ -41,68 +41,99 @@ async function checkProductionEnvironment() {
     console.log('🔍 Checking Production Environment Configuration...\n');
     
     const serviceArn = awsConfig.appRunner.serviceArn;
-    const updater = new AppRunnerEnvUpdater(serviceArn);
     
-    // Get current service configuration
-    const currentService = await updater.getCurrentServiceConfig();
-    const envVars = currentService.SourceConfiguration?.ImageRepository?.ImageConfiguration?.RuntimeEnvironmentVariables || {};
-    
-    console.log(`📊 Service: ${currentService.ServiceName}`);
-    console.log(`🔄 Status: ${currentService.Status}`);
-    console.log(`🌐 URL: ${currentService.ServiceUrl}`);
-    
-    console.log('\n🔍 Port-Related Environment Variables:');
-    const portVars = ['PORT', 'NODE_PORT', 'NGINX_PORT'];
-    
-    portVars.forEach(varName => {
-      const value = envVars[varName];
-      const status = value ? '✅' : '❌';
-      console.log(`  ${status} ${varName}: ${value || 'NOT SET'}`);
-    });
-    
-    // Analyze the configuration
-    console.log('\n🔧 Configuration Analysis:');
-    const nodePort = envVars.NODE_PORT || envVars.PORT || '3001';
-    const nginxPort = envVars.NGINX_PORT || '8080';
-    
-    console.log(`  📱 Node.js will run on: ${nodePort}`);
-    console.log(`  🌐 Nginx listens on: ${nginxPort}`);
-    console.log(`  🔗 Nginx expects Node.js on: 3001`);
-    
-    // Identify the problem
-    console.log('\n🚨 Issue Analysis:');
-    if (envVars.PORT && envVars.PORT !== '3001') {
-      console.log(`  ❌ PROBLEM: PORT=${envVars.PORT} overrides NODE_PORT`);
-      console.log(`  💡 SOLUTION: Remove PORT variable or set PORT=3001`);
-    }
-    
-    if (!envVars.NODE_PORT) {
-      console.log(`  ❌ PROBLEM: NODE_PORT is not set`);
-      console.log(`  💡 SOLUTION: Set NODE_PORT=3001`);
-    } else if (envVars.NODE_PORT !== '3001') {
-      console.log(`  ❌ PROBLEM: NODE_PORT=${envVars.NODE_PORT} should be 3001`);
-      console.log(`  💡 SOLUTION: Set NODE_PORT=3001`);
-    }
-    
-    if (nodePort !== '3001') {
-      console.log(`  ❌ CRITICAL: Node.js will run on ${nodePort}, but Nginx expects 3001`);
-      console.log(`  🔥 RESULT: This causes 502 Bad Gateway errors`);
-    } else {
-      console.log(`  ✅ Port configuration should be correct`);
-    }
-    
-    // Show the fix
-    console.log('\n🔧 Recommended Fix:');
-    if (envVars.PORT && envVars.PORT !== '3001') {
-      console.log('  1. Remove the PORT environment variable');
-      console.log('  2. Ensure NODE_PORT=3001');
-      console.log('  3. Redeploy the service');
-      
-      console.log('\n💡 Quick Fix Command:');
-      console.log('   Run: node scripts/production-port-fix.js');
-    } else {
-      console.log('  ✅ Configuration appears correct');
-      console.log('  🤔 Check if there are other issues (Docker, Nginx config, etc.)');
+    try {
+        const updater = new AppRunnerEnvUpdater(serviceArn);
+        
+        // Get current service configuration
+        const currentService = await updater.getCurrentServiceConfig();
+        const envVars = currentService.SourceConfiguration?.ImageRepository?.ImageConfiguration?.RuntimeEnvironmentVariables || {};
+        
+        console.log(`📊 Service: ${currentService.ServiceName}`);
+        console.log(`🔄 Status: ${currentService.Status}`);
+        console.log(`🌐 URL: ${currentService.ServiceUrl}`);
+        
+        console.log('\n🔍 Port-Related Environment Variables:');
+        const portVars = ['PORT', 'NODE_PORT', 'NGINX_PORT'];
+        
+        portVars.forEach(varName => {
+          const value = envVars[varName];
+          const status = value ? '✅' : '❌';
+          console.log(`  ${status} ${varName}: ${value || 'NOT SET'}`);
+        });
+        
+        // Analyze the configuration
+        console.log('\n🔧 Configuration Analysis:');
+        const nodePort = envVars.NODE_PORT || envVars.PORT || '3001';
+        const nginxPort = envVars.NGINX_PORT || '8080';
+        
+        console.log(`  📱 Node.js will run on: ${nodePort}`);
+        console.log(`  🌐 Nginx listens on: ${nginxPort}`);
+        console.log(`  🔗 Nginx expects Node.js on: 3001`);
+        
+        // Identify the problem
+        console.log('\n🚨 Issue Analysis:');
+        if (envVars.PORT && envVars.PORT !== '3001') {
+          console.log(`  ❌ PROBLEM: PORT=${envVars.PORT} overrides NODE_PORT`);
+          console.log(`  💡 SOLUTION: Remove PORT variable or set PORT=3001`);
+        }
+        
+        if (!envVars.NODE_PORT) {
+          console.log(`  ❌ PROBLEM: NODE_PORT is not set`);
+          console.log(`  💡 SOLUTION: Set NODE_PORT=3001`);
+        } else if (envVars.NODE_PORT !== '3001') {
+          console.log(`  ❌ PROBLEM: NODE_PORT=${envVars.NODE_PORT} should be 3001`);
+          console.log(`  💡 SOLUTION: Set NODE_PORT=3001`);
+        }
+        
+        if (nodePort !== '3001') {
+          console.log(`  ❌ CRITICAL: Node.js will run on ${nodePort}, but Nginx expects 3001`);
+          console.log(`  🔥 RESULT: This causes 502 Bad Gateway errors`);
+        } else {
+          console.log(`  ✅ Port configuration should be correct`);
+        }
+        
+        // Show the fix
+        console.log('\n🔧 Recommended Fix:');
+        if (envVars.PORT && envVars.PORT !== '3001') {
+          console.log('  1. Remove the PORT environment variable');
+          console.log('  2. Ensure NODE_PORT=3001');
+          console.log('  3. Redeploy the service');
+          
+          console.log('\n💡 Quick Fix Command:');
+          console.log('   Run: node scripts/production-port-fix.js');
+        } else {
+          console.log('  ✅ Configuration appears correct');
+          console.log('  🤔 Check if there are other issues (Docker, Nginx config, etc.)');
+        }
+        
+    } catch (error) {
+        console.log('⚠️  Unable to access AWS AppRunner service directly');
+        console.log(`   Error: ${error.message}`);
+        
+        console.log('\n🔧 Alternative Approach:');
+        console.log('   ✅ Check local environment variables');
+        console.log('   ✅ Compare with expected production config');
+        console.log('   ✅ Verify deployment pipeline settings');
+        
+        console.log('\n📋 Local Environment Check:');
+        const localPortVars = ['PORT', 'NODE_PORT', 'NGINX_PORT'];
+        
+        localPortVars.forEach(varName => {
+          const value = process.env[varName];
+          const status = value ? '✅' : '❌';
+          console.log(`  ${status} Local ${varName}: ${value || 'NOT SET'}`);
+        });
+        
+        console.log('\n💡 Recommended Production Values:');
+        console.log('   ✅ NODE_PORT=3001 (Node.js application port)');
+        console.log('   ✅ NGINX_PORT=8080 (Container external port)');
+        console.log('   ❌ PORT should NOT be set (conflicts with NODE_PORT)');
+        
+        console.log('\n🚀 Next Steps:');
+        console.log('   1. Verify these values in your deployment pipeline');
+        console.log('   2. Check AWS AppRunner service configuration');
+        console.log('   3. Test with local Docker container to confirm');
     }
 }
 
