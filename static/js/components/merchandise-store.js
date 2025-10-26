@@ -1248,6 +1248,14 @@ class MerchandiseStore {
     
     console.log('🔧 Initializing ProductNavigator...');
     console.log('🔍 Checking ProductNavigator availability:', typeof ProductNavigator);
+    console.log('🔍 Product types available:', Object.keys(this.productTypes || {}));
+    
+    // Check if we have product types data first
+    if (!this.productTypes || Object.keys(this.productTypes).length === 0) {
+      console.error('❌ No product types data available, cannot initialize ProductNavigator');
+      this.renderSimpleCategories(container);
+      return;
+    }
     
     // Check if ProductNavigator class is available
     if (typeof ProductNavigator === 'undefined') {
@@ -1282,22 +1290,33 @@ class MerchandiseStore {
       
       console.log('✅ ProductNavigator initialized successfully');
       
-      // Verify it rendered properly after a short delay
-      setTimeout(() => {
+      // Verify it rendered properly with multiple checks
+      let verificationAttempts = 0;
+      const maxAttempts = 3;
+      
+      const verifyRendering = () => {
+        verificationAttempts++;
         const categories = container.querySelectorAll('.category-card');
+        
         if (categories.length > 0) {
           console.log(`✅ Product categories rendered: ${categories.length} categories found`);
           // Remove any fallback notices since full navigator loaded
-          const fallbackNotices = document.querySelectorAll('.fallback-notice');
+          const fallbackNotices = document.querySelectorAll('.fallback-notice, .error-notice');
           fallbackNotices.forEach(notice => notice.remove());
+        } else if (verificationAttempts < maxAttempts) {
+          console.log(`⏳ Attempt ${verificationAttempts}: Categories still loading, retrying...`);
+          setTimeout(verifyRendering, 1000);
         } else {
-          console.log('⏭️ Categories still loading, using simple fallback');
+          console.log('⚠️ ProductNavigator failed to render categories, using fallback');
           this.renderSimpleCategories(container);
         }
-      }, 1000);
+      };
+      
+      setTimeout(verifyRendering, 1000);
       
     } catch (error) {
       console.error('❌ Error creating ProductNavigator:', error);
+      console.error('Error details:', error.stack);
       this.renderSimpleCategories(container);
     }
   }
@@ -1311,6 +1330,7 @@ class MerchandiseStore {
     // Use the loaded product types data if available
     if (this.productTypes && Object.keys(this.productTypes).length > 0) {
       console.log('📦 Using loaded product types for fallback:', Object.keys(this.productTypes));
+      console.log('🔍 Product types data:', this.productTypes);
       
       const allProducts = [];
       Object.entries(this.productTypes).forEach(([categoryKey, category]) => {
@@ -1348,39 +1368,14 @@ class MerchandiseStore {
         </div>
       `;
     } else {
-      // Fallback to hardcoded popular products if no data loaded
-      console.log('⚠️ No product types loaded, using hardcoded fallback');
+      // If no product types loaded, show error instead of hardcoded fallback
+      console.log('❌ No product types loaded, showing error message');
       container.innerHTML = `
         <div class="simple-categories">
-          <div class="fallback-notice">
-            <p>🚧 <strong>Loading product catalog...</strong> Showing popular options while we load the full selection.</p>
-          </div>
-          <h3>📦 Popular Products</h3>
-          <div class="simple-categories-grid">
-            <div class="simple-category" data-type="premium-tshirt">
-              <div class="category-icon">👕</div>
-              <h4>Premium T-Shirt</h4>
-              <p>High-quality cotton tee</p>
-              <button class="select-simple-product" data-product="premium-tshirt" data-blueprint="5" data-provider="3">Select</button>
-            </div>
-            <div class="simple-category" data-type="hoodie">
-              <div class="category-icon">🧥</div>
-              <h4>Pullover Hoodie</h4>
-              <p>Cozy fleece hoodie</p>
-              <button class="select-simple-product" data-product="hoodie" data-blueprint="146" data-provider="3">Select</button>
-            </div>
-            <div class="simple-category" data-type="coffee-mug">
-              <div class="category-icon">☕</div>
-              <h4>Coffee Mug</h4>
-              <p>Ceramic 11oz mug</p>
-              <button class="select-simple-product" data-product="coffee-mug" data-blueprint="263" data-provider="5">Select</button>
-            </div>
-            <div class="simple-category" data-type="pillow">
-              <div class="category-icon">🛋️</div>
-              <h4>Square Pillow</h4>
-              <p>Spun polyester pillow</p>
-              <button class="select-simple-product" data-product="pillow" data-blueprint="220" data-provider="10">Select</button>
-            </div>
+          <div class="error-notice">
+            <p>❌ <strong>Failed to load product catalog.</strong></p>
+            <p>Please refresh the page to try again.</p>
+            <button onclick="location.reload()" class="btn-primary">Refresh Page</button>
           </div>
         </div>
       `;

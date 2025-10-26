@@ -54,7 +54,69 @@ async function testProductionMobile() {
                 
                 console.log('⏳ Waiting for game to load...');
                 await page.waitForFunction(() => document.readyState === 'complete', { timeout: 15000 });
-                await new Promise(resolve => setTimeout(resolve, 5000));
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Interact with the welcome screen to get to the actual game
+                console.log('🎮 Attempting to start the game...');
+                
+                // Try to find and click start button or dismiss welcome screen
+                const startSelectors = [
+                    'button:contains("Start")',
+                    'button:contains("Play")', 
+                    '.start-button',
+                    '.play-button',
+                    '[data-action="start"]',
+                    '.welcome-screen button',
+                    '.instructions button'
+                ];
+                
+                let gameStarted = false;
+                for (const selector of startSelectors) {
+                    try {
+                        if (selector.includes(':contains')) {
+                            // Handle text-based selectors
+                            const button = await page.evaluateHandle(() => {
+                                const buttons = Array.from(document.querySelectorAll('button'));
+                                return buttons.find(btn => 
+                                    btn.textContent.toLowerCase().includes('start') ||
+                                    btn.textContent.toLowerCase().includes('play') ||
+                                    btn.textContent.toLowerCase().includes('begin')
+                                );
+                            });
+                            if (button.asElement()) {
+                                await button.asElement().click();
+                                console.log('   ✅ Clicked start button via text search');
+                                gameStarted = true;
+                                break;
+                            }
+                        } else {
+                            const element = await page.$(selector);
+                            if (element) {
+                                await element.click();
+                                console.log(`   ✅ Clicked: ${selector}`);
+                                gameStarted = true;
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        // Continue trying other selectors
+                    }
+                }
+                
+                // Try clicking anywhere on screen if no button found (some games start on any click)
+                if (!gameStarted) {
+                    console.log('   🔄 No start button found, trying screen tap...');
+                    await page.click('body');
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Try escape key to dismiss overlays
+                    await page.keyboard.press('Escape');
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+                
+                // Wait for game board to appear
+                console.log('⏳ Waiting for actual game board to appear...');
+                await new Promise(resolve => setTimeout(resolve, 3000));
                 
                 // Comprehensive mobile analysis
                 const analysis = await page.evaluate((siteName) => {
@@ -68,18 +130,58 @@ async function testProductionMobile() {
                         recommendations: []
                     };
                     
-                    // Find game board - try multiple selectors
-                    const selectors = ['#game-board', 'canvas', '.game-container', '.game-board', '#wavelength-gems-canvas'];
+                    // Find actual game board (not welcome screen canvas)
+                    const selectors = [
+                        '#gameBoard',        // Main game board ID
+                        '#game-board', 
+                        '.game-grid',
+                        '.gems-container',
+                        'canvas:not(.welcome-canvas):not(.background-canvas)',
+                        '.game-container canvas',
+                        '.game-board'
+                    ];
                     let gameBoard = null;
                     
                     for (const selector of selectors) {
                         gameBoard = document.querySelector(selector);
-                        if (gameBoard) break;
+                        if (gameBoard) {
+                            // Verify this is actually the game board with gems, not just a welcome screen
+                            const hasGems = gameBoard.querySelector ? 
+                                gameBoard.querySelector('.gem') !== null : 
+                                gameBoard.getContext && gameBoard.width > 100 && gameBoard.height > 100;
+                            
+                            if (hasGems || gameBoard.children.length > 0) {
+                                break;
+                            }
+                        }
                     }
                     
-                    if (!gameBoard) {
-                        results.issues.push(`❌ No game board found using selectors: ${selectors.join(', ')}`);
+                    // Check if we have gems/grid items as additional validation
+                    const gems = document.querySelectorAll('.gem');
+                    const gridItems = document.querySelectorAll('.grid-item, .game-cell');
+                    
+                    results.gameElements = {
+                        boardFound: !!gameBoard,
+                        boardSelector: gameBoard ? (gameBoard.tagName.toLowerCase() + (gameBoard.id ? '#' + gameBoard.id : '') + (gameBoard.className ? '.' + gameBoard.className.split(' ')[0] : '')) : null,
+                        gemsCount: gems.length,
+                        gridItemsCount: gridItems.length,
+                        hasActiveGame: gems.length > 0 || gridItems.length > 0
+                    };
+                    
+                    if (!gameBoard && !results.gameElements.hasActiveGame) {
+                        results.issues.push(`❌ No active game board found using selectors: ${selectors.join(', ')}`);
+                        results.issues.push(`❌ No gems or grid items found (${results.gameElements.gemsCount} gems, ${results.gameElements.gridItemsCount} grid items)`);
+                        results.issues.push(`❌ Game may still be on welcome/instruction screen`);
                         return results;
+                    }
+                    
+                    // If we found gems but no main board element, create a virtual board analysis
+                    if (!gameBoard && results.gameElements.hasActiveGame) {
+                        const gemsContainer = document.querySelector('.gems-container') || document.querySelector('#gameBoard') || document.body;
+                        if (gemsContainer) {
+                            gameBoard = gemsContainer;
+                            results.issues.push(`⚠️ Using gems container as game board reference`);
+                        }
                     }
                     
                     const rect = gameBoard.getBoundingClientRect();
@@ -193,8 +295,20 @@ async function testProductionMobile() {
                 console.log(`\n📊 ${testSite.name.toUpperCase()} ANALYSIS:`);
                 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
                 
+                if (analysis.gameElements) {
+                    console.log(`🎮 Game Status:`);
+                    console.log(`   Board found: ${analysis.gameElements.boardFound ? '✅ Yes' : '❌ No'}`);
+                    console.log(`   Active game: ${analysis.gameElements.hasActiveGame ? '✅ Yes' : '❌ No'}`);
+                    console.log(`   Gems count: ${analysis.gameElements.gemsCount}`);
+                    console.log(`   Grid items: ${analysis.gameElements.gridItemsCount}`);
+                    
+                    if (analysis.gameElements.boardSelector) {
+                        console.log(`   Board element: ${analysis.gameElements.boardSelector}`);
+                    }
+                }
+                
                 if (analysis.gameBoard) {
-                    console.log(`🎮 Game Board: ${analysis.gameBoard.selector}`);
+                    console.log(`📊 Game Board Analysis:`);
                     console.log(`   Dimensions: ${analysis.gameBoard.dimensions.width}x${analysis.gameBoard.dimensions.height}px`);
                     console.log(`   Position: (${analysis.gameBoard.position.left}, ${analysis.gameBoard.position.top})`);
                     console.log(`   Visibility: ${analysis.gameBoard.visibility.percentVisible}% visible`);
