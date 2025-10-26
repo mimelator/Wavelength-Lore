@@ -26,6 +26,7 @@ fi
 
 # Start Node.js application with enhanced monitoring
 echo "🚀 Starting Node.js application..."
+cd /app
 node index.js &
 NODE_PID=$!
 echo "✅ Node.js started successfully with PID: $NODE_PID"
@@ -56,7 +57,12 @@ chmod 755 /var/lib/nginx/logs
 echo "🌐 Starting Nginx reverse proxy..."
 if nginx -t; then
     echo "✅ Nginx configuration valid"
-    sudo nginx -g "daemon off;"
+    nginx -g 'daemon off;' &
+    NGINX_PID=$!
+    echo "✅ Nginx started with PID: $NGINX_PID"
+    
+    # Keep container running
+    wait $NGINX_PID
 else
     echo "❌ Nginx configuration invalid"
     exit 1
