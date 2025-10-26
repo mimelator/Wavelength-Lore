@@ -1,6 +1,11 @@
 AI COPILOT QUICK START - COPY/PASTE THIS TO ANY AI ASSISTANT
 ================================================================
 
+🚨 **CRITICAL RULE #1: NO PERMISSION QUESTIONS!** 🚨
+• If you create/break something → FIX IT IMMEDIATELY, DON'T ASK
+• "Should I...?" "Would you like me to...?" → BANNED PHRASES
+• WAVELENGTH AGENTS ACT, DON'T ASK (unless genuinely unclear requirements)
+
 🧪⚡ **NEW EFFICIENCY EXPERIMENT** ⚡🧪
 We're trying to save as much time as possible and make everyone more efficient by NOT requiring manual approval for common development tasks! This is an active experiment to eliminate friction and maximize development velocity.
 
