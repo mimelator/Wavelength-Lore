@@ -1263,8 +1263,16 @@ class MerchandiseStore {
         apiEndpoint: '/api/product-catalog',
         onProductSelect: (product) => {
           console.log('✅ Product selected from navigator:', product);
+          
+          // Map blueprint title to product type
+          const productType = this.mapBlueprintToProductType(product.blueprint_title, product.blueprint_id);
+          
+          console.log('🔄 Mapped product type:', productType);
+          console.log('  From blueprint_title:', product.blueprint_title);
+          console.log('  From blueprint_id:', product.blueprint_id);
+          
           this.selectProductType(
-            product.blueprint_title,
+            productType,
             product.blueprint_id,
             product.provider_id
           );
@@ -1828,6 +1836,68 @@ class MerchandiseStore {
     return context;
   }
   
+  /**
+   * Map blueprint title/ID to our internal product type
+   */
+  mapBlueprintToProductType(blueprintTitle, blueprintId) {
+    const title = blueprintTitle.toLowerCase();
+    
+    // Map by blueprint ID first (most reliable)
+    const blueprintMap = {
+      // T-Shirts & Tops
+      '5': 'premium-tshirt',
+      '6': 'premium-tshirt', 
+      '9': 'premium-tshirt',
+      '11': 'premium-tshirt',
+      '12': 'premium-tshirt',
+      '14': 'premium-tshirt',
+      '15': 'premium-tshirt',
+      '26': 'premium-tshirt',
+      
+      // Hoodies
+      '146': 'hoodie',
+      
+      // Tank Tops
+      '17': 'tank-top',
+      
+      // Mugs & Drinkware  
+      '68': 'mug',
+      
+      // Pillows & Bedding
+      '220': 'pillow',
+      '223': 'pillow', 
+      '229': 'pillow',
+      '232': 'pillow',
+      
+      // Posters & Wall Art
+      '19': 'poster'
+    };
+    
+    if (blueprintMap[blueprintId]) {
+      return blueprintMap[blueprintId];
+    }
+    
+    // Fallback to title matching
+    if (title.includes('hoodie') || title.includes('pullover')) {
+      return 'hoodie';
+    }
+    if (title.includes('tank') || title.includes('sleeveless')) {
+      return 'tank-top';
+    }
+    if (title.includes('pillow') || title.includes('cushion')) {
+      return 'pillow';
+    }
+    if (title.includes('poster') || title.includes('print')) {
+      return 'poster';
+    }
+    if (title.includes('mug') || title.includes('cup')) {
+      return 'mug';
+    }
+    
+    // Default to t-shirt
+    return 'premium-tshirt';
+  }
+  
   findProductConfig(productTypeId) {
     console.log('🔍 Looking for product config:', productTypeId);
     console.log('🔍 Available product types:', Object.keys(this.productTypes));
@@ -1850,10 +1920,20 @@ class MerchandiseStore {
   
   showProductCustomizationModal(productType, productConfig, imageData, imageContext, existingProduct = null) {
     const isUpdate = !!existingProduct;
+    
+    // DEBUG: Log the product type mapping flow
+    console.log('🔍 showProductCustomizationModal called with:');
+    console.log('  productType:', productType);
+    console.log('  productConfig:', productConfig);
+    
     // Fix Issue 1: Use proper product type name instead of undefined productConfig.name
     const productTypeName = this.getProductTypeName(productType);
+    console.log('  productTypeName result:', productTypeName);
+    
     const modalTitle = isUpdate ? `✏️ Update Your ${productTypeName}` : `✨ Design Your ${productTypeName}`;
     const buttonText = isUpdate ? 'Update Product' : 'Design Product';
+    
+    console.log('  Final modal title:', modalTitle);
     
     // Remove any existing customization modals to prevent duplicate form field IDs
     document.querySelectorAll('.product-customization-modal, #productCustomizationModal').forEach(el => el.remove());
@@ -2223,6 +2303,12 @@ class MerchandiseStore {
   extractProductTypeFromProduct(product) {
     console.log('🔍 Extracting product type from:', product);
     
+    // First check if product has stored productType metadata
+    if (product.productType) {
+      console.log('🔍 Found stored productType:', product.productType);
+      return product.productType;
+    }
+    
     // Check if we have variants to determine product type
     if (product.variants && product.variants.length > 0) {
       const firstVariant = product.variants[0];
@@ -2230,16 +2316,50 @@ class MerchandiseStore {
       
       console.log('🔍 First variant title:', variantTitle);
       
-      // Check variant titles for product type indicators
-      if (variantTitle.includes('hoodie')) {
+      // Enhanced product type detection from variant titles
+      if (variantTitle.includes('hoodie') || variantTitle.includes('pullover')) {
         return 'hoodie';
       }
-      if (variantTitle.includes('tank')) {
+      if (variantTitle.includes('tank') || variantTitle.includes('sleeveless')) {
         return 'tank-top';
       }
-      if (variantTitle.includes('pillow')) {
+      if (variantTitle.includes('pillow') || variantTitle.includes('cushion')) {
         return 'pillow';
       }
+      if (variantTitle.includes('poster') || variantTitle.includes('print')) {
+        return 'poster';
+      }
+      if (variantTitle.includes('mug') || variantTitle.includes('cup')) {
+        return 'mug';
+      }
+      if (variantTitle.includes('tote') || variantTitle.includes('bag')) {
+        return 'tote-bag';
+      }
+      if (variantTitle.includes('sticker')) {
+        return 'sticker';
+      }
+      
+      // Check blueprint ID patterns if available
+      if (product.blueprintId || firstVariant.blueprintId) {
+        const blueprintId = product.blueprintId || firstVariant.blueprintId;
+        console.log('🔍 Blueprint ID:', blueprintId);
+        
+        // Map common blueprint IDs to product types
+        const blueprintMap = {
+          '5': 'premium-tshirt',
+          '146': 'hoodie', 
+          '17': 'tank-top',
+          '68': 'mug',
+          '19': 'poster',
+          '71': 'pillow'
+        };
+        
+        if (blueprintMap[blueprintId]) {
+          console.log('🔍 Mapped blueprint to type:', blueprintMap[blueprintId]);
+          return blueprintMap[blueprintId];
+        }
+      }
+      
       // Default to premium t-shirt for clothing items
       return 'premium-tshirt';
     }
@@ -2248,14 +2368,20 @@ class MerchandiseStore {
     const title = product.title?.toLowerCase() || '';
     console.log('🔍 Product title:', title);
     
-    if (title.includes('hoodie')) {
+    if (title.includes('hoodie') || title.includes('pullover')) {
       return 'hoodie';
     }
-    if (title.includes('tank')) {
+    if (title.includes('tank') || title.includes('sleeveless')) {
       return 'tank-top';
     }
-    if (title.includes('pillow')) {
+    if (title.includes('pillow') || title.includes('cushion')) {
       return 'pillow';
+    }
+    if (title.includes('poster') || title.includes('print')) {
+      return 'poster';
+    }
+    if (title.includes('mug') || title.includes('cup')) {
+      return 'mug';
     }
     
     // Default fallback
@@ -2279,6 +2405,10 @@ class MerchandiseStore {
       'hoodie': '🧥',
       'tank-top': '🎽',
       'pillow': '🛏️',
+      'poster': '🖼️',
+      'mug': '☕',
+      'tote-bag': '🛍️',
+      'sticker': '🏷️',
       'womens-tee': '👚',
       'heavy-cotton-tee': '👕',
       'infant-tee': '👶',
@@ -2294,6 +2424,10 @@ class MerchandiseStore {
       'hoodie': 'Pullover Hoodie',
       'tank-top': 'Tank Top',
       'pillow': 'Square Pillow',
+      'poster': 'Premium Poster',
+      'mug': 'Coffee Mug',
+      'tote-bag': 'Tote Bag',
+      'sticker': 'Vinyl Sticker',
       'womens-tee': "Women's Tee",
       'heavy-cotton-tee': 'Heavy Cotton Tee',
       'infant-tee': 'Infant Tee',

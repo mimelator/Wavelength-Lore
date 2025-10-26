@@ -13,8 +13,8 @@ class SafeScriptRunner {
         this.protector = new PackageProtector();
     }
 
-    async runScript(scriptPath, args = []) {
-        console.log(`🛡️ Starting protected execution: ${scriptPath}`);
+    async runScript(command, args = []) {
+        console.log(`🛡️ Starting protected execution: ${command} ${args.join(' ')}`);
         
         // Pre-execution protection
         try {
@@ -30,10 +30,10 @@ class SafeScriptRunner {
             return false;
         }
 
-        // Execute script
+        // Execute command
         let success = false;
         try {
-            await this.executeScript(scriptPath, args);
+            await this.executeScript(command, args);
             success = true;
         } catch (error) {
             console.error('❌ Script execution failed:', error.message);
@@ -56,11 +56,25 @@ class SafeScriptRunner {
         return success;
     }
 
-    executeScript(scriptPath, args) {
+    executeScript(inputCommand, args) {
         return new Promise((resolve, reject) => {
-            const child = spawn('node', [scriptPath, ...args], {
+            let command, commandArgs;
+            
+            // Detect if it's a shell command (npm, bash, etc.) or Node.js script
+            if (inputCommand === 'npm' || inputCommand === 'bash' || inputCommand === 'sh' || !inputCommand.endsWith('.js')) {
+                // Shell command
+                command = inputCommand;
+                commandArgs = args;
+            } else {
+                // Node.js script
+                command = 'node';
+                commandArgs = [inputCommand, ...args];
+            }
+            
+            const child = spawn(command, commandArgs, {
                 stdio: 'inherit',
-                cwd: process.cwd()
+                cwd: process.cwd(),
+                shell: true // Enable shell for npm commands
             });
 
             child.on('close', (code) => {
@@ -79,23 +93,25 @@ class SafeScriptRunner {
 // CLI Interface
 if (require.main === module) {
     const runner = new SafeScriptRunner();
-    const scriptPath = process.argv[2];
+    const command = process.argv[2];
     const args = process.argv.slice(3);
 
-    if (!scriptPath) {
+    if (!command) {
         console.log(`
 Safe Script Runner - Package.json Protection
 
-Usage: node safe-script-runner.js <script-path> [args...]
+Usage: node safe-script-runner.js <command> [args...]
 
-Example:
+Examples:
+  node safe-script-runner.js npm run dev
+  node safe-script-runner.js npm start
   node safe-script-runner.js ./test-runner.js all
   node safe-script-runner.js ../debug/test-admin-api.js
 `);
         process.exit(1);
     }
 
-    runner.runScript(scriptPath, args)
+    runner.runScript(command, args)
         .then(success => {
             console.log(success ? '✅ Script completed safely' : '❌ Script failed');
             process.exit(success ? 0 : 1);
