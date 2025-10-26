@@ -34,7 +34,9 @@ All project documentation has been organized in the [`docs/`](docs/) folder:
 
 - **[🏗️ System Architecture](docs/WAVELENGTH_SYSTEM_ARCHITECTURE.md)** - Complete system architecture including external chatbot integration
 - **[📖 Documentation Index](docs/README.md)** - Complete documentation overview and navigation
-- **[🔒 Security Guide](docs/SECURITY_ENHANCEMENT_GUIDE.md)** - Security implementation and best practices
+- **[� MCP Tools Documentation](docs/MCP_TOOLS_DOCUMENTATION.md)** - Model Context Protocol tools for AI automation
+- **[⚡ MCP Quick Reference](docs/MCP_QUICK_REFERENCE.md)** - Essential MCP commands and usage examples
+- **[�🔒 Security Guide](docs/SECURITY_ENHANCEMENT_GUIDE.md)** - Security implementation and best practices
 - **[💾 Backup System](docs/BACKUP_CONFIGURATION.md)** - Automated database backup setup
 - **[🤖 Chatbot Integration](tests/chatbot/CHATBOT_TESTING_SUMMARY.md)** - Firebase Functions chatbot architecture and validation
 - **[🎮 Features](docs/)** - Character system, lore management, and application features

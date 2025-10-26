@@ -31,13 +31,15 @@ AI COPILOT QUICK START - COPY/PASTE THIS TO ANY AI ASSISTANT
 • node scripts/unified/smart-commit.js (ONLY commit method)
 
 🚀 MCP SUPERPOWERS (Revolutionary AI Control):
-• Custom Wavelength MCP servers in /mcp/ directory
-• AI can control dev server: start/stop/restart/status/logs
-• AI can validate lore: characters/episodes/content consistency
-• AI can query Firebase: direct database access with admin privileges
+• 📚 FULL DOCUMENTATION: /docs/MCP_TOOLS_DOCUMENTATION.md
+• Enhanced MCP server: /mcp/enhanced-wavelength-server.js (8 tools operational)
+• Lore management: ./lore-tools (command-line interface)
+• Content search: wavelength_lore_search, character_relationship_map
+• Document pipeline: register_shared_document, lore_ingestion_status  
+• Cross-project sync: content_sync_manager (Lore ↔ Chatbot)
+• Development tools: smart_deployment_check, forum_health_monitor
 • Setup: Copy mcp/claude-desktop-config.json to ~/Library/Application Support/Claude/
-• Test: Ask AI "Check server status" or "Validate this character: Lucky"
-• 12 custom tools available: wavelength_validate, firebase_query, dev_server_*, etc.
+• Test: Ask AI "Search for Yeti origin" or "Map character relationships"
 
 🚫 DO NOT TOUCH:
 • .current-notes.md (private workspace)

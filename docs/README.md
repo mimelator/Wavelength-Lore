@@ -26,6 +26,18 @@ npm run env:prod-preview # Preview production config changes
 - **[WAVELENGTH_SYSTEM_ARCHITECTURE.md](WAVELENGTH_SYSTEM_ARCHITECTURE.md)** - Complete system architecture including external chatbot integration
 - **[Chatbot Integration](../tests/chatbot/CHATBOT_TESTING_SUMMARY.md)** - Firebase Functions chatbot architecture and validation
 
+## 🚀 AI Automation & MCP Tools
+
+### Model Context Protocol Integration
+- **[MCP_TOOLS_DOCUMENTATION.md](MCP_TOOLS_DOCUMENTATION.md)** - Complete MCP tools documentation with technical specs
+- **[MCP_QUICK_REFERENCE.md](MCP_QUICK_REFERENCE.md)** - Essential commands and usage examples
+- **[AI_COPILOT_QUICKSTART.txt](../AI_COPILOT_QUICKSTART.txt)** - AI assistant onboarding with MCP integration
+
+### Lore Management Tools
+- **Enhanced MCP Server**: `/mcp/enhanced-wavelength-server.js` (8 operational tools)
+- **Command-Line Interface**: `./lore-tools` (unified access to all features)
+- **Interactive Management**: `node scripts/lore-tools.js` (guided workflows)
+
 ## Directory Structure
 
 ```

@@ -52,36 +52,22 @@ function setupRealtimeNotifications() {
  * Setup real-time activity tracking
  */
 function setupActivityTracking() {
-    // Update user activity every 2 minutes
+    // Only track session activity for 2-week persistence (no Firebase writes)
     setInterval(() => {
-        if (window.forumState.isAuthenticated && window.forumState.currentUser) {
-            const userRef = window.firebaseUtils.ref(window.firebaseDB, 
-                `forum/users/${window.forumState.currentUser.uid}/lastSeen`);
-            window.firebaseUtils.set(userRef, Date.now());
-            
-            // Update session activity for 2-week persistence
-            if (window.sessionManager) {
-                window.sessionManager.updateActivity();
-            }
+        if (window.forumState.isAuthenticated && window.sessionManager) {
+            window.sessionManager.updateActivity();
         }
     }, 2 * 60 * 1000);
     
-    // Update activity on user interaction
+    // Update activity on user interaction (session only)
     ['click', 'keydown', 'scroll', 'mousemove'].forEach(event => {
         let lastActivity = 0;
         document.addEventListener(event, () => {
             const now = Date.now();
             if (now - lastActivity > 30000) { // Throttle to every 30 seconds
                 lastActivity = now;
-                if (window.forumState.isAuthenticated && window.forumState.currentUser) {
-                    const userRef = window.firebaseUtils.ref(window.firebaseDB, 
-                        `forum/users/${window.forumState.currentUser.uid}/lastSeen`);
-                    window.firebaseUtils.set(userRef, now);
-                    
-                    // Update session activity for 2-week persistence
-                    if (window.sessionManager) {
-                        window.sessionManager.updateActivity();
-                    }
+                if (window.forumState.isAuthenticated && window.sessionManager) {
+                    window.sessionManager.updateActivity();
                 }
             }
         });
@@ -403,31 +389,21 @@ async function updateUserProfile(user) {
     try {
         const userRef = window.firebaseUtils.ref(window.firebaseDB, `forum/users/${user.uid}`);
         const userData = {
-            uid: user.uid,
-            name: user.name,
+            displayName: user.name,
             email: user.email,
             avatar: user.avatar,
-            lastSeen: Date.now(),
-            joinDate: Date.now(), // Will be overwritten if user already exists
+            joinedAt: Date.now(), // Will be overwritten if user already exists
             postCount: 0,
-            replyCount: 0,
-            role: 'member'
+            replyCount: 0
         };
         
         // Check if user already exists to preserve join date, counts, and groups
         window.firebaseUtils.onValue(userRef, (snapshot) => {
             const existingData = snapshot.val();
             if (existingData) {
-                userData.joinDate = existingData.joinDate;
+                userData.joinedAt = existingData.joinedAt;
                 userData.postCount = existingData.postCount || 0;
                 userData.replyCount = existingData.replyCount || 0;
-                userData.role = existingData.role || 'member';
-                // Preserve groups field - CRITICAL for admin access
-                // ALWAYS preserve groups if they exist, default to empty array if not
-                userData.groups = existingData.groups || [];
-            } else {
-                // New user - initialize with empty groups array
-                userData.groups = [];
             }
 
             // Use update() instead of set() to preserve any fields we're not explicitly setting

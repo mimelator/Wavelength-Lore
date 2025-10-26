@@ -1,0 +1,58 @@
+{
+  "rules": {
+    "forum": {
+      "categories": {
+        ".read": true,
+        ".write": "auth != null"
+      },
+      "posts": {
+        ".read": true,
+        ".write": "auth != null",
+        "$postId": {
+          "views": {
+            ".write": true
+          }
+        }
+      },
+      "replies": {
+        ".read": true,
+        ".write": "auth != null"
+      },
+      "users": {
+        "$uid": {
+          ".read": "auth != null && auth.uid == $uid",
+          ".write": "auth != null && auth.uid == $uid",
+          "lastSeen": {
+            ".write": "auth != null && auth.uid == $uid"
+          }
+        }
+      }
+    },
+    "characters": {
+      ".read": true,
+      ".write": "auth != null && (root.child('users').child(auth.uid).child('groups').exists() || root.child('users').child(auth.uid).child('isContentCreator').val() == true)"
+    },
+    "lore": {
+      ".read": true,
+      ".write": "auth != null && (root.child('users').child(auth.uid).child('groups').exists() || root.child('users').child(auth.uid).child('isContentCreator').val() == true)"
+    },
+    "episodes": {
+      ".read": true,
+      ".write": "auth != null && (root.child('users').child(auth.uid).child('groups').exists() || root.child('users').child(auth.uid).child('isContentCreator').val() == true)"
+    },
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+    "games": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "videos": {
+      ".read": true,
+      ".write": "auth != null && (root.child('users').child(auth.uid).child('groups').exists() || root.child('users').child(auth.uid).child('isContentCreator').val() == true)"
+    }
+  }
+}
