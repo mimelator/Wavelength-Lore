@@ -12,22 +12,22 @@
  * Operations: list, deploy, monitor, update, cache-bust, logs, etc.
  */
 
-import { program } from 'commander';
-import { CloudFrontClient, ListDistributionsCommand, GetDistributionCommand, 
-        CreateInvalidationCommand, UpdateDistributionCommand } from '@aws-sdk/client-cloudfront';
-import { AppRunnerClient, UpdateServiceCommand, DescribeServiceCommand, 
-        ListServicesCommand } from '@aws-sdk/client-apprunner';
-import { ECRClient, ListImagesCommand, BatchGetImageCommand, 
-        PutImageCommand } from '@aws-sdk/client-ecr';
-import { S3Client, ListObjectsV2Command, PutObjectCommand, 
-        DeleteObjectCommand } from '@aws-sdk/client-s3';
-import { IAMClient, PutUserPolicyCommand, GetUserPolicyCommand } from '@aws-sdk/client-iam';
-import chalk from 'chalk';
-import fs from 'fs/promises';
-import path from 'path';
+const { program } = require('commander');
+const { CloudFrontClient, ListDistributionsCommand, GetDistributionCommand, 
+        CreateInvalidationCommand, UpdateDistributionCommand } = require('@aws-sdk/client-cloudfront');
+const { AppRunnerClient, UpdateServiceCommand, DescribeServiceCommand, 
+        ListServicesCommand } = require('@aws-sdk/client-apprunner');
+const { ECRClient, ListImagesCommand, BatchGetImageCommand, 
+        PutImageCommand } = require('@aws-sdk/client-ecr');
+const { S3Client, ListObjectsV2Command, PutObjectCommand, 
+        DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const { IAMClient, PutUserPolicyCommand, GetUserPolicyCommand } = require('@aws-sdk/client-iam');
+const chalk = require('chalk');
+const fs = require('fs/promises');
+const path = require('path');
 
 // Load configuration
-import 'dotenv/config';
+require('dotenv/config');
 
 // Load AWS resources configuration
 let awsResources;
