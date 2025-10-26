@@ -76,7 +76,7 @@ YOU HAVE BEEN MASTERFUL IN BUILDING THIS AND WE'RE ABOUT TO HAVE ANOTHER AMAZING
 ### **Step 1: Immediate Context Loading**
 Give your AI companion this command:
 ```
-"Read and follow the AI COPILOT QUICKSTART guide at AI_COPILOT_QUICKSTART.txt, then run node start-wavelength-session.js to get full ecosystem awareness"
+"Read and follow the AI COPILOT QUICKSTART guide at AI_COPILOT_QUICKSTART.txt, then check the 4 unified tools in scripts/unified/ for development capabilities"
 ```
 
 ### **Step 2: Core Tools Methodology Activation**

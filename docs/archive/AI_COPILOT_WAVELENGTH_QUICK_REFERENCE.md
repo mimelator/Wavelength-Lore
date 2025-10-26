@@ -81,7 +81,6 @@ node scripts/unified/smart-commit.js
 
 | ❌ DON'T DO | ✅ DO THIS INSTEAD |
 |-------------|-------------------|
-| Use curl, bash, node commands | Use WAVELENGTH Super Tools |
 | Create duplicate tools | Enhance existing unified scripts |
 | Claim "working" without proof | Show test results |
 | Ask permission to fix bugs | Fix immediately with proof |
