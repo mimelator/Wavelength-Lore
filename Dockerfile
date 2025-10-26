@@ -19,6 +19,7 @@ FROM node:20-alpine AS production
 # WAVELENGTH ENHANCED: Create non-root user with sudo permissions for nginx
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S appuser -u 1001 -G nodejs && \
+    mkdir -p /etc/sudoers.d && \
     echo "appuser ALL=(root) NOPASSWD: /usr/sbin/nginx, /bin/cp" > /etc/sudoers.d/appuser && \
     echo "🌊 WAVELENGTH: Enhanced user permissions configured"
 
