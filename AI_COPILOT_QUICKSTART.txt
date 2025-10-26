@@ -1,10 +1,22 @@
 AI COPILOT QUICK START - COPY/PASTE THIS TO ANY AI ASSISTANT
 ================================================================
 
+🧪⚡ **NEW EFFICIENCY EXPERIMENT** ⚡🧪
+We're trying to save as much time as possible and make everyone more efficient by NOT requiring manual approval for common development tasks! This is an active experiment to eliminate friction and maximize development velocity.
+
+**EXPERIMENT GOALS:**
+✅ Zero approval delays for HTTP requests (curl replacement)
+✅ Zero hanging Node.js processes (auto-exit detection) 
+✅ Instant access to 36+ command-line tools without approval
+✅ Maximum development speed with safety guardrails
+
+**HOW TO PARTICIPATE:** Use MCP tools instead of requesting manual approvals. See MCP section below for the new superpowers!
+
 👋 Welcome! Before we start working together, please read this:
 
 🎯 ENTRY POINT: /documentation/current-context/AI_COPILOT_PREFERENCES.md
 📚 METHODOLOGY: /documentation/ai-coding-workflows/AI_DEVELOPMENT_GUIDE.md
+⚡ MCP QUICK REFERENCE: /docs/MCP_QUICK_REFERENCE.md
 
 ⚡ CRITICAL RULES (Non-Negotiable):
 • USE EXISTING SCRIPTS - Learn what exists first: ls -la scripts/unified/
@@ -33,6 +45,7 @@ AI COPILOT QUICK START - COPY/PASTE THIS TO ANY AI ASSISTANT
 🚀 MCP SUPERPOWERS (Revolutionary AI Control):
 • 📚 FULL DOCUMENTATION: /docs/MCP_TOOLS_DOCUMENTATION.md
 • Enhanced MCP server: /mcp/enhanced-wavelength-server.js (11 tools operational)
+• 🛠️ SYSTEM TOOLS SERVER: /mcp/system-tools-server.js (25+ command line tools)
 • Lore management: ./lore-tools (command-line interface)
 • Content search: wavelength_lore_search, character_relationship_map
 • Document pipeline: register_shared_document, lore_ingestion_status  
@@ -40,9 +53,24 @@ AI COPILOT QUICK START - COPY/PASTE THIS TO ANY AI ASSISTANT
 • Development tools: smart_deployment_check, forum_health_monitor
 • Documentation finder: documentation_navigator (finds docs, scripts, tests instantly)
 • HTTP requests: http_request (replaces curl with intelligent response handling)
-• Node execution: node_execute (run scripts, tests, diagnostics without approval)
+• Node execution: node_execute (run scripts, tests, diagnostics without approval + AUTO-EXIT!)
+• Command line tools: cat, grep, ps, top, df, git_status, npm_info, docker_status, etc.
 • Setup: Copy mcp/claude-desktop-config.json to ~/Library/Application Support/Claude/
 • Test: Ask AI "Run diagnostic check", "Execute npm test", or "Make API call to httpbin.org/get"
+
+🔄 **TRANSITION GUIDE - Shell Commands → MCP Tools:**
+Instead of waiting for manual approval, use these instant alternatives:
+
+**Old way (requires approval):**           **New way (instant via MCP):**
+• curl -X GET https://api.com/data     →  Use `http_request` tool  
+• echo "Hello World"                   →  Use `echo` tool in system MCP
+• node -e "console.log('test')"        →  Use `node_execute` tool with auto-exit
+• grep "error" server.log              →  Use `grep` tool in system MCP  
+• cat package.json                     →  Use `cat` tool in system MCP
+• ps aux | grep node                   →  Use `ps` tool in system MCP
+• git status                           →  Use `git_status` tool in system MCP
+
+**💡 TIP:** Ask AI to "use MCP tools" instead of shell commands to eliminate approval delays!
 
 🚫 DO NOT TOUCH:
 • .current-notes.md (private workspace)
@@ -70,6 +98,18 @@ AI COPILOT QUICK START - COPY/PASTE THIS TO ANY AI ASSISTANT
 • Dev server management via AI commands
 • Wavelength lore validation in real-time
 • Firebase operations with project context
+• System administration without manual approval
+• Complete command line toolkit (25+ tools)
 • Enterprise-grade AI toolchain operational
+
+🛠️ SYSTEM TOOLS QUICK REFERENCE:
+• File ops: cat package.json, grep "error" server.log, find . -name "*.js"
+• System: ps aux, top, df -h, free -h, uptime
+• Network: ping google.com, netstat -tulpn, nslookup wavelengthlore.com
+• Dev: git_status, npm_info audit, docker_status ps
+• Text: sort data.txt, jq '.name' config.json
+• Archives: tar -czf backup.tar.gz src/, rsync -av src/ dest/
+• Documentation: /docs/SYSTEM_TOOLS_MCP_DOCUMENTATION.md
+• Tests: node tests/system-tools-tests.js
 
 Ready? Start by reading your entry point document above! 🚀

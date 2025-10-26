@@ -187,6 +187,22 @@ class SystemToolsMCPServer {
 
         // Network Tools
         {
+          name: "curl",
+          description: "HTTP client for API testing and web requests",
+          inputSchema: {
+            type: "object",
+            properties: {
+              url: { type: "string", description: "URL to request" },
+              method: { type: "string", enum: ["GET", "POST", "PUT", "DELETE", "PATCH"], description: "HTTP method", default: "GET" },
+              headers: { type: "object", description: "HTTP headers" },
+              data: { type: "string", description: "Request body data" },
+              timeout: { type: "number", description: "Timeout in seconds", default: 30 },
+              followRedirects: { type: "boolean", description: "Follow redirects", default: true }
+            },
+            required: ["url"]
+          }
+        },
+        {
           name: "ping",
           description: "Network connectivity with latency analysis",
           inputSchema: {
@@ -260,6 +276,19 @@ class SystemToolsMCPServer {
         },
 
         // Text Processing
+        {
+          name: "echo",
+          description: "Output text with formatting and variables",
+          inputSchema: {
+            type: "object",
+            properties: {
+              text: { type: "string", description: "Text to output" },
+              newline: { type: "boolean", description: "Add newline at end", default: true },
+              escape: { type: "boolean", description: "Enable escape sequences", default: false }
+            },
+            required: ["text"]
+          }
+        },
         {
           name: "sed",
           description: "Stream editing with preview and validation",
@@ -369,6 +398,7 @@ class SystemToolsMCPServer {
           case "uptime": return await this.uptimeCommand(args);
           
           // Network Tools
+          case "curl": return await this.curlRequest(args);
           case "ping": return await this.pingHost(args);
           case "netstat": return await this.netstatCommand(args);
           case "nslookup": return await this.nslookupHost(args);
@@ -379,6 +409,7 @@ class SystemToolsMCPServer {
           case "docker_status": return await this.dockerStatus(args);
           
           // Text Processing
+          case "echo": return await this.echoCommand(args);
           case "sed": return await this.sedCommand(args);
           case "awk": return await this.awkCommand(args);
           case "sort": return await this.sortCommand(args);
@@ -606,6 +637,43 @@ class SystemToolsMCPServer {
   }
 
   // Network Tools
+  async curlRequest(args) {
+    const curlArgs = ['-s', '-w', '\nHTTP_CODE:%{http_code}\nTIME_TOTAL:%{time_total}'];
+    
+    if (args.method && args.method !== 'GET') {
+      curlArgs.push('-X', args.method);
+    }
+    
+    if (args.headers) {
+      Object.entries(args.headers).forEach(([key, value]) => {
+        curlArgs.push('-H', `${key}: ${value}`);
+      });
+    }
+    
+    if (args.data) {
+      curlArgs.push('-d', args.data);
+    }
+    
+    if (args.timeout) {
+      curlArgs.push('--max-time', args.timeout.toString());
+    }
+    
+    if (!args.followRedirects) {
+      curlArgs.push('--no-location');
+    }
+    
+    curlArgs.push(args.url);
+    
+    const result = await this.executeCommand('curl', curlArgs);
+    
+    return {
+      content: [{
+        type: "text",
+        text: `🌐 HTTP ${args.method || 'GET'} ${args.url}:\n\n${result.stdout}`
+      }]
+    };
+  }
+
   async pingHost(args) {
     const pingArgs = ['-c', args.count.toString(), '-W', args.timeout.toString(), args.host];
     const result = await this.executeCommand('ping', pingArgs);
@@ -681,6 +749,30 @@ class SystemToolsMCPServer {
   }
 
   // Text Processing
+  async echoCommand(args) {
+    let output = args.text;
+    
+    if (args.escape) {
+      output = output.replace(/\\n/g, '\n')
+                    .replace(/\\t/g, '\t')
+                    .replace(/\\\\/g, '\\');
+    }
+    
+    if (!args.newline) {
+      // Remove trailing newline if present
+      output = output.replace(/\n$/, '');
+    } else if (!output.endsWith('\n')) {
+      output += '\n';
+    }
+    
+    return {
+      content: [{
+        type: "text",
+        text: `📢 Echo Output:\n\n${output}`
+      }]
+    };
+  }
+
   async sedCommand(args) {
     const sedArgs = [args.pattern];
     if (!args.preview) sedArgs.push('-i');

@@ -176,7 +176,9 @@ class EnhancedWavelengthMCPServer {
               script: { type: "string", description: "Script path or npm script name to execute" },
               args: { type: "array", items: { type: "string" }, description: "Command line arguments" },
               timeout: { type: "number", description: "Execution timeout in seconds (default: 30)", default: 30 },
-              context: { type: "string", description: "Context for intelligent execution (e.g., 'fixing deployment issue')" }
+              context: { type: "string", description: "Context for intelligent execution (e.g., 'fixing deployment issue')" },
+              forceExit: { type: "boolean", description: "Force process exit even with open handles (default: true)", default: true },
+              exitDelay: { type: "number", description: "Seconds to wait for graceful exit before force kill (default: 2)", default: 2 }
             },
             required: ["command", "script"]
           }
@@ -210,7 +212,7 @@ class EnhancedWavelengthMCPServer {
           case "http_request":
             return await this.makeHttpRequest(args.url, args.method, args.headers, args.body, args.auth);
           case "node_execute":
-            return await this.executeNodeCommand(args.command, args.script, args.args, args.timeout, args.context);
+            return await this.executeNodeCommand(args.command, args.script, args.args, args.timeout, args.context, args.forceExit, args.exitDelay);
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
@@ -913,8 +915,8 @@ console.log(checkDir(googleDocsPath, 'Google Docs'));
     }
   }
 
-  // Tool 11: Node Command Executor (No More Manual Approvals!)
-  async executeNodeCommand(command, script, args = [], timeout = 30, context = '') {
+  // Tool 11: Node Command Executor (No More Manual Approvals + Auto-Exit!)
+  async executeNodeCommand(command, script, args = [], timeout = 30, context = '', forceExit = true, exitDelay = 2) {
     const { spawn } = require('child_process');
     const path = require('path');
     
@@ -1031,30 +1033,119 @@ console.log(checkDir(googleDocsPath, 'Google Docs'));
           timeout: timeout * 1000
         });
         
+        let hasOutput = false;
+        let lastOutputTime = Date.now();
+        let isResolved = false;
+        
         child.stdout.on('data', (data) => {
           output += data.toString();
+          hasOutput = true;
+          lastOutputTime = Date.now();
         });
         
         child.stderr.on('data', (data) => {
           errorOutput += data.toString();
+          hasOutput = true;
+          lastOutputTime = Date.now();
         });
         
         child.on('close', (code) => {
-          exitCode = code;
-          resolve({ output, errorOutput, exitCode });
+          if (!isResolved) {
+            exitCode = code;
+            isResolved = true;
+            resolve({ output, errorOutput, exitCode, exitMethod: 'natural' });
+          }
+        });
+        
+        child.on('exit', (code) => {
+          if (!isResolved) {
+            exitCode = code;
+            isResolved = true;
+            resolve({ output, errorOutput, exitCode, exitMethod: 'exit' });
+          }
         });
         
         child.on('error', (error) => {
-          reject(error);
+          if (!isResolved) {
+            isResolved = true;
+            reject(error);
+          }
         });
         
-        // Handle timeout
-        setTimeout(() => {
-          if (!child.killed) {
-            child.kill('SIGTERM');
+        // Enhanced exit detection with force exit capability
+        const exitHandler = setTimeout(() => {
+          if (!isResolved && forceExit) {
+            // Intelligent exit detection
+            const timeSinceLastOutput = Date.now() - lastOutputTime;
+            const shouldForceExit = timeSinceLastOutput > (exitDelay * 1000);
+            
+            if (shouldForceExit) {
+              // First try graceful termination
+              child.kill('SIGTERM');
+              
+              // If still hanging after delay, force kill
+              setTimeout(() => {
+                if (!isResolved) {
+                  child.kill('SIGKILL');
+                  isResolved = true;
+                  resolve({ 
+                    output: output + '\n[Process force-terminated due to hanging]', 
+                    errorOutput: errorOutput + '\n[Auto-exit: Process had open handles preventing natural exit]', 
+                    exitCode: exitCode || 0,
+                    exitMethod: 'force-killed'
+                  });
+                }
+              }, 1000);
+            }
+          }
+        }, Math.min(timeout * 1000, (exitDelay + 3) * 1000));
+        
+        // Main timeout handler
+        const timeoutHandler = setTimeout(() => {
+          if (!isResolved) {
+            child.kill('SIGKILL');
+            isResolved = true;
             reject(new Error(`Command timed out after ${timeout} seconds`));
           }
         }, timeout * 1000);
+        
+        // Smart completion detection for tests and scripts
+        if (command === 'test' || command === 'run-script') {
+          const completionDetector = setInterval(() => {
+            if (!isResolved && hasOutput) {
+              const timeSinceLastOutput = Date.now() - lastOutputTime;
+              
+              // If no output for exitDelay seconds and we have received output, likely done
+              if (timeSinceLastOutput > (exitDelay * 1000) && forceExit) {
+                clearInterval(completionDetector);
+                
+                // Check for common completion indicators
+                const outputLower = output.toLowerCase();
+                const hasCompletionIndicators = 
+                  outputLower.includes('test') && (outputLower.includes('passed') || outputLower.includes('failed')) ||
+                  outputLower.includes('done') ||
+                  outputLower.includes('finished') ||
+                  outputLower.includes('complete');
+                
+                if (hasCompletionIndicators) {
+                  child.kill('SIGTERM');
+                  setTimeout(() => {
+                    if (!isResolved) {
+                      child.kill('SIGKILL');
+                      isResolved = true;
+                      resolve({ 
+                        output: output + '\n[Auto-completed: Detected test/script completion]', 
+                        errorOutput, 
+                        exitCode: 0,
+                        exitMethod: 'auto-detected-completion'
+                      });
+                    }
+                  }, 500);
+                }
+              }
+            }
+          }, 500);
+        }
       });
       
       const duration = Date.now() - startTime;
@@ -1068,7 +1159,19 @@ console.log(checkDir(googleDocsPath, 'Google Docs'));
       }
       responseText += `📊 Exit Code: ${result.exitCode}\n`;
       responseText += `⏱️ Duration: ${duration}ms\n`;
-      responseText += `🔧 Command: \`${fullCommand} ${commandArgs.join(' ')}\`\n\n`;
+      responseText += `🔧 Command: \`${fullCommand} ${commandArgs.join(' ')}\`\n`;
+      
+      // Add exit method information
+      if (result.exitMethod) {
+        const exitEmojis = {
+          'natural': '🌟',
+          'exit': '✨', 
+          'force-killed': '⚡',
+          'auto-detected-completion': '🎯'
+        };
+        responseText += `${exitEmojis[result.exitMethod] || '🔄'} Exit Method: ${result.exitMethod}\n`;
+      }
+      responseText += `\n`;
       
       // Add output
       if (result.output) {

@@ -80,12 +80,20 @@ The Wavelength-Lore project features a powerful **Enhanced MCP Server** that pro
 **Features:** JSON parsing, response summarization, error handling, performance metrics  
 **Benefits:** No manual approval delays, intelligent error messages, contextual quick actions
 
-#### **⚡ Node Command Executor** (`node_execute`)
-**Purpose:** Execute Node.js commands, scripts, and tests without manual approval  
-**What it does:** Run npm scripts, diagnostics, tests, fixes, and custom Node.js code  
-**Safety Features:** Command validation, timeout protection, dangerous pattern detection  
+#### **⚡ Node Command Executor** (`node_execute`) - **🆕 Enhanced with Auto-Exit Detection**
+**Purpose:** Execute Node.js commands, scripts, and tests without manual approval or hanging processes  
+**What it does:** Run npm scripts, diagnostics, tests, fixes, and custom Node.js code with intelligent termination  
+**🚀 NEW FEATURES:** 
+- **Auto-Exit Detection:** Automatically terminates hanging processes (setInterval, open handles, etc.)
+- **Force Exit Mode:** Uses `forceExit: true` to prevent infinite hanging on incomplete tests
+- **Smart Timeouts:** Configurable `exitDelay` (default: 2 seconds) for graceful vs forced termination
+- **Process Lifecycle Management:** SIGTERM → SIGKILL escalation for stubborn processes
+
+**Safety Features:** Command validation, timeout protection, dangerous pattern detection, hanging process prevention  
 **Command Types:** run-script, test, diagnostic, fix, validate, custom  
-**Benefits:** Eliminates approval delays for one-off commands, intelligent error handling, context-aware execution
+**Benefits:** ✅ **Zero hanging processes** ✅ **No more lost development time** ✅ **Intelligent error handling** ✅ **Context-aware execution**
+
+**⚡ Problem Solved:** *"I lose a lot of time when node doesn't return even though tests have completed"* - Now automatically detects and terminates hanging Node.js processes!
 
 ---
 
@@ -409,6 +417,44 @@ echo '{"jsonrpc": "2.0", "id": 4, "method": "tools/call", "params": {"name": "co
 
 ---
 
+---
+
+## 🛠️ **SYSTEM TOOLS MCP SERVER**
+
+**Location:** `/mcp/system-tools-server.js`  
+**Documentation:** `/docs/SYSTEM_TOOLS_MCP_DOCUMENTATION.md`  
+**Tests:** `/tests/system-tools-tests.js`  
+**Status:** ✅ **25+ Command Line Tools Available**
+
+### **Tool Categories:**
+- **File Operations (6):** cat, head, tail, grep, find, wc
+- **System Information (6):** ps, top, df, du, free, uptime  
+- **Network Tools (3):** ping, netstat, nslookup
+- **Development (3):** git_status, npm_info, docker_status
+- **Text Processing (4):** sed, awk, sort, jq
+- **Archive Operations (2):** tar, rsync
+
+### **Quick Usage:**
+```bash
+# Test the system tools server
+node tests/system-tools-tests.js
+
+# Example tool calls
+echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "cat", "arguments": {"file": "package.json"}}, "id": 1}' | node mcp/system-tools-server.js
+
+echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "ps", "arguments": {}}, "id": 2}' | node mcp/system-tools-server.js
+
+echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "git_status", "arguments": {"path": "."}}, "id": 3}' | node mcp/system-tools-server.js
+```
+
+**Key Features:**
+- ✅ **No Manual Approval Required** - All tools execute automatically
+- ✅ **Intelligent Output** - Formatted responses with analysis
+- ✅ **Security Built-in** - Timeouts, validation, error handling
+- ✅ **Comprehensive Tests** - 100+ test cases covering all functionality
+
+---
+
 **Last Updated:** October 25, 2025  
-**Status:** ✅ All 8 tools verified and operational  
+**Status:** ✅ All 11 Enhanced tools + 25+ System tools operational  
 **Integration:** Fully integrated with Wavelength-Lore ecosystem
