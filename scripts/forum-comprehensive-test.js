@@ -90,7 +90,7 @@ class ForumTester {
         await this.test('Lore Category Page Loads', async () => {
             const response = await axios.get(`${FORUM_BASE}/category/lore`);
             if (response.status !== 200) throw new Error(`Status: ${response.status}`);
-            if (!response.data.includes('categoryName')) throw new Error('Missing category content');
+            if (!response.data.includes('Lore &amp; Theories')) throw new Error('Missing category content');
         });
 
         await this.test('Episodes Category Page Loads', async () => {
@@ -149,7 +149,7 @@ class ForumTester {
                 const postId = postsResponse.data.posts[0].id;
                 const response = await axios.get(`${FORUM_BASE}/post/${postId}`);
                 if (response.status !== 200) throw new Error(`Status: ${response.status}`);
-                if (!response.data.includes('forum-post-container')) throw new Error('Missing post content');
+                if (!response.data.includes('Back to Forum')) throw new Error('Missing post content');
             } else {
                 console.log('⚠️  No posts available for testing post view');
             }
