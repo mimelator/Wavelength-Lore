@@ -675,7 +675,7 @@ class MerchandiseStore {
         <h2>${product.title}</h2>
         <div class="product-detail-content">
           <div class="detail-image">
-            <img src="${product.images?.[0]?.src || product.sourceImage?.url}" alt="${product.title}" />
+            <img src="${(product.images && product.images.length > 0) ? product.images[0].src : (product.sourceImage?.url || '')}" alt="${product.title}" />
           </div>
           <div class="detail-info">
             <p>${product.description || ''}</p>
@@ -1452,7 +1452,10 @@ class MerchandiseStore {
       html += completeProducts.map(product => {
       const productId = product.id || product.productId;
       const productTitle = product.title || 'Untitled Product';
-      const productImage = product.images?.[0]?.src || product.sourceImage?.url || '';
+      // FIX: Ensure each product uses its own unique image
+      const productImage = (product.images && product.images.length > 0) 
+        ? product.images[0].src 
+        : (product.sourceImage?.url || '');
       const productType = this.extractProductTypeFromProduct(product);
       const productIcon = this.getProductIcon(productType);
       const productDetails = this.getProductDetails(product);
@@ -1716,7 +1719,7 @@ class MerchandiseStore {
             
             return `
               <div class="cart-item">
-                <img src="${item.product.images?.[0]?.src || item.product.sourceImage?.url || ''}" alt="${item.product.title || 'Product'}" 
+                <img src="${(item.product.images && item.product.images.length > 0) ? item.product.images[0].src : (item.product.sourceImage?.url || '')}" alt="${item.product.title || 'Product'}" 
                      onerror="this.src='/images/placeholder.jpg'" />
                 <div class="item-details">
                   <h4>${item.product.title || 'Untitled Product'}</h4>
@@ -2604,7 +2607,10 @@ class MerchandiseStore {
   showProductPreviewModal(product) {
     const hasVariants = product.variants && product.variants.length > 0;
     const hasImages = product.images && product.images.length > 0;
-    const previewImage = hasImages ? product.images[0].src : product.sourceImage?.url;
+    // FIX: Ensure preview uses the correct product's image
+    const previewImage = (hasImages && product.images.length > 0) 
+      ? product.images[0].src 
+      : (product.sourceImage?.url || '');
     
     // Helper function to get variant-specific image
     const getVariantImage = (variant, variantIndex) => {
