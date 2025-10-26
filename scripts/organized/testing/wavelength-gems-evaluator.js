@@ -89,29 +89,33 @@ async function executeWavelengthGemsTests() {
             
             // Execute Mobile Tests
             if (typeof WavelengthGemsMobileTests !== 'undefined') {
+                const mobileTests = new WavelengthGemsMobileTests();
                 const mobileResult = await safeExecuteTest('Mobile Tests', 
-                    () => WavelengthGemsMobileTests.runAllTests());
+                    () => mobileTests.runAllMobileTests());
                 results.testSuites.mobile = mobileResult;
             }
             
             // Execute Desktop Tests  
             if (typeof WavelengthGemsDesktopTests !== 'undefined') {
+                const desktopTests = new WavelengthGemsDesktopTests();
                 const desktopResult = await safeExecuteTest('Desktop Tests',
-                    () => WavelengthGemsDesktopTests.runAllTests());
+                    () => desktopTests.runAllDesktopTests());
                 results.testSuites.desktop = desktopResult;
             }
             
             // Execute Game Mechanics Tests
             if (typeof WavelengthGemsGameMechanicsTests !== 'undefined') {
+                const mechanicsTests = new WavelengthGemsGameMechanicsTests();
                 const mechanicsResult = await safeExecuteTest('Game Mechanics Tests',
-                    () => WavelengthGemsGameMechanicsTests.runAllTests());
+                    () => mechanicsTests.runAllMechanicsTests());
                 results.testSuites.mechanics = mechanicsResult;
             }
             
             // Execute UI Polish Tests
             if (typeof WavelengthGemsUIPolishTests !== 'undefined') {
+                const uiTests = new WavelengthGemsUIPolishTests();
                 const uiResult = await safeExecuteTest('UI Polish Tests',
-                    () => WavelengthGemsUIPolishTests.runAllTests());
+                    () => uiTests.runAllPolishTests());
                 results.testSuites.ui = uiResult;
             }
             
