@@ -1799,7 +1799,7 @@ class MerchandiseStore {
     this.render();
     
     // Initialize the product navigator after rendering with error handling
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
         console.log('🚀 Initializing product navigator...');
         await this.initializeProductNavigator();
