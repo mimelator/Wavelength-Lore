@@ -124,7 +124,7 @@ class MerchandiseStore {
         this.render();
         
         // Initialize product navigator for pre-selected image
-        setTimeout(() => {
+        setTimeout(async () => {
           try {
             console.log('🚀 Initializing product navigator for pre-selected image...');
             

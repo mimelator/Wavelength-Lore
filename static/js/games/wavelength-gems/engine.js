@@ -100,7 +100,9 @@ let canvasManager = {
         if (!this.canvas) return;
 
         const width = window.innerWidth;
-        const height = window.innerHeight;
+        // Use a more appropriate height for mobile - don't take full window height
+        const isMobile = width <= 768;
+        const height = isMobile ? Math.min(window.innerHeight, 700) : window.innerHeight;
 
         // Account for DPI for sharp rendering
         this.canvas.width = width * this.dpi;
@@ -141,7 +143,8 @@ let canvasManager = {
 
         // Center the board horizontally
         const boardX = (viewport - boardWidth) / 2;
-        const boardY = 60; // Reduced from 100 for more vertical space
+        // Mobile-friendly Y positioning
+        const boardY = isMobile ? 20 : 60;
 
         this.boardX = boardX;
         this.boardY = boardY;
