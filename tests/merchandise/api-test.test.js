@@ -10,7 +10,7 @@ describe('Product Catalog API Test', () => {
 
     it('should return product catalog data', async () => {
         const response = await request(app)
-            .get('/api/product-catalog')
+            .get('/api/merchandise/product-types')
             .expect(200);
 
         console.log('📦 API Response:', JSON.stringify(response.body, null, 2));
@@ -23,7 +23,7 @@ describe('Product Catalog API Test', () => {
 
     it('should have proper category structure', async () => {
         const response = await request(app)
-            .get('/api/product-catalog')
+            .get('/api/merchandise/product-types')
             .expect(200);
 
         const categories = response.body.categories;

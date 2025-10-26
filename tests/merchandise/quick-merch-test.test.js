@@ -107,7 +107,7 @@ async function quickMerchTest() {
     console.log('\n🌐 Testing API endpoints...');
     const apiTest = await page.evaluate(async () => {
       try {
-        const response = await fetch('/api/product-catalog');
+        const response = await fetch('/api/merchandise/product-types');
         const data = await response.json();
         return {
           success: true,

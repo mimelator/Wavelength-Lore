@@ -75,7 +75,7 @@ async function testNavigatorDebug() {
             console.log('\n🌐 Testing product catalog API...');
             const apiResponse = await page.evaluate(async () => {
                 try {
-                    const response = await fetch('/api/product-catalog');
+                    const response = await fetch('/api/merchandise/product-types');
                     const data = await response.json();
                     return {
                         success: response.ok,

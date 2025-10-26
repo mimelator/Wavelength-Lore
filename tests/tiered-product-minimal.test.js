@@ -18,11 +18,11 @@ describe('Tiered Product System - Minimal Tests', () => {
     const catalogData = require('../config/product-catalog-categorized.json');
 
     // Mount product catalog routes
-    app.get('/api/product-catalog', (req, res) => {
+    app.get('/api/merchandise/product-types', (req, res) => {
       res.json(catalogData);
     });
 
-    app.get('/api/product-catalog/search', (req, res) => {
+    app.get('/api/merchandise/product-types/search', (req, res) => {
       const query = req.query.q || '';
       const searchIndex = catalogData.searchIndex || [];
       
@@ -55,7 +55,7 @@ describe('Tiered Product System - Minimal Tests', () => {
   describe('Product Catalog API', () => {
     test('should return categorized products', async () => {
       const response = await request(app)
-        .get('/api/product-catalog')
+        .get('/api/merchandise/product-types')
         .expect(200);
 
       expect(response.body).toHaveProperty('categories');
@@ -65,7 +65,7 @@ describe('Tiered Product System - Minimal Tests', () => {
     });
 
     test('should have valid category structure', async () => {
-      const response = await request(app).get('/api/product-catalog');
+      const response = await request(app).get('/api/merchandise/product-types');
       const { categories } = response.body;
 
       Object.entries(categories).forEach(([categoryId, category]) => {
@@ -80,7 +80,7 @@ describe('Tiered Product System - Minimal Tests', () => {
   describe('Search API', () => {
     test('should handle search queries', async () => {
       const response = await request(app)
-        .get('/api/product-catalog/search?q=tee')
+        .get('/api/merchandise/product-types/search?q=tee')
         .expect(200);
 
       expect(response.body).toHaveProperty('results');
@@ -91,7 +91,7 @@ describe('Tiered Product System - Minimal Tests', () => {
 
     test('should return empty results for non-matching queries', async () => {
       const response = await request(app)
-        .get('/api/product-catalog/search?q=nonexistentproduct')
+        .get('/api/merchandise/product-types/search?q=nonexistentproduct')
         .expect(200);
 
       expect(response.body.results).toEqual([]);
@@ -100,7 +100,7 @@ describe('Tiered Product System - Minimal Tests', () => {
 
     test('should handle empty search queries', async () => {
       const response = await request(app)
-        .get('/api/product-catalog/search?q=')
+        .get('/api/merchandise/product-types/search?q=')
         .expect(200);
 
       expect(response.body.query).toBe('');
@@ -122,7 +122,7 @@ describe('Tiered Product System - Minimal Tests', () => {
   describe('Performance Tests', () => {
     test('catalog API should respond quickly', async () => {
       const start = Date.now();
-      await request(app).get('/api/product-catalog').expect(200);
+      await request(app).get('/api/merchandise/product-types').expect(200);
       const duration = Date.now() - start;
       
       expect(duration).toBeLessThan(1000);
@@ -130,7 +130,7 @@ describe('Tiered Product System - Minimal Tests', () => {
 
     test('search API should respond quickly', async () => {
       const start = Date.now();
-      await request(app).get('/api/product-catalog/search?q=test').expect(200);
+      await request(app).get('/api/merchandise/product-types/search?q=test').expect(200);
       const duration = Date.now() - start;
       
       expect(duration).toBeLessThan(500);

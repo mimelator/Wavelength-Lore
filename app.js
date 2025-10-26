@@ -44,7 +44,7 @@ const borderPreviewApiRoutes = require('./routes/api-border-preview');
 const productImageApiRoutes = require('./routes/api-product-image');
 const chatbotRoutes = require('./routes/chatbot');
 const authRoutes = require('./routes/auth');
-const apiProductCatalogRoutes = require('./routes/api-product-catalog');
+
 const diagnosticRoutes = require('./routes/diagnostic');
 const deploymentApiRoutes = require('./routes/deploymentApi');
 
@@ -157,8 +157,7 @@ async function createApp() {
   // Mount product image resolution API routes
   app.use('/api/product-image', productImageApiRoutes);
 
-  // Mount product catalog API routes (public access)
-  app.use('/api', apiProductCatalogRoutes);
+
 
   // Mount admin vendor research routes (admin only)
   app.use('/admin', adminVendorResearchRoutes);

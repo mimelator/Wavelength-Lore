@@ -14,9 +14,9 @@ describe('Tiered Product System API Tests', () => {
   });
 
   describe('Product Catalog API', () => {
-    test('GET /api/product-catalog should return categorized products', async () => {
+    test('GET /api/merchandise/product-types should return categorized products', async () => {
       const response = await request(app)
-        .get('/api/product-catalog')
+        .get('/api/merchandise/product-types')
         .expect(200);
 
       expect(response.body).toHaveProperty('categories');
@@ -31,13 +31,13 @@ describe('Tiered Product System API Tests', () => {
       expect(Array.isArray(category.subcategories)).toBe(true);
     });
 
-    test('GET /api/product-catalog/:categoryId should return category products', async () => {
+    test('GET /api/merchandise/product-types/:categoryId should return category products', async () => {
       // First get categories
-      const catalogResponse = await request(app).get('/api/product-catalog');
+      const catalogResponse = await request(app).get('/api/merchandise/product-types');
       const categoryId = catalogResponse.body.categories[0].id;
 
       const response = await request(app)
-        .get(`/api/product-catalog/${categoryId}`)
+        .get(`/api/merchandise/product-types/${categoryId}`)
         .expect(200);
 
       expect(response.body).toHaveProperty('category');
@@ -45,9 +45,9 @@ describe('Tiered Product System API Tests', () => {
       expect(response.body.category.id).toBe(categoryId);
     });
 
-    test('GET /api/product-catalog/search should handle search queries', async () => {
+    test('GET /api/merchandise/product-types/search should handle search queries', async () => {
       const response = await request(app)
-        .get('/api/product-catalog/search?q=shirt')
+        .get('/api/merchandise/product-types/search?q=shirt')
         .expect(200);
 
       expect(response.body).toHaveProperty('results');
@@ -55,17 +55,17 @@ describe('Tiered Product System API Tests', () => {
       expect(response.body).toHaveProperty('query', 'shirt');
     });
 
-    test('GET /api/product-catalog/search should handle empty queries', async () => {
+    test('GET /api/merchandise/product-types/search should handle empty queries', async () => {
       const response = await request(app)
-        .get('/api/product-catalog/search?q=')
+        .get('/api/merchandise/product-types/search?q=')
         .expect(200);
 
       expect(response.body.results).toEqual([]);
     });
 
-    test('GET /api/product-catalog/invalid-category should return 404', async () => {
+    test('GET /api/merchandise/product-types/invalid-category should return 404', async () => {
       await request(app)
-        .get('/api/product-catalog/invalid-category-id')
+        .get('/api/merchandise/product-types/invalid-category-id')
         .expect(404);
     });
   });
@@ -84,7 +84,7 @@ describe('Tiered Product System API Tests', () => {
   describe('API Performance', () => {
     test('Product catalog API should respond within 2 seconds', async () => {
       const start = Date.now();
-      await request(app).get('/api/product-catalog').expect(200);
+      await request(app).get('/api/merchandise/product-types').expect(200);
       const duration = Date.now() - start;
       
       expect(duration).toBeLessThan(2000);
@@ -92,7 +92,7 @@ describe('Tiered Product System API Tests', () => {
 
     test('Search API should respond within 1 second', async () => {
       const start = Date.now();
-      await request(app).get('/api/product-catalog/search?q=test').expect(200);
+      await request(app).get('/api/merchandise/product-types/search?q=test').expect(200);
       const duration = Date.now() - start;
       
       expect(duration).toBeLessThan(1000);
@@ -101,7 +101,7 @@ describe('Tiered Product System API Tests', () => {
 
   describe('Data Validation', () => {
     test('Product catalog should have valid structure', async () => {
-      const response = await request(app).get('/api/product-catalog');
+      const response = await request(app).get('/api/merchandise/product-types');
       const { categories } = response.body;
 
       categories.forEach(category => {

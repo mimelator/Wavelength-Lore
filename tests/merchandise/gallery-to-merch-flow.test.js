@@ -190,7 +190,7 @@ async function testGalleryToMerchFlow() {
       const results = {};
       
       try {
-        const catalogResponse = await fetch('/api/product-catalog');
+        const catalogResponse = await fetch('/api/merchandise/product-types');
         results.catalog = {
           status: catalogResponse.status,
           ok: catalogResponse.ok,
