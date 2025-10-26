@@ -62,6 +62,14 @@
         // Wait for Firebase to be available
         if (window.firebaseAuth && window.firebaseUtils) {
           console.log('🔥 Firebase available, checking auth state...');
+          
+          // Prevent duplicate auth listeners
+          if (window.wavelengthAuthListenerActive) {
+            console.log('⚠️ Auth listener already active, skipping duplicate');
+            return;
+          }
+          window.wavelengthAuthListenerActive = true;
+          
           window.firebaseUtils.onAuthStateChanged(window.firebaseAuth, async (user) => {
             if (user) {
               try {

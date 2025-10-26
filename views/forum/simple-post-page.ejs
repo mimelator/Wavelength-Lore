@@ -14,7 +14,7 @@
             border-radius: 1rem;
             border: 1px solid rgba(74, 71, 163, 0.3);
         }
-        .post-header {
+        .post-meta-header {
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -104,7 +104,7 @@
         
         <% if (typeof post !== 'undefined' && post) { %>
             <article class="forum-post">
-                <header class="post-header">
+                <div class="post-meta-header">
                     <img src="<%= post.authorAvatar || '/icons/hero-icon.svg' %>" 
                          alt="<%= post.authorName || 'Author' %>" 
                          class="post-avatar"
@@ -117,7 +117,7 @@
                             <%= post.views || 0 %> views
                         </div>
                     </div>
-                </header>
+                </div>
                 
                 <div class="post-content"><%- post.content ? post.content.replace(/\n/g, '<br>') : 'No content available' %></div>
                 
@@ -152,9 +152,23 @@
             
         <% } else { %>
             <div class="error-message">
-                <h2>Post Not Found</h2>
-                <p>The requested post could not be found or may have been removed.</p>
+                <h2><%= typeof error !== 'undefined' && error ? 'Error' : 'Post Not Found' %></h2>
+                <p>
+                    <% if (typeof error !== 'undefined' && error) { %>
+                        <%= error %>
+                    <% } else { %>
+                        The requested post could not be found or may have been removed.
+                    <% } %>
+                </p>
                 <a href="/forum" class="back-link">Return to Forum</a>
+                
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,0,0,0.1); border-radius: 0.5rem; font-family: monospace; font-size: 0.9rem; color: #666;">
+                        <strong>Debug Info:</strong><br>
+                        Error: <%= error %><br>
+                        Timestamp: <%= new Date().toISOString() %>
+                    </div>
+                <% } %>
             </div>
         <% } %>
     </main>

@@ -80,7 +80,6 @@
 </head>
 <body>
     <%- include('../partials/header') %>
-    <%- include('../partials/header') %>
     
     <div class="forum-container">
         <!-- Forum Header -->
@@ -228,12 +227,22 @@
         
         // Initialize post page
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 POST PAGE INITIALIZATION');
+            console.log('   📋 Post ID:', postId);
+            console.log('   📋 Post ID type:', typeof postId);
+            console.log('   📋 Post ID length:', postId ? postId.length : 'null');
+            console.log('   📋 Firebase Auth available:', !!window.firebaseAuth);
+            console.log('   📋 Firebase DB available:', !!window.firebaseDB);
+            console.log('   📋 Firebase Utils available:', !!window.firebaseUtils);
+            
             if (postId && postId !== 'undefined') {
+                console.log('✅ Valid post ID detected, starting data loading...');
                 loadPost();
                 loadReplies();
                 setupAuthListener();
                 setupTypingIndicatorListener();
             } else {
+                console.log('❌ Invalid post ID, showing not found');
                 showNotFound();
             }
         });
@@ -305,34 +314,76 @@
         }
         
         async function loadPost() {
+            console.log('📝 LOADING POST DATA');
+            console.log('   🔍 Target post ID:', postId);
+            console.log('   🔍 Firebase path:', `forum/posts/${postId}`);
+            
             try {
+                console.log('   🔥 Creating Firebase reference...');
                 const postRef = window.firebaseUtils.ref(window.firebaseDB, `forum/posts/${postId}`);
+                console.log('   ✅ Firebase reference created successfully');
                 
+                console.log('   🔊 Setting up real-time listener...');
                 // Set up real-time listener for live updates
                 window.firebaseUtils.onValue(postRef, (snapshot) => {
+                    console.log('📡 FIREBASE DATA RECEIVED');
+                    console.log('   📋 Snapshot exists:', snapshot.exists());
+                    
                     const post = snapshot.val();
+                    console.log('   📋 Raw post data:', post);
+                    console.log('   📋 Post data type:', typeof post);
+                    
                     if (post) {
+                        console.log('   ✅ Post data found!');
+                        console.log('   📝 Post title:', post.title);
+                        console.log('   📝 Post content length:', post.content ? post.content.length : 0);
+                        console.log('   👤 Post author:', post.authorName);
+                        console.log('   📅 Post created:', post.createdAt);
+                        console.log('   👁️ Post views:', post.views || 0);
+                        
                         currentPost = { id: postId, ...post };
+                        console.log('   📋 Current post object:', currentPost);
+                        
+                        console.log('   🎨 Calling displayPost...');
                         displayPost(currentPost);
+                        
+                        console.log('   🧭 Updating breadcrumbs...');
                         updateBreadcrumbs(currentPost);
                         
-                        // Update like button state in real-time
+                        console.log('   ❤️ Updating like button state...');
                         updateLikeButtonState(currentPost);
                         
-                        // Update reply button visibility when post loads
+                        console.log('   💬 Updating reply button visibility...');
                         updateReplyButtonVisibility();
                         
                         // Only increment view count once per session
                         if (!window.postViewIncremented) {
+                            console.log('   🔢 Incrementing view count...');
                             incrementViewCount();
                             window.postViewIncremented = true;
+                        } else {
+                            console.log('   🚫 View count already incremented this session');
                         }
+                        
+                        console.log('✅ POST LOADING COMPLETE');
                     } else {
+                        console.log('   ❌ No post data found');
+                        console.log('   🚫 Showing not found page...');
                         showNotFound();
                     }
+                }, (error) => {
+                    console.error('💥 FIREBASE LISTENER ERROR:', error);
+                    console.error('   📝 Error message:', error.message);
+                    console.error('   📝 Error code:', error.code);
+                    showNotFound();
                 });
+                
+                console.log('   ✅ Real-time listener setup complete');
+                
             } catch (error) {
-                console.error('Error loading post:', error);
+                console.error('💥 ERROR LOADING POST:', error);
+                console.error('   📝 Error message:', error.message);
+                console.error('   📝 Error stack:', error.stack);
                 showNotFound();
             }
         }
@@ -350,29 +401,64 @@
         }
         
         async function loadReplies() {
+            console.log('💬 LOADING REPLIES');
+            console.log('   🔍 Target post ID for replies:', postId);
+            
             try {
+                console.log('   🔥 Creating replies Firebase reference...');
                 const repliesRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/replies');
                 const repliesQuery = window.firebaseUtils.query(repliesRef, 
                     window.firebaseUtils.orderByChild('postId'));
+                console.log('   ✅ Replies query created');
                 
                 // Set up real-time listener for live reply updates
+                console.log('   🔊 Setting up replies listener...');
                 window.firebaseUtils.onValue(repliesQuery, (snapshot) => {
+                    console.log('📡 REPLIES DATA RECEIVED');
+                    console.log('   📋 Replies snapshot exists:', snapshot.exists());
+                    
                     const allReplies = snapshot.val();
+                    console.log('   📋 All replies data:', allReplies);
+                    console.log('   📋 All replies count:', allReplies ? Object.keys(allReplies).length : 0);
+                    
                     if (allReplies) {
+                        console.log('   🔍 Filtering replies for post:', postId);
                         replies = Object.entries(allReplies)
                             .map(([id, reply]) => ({ id, ...reply }))
-                            .filter(reply => reply.postId === postId)
+                            .filter(reply => {
+                                const matches = reply.postId === postId;
+                                if (!matches) {
+                                    console.log('     🚫 Reply', id, 'postId:', reply.postId, '!== target:', postId);
+                                }
+                                return matches;
+                            })
                             .sort((a, b) => a.createdAt - b.createdAt);
+                        
+                        console.log('   ✅ Filtered replies for this post:', replies.length);
+                        replies.forEach((reply, index) => {
+                            console.log(`     ${index + 1}. Reply by ${reply.authorName}: ${reply.content.substring(0, 50)}...`);
+                        });
                     } else {
+                        console.log('   🚫 No replies data found');
                         replies = [];
                     }
+                    
+                    console.log('   🎨 Calling displayReplies with', replies.length, 'replies');
                     displayReplies(replies);
                     
-                    // Update reply count in real-time
+                    console.log('   🔢 Updating reply count to:', replies.length);
                     updateReplyCount(replies.length);
+                    
+                    console.log('✅ REPLIES LOADING COMPLETE');
+                }, (error) => {
+                    console.error('💥 REPLIES LISTENER ERROR:', error);
+                    console.error('   📝 Error message:', error.message);
                 });
+                
             } catch (error) {
-                console.error('Error loading replies:', error);
+                console.error('💥 ERROR LOADING REPLIES:', error);
+                console.error('   📝 Error message:', error.message);
+                console.error('   📝 Error stack:', error.stack);
             }
         }
         
@@ -390,13 +476,28 @@
         }
         
         function displayPost(post) {
+            console.log('🎨 DISPLAYING POST');
+            console.log('   📋 Post object:', post);
+            console.log('   📋 Post keys:', Object.keys(post));
+            
             const container = document.getElementById('post-container');
+            console.log('   📎 Container element:', container);
+            console.log('   📎 Container exists:', !!container);
+            
+            if (!container) {
+                console.error('   ❌ POST CONTAINER NOT FOUND!');
+                return;
+            }
+            
             const categoryNames = {
                 'general': '🎵 General Discussion',
                 'lore': '📜 Lore & Theories',
                 'episodes': '🎬 Episode Discussions',
                 'fanart': '🎨 Fan Creations'
             };
+            
+            console.log('   📝 Post category:', post.forumId);
+            console.log('   📝 Category display name:', categoryNames[post.forumId] || post.forumId);
             
             const typeEmojis = {
                 'discussion': '💬',
@@ -507,8 +608,20 @@
                 </article>
             `;
             
+            console.log('   📝 Generated HTML length:', container.innerHTML.length);
+            console.log('   📝 HTML preview:', container.innerHTML.substring(0, 200) + '...');
+            
             // Show reply section
-            document.getElementById('reply-section').style.display = 'block';
+            const replySection = document.getElementById('reply-section');
+            console.log('   💬 Reply section element:', replySection);
+            if (replySection) {
+                replySection.style.display = 'block';
+                console.log('   ✅ Reply section made visible');
+            } else {
+                console.error('   ❌ Reply section not found!');
+            }
+            
+            console.log('✅ POST DISPLAY COMPLETE');
         }
         
         function displayReplies(replies) {

@@ -72,29 +72,40 @@ router.get('/post/:postId', async (req, res) => {
         
         if (!db) {
             console.log('❌ Firebase not initialized');
-            return res.render('forum/simple-post-page', {
+            return res.status(500).render('forum/simple-post-page', {
                 post: null,
                 replies: [],
-                title: 'Post Not Found'
+                title: 'Database Error',
+                cdnUrl: process.env.CDN_URL || '',
+                version: `v${Date.now()}`,
+                error: 'Database connection failed'
             });
         }
         
         // Fetch post data
         console.log('🔍 Fetching post data from Firebase...');
         const postSnapshot = await db.ref(`forum/posts/${postId}`).once('value');
-        const post = postSnapshot.val();
+        const postData = postSnapshot.val();
+        
+        // Add ID field to match API route structure
+        const post = postData ? { id: postId, ...postData } : null;
         
         console.log('📊 Post data retrieved:', post ? 'Found' : 'Not found');
         if (post) {
             console.log('📝 Post title:', post.title);
+            console.log('📄 Post content length:', post.content ? post.content.length : 0);
+            console.log('👤 Post author:', post.authorName);
         }
         
         if (!post) {
             console.log('❌ Post not found in database');
-            return res.render('forum/simple-post-page', {
+            return res.status(404).render('forum/simple-post-page', {
                 post: null,
                 replies: [],
-                title: 'Post Not Found'
+                title: 'Post Not Found',
+                cdnUrl: process.env.CDN_URL || '',
+                version: `v${Date.now()}`,
+                error: `Post ${postId} not found`
             });
         }
         
@@ -108,23 +119,40 @@ router.get('/post/:postId', async (req, res) => {
         
         console.log('💬 Found replies:', postReplies.length);
         
-        // Increment view count
-        await db.ref(`forum/posts/${postId}/views`).set((post.views || 0) + 1);
+        // Increment view count (non-blocking)
+        db.ref(`forum/posts/${postId}/views`).set((post.views || 0) + 1).catch(err => {
+            console.log('⚠️ View count update failed (non-critical):', err.message);
+        });
         
         console.log('✅ Rendering post page with data');
         console.log('📄 Post object keys:', Object.keys(post));
-        res.render('forum/simple-post-page', {
+        console.log('🎯 About to render with post title:', post.title);
+        console.log('📝 Post content preview:', post.content ? post.content.substring(0, 50) : 'NO CONTENT');
+        
+        // Pass raw post data to template - no masking fallbacks
+        const templateData = {
             post: post,
             replies: postReplies,
-            title: post.title
-        });
+            title: post.title || 'Forum Post',
+            cdnUrl: process.env.CDN_URL || '',
+            version: `v${Date.now()}`
+        };
+        
+        console.log('📋 Template data keys:', Object.keys(templateData));
+        console.log('🔍 Raw post title:', post.title);
+        console.log('🔍 Raw post content length:', post.content ? post.content.length : 'UNDEFINED');
+        res.render('forum/simple-post-page', templateData);
         
     } catch (error) {
         console.error('💥 Error loading post:', error);
-        res.render('forum/simple-post-page', {
+        console.error('💥 Error stack:', error.stack);
+        res.status(500).render('forum/simple-post-page', {
             post: null,
             replies: [],
-            title: 'Error Loading Post'
+            title: 'Error Loading Post',
+            cdnUrl: process.env.CDN_URL || '',
+            version: `v${Date.now()}`,
+            error: error.message
         });
     }
 });

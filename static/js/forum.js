@@ -138,8 +138,9 @@ function initializeForumAuth() {
                 window.sessionManager.updateActivity();
             }
             
-            // Now handle the user sign-in
+            // Handle the user sign-in and update UI after state is set
             handleUserSignIn(user);
+            // UI update is now handled inside handleUserSignIn after state is properly set
         } else {
             // Only clear session if this wasn't caused by our own session cleanup
             if (window.forumState.isAuthenticated) {
@@ -149,8 +150,9 @@ function initializeForumAuth() {
                 }
             }
             handleUserSignOut();
+            // Update UI immediately for sign-out
+            updateAuthUI();
         }
-        updateAuthUI();
     });
 }
 
@@ -208,11 +210,9 @@ function handleUserSignIn(user) {
     // Start activity tracking
     setupActivityTracking();
     
-    // Force UI update after a brief delay to ensure DOM is ready
-    setTimeout(() => {
-        console.log('🔄 Forcing auth UI update...');
-        updateAuthUI();
-    }, 100);
+    // Update UI immediately now that state is properly set
+    console.log('🔄 Updating auth UI with user state...');
+    updateAuthUI();
 }
 
 /**
@@ -238,36 +238,59 @@ function updateAuthUI() {
         return;
     }
 
+    // ENHANCED DIAGNOSTICS
+    console.log('🔍 Container element type:', authContainer.tagName);
+    console.log('🔍 Container current innerHTML length:', authContainer.innerHTML.length);
+    console.log('🔍 Container current innerHTML preview:', authContainer.innerHTML.substring(0, 100));
+    console.log('🔍 Container parent element:', authContainer.parentElement?.tagName);
+    console.log('🔍 Container classes:', authContainer.className);
+
     if (window.forumState.isAuthenticated && window.forumState.currentUser) {
         // Always use fallback avatar to avoid Google rate limits
         let avatarUrl = '/icons/hero-icon.svg';
         
         console.log('🖼️ Using fallback avatar in updateAuthUI:', avatarUrl);
         
-        const userHTML = `
-            <div class="user-info">
-                <img src="${avatarUrl}" 
-                     alt="${window.forumState.currentUser.name}" 
-                     class="user-avatar"
-                     crossorigin="anonymous"
-                     referrerpolicy="no-referrer-when-downgrade"
-                     onerror="this.src='/icons/hero-icon.svg'; console.log('🖼️ Avatar failed to load, using fallback:', this.src);"
-                     onload="console.log('🖼️ Avatar loaded successfully:', this.src);">
-                <span class="user-name">${window.forumState.currentUser.name}</span>
-                <button class="auth-btn" onclick="signOutUser()">Sign Out</button>
-            </div>
-        `;
+        const userHTML = `<div class="user-info"><img src="${avatarUrl}" alt="${window.forumState.currentUser.name}" class="user-avatar"><span class="user-name">${window.forumState.currentUser.name}</span><button class="auth-btn" onclick="signOutUser()">Sign Out</button></div>`;
         
         console.log('🔄 Setting auth container HTML to:', userHTML);
+        console.log('🔍 HTML length:', userHTML.length);
+        console.log('🔍 HTML contains quotes:', userHTML.includes('"'));
+        
+        // Try setting innerHTML
         authContainer.innerHTML = userHTML;
+        
+        // VERIFY WHAT ACTUALLY GOT SET
+        console.log('✅ After setting - innerHTML length:', authContainer.innerHTML.length);
+        console.log('✅ After setting - innerHTML preview:', authContainer.innerHTML.substring(0, 100));
+        console.log('✅ After setting - contains encoded chars:', authContainer.innerHTML.includes('&lt;'));
+        console.log('✅ After setting - user-info div found:', !!authContainer.querySelector('.user-info'));
+        
+        // FINAL VERIFICATION - Check if UI is actually visible
+        const userInfoDiv = authContainer.querySelector('.user-info');
+        const userNameSpan = authContainer.querySelector('.user-name');
+        const signOutBtn = authContainer.querySelector('.auth-btn');
+        
+        console.log('🎯 FINAL DOM CHECK:');
+        console.log('   📋 user-info div exists:', !!userInfoDiv);
+        console.log('   📋 user-name span exists:', !!userNameSpan);
+        console.log('   📋 sign-out button exists:', !!signOutBtn);
+        console.log('   📋 user name text:', userNameSpan?.textContent);
+        console.log('   📋 button text:', signOutBtn?.textContent);
+        console.log('   📋 container is visible:', authContainer.offsetHeight > 0);
+        
+        if (userInfoDiv && userNameSpan && signOutBtn) {
+            console.log('🎉 SUCCESS: Auth UI is fully rendered and functional!');
+        } else {
+            console.log('❌ PROBLEM: Some auth UI elements are missing');
+        }
         
     } else {
         console.log('🔄 User not authenticated, showing sign-in button');
-        authContainer.innerHTML = `
-            <button class="auth-btn" onclick="signInWithGoogle()">
-                🔐 Sign In with Google
-            </button>
-        `;
+        const signInHTML = `<button class="auth-btn" onclick="signInWithGoogle()">🔐 Sign In with Google</button>`;
+        console.log('🔄 Setting sign-in HTML:', signInHTML);
+        authContainer.innerHTML = signInHTML;
+        console.log('✅ After setting sign-in - innerHTML:', authContainer.innerHTML);
     }
 }
 
@@ -394,13 +417,24 @@ async function updateUserProfile(user) {
         window.firebaseUtils.onValue(userRef, (snapshot) => {
             const existingData = snapshot.val();
             if (existingData) {
-                userData.joinedAt = existingData.joinedAt;
+                // Only preserve existing values if they're valid
+                if (existingData.joinedAt && typeof existingData.joinedAt === 'number') {
+                    userData.joinedAt = existingData.joinedAt;
+                }
                 userData.postCount = existingData.postCount || 0;
                 userData.replyCount = existingData.replyCount || 0;
             }
+            
+            // Ensure all values are defined before updating
+            const cleanUserData = {};
+            Object.keys(userData).forEach(key => {
+                if (userData[key] !== undefined && userData[key] !== null) {
+                    cleanUserData[key] = userData[key];
+                }
+            });
 
             // Use update() instead of set() to preserve any fields we're not explicitly setting
-            window.firebaseUtils.update(userRef, userData);
+            window.firebaseUtils.update(userRef, cleanUserData);
         }, { onlyOnce: true });
         
     } catch (error) {
