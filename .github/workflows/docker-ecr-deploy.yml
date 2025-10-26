@@ -100,6 +100,76 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Validate App Runner Service Health
+        id: validate-apprunner
+        env:
+          APPRUNNER_SERVICE_ARN: ${{ secrets.APPRUNNER_SERVICE_ARN }}
+        run: |
+          echo "🔍 WAVELENGTH: Validating App Runner service health before build..."
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # Get current service status
+          SERVICE_STATUS=$(aws apprunner describe-service \
+            --service-arn "$APPRUNNER_SERVICE_ARN" \
+            --query 'Service.Status' \
+            --output text)
+          
+          SERVICE_URL=$(aws apprunner describe-service \
+            --service-arn "$APPRUNNER_SERVICE_ARN" \
+            --query 'Service.ServiceUrl' \
+            --output text)
+          
+          CURRENT_IMAGE=$(aws apprunner describe-service \
+            --service-arn "$APPRUNNER_SERVICE_ARN" \
+            --query 'Service.SourceConfiguration.ImageRepository.ImageIdentifier' \
+            --output text)
+          
+          echo "📊 SERVICE STATUS: $SERVICE_STATUS"
+          echo "🌐 SERVICE URL: https://$SERVICE_URL"  
+          echo "🐳 CURRENT IMAGE: $CURRENT_IMAGE"
+          
+          # Check if service is in a healthy state for deployment
+          case $SERVICE_STATUS in
+            "RUNNING")
+              echo "✅ Service is running - safe to deploy new image"
+              ;;
+            "CREATE_FAILED"|"DELETE_FAILED")
+              echo "::error::❌ App Runner service is in failed state: $SERVICE_STATUS"
+              echo "::error::Cannot deploy to failed service. Manual intervention required."
+              exit 1
+              ;;
+            "OPERATION_IN_PROGRESS")
+              echo "::warning::⚠️  Service has operation in progress: $SERVICE_STATUS"
+              echo "::warning::Deployment may conflict with ongoing operation"
+              echo "::notice::Continuing with build - GitHub Actions will handle deployment retries"
+              ;;
+            "PAUSED")
+              echo "::warning::⚠️  Service is paused: $SERVICE_STATUS"
+              echo "::notice::Service will resume when new deployment is triggered"
+              ;;
+            *)
+              echo "::warning::⚠️  Unknown service status: $SERVICE_STATUS"
+              echo "::notice::Proceeding with caution"
+              ;;
+          esac
+          
+          # Optional: Test current service health if running
+          if [ "$SERVICE_STATUS" = "RUNNING" ]; then
+            echo "🏥 Testing current service health..."
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://$SERVICE_URL" || echo "000")
+            
+            if [ "$HTTP_STATUS" = "200" ]; then
+              echo "✅ Current service responding with HTTP 200"
+            else
+              echo "::warning::⚠️  Current service responding with HTTP $HTTP_STATUS"
+              echo "::notice::New deployment may resolve health issues"
+            fi
+          fi
+          
+          echo "🎯 Pre-build validation complete - proceeding with image build"
+          echo "service_status=$SERVICE_STATUS" >> $GITHUB_OUTPUT
+          echo "current_image=$CURRENT_IMAGE" >> $GITHUB_OUTPUT
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
@@ -120,7 +190,13 @@ jobs:
           # Use the version determined in previous step (either incremented or existing)
           VERSION_TAG="v$VERSION"
 
-          echo "Building with tags: $VERSION_TAG and $SHORT_SHA"
+          echo "🚀 WAVELENGTH: Starting Docker build process"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📦 NEW IMAGE TAGS: $VERSION_TAG and $SHORT_SHA" 
+          echo "🐳 CURRENT DEPLOYED: ${{ steps.validate-apprunner.outputs.current_image }}"
+          echo "📊 APP RUNNER STATUS: ${{ steps.validate-apprunner.outputs.service_status }}"
+          echo "🎯 DEPLOYMENT STRATEGY: Specific version tags (no :latest dependency)"
+          echo ""
 
           # Build with buildx and push with multiple tags
           # Using specific version tags only - App Runner configured to use specific versions
