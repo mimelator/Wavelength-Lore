@@ -39,7 +39,8 @@ async function executeGameTests() {
         
         // Wait for game to initialize
         console.log('⏳ Waiting for game initialization...');
-        await page.waitForTimeout(3000);
+        await page.waitForFunction(() => document.readyState === 'complete', { timeout: 10000 });
+        await new Promise(resolve => setTimeout(resolve, 3000));
         
         // Check if our test suites are loaded
         const testSuitesAvailable = await page.evaluate(() => {

@@ -42,6 +42,10 @@ This comprehensive documentation organization system transforms **416+ scattered
 │   ├── deployment-guides/            # Current deployment procedures
 │   ├── security-guidelines/          # Active security procedures
 │   └── troubleshooting/             # Active issue resolution guides
+├── 🔐 security/                      # Security documentation and guides
+│   ├── AUTHENTICATION_MIDDLEWARE_GUIDE.md # Auth & middleware documentation
+│   ├── CHATBOT_PUBLIC_REPOSITORY_SECURITY_ANALYSIS.md # Security analysis
+│   └── UNIFIED_MANAGERS_SECURITY_AUDIT.md # Security audit results
 ├── 📦 archived-documentation/        # Historical and deprecated documentation
 │   ├── legacy-procedures/            # Outdated but preserved procedures
 │   ├── historical-decisions/         # Past architectural decisions
