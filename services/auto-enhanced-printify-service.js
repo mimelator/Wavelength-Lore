@@ -32,6 +32,12 @@ class AutoEnhancedPrintifyService extends PrintifyService {
     try {
       console.log('🔄 Auto-enhancement upload for:', fileName);
       
+      // 🚨 CRITICAL VALIDATION: Ensure high-quality image for Printify
+      const qualityCheck = await this.validateImageQualityForPrintify(imageBuffer, fileName);
+      if (!qualityCheck.passedValidation) {
+        throw new Error(`QUALITY VALIDATION FAILED: ${qualityCheck.reason}. Printify requires 300DPI high-quality images, not compressed web images.`);
+      }
+      
       let finalBuffer = imageBuffer;
       let enhancementInfo = { autoEnhanced: false };
       
@@ -54,9 +60,24 @@ class AutoEnhancedPrintifyService extends PrintifyService {
                 }
               }
             };
+            
+            // 🚨 RE-VALIDATE enhanced image quality
+            const enhancedQualityCheck = await this.validateImageQualityForPrintify(finalBuffer, `enhanced-${fileName}`);
+            if (!enhancedQualityCheck.passedValidation) {
+              throw new Error(`ENHANCED IMAGE QUALITY VALIDATION FAILED: ${enhancedQualityCheck.reason}. Enhancement did not produce Printify-quality image.`);
+            }
+            console.log('✅ Enhanced image passed Printify quality validation');
           }
         }
       }
+      
+      // 🚨 FINAL VALIDATION: Double-check image quality before Printify upload
+      const finalQualityCheck = await this.validateImageQualityForPrintify(finalBuffer, fileName);
+      if (!finalQualityCheck.passedValidation) {
+        throw new Error(`FINAL QUALITY VALIDATION FAILED: ${finalQualityCheck.reason}. Cannot upload to Printify without high-quality 300DPI image.`);
+      }
+      
+      console.log('✅ Image passed all quality validations - uploading to Printify');
       
       // Upload to Printify
       const uploadResult = await super.uploadImage(finalBuffer, fileName, title);
@@ -504,10 +525,96 @@ class AutoEnhancedPrintifyService extends PrintifyService {
         ? 'Full AI enhancement available' 
         : hasOpenAI 
           ? 'AI enhancement available for artwork'
-          : hasReplicate
+            : hasReplicate
             ? 'AI enhancement available for photos'
             : 'Basic upscaling only'
     };
+  }
+  
+  /**
+   * 🚨 CRITICAL VALIDATION: Ensure image meets Printify quality requirements
+   * Printify requires high-quality 300DPI images, not compressed web images
+   * @param {Buffer} imageBuffer - Image buffer to validate
+   * @param {string} fileName - Image filename for logging
+   * @returns {Object} Validation result with pass/fail and reason
+   */
+  async validateImageQualityForPrintify(imageBuffer, fileName) {
+    try {
+      const sharp = require('sharp');
+      const metadata = await sharp(imageBuffer).metadata();
+      
+      const width = metadata.width;
+      const height = metadata.height;
+      const format = metadata.format;
+      const density = metadata.density || 72; // Default web DPI
+      
+      console.log(`🔍 PRINTIFY QUALITY CHECK: ${fileName}`);
+      console.log(`   📐 Dimensions: ${width}x${height}`);
+      console.log(`   🎨 Format: ${format}`);
+      console.log(`   📊 Density: ${density} DPI`);
+      
+      // MINIMUM REQUIREMENTS FOR PRINTIFY
+      const MIN_WIDTH = 1800;   // Minimum width for quality printing
+      const MIN_HEIGHT = 1800;  // Minimum height for quality printing  
+      const MIN_DPI = 200;      // Minimum DPI (prefer 300+)
+      const MAX_COMPRESSION_FORMATS = ['webp', 'jpeg']; // Formats that are often too compressed
+      
+      // Check 1: Minimum dimensions
+      if (width < MIN_WIDTH || height < MIN_HEIGHT) {
+        return {
+          passedValidation: false,
+          reason: `Image too small: ${width}x${height}. Printify needs minimum ${MIN_WIDTH}x${MIN_HEIGHT} for quality printing.`,
+          metadata: { width, height, format, density }
+        };
+      }
+      
+      // Check 2: DPI/Quality check  
+      if (density < MIN_DPI) {
+        return {
+          passedValidation: false,
+          reason: `Image DPI too low: ${density}. Printify needs minimum ${MIN_DPI} DPI (prefer 300+) for quality printing.`,
+          metadata: { width, height, format, density }
+        };
+      }
+      
+      // Check 3: Format quality concerns
+      if (format === 'webp') {
+        return {
+          passedValidation: false,
+          reason: `WebP format not suitable for Printify. WebP is highly compressed for web use. Printify needs high-quality uncompressed images.`,
+          metadata: { width, height, format, density }
+        };
+      }
+      
+      // Check 4: File size too small (indicates over-compression)
+      const fileSizeKB = imageBuffer.length / 1024;
+      const pixelCount = width * height;
+      const bytesPerPixel = imageBuffer.length / pixelCount;
+      
+      if (bytesPerPixel < 2) { // Very compressed
+        return {
+          passedValidation: false,
+          reason: `Image appears over-compressed: ${bytesPerPixel.toFixed(2)} bytes/pixel. Printify needs high-quality uncompressed images.`,
+          metadata: { width, height, format, density, fileSizeKB, bytesPerPixel }
+        };
+      }
+      
+      // ✅ PASSED ALL VALIDATIONS
+      console.log('✅ Image meets Printify quality requirements');
+      return {
+        passedValidation: true,
+        reason: 'Image meets all Printify quality requirements',
+        metadata: { width, height, format, density, fileSizeKB, bytesPerPixel }
+      };
+      
+    } catch (error) {
+      console.error('❌ Quality validation error:', error);
+      return {
+        passedValidation: false,
+        reason: `Quality validation failed: ${error.message}`,
+        metadata: {}
+      };
+    }
   }
 }
 

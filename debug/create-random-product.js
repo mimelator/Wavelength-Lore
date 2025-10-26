@@ -173,6 +173,23 @@ class RandomProductGenerator {
       console.log(`🔧 Using blueprint: ${randomProductType.blueprintId} (${randomProductType.name})`);
       console.log(`🏭 Using provider: ${randomProductType.printProviderId}`);
       
+      // 🚨 CRITICAL VALIDATION: Check image quality before Printify upload
+      console.log('\n🚨 Validating image quality for Printify...');
+      const qualityCheck = await this.printifyService.validateImageQualityForPrintify(imageBuffer, `${randomImage.title}.jpg`);
+      
+      if (!qualityCheck.passedValidation) {
+        console.error('❌ QUALITY VALIDATION FAILED:', qualityCheck.reason);
+        console.error('📊 Image metadata:', qualityCheck.metadata);
+        return {
+          success: false,
+          error: `Image quality validation failed: ${qualityCheck.reason}`,
+          qualityCheck,
+          message: 'Cannot create product with low-quality image. Printify requires 300DPI high-quality images.'
+        };
+      }
+      
+      console.log('✅ Image passed quality validation - proceeding with product creation');
+      
       // Create product with Printify using correct parameters
       const productResult = await this.printifyService.createCustomProductWithBlueprintAndAutoEnhancement(
         imageBuffer,
