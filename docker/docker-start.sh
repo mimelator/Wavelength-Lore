@@ -44,7 +44,16 @@ for i in 1 2 3 4 5; do
 done
 
 # Start Nginx with enhanced error handling
-echo "🌐 Starting Nginx reverse proxy..."
+echo "
+# 🌊 WAVELENGTH: Fix nginx permissions
+echo "🔧 Setting up nginx directories..."
+mkdir -p /run/nginx
+mkdir -p /var/lib/nginx/logs
+chown -R appuser:nginx /run/nginx
+chown -R appuser:nginx /var/lib/nginx
+chmod 755 /run/nginx
+chmod 755 /var/lib/nginx/logs
+🌐 Starting Nginx reverse proxy..."
 if nginx -t; then
     echo "✅ Nginx configuration valid"
     sudo nginx -g "daemon off;"
