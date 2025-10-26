@@ -1260,7 +1260,6 @@ class MerchandiseStore {
       // Initialize the ProductNavigator component
       console.log('🚀 Creating ProductNavigator instance...');
       this.productNavigator = new ProductNavigator('product-navigator', {
-        apiEndpoint: '/api/product-catalog',
         onProductSelect: (product) => {
           console.log('✅ Product selected from navigator:', product);
           

@@ -8,11 +8,12 @@
 
 ## 🎯 CURRENT TASK: URGENT - Fix Merchandise Store Only Showing T-Shirts
 
-### **CRITICAL ISSUE IDENTIFIED**
+### **CRITICAL ISSUE IDENTIFIED & PARTIALLY FIXED**
 - ❌ **USER REPORT**: Merchandise store only shows t-shirts, not full product catalog
-- ❌ **ROOT CAUSE**: ProductNavigator using wrong API endpoint (`/api/product-catalog` vs `/api/merchandise/product-types`)
-- ❌ **IMPACT**: Users cannot access 8 product types (hoodies, mugs, pillows, etc.) - only seeing fallback t-shirts
-- 🔧 **SOLUTION**: Fix ProductNavigator API endpoint and ensure proper product type mapping
+- ✅ **ROOT CAUSE FIXED**: ProductNavigator API endpoint updated to use `/api/merchandise/product-types`
+- ✅ **FALLBACK IMPROVED**: Simple categories now show all 8 product types when ProductNavigator fails
+- ❌ **REMAINING ISSUE**: Product navigator not initializing when image selected
+- 🔧 **NEXT STEP**: Fix image selection → product navigator initialization flow
 
 ### **Previous Session Summary**
 - ✅ **PRODUCTNAVIGATOR TESTING**: Created comprehensive browser tests proving restoration works
