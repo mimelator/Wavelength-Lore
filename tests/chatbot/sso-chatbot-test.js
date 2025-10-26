@@ -324,7 +324,8 @@ class SSOChatbotTester {
                 // Look for trigger elements
                 const triggers = [
                   '.vip-chatbot-container',
-                  '#vip-chatbot-dropdown-item',
+                  '#ai-assistant-icon',
+                  '.ai-assistant-icon',
                   '.chat-trigger',
                   '.chatbot-toggle'
                 ];

@@ -377,6 +377,87 @@ router.get('/api/post/:postId', async (req, res) => {
     }
 });
 
+// Get recent posts
+router.get('/api/posts/recent', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const page = parseInt(req.query.page) || 1;
+        
+        // This would fetch from Firebase in a real implementation
+        res.json({
+            success: true,
+            posts: [],
+            pagination: {
+                page: page,
+                limit: limit,
+                total: 0,
+                totalPages: 0
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching recent posts:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch recent posts'
+        });
+    }
+});
+
+// Get popular posts
+router.get('/api/posts/popular', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const page = parseInt(req.query.page) || 1;
+        
+        // This would fetch from Firebase in a real implementation
+        res.json({
+            success: true,
+            posts: [],
+            pagination: {
+                page: page,
+                limit: limit,
+                total: 0,
+                totalPages: 0
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching popular posts:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch popular posts'
+        });
+    }
+});
+
+// Get forum statistics
+router.get('/api/stats', async (req, res) => {
+    try {
+        // This would fetch from Firebase in a real implementation
+        res.json({
+            success: true,
+            stats: {
+                totalPosts: 0,
+                totalUsers: 0,
+                totalReplies: 0,
+                postsToday: 0,
+                activeUsers: 0,
+                categories: {
+                    general: { posts: 0, replies: 0 },
+                    lore: { posts: 0, replies: 0 },
+                    episodes: { posts: 0, replies: 0 },
+                    fanart: { posts: 0, replies: 0 }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching forum stats:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch forum stats'
+        });
+    }
+});
+
 // Search posts
 router.get('/api/search', async (req, res) => {
     try {

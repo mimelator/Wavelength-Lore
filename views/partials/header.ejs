@@ -4,11 +4,11 @@
       <span>☰</span>  <!-- Hamburger icon placeholder -->
     </div>
     <ul class="nav-links">
-      <li><a href="/">Home</a></li>
+      <li><a href="/">🏠 Home</a></li>
 
       <!-- Browse Dropdown -->
       <li class="has-dropdown">
-        <a href="#" onclick="return false;">Browse</a>
+        <a href="#" onclick="return false;">📚 Browse</a>
         <ul class="dropdown">
           <li><a href="/characters">🦸 Hero Gallery</a></li>
           <li><a href="/lore">📖 Lore Gallery</a></li>
@@ -16,16 +16,19 @@
         </ul>
       </li>
       
+      <!-- Games - Now Top Level -->
+      <li id="games-nav-item" class="featured-nav-item" style="display: none;">
+        <a href="/games" class="games-nav-link">🎮 Games</a>
+      </li>
+      
       <!-- Community Dropdown -->
       <li class="has-dropdown">
-        <a href="#" onclick="return false;">Community</a>
+        <a href="#" onclick="return false;">👥 Community</a>
         <ul class="dropdown">
           <li><a href="/forum">💬 Forum</a></li>
           <li id="leaderboard-dropdown-item" style="display: none;"><a href="/leaderboard">🏆 Leaderboard</a></li>
           <li id="profile-dropdown-item" style="display: none;"><a href="/forum/profile">👤 My Profile</a></li>
           <li id="gallery-dropdown-item" style="display: none;"><a href="/my-gallery">🖼️ My Gallery</a></li>
-          <li id="games-dropdown-item" style="display: none;"><a href="/games" style="background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #ffd700; font-weight: bold;">🎮 Games</a></li>
-          <li id="vip-chatbot-dropdown-item" style="display: none;"><a href="/chatbot/widget" style="background: linear-gradient(135deg, #667eea, #764ba2); color: #ffd700; font-weight: bold;">🎵 VIP AI Assistant</a></li>
         </ul>
       </li>
       
@@ -35,6 +38,16 @@
       <li id="content-creator-nav-item" style="display: none;"><a href="/create">✨ Create</a></li>
       <li id="admin-nav-item" style="display: none;"><a href="/forum/admin">⚙️ Admin</a></li>
     </ul>
+    
+    <!-- AI Assistant Floating Icon -->
+    <div id="ai-assistant-icon" class="ai-assistant-icon" style="display: none;" title="VIP AI Assistant">
+      <a href="/chatbot/widget" class="ai-icon-link">
+        <div class="ai-icon-wrapper">
+          <span class="ai-icon">🤖</span>
+          <div class="ai-pulse"></div>
+        </div>
+      </a>
+    </div>
   </nav>
 </header>
 <script>
@@ -109,15 +122,15 @@
                     data.groups.includes('super_admin')
                   );
                   if (hasGameAccess) {
-                    const gamesItem = document.getElementById('games-dropdown-item');
-                    if (gamesItem) {
-                      gamesItem.style.display = 'block';
+                    const gamesNavItem = document.getElementById('games-nav-item');
+                    if (gamesNavItem) {
+                      gamesNavItem.style.display = 'block';
                     }
                     
-                    // Show VIP AI Assistant for same access levels as games
-                    const vipChatbotItem = document.getElementById('vip-chatbot-dropdown-item');
-                    if (vipChatbotItem) {
-                      vipChatbotItem.style.display = 'block';
+                    // Show VIP AI Assistant floating icon for same access levels as games
+                    const aiAssistantIcon = document.getElementById('ai-assistant-icon');
+                    if (aiAssistantIcon) {
+                      aiAssistantIcon.style.display = 'block';
                     }
                   }
 
@@ -130,9 +143,21 @@
                 console.error('❌ Error checking admin status:', error);
               }
             } else {
-              // User not authenticated
+              // User not authenticated - hide VIP features
               console.log('👤 No user authenticated');
               window.wavelengthUserGroups = null;
+              
+              // Ensure VIP features are hidden
+              const gamesNavItem = document.getElementById('games-nav-item');
+              if (gamesNavItem) {
+                gamesNavItem.style.display = 'none';
+              }
+              
+              const aiAssistantIcon = document.getElementById('ai-assistant-icon');
+              if (aiAssistantIcon) {
+                aiAssistantIcon.style.display = 'none';
+              }
+              
               window.dispatchEvent(new CustomEvent('wavelengthUserLoaded', { detail: null }));
             }
           });
@@ -368,6 +393,108 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     text-decoration: none;
   }
+
+  /* Featured Nav Item (Games) */
+  .featured-nav-item .games-nav-link {
+    background: linear-gradient(135deg, #8b5cf6, #6366f1) !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    color: #ffd700 !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+    border: 2px solid rgba(255, 215, 0, 0.3) !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .featured-nav-item .games-nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .featured-nav-item .games-nav-link:hover::before {
+    left: 100%;
+  }
+
+  .featured-nav-item .games-nav-link:hover {
+    background: linear-gradient(135deg, #a78bfa, #818cf8) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important;
+    border-color: rgba(255, 215, 0, 0.6) !important;
+  }
+
+  /* AI Assistant Floating Icon */
+  .ai-assistant-icon {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    z-index: 1003;
+  }
+
+  .ai-icon-link {
+    display: block;
+    text-decoration: none;
+  }
+
+  .ai-icon-wrapper {
+    position: relative;
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .ai-icon-wrapper:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    border-color: rgba(255, 215, 0, 0.4);
+  }
+
+  .ai-icon {
+    font-size: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .ai-icon-wrapper:hover .ai-icon {
+    transform: scale(1.1);
+  }
+
+  .ai-pulse {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    border: 2px solid rgba(102, 126, 234, 0.6);
+    animation: ai-pulse 2s infinite;
+  }
+
+  @keyframes ai-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1.2);
+      opacity: 0;
+    }
+  }
   
   /* Responsive navigation */
   @media (max-width: 768px) {
@@ -381,6 +508,7 @@
       flex-direction: column;
       align-items: center;
       z-index: 1001;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .nav-links.active {
@@ -389,6 +517,8 @@
 
     .nav-links > li {
       margin: 10px 0;
+      width: 90%;
+      text-align: center;
     }
 
     .menu-icon {
@@ -401,6 +531,29 @@
 
     header > nav > ul > li > a {
       font-size: 14px;
+    }
+
+    /* Featured Games link mobile styling */
+    .featured-nav-item .games-nav-link {
+      padding: 12px 20px !important;
+      font-size: 16px !important;
+      border-radius: 25px !important;
+    }
+
+    /* AI Assistant mobile positioning */
+    .ai-assistant-icon {
+      right: 70px; /* Move left to avoid hamburger menu */
+      top: 15px;
+      transform: none;
+    }
+
+    .ai-icon-wrapper {
+      width: 40px;
+      height: 40px;
+    }
+
+    .ai-icon {
+      font-size: 18px;
     }
   }
   

@@ -218,11 +218,21 @@ class FirebaseChatbotTester {
       const widgetElements = await this.page.evaluate(() => {
         const elements = [];
         
-        // Look for VIP chatbot elements
+        // Look for VIP AI Assistant elements (updated for new floating icon)
+        const aiAssistantIcon = document.querySelector('#ai-assistant-icon');
+        if (aiAssistantIcon) {
+          elements.push({
+            type: 'ai-assistant-icon',
+            visible: aiAssistantIcon.style.display !== 'none',
+            text: aiAssistantIcon.getAttribute('title') || 'AI Assistant'
+          });
+        }
+        
+        // Look for legacy VIP dropdown (for backwards compatibility testing)
         const vipChatbotItem = document.querySelector('#vip-chatbot-dropdown-item');
         if (vipChatbotItem) {
           elements.push({
-            type: 'vip-dropdown',
+            type: 'vip-dropdown-legacy',
             visible: vipChatbotItem.style.display !== 'none',
             text: vipChatbotItem.textContent?.trim()
           });
