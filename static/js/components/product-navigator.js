@@ -33,11 +33,74 @@ class ProductNavigator {
   }
   
   async loadCatalog() {
-    const response = await fetch('/api/product-catalog');
+    const response = await fetch('/api/merchandise/product-types');
     if (!response.ok) {
       throw new Error('Failed to load catalog');
     }
-    this.catalog = await response.json();
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.error || 'Failed to load product types');
+    }
+    
+    // Transform merchandise API response to match ProductNavigator expected format
+    this.catalog = this.transformMerchandiseData(data);
+  }
+  
+  transformMerchandiseData(data) {
+    const categories = {};
+    const searchIndex = [];
+    
+    // Transform productTypes to categories format
+    Object.entries(data.productTypes).forEach(([categoryKey, category]) => {
+      categories[categoryKey] = {
+        name: category.name,
+        icon: category.icon,
+        description: category.description,
+        productCount: category.products.length,
+        subcategories: {
+          main: {
+            name: category.name,
+            products: category.products.map(product => ({
+              blueprint_id: product.blueprintId,
+              blueprint_title: product.name,
+              blueprint_brand: 'Wavelength Lore',
+              provider_id: product.printProviderId,
+              provider_title: 'Print Provider',
+              tags: product.tags || [],
+              searchTerms: `${product.name} ${product.description} ${(product.tags || []).join(' ')}`.toLowerCase(),
+              estimatedPrice: product.basePrice,
+              popularityScore: 50,
+              category: categoryKey,
+              subcategory: 'main'
+            }))
+          }
+        }
+      };
+      
+      // Add products to search index
+      category.products.forEach(product => {
+        searchIndex.push({
+          blueprint_id: product.blueprintId,
+          blueprint_title: product.name,
+          blueprint_brand: 'Wavelength Lore',
+          provider_id: product.printProviderId,
+          provider_title: 'Print Provider',
+          tags: product.tags || [],
+          searchTerms: `${product.name} ${product.description} ${(product.tags || []).join(' ')}`.toLowerCase(),
+          estimatedPrice: product.basePrice,
+          popularityScore: 50,
+          category: categoryKey,
+          subcategory: 'main'
+        });
+      });
+    });
+    
+    return {
+      categories,
+      searchIndex,
+      totalProducts: searchIndex.length
+    };
   }
   
   render() {

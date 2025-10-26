@@ -1308,40 +1308,84 @@ class MerchandiseStore {
    */
   renderSimpleCategories(container) {
     console.log('🔧 Rendering simple categories fallback');
-    container.innerHTML = `
-      <div class="simple-categories">
-        <div class="fallback-notice">
-          <p>🚧 <strong>Loading product catalog...</strong> Showing popular options while we load the full selection.</p>
+    
+    // Use the loaded product types data if available
+    if (this.productTypes && Object.keys(this.productTypes).length > 0) {
+      console.log('📦 Using loaded product types for fallback:', Object.keys(this.productTypes));
+      
+      const allProducts = [];
+      Object.entries(this.productTypes).forEach(([categoryKey, category]) => {
+        category.products.forEach(product => {
+          allProducts.push({
+            ...product,
+            categoryName: category.name,
+            categoryIcon: category.icon
+          });
+        });
+      });
+      
+      container.innerHTML = `
+        <div class="simple-categories">
+          <div class="fallback-notice">
+            <p>🚧 <strong>Product navigator loading...</strong> Showing all available products.</p>
+          </div>
+          <h3>🌆 All Available Products</h3>
+          <div class="simple-categories-grid">
+            ${allProducts.map(product => `
+              <div class="simple-category" data-type="${product.id}">
+                <div class="category-icon">${product.icon}</div>
+                <h4>${product.name}</h4>
+                <p>${product.description}</p>
+                <div class="product-price">$${(product.basePrice / 100).toFixed(2)}</div>
+                <button class="select-simple-product" 
+                        data-product="${product.id}" 
+                        data-blueprint="${product.blueprintId}" 
+                        data-provider="${product.printProviderId}">
+                  Select
+                </button>
+              </div>
+            `).join('')}
+          </div>
         </div>
-        <h3>📦 Popular Products</h3>
-        <div class="simple-categories-grid">
-          <div class="simple-category" data-type="premium-tshirt">
-            <div class="category-icon">👕</div>
-            <h4>Premium T-Shirt</h4>
-            <p>High-quality cotton tee</p>
-            <button class="select-simple-product" data-product="premium-tshirt" data-blueprint="5" data-provider="1">Select</button>
+      `;
+    } else {
+      // Fallback to hardcoded popular products if no data loaded
+      console.log('⚠️ No product types loaded, using hardcoded fallback');
+      container.innerHTML = `
+        <div class="simple-categories">
+          <div class="fallback-notice">
+            <p>🚧 <strong>Loading product catalog...</strong> Showing popular options while we load the full selection.</p>
           </div>
-          <div class="simple-category" data-type="hoodie">
-            <div class="category-icon">🧥</div>
-            <h4>Pullover Hoodie</h4>
-            <p>Cozy fleece hoodie</p>
-            <button class="select-simple-product" data-product="hoodie" data-blueprint="146" data-provider="1">Select</button>
-          </div>
-          <div class="simple-category" data-type="mug">
-            <div class="category-icon">☕</div>
-            <h4>Coffee Mug</h4>
-            <p>Ceramic 11oz mug</p>
-            <button class="select-simple-product" data-product="mug" data-blueprint="68" data-provider="1">Select</button>
-          </div>
-          <div class="simple-category" data-type="tank-top">
-            <div class="category-icon">🎨</div>
-            <h4>Tank Top</h4>
-            <p>Lightweight summer wear</p>
-            <button class="select-simple-product" data-product="tank-top" data-blueprint="17" data-provider="1">Select</button>
+          <h3>📦 Popular Products</h3>
+          <div class="simple-categories-grid">
+            <div class="simple-category" data-type="premium-tshirt">
+              <div class="category-icon">👕</div>
+              <h4>Premium T-Shirt</h4>
+              <p>High-quality cotton tee</p>
+              <button class="select-simple-product" data-product="premium-tshirt" data-blueprint="5" data-provider="3">Select</button>
+            </div>
+            <div class="simple-category" data-type="hoodie">
+              <div class="category-icon">🧥</div>
+              <h4>Pullover Hoodie</h4>
+              <p>Cozy fleece hoodie</p>
+              <button class="select-simple-product" data-product="hoodie" data-blueprint="146" data-provider="3">Select</button>
+            </div>
+            <div class="simple-category" data-type="coffee-mug">
+              <div class="category-icon">☕</div>
+              <h4>Coffee Mug</h4>
+              <p>Ceramic 11oz mug</p>
+              <button class="select-simple-product" data-product="coffee-mug" data-blueprint="263" data-provider="5">Select</button>
+            </div>
+            <div class="simple-category" data-type="pillow">
+              <div class="category-icon">🛋️</div>
+              <h4>Square Pillow</h4>
+              <p>Spun polyester pillow</p>
+              <button class="select-simple-product" data-product="pillow" data-blueprint="220" data-provider="10">Select</button>
+            </div>
           </div>
         </div>
-      </div>
-    `;
+      `;
+    }
     
     console.log('✅ Simple categories rendered successfully');
     

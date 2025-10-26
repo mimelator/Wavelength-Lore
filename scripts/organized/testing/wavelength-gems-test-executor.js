@@ -32,7 +32,7 @@ async function executeGameTests() {
         
         // Navigate to Wavelength Gems
         console.log('🔗 Loading Wavelength Gems game...');
-        await page.goto('http://localhost:3001/wavelength-gems', { 
+        await page.goto('http://localhost:3001/games/wavelength-gems', { 
             waitUntil: 'networkidle0',
             timeout: 30000 
         });
@@ -144,7 +144,7 @@ try {
     console.log('⚠️ Puppeteer not available, falling back to manual execution instructions...');
     console.log('\n🎮 Manual Test Execution Instructions:');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('1. Open browser to: http://localhost:3001/wavelength-gems');
+    console.log('1. Open browser to: http://localhost:3001/games/wavelength-gems');
     console.log('2. Open Developer Console (F12)');
     console.log('3. Execute: runAllWavelengthGemsTests()');
     console.log('4. Or run individual suites:');

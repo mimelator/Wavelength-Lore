@@ -6,9 +6,15 @@
 
 ---
 
-## 🎯 CURRENT TASK: ProductNavigator Testing & Documentation Enhancement (COMPLETE)
+## 🎯 CURRENT TASK: URGENT - Fix Merchandise Store Only Showing T-Shirts
 
-### **Session Summary**
+### **CRITICAL ISSUE IDENTIFIED**
+- ❌ **USER REPORT**: Merchandise store only shows t-shirts, not full product catalog
+- ❌ **ROOT CAUSE**: ProductNavigator using wrong API endpoint (`/api/product-catalog` vs `/api/merchandise/product-types`)
+- ❌ **IMPACT**: Users cannot access 8 product types (hoodies, mugs, pillows, etc.) - only seeing fallback t-shirts
+- 🔧 **SOLUTION**: Fix ProductNavigator API endpoint and ensure proper product type mapping
+
+### **Previous Session Summary**
 - ✅ **PRODUCTNAVIGATOR TESTING**: Created comprehensive browser tests proving restoration works
 - ✅ **WORKFLOW VALIDATION**: Full merchandise workflow tested (image selection → ProductNavigator → categories)
 - ✅ **DOCUMENTATION ENHANCEMENT**: Added mandatory script discovery protocol to prevent duplicate tools
