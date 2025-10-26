@@ -4,6 +4,7 @@
  */
 
 const express = require('express');
+const path = require('path');
 
 // Import configuration modules
 const { configureApp } = require('./config/server');
@@ -179,6 +180,15 @@ async function createApp() {
   
   // Mount admin compatibility test routes (admin only)
   app.use('/admin', adminCompatibilityRoutes);
+  
+  // Catalog Explorer - accessible to all users
+  app.get('/catalog-explorer', (req, res) => {
+    console.log('📁 Serving catalog explorer');
+    res.render('catalog-explorer', {
+      title: 'Wavelength Catalog Explorer',
+      user: req.user || null
+    });
+  });
 
   // Mount content routes
   app.use('/', contentRoutes);
