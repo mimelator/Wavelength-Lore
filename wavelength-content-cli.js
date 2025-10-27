@@ -87,89 +87,164 @@ class WavelengthContentCLI {
             console.log(chalk.green('  📺 episodes/') + chalk.gray('   - Episode content, stories, and metadata'));
         } else if (this.currentPath.includes('/lore')) {
             const allLore = loreHelpers.getAllLoreSync();
-            console.log(chalk.gray(`  Found ${allLore.length} lore entries:`));
             
-            // Group by type
-            const loreByType = {};
-            allLore.forEach(item => {
-                if (!loreByType[item.type]) loreByType[item.type] = [];
-                loreByType[item.type].push(item);
-            });
-            
-            Object.keys(loreByType).forEach(type => {
-                console.log(chalk.yellow(`\n  📂 ${type}/ (${loreByType[type].length} items)`));
-                loreByType[type].forEach(item => {
-                    const icon = this.getTypeIcon(item.type);
-                    const hiddenLabel = item.hidden ? chalk.red('[HIDDEN]') : '';
-                    console.log(chalk.white(`    ${icon} ${item.id}`) + chalk.gray(` - ${item.title}`) + hiddenLabel);
+            // Check if we're in a specific lore subcategory
+            const pathParts = this.currentPath.split('/').filter(part => part);
+            if (pathParts.length > 1 && pathParts[0] === 'lore') {
+                // We're in a specific category like /lore/band/
+                const categoryType = pathParts[1];
+                const categoryLore = allLore.filter(item => item.type === categoryType);
+                
+                if (categoryLore.length > 0) {
+                    console.log(chalk.gray(`  Found ${categoryLore.length} ${categoryType} items:`));
+                    console.log('');
+                    categoryLore.forEach(item => {
+                        const icon = this.getTypeIcon(item.type);
+                        const hiddenLabel = item.hidden ? chalk.red('[HIDDEN]') : '';
+                        console.log(chalk.white(`    ${icon} ${item.id}`) + chalk.gray(` - ${item.title}`) + hiddenLabel);
+                    });
+                } else {
+                    console.log(chalk.yellow(`  No ${categoryType} items found`));
+                    console.log(chalk.gray('  Use "cd .." to go back to /lore/'));
+                }
+            } else {
+                // We're in the main /lore/ directory - show categories
+                console.log(chalk.gray(`  Found ${allLore.length} lore entries:`));
+                
+                // Group by type
+                const loreByType = {};
+                allLore.forEach(item => {
+                    if (!loreByType[item.type]) loreByType[item.type] = [];
+                    loreByType[item.type].push(item);
                 });
-            });
+                
+                Object.keys(loreByType).forEach(type => {
+                    console.log(chalk.yellow(`\n  📂 ${type}/ (${loreByType[type].length} items)`));
+                    loreByType[type].forEach(item => {
+                        const icon = this.getTypeIcon(item.type);
+                        const hiddenLabel = item.hidden ? chalk.red('[HIDDEN]') : '';
+                        console.log(chalk.white(`    ${icon} ${item.id}`) + chalk.gray(` - ${item.title}`) + hiddenLabel);
+                    });
+                });
+            }
         } else if (this.currentPath.includes('/characters')) {
             try {
                 const allCharacters = characterHelpers.getAllCharactersSync();
-                console.log(chalk.gray(`  Found ${allCharacters.length} characters:`));
                 
-                // Group by role/type for better organization
-                const charactersByRole = {};
-                allCharacters.forEach(character => {
-                    const role = character.role || character.type || 'other';
-                    if (!charactersByRole[role]) charactersByRole[role] = [];
-                    charactersByRole[role].push(character);
-                });
-                
-                // Sort roles with common ones first
-                const commonRoles = ['main', 'protagonist', 'antagonist', 'supporting', 'minor'];
-                const roleKeys = Object.keys(charactersByRole).sort((a, b) => {
-                    const aIndex = commonRoles.indexOf(a.toLowerCase());
-                    const bIndex = commonRoles.indexOf(b.toLowerCase());
-                    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
-                    if (aIndex !== -1) return -1;
-                    if (bIndex !== -1) return 1;
-                    return a.localeCompare(b);
-                });
-                
-                roleKeys.forEach(role => {
-                    const roleName = role.charAt(0).toUpperCase() + role.slice(1);
-                    console.log(chalk.yellow(`\n  📂 ${roleName}/ (${charactersByRole[role].length} characters)`));
-                    charactersByRole[role].forEach(character => {
-                        const hiddenLabel = character.hidden ? chalk.red('[HIDDEN]') : '';
-                        const displayName = character.name || character.title || character.id;
-                        const roleIcon = this.getCharacterIcon(role);
-                        console.log(chalk.white(`    ${roleIcon} ${character.id}`) + chalk.gray(` - ${displayName}`) + hiddenLabel);
+                // Check if we're in a specific character role subcategory
+                const pathParts = this.currentPath.split('/').filter(part => part);
+                if (pathParts.length > 1 && pathParts[0] === 'characters') {
+                    // We're in a specific role like /characters/main/
+                    const roleType = pathParts[1];
+                    const roleCharacters = allCharacters.filter(character => {
+                        const charRole = character.role || character.type || 'other';
+                        return charRole === roleType;
                     });
-                });
+                    
+                    if (roleCharacters.length > 0) {
+                        const roleName = roleType.charAt(0).toUpperCase() + roleType.slice(1);
+                        console.log(chalk.gray(`  Found ${roleCharacters.length} characters in ${roleName}:`));
+                        console.log('');
+                        roleCharacters.forEach(character => {
+                            const roleIcon = this.getCharacterIcon(roleType);
+                            const hiddenLabel = character.hidden ? chalk.red('[HIDDEN]') : '';
+                            const displayName = character.name || character.title || character.id;
+                            console.log(chalk.white(`    ${roleIcon} ${character.id}`) + chalk.gray(` - ${displayName}`) + hiddenLabel);
+                        });
+                    } else {
+                        console.log(chalk.yellow(`  No characters found in ${roleType}`));
+                        console.log(chalk.gray('  Use "cd .." to go back to /characters/'));
+                    }
+                } else {
+                    // We're in the main /characters/ directory - show roles
+                    console.log(chalk.gray(`  Found ${allCharacters.length} characters:`));
+                    
+                    // Group by role/type for better organization
+                    const charactersByRole = {};
+                    allCharacters.forEach(character => {
+                        const role = character.role || character.type || 'other';
+                        if (!charactersByRole[role]) charactersByRole[role] = [];
+                        charactersByRole[role].push(character);
+                    });
+                    
+                    // Sort roles with common ones first
+                    const commonRoles = ['main', 'protagonist', 'antagonist', 'supporting', 'minor'];
+                    const roleKeys = Object.keys(charactersByRole).sort((a, b) => {
+                        const aIndex = commonRoles.indexOf(a.toLowerCase());
+                        const bIndex = commonRoles.indexOf(b.toLowerCase());
+                        if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+                        if (aIndex !== -1) return -1;
+                        if (bIndex !== -1) return 1;
+                        return a.localeCompare(b);
+                    });
+                    
+                    roleKeys.forEach(role => {
+                        const roleName = role.charAt(0).toUpperCase() + role.slice(1);
+                        console.log(chalk.yellow(`\n  📂 ${roleName}/ (${charactersByRole[role].length} characters)`));
+                        charactersByRole[role].forEach(character => {
+                            const hiddenLabel = character.hidden ? chalk.red('[HIDDEN]') : '';
+                            const displayName = character.name || character.title || character.id;
+                            const roleIcon = this.getCharacterIcon(role);
+                            console.log(chalk.white(`    ${roleIcon} ${character.id}`) + chalk.gray(` - ${displayName}`) + hiddenLabel);
+                        });
+                    });
+                }
             } catch (error) {
                 console.log(chalk.yellow('  ⚠️ Characters not yet loaded'));
             }
         } else if (this.currentPath.includes('/episodes')) {
             try {
                 const allEpisodes = episodeHelpers.getAllEpisodesSync();
-                console.log(chalk.gray(`  Found ${allEpisodes.length} episodes:`));
                 
-                // Group by season for better organization
-                const episodesBySeason = {};
-                allEpisodes.forEach(episode => {
-                    const season = episode.season || 'unknown';
-                    if (!episodesBySeason[season]) episodesBySeason[season] = [];
-                    episodesBySeason[season].push(episode);
-                });
-                
-                // Sort seasons
-                const seasons = Object.keys(episodesBySeason).sort((a, b) => {
-                    if (a === 'unknown') return 1;
-                    if (b === 'unknown') return -1;
-                    return a.localeCompare(b);
-                });
-                
-                seasons.forEach(season => {
-                    const seasonName = season === 'unknown' ? 'Unknown Season' : season.replace('season', 'Season ');
-                    const seasonIcon = this.getSeasonIcon(season);
-                    console.log(chalk.yellow(`\n  📂 ${seasonName}/ (${episodesBySeason[season].length} episodes)`));
-                    episodesBySeason[season].forEach(episode => {
-                        const hiddenLabel = episode.hidden ? chalk.red('[HIDDEN]') : '';
-                        console.log(chalk.white(`    ${seasonIcon} ${episode.id}`) + chalk.gray(` - ${episode.title}`) + hiddenLabel);
+                // Check if we're in a specific season subcategory
+                const pathParts = this.currentPath.split('/').filter(part => part);
+                if (pathParts.length > 1 && pathParts[0] === 'episodes') {
+                    // We're in a specific season like /episodes/season1/
+                    const seasonType = pathParts[1];
+                    const seasonEpisodes = allEpisodes.filter(episode => episode.season === seasonType);
+                    
+                    if (seasonEpisodes.length > 0) {
+                        const seasonName = seasonType === 'unknown' ? 'Unknown Season' : seasonType.replace('season', 'Season ');
+                        console.log(chalk.gray(`  Found ${seasonEpisodes.length} episodes in ${seasonName}:`));
+                        console.log('');
+                        seasonEpisodes.forEach(episode => {
+                            const seasonIcon = this.getSeasonIcon(seasonType);
+                            const hiddenLabel = episode.hidden ? chalk.red('[HIDDEN]') : '';
+                            console.log(chalk.white(`    ${seasonIcon} ${episode.id}`) + chalk.gray(` - ${episode.title}`) + hiddenLabel);
+                        });
+                    } else {
+                        console.log(chalk.yellow(`  No episodes found in ${seasonType}`));
+                        console.log(chalk.gray('  Use "cd .." to go back to /episodes/'));
+                    }
+                } else {
+                    // We're in the main /episodes/ directory - show seasons
+                    console.log(chalk.gray(`  Found ${allEpisodes.length} episodes:`));
+                    
+                    // Group by season for better organization
+                    const episodesBySeason = {};
+                    allEpisodes.forEach(episode => {
+                        const season = episode.season || 'unknown';
+                        if (!episodesBySeason[season]) episodesBySeason[season] = [];
+                        episodesBySeason[season].push(episode);
                     });
-                });
+                    
+                    // Sort seasons
+                    const seasons = Object.keys(episodesBySeason).sort((a, b) => {
+                        if (a === 'unknown') return 1;
+                        if (b === 'unknown') return -1;
+                        return a.localeCompare(b);
+                    });
+                    
+                    seasons.forEach(season => {
+                        const seasonName = season === 'unknown' ? 'Unknown Season' : season.replace('season', 'Season ');
+                        const seasonIcon = this.getSeasonIcon(season);
+                        console.log(chalk.yellow(`\n  📂 ${seasonName}/ (${episodesBySeason[season].length} episodes)`));
+                        episodesBySeason[season].forEach(episode => {
+                            const hiddenLabel = episode.hidden ? chalk.red('[HIDDEN]') : '';
+                            console.log(chalk.white(`    ${seasonIcon} ${episode.id}`) + chalk.gray(` - ${episode.title}`) + hiddenLabel);
+                        });
+                    });
+                }
             } catch (error) {
                 console.log(chalk.yellow('  ⚠️ Episodes not yet loaded'));
             }
