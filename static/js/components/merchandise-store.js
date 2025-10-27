@@ -1226,17 +1226,12 @@ class MerchandiseStore {
     const productsHTML = categoryData.products.map(product => `
       <div class="product-item">
         <div class="product-preview">
-          ${product.imageUrl ? `
-            <img src="${product.imageUrl}" alt="${product.name}" class="product-preview-image" 
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-            <div class="product-fallback-icon" style="display: none;">
+          <div class="product-preview-placeholder">
+            <div class="product-preview-icon">
               ${this.getCategoryIcon(product.category)}
             </div>
-          ` : `
-            <div class="product-fallback-icon">
-              ${this.getCategoryIcon(product.category)}
-            </div>
-          `}
+            <div class="product-preview-text">${product.name}</div>
+          </div>
         </div>
         <div class="product-info">
           <h4 class="product-name">${product.name}</h4>
@@ -1349,6 +1344,8 @@ class MerchandiseStore {
       this.renderCategoryCards(container);
     }
   }
+
+
 
   handleShowMoreProducts(categoryKey) {
     console.log(`🔄 Showing more products for category: ${categoryKey}`);

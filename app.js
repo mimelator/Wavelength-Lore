@@ -37,6 +37,7 @@ const galleryRoutes = require('./routes/gallery');
 const galleryApiRoutes = require('./routes/galleryApi');
 const merchandiseRoutes = require('./routes/merchandise');
 const enhancedMerchandiseRoutes = require('./routes/enhanced-merchandise');
+// const blueprintPreviewRoutes = require('./routes/blueprint-preview');
 const adminVendorResearchRoutes = require('./routes/admin-vendor-research');
 const adminVendorCatalogRoutes = require('./routes/admin-vendor-catalog');
 const adminCleanupRoutes = require('./routes/admin-cleanup');
@@ -156,6 +157,9 @@ async function createApp() {
   app.use('/merchandise', merchandiseRoutes); // Also mount at /merchandise for the main store page
   app.use('/api/enhanced-merchandise', enhancedMerchandiseRoutes);
   app.use('/enhanced-merchandise', enhancedMerchandiseRoutes); // Also mount at /enhanced-merchandise for the AI store page
+
+  // Mount blueprint preview API routes for getting vendor product images
+  // app.use('/api/merchandise', blueprintPreviewRoutes);
 
   // Mount border preview API routes for image border overlays
   app.use('/api/merchandise', borderPreviewApiRoutes);
