@@ -28,48 +28,42 @@ class EffectsProcessor {
         blur: effectParams.blur ?? 0,
         brightness: effectParams.brightness ?? 1.0,
         contrast: effectParams.contrast ?? 1.0,
-        lightning: effectParams.lightning ?? 0,
-        mask: effectParams.mask ?? null,
-        featherEdges: effectParams.featherEdges ?? 0,
-        featherFalloff: effectParams.featherFalloff ?? 'smooth'
+        lightning: effectParams.lightning ?? 0
       };
 
       console.log(`🎨 Processing image with effects:`, finalParams);
 
-      // Start with Sharp pipeline for color/lighting effects
+      // Start with Sharp pipeline
       let pipeline = Sharp(imageBuffer);
 
-      // Apply color and lighting effects first
+      // Apply effects in optimal order
       pipeline = await this.applyColorGrading(pipeline, finalParams);
       pipeline = await this.applyLightingEffects(pipeline, finalParams);
       pipeline = await this.applySpecialEffects(pipeline, finalParams);
 
-      // Convert to buffer for mask processing
-      let processed = await pipeline
+      // Convert to WebP for preview
+      const processed = await pipeline
         .webp({
           quality: effectsConfig.processing.webpQuality,
           alphaQuality: effectsConfig.processing.webpAlphaQuality
         })
         .toBuffer();
 
-      // Apply mask effects if specified
-      if (finalParams.mask) {
-        const MaskProcessor = require('./MaskProcessor');
-        const maskProcessor = new MaskProcessor();
-        processed = await maskProcessor.processWithMask(processed, {
-          mask: finalParams.mask,
-          featherEdges: finalParams.featherEdges,
-          featherFalloff: finalParams.featherFalloff
+      // Apply border if specified in effectParams
+      let finalProcessed = processed;
+      if (effectParams.borderEnabled && effectParams.borderWidth > 0 && effectParams.borderColor) {
+        const BorderProcessor = require('./BorderProcessor');
+        const borderProcessor = new BorderProcessor();
+        finalProcessed = await borderProcessor.applyBorder(processed, {
+          enabled: true,
+          width: effectParams.borderWidth,
+          widthPixels: effectParams.borderWidthPixels,
+          colorHex: effectParams.borderColor
         });
-      } else if (finalParams.featherEdges > 0) {
-        // Apply feathering without mask if only feather is enabled
-        const MaskProcessor = require('./MaskProcessor');
-        const maskProcessor = new MaskProcessor();
-        processed = await maskProcessor.applyFeatherOnly(processed, finalParams.featherEdges, finalParams.featherFalloff);
       }
 
       console.log(`✅ Effects applied successfully`);
-      return processed;
+      return finalProcessed;
 
     } catch (error) {
       console.error(`❌ Error processing image with effects:`, error.message);

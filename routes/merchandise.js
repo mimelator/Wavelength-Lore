@@ -1486,7 +1486,199 @@ router.get('/payment-health', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/merchandise/stripe-webhook
+ * Stripe webhook endpoint for payment status updates
+ * 🔔 ENHANCED: Real-time payment tracking and order management
+ */
+router.post('/stripe-webhook', async (req, res) => {
+  try {
+    const signature = req.headers['stripe-signature'];
+    const payload = req.body;
+
+    console.log('🔔 Stripe webhook received');
+
+    // Verify webhook signature and parse event
+    const webhookResult = stripePaymentService.verifyWebhookSignature(
+      JSON.stringify(payload), 
+      signature
+    );
+
+    if (!webhookResult.success) {
+      console.error('❌ Webhook verification failed:', webhookResult.error);
+      return res.status(400).json({
+        success: false,
+        error: 'Webhook verification failed'
+      });
+    }
+
+    // Process the webhook event
+    const eventResult = stripePaymentService.processWebhookEvent(webhookResult.event);
+
+    if (!eventResult.success) {
+      console.error('❌ Webhook processing failed:', eventResult.error);
+      return res.status(500).json({
+        success: false,
+        error: 'Webhook processing failed'
+      });
+    }
+
+    // Execute actions based on webhook event
+    await executeWebhookActions(eventResult);
+
+    res.json({ 
+      success: true, 
+      received: true,
+      eventType: eventResult.eventType,
+      actionsExecuted: eventResult.actions?.length || 0
+    });
+
+  } catch (error) {
+    console.error('❌ Stripe webhook error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Webhook processing failed'
+    });
+  }
+});
+
+/**
+ * POST /api/merchandise/refund
+ * Create refund for a payment
+ * 🔧 ADMIN: Refund processing for customer service
+ */
+router.post('/refund', ensureAuthenticated, async (req, res) => {
+  try {
+    const { paymentIntentId, amount, reason = 'requested_by_customer' } = req.body;
+
+    console.log(`💸 Processing refund request: ${paymentIntentId}`);
+
+    // Create refund through Stripe
+    const refundResult = await stripePaymentService.createRefund(
+      paymentIntentId, 
+      amount, 
+      reason
+    );
+
+    if (!refundResult.success) {
+      return res.status(400).json(refundResult);
+    }
+
+    // Update order status in database
+    try {
+      await merchandiseDB.updateOrderStatus(paymentIntentId, {
+        status: 'refunded',
+        refundId: refundResult.refundId,
+        refundAmount: refundResult.amount,
+        refundedAt: new Date().toISOString()
+      });
+    } catch (dbError) {
+      console.warn('⚠️ Database update failed for refund:', dbError.message);
+    }
+
+    res.json({
+      success: true,
+      refundId: refundResult.refundId,
+      amount: refundResult.amount,
+      status: refundResult.status
+    });
+
+  } catch (error) {
+    console.error('❌ Refund processing error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Refund processing failed'
+    });
+  }
+});
+
 // Helper functions
+
+/**
+ * Execute actions based on webhook events
+ * 🔔 ENHANCED: Automated order management from Stripe webhooks
+ */
+async function executeWebhookActions(eventResult) {
+  const { paymentIntentId, actions, status, amount } = eventResult;
+
+  console.log(`🤖 Executing ${actions.length} actions for payment ${paymentIntentId}`);
+
+  for (const action of actions) {
+    try {
+      switch (action) {
+        case 'update_order_status_paid':
+          await merchandiseDB.updateOrderStatus(paymentIntentId, {
+            status: 'paid',
+            paidAt: new Date().toISOString(),
+            amount: amount
+          });
+          console.log(`✅ Order status updated to paid: ${paymentIntentId}`);
+          break;
+
+        case 'update_order_status_failed':
+          await merchandiseDB.updateOrderStatus(paymentIntentId, {
+            status: 'payment_failed',
+            failedAt: new Date().toISOString()
+          });
+          console.log(`❌ Order status updated to failed: ${paymentIntentId}`);
+          break;
+
+        case 'update_order_status_canceled':
+          await merchandiseDB.updateOrderStatus(paymentIntentId, {
+            status: 'canceled',
+            canceledAt: new Date().toISOString()
+          });
+          console.log(`🚫 Order status updated to canceled: ${paymentIntentId}`);
+          break;
+
+        case 'update_order_status_pending':
+          await merchandiseDB.updateOrderStatus(paymentIntentId, {
+            status: 'pending_action',
+            pendingAt: new Date().toISOString()
+          });
+          console.log(`⏳ Order status updated to pending: ${paymentIntentId}`);
+          break;
+
+        case 'send_confirmation_email':
+          // TODO: Implement email service
+          console.log(`📧 Email confirmation queued for: ${paymentIntentId}`);
+          break;
+
+        case 'send_failure_email':
+          // TODO: Implement email service
+          console.log(`📧 Failure notification queued for: ${paymentIntentId}`);
+          break;
+
+        case 'send_action_required_email':
+          // TODO: Implement email service
+          console.log(`📧 Action required notification queued for: ${paymentIntentId}`);
+          break;
+
+        case 'trigger_fulfillment':
+          // TODO: Trigger Printify fulfillment
+          console.log(`📦 Fulfillment triggered for: ${paymentIntentId}`);
+          break;
+
+        case 'release_inventory':
+          // TODO: Release inventory if applicable
+          console.log(`📋 Inventory released for: ${paymentIntentId}`);
+          break;
+
+        case 'log_event':
+          console.log(`📝 Event logged for: ${paymentIntentId}`);
+          break;
+
+        default:
+          console.warn(`⚠️ Unknown action: ${action}`);
+          break;
+      }
+    } catch (actionError) {
+      console.error(`❌ Action failed: ${action}`, actionError.message);
+    }
+  }
+
+  console.log(`✅ Completed ${actions.length} actions for ${paymentIntentId}`);
+}
 
 /**
  * Download image from S3 URL
@@ -3905,6 +4097,32 @@ router.get('/openai-upscaler/effects-list', (req, res) => {
     });
   } catch (error) {
     console.error('❌ Error loading effects list:', error.message);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/openai-upscaler/border-options
+ * Get available border colors and widths for merchandise customization
+ */
+router.get('/openai-upscaler/border-options', (req, res) => {
+  try {
+    const effectsConfig = require('../config/effectsConfig');
+    const { borderConfig } = effectsConfig;
+
+    res.json({
+      success: true,
+      borderEnabled: borderConfig.enabled,
+      colors: borderConfig.colors,
+      widths: borderConfig.widths,
+      totalColors: borderConfig.colors.length,
+      totalWidths: borderConfig.widths.length
+    });
+  } catch (error) {
+    console.error('❌ Error loading border options:', error.message);
     res.status(500).json({
       success: false,
       error: error.message

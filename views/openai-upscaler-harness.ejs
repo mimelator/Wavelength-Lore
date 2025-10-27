@@ -357,6 +357,44 @@
             </div>
         </div>
 
+        <!-- Border Customization Panel -->
+        <div class="card full-width" id="borderPanel" style="display: none;">
+            <h2>🖼️ Border Customization</h2>
+
+            <!-- Border Enable Toggle -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="borderEnabled" onchange="updateBorderUI()">
+                    <span style="font-weight: 600;">Enable Border</span>
+                </label>
+            </div>
+
+            <div id="borderControls" style="display: none;">
+                <!-- Border Width Selection -->
+                <div class="control-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Border Width</label>
+                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;" id="widthButtons"></div>
+                </div>
+
+                <!-- Border Color Palette -->
+                <div class="control-group">
+                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Border Color (36 Options)</label>
+                    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;" id="colorPalette"></div>
+                </div>
+
+                <!-- Selected Border Preview -->
+                <div style="margin-top: 15px; padding: 15px; background: #f9f9f9; border-radius: 6px;">
+                    <small style="color: #666;">Selected: <span id="borderPreview" style="font-weight: 600;"></span></small>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="applyBorderAndEffects()" style="flex: 1;">✨ Continue to Effects</button>
+                <button onclick="closeBorderPanel()" style="flex: 1; background: #ccc; color: #333;">Cancel</button>
+            </div>
+        </div>
+
         <!-- Effect Customization Panel -->
         <div class="card full-width" id="effectsPanel" style="display: none;">
             <h2>✨ Customize with Effects</h2>
@@ -484,8 +522,8 @@
 
             addLog(`Image ready at: ${imageUrl}`, 'info');
 
-            // Show effects panel when image is displayed
-            setTimeout(() => showEffectsPanel(), 500);
+            // Show border customization panel first, then effects
+            setTimeout(() => showBorderPanel(), 500);
         }
 
         // ============================================================
@@ -556,7 +594,6 @@
             container.style.gap = '10px';
             container.style.cursor = 'pointer';
             container.style.transition = 'all 0.2s';
-            container.setAttribute('data-effect-group', effectConfig.group || 'none');
 
             container.onmouseover = () => {
                 container.style.background = '#f5f5f5';
@@ -575,17 +612,6 @@
             checkbox.checked = false;
 
             checkbox.onchange = () => {
-                // Handle exclusive mask effects (only one can be active at a time)
-                if (effectConfig.group === 'mask' && checkbox.checked) {
-                    // Uncheck all other masks in the same group
-                    document.querySelectorAll('[data-effect-group="mask"] input[type="checkbox"]').forEach(cb => {
-                        if (cb.id !== checkbox.id) {
-                            cb.checked = false;
-                            const key = cb.id.replace('effect-', '');
-                            enabledEffects[key] = false;
-                        }
-                    });
-                }
                 enabledEffects[effectKey] = checkbox.checked;
                 console.log(`Effect ${effectKey}: ${checkbox.checked ? 'enabled' : 'disabled'}`);
             };
@@ -1045,10 +1071,114 @@
             }
         }
 
+        // ============================================================
+        // BORDER CUSTOMIZATION FUNCTIONS
+        // ============================================================
+        let borderOptions = {};
+        let selectedBorderColor = '#000000';
+        let selectedBorderWidth = 0;
+
+        async function loadBorderOptions() {
+            try {
+                const response = await fetch('/api/merchandise/openai-upscaler/border-options');
+                const data = await response.json();
+                if (data.success) {
+                    borderOptions = data;
+                    renderBorderUI();
+                    addLog(`✅ Loaded ${data.totalColors} border colors and ${data.totalWidths} width options`, 'info');
+                }
+            } catch (error) {
+                console.error('Error loading border options:', error);
+                addLog(`⚠️ Could not load border options: ${error.message}`, 'warn');
+            }
+        }
+
+        function renderBorderUI() {
+            // Render width buttons
+            const widthContainer = document.getElementById('widthButtons');
+            widthContainer.innerHTML = '';
+            borderOptions.widths.forEach(width => {
+                const btn = document.createElement('button');
+                btn.textContent = width.label;
+                btn.style.padding = '10px';
+                btn.style.borderRadius = '4px';
+                btn.style.border = '2px solid #ddd';
+                btn.style.cursor = 'pointer';
+                btn.style.background = 'white';
+                btn.onclick = () => selectBorderWidth(width);
+                widthContainer.appendChild(btn);
+            });
+
+            // Render color palette
+            const colorContainer = document.getElementById('colorPalette');
+            colorContainer.innerHTML = '';
+            borderOptions.colors.forEach(color => {
+                const btn = document.createElement('button');
+                btn.style.width = '100%';
+                btn.style.aspectRatio = '1';
+                btn.style.background = color.hex;
+                btn.style.border = '2px solid #ddd';
+                btn.style.borderRadius = '4px';
+                btn.style.cursor = 'pointer';
+                btn.title = color.name;
+                btn.onclick = () => selectBorderColor(color);
+                colorContainer.appendChild(btn);
+            });
+        }
+
+        function selectBorderWidth(width) {
+            selectedBorderWidth = width;
+            updateBorderPreview();
+        }
+
+        function selectBorderColor(color) {
+            selectedBorderColor = color.hex;
+            updateBorderPreview();
+        }
+
+        function updateBorderPreview() {
+            const preview = document.getElementById('borderPreview');
+            const width = selectedBorderWidth.label || 'None';
+            const colorName = borderOptions.colors.find(c => c.hex === selectedBorderColor)?.name || 'Unknown';
+            preview.textContent = `${width} / ${colorName}`;
+        }
+
+        function updateBorderUI() {
+            const enabled = document.getElementById('borderEnabled').checked;
+            document.getElementById('borderControls').style.display = enabled ? 'block' : 'none';
+        }
+
+        function showBorderPanel() {
+            const panel = document.getElementById('borderPanel');
+            if (panel) {
+                panel.style.display = 'block';
+                addLog('🖼️ Border customization panel is ready!', 'info');
+            }
+        }
+
+        function closeBorderPanel() {
+            const panel = document.getElementById('borderPanel');
+            if (panel) {
+                panel.style.display = 'none';
+            }
+        }
+
+        function applyBorderAndEffects() {
+            const borderEnabled = document.getElementById('borderEnabled').checked;
+            if (borderEnabled) {
+                addLog(`🖼️ Border selected: ${selectedBorderWidth.label} / ${selectedBorderColor}`, 'info');
+            } else {
+                addLog('⏭️ Skipping border customization', 'info');
+            }
+            closeBorderPanel();
+            showEffectsPanel();
+        }
+
         // Load templates and gallery on startup
         loadTemplates();
         loadGalleryImages();
         loadEffects();
+        loadBorderOptions();
 
         // Initial log
         addLog('OpenAI Upscaler Harness Ready', 'success');

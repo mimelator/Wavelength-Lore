@@ -249,6 +249,150 @@ class StripePaymentService {
       };
     }
   }
+
+  /**
+   * Verify webhook signature and parse event
+   * @param {string} payload - Raw webhook payload
+   * @param {string} signature - Stripe signature header
+   * @returns {object} Verified webhook event
+   */
+  verifyWebhookSignature(payload, signature) {
+    try {
+      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+      
+      if (!webhookSecret) {
+        console.warn('⚠️ STRIPE_WEBHOOK_SECRET not configured - webhook verification disabled');
+        return { 
+          success: true, 
+          event: JSON.parse(payload),
+          verified: false 
+        };
+      }
+
+      // Verify webhook signature
+      const event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+      
+      console.log(`✅ Webhook signature verified: ${event.type}`);
+      
+      return {
+        success: true,
+        event: event,
+        verified: true
+      };
+    } catch (error) {
+      console.error('❌ Webhook signature verification failed:', error.message);
+      return {
+        success: false,
+        error: error.message,
+        verified: false
+      };
+    }
+  }
+
+  /**
+   * Process webhook event and return action to take
+   * @param {object} event - Stripe webhook event
+   * @returns {object} Processing result with actions
+   */
+  processWebhookEvent(event) {
+    try {
+      const { type, data } = event;
+      const paymentIntent = data.object;
+
+      console.log(`🔔 Processing webhook: ${type} for ${paymentIntent.id}`);
+
+      const result = {
+        success: true,
+        eventType: type,
+        paymentIntentId: paymentIntent.id,
+        amount: paymentIntent.amount / 100,
+        status: paymentIntent.status,
+        actions: []
+      };
+
+      // Determine what actions to take based on event type
+      switch (type) {
+        case 'payment_intent.succeeded':
+          result.actions.push('update_order_status_paid');
+          result.actions.push('send_confirmation_email');
+          result.actions.push('trigger_fulfillment');
+          console.log(`💰 Payment succeeded: ${paymentIntent.id}, $${result.amount}`);
+          break;
+
+        case 'payment_intent.payment_failed':
+          result.actions.push('update_order_status_failed');
+          result.actions.push('send_failure_email');
+          result.actions.push('release_inventory');
+          console.log(`❌ Payment failed: ${paymentIntent.id}, reason: ${paymentIntent.last_payment_error?.message || 'Unknown'}`);
+          break;
+
+        case 'payment_intent.canceled':
+          result.actions.push('update_order_status_canceled');
+          result.actions.push('release_inventory');
+          console.log(`🚫 Payment canceled: ${paymentIntent.id}`);
+          break;
+
+        case 'payment_intent.requires_action':
+          result.actions.push('update_order_status_pending');
+          result.actions.push('send_action_required_email');
+          console.log(`🔐 Payment requires action: ${paymentIntent.id}`);
+          break;
+
+        default:
+          console.log(`ℹ️ Unhandled webhook event: ${type}`);
+          result.actions.push('log_event');
+          break;
+      }
+
+      return result;
+    } catch (error) {
+      console.error('❌ Webhook event processing failed:', error);
+      return {
+        success: false,
+        error: error.message,
+        eventType: event?.type || 'unknown'
+      };
+    }
+  }
+
+  /**
+   * Create a refund for a payment
+   * @param {string} paymentIntentId - Payment intent to refund
+   * @param {number} amount - Amount to refund (optional, full refund if not specified)
+   * @param {string} reason - Reason for refund
+   * @returns {object} Refund result
+   */
+  async createRefund(paymentIntentId, amount = null, reason = 'requested_by_customer') {
+    try {
+      console.log(`💸 Creating refund for payment: ${paymentIntentId}`);
+
+      const refundData = {
+        payment_intent: paymentIntentId,
+        reason: reason
+      };
+
+      if (amount) {
+        refundData.amount = Math.round(amount * 100); // Convert to cents
+      }
+
+      const refund = await stripe.refunds.create(refundData);
+
+      console.log(`✅ Refund created: ${refund.id}, amount: $${refund.amount / 100}`);
+
+      return {
+        success: true,
+        refundId: refund.id,
+        amount: refund.amount / 100,
+        status: refund.status
+      };
+    } catch (error) {
+      console.error('❌ Refund creation failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
 }
 
 // Export singleton instance
