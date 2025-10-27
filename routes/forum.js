@@ -361,32 +361,32 @@ router.get('/api/categories', async (req, res) => {
             categories: {
                 general: {
                     id: 'general',
-                    title: 'General Discussion',
-                    description: 'Talk about Wavelength episodes, characters, and music',
+                    title: 'The Wavelength Band',
+                    description: 'Dive into the heroes! Discuss Alexandria\'s vocal sorcery, Andrew\'s noble quest, and the rest of the team\'s role in the fight for the Shire.',
                     color: '#4a47a3',
                     icon: '🎵',
                     iconSvg: '/icons/hero-icon.svg'
                 },
                 lore: {
                     id: 'lore',
-                    title: 'Lore & Theories',
-                    description: 'Dive deep into Wavelength lore, analyze episodes, and share theories',
+                    title: 'The Lore',
+                    description: 'Explore the Atlas! Break down the power of the Ice Blue Diamond and share your findings on the most mysterious places in the Wavelength Universe.',
                     color: '#6a4c93',
                     icon: '📜',
                     iconSvg: '/icons/lore-icon.svg'
                 },
                 episodes: {
                     id: 'episodes',
-                    title: 'Episode Discussions',
-                    description: 'Discuss specific episodes, favorite moments, and episode reviews',
+                    title: 'Fan Theory',
+                    description: 'What secrets are hidden in the score? Post your wildest predictions about future seasons, character twists, and hidden meaning in the lore.',
                     color: '#e74c3c',
-                    icon: '🎬',
+                    icon: '🔮',
                     iconSvg: '/icons/episode-icon.svg'
                 },
                 fanart: {
                     id: 'fanart',
-                    title: 'Fan Creations',
-                    description: 'Share fan art, music covers, and creative works inspired by Wavelength',
+                    title: 'Music and Art',
+                    description: 'The Soundtrack of War. Discuss your favorite tracks, break down the animation style, and post your own Wavelength-inspired fan art!',
                     color: '#9b59b6',
                     icon: '🎨',
                     iconSvg: '/icons/hero-icon.svg'
