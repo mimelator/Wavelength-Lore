@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head', {
+        title: 'Product Preview Harness - PERFECT PRINTING',
+        pageDescription: 'View optimized Wavelength images on vendor product mockups'
+    }) %>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --warning: #f39c12;
+            --bg: #1a252f;
+            --card-bg: #2c3e50;
+            --text: #ecf0f1;
+            --text-muted: #bdc3c7;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'AnimeAce', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .workflow-display {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+        }
+
+        .workflow-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .workflow-step {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+            text-align: center;
+        }
+
+        .workflow-step-number {
+            font-size: 2em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .workflow-step-title {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .control-panel {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+        }
+
+        .control-section h2 {
+            font-size: 1.3em;
+            margin: 0 0 15px 0;
+            color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 14px 28px;
+            font-family: 'AnimeAce', Arial, sans-serif;
+            font-size: 1em;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--text-muted);
+            color: var(--bg);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .preview-container {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+        }
+
+        .preview-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .preview-section h3 {
+            margin: 0 0 10px 0;
+            color: #667eea;
+        }
+
+        .preview-item {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-label {
+            color: var(--text-muted);
+            min-width: 200px;
+        }
+
+        .preview-value {
+            color: var(--text);
+            font-weight: bold;
+        }
+
+        .preview-image {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border: 2px solid #667eea;
+        }
+
+        .product-mockup {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .product-mockup-image {
+            max-width: 250px;
+            max-height: 250px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+
+        .product-mockup-title {
+            color: #333;
+            font-size: 1.1em;
+            margin: 10px 0 0 0;
+        }
+
+        .logs {
+            background: #000;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border: 1px solid #333;
+        }
+
+        .log-entry {
+            padding: 3px 0;
+            line-height: 1.4;
+        }
+
+        .log-success {
+            color: #2ecc71;
+        }
+
+        .log-error {
+            color: #e74c3c;
+        }
+
+        .log-info {
+            color: #3498db;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-value {
+            font-size: 1.6em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 PERFECT PRINTING Product Preview Harness</h1>
+            <p>Optimize Wavelength images and see them on actual vendor products</p>
+        </div>
+
+        <div class="workflow-display">
+            <h2>📊 Complete Workflow</h2>
+            <p>Watch as your image is optimized and displayed on real product mockups:</p>
+            <div class="workflow-steps">
+                <div class="workflow-step">
+                    <div class="workflow-step-number">1</div>
+                    <div class="workflow-step-title">Select Image</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-step-number">2</div>
+                    <div class="workflow-step-title">Pick Product</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-step-number">3</div>
+                    <div class="workflow-step-title">Optimize</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-step-number">4</div>
+                    <div class="workflow-step-title">Preview</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-step-number">5</div>
+                    <div class="workflow-step-title">Create</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <h2>🎮 Test Controls</h2>
+            <div class="button-group">
+                <button class="btn-primary" id="runPreviewBtn">
+                    ▶️ Generate Product Preview
+                </button>
+                <button class="btn-secondary" id="clearLogsBtn">
+                    🗑️ Clear Results
+                </button>
+                <button class="btn-secondary" id="refreshStatusBtn">
+                    🔄 Check Status
+                </button>
+            </div>
+        </div>
+
+        <div class="preview-container">
+            <h2>📋 Preview Results</h2>
+            <div id="resultsContainer" class="empty-state">
+                <p>🎬 Click "Generate Product Preview" to start</p>
+                <p style="font-size: 0.9em;">This will optimize your image and show how it looks on a vendor product mockup</p>
+            </div>
+            <div id="previewContent" style="display: none;"></div>
+            <div class="logs" id="logsContainer" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            running: false,
+            logs: [],
+            previewData: null
+        };
+
+        // Check harness status on load
+        checkHarnessStatus();
+
+        document.getElementById('runPreviewBtn').addEventListener('click', runPreview);
+        document.getElementById('clearLogsBtn').addEventListener('click', clearLogs);
+        document.getElementById('refreshStatusBtn').addEventListener('click', checkHarnessStatus);
+
+        async function checkHarnessStatus() {
+            try {
+                const response = await fetch('/api/merchandise/preview-harness/status');
+                const data = await response.json();
+                if (data.success) {
+                    console.log('✅ Preview harness ready');
+                } else {
+                    console.log('❌ Preview harness unavailable');
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+            }
+        }
+
+        async function runPreview() {
+            if (state.running) return;
+
+            state.running = true;
+            document.getElementById('runPreviewBtn').disabled = true;
+
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('previewContent').style.display = 'block';
+            document.getElementById('logsContainer').style.display = 'block';
+            document.getElementById('logsContainer').innerHTML = '';
+            state.logs = [];
+
+            addLog('🎬 Starting product preview generation...', 'info');
+
+            try {
+                addLog('📡 Sending optimization and preview request...', 'info');
+                const response = await fetch('/api/merchandise/preview-harness/optimize-and-preview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    addLog(`✅ Preview generation SUCCESSFUL`, 'success');
+                    state.previewData = data.preview_workflow;
+                    displayPreview(data.preview_workflow);
+                } else {
+                    addLog(`❌ Preview generation FAILED: ${data.error}`, 'error');
+                    addLog(`   Details: ${data.details}`, 'error');
+                    if (data.optimization_completed) {
+                        addLog(`   Note: Image was optimized but preview creation failed`, 'info');
+                    }
+                }
+
+            } catch (error) {
+                addLog(`❌ ERROR: ${error.message}`, 'error');
+            }
+
+            state.running = false;
+            document.getElementById('runPreviewBtn').disabled = false;
+            addLog('🏁 Preview generation complete!', 'success');
+        }
+
+        function displayPreview(data) {
+            const container = document.getElementById('previewContent');
+
+            let html = `
+                <div class="preview-section">
+                    <h3>🖼️ Source Image</h3>
+                    <div class="preview-item">
+                        <span class="preview-label">Image Name:</span>
+                        <span class="preview-value">${data.selected_image.name}</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Type:</span>
+                        <span class="preview-value">${data.selected_image.type}</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Size:</span>
+                        <span class="preview-value">${formatBytes(data.selected_image.size)}</span>
+                    </div>
+                    <img src="${data.selected_image.url}" alt="Source" class="preview-image">
+                </div>
+
+                <div class="preview-section">
+                    <h3>🛍️ Selected Product</h3>
+                    <div class="preview-item">
+                        <span class="preview-label">Product Name:</span>
+                        <span class="preview-value">${data.selected_product.name}</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Category:</span>
+                        <span class="preview-value">${data.selected_product.category}</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Vendor:</span>
+                        <span class="preview-value">${data.selected_product.provider}</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Blueprint ID:</span>
+                        <span class="preview-value">${data.selected_product.blueprint}</span>
+                    </div>
+                </div>
+
+                <div class="preview-section">
+                    <h3>⚙️ Optimization Results</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${data.optimization_result.strategy.toUpperCase()}</div>
+                            <div class="stat-label">Strategy</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${data.optimization_result.processingTime}ms</div>
+                            <div class="stat-label">Processing Time</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${data.optimization_result.scaleFactor.toFixed(2)}x</div>
+                            <div class="stat-label">Scale Factor</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">$${data.optimization_result.estimatedCost.toFixed(2)}</div>
+                            <div class="stat-label">Cost Estimate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-section">
+                    <h3>🎬 Vendor Preview</h3>
+                    <div class="preview-item">
+                        <span class="preview-label">Preview ID:</span>
+                        <span class="preview-value">${data.vendor_preview.previewProductId}</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Title:</span>
+                        <span class="preview-value">${data.vendor_preview.title}</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Print Area:</span>
+                        <span class="preview-value">${data.vendor_preview.printArea.width}" x ${data.vendor_preview.printArea.height}"</span>
+                    </div>
+
+                    <div class="product-mockup">
+                        <img src="${data.selected_image.url}" alt="Product Mockup" class="product-mockup-image">
+                        <div class="product-mockup-title">${data.selected_product.name}</div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <a href="${data.actions.viewPreview}" class="btn-primary btn-small" target="_blank">
+                            👁️ View Full Preview
+                        </a>
+                        <button class="btn-success btn-small" onclick="runPreview()">
+                            🔄 Generate Another
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function addLog(message, level = 'info') {
+            state.logs.push({ message, level, timestamp: new Date() });
+            const logsContainer = document.getElementById('logsContainer');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${level}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        function clearLogs() {
+            state.logs = [];
+            document.getElementById('logsContainer').innerHTML = '';
+            document.getElementById('previewContent').innerHTML = '';
+            document.getElementById('resultsContainer').style.display = 'block';
+            document.getElementById('previewContent').style.display = 'none';
+            document.getElementById('logsContainer').style.display = 'none';
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>
