@@ -2751,8 +2751,26 @@ router.post('/test-harness/optimize-random', ensureAuthenticated, groupAuth.requ
 
       const optimizer = new ImageOptimizer();
 
-      // optimizeForProduct takes imageBuffer and productKey
-      const result = await optimizer.optimizeForProduct(imageBuffer, selectedProduct.id);
+      // optimizeForProduct takes imageBuffer and specKey
+      // The spec key is based on the product category (e.g., 'apparel-tshirt')
+      // For now, try with the product category directly
+      let specKey = selectedProduct.category;
+
+      // If it's a simple category like 't-shirt', try to find matching spec
+      // Common mappings: 't-shirt' -> 'apparel-tshirt', 'hoodie' -> 'apparel-hoodie'
+      if (specKey === 't-shirt') {
+        specKey = 'apparel-tshirt';
+      } else if (specKey === 'heavy-cotton-tee') {
+        specKey = 'apparel-tshirt';  // Fallback to standard tshirt specs
+      } else if (specKey.includes('hoodie')) {
+        specKey = 'apparel-hoodie';
+      } else if (specKey.includes('tank')) {
+        specKey = 'apparel-tank';
+      }
+
+      console.log(`📋 Using spec key: ${specKey} (product category: ${selectedProduct.category})`);
+
+      const result = await optimizer.optimizeForProduct(imageBuffer, specKey);
       console.log(`✅ Optimization complete - Strategy: ${result.analysis.action}`);
 
       // Record optimization analytics
