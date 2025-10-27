@@ -41,6 +41,11 @@ class WavelengthAdminToolkit {
                 name: 'AWS Manager',
                 description: 'Clean room AWS infrastructure management',
                 script: 'aws-admin.js',
+            },
+            'deploy': {
+                name: 'Deployment Manager',
+                description: 'Clean room deployment pipeline management',
+                script: 'deploy-admin.js',
             }
         };
     }
@@ -67,6 +72,8 @@ class WavelengthAdminToolkit {
         console.log(chalk.white('  Example: npm run cli:admin chatbot query "Who is Andrew?"'));
         console.log(chalk.white('  Example: npm run cli:admin aws cloudfront list'));
         console.log(chalk.white('  Example: npm run cli:admin aws apprunner status'));
+        console.log(chalk.white('  Example: npm run cli:admin deploy deploy'));
+        console.log(chalk.white('  Example: npm run cli:admin deploy monitor'));
         console.log('');
         
         console.log(chalk.green('🌟 Pristine Tools - Isolated & Reliable'));
@@ -150,6 +157,23 @@ class WavelengthAdminToolkit {
                     }
                     
                     await toolInstance.handleCommand(service, operation, options);
+                    
+                } else if (toolKey === 'deploy') {
+                    // Handle deployment subcommands
+                    const operation = args[0] || 'help';
+                    const subArgs = args.slice(1);
+                    
+                    // Parse options
+                    const options = {};
+                    for (let i = 0; i < subArgs.length; i += 2) {
+                        if (subArgs[i]?.startsWith('--')) {
+                            const key = subArgs[i].substring(2);
+                            const value = subArgs[i + 1];
+                            options[key] = value;
+                        }
+                    }
+                    
+                    await toolInstance.handleCommand(operation, options);
                     
                 } else if (toolKey === 'chatbot') {
                     // Handle chatbot subcommands
