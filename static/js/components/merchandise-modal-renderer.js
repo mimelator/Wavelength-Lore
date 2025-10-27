@@ -1451,20 +1451,27 @@ class MerchandiseModalRenderer {
    */
   showModal(modalHtml, options = {}) {
     const { appendTo = document.body, focus = true } = options;
-    
+
     // Create modal element
     const modalElement = document.createElement('div');
     modalElement.innerHTML = modalHtml;
-    const modal = modalElement.firstElementChild;
-    
-    // Add to DOM
-    appendTo.appendChild(modal);
-    
-    // Track active modal
-    const modalId = modal.dataset.modalId;
+    const overlay = modalElement.firstElementChild;
+
+    // The actual modal dialog might be inside the overlay (for fullscreen modals)
+    // Try to find modal-dialog inside the overlay, otherwise use overlay itself
+    let modal = overlay.querySelector('.modal-dialog') || overlay;
+
+    // Add overlay to DOM (contains the modal-dialog)
+    appendTo.appendChild(overlay);
+
+    console.log('📦 showModal: overlay classes:', overlay.className);
+    console.log('📦 showModal: modal classes:', modal.className);
+
+    // Track active modal using the overlay's modal ID
+    const modalId = overlay.dataset.modalId;
     this.activeModals.add(modalId);
-    
-    // Setup event listeners
+
+    // Setup event listeners on the modal dialog (not the overlay)
     this.setupModalEventListeners(modal);
     
     // Focus management
@@ -1512,11 +1519,16 @@ class MerchandiseModalRenderer {
   
   /**
    * Setup modal event listeners
-   * @param {HTMLElement} modal - Modal element
+   * @param {HTMLElement} modal - Modal element (the dialog, not the overlay)
    */
   setupModalEventListeners(modal) {
-    console.log('📋 setupModalEventListeners called for modal:', modal.dataset.modalId);
-    const modalId = modal.dataset.modalId;
+    // Get modalId from the overlay (parent of modal-dialog)
+    const overlay = modal.classList.contains('modal-overlay') ? modal : modal.closest('.modal-overlay');
+    const modalId = overlay?.dataset.modalId;
+
+    console.log('📋 setupModalEventListeners called for modal:', modalId);
+    console.log('📋 Modal element classes:', modal.className);
+    console.log('📋 Overlay element classes:', overlay?.className);
 
     // Close button handlers
     modal.addEventListener('click', (e) => {
@@ -1524,7 +1536,7 @@ class MerchandiseModalRenderer {
           e.target.closest('.modal-close-btn')) {
         this.hideModal(modalId);
       }
-      
+
       // Close on overlay click
       if (e.target.classList.contains('modal-overlay')) {
         this.hideModal(modalId);
