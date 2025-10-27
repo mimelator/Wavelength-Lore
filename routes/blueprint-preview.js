@@ -39,7 +39,7 @@ router.get('/blueprint-preview/:blueprintId', async (req, res) => {
         
         console.log(`🔍 Fetching blueprint preview for: ${blueprintId}`);
         
-        // Get blueprint details from Printify
+                // Get blueprint details from Printify
         const blueprints = await printifyService.getBlueprints();
         if (!blueprints.success) {
             throw new Error('Failed to fetch blueprints from Printify');
@@ -59,33 +59,24 @@ router.get('/blueprint-preview/:blueprintId', async (req, res) => {
             success: true,
             blueprintId: parseInt(blueprintId),
             name: blueprint.title,
-            description: blueprint.description,
+            description: blueprint.description || '',
             brand: blueprint.brand,
+            model: blueprint.model,
             previewImage: null,
-            fallbackImage: null
+            fallbackImage: '/images/previews/generic-product-preview.svg'
         };
         
-        // Look for preview images in blueprint data
+        // Use official Printify preview images
         if (blueprint.images && blueprint.images.length > 0) {
-            // Use the first image as preview
+            // Use the first official image as primary preview
             result.previewImage = blueprint.images[0];
-            console.log(`✅ Found preview image for blueprint ${blueprintId}: ${result.previewImage}`);
-        } else if (blueprint.image) {
-            // Some blueprints might have a single image field
-            result.previewImage = blueprint.image;
-            console.log(`✅ Found single image for blueprint ${blueprintId}: ${result.previewImage}`);
+            console.log(`✅ Using official Printify image for blueprint ${blueprintId}: ${result.previewImage}`);
         }
         
-        // Create a fallback image URL based on category/type
-        const category = blueprint.title.toLowerCase();
-        if (category.includes('tee') || category.includes('t-shirt')) {
-            result.fallbackImage = '/images/placeholders/tshirt-preview.png';
-        } else if (category.includes('hoodie')) {
-            result.fallbackImage = '/images/placeholders/hoodie-preview.png';
-        } else if (category.includes('mug')) {
-            result.fallbackImage = '/images/placeholders/mug-preview.png';
-        } else {
-            result.fallbackImage = '/images/placeholders/generic-product.png';
+        // If no official image available, use local fallback
+        if (!result.previewImage) {
+            result.previewImage = result.fallbackImage;
+            console.log(`⚠️ No official image for blueprint ${blueprintId}, using fallback`);
         }
         
         // Cache the result
@@ -149,29 +140,21 @@ router.post('/blueprint-previews', async (req, res) => {
                         success: true,
                         blueprintId: parseInt(blueprintId),
                         name: blueprint.title,
-                        description: blueprint.description,
+                        description: blueprint.description || '',
                         brand: blueprint.brand,
+                        model: blueprint.model,
                         previewImage: null,
-                        fallbackImage: null
+                        fallbackImage: '/images/previews/generic-product-preview.svg'
                     };
                     
-                    // Extract preview image
+                    // Use official Printify preview images
                     if (blueprint.images && blueprint.images.length > 0) {
                         result.previewImage = blueprint.images[0];
-                    } else if (blueprint.image) {
-                        result.previewImage = blueprint.image;
                     }
                     
-                    // Create fallback
-                    const category = blueprint.title.toLowerCase();
-                    if (category.includes('tee') || category.includes('t-shirt')) {
-                        result.fallbackImage = '/images/placeholders/tshirt-preview.png';
-                    } else if (category.includes('hoodie')) {
-                        result.fallbackImage = '/images/placeholders/hoodie-preview.png';
-                    } else if (category.includes('mug')) {
-                        result.fallbackImage = '/images/placeholders/mug-preview.png';
-                    } else {
-                        result.fallbackImage = '/images/placeholders/generic-product.png';
+                    // If no official image available, use local fallback
+                    if (!result.previewImage) {
+                        result.previewImage = result.fallbackImage;
                     }
                     
                     // Cache it

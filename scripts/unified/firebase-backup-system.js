@@ -35,27 +35,18 @@
  */
 
 require('dotenv').config();
-const firebaseAdminUtils = require('../../helpers/firebase-admin-utils');
 const fs = require('fs').promises;
 const path = require('path');
 const yaml = require('js-yaml');
 const zlib = require('zlib');
 const { promisify } = require('util');
 
-// Initialize Firebase Admin
-let admin, db;
+// Use existing Firebase utilities (same pattern as export script)
+const firebaseUtils = require('../../helpers/firebase-utils');
+const { fetchDataAsAdmin } = require('../../helpers/firebase-admin-utils');
 
-async function initializeFirebase() {
-  try {
-    firebaseAdminUtils.initializeFirebaseAdmin();
-    admin = require('firebase-admin');
-    db = admin.database();
-    console.log('🔥 Firebase initialized successfully');
-  } catch (error) {
-    console.error('❌ Firebase initialization failed:', error.message);
-    throw error;
-  }
-}
+// Initialize Firebase using existing utility
+firebaseUtils.initializeFirebase('backup-script');
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -113,9 +104,7 @@ async function backupCharacters(backupDir) {
   console.log('🦸 Backing up characters...');
   
   try {
-    const charactersRef = db.ref('characters');
-    const snapshot = await charactersRef.once('value');
-    const charactersData = snapshot.val();
+    const charactersData = await firebaseUtils.fetchFromFirebase('characters');
     
     if (!charactersData) {
       console.log('  ⚠️  No characters data found');
@@ -169,9 +158,7 @@ async function backupEpisodes(backupDir) {
   console.log('🎬 Backing up episodes...');
   
   try {
-    const videosRef = db.ref('videos');
-    const snapshot = await videosRef.once('value');
-    const videosData = snapshot.val();
+    const videosData = await firebaseUtils.fetchFromFirebase('videos');
     
     if (!videosData) {
       console.log('  ⚠️  No episodes data found');
@@ -228,9 +215,7 @@ async function backupLore(backupDir) {
   console.log('📚 Backing up lore...');
   
   try {
-    const loreRef = db.ref('lore');
-    const snapshot = await loreRef.once('value');
-    const loreData = snapshot.val();
+    const loreData = await firebaseUtils.fetchFromFirebase('lore');
     
     if (!loreData) {
       console.log('  ⚠️  No lore data found');
@@ -284,9 +269,7 @@ async function backupForum(backupDir) {
   console.log('💬 Backing up forum...');
   
   try {
-    const forumRef = db.ref('forum');
-    const snapshot = await forumRef.once('value');
-    const forumData = snapshot.val();
+    const forumData = await firebaseUtils.fetchFromFirebase('forum');
     
     if (!forumData) {
       console.log('  ⚠️  No forum data found');
@@ -335,9 +318,7 @@ async function backupAnalytics(backupDir) {
   console.log('📊 Backing up analytics...');
   
   try {
-    const analyticsRef = db.ref('analytics');
-    const snapshot = await analyticsRef.once('value');
-    const analyticsData = snapshot.val();
+    const analyticsData = await firebaseUtils.fetchFromFirebase('analytics');
     
     if (!analyticsData) {
       console.log('  ⚠️  No analytics data found');

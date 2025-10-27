@@ -1,0 +1,214 @@
+{
+  "alex": {
+    "description": "The Precocious Free-Spirited Violinist of Wavelength and Daughter of Prince Andrew and Jewel, Alexandria is a quarter elf and musically gifted like her mother.  She loves to teach others how to play and compose music...  Especially young children.",
+    "id": "alex",
+    "image": "/images/characters/wavelength/alexandria-1.webp",
+    "image_gallery": [
+      "/images/characters/wavelength/alexandria-1.webp",
+      "/images/characters/wavelength/alexandria-2.webp",
+      "/images/characters/wavelength/alexandria-3.webp",
+      "/images/characters/wavelength/alexandria-4.webp",
+      "/images/characters/wavelength/alexandria-5.webp",
+      "/images/characters/wavelength/alexandria-6.webp"
+    ],
+    "keywords": [
+      "alexandria",
+      "Alex",
+      "The Daughter",
+      "Quarter Elf",
+      "Music Teacher",
+      "Young Teacher"
+    ],
+    "title": "Alexandria"
+  },
+  "andrew": {
+    "description": "The lead singer and lutist of Wavelength, husband of Jewel, and father of Alexandria and Eloquence",
+    "id": "andrew",
+    "image": "/images/characters/wavelength/andrew-4.webp",
+    "image_gallery": [
+      "/images/characters/wavelength/IceBlueGreed-08.webp",
+      "/images/characters/wavelength/MyLuckyCharm-02.webp",
+      "/images/characters/wavelength/MyLuckyCharm-08.webp",
+      "/images/characters/wavelength/TheShireDream-02.webp",
+      "/images/characters/wavelength/TheSongOfMourning-19.webp",
+      "/images/characters/wavelength/andrew-1.webp",
+      "/images/characters/wavelength/andrew-2.webp",
+      "/images/characters/wavelength/andrew-3.webp",
+      "/images/characters/wavelength/andrew-4.webp",
+      "/images/characters/wavelength/andrew-5.webp",
+      "https://df5sj8f594cdx.cloudfront.net/images/characters/andrew/ai-generated-1760959221256-d44f7f91bc02412f.png"
+    ],
+    "keywords": [
+      "The Prince",
+      "The Leader",
+      "Andrew",
+      "Band Leader",
+      "Father",
+      "Husband"
+    ],
+    "title": "Prince Andrew"
+  },
+  "daphne": {
+    "description": "The prodigy daughter of the Shire's Choir Master, Daphne is a gifted drummer who joins Wavelength after the Battle of the Shire when she and her brother are orphaned and Wavelength loses their Drummer Maurice.",
+    "id": "daphne",
+    "image": "/images/characters/wavelength/daphne-6.webp",
+    "image_gallery": [
+      "/images/characters/wavelength/TheSongOfMourning-05.webp",
+      "/images/characters/wavelength/TheSongOfMourning-06.webp",
+      "/images/characters/wavelength/TheSongOfMourning-18.webp",
+      "/images/characters/wavelength/TheSongOfMourning-19.webp",
+      "/images/characters/wavelength/TheShireDream-11.webp",
+      "/images/characters/wavelength/daphne-1.webp",
+      "/images/characters/wavelength/daphne-2.webp",
+      "/images/characters/wavelength/daphne-3.webp",
+      "/images/characters/wavelength/daphne-4.webp",
+      "/images/characters/wavelength/daphne-5.webp",
+      "/images/characters/wavelength/daphne-6.webp"
+    ],
+    "keywords": [
+      "daphne",
+      "The Prodigy",
+      "Drummer Girl",
+      "Orphan",
+      "New Drummer",
+      "Choir Master's Daughter"
+    ],
+    "title": "Daphne"
+  },
+  "eloquence": {
+    "description": "The Bass player of Wavelength Son of Prince Andrew and Jewel, Eloquence is a quarter elf and passionate about the Bass Guitar as well as Rhythm Theory.  He was best friends with Magical Maurice the Percussion Wizard of Wavelength until Maurice died at the Battle of the Shire.",
+    "id": "eloquence",
+    "image": "/images/characters/wavelength/eloquence-5.webp",
+    "image_gallery": [
+      "/images/characters/wavelength/TheSongOfMourning-06.webp",
+      "/images/characters/wavelength/TheSongOfMourning-18.webp",
+      "/images/characters/wavelength/LockedAndLoaded-03.webp",
+      "/images/characters/wavelength/LockedAndLoaded-14.webp",
+      "/images/characters/wavelength/eloquence-1.webp",
+      "/images/characters/wavelength/eloquence-2.webp",
+      "/images/characters/wavelength/eloquence-3.webp",
+      "/images/characters/wavelength/eloquence-4.webp",
+      "/images/characters/wavelength/eloquence-5.webp"
+    ],
+    "keywords": [
+      "eloquence",
+      "The Son",
+      "Bass Player",
+      "Quarter Elf",
+      "Rhythm Expert",
+      "Best Friend"
+    ],
+    "title": "Eloquence"
+  },
+  "jewel": {
+    "description": "The harpist of Wavelength and Wife of Prince Andrew and mother of Alexandria and Eloquence.  Being half elf, she obtained a superior musical education and has innate gifted musical talents, but being a half elf her community shunner her.  She met her husband at a Summer Music Workshop and after years of marriage and raising two children they formed the band Wavelength.",
+    "id": "jewel",
+    "image": "/images/characters/wavelength/jewel-5.webp",
+    "image_gallery": [
+      "/images/characters/wavelength/TheShireDream-11.webp",
+      "/images/characters/wavelength/IceBlueGreed-08.webp",
+      "/images/characters/wavelength/MyLuckyCharm-08.webp",
+      "/images/characters/wavelength/TheShireDream-02.webp",
+      "/images/characters/wavelength/TheSongOfMourning-19.webp",
+      "/images/characters/wavelength/jewel-1.webp",
+      "/images/characters/wavelength/jewel-2.webp",
+      "/images/characters/wavelength/jewel-3.webp",
+      "/images/characters/wavelength/jewel-4.webp",
+      "/images/characters/wavelength/jewel-5.webp",
+      "/images/characters/wavelength/jewel-6.webp"
+    ],
+    "keywords": [
+      "jewel",
+      "Princess Jewel",
+      "Half Elf",
+      "Musical Talent",
+      "Mother",
+      "Wife"
+    ],
+    "title": "Jewel"
+  },
+  "lucky": {
+    "description": "Lucky is the Leprechaun who has an endless supply of Golden Advice.  His wisdom has earned him a role as the a beloved token of luck to the Shire.  But after the Battle of the Shire, Lucky decides to travel with Wavelength for awhile even though he isn't a musician per-se.  He is a fantastic singer though.  Mostly, he wants to fish and everywhere the Wavelength travels, seems to include a convenient fishing opporunity for Lucky.",
+    "id": "lucky",
+    "image": "/images/characters/wavelength/lucky_closeup.webp",
+    "image_gallery": [
+      "/images/characters/wavelength/MyLuckyCharm-02.webp",
+      "/images/characters/wavelength/MyLuckyCharm-08.webp",
+      "/images/characters/wavelength/MyLuckyCharm-10.webp",
+      "/images/characters/wavelength/IceBlueGreed-06.webp",
+      "/images/characters/wavelength/IceBlueGreed-08.webp",
+      "/images/characters/wavelength/TheBattleOfTheShire-058.webp",
+      "/images/characters/wavelength/lucky-1.webp",
+      "/images/characters/wavelength/lucky-2.webp",
+      "/images/characters/wavelength/lucky-3.webp",
+      "/images/characters/wavelength/lucky-4.webp",
+      "/images/characters/wavelength/lucky-5.webp",
+      "/images/characters/wavelength/lucky-6.webp",
+      "/images/characters/wavelength/lucky_closeup.webp"
+    ],
+    "keywords": [
+      "lucky",
+      "The Leprechaun",
+      "Wise Elder",
+      "Golden Advice",
+      "Fisher",
+      "Token of Luck",
+      "Singing Fisherman"
+    ],
+    "title": "Lucky"
+  },
+  "maurice": {
+    "description": "Wavelength has been blessed with the Percussion Wizard, Maurice.  Maurice is a Dwarf who is short in stature but big in heart.  He is a master of rhythm and percussion, and his drumming skills are unmatched in all the land.  Maurice's beats can shake the very earth and inspire courage in the hearts of his allies.  He is a loyal companion to Wavelength and will stop at nothing to protect his friends and their music.  He is also very much a big brother figure to Eloquence.  Sadly, he died at the Battle of the Shire, defending the Shire from the Goblin King and his Misery of Goblins.",
+    "id": "maurice",
+    "image": "/images/characters/wavelength/maurice-4.webp",
+    "image_gallery": [
+      "/images/characters/wavelength/maurice-1.webp",
+      "/images/characters/wavelength/maurice-2.webp",
+      "/images/characters/wavelength/maurice-3.webp",
+      "/images/characters/wavelength/maurice-4.webp",
+      "/images/characters/wavelength/maurice-5.webp",
+      "/images/characters/wavelength/maurice-6.webp"
+    ],
+    "keywords": [
+      "maurice",
+      "The Merchant",
+      "Percussion Wizard",
+      "Magical Maurice",
+      "The Dwarf",
+      "Big Brother",
+      "Fallen Hero"
+    ],
+    "title": "Maurice"
+  },
+  "yeti": {
+    "description": "Wavelength first met Yeti up in the far, frozen North at the Ice Castle.  Yeti, while ferocious looking is actually a Nurse in practice.  Although very clumsy, which is how he got the name: Yeti.  He keeps falling down, 'Yeti' gets back up again.",
+    "id": "yeti",
+    "image": "/images/characters/wavelength/yeti-5.webp",
+    "image_gallery": [
+      "/images/characters/wavelength/TheKingHasFled-08.webp",
+      "/images/characters/wavelength/TheKingHasFled-13.webp",
+      "/images/characters/wavelength/FrozenPeace-16.webp",
+      "/images/characters/wavelength/TheSongOfMourning-06.webp",
+      "/images/characters/wavelength/LockedAndLoaded-04.webp",
+      "/images/characters/wavelength/TheBattleOfTheShire-050.webp",
+      "/images/characters/wavelength/PrepareForBattle-14.webp",
+      "/images/characters/wavelength/yeti.webp",
+      "/images/characters/wavelength/yeti2.webp",
+      "/images/characters/wavelength/yeti-1.webp",
+      "/images/characters/wavelength/yeti-2.webp",
+      "/images/characters/wavelength/yeti-3.webp",
+      "/images/characters/wavelength/yeti-4.webp",
+      "/images/characters/wavelength/yeti-5.webp",
+      "/images/characters/wavelength/yeti-6.webp"
+    ],
+    "keywords": [
+      "yeti",
+      "Ice Beast",
+      "The Nurse",
+      "Clumsy Giant",
+      "Ice Castle Guardian",
+      "Ferocious Healer"
+    ],
+    "title": "Yeti"
+  }
+}

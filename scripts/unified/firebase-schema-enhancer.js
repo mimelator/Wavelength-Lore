@@ -12,13 +12,14 @@
  * Usage: node scripts/unified/firebase-schema-enhancer.js [options]
  * 
  * Options:
- *   --dry-run          Show what would be updated without making changes
- *   --characters       Update only character schema
- *   --episodes         Update only episode schema  
- *   --lore             Update only lore schema
- *   --analytics        Update only analytics schema
- *   --backup           Create backup before changes
- *   --rollback         Rollback to previous backup
+ *   --dry-run              Show what would be updated without making changes
+ *   --characters           Update only character schema
+ *   --episodes             Update only episode schema  
+ *   --lore                 Update only lore schema
+ *   --analytics            Update only analytics schema
+ *   --backup               Create backup before changes
+ *   --rollback             Rollback to previous backup
+ *   --use-authentic-content Use Wavelength Chatbot for authentic content generation
  * 
  * Examples:
  *   node scripts/unified/firebase-schema-enhancer.js --dry-run
@@ -27,14 +28,15 @@
  */
 
 require('dotenv').config();
-const firebaseAdminUtils = require('../../helpers/firebase-admin-utils');
 const fs = require('fs').promises;
 const path = require('path');
 
-// Initialize Firebase Admin
-firebaseAdminUtils.initializeFirebaseAdmin();
-const admin = require('firebase-admin');
-const db = admin.database();
+// Use existing Firebase utilities (same pattern as backup script)
+const firebaseUtils = require('../../helpers/firebase-utils');
+const { fetchDataAsAdmin, writeDataAsAdmin } = require('../../helpers/firebase-admin-utils');
+
+// Initialize Firebase using existing utility
+firebaseUtils.initializeFirebase('schema-enhancer');
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -123,9 +125,7 @@ async function createBackup() {
 async function enhanceCharacterSchema() {
   console.log('🦸 Enhancing character schema...');
   
-  const charactersRef = db.ref('characters');
-  const snapshot = await charactersRef.once('value');
-  const charactersData = snapshot.val();
+  const charactersData = await firebaseUtils.fetchFromFirebase('characters');
   
   if (!charactersData) {
     console.log('  ⚠️  No characters found');
@@ -168,7 +168,10 @@ async function enhanceCharacterSchema() {
   }
   
   if (!flags.dryRun && Object.keys(updates).length > 0) {
-    await db.ref().update(updates);
+    // Update characters one by one using writeDataAsAdmin
+    for (const [path, data] of Object.entries(updates)) {
+      await writeDataAsAdmin(path, data);
+    }
     console.log(`  ✅ Updated ${updateCount} characters with CTA fields`);
   } else if (flags.dryRun) {
     console.log(`  📋 Would update ${updateCount} characters`);
@@ -183,9 +186,7 @@ async function enhanceCharacterSchema() {
 async function enhanceEpisodeSchema() {
   console.log('🎬 Enhancing episode schema...');
   
-  const videosRef = db.ref('videos');
-  const snapshot = await videosRef.once('value');
-  const videosData = snapshot.val();
+  const videosData = await firebaseUtils.fetchFromFirebase('videos');
   
   if (!videosData) {
     console.log('  ⚠️  No episodes found');
@@ -232,7 +233,10 @@ async function enhanceEpisodeSchema() {
   }
   
   if (!flags.dryRun && Object.keys(updates).length > 0) {
-    await db.ref().update(updates);
+    // Update episodes one by one using writeDataAsAdmin
+    for (const [path, data] of Object.entries(updates)) {
+      await writeDataAsAdmin(path, data);
+    }
     console.log(`  ✅ Updated ${updateCount} episodes with CTA fields`);
   } else if (flags.dryRun) {
     console.log(`  📋 Would update ${updateCount} episodes`);
@@ -247,9 +251,7 @@ async function enhanceEpisodeSchema() {
 async function enhanceLoreSchema() {
   console.log('📚 Enhancing lore schema...');
   
-  const loreRef = db.ref('lore');
-  const snapshot = await loreRef.once('value');
-  const loreData = snapshot.val();
+  const loreData = await firebaseUtils.fetchFromFirebase('lore');
   
   if (!loreData) {
     console.log('  ⚠️  No lore found');
@@ -292,7 +294,10 @@ async function enhanceLoreSchema() {
   }
   
   if (!flags.dryRun && Object.keys(updates).length > 0) {
-    await db.ref().update(updates);
+    // Update lore items one by one using writeDataAsAdmin
+    for (const [path, data] of Object.entries(updates)) {
+      await writeDataAsAdmin(path, data);
+    }
     console.log(`  ✅ Updated ${updateCount} lore items with CTA fields`);
   } else if (flags.dryRun) {
     console.log(`  📋 Would update ${updateCount} lore items`);
@@ -307,9 +312,7 @@ async function enhanceLoreSchema() {
 async function createAnalyticsSchema() {
   console.log('📊 Creating analytics schema...');
   
-  const analyticsRef = db.ref('analytics');
-  const snapshot = await analyticsRef.once('value');
-  const existingData = snapshot.val();
+  const existingData = await firebaseUtils.fetchFromFirebase('analytics');
   
   if (existingData) {
     console.log('  ℹ️  Analytics schema already exists');
@@ -341,7 +344,7 @@ async function createAnalyticsSchema() {
   };
   
   if (!flags.dryRun) {
-    await analyticsRef.set(analyticsSchema);
+    await writeDataAsAdmin('analytics', analyticsSchema);
     console.log('  ✅ Analytics schema created');
   } else {
     console.log('  📋 Would create analytics schema:', Object.keys(analyticsSchema));
