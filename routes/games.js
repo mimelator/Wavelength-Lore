@@ -139,17 +139,24 @@ router.get('/api/list', groupAuth.requireAction('game_access_member'), async (re
         
         // Filter games based on access level
         const availableGames = allThemedGames.map(game => {
-            // Jigsaw puzzle is VIP-only (still under development)
-            if (game.id.includes('lore-tapestry') || game.id.includes('jigsaw')) {
+            // Jigsaw puzzle is VIP-only and coming soon
+            if (game.id.includes('lore-tapestry') || game.id.includes('jigsaw') || game.vip_exclusive) {
                 if (!hasVipAccess) {
                     return {
                         ...game,
                         status: 'vip-required',
-                        cta_primary: 'VIP Required',
-                        description: `${game.description} (VIP access required - game under development)`,
-                        access_note: 'This game is currently exclusive to VIP members while under development.'
+                        cta_primary: 'VIP Only - Coming Soon',
+                        description: game.description, // Keep the original description which already mentions VIP Only
+                        access_note: 'This advanced strategic puzzle experience is exclusive to VIP members.',
+                        upgrade_message: 'Upgrade to VIP for exclusive access to development games!'
                     };
                 }
+                // For VIP users, keep the coming-soon status
+                return {
+                    ...game,
+                    status: 'coming-soon',
+                    vip_preview: true
+                };
             }
             return game;
         });

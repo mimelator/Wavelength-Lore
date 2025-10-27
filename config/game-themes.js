@@ -159,10 +159,11 @@ function generateGamesWithTheme(theme = ACTIVE_THEME) {
     games.push({
         id: `${theme}-lore-tapestry`,
         title: `${themeConfig.prefix}: Lore Tapestry`,
-        description: `${themeConfig.callToAction} Reconstruct legendary Middle-earth scenes with strategic time bonuses.`,
+        description: `${themeConfig.callToAction} Reconstruct legendary Middle-earth scenes with strategic time bonuses. (VIP Only - Coming Soon)`,
         category: 'strategic-reconstruction',
-        status: 'live',
-        releaseDate: '2024-10-27',
+        status: 'coming-soon',
+        access_level: 'vip-only',
+        releaseDate: '2025-Q1',
         thumbnail: '/images/games/jigsaw-lore-tapestry.jpg',
         
         // Theme-specific enhancements
@@ -179,9 +180,11 @@ function generateGamesWithTheme(theme = ACTIVE_THEME) {
         difficulty_progression: themeConfig.difficulty_names,
         
         // Enhanced CTA elements  
-        cta_primary: 'Start Puzzle',
-        cta_secondary: `Unlock ${themeConfig.lore_focus}`,
-        strategic_tagline: `${themeConfig.callToAction}`
+        cta_primary: 'VIP Only - Coming Soon',
+        cta_secondary: `Exclusive ${themeConfig.lore_focus}`,
+        strategic_tagline: `${themeConfig.callToAction}`,
+        vip_exclusive: true,
+        coming_soon_note: 'Advanced strategic puzzle experience for VIP members'
     });
     
     return games;

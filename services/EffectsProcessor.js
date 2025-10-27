@@ -33,13 +33,17 @@ class EffectsProcessor {
 
       console.log(`🎨 Processing image with effects:`, finalParams);
 
+      // Get image metadata first to know dimensions
+      const imageMetadata = await Sharp(imageBuffer).metadata();
+      console.log(`📐 Image dimensions: ${imageMetadata.width}x${imageMetadata.height}`);
+
       // Start with Sharp pipeline
       let pipeline = Sharp(imageBuffer);
 
       // Apply effects in optimal order
       pipeline = await this.applyColorGrading(pipeline, finalParams);
       pipeline = await this.applyLightingEffects(pipeline, finalParams);
-      pipeline = await this.applySpecialEffects(pipeline, finalParams);
+      pipeline = await this.applySpecialEffects(pipeline, finalParams, imageMetadata);
 
       // Convert to WebP for preview
       const processed = await pipeline
@@ -141,11 +145,11 @@ class EffectsProcessor {
   /**
    * Apply special effects (lightning, etc.)
    */
-  async applySpecialEffects(pipeline, params) {
+  async applySpecialEffects(pipeline, params, imageMetadata = {}) {
     try {
       // Lightning effect (electric color shift and vignette)
       if (params.lightning > 0) {
-        pipeline = await this.applyLightningEffect(pipeline, params.lightning);
+        pipeline = await this.applyLightningEffect(pipeline, params.lightning, imageMetadata);
       }
 
       return pipeline;
@@ -281,11 +285,16 @@ class EffectsProcessor {
    * Apply lightning strike effect
    * Creates electric blue/white tones with procedural lightning bolts and enhanced vignette
    */
-  async applyLightningEffect(pipeline, intensity) {
+  async applyLightningEffect(pipeline, intensity, imageMetadata = {}) {
     try {
       const lightningIntensity = Math.max(0, Math.min(1, intensity));
 
       if (lightningIntensity === 0) return pipeline;
+
+      // Get image dimensions, default to 1000x1000 if not available
+      const width = imageMetadata.width || 1000;
+      const height = imageMetadata.height || 1000;
+      console.log(`⚡ Applying lightning effect to ${width}x${height} image`);
 
       // Apply cool color shift (blue tones)
       pipeline = pipeline.modulate({
@@ -311,8 +320,8 @@ class EffectsProcessor {
         }
       ]);
 
-      // Create procedural lightning bolts
-      const lightningBolts = this.generateLightningBolts(lightningIntensity);
+      // Create procedural lightning bolts with correct dimensions
+      const lightningBolts = this.generateLightningBolts(lightningIntensity, width, height);
       pipeline = pipeline.composite([
         {
           input: lightningBolts,
@@ -321,16 +330,16 @@ class EffectsProcessor {
         }
       ]);
 
-      // Add strong vignette for drama
+      // Add strong vignette for drama with correct dimensions
       const vignetteOverlay = Buffer.from(`
-        <svg width="1000" height="1000" xmlns="http://www.w3.org/2000/svg">
+        <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <radialGradient id="lightning-vignette" cx="50%" cy="50%" r="70%">
               <stop offset="0%" style="stop-color:rgba(0,0,0,0);stop-opacity:1" />
               <stop offset="100%" style="stop-color:rgba(20,40,80,${lightningIntensity * 0.6});stop-opacity:1" />
             </radialGradient>
           </defs>
-          <rect width="1000" height="1000" fill="url(#lightning-vignette)" />
+          <rect width="${width}" height="${height}" fill="url(#lightning-vignette)" />
         </svg>
       `);
 
@@ -353,9 +362,7 @@ class EffectsProcessor {
    * Generate procedural lightning bolts
    * Creates fractal-like branching lightning paths
    */
-  generateLightningBolts(intensity) {
-    const width = 1000;
-    const height = 1000;
+  generateLightningBolts(intensity, width = 1000, height = 1000) {
     let svgContent = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <filter id="glow">
