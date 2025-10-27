@@ -316,11 +316,24 @@ class ImageUpscalingService {
         }
         
         console.log(`❌ Global cache MISS - proceeding with upscaling`);
+      } else {
+        // Cache miss - log diagnostic info
+        console.log('📋 CACHE DIAGNOSTIC SUMMARY:');
+        console.log('╔═══════════════════════════════════════════╗');
+        console.log('║           🔍 CACHE CHECK RESULT            ║');
+        console.log('╠═══════════════════════════════════════════╣');
+        console.log(`║ Status:       ❌ MISS                       ║`);
+        console.log(`║ Content Hash: ${cacheResult.contentHash ? cacheResult.contentHash.substring(0, 32) + '...' : 'N/A                       '} ║`);
+        console.log(`║ Reason:       ${(cacheResult.reason || 'No cached version').padEnd(25)} ║`);
+        console.log('╠═══════════════════════════════════════════╣');
+        console.log('║ Action:       ▶️ Proceeding with upscaling   ║');
+        console.log('║ Result:       Will be cached for reuse     ║');
+        console.log('╚═══════════════════════════════════════════╝');
       }
-      
+
       // Step 2: Proceed with actual upscaling
       const upscaleMethod = method === 'auto' ? this.chooseUpscaleMethod(contentType) : method;
-      
+
       // Track processing time
       const processingStartTime = Date.now();
       

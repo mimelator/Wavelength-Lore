@@ -9,69 +9,6 @@ const effectsConfig = {
    * Available effect toggles - simple on/off functionality
    */
   effectTypes: {
-    /**
-     * MASK EFFECTS - Transform image into iconic shapes
-     * Exclusive group: Only one mask can be active at a time
-     */
-    maskHeart: {
-      name: '💖 Heart Mask',
-      description: 'Transform image into a heart shape',
-      type: 'exclusive-mask',
-      group: 'mask',
-      enabled: false,
-      preset: {
-        mask: 'heart',
-        featherEdges: 0.15
-      }
-    },
-    maskLuckyCharm: {
-      name: '🍀 Lucky Charm Mask',
-      description: 'Transform image into a four-leaf clover shape',
-      type: 'exclusive-mask',
-      group: 'mask',
-      enabled: false,
-      preset: {
-        mask: 'lucky-charm',
-        featherEdges: 0.15
-      }
-    },
-    maskHorseshoe: {
-      name: '🧲 Horseshoe Mask',
-      description: 'Transform image into a horseshoe shape',
-      type: 'exclusive-mask',
-      group: 'mask',
-      enabled: false,
-      preset: {
-        mask: 'horseshoe',
-        featherEdges: 0.15
-      }
-    },
-    maskMushroom: {
-      name: '🍄 Mushroom Mask',
-      description: 'Transform image into a fun mushroom shape',
-      type: 'exclusive-mask',
-      group: 'mask',
-      enabled: false,
-      preset: {
-        mask: 'mushroom',
-        featherEdges: 0.15
-      }
-    },
-
-    /**
-     * FEATHER EFFECT - Smooth edge blending for printed objects
-     */
-    feather: {
-      name: '🌫️ Feather Edges',
-      description: 'Smoothly blend edges with printed object background',
-      type: 'toggle',
-      enabled: false,
-      preset: {
-        featherEdges: 0.25,
-        featherFalloff: 'smooth'
-      }
-    },
-
     vibrancy: {
       name: '🌈 Enhanced Vibrancy',
       description: 'Boost color saturation and warmth',
@@ -150,20 +87,6 @@ const effectsConfig = {
    * Effect categories for UI organization
    */
   categories: [
-    {
-      id: 'shape',
-      name: '✨ Shape Masks',
-      description: 'Transform image into iconic shapes',
-      effects: ['maskHeart', 'maskLuckyCharm', 'maskHorseshoe', 'maskMushroom'],
-      exclusive: true,
-      note: 'Select only one mask effect at a time'
-    },
-    {
-      id: 'blending',
-      name: '🌫️ Edge Effects',
-      description: 'Refine and blend edges for printing',
-      effects: ['feather']
-    },
     {
       id: 'color',
       name: '🎨 Color Effects',

@@ -41,8 +41,9 @@ class MaskProcessor {
       // Generate mask SVG based on type
       const maskSvg = this.generateMaskSVG(mask, width, height, featherEdges, featherFalloff);
 
-      // Create mask as PNG, properly sized
-      const maskBuffer = await Sharp(maskSvg)
+      // Create mask as PNG with proper size
+      // Black = transparent, White = opaque
+      const maskPng = await Sharp(maskSvg)
         .resize(width, height, {
           fit: 'fill',
           withoutEnlargement: false
@@ -50,15 +51,16 @@ class MaskProcessor {
         .png()
         .toBuffer();
 
-      console.log(`✅ Generated mask for ${mask}`);
+      console.log(`✅ Generated mask SVG for ${mask}`);
 
-      // Apply mask using composite directly on the image
-      // This is much simpler and avoids memory issues
+      // Apply mask using the 'darken' blend mode to create silhouette effect
+      // The mask PNG has black shape on white background
+      // Darken blend keeps the darker areas (black shape) and removes lighter areas (white background)
       const result = await Sharp(imageBuffer)
         .composite([
           {
-            input: maskBuffer,
-            blend: 'multiply',
+            input: maskPng,
+            blend: 'darken',  // Darken blend keeps black shape, removes white background
             gravity: 'center'
           }
         ])
@@ -73,7 +75,7 @@ class MaskProcessor {
 
     } catch (error) {
       console.error(`❌ Error applying mask:`, error.message);
-      console.error(`Error details:`, error);
+      console.error(`Stack:`, error.stack);
       throw error;
     }
   }
@@ -122,16 +124,17 @@ class MaskProcessor {
         maskPath = this.generateHeartPath(cx, cy, scale);
     }
 
-    // Create an SVG with a white shape on black background
-    // This will be used as a luminance mask where white = keep, black = transparent
+    // Create an SVG with a black shape on WHITE background
+    // When composited with 'darken' blend, it will keep the black shape and remove white areas
+    // This creates the mask effect where only the shape is visible
     const svg = `
       <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
         <defs>
           ${featherFilter}
         </defs>
-        <!-- Black background for transparency -->
-        <rect width="${width}" height="${height}" fill="black"/>
-        <!-- White shape with optional feathering -->
+        <!-- White background (will be removed by 'darken' blend) -->
+        <rect width="${width}" height="${height}" fill="white"/>
+        <!-- Black shape with optional feathering (will be kept by 'darken' blend) -->
         ${featherAmount > 0 ? `<g filter="url(#${filterId})">${maskPath}</g>` : maskPath}
       </svg>
     `;
@@ -157,7 +160,7 @@ class MaskProcessor {
         C ${cx} ${y}, ${x + heartWidth * 0.65} ${y + heartHeight * 0.15}, ${x + heartWidth * 0.75} ${y + heartHeight * 0.25}
         C ${x + heartWidth} ${y + heartHeight * 0.25}, ${x + heartWidth} ${y}, ${cx} ${y + heartHeight * 0.35}
         Z
-      " fill="white"/>
+      " fill="black"/>
     `;
   }
 
@@ -172,19 +175,19 @@ class MaskProcessor {
 
     return `
       <!-- Stem -->
-      <rect x="${cx - stemWidth / 2}" y="${cy}" width="${stemWidth}" height="${stemLength}" fill="white"/>
+      <rect x="${cx - stemWidth / 2}" y="${cy}" width="${stemWidth}" height="${stemLength}" fill="black"/>
 
       <!-- Top leaf -->
-      <circle cx="${cx}" cy="${cy - leafRadius}" r="${leafRadius}" fill="white"/>
+      <circle cx="${cx}" cy="${cy - leafRadius}" r="${leafRadius}" fill="black"/>
 
       <!-- Bottom leaf -->
-      <circle cx="${cx}" cy="${cy + leafRadius}" r="${leafRadius}" fill="white"/>
+      <circle cx="${cx}" cy="${cy + leafRadius}" r="${leafRadius}" fill="black"/>
 
       <!-- Left leaf -->
-      <circle cx="${cx - leafRadius}" cy="${cy}" r="${leafRadius}" fill="white"/>
+      <circle cx="${cx - leafRadius}" cy="${cy}" r="${leafRadius}" fill="black"/>
 
       <!-- Right leaf -->
-      <circle cx="${cx + leafRadius}" cy="${cy}" r="${leafRadius}" fill="white"/>
+      <circle cx="${cx + leafRadius}" cy="${cy}" r="${leafRadius}" fill="black"/>
     `;
   }
 
@@ -198,7 +201,7 @@ class MaskProcessor {
     const gapWidth = scale * 0.6;
 
     return `
-      <g fill="white">
+      <g fill="black">
         <!-- Outer arc (top) -->
         <path d="
           M ${cx - gapWidth / 2} ${cy - outerRadius}
@@ -209,10 +212,10 @@ class MaskProcessor {
         "/>
 
         <!-- Left arm -->
-        <rect x="${cx - outerRadius}" y="${cy - outerRadius * 0.5}" width="${outerRadius - gapWidth / 2}" height="${scale * 1}" fill="white" rx="${scale * 0.2}"/>
+        <rect x="${cx - outerRadius}" y="${cy - outerRadius * 0.5}" width="${outerRadius - gapWidth / 2}" height="${scale * 1}" fill="black" rx="${scale * 0.2}"/>
 
         <!-- Right arm -->
-        <rect x="${cx + gapWidth / 2}" y="${cy - outerRadius * 0.5}" width="${outerRadius - gapWidth / 2}" height="${scale * 1}" fill="white" rx="${scale * 0.2}"/>
+        <rect x="${cx + gapWidth / 2}" y="${cy - outerRadius * 0.5}" width="${outerRadius - gapWidth / 2}" height="${scale * 1}" fill="black" rx="${scale * 0.2}"/>
       </g>
     `;
   }
@@ -228,18 +231,14 @@ class MaskProcessor {
     const spotSize = scale * 0.15;
 
     return `
-      <g fill="white">
+      <g fill="black">
         <!-- Mushroom cap (circle) -->
-        <circle cx="${cx}" cy="${cy - scale * 0.3}" r="${capRadius}" fill="white"/>
+        <circle cx="${cx}" cy="${cy - scale * 0.3}" r="${capRadius}" fill="black"/>
 
         <!-- Mushroom stem (rectangle) -->
-        <rect x="${cx - stemWidth / 2}" y="${cy - scale * 0.3}" width="${stemWidth}" height="${stemHeight}" fill="white" rx="${scale * 0.1}"/>
+        <rect x="${cx - stemWidth / 2}" y="${cy - scale * 0.3}" width="${stemWidth}" height="${stemHeight}" fill="black" rx="${scale * 0.1}"/>
 
-        <!-- Decorative spots on cap -->
-        <circle cx="${cx - capRadius * 0.4}" cy="${cy - scale * 0.8}" r="${spotSize}" fill="rgba(255,255,255,0.6)"/>
-        <circle cx="${cx + capRadius * 0.4}" cy="${cy - scale * 0.8}" r="${spotSize}" fill="rgba(255,255,255,0.6)"/>
-        <circle cx="${cx - capRadius * 0.2}" cy="${cy - scale * 1.0}" r="${spotSize * 0.8}" fill="rgba(255,255,255,0.4)"/>
-        <circle cx="${cx + capRadius * 0.2}" cy="${cy - scale * 1.0}" r="${spotSize * 0.8}" fill="rgba(255,255,255,0.4)"/>
+        <!-- Decorative spots on cap (removed - would invert) -->
       </g>
     `;
   }

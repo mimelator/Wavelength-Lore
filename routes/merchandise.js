@@ -3,12 +3,14 @@
  * 
  * API routes for custom merchandise creation and ordering
  * integrating user gallery images with Printify print-on-demand
+ * 🔥 ENHANCED: Real Stripe payment processing integration
  */
 
 const express = require('express');
 const router = express.Router();
 const path = require('path');
 const { ensureAuthenticated } = require('../middleware/auth');
+const stripePaymentService = require('../services/stripe-payment-service');
 const groupAuth = require('../middleware/groupAuth');
 const AutoEnhancedPrintifyService = require('../services/auto-enhanced-printify-service');
 const MerchandiseDatabase = require('../services/merchandise-database');
@@ -1355,6 +1357,135 @@ router.post('/webhook', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/merchandise/create-payment-intent
+ * Create Stripe payment intent for checkout
+ * 🔥 NEW: Real Stripe payment processing
+ */
+router.post('/create-payment-intent', ensureAuthenticated, async (req, res) => {
+  try {
+    const { items, shippingAddress, shippingCost = 0 } = req.body;
+    
+    console.log('🔑 Creating payment intent for checkout');
+    
+    // Calculate order total including tax and shipping
+    const orderTotal = stripePaymentService.calculateOrderTotal(items, shippingAddress, shippingCost);
+    
+    // Create payment intent
+    const paymentIntent = await stripePaymentService.createPaymentIntent(
+      orderTotal.total,
+      'usd',
+      {
+        userId: req.user.uid,
+        itemCount: items?.length || 0,
+        subtotal: orderTotal.subtotal.toString(),
+        taxAmount: orderTotal.taxAmount.toString(),
+        shippingCost: orderTotal.shippingCost.toString()
+      }
+    );
+
+    if (!paymentIntent.success) {
+      return res.status(400).json(paymentIntent);
+    }
+
+    res.json({
+      success: true,
+      clientSecret: paymentIntent.clientSecret,
+      paymentIntentId: paymentIntent.paymentIntentId,
+      orderTotal: orderTotal
+    });
+    
+  } catch (error) {
+    console.error('❌ Error creating payment intent:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create payment intent'
+    });
+  }
+});
+
+/**
+ * POST /api/merchandise/confirm-payment
+ * Confirm payment and create order after successful Stripe payment
+ * 🔥 NEW: Complete payment flow with order creation
+ */
+router.post('/confirm-payment', ensureAuthenticated, async (req, res) => {
+  try {
+    const { paymentIntentId, items, shippingAddress } = req.body;
+    
+    console.log('✅ Confirming payment and creating order');
+    
+    // Confirm payment with Stripe
+    const paymentResult = await stripePaymentService.confirmPayment(paymentIntentId);
+    
+    if (!paymentResult.success) {
+      return res.status(400).json({
+        success: false,
+        error: 'Payment confirmation failed',
+        details: paymentResult.error
+      });
+    }
+
+    // Payment successful - create Printify order
+    const printifyOrder = await createPrintifyOrder(items, shippingAddress);
+    
+    if (!printifyOrder.success) {
+      console.error('❌ Order creation failed after successful payment:', printifyOrder.error);
+      // Payment succeeded but order failed - this needs manual handling
+      return res.status(500).json({
+        success: false,
+        error: 'Payment succeeded but order creation failed. Please contact support.',
+        paymentId: paymentResult.paymentId
+      });
+    }
+
+    // Store order in our database
+    const userOrder = {
+      orderId: printifyOrder.orderId,
+      paymentId: paymentResult.paymentId,
+      amount: paymentResult.amount,
+      items: items,
+      shippingAddress: shippingAddress,
+      userId: req.user.uid,
+      status: 'paid',
+      createdAt: new Date().toISOString()
+    };
+    
+    await merchandiseDB.saveOrder(printifyOrder.orderId, userOrder);
+
+    res.json({
+      success: true,
+      orderId: printifyOrder.orderId,
+      paymentId: paymentResult.paymentId,
+      amount: paymentResult.amount
+    });
+    
+  } catch (error) {
+    console.error('❌ Error confirming payment:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to confirm payment and create order'
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/payment-health
+ * Health check for Stripe payment integration
+ * 🔧 UTILITY: Check Stripe connection status
+ */
+router.get('/payment-health', async (req, res) => {
+  try {
+    const healthCheck = await stripePaymentService.healthCheck();
+    res.json(healthCheck);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Payment service health check failed'
+    });
+  }
+});
+
 // Helper functions
 
 /**
@@ -1371,18 +1502,34 @@ async function downloadImageFromS3(imageUrl) {
 }
 
 /**
- * Process payment (integrate with your payment system)
+ * Process payment with Stripe integration
+ * 🔥 ENHANCED: Real payment processing replacing mock functionality
  */
-async function processPayment(paymentToken, lineItems, shippingAddress) {
-  // TODO: Integrate with Stripe, PayPal, or your payment processor
-  console.log('Processing payment:', { paymentToken, lineItems, shippingAddress });
+async function processPayment(paymentToken, lineItems, shippingAddress, shippingCost = 0) {
+  console.log('🌊 WAVELENGTH: Processing real payment with Stripe');
   
-  // Mock successful payment for development
-  return {
-    success: true,
-    paymentId: `pay_${Date.now()}`,
-    amount: 2099 // $20.99 in cents
-  };
+  try {
+    // Use Stripe payment service for real payment processing
+    const paymentResult = await stripePaymentService.processPayment(
+      paymentToken, 
+      lineItems, 
+      shippingAddress, 
+      shippingCost
+    );
+
+    // Convert amount to cents for compatibility with existing code
+    if (paymentResult.success && paymentResult.amount) {
+      paymentResult.amountInCents = Math.round(paymentResult.amount * 100);
+    }
+
+    return paymentResult;
+  } catch (error) {
+    console.error('❌ Stripe payment processing error:', error);
+    return {
+      success: false,
+      error: error.message || 'Payment processing failed'
+    };
+  }
 }
 
 /**
