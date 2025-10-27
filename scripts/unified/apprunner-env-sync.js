@@ -14,6 +14,47 @@ const { AppRunnerClient, DescribeServiceCommand, UpdateServiceCommand } = requir
 const fs = require('fs').promises;
 const path = require('path');
 
+// Load environment variables from .env files before anything else
+function loadEnvFiles() {
+  const projectRoot = path.resolve(__dirname, '../../');
+  const envFiles = [
+    path.join(projectRoot, '.env'),
+    path.join(projectRoot, '.env.production')
+  ];
+  
+  for (const envFile of envFiles) {
+    try {
+      const content = require('fs').readFileSync(envFile, 'utf8');
+      content.split('\n').forEach(line => {
+        line = line.trim();
+        if (!line || line.startsWith('#')) return;
+        
+        const match = line.match(/^([^=]+)=(.*)$/);
+        if (match) {
+          const key = match[1].trim();
+          let value = match[2].trim();
+          
+          // Remove surrounding quotes
+          if ((value.startsWith('"') && value.endsWith('"')) ||
+              (value.startsWith("'") && value.endsWith("'"))) {
+            value = value.slice(1, -1);
+          }
+          
+          // Only set if not already in process.env
+          if (!process.env[key]) {
+            process.env[key] = value;
+          }
+        }
+      });
+    } catch (error) {
+      // File doesn't exist or can't be read - that's okay
+    }
+  }
+}
+
+// Load environment variables immediately
+loadEnvFiles();
+
 class AppRunnerEnvSync {
   constructor() {
     this.serviceArn = process.env.APPRUNNER_SERVICE_ARN;
@@ -123,9 +164,11 @@ class AppRunnerEnvSync {
    * Load and parse environment files
    */
   async loadEnvironmentVariables() {
+    // Look for .env files in the project root (3 levels up from scripts/unified/)
+    const projectRoot = path.resolve(__dirname, '../../');
     const envFiles = [
-      path.resolve('.env'),
-      path.resolve('.env.production')
+      path.join(projectRoot, '.env'),
+      path.join(projectRoot, '.env.production')
     ];
 
     const envVars = {};
