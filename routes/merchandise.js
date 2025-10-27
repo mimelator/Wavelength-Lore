@@ -214,10 +214,10 @@ router.get('/categories', async (req, res) => {
  */
 router.get('/product-types', async (req, res) => {
   try {
+    // Keep it simple - return the same structure that admin catalog expects
     res.json({
       success: true,
-      productTypes: ProductTypes,
-      allProducts: getAllProducts()
+      allProducts: getAllProducts() // Both admin and merchandise store use this
     });
   } catch (error) {
     console.error('Error fetching product types:', error);
@@ -227,6 +227,8 @@ router.get('/product-types', async (req, res) => {
     });
   }
 });
+
+
 
 /**
  * GET /api/merchandise/product-types/:category

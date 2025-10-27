@@ -59,6 +59,70 @@ class MerchandiseStore {
       return false;
     }
   }
+
+  /**
+   * Get category icon (same as admin catalog approach)
+   */
+  getCategoryIcon(category) {
+    const iconMap = {
+      't-shirt': '👕',
+      'premium-tshirt': '👔', 
+      'heavy-cotton-tee': '👕',
+      'women-tee': '👚',
+      'tank-top': '🎽',
+      'hoodie': '🧥',
+      'zip-hoodie': '🧥',
+      'sweatshirt': '👔',
+      'coffee-mug': '☕',
+      'travel-mug': '🥤',
+      'pillow': '🛏️',
+      'blanket': '🛋️',
+      'canvas': '🖼️',
+      'tote-bag': '👜',
+      'backpack': '🎒',
+      'phone-case': '📱',
+      'laptop-sleeve': '💻',
+      'notebook': '📓',
+      'sticker': '🏷️',
+      'hat': '🧢',
+      'fanny-pack': '👝',
+      'infant-wear': '👶',
+      'specialty-item': '✨'
+    };
+    return iconMap[category] || '📦';
+  }
+
+  /**
+   * Get estimated price for display (same as admin approach)
+   */
+  getEstimatedPrice(category) {
+    const priceMap = {
+      't-shirt': '$18.95',
+      'premium-tshirt': '$22.95',
+      'heavy-cotton-tee': '$19.95',
+      'women-tee': '$18.95',
+      'tank-top': '$16.95',
+      'hoodie': '$34.95',
+      'zip-hoodie': '$36.95',
+      'sweatshirt': '$28.95',
+      'coffee-mug': '$14.95',
+      'travel-mug': '$21.95',
+      'pillow': '$18.95',
+      'blanket': '$49.95',
+      'canvas': '$29.95',
+      'tote-bag': '$15.95',
+      'backpack': '$34.95',
+      'phone-case': '$19.95',
+      'laptop-sleeve': '$24.95',
+      'notebook': '$16.95',
+      'sticker': '$4.95',
+      'hat': '$19.95',
+      'fanny-pack': '$21.95',
+      'infant-wear': '$15.95',
+      'specialty-item': '$24.95'
+    };
+    return priceMap[category] || '$19.95';
+  }
   
   async init() {
     console.log('🛍️ Initializing Merchandise Store');
@@ -227,7 +291,6 @@ class MerchandiseStore {
       
       const response = await fetch('/api/merchandise/product-types');
       
-      
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -235,11 +298,25 @@ class MerchandiseStore {
       const data = await response.json();
       console.log('📋 Product types API response:', data);
       
-      if (data.success) {
-        this.productTypes = data.productTypes;
+      if (data.success && data.allProducts) {
+        // Use the same approach as admin catalog - simple allProducts array
         this.availableProducts = data.allProducts;
-        console.log(`📋 Loaded ${this.availableProducts?.length || 0} product types`);
-        console.log('📋 Product types structure:', Object.keys(this.productTypes || {}));
+        
+        // Group products by category for display (same as admin catalog approach)
+        this.productCategories = {};
+        data.allProducts.forEach(product => {
+          const category = product.category || 'specialty';
+          if (!this.productCategories[category]) {
+            this.productCategories[category] = {
+              name: category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, ' '),
+              products: []
+            };
+          }
+          this.productCategories[category].products.push(product);
+        });
+        
+        console.log(`📋 Loaded ${this.availableProducts.length} products`);
+        console.log(`� Organized into ${Object.keys(this.productCategories).length} categories`);
       } else {
         throw new Error(data.error || 'Failed to load product types');
       }
@@ -249,8 +326,8 @@ class MerchandiseStore {
       this.showError('Failed to load product options: ' + error.message);
       
       // Fallback to prevent complete failure
-      this.productTypes = {};
       this.availableProducts = [];
+      this.productCategories = {};
     } finally {
       this.setLoading(false);
     }
@@ -1177,37 +1254,27 @@ class MerchandiseStore {
    * Simple fallback category display
    */
   async renderSimpleCategories(container) {
-    console.log('🔧 Rendering simple categories fallback');
+    console.log('🔧 Rendering simple categories using admin catalog approach');
     
-    // Use the loaded product types data if available
-    if (this.productTypes && Object.keys(this.productTypes).length > 0) {
-      console.log('📦 Using loaded product types for fallback:', Object.keys(this.productTypes));
-      console.log('🔍 Product types data:', this.productTypes);
+    // Use the same simple approach as admin catalog
+    if (this.availableProducts && this.availableProducts.length > 0) {
+      console.log(`📦 Using ${this.availableProducts.length} products from allProducts array`);
+      console.log(`� Available categories: ${Object.keys(this.productCategories).length}`);
       
-      const allProducts = [];
-      Object.entries(this.productTypes).forEach(([categoryKey, category]) => {
-        category.products.forEach(product => {
-          allProducts.push({
-            ...product,
-            categoryName: category.name,
-            categoryIcon: category.icon
-          });
-        });
-      });
-      
-      container.innerHTML = `
-        <div class="simple-categories">
-          <div class="fallback-notice">
-            <p>🚧 <strong>Product navigator loading...</strong> Showing all available products.</p>
-          </div>
-          <h3>🌆 All Available Products</h3>
-          <div class="simple-categories-grid">
-            ${allProducts.map(product => `
+      // Create category sections (same as admin approach but for user selection)
+      const categoryHTML = Object.entries(this.productCategories).map(([categoryKey, categoryData]) => `
+        <div class="category-section">
+          <h4 class="category-title">
+            ${this.getCategoryIcon(categoryKey)} ${categoryData.name}
+            <span class="product-count">(${categoryData.products.length} products)</span>
+          </h4>
+          <div class="category-products">
+            ${categoryData.products.slice(0, 6).map(product => `
               <div class="simple-category" data-type="${product.id}">
-                <div class="category-icon">${product.icon}</div>
-                <h4>${product.name}</h4>
-                <p>${product.description}</p>
-                <div class="product-price">$${(product.basePrice / 100).toFixed(2)}</div>
+                <div class="category-icon">${this.getCategoryIcon(product.category)}</div>
+                <h5>${product.name}</h5>
+                <p class="product-desc">${product.description || 'Custom merchandise item'}</p>
+                <div class="product-price">$${this.getEstimatedPrice(product.category)}</div>
                 <button class="select-simple-product" 
                         data-product="${product.id}" 
                         data-blueprint="${product.blueprintId}" 
@@ -1216,6 +1283,25 @@ class MerchandiseStore {
                 </button>
               </div>
             `).join('')}
+            ${categoryData.products.length > 6 ? `
+              <div class="show-more-products">
+                <button class="btn-secondary show-all-in-category" data-category="${categoryKey}">
+                  Show all ${categoryData.products.length} ${categoryData.name.toLowerCase()} products
+                </button>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+      
+      container.innerHTML = `
+        <div class="simple-categories">
+          <div class="catalog-header">
+            <h3>🛍️ Choose Your Product Type</h3>
+            <p>Select from ${this.availableProducts.length} validated products across ${Object.keys(this.productCategories).length} categories</p>
+          </div>
+          <div class="categories-container">
+            ${categoryHTML}
           </div>
         </div>
       `;
