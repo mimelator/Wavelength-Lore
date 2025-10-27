@@ -2618,4 +2618,213 @@ router.post('/cache/policy', (req, res) => {
   }
 });
 
+/**
+ * TEST HARNESS FOR PERFECT PRINTING
+ * POST /api/merchandise/test-harness/optimize-random
+ *
+ * Randomly selects:
+ * 1. A gallery image from the authenticated user
+ * 2. A product type from the catalog
+ * 3. Optimizes the image for that product
+ * 4. Creates a product with the optimized image
+ *
+ * This generates real analytics data and tests the full pipeline
+ */
+router.post('/test-harness/optimize-random', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+  try {
+    console.log('🧪 TEST HARNESS: optimize-random endpoint called');
+
+    const userId = req.user.uid;
+    const userName = req.user.displayName || 'Test User';
+
+    // Step 1: Get user's gallery images
+    console.log(`🖼️  Fetching gallery images for user: ${userId}`);
+    const s3Images = await galleryStorage.listUserGalleryImages(userId);
+
+    if (!s3Images || s3Images.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No gallery images found. Please upload an image first.',
+        details: 'User has no images in their gallery'
+      });
+    }
+
+    // Randomly select an image
+    const randomImage = s3Images[Math.floor(Math.random() * s3Images.length)];
+    console.log(`✅ Selected random image: ${randomImage.fileName}`);
+
+    // Step 2: Get all product types and randomly select one
+    const allProducts = getAllProducts();
+    const productIds = Object.keys(allProducts);
+
+    if (!productIds || productIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No product types available in catalog',
+        details: 'Product catalog is empty'
+      });
+    }
+
+    const randomProductId = productIds[Math.floor(Math.random() * productIds.length)];
+    const selectedProduct = allProducts[randomProductId];
+    console.log(`✅ Selected random product: ${selectedProduct.name} (${randomProductId})`);
+
+    // Step 3: Download image buffer
+    console.log(`📥 Downloading image: ${randomImage.url}`);
+    let imageBuffer;
+    try {
+      const response = await axios.get(randomImage.url, {
+        responseType: 'arraybuffer',
+        timeout: 30000
+      });
+      imageBuffer = Buffer.from(response.data);
+      console.log(`✅ Image downloaded: ${imageBuffer.length} bytes`);
+    } catch (error) {
+      console.error('❌ Failed to download image:', error.message);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to download image',
+        details: error.message
+      });
+    }
+
+    // Step 4: Create product with the image
+    const productTitle = `[TEST] ${selectedProduct.name} - ${randomImage.fileName}`;
+    const productDescription = `Auto-generated test product for PERFECT PRINTING optimization pipeline testing. Product: ${selectedProduct.name}. Source image: ${randomImage.fileName}.`;
+
+    console.log(`🎨 Creating product: ${productTitle}`);
+
+    try {
+      // Create the product in the database
+      const productKey = sanitizeFirebaseKey(`${selectedProduct.id}-${Date.now()}-test`);
+
+      const newProduct = {
+        productId: productKey,
+        localId: productKey,
+        title: productTitle,
+        description: productDescription,
+        productType: selectedProduct.category,
+        blueprintId: selectedProduct.blueprintId,
+        printProviderId: selectedProduct.printProviderId,
+        sourceImage: {
+          url: randomImage.url,
+          title: randomImage.fileName,
+          dimensions: randomImage.dimensions
+        },
+        status: 'test',
+        isTestProduct: true,
+        createdAt: new Date().toISOString(),
+        createdBy: userId,
+        createdByName: userName,
+        imageBuffer: imageBuffer.toString('base64'),
+        imageSize: imageBuffer.length,
+        testHarnessRun: true
+      };
+
+      // Save to merchandise database
+      await merchandiseDB.saveProduct(newProduct);
+      console.log(`✅ Product created: ${productKey}`);
+
+      // Step 5: Optimize image for this product
+      console.log(`🎨 Optimizing image for product: ${selectedProduct.name}`);
+
+      const optimizer = new ImageOptimizer();
+      const spec = productSpecifications.getSpecsByProductKey(selectedProduct.id);
+
+      if (!spec) {
+        console.warn(`⚠️  No specs found for ${selectedProduct.id}, using generic optimization`);
+      }
+
+      const result = await optimizer.optimize(imageBuffer, spec || {});
+      console.log(`✅ Optimization complete: ${result.message}`);
+
+      // Record optimization analytics
+      console.log(`📊 Recording optimization analytics...`);
+      cacheAnalytics.recordOptimization(selectedProduct.id, {
+        processingTime: result.processingTime,
+        scaleFactor: result.analysis.scaleFactor,
+        costEstimate: result.analysis.strategy === 'UPSCALE' ? 0.08 : 0,
+        testRun: true
+      }).then(recordResult => {
+        console.log(`✅ Analytics recorded:`, recordResult);
+      }).catch(err => {
+        console.warn(`❌ Failed to record optimization analytics:`, err.message);
+      });
+
+      // Return success with detailed info
+      res.json({
+        success: true,
+        message: 'Test harness completed successfully',
+        test_run_details: {
+          timestamp: new Date().toISOString(),
+          userId: userId,
+          userName: userName,
+          selected_image: {
+            name: randomImage.fileName,
+            url: randomImage.url,
+            size: imageBuffer.length,
+            dimensions: randomImage.dimensions
+          },
+          selected_product: {
+            id: selectedProduct.id,
+            name: selectedProduct.name,
+            category: selectedProduct.category,
+            blueprint: selectedProduct.blueprintId
+          },
+          created_product: {
+            productKey: productKey,
+            title: productTitle,
+            status: 'test'
+          },
+          optimization_result: {
+            message: result.message,
+            strategy: result.analysis.strategy,
+            scaleFactor: result.analysis.scaleFactor,
+            processingTime: result.processingTime,
+            originalSize: imageBuffer.length,
+            optimizedSize: result.optimizedBuffer ? result.optimizedBuffer.length : 'unknown',
+            estimatedCost: result.analysis.strategy === 'UPSCALE' ? 0.08 : 0
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Error in test harness:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Test harness encountered an error',
+        details: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ Test harness error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Test harness failed',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/test-harness/status
+ * Check test harness status and availability
+ */
+router.get('/test-harness/status', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Test harness is available',
+    endpoints: {
+      'POST /api/merchandise/test-harness/optimize-random': {
+        description: 'Run one test cycle: random image + random product + optimization',
+        requires: 'Authentication + game_access permission',
+        prerequisites: 'User must have at least one image in their gallery'
+      }
+    },
+    note: 'This test harness generates real analytics data for debugging PERFECT PRINTING'
+  });
+});
+
 module.exports = router;
