@@ -383,6 +383,10 @@ class WavelengthContentCLI {
                     await this.queryServer(args);
                     break;
                     
+                case 'publish':
+                    await this.publishToFirebase(args);
+                    break;
+                    
                 case 'bulk-edit':
                 case 'batch':
                     await this.batchOperations(args);
@@ -454,6 +458,11 @@ class WavelengthContentCLI {
         
         console.log(chalk.green('\nMedia Management:'));
         console.log('  preview <item>   - Open item images in browser');
+        
+        console.log(chalk.green('\nFirebase Publishing:'));
+        console.log('  publish item <id> - Publish specific item to Firebase');
+        console.log('  publish status   - Check Firebase connection');
+        console.log('  publish validate <id> - Validate item before publishing');
         
         console.log(chalk.green('\nAdmin Tools:'));
         console.log(chalk.red('  admin            - Access pristine admin toolkit'));
@@ -2196,6 +2205,263 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
 
     showPrompt() {
         this.rl.prompt();
+    }
+    /**
+     * 🚀 PUBLISH TO FIREBASE - Clean room publishing
+     */
+    async publishToFirebase(args) {
+        if (args.length === 0) {
+            console.log(chalk.blue.bold('\n🚀 FIREBASE PUBLISHING'));
+            console.log(chalk.gray('=' .repeat(50)));
+            console.log(chalk.yellow('Available publish operations:'));
+            console.log(chalk.gray('  • publish item <id>     - Publish specific item to Firebase'));
+            console.log(chalk.gray('  • publish type <type>   - Publish all items of specific type'));
+            console.log(chalk.gray('  • publish status        - Show Firebase connection status'));
+            console.log(chalk.gray('  • publish validate <id> - Validate item before publishing'));
+            return;
+        }
+
+        const operation = args[0].toLowerCase();
+        const target = args.slice(1).join(' ');
+
+        try {
+            switch (operation) {
+                case 'item':
+                    await this.publishItem(target);
+                    break;
+                case 'type':
+                    await this.publishByType(target);
+                    break;
+                case 'status':
+                    await this.publishStatus();
+                    break;
+                case 'validate':
+                    await this.publishValidate(target);
+                    break;
+                default:
+                    console.log(chalk.red(`❌ Unknown publish operation: ${operation}`));
+                    console.log(chalk.gray('Type "publish" to see available options'));
+            }
+        } catch (error) {
+            console.log(chalk.red(`❌ Publish failed: ${error.message}`));
+        }
+    }
+
+    async publishItem(itemId) {
+        if (!itemId) {
+            console.log(chalk.red('❌ Please specify an item ID'));
+            return;
+        }
+
+        console.log(chalk.blue.bold(`\n🚀 PUBLISHING ITEM: ${itemId}`));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        // Find the item in local cache
+        const item = this.findItemById(itemId);
+        if (!item) {
+            console.log(chalk.red(`❌ Item "${itemId}" not found in local cache`));
+            return;
+        }
+
+        try {
+            // Initialize Firebase Admin if needed
+            const firebaseAdminUtils = require('./helpers/firebase-admin-utils');
+            
+            // Validate item structure
+            const validation = this.validateItemStructure(item);
+            if (!validation.valid) {
+                console.log(chalk.yellow('⚠️ Item validation warnings:'));
+                validation.warnings.forEach(warning => {
+                    console.log(chalk.gray(`   • ${warning}`));
+                });
+            }
+
+            // Determine collection based on content type or current path
+            let collection = 'lore'; // Default
+            if (this.currentPath.includes('/characters/')) {
+                collection = 'characters';
+            } else if (this.currentPath.includes('/episodes/')) {
+                collection = 'episodes';
+            }
+
+            console.log(chalk.cyan(`📤 Publishing to Firebase collection: ${collection}`));
+            console.log(chalk.gray(`   Item ID: ${item.id}`));
+            console.log(chalk.gray(`   Title: ${item.title || item.name}`));
+
+            // Create clean item for publishing (remove any local-only fields)
+            const cleanItem = this.sanitizeForFirebase(item);
+
+            // Publish to Firebase
+            await firebaseAdminUtils.writeDataAsAdmin(`${collection}/${item.id}`, cleanItem);
+
+            console.log(chalk.green(`✅ Successfully published "${item.id}" to Firebase!`));
+            console.log(chalk.gray(`   Collection: ${collection}`));
+            console.log(chalk.gray(`   Size: ${JSON.stringify(cleanItem).length} bytes`));
+
+        } catch (error) {
+            console.log(chalk.red(`❌ Failed to publish item: ${error.message}`));
+            if (error.code) {
+                console.log(chalk.gray(`   Error code: ${error.code}`));
+            }
+        }
+    }
+
+    async publishByType(type) {
+        if (!type) {
+            console.log(chalk.red('❌ Please specify a content type'));
+            return;
+        }
+
+        console.log(chalk.blue.bold(`\n🚀 PUBLISHING BY TYPE: ${type.toUpperCase()}`));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        const allLore = loreHelpers.getAllLoreSync();
+        const filtered = allLore.filter(item => item.type && item.type.toLowerCase() === type.toLowerCase());
+
+        if (filtered.length === 0) {
+            console.log(chalk.yellow(`No items found for type: ${type}`));
+            return;
+        }
+
+        console.log(chalk.cyan(`Found ${filtered.length} items to publish`));
+        console.log(chalk.yellow(`⚠️ This will publish ${filtered.length} items. Continue? (y/N)`));
+
+        // For CLI safety, we'll just show what would be published
+        console.log(chalk.gray('\nItems that would be published:'));
+        filtered.forEach((item, index) => {
+            console.log(chalk.gray(`  ${index + 1}. ${item.id} - ${item.title}`));
+        });
+        
+        console.log(chalk.cyan(`\n💡 To actually publish, use individual "publish item <id>" commands for safety`));
+    }
+
+    async publishStatus() {
+        console.log(chalk.blue.bold('\n📡 FIREBASE CONNECTION STATUS'));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        try {
+            const firebaseAdminUtils = require('./helpers/firebase-admin-utils');
+            
+            // Test Firebase connection
+            console.log(chalk.cyan('🔗 Testing Firebase connection...'));
+            
+            // Try to read a small piece of data
+            const testData = await firebaseAdminUtils.fetchDataAsAdmin('lore');
+            if (testData) {
+                console.log(chalk.green('✅ Firebase connection active'));
+                console.log(chalk.gray(`   Database accessible: Yes`));
+                console.log(chalk.gray(`   Admin permissions: Yes`));
+                
+                // Show collection counts
+                const loreCount = Object.keys(testData || {}).length;
+                console.log(chalk.cyan(`\n📊 Current Firebase data:`));
+                console.log(chalk.gray(`   Lore items: ${loreCount}`));
+                
+                // Try to get characters and episodes too
+                try {
+                    const charactersData = await firebaseAdminUtils.fetchDataAsAdmin('characters');
+                    const episodesData = await firebaseAdminUtils.fetchDataAsAdmin('episodes');
+                    console.log(chalk.gray(`   Characters: ${Object.keys(charactersData || {}).length}`));
+                    console.log(chalk.gray(`   Episodes: ${Object.keys(episodesData || {}).length}`));
+                } catch (e) {
+                    console.log(chalk.gray(`   Other collections: Not accessible or empty`));
+                }
+                
+            } else {
+                console.log(chalk.yellow('⚠️ Firebase connected but no data found'));
+            }
+
+        } catch (error) {
+            console.log(chalk.red('❌ Firebase connection failed'));
+            console.log(chalk.gray(`   Error: ${error.message}`));
+            
+            if (error.message.includes('service account')) {
+                console.log(chalk.yellow('\n💡 Fix suggestions:'));
+                console.log(chalk.gray('   • Check FIREBASE_SERVICE_ACCOUNT environment variable'));
+                console.log(chalk.gray('   • Verify firebaseServiceAccountKey.json exists'));
+                console.log(chalk.gray('   • Ensure Firebase Admin SDK is properly initialized'));
+            }
+        }
+    }
+
+    async publishValidate(itemId) {
+        if (!itemId) {
+            console.log(chalk.red('❌ Please specify an item ID'));
+            return;
+        }
+
+        console.log(chalk.blue.bold(`\n✅ VALIDATING ITEM: ${itemId}`));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        const item = this.findItemById(itemId);
+        if (!item) {
+            console.log(chalk.red(`❌ Item "${itemId}" not found`));
+            return;
+        }
+
+        const validation = this.validateItemStructure(item);
+        const cleanItem = this.sanitizeForFirebase(item);
+
+        console.log(chalk.cyan(`📋 Item Details:`));
+        console.log(chalk.gray(`   ID: ${item.id}`));
+        console.log(chalk.gray(`   Title: ${item.title || item.name || 'No title'}`));
+        console.log(chalk.gray(`   Type: ${item.type || 'No type'}`));
+        console.log(chalk.gray(`   Size: ${JSON.stringify(item).length} bytes`));
+        console.log(chalk.gray(`   Clean size: ${JSON.stringify(cleanItem).length} bytes`));
+
+        if (validation.valid) {
+            console.log(chalk.green('\n✅ Item structure is valid for publishing'));
+        } else {
+            console.log(chalk.yellow('\n⚠️ Item has validation warnings:'));
+            validation.warnings.forEach(warning => {
+                console.log(chalk.gray(`   • ${warning}`));
+            });
+        }
+
+        // Show what would be published
+        console.log(chalk.cyan('\n📤 Preview of clean data to be published:'));
+        console.log(chalk.gray(JSON.stringify(cleanItem, null, 2)));
+    }
+
+    validateItemStructure(item) {
+        const warnings = [];
+        
+        if (!item.id) warnings.push('Missing required field: id');
+        if (!item.title && !item.name) warnings.push('Missing title or name');
+        if (!item.type) warnings.push('Missing type');
+        if (!item.content && !item.description) warnings.push('Missing content or description');
+        
+        return {
+            valid: warnings.length === 0,
+            warnings: warnings
+        };
+    }
+
+    sanitizeForFirebase(item) {
+        // Create a clean copy for Firebase
+        const clean = { ...item };
+        
+        // Remove any local-only fields that shouldn't go to Firebase
+        delete clean._localCache;
+        delete clean._tempData;
+        delete clean._editSession;
+        
+        // Ensure consistent field names
+        if (clean.visibility === undefined && clean.hidden) {
+            clean.visibility = clean.hidden ? 'hidden' : 'visible';
+        }
+        
+        // Clean up empty arrays and objects
+        Object.keys(clean).forEach(key => {
+            if (Array.isArray(clean[key]) && clean[key].length === 0) {
+                delete clean[key]; // Remove empty arrays
+            }
+            if (typeof clean[key] === 'object' && clean[key] !== null && Object.keys(clean[key]).length === 0) {
+                delete clean[key]; // Remove empty objects
+            }
+        });
+        
+        return clean;
     }
 }
 
