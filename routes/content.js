@@ -694,6 +694,26 @@ router.get('/leaderboard', async (req, res) => {
 });
 
 /**
+ * Firebase Leaderboard Test page route - Debug permission issues
+ */
+router.get('/firebase-leaderboard-test', async (req, res) => {
+  try {
+    res.render('firebase-leaderboard-test', {
+      title: 'Firebase Leaderboard Permission Test - Debug Tool',
+      pageTitle: 'Firebase Leaderboard Permission Diagnostic',
+      pageDescription: 'Debug tool to isolate and test Firebase permission issues with the leaderboard functionality.',
+      pageKeywords: 'firebase, leaderboard, debug, permissions, test',
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`,
+      req: req
+    });
+  } catch (error) {
+    console.error('Error rendering firebase leaderboard test page:', error);
+    res.status(500).send('Error loading firebase test page');
+  }
+});
+
+/**
  * Map page route
  */
 router.get('/map', async (req, res) => {

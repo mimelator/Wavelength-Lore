@@ -51,10 +51,10 @@ class WavelengthCTASystem {
     
     return `
       <div class="wavelength-character-tagline" 
-           style="background: rgba(0,0,0,0.7); padding: 15px 25px; border-radius: 25px; 
-                  margin: 20px auto; max-width: 600px; backdrop-filter: blur(10px); 
+           style="background: rgba(0,0,0,0.5); padding: 15px 25px; border-radius: 25px; 
+                  margin: 20px auto 2px auto; max-width: 600px; backdrop-filter: blur(10px); 
                   text-align: center;">
-        <h2 style="margin: 0; font-size: 1.4rem; color: #fff; 
+        <h2 style="margin: 0; font-size: 1.1rem; color: #fff; 
                    text-shadow: 2px 2px 4px rgba(0,0,0,0.8); font-style: italic;">
           "${character.tagline}"
         </h2>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head', {
+        title: 'PERFECT PRINTING Test Harness',
+        pageDescription: 'Test the image optimization and product creation pipeline'
+    }) %>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --warning: #f39c12;
+            --bg: #1a252f;
+            --card-bg: #2c3e50;
+            --text: #ecf0f1;
+            --text-muted: #bdc3c7;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'AnimeAce', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a90e2 0%, #5dade2 100%);
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .control-panel {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+        }
+
+        .control-section {
+            margin-bottom: 25px;
+        }
+
+        .control-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-section h2 {
+            font-size: 1.3em;
+            margin: 0 0 15px 0;
+            color: #4a90e2;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-family: 'AnimeAce', Arial, sans-serif;
+            font-size: 1em;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #357abd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--text-muted);
+            color: var(--bg);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--text);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status-display {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-row:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .status-value {
+            color: #4a90e2;
+            font-weight: bold;
+        }
+
+        .test-results {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+        }
+
+        .result-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            border-left: 4px solid #4a90e2;
+        }
+
+        .result-section h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .result-item {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-label {
+            color: var(--text-muted);
+            min-width: 200px;
+        }
+
+        .result-value {
+            color: var(--text);
+            font-family: monospace;
+            font-size: 0.9em;
+            max-width: 600px;
+            word-break: break-all;
+        }
+
+        .result-value.success {
+            color: #2ecc71;
+        }
+
+        .result-value.error {
+            color: #e74c3c;
+        }
+
+        .logs {
+            background: #000;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border: 1px solid #333;
+        }
+
+        .log-entry {
+            padding: 3px 0;
+            line-height: 1.4;
+        }
+
+        .log-success {
+            color: #2ecc71;
+        }
+
+        .log-error {
+            color: #e74c3c;
+        }
+
+        .log-warning {
+            color: #f39c12;
+        }
+
+        .log-info {
+            color: #3498db;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #4a90e2;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .empty-state p {
+            margin: 10px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #4a90e2;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            color: #4a90e2;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 PERFECT PRINTING Test Harness</h1>
+            <p>Test the image optimization and product creation pipeline</p>
+        </div>
+
+        <div class="control-panel">
+            <div class="control-section">
+                <h2>Test Controls</h2>
+                <div class="button-group">
+                    <button class="btn-primary" id="runTestBtn">
+                        ▶️ Run Single Test
+                    </button>
+                    <button class="btn-primary" id="runMultipleBtn">
+                        ▶️ Run 5 Tests
+                    </button>
+                    <button class="btn-secondary" id="clearLogsBtn">
+                        🗑️ Clear Logs
+                    </button>
+                    <button class="btn-secondary" id="refreshStatusBtn">
+                        🔄 Refresh Status
+                    </button>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h2>System Status</h2>
+                <div class="status-display">
+                    <div class="status-row">
+                        <span class="status-label">Harness Status:</span>
+                        <span class="status-value" id="harnessStatus">Checking...</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">Test Runs Completed:</span>
+                        <span class="status-value" id="testCount">0</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">Successful Tests:</span>
+                        <span class="status-value" id="successCount">0</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">Failed Tests:</span>
+                        <span class="status-value" id="failureCount">0</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">Last Run:</span>
+                        <span class="status-value" id="lastRun">Never</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-results">
+            <h2>📋 Test Results & Logs</h2>
+            <div id="resultsContainer" class="empty-state">
+                <p>🎯 Click "Run Single Test" to start testing the pipeline</p>
+                <p style="font-size: 0.9em;">Tests will randomly select a gallery image and product type, then optimize and create a test product.</p>
+            </div>
+            <div class="logs" id="logsContainer" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            running: false,
+            testCount: 0,
+            successCount: 0,
+            failureCount: 0,
+            logs: [],
+            results: null
+        };
+
+        // Check harness status on load
+        checkHarnessStatus();
+
+        document.getElementById('runTestBtn').addEventListener('click', () => runTest(1));
+        document.getElementById('runMultipleBtn').addEventListener('click', () => runTest(5));
+        document.getElementById('clearLogsBtn').addEventListener('click', clearLogs);
+        document.getElementById('refreshStatusBtn').addEventListener('click', checkHarnessStatus);
+
+        async function checkHarnessStatus() {
+            try {
+                const response = await fetch('/api/merchandise/test-harness/status');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('harnessStatus').textContent = '✅ Ready';
+                    document.getElementById('harnessStatus').style.color = '#2ecc71';
+                } else {
+                    document.getElementById('harnessStatus').textContent = '❌ Unavailable';
+                    document.getElementById('harnessStatus').style.color = '#e74c3c';
+                }
+            } catch (error) {
+                document.getElementById('harnessStatus').textContent = '❌ Error';
+                document.getElementById('harnessStatus').style.color = '#e74c3c';
+            }
+        }
+
+        async function runTest(count) {
+            if (state.running) return;
+
+            state.running = true;
+            document.getElementById('runTestBtn').disabled = true;
+            document.getElementById('runMultipleBtn').disabled = true;
+
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('logsContainer').style.display = 'block';
+            document.getElementById('logsContainer').innerHTML = '';
+            state.logs = [];
+
+            for (let i = 0; i < count; i++) {
+                addLog(`🧪 Starting test ${i + 1} of ${count}...`, 'info');
+
+                try {
+                    const response = await fetch('/api/merchandise/test-harness/optimize-random', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        state.successCount++;
+                        addLog(`✅ Test ${i + 1} PASSED`, 'success');
+                        addLog(`   Selected Image: ${data.test_run_details.selected_image.name}`, 'info');
+                        addLog(`   Selected Product: ${data.test_run_details.selected_product.name}`, 'info');
+                        addLog(`   Optimization: ${data.test_run_details.optimization_result.strategy}`, 'info');
+                        displayTestResult(data);
+                    } else {
+                        state.failureCount++;
+                        addLog(`❌ Test ${i + 1} FAILED: ${data.error}`, 'error');
+                        addLog(`   Details: ${data.details}`, 'error');
+                    }
+
+                    state.testCount++;
+                    updateStatusDisplay();
+
+                    // Add delay between tests
+                    if (i < count - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+
+                } catch (error) {
+                    state.failureCount++;
+                    state.testCount++;
+                    addLog(`❌ Test ${i + 1} ERROR: ${error.message}`, 'error');
+                    updateStatusDisplay();
+                }
+            }
+
+            state.running = false;
+            document.getElementById('runTestBtn').disabled = false;
+            document.getElementById('runMultipleBtn').disabled = false;
+            addLog('🏁 Test batch complete!', 'success');
+        }
+
+        function displayTestResult(data) {
+            const container = document.getElementById('logsContainer');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'result-section';
+            resultDiv.innerHTML = `
+                <h3>Test Run: ${new Date(data.test_run_details.timestamp).toLocaleTimeString()}</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${data.test_run_details.selected_image.name}</div>
+                        <div class="stat-label">Selected Image</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${data.test_run_details.selected_product.name}</div>
+                        <div class="stat-label">Selected Product</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${data.test_run_details.optimization_result.strategy}</div>
+                        <div class="stat-label">Optimization Strategy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${data.test_run_details.optimization_result.processingTime}ms</div>
+                        <div class="stat-label">Processing Time</div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(resultDiv);
+        }
+
+        function addLog(message, level = 'info') {
+            state.logs.push({ message, level, timestamp: new Date() });
+            const logsContainer = document.getElementById('logsContainer');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${level}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        function clearLogs() {
+            state.logs = [];
+            document.getElementById('logsContainer').innerHTML = '';
+            document.getElementById('resultsContainer').style.display = 'block';
+            document.getElementById('logsContainer').style.display = 'none';
+            state.testCount = 0;
+            state.successCount = 0;
+            state.failureCount = 0;
+            updateStatusDisplay();
+        }
+
+        function updateStatusDisplay() {
+            document.getElementById('testCount').textContent = state.testCount;
+            document.getElementById('successCount').textContent = state.successCount;
+            document.getElementById('failureCount').textContent = state.failureCount;
+            document.getElementById('lastRun').textContent = new Date().toLocaleTimeString();
+        }
+    </script>
+</body>
+</html>

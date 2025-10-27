@@ -193,6 +193,7 @@
                     <button class="admin-tab-btn" data-tab="posts">📝 Posts</button>
                     <button class="admin-tab-btn" data-tab="reports">⚠️ Reports</button>
                     <button class="admin-tab-btn" data-tab="settings">⚙️ Settings</button>
+                    <button class="admin-tab-btn" data-tab="cache">🎨 PERFECT PRINTING Cache</button>
                 </div>
             </div>
 
@@ -392,9 +393,78 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- PERFECT PRINTING Cache Tab -->
+                <div id="admin-cache" class="admin-tab">
+                    <div class="admin-section">
+                        <div class="section-header">
+                            <h3>🎨 PERFECT PRINTING Cache Analytics</h3>
+                            <p style="color: #666; margin-top: 5px;">Real-time monitoring and management of product image optimization cache</p>
+                        </div>
+
+                        <iframe id="cache-dashboard" src="/api/merchandise/cache/statistics" style="width: 100%; height: 2000px; border: none; margin-top: 20px; display: none;"></iframe>
+
+                        <div id="cache-content" style="display: block;">
+                            <!-- Metrics Grid -->
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;" id="cacheMetricsGrid">
+                                <div style="background: rgba(99, 102, 241, 0.1); padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid #6366f1;">
+                                    <div class="loading-spinner" style="display: inline-block; width: 20px; height: 20px; border: 2px solid #ccc; border-top-color: #6366f1; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                    <p style="margin: 10px 0 0 0; color: #666;">Loading metrics...</p>
+                                </div>
+                            </div>
+
+                            <!-- Product Rankings -->
+                            <div style="margin-bottom: 30px;">
+                                <h4 style="color: #333; margin-top: 0; margin-bottom: 15px;">📊 Product Rankings</h4>
+                                <div id="cacheProductsTable" class="admin-table" style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+                                    <div class="loading-spinner" style="display: inline-block; width: 20px; height: 20px; border: 2px solid #ccc; border-top-color: #6366f1; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 20px;"></div>
+                                    <p style="margin: 0 20px 20px 0; color: #666;">Loading product data...</p>
+                                </div>
+                            </div>
+
+                            <!-- Health & Recommendations -->
+                            <div style="margin-bottom: 30px;">
+                                <h4 style="color: #333; margin-top: 0; margin-bottom: 15px;">💡 Health & Recommendations</h4>
+                                <div id="cacheHealthSection" style="background: rgba(99, 102, 241, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #6366f1;">
+                                    <div class="loading-spinner" style="display: inline-block; width: 20px; height: 20px; border: 2px solid #ccc; border-top-color: #6366f1; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                    <p style="margin: 10px 0 0 0; color: #666;">Loading health data...</p>
+                                </div>
+                            </div>
+
+                            <!-- Storage & Controls -->
+                            <div style="margin-bottom: 30px;">
+                                <h4 style="color: #333; margin-top: 0; margin-bottom: 15px;">💾 Storage Management</h4>
+                                <div id="cacheStorageSection" style="background: rgba(99, 102, 241, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #6366f1;">
+                                    <div class="loading-spinner" style="display: inline-block; width: 20px; height: 20px; border: 2px solid #ccc; border-top-color: #6366f1; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                    <p style="margin: 10px 0 0 0; color: #666;">Loading storage data...</p>
+                                </div>
+                            </div>
+
+                            <!-- Cache Controls -->
+                            <div>
+                                <h4 style="color: #333; margin-top: 0; margin-bottom: 15px;">⚙️ Cache Maintenance</h4>
+                                <div style="background: rgba(99, 102, 241, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #6366f1;">
+                                    <p style="color: #666; margin-top: 0;">Run cache maintenance to remove unused optimized images and free up storage.</p>
+                                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                                        <button style="background: #e5e7eb; color: #333; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="runCacheMaintenance(true)">🔍 Preview (Dry Run)</button>
+                                        <button style="background: #6366f1; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="runCacheMaintenance(false)">🧹 Run Maintenance</button>
+                                        <button style="background: #ef4444; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="runAggressiveMaintenance()">⚡ Aggressive Cleanup</button>
+                                    </div>
+                                    <div id="maintenanceStatus" style="margin-top: 15px; padding: 10px; border-radius: 6px; display: none;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 
     <script>
         // Initialize admin panel
@@ -421,9 +491,166 @@
                     });
                 });
             });
-            
 
+            // Load cache data when cache tab is clicked
+            const cacheBtn = document.querySelector('[data-tab="cache"]');
+            if (cacheBtn) {
+                cacheBtn.addEventListener('click', () => {
+                    setTimeout(loadCacheMetrics, 100);
+                });
+            }
         });
+
+        // Cache Analytics Functions
+        const API_BASE = '/api/merchandise';
+
+        async function loadCacheMetrics() {
+            try {
+                const [stats, metrics, health, storage] = await Promise.all([
+                    fetch(`${API_BASE}/cache/statistics`).then(r => r.json()).catch(e => null),
+                    fetch(`${API_BASE}/cache/product-metrics`).then(r => r.json()).catch(e => null),
+                    fetch(`${API_BASE}/cache/health`).then(r => r.json()).catch(e => null),
+                    fetch(`${API_BASE}/cache/storage`).then(r => r.json()).catch(e => null)
+                ]);
+
+                if (stats?.success) displayCacheMetrics(stats.cache);
+                if (metrics?.success) displayCacheProducts(metrics.metrics?.productMetrics || {});
+                if (health?.success) displayCacheHealth(health.health);
+                if (storage?.success) displayCacheStorage(storage.storage);
+            } catch (error) {
+                console.error('Error loading cache metrics:', error);
+            }
+        }
+
+        function displayCacheMetrics(stats) {
+            const grid = document.getElementById('cacheMetricsGrid');
+            const hitRatePercent = (stats.hitRate * 100).toFixed(1);
+
+            grid.innerHTML = `
+                <div style="background: rgba(99, 102, 241, 0.1); padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid #6366f1;">
+                    <div style="font-size: 28px; font-weight: bold; color: #6366f1;">${hitRatePercent}%</div>
+                    <div style="color: #666; margin-top: 5px; font-size: 12px;">Cache Hit Rate</div>
+                </div>
+                <div style="background: rgba(34, 197, 94, 0.1); padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid #22c55e;">
+                    <div style="font-size: 28px; font-weight: bold; color: #22c55e;">${stats.cacheHits.toLocaleString()}</div>
+                    <div style="color: #666; margin-top: 5px; font-size: 12px;">Cache Hits</div>
+                </div>
+                <div style="background: rgba(239, 68, 68, 0.1); padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid #ef4444;">
+                    <div style="font-size: 28px; font-weight: bold; color: #ef4444;">${stats.cacheMisses.toLocaleString()}</div>
+                    <div style="color: #666; margin-top: 5px; font-size: 12px;">Cache Misses</div>
+                </div>
+                <div style="background: rgba(34, 197, 94, 0.1); padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid #22c55e;">
+                    <div style="font-size: 28px; font-weight: bold; color: #22c55e;">$${stats.estimatedCostSavings.toFixed(2)}</div>
+                    <div style="color: #666; margin-top: 5px; font-size: 12px;">Cost Saved</div>
+                </div>
+            `;
+        }
+
+        function displayCacheProducts(products) {
+            const container = document.getElementById('cacheProductsTable');
+            const sorted = Object.entries(products)
+                .sort((a, b) => (b[1].totalRequests || 0) - (a[1].totalRequests || 0))
+                .slice(0, 10);
+
+            if (sorted.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">No product data available</div>';
+                return;
+            }
+
+            let html = '<table style="width: 100%; border-collapse: collapse;"><thead><tr style="background: #f9fafb; border-bottom: 2px solid #ddd;"><th style="padding: 12px; text-align: left; font-weight: 600; color: #333;">Product</th><th style="padding: 12px; text-align: left; font-weight: 600; color: #333;">Optimizations</th><th style="padding: 12px; text-align: left; font-weight: 600; color: #333;">Reuses</th><th style="padding: 12px; text-align: left; font-weight: 600; color: #333;">Avg Time</th></tr></thead><tbody>';
+            sorted.forEach(([key, data]) => {
+                html += `<tr style="border-bottom: 1px solid #ddd; hover-background: #f9fafb;">
+                    <td style="padding: 12px; color: #333;"><strong>${key}</strong></td>
+                    <td style="padding: 12px; color: #666;">${data.timesOptimized}</td>
+                    <td style="padding: 12px; color: #666;">${data.timesReused.toLocaleString()}</td>
+                    <td style="padding: 12px; color: #666;">${(data.avgOptimizationTime / 1000).toFixed(1)}s</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function displayCacheHealth(health) {
+            const container = document.getElementById('cacheHealthSection');
+            let html = `<div style="padding: 15px; background: white; border-radius: 6px; margin-bottom: 15px;">
+                <div style="font-weight: 600; color: #333; margin-bottom: 10px;">Health Score: ${health.overall_health.score}/100 - ${health.overall_health.status.replace(/_/g, ' ').toUpperCase()}</div>
+            </div>`;
+
+            if (health.insights?.length > 0) {
+                html += '<div style="margin-bottom: 15px;"><strong style="color: #333;">Key Insights:</strong>';
+                health.insights.slice(0, 3).forEach(insight => {
+                    html += `<div style="margin-top: 8px; color: #666; font-size: 14px;">${insight.message || insight.title}</div>`;
+                });
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        function displayCacheStorage(storage) {
+            const container = document.getElementById('cacheStorageSection');
+            html = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                    <div style="background: white; padding: 12px; border-radius: 6px; text-align: center;">
+                        <div style="font-weight: 600; color: #6366f1;">${storage.totalSize.gigabytes} GB</div>
+                        <div style="color: #666; font-size: 12px; margin-top: 4px;">Total Storage</div>
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 6px; text-align: center;">
+                        <div style="font-weight: 600; color: #6366f1;">${storage.itemCount}</div>
+                        <div style="color: #666; font-size: 12px; margin-top: 4px;">Items Cached</div>
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 6px; text-align: center;">
+                        <div style="font-weight: 600; color: #6366f1;">${(storage.avgItemSize / 1024).toFixed(2)} KB</div>
+                        <div style="color: #666; font-size: 12px; margin-top: 4px;">Avg Item Size</div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        async function runCacheMaintenance(dryRun) {
+            const statusDiv = document.getElementById('maintenanceStatus');
+            try {
+                const res = await fetch(`${API_BASE}/cache/maintenance?dryRun=${dryRun}`, { method: 'POST' });
+                const data = await res.json();
+
+                if (data.success) {
+                    if (dryRun) {
+                        statusDiv.innerHTML = `<div style="background: #dbeafe; color: #1e40af; padding: 10px; border-radius: 6px;">✅ Dry run: Would remove ${data.result.analysis?.candidates?.length || 0} items</div>`;
+                    } else {
+                        statusDiv.innerHTML = `<div style="background: #d1fae5; color: #065f46; padding: 10px; border-radius: 6px;">✅ Removed ${data.result.removed} items, freed ${data.result.spaceSaved.megabytes} MB</div>`;
+                        setTimeout(loadCacheMetrics, 1000);
+                    }
+                } else {
+                    statusDiv.innerHTML = `<div style="background: #fee2e2; color: #7f1d1d; padding: 10px; border-radius: 6px;">❌ Error: ${data.error}</div>`;
+                }
+                statusDiv.style.display = 'block';
+                setTimeout(() => statusDiv.style.display = 'none', 5000);
+            } catch (error) {
+                statusDiv.innerHTML = `<div style="background: #fee2e2; color: #7f1d1d; padding: 10px; border-radius: 6px;">❌ Error: ${error.message}</div>`;
+                statusDiv.style.display = 'block';
+            }
+        }
+
+        async function runAggressiveMaintenance() {
+            if (!confirm('⚠️ Aggressive cleanup will remove more items. Continue?')) return;
+            const statusDiv = document.getElementById('maintenanceStatus');
+            try {
+                const res = await fetch(`${API_BASE}/cache/maintenance?dryRun=false&aggressive=true`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    statusDiv.innerHTML = `<div style="background: #d1fae5; color: #065f46; padding: 10px; border-radius: 6px;">✅ Removed ${data.result.removed} items, freed ${data.result.spaceSaved.megabytes} MB</div>`;
+                    setTimeout(loadCacheMetrics, 1000);
+                } else {
+                    statusDiv.innerHTML = `<div style="background: #fee2e2; color: #7f1d1d; padding: 10px; border-radius: 6px;">❌ Error: ${data.error}</div>`;
+                }
+                statusDiv.style.display = 'block';
+                setTimeout(() => statusDiv.style.display = 'none', 5000);
+            } catch (error) {
+                statusDiv.innerHTML = `<div style="background: #fee2e2; color: #7f1d1d; padding: 10px; border-radius: 6px;">❌ Error: ${error.message}</div>`;
+                statusDiv.style.display = 'block';
+            }
+        }
 
     </script>
 

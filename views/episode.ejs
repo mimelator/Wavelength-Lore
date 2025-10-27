@@ -107,6 +107,50 @@
             </div>
         </section>
 
+        <!-- Next Episode Cliffhanger CTA -->
+        <% if (nextLink) { %>
+        <section class="next-episode-cta" style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(75, 0, 130, 0.1)); border: 2px solid rgba(138, 43, 226, 0.3); border-radius: 15px; padding: 25px; margin: 30px 0; text-align: center; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.05), transparent 70%); pointer-events: none;"></div>
+            
+            <div style="position: relative; z-index: 1;">
+                <h3 style="color: #ffd700; font-size: 1.8rem; margin-bottom: 15px; text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);">
+                    🎬 What Happens Next?
+                </h3>
+                
+                <p style="color: #e0e0e0; font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6;">
+                    The story continues and the stakes get higher...
+                </p>
+                
+                <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px;">
+                    <img src="<%= cdnUrl %><%= nextLink.image %>" 
+                         alt="<%= nextLink.title %>" 
+                         style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; border: 3px solid rgba(255, 215, 0, 0.5); box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);">
+                    
+                    <div style="text-align: left;">
+                        <p style="color: #888; font-size: 0.9rem; margin: 0;">Up Next:</p>
+                        <h4 style="color: #ffd700; font-size: 1.3rem; margin: 5px 0; font-weight: bold;">
+                            <%= nextLink.title %>
+                        </h4>
+                        <p style="color: #ccc; font-size: 0.95rem; margin: 0;">
+                            Continue the adventure...
+                        </p>
+                    </div>
+                </div>
+                
+                <a href="<%= nextLink.url %>" 
+                   style="display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 1.1rem; transition: all 0.3s ease; border: 2px solid rgba(255, 255, 255, 0.2); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);"
+                   onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(102, 126, 234, 0.4)';"
+                   onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.3)';">
+                    ▶️ Watch Next Episode
+                </a>
+                
+                <p style="color: #888; font-size: 0.8rem; margin-top: 15px;">
+                    Don't let the story end here – the adventure is just beginning!
+                </p>
+            </div>
+        </section>
+        <% } %>
+
         <!-- Radio Player Section -->
         <section class="episode-radio-player">
             <h2>Listen to the Song</h2>

@@ -1,5 +1,7 @@
 {
   "rules": {
+    ".read": true,
+    ".write": false,
     "lore": {
       ".read": true,
       ".write": "auth != null && auth.token.isScript == true"
@@ -15,6 +17,28 @@
     "videos": {
       ".read": true,
       ".write": "auth != null && auth.token.isScript == true"
+    },
+    "leaderboard": {
+      ".read": true,
+      ".write": "auth != null && auth.token.isScript == true"
+    },
+    "users": {
+      ".read": true,
+      "$userId": {
+        ".write": "auth != null && (auth.uid == $userId || auth.token.isScript == true)",
+        "radioPlayerStats": {
+          ".read": true,
+          ".write": "auth != null && (auth.uid == $userId || auth.token.isScript == true)"
+        },
+        "radioPlayerFavorites": {
+          ".read": "auth != null && auth.uid == $userId",
+          ".write": "auth != null && auth.uid == $userId"
+        },
+        "gameStats": {
+          ".read": true,
+          ".write": "auth != null && (auth.uid == $userId || auth.token.isScript == true)"
+        }
+      }
     },
     "forum": {
       "categories": {

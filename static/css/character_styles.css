@@ -8,12 +8,68 @@ main {
 .character-banner {
     text-align: center;
     color: white;
-    padding: 50px 20px;
+    padding: 50px 20px 2px 20px; /* Normal top/sides padding, minimal bottom padding */
     background-size: cover;
     background-position: center;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    position: relative; /* Allow positioning of tagline within banner */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Align content to bottom */
+}
+
+/* Tagline styling improvements - smaller font sizes and bottom positioning */
+.character-tagline,
+.wavelength-character-tagline {
+    margin: 20px auto 2px auto !important; /* Top spacing, minimal bottom margin */
+    background: rgba(0,0,0,0.5) !important; /* More transparent */
+}
+
+.character-tagline h2,
+.wavelength-character-tagline h2 {
+    font-size: 1.1rem !important; /* Smaller base font size for better proportion */
+}
+
+/* Mobile responsive tagline adjustments */
+@media (max-width: 768px) {
+    .character-banner {
+        padding: 30px 15px 2px 15px; /* Normal top padding, minimal bottom padding for mobile */
+    }
+    
+    .character-tagline,
+    .wavelength-character-tagline {
+        padding: 10px 20px !important; /* Smaller padding on mobile */
+        margin: 15px auto 1px auto !important; /* Bottom positioned with tiny bottom margin */
+        max-width: 90% !important; /* Use more width on mobile */
+        background: rgba(0,0,0,0.4) !important; /* Even more transparent on mobile */
+    }
+    
+    .character-tagline h2,
+    .wavelength-character-tagline h2 {
+        font-size: 1rem !important; /* Smaller font size on mobile */
+        line-height: 1.3 !important; /* Tighter line height */
+    }
+}
+
+@media (max-width: 480px) {
+    .character-banner {
+        padding: 20px 10px 1px 10px; /* Normal top padding, minimal bottom padding on small screens */
+    }
+    
+    .character-tagline,
+    .wavelength-character-tagline {
+        padding: 8px 15px !important; /* Even smaller padding */
+        margin: 10px auto 1px auto !important; /* Bottom positioned with 1px bottom margin */
+        border-radius: 15px !important; /* Smaller border radius */
+        background: rgba(0,0,0,0.4) !important; /* Consistent transparency */
+    }
+    
+    .character-tagline h2,
+    .wavelength-character-tagline h2 {
+        font-size: 0.9rem !important; /* Even smaller font on very small screens */
+    }
 }
 .character-description {
     width: 80%;

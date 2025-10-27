@@ -1263,12 +1263,6 @@ class MerchandiseStore {
               <span class="stat-number">${categoryData.products.length}</span>
               <span class="stat-label">Products</span>
             </div>
-            ${stats.providerCount > 0 ? `
-            <div class="stat-item">
-              <span class="stat-number">${stats.providerCount}</span>
-              <span class="stat-label">Providers</span>
-            </div>
-            ` : ''}
             <div class="stat-item">
               <span class="stat-price">${stats.priceRange}</span>
               <span class="stat-label">Price Range</span>
@@ -1328,7 +1322,6 @@ class MerchandiseStore {
           <p class="product-description">${product.description || 'Custom merchandise item'}</p>
           <div class="product-details">
             <span class="product-price">${this.getEstimatedPrice(product.category)}</span>
-            ${product.provider ? `<span class="product-provider">${this.getUserFriendlyProvider(product.provider)}</span>` : ''}
           </div>
         </div>
         <button class="select-simple-product product-select-btn" 

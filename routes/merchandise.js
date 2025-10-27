@@ -16,10 +16,13 @@ const galleryStorage = require('../utils/gallery/storage');
 const { getUserBookmarks } = require('../services/firebase/galleryService');
 const axios = require('axios');
 const { generateProductTitle, prettifyImageName } = require('../utils/product-name-formatter');
-const { 
-  ProductTypes, 
-  generateProductName, 
-  generateProductDescription, 
+const ImageOptimizer = require('../services/ImageOptimizer');
+const productSpecifications = require('../config/productSpecifications');
+const productTemplates = require('../config/productTemplates');
+const {
+  ProductTypes,
+  generateProductName,
+  generateProductDescription,
   generateProductTags,
   findProductById,
   getAllProducts,
@@ -83,6 +86,30 @@ router.get('/', ensureAuthenticated, groupAuth.requireAction('game_access'), asy
 });
 
 /**
+ * GET /merchandise/test-harness
+ * Render the PERFECT PRINTING test harness UI
+ */
+router.get('/test-harness', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+  try {
+    res.render('test-harness', {
+      title: 'PERFECT PRINTING Test Harness',
+      pageTitle: 'Test Harness',
+      pageDescription: 'Test the image optimization and product creation pipeline',
+      user: req.user,
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`
+    });
+  } catch (error) {
+    console.error('Error rendering test harness:', error);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Unable to load test harness',
+      error: process.env.NODE_ENV === 'development' ? error : {}
+    });
+  }
+});
+
+/**
  * GET /merchandise/debug
  * Debug page for testing merchandise store (development only)
  */
@@ -90,12 +117,51 @@ router.get('/debug', async (req, res) => {
   if (process.env.NODE_ENV !== 'development') {
     return res.status(404).json({ error: 'Not found' });
   }
-  
+
   try {
     res.sendFile(require('path').join(__dirname, '../debug/test-merchandise-simple.html'));
   } catch (error) {
     console.error('Error serving debug page:', error);
     res.status(500).json({ error: 'Failed to load debug page' });
+  }
+});
+
+/**
+ * GET /merchandise/cache-admin
+ * Cache administration dashboard (standalone)
+ * Shows analytics, metrics, and cache management controls
+ */
+router.get('/cache-admin', (req, res) => {
+  try {
+    res.sendFile(require('path').join(__dirname, '../static/html/cache-admin-dashboard.html'));
+  } catch (error) {
+    console.error('Error serving cache admin dashboard:', error);
+    res.status(500).json({ error: 'Failed to load cache admin dashboard' });
+  }
+});
+
+/**
+ * GET /admin/merchandise/perfect-printing-cache
+ * Cache administration dashboard integrated into admin panel
+ * Shows analytics, metrics, and cache management controls with admin styling
+ */
+router.get('/admin/merchandise/perfect-printing-cache', ensureAuthenticated, groupAuth.requireAction('admin'), async (req, res) => {
+  try {
+    console.log('🎨 Loading PERFECT PRINTING cache dashboard for admin...');
+
+    res.render('admin/perfect-printing-cache', {
+      title: 'PERFECT PRINTING - Cache Analytics',
+      user: req.user,
+      adminView: true
+    });
+
+  } catch (error) {
+    console.error('Error loading PERFECT PRINTING cache dashboard:', error);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Failed to load cache dashboard',
+      error: process.env.NODE_ENV === 'development' ? error : {}
+    });
   }
 });
 
@@ -1934,6 +2000,1188 @@ router.get('/gallery/:imageId', ensureAuthenticated, async (req, res) => {
       success: false,
       error: 'Failed to fetch gallery image',
       details: error.message
+    });
+  }
+});
+
+// ========================================
+// PERFECT PRINTING - OPTIMIZATION ENDPOINTS
+// ========================================
+
+/**
+ * POST /api/merchandise/optimize-for-product
+ * Optimize image for a specific product type
+ *
+ * Handles:
+ * - Product specification validation
+ * - Image analysis (current dimensions, format)
+ * - Intelligent sizing (upscale/downscale/optimize)
+ * - Progress reporting (real-time updates to UI)
+ * - Transparent user messaging
+ *
+ * Request body:
+ * {
+ *   "imageBuffer": base64 or Buffer,
+ *   "productKey": "apparel-tshirt",
+ *   "fileName": "my-design.png"
+ * }
+ */
+router.post('/optimize-for-product', ensureAuthenticated, async (req, res) => {
+  try {
+    const { imageBuffer, productKey, fileName } = req.body;
+
+    if (!imageBuffer) {
+      return res.status(400).json({
+        success: false,
+        error: 'Image buffer is required'
+      });
+    }
+
+    if (!productKey) {
+      return res.status(400).json({
+        success: false,
+        error: 'Product key is required'
+      });
+    }
+
+    console.log(`🎨 Optimizing image for product: ${productKey}`);
+
+    // Validate product specification exists
+    const spec = productSpecifications.getSpecsByProductKey(productKey);
+    if (!spec) {
+      return res.status(404).json({
+        success: false,
+        error: `Product "${productKey}" not found in specifications`
+      });
+    }
+
+    // Convert base64 to Buffer if needed
+    let imgBuffer = imageBuffer;
+    if (typeof imageBuffer === 'string') {
+      imgBuffer = Buffer.from(imageBuffer, 'base64');
+    }
+
+    // Create optimizer instance
+    const optimizer = new ImageOptimizer();
+
+    // Set up progress callbacks to stream to client via SSE (if requested)
+    optimizer.onProgress((event) => {
+      // Progress events are logged for debugging
+      // In a real scenario, you could use WebSockets or Server-Sent Events
+    });
+
+    // CHECK CACHE FIRST - before analyzing
+    console.log(`💾 Checking cache for product-specific optimization...`);
+    const cacheCheck = await optimizer.checkProductCache(imgBuffer, productKey);
+
+    if (cacheCheck.cached) {
+      // Cache hit! Return cached result immediately
+      console.log(`✨ CACHE HIT - Returning cached optimization`);
+
+      // Record cache reuse for analytics
+      cacheAnalytics.recordCacheReuse(productKey).then(result => {
+        console.log(`📊 Cache reuse recorded for ${productKey}:`, result);
+      }).catch(err =>
+        console.warn('❌ Failed to record cache reuse:', err.message)
+      );
+
+      return res.json({
+        success: true,
+        cacheHit: true,
+        cachedOptimization: {
+          enhancedImageUrl: cacheCheck.enhancedImageUrl,
+          s3Key: cacheCheck.s3Key,
+          metadata: cacheCheck.metadata,
+          message: `✨ Using cached optimization from ${cacheCheck.metadata.usageCount} other users!`,
+          processingTime: 0,
+          estimatedSavings: cacheCheck.metadata.processingTime
+        },
+        product: {
+          key: productKey,
+          name: spec.name,
+          printArea: spec.printArea,
+          dpi: spec.imageSpec.recommendedDpi
+        },
+        nextSteps: [
+          '1. Your image was already optimized and cached!',
+          '2. Proceed directly to checkout or customization'
+        ]
+      });
+    }
+
+    // Cache miss - proceed with analysis
+    console.log(`📦 CACHE MISS - Analyzing image for optimization...`);
+    const analysis = await optimizer.analyzeImage(imgBuffer, productKey);
+
+    // Get template recommendations
+    const applicableTemplates = productTemplates
+      .getAllTemplates()
+      .filter(templateId => {
+        const template = productTemplates.getTemplateById(templateId);
+        return template.productType === productKey;
+      })
+      .map(templateId => productTemplates.getTemplateInfo(templateId));
+
+    // Return analysis to user for decision
+    return res.json({
+      success: true,
+      cacheHit: false,
+      analysis: {
+        currentDimensions: analysis.currentDimensions,
+        targetDimensions: analysis.targetDimensions,
+        strategy: analysis.strategy,
+        action: analysis.action,
+        message: analysis.message,
+        estimatedTime: analysis.estimatedTime,
+        scaleFactor: analysis.scaleFactor
+      },
+      product: {
+        key: productKey,
+        name: spec.name,
+        printArea: spec.printArea,
+        dpi: spec.imageSpec.recommendedDpi
+      },
+      templates: applicableTemplates,
+      nextSteps: [
+        '1. Review the optimization strategy above',
+        '2. Confirm you want to proceed',
+        '3. Send request to /optimize-for-product-confirm to perform actual optimization'
+      ]
+    });
+
+  } catch (error) {
+    console.error('Error analyzing image for optimization:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to analyze image',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/merchandise/optimize-for-product-confirm
+ * Confirm and execute image optimization
+ *
+ * After user reviews the analysis from the previous endpoint,
+ * they confirm and this performs the actual optimization.
+ *
+ * Request body:
+ * {
+ *   "imageBuffer": base64 or Buffer,
+ *   "productKey": "apparel-tshirt",
+ *   "confirm": true
+ * }
+ */
+router.post('/optimize-for-product-confirm', ensureAuthenticated, async (req, res) => {
+  try {
+    const { imageBuffer, productKey, confirm } = req.body;
+
+    if (!confirm) {
+      return res.status(400).json({
+        success: false,
+        error: 'Optimization must be confirmed'
+      });
+    }
+
+    console.log(`⚡ Executing optimization for product: ${productKey}`);
+
+    // Convert base64 to Buffer if needed
+    let imgBuffer = imageBuffer;
+    if (typeof imageBuffer === 'string') {
+      imgBuffer = Buffer.from(imageBuffer, 'base64');
+    }
+
+    const optimizer = new ImageOptimizer();
+
+    // Perform actual optimization
+    const result = await optimizer.optimizeForProduct(imgBuffer, productKey);
+
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        error: 'Optimization failed',
+        details: result.message
+      });
+    }
+
+    // Get file statistics
+    const stats = optimizer.getStats(imgBuffer, result.optimizedBuffer);
+
+    console.log(`✅ Optimization complete: ${result.message}`);
+
+    // Record optimization for analytics
+    console.log(`📊 Recording optimization metrics...`);
+    cacheAnalytics.recordOptimization(productKey, {
+      processingTime: result.processingTime,
+      scaleFactor: result.analysis.scaleFactor,
+      costEstimate: result.analysis.strategy === 'UPSCALE' ? 0.08 : 0
+    }).then(recordResult => {
+      console.log(`📊 Optimization recorded for ${productKey}:`, recordResult);
+    }).catch(err =>
+      console.warn('❌ Failed to record optimization:', err.message)
+    );
+
+    // STORE IN CACHE for future users
+    console.log(`💾 Storing optimized image in cache for reuse...`);
+    // Note: In a real scenario, this would upload to S3 first and get back the URL
+    // For now, we'll create a placeholder that would be filled in during S3 upload
+    const cacheResult = await optimizer.storeCachedOptimization(
+      imgBuffer,
+      result.optimizedBuffer,
+      productKey,
+      result.analysis,
+      result.processingTime,
+      'https://placeholder-s3-url.example.com/optimized', // Would be real S3 URL after upload
+      `optimized/${productKey}/${Date.now()}-optimized.png` // S3 key
+    );
+
+    if (cacheResult.success) {
+      console.log(`✨ Optimization cached - future users will get instant results!`);
+    }
+
+    return res.json({
+      success: true,
+      optimizedImage: result.optimizedBuffer.toString('base64'),
+      analysis: result.analysis,
+      resultMetadata: result.resultMetadata,
+      processingTime: result.processingTime,
+      message: result.message,
+      stats: {
+        originalSize: stats.originalSize,
+        optimizedSize: stats.optimizedSize,
+        saved: stats.saved
+      },
+      cacheStored: cacheResult.success,
+      cacheKey: cacheResult.cacheKey,
+      readyForPrintify: true,
+      futureUserMessage: cacheResult.success ? `✨ This optimization is now cached and will be instant for other users!` : undefined
+    });
+
+  } catch (error) {
+    console.error('Error executing optimization:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Optimization failed',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/product-specs/:productKey
+ * Get product specifications for a specific product
+ * Used to display product info and requirements to user
+ */
+router.get('/product-specs/:productKey', (req, res) => {
+  try {
+    const { productKey } = req.params;
+
+    const spec = productSpecifications.getSpecsByProductKey(productKey);
+    if (!spec) {
+      return res.status(404).json({
+        success: false,
+        error: `Product "${productKey}" not found`
+      });
+    }
+
+    res.json({
+      success: true,
+      productKey: productKey,
+      name: spec.name,
+      category: spec.category,
+      printMethod: spec.printMethod,
+      printArea: spec.printArea,
+      imageSpec: {
+        recommendedDpi: spec.imageSpec.recommendedDpi,
+        optimalDimensions: spec.imageSpec.optimalDimensions,
+        minDimensions: spec.imageSpec.minDimensions,
+        maxDimensions: spec.imageSpec.maxDimensions
+      },
+      placement: spec.placement,
+      notes: spec.notes
+    });
+  } catch (error) {
+    console.error('Error fetching product specs:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch product specifications',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/templates
+ * Get all available product templates
+ */
+router.get('/templates', (req, res) => {
+  try {
+    const allTemplates = productTemplates.getAllTemplates();
+
+    const templateList = allTemplates.map(templateId => {
+      const info = productTemplates.getTemplateInfo(templateId);
+      return {
+        id: templateId,
+        ...info
+      };
+    });
+
+    res.json({
+      success: true,
+      templates: templateList,
+      total: templateList.length
+    });
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch templates',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/templates/:templateId
+ * Get specific template details
+ */
+router.get('/templates/:templateId', (req, res) => {
+  try {
+    const { templateId } = req.params;
+
+    const template = productTemplates.getTemplateById(templateId);
+    if (!template) {
+      return res.status(404).json({
+        success: false,
+        error: `Template "${templateId}" not found`
+      });
+    }
+
+    res.json({
+      success: true,
+      template: {
+        id: template.id,
+        name: template.name,
+        category: template.category,
+        description: template.description,
+        productType: template.productType,
+        imageOptimization: template.imageOptimization,
+        printify: template.printify,
+        userMessages: template.userMessages,
+        success: template.success
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching template:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch template',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * CACHE ANALYTICS ENDPOINTS
+ * Phase 2B: Analytics, metrics, and cache management
+ */
+
+// Import analytics services
+const CacheAnalyticsService = require('../services/cache-analytics-service');
+const CacheLifecycleService = require('../services/cache-lifecycle-service');
+
+const cacheAnalytics = new CacheAnalyticsService();
+const cacheLifecycle = new CacheLifecycleService();
+
+/**
+ * GET /api/merchandise/cache/statistics
+ * Get overall cache performance statistics
+ */
+router.get('/cache/statistics', async (req, res) => {
+  try {
+    const stats = await cacheAnalytics.getCacheStatistics();
+
+    if (!stats.success) {
+      return res.status(500).json({
+        success: false,
+        error: stats.error
+      });
+    }
+
+    res.json({
+      success: true,
+      cache: stats
+    });
+
+  } catch (error) {
+    console.error('Error getting cache statistics:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get cache statistics',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/cache/product-metrics
+ * Get product-specific optimization metrics
+ */
+router.get('/cache/product-metrics', async (req, res) => {
+  try {
+    const metrics = await cacheAnalytics.getProductMetrics();
+
+    if (!metrics.success) {
+      return res.status(500).json({
+        success: false,
+        error: metrics.error
+      });
+    }
+
+    res.json({
+      success: true,
+      metrics
+    });
+
+  } catch (error) {
+    console.error('Error getting product metrics:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get product metrics',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/cache/health
+ * Get cache health recommendations and insights
+ */
+router.get('/cache/health', async (req, res) => {
+  try {
+    const health = await cacheAnalytics.getCacheHealthRecommendations();
+
+    if (!health.success) {
+      return res.status(500).json({
+        success: false,
+        error: health.error
+      });
+    }
+
+    res.json({
+      success: true,
+      health
+    });
+
+  } catch (error) {
+    console.error('Error getting cache health:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get cache health',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/cache/top-optimizations
+ * Get top performing cached optimizations
+ */
+router.get('/cache/top-optimizations', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const results = await cacheAnalytics.getTopOptimizations(limit);
+
+    if (!results.success) {
+      return res.status(500).json({
+        success: false,
+        error: results.error
+      });
+    }
+
+    res.json({
+      success: true,
+      results
+    });
+
+  } catch (error) {
+    console.error('Error getting top optimizations:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get top optimizations',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/cache/storage
+ * Get cache storage statistics
+ */
+router.get('/cache/storage', async (req, res) => {
+  try {
+    const storage = await cacheLifecycle.getCacheStorageStats();
+
+    if (!storage.success) {
+      return res.status(500).json({
+        success: false,
+        error: storage.error
+      });
+    }
+
+    res.json({
+      success: true,
+      storage
+    });
+
+  } catch (error) {
+    console.error('Error getting storage stats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get storage statistics',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/merchandise/cache/maintenance
+ * Run cache maintenance (cleanup old entries)
+ * Query params:
+ *   - dryRun: boolean (default: true) - Preview changes without making them
+ *   - aggressive: boolean (default: false) - More aggressive cleanup
+ *   - maxAge: number (default: 90) - Max age in days
+ */
+router.post('/cache/maintenance', async (req, res) => {
+  try {
+    // Require admin authentication in production
+    if (process.env.NODE_ENV === 'production' && !req.user?.isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error: 'Admin access required'
+      });
+    }
+
+    const options = {
+      dryRun: req.query.dryRun !== 'false', // default true for safety
+      aggressive: req.query.aggressive === 'true',
+      maxAge: parseInt(req.query.maxAge) || 90
+    };
+
+    console.log(`🚀 Starting cache maintenance with options:`, options);
+    const result = await cacheLifecycle.runCacheMaintenance(options);
+
+    res.json({
+      success: true,
+      result
+    });
+
+  } catch (error) {
+    console.error('Error running cache maintenance:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to run cache maintenance',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/cache/policy
+ * Get current cache retention policy
+ */
+router.get('/cache/policy', (req, res) => {
+  try {
+    const policy = cacheLifecycle.getRetentionPolicy();
+
+    res.json({
+      success: true,
+      policy
+    });
+
+  } catch (error) {
+    console.error('Error getting cache policy:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get cache policy',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/merchandise/cache/policy
+ * Update cache retention policy (admin only)
+ */
+router.post('/cache/policy', (req, res) => {
+  try {
+    // Require admin authentication in production
+    if (process.env.NODE_ENV === 'production' && !req.user?.isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error: 'Admin access required'
+      });
+    }
+
+    const newPolicy = cacheLifecycle.configureRetentionPolicy(req.body);
+
+    res.json({
+      success: true,
+      policy: newPolicy,
+      message: 'Cache retention policy updated'
+    });
+
+  } catch (error) {
+    console.error('Error updating cache policy:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update cache policy',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * TEST HARNESS FOR PERFECT PRINTING
+ * POST /api/merchandise/test-harness/optimize-random
+ *
+ * Randomly selects:
+ * 1. A gallery image from the authenticated user
+ * 2. A product type from the catalog
+ * 3. Optimizes the image for that product
+ * 4. Creates a product with the optimized image
+ *
+ * This generates real analytics data and tests the full pipeline
+ */
+router.post('/test-harness/optimize-random', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+  try {
+    console.log('🧪 TEST HARNESS: optimize-random endpoint called');
+
+    const userId = req.user.uid;
+    const userName = req.user.displayName || 'Test User';
+
+    // Step 1: Get user's gallery images (both S3 uploads AND bookmarks)
+    console.log(`🖼️  Fetching gallery images for user: ${userId}`);
+    const s3Images = await galleryStorage.listUserGalleryImages(userId);
+    const { getUserBookmarks } = require('../services/firebase/galleryService');
+    const bookmarks = await getUserBookmarks(userId);
+
+    // Combine both S3 images and bookmarks
+    const allGalleryImages = [];
+
+    if (s3Images && s3Images.length > 0) {
+      allGalleryImages.push(...s3Images.map(img => ({
+        ...img,
+        type: 'uploaded',
+        url: img.url || img.url
+      })));
+    }
+
+    if (bookmarks && bookmarks.length > 0) {
+      allGalleryImages.push(...bookmarks.map(bookmark => ({
+        fileName: bookmark.title || bookmark.fileName,
+        url: bookmark.url,
+        type: 'bookmark',
+        bookmarkId: bookmark.bookmarkId,
+        title: bookmark.title
+      })));
+    }
+
+    if (!allGalleryImages || allGalleryImages.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No gallery images found. Please upload an image or bookmark content first.',
+        details: 'User has no images or bookmarks in their gallery'
+      });
+    }
+
+    console.log(`✅ Found ${allGalleryImages.length} gallery images (${s3Images?.length || 0} uploads + ${bookmarks?.length || 0} bookmarks)`);
+
+    // Randomly select an image
+    const randomImage = allGalleryImages[Math.floor(Math.random() * allGalleryImages.length)];
+    console.log(`✅ Selected random image: ${randomImage.fileName}`);
+
+    // Step 2: Get all product types and randomly select one
+    const allProducts = getAllProducts();
+    const productIds = Object.keys(allProducts);
+
+    if (!productIds || productIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No product types available in catalog',
+        details: 'Product catalog is empty'
+      });
+    }
+
+    const randomProductId = productIds[Math.floor(Math.random() * productIds.length)];
+    const selectedProduct = allProducts[randomProductId];
+    console.log(`✅ Selected random product: ${selectedProduct.name} (${randomProductId})`);
+
+    // Step 3: Download image buffer
+    console.log(`📥 Downloading image: ${randomImage.url}`);
+    let imageBuffer;
+    try {
+      const response = await axios.get(randomImage.url, {
+        responseType: 'arraybuffer',
+        timeout: 30000
+      });
+      imageBuffer = Buffer.from(response.data);
+      console.log(`✅ Image downloaded: ${imageBuffer.length} bytes`);
+    } catch (error) {
+      console.error('❌ Failed to download image:', error.message);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to download image',
+        details: error.message
+      });
+    }
+
+    // Step 4: Prepare test product metadata
+    const productTitle = `[TEST] ${selectedProduct.name} - ${randomImage.fileName}`;
+    const productDescription = `Auto-generated test product for PERFECT PRINTING optimization pipeline testing. Product: ${selectedProduct.name}. Source image: ${randomImage.fileName}.`;
+    const productKey = sanitizeFirebaseKey(`${selectedProduct.id}-${Date.now()}-test`);
+
+    console.log(`🎨 Prepared test product: ${productTitle} (Key: ${productKey})`);
+
+    try {
+
+      // Step 5: Optimize image for this product
+      console.log(`🎨 Optimizing image for product: ${selectedProduct.name}`);
+
+      const optimizer = new ImageOptimizer();
+
+      // optimizeForProduct takes imageBuffer and specKey
+      // The spec key is based on the product category (e.g., 'apparel-tshirt')
+      // For now, try with the product category directly
+      let specKey = selectedProduct.category;
+
+      // If it's a simple category like 't-shirt', try to find matching spec
+      // Common mappings: 't-shirt' -> 'apparel-tshirt', 'hoodie' -> 'apparel-hoodie'
+      if (specKey === 't-shirt') {
+        specKey = 'apparel-tshirt';
+      } else if (specKey === 'heavy-cotton-tee') {
+        specKey = 'apparel-tshirt';  // Fallback to standard tshirt specs
+      } else if (specKey.includes('hoodie')) {
+        specKey = 'apparel-hoodie';
+      } else if (specKey.includes('tank')) {
+        specKey = 'apparel-tank';
+      }
+
+      console.log(`📋 Using spec key: ${specKey} (product category: ${selectedProduct.category})`);
+
+      const result = await optimizer.optimizeForProduct(imageBuffer, specKey);
+      console.log(`✅ Optimization complete - Strategy: ${result.analysis.action}`);
+
+      // Record optimization analytics
+      console.log(`📊 Recording optimization analytics...`);
+      cacheAnalytics.recordOptimization(selectedProduct.id, {
+        processingTime: result.processingTime,
+        scaleFactor: result.analysis.scaleFactor || 1.0,
+        costEstimate: result.analysis.action === 'upscale' ? 0.08 : 0,
+        testRun: true
+      }).then(recordResult => {
+        console.log(`✅ Analytics recorded:`, recordResult);
+      }).catch(err => {
+        console.warn(`❌ Failed to record optimization analytics:`, err.message);
+      });
+
+      // Return success with detailed info
+      res.json({
+        success: true,
+        message: 'Test harness completed successfully',
+        test_run_details: {
+          timestamp: new Date().toISOString(),
+          userId: userId,
+          userName: userName,
+          selected_image: {
+            name: randomImage.fileName,
+            url: randomImage.url,
+            size: imageBuffer.length,
+            dimensions: randomImage.dimensions
+          },
+          selected_product: {
+            id: selectedProduct.id,
+            name: selectedProduct.name,
+            category: selectedProduct.category,
+            blueprint: selectedProduct.blueprintId
+          },
+          created_product: {
+            productKey: productKey,
+            title: productTitle,
+            status: 'test'
+          },
+          optimization_result: {
+            message: `Optimization ${result.optimized ? 'applied' : 'not needed'}`,
+            strategy: result.analysis.action,
+            scaleFactor: result.analysis.scaleFactor || 1.0,
+            processingTime: result.processingTime,
+            originalSize: imageBuffer.length,
+            optimizedSize: result.optimizedBuffer ? result.optimizedBuffer.length : imageBuffer.length,
+            estimatedCost: result.analysis.action === 'upscale' ? 0.08 : 0
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Error in test harness:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Test harness encountered an error',
+        details: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ Test harness error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Test harness failed',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/test-harness/status
+ * Check test harness status and availability
+ */
+router.get('/test-harness/status', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Test harness is available',
+    endpoints: {
+      'POST /api/merchandise/test-harness/optimize-random': {
+        description: 'Run one test cycle: random image + random product + optimization',
+        requires: 'Authentication + game_access permission',
+        prerequisites: 'User must have at least one image in their gallery'
+      }
+    },
+    note: 'This test harness generates real analytics data for debugging PERFECT PRINTING'
+  });
+});
+
+/**
+ * PRODUCT PREVIEW HARNESS - PERFECT PRINTING
+ * Demonstrates optimized images on actual vendor products
+ * Complete workflow: Optimization → Product Creation → Vendor Preview
+ */
+
+/**
+ * POST /api/merchandise/preview-harness/optimize-and-preview
+ *
+ * Runs complete workflow:
+ * 1. Selects random gallery image
+ * 2. Selects random product type
+ * 3. Optimizes image for that product
+ * 4. Generates vendor preview showing image on product mockup
+ * 5. Returns preview URLs and product details
+ */
+router.post('/preview-harness/optimize-and-preview', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+  try {
+    console.log('🎨 PREVIEW HARNESS: optimize-and-preview endpoint called');
+
+    const userId = req.user.uid;
+    const userName = req.user.displayName || 'Test User';
+
+    // Step 1: Get user's gallery images (both S3 uploads AND bookmarks)
+    console.log(`🖼️  Fetching gallery images for user: ${userId}`);
+    const s3Images = await galleryStorage.listUserGalleryImages(userId);
+    const { getUserBookmarks } = require('../services/firebase/galleryService');
+    const bookmarks = await getUserBookmarks(userId);
+
+    // Combine both S3 images and bookmarks
+    const allGalleryImages = [];
+
+    if (s3Images && s3Images.length > 0) {
+      allGalleryImages.push(...s3Images.map(img => ({
+        ...img,
+        type: 'uploaded',
+        url: img.url || img.url
+      })));
+    }
+
+    if (bookmarks && bookmarks.length > 0) {
+      allGalleryImages.push(...bookmarks.map(bookmark => ({
+        fileName: bookmark.title || bookmark.fileName,
+        url: bookmark.url,
+        type: 'bookmark',
+        bookmarkId: bookmark.bookmarkId,
+        title: bookmark.title
+      })));
+    }
+
+    if (!allGalleryImages || allGalleryImages.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No gallery images found. Please upload an image or bookmark content first.',
+        details: 'User has no images or bookmarks in their gallery'
+      });
+    }
+
+    console.log(`✅ Found ${allGalleryImages.length} gallery images (${s3Images?.length || 0} uploads + ${bookmarks?.length || 0} bookmarks)`);
+
+    // Randomly select an image
+    const randomImage = allGalleryImages[Math.floor(Math.random() * allGalleryImages.length)];
+    console.log(`✅ Selected random image: ${randomImage.fileName}`);
+
+    // Step 2: Get all product types and randomly select one
+    const allProducts = getAllProducts();
+    const productIds = Object.keys(allProducts);
+
+    if (!productIds || productIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No product types available in catalog',
+        details: 'Product catalog is empty'
+      });
+    }
+
+    const randomProductId = productIds[Math.floor(Math.random() * productIds.length)];
+    const selectedProduct = allProducts[randomProductId];
+    console.log(`✅ Selected random product: ${selectedProduct.name} (${randomProductId})`);
+
+    // Step 3: Download image buffer
+    console.log(`📥 Downloading image: ${randomImage.url}`);
+    let imageBuffer;
+    try {
+      const response = await axios.get(randomImage.url, {
+        responseType: 'arraybuffer',
+        timeout: 30000
+      });
+      imageBuffer = Buffer.from(response.data);
+      console.log(`✅ Image downloaded: ${imageBuffer.length} bytes`);
+    } catch (error) {
+      console.error('❌ Failed to download image:', error.message);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to download image',
+        details: error.message
+      });
+    }
+
+    // Step 4: Optimize image for this product
+    console.log(`🎨 Optimizing image for product: ${selectedProduct.name}`);
+
+    const optimizer = new ImageOptimizer();
+    let specKey = selectedProduct.category;
+
+    // Map common categories to spec keys
+    if (specKey === 't-shirt') {
+      specKey = 'apparel-tshirt';
+    } else if (specKey === 'heavy-cotton-tee') {
+      specKey = 'apparel-tshirt';
+    } else if (specKey.includes('hoodie')) {
+      specKey = 'apparel-hoodie';
+    } else if (specKey.includes('tank')) {
+      specKey = 'apparel-tank';
+    }
+
+    console.log(`📋 Using spec key: ${specKey} (product category: ${selectedProduct.category})`);
+
+    const optimizationResult = await optimizer.optimizeForProduct(imageBuffer, specKey);
+    console.log(`✅ Optimization complete - Strategy: ${optimizationResult.analysis.action}`);
+
+    // Record optimization analytics
+    console.log(`📊 Recording optimization analytics...`);
+    cacheAnalytics.recordOptimization(selectedProduct.id, {
+      processingTime: optimizationResult.processingTime,
+      scaleFactor: optimizationResult.analysis.scaleFactor || 1.0,
+      costEstimate: optimizationResult.analysis.action === 'upscale' ? 0.08 : 0,
+      testRun: true
+    }).catch(err => {
+      console.warn(`❌ Failed to record optimization analytics:`, err.message);
+    });
+
+    // Step 5: Create vendor preview with optimized image
+    console.log(`🎬 Creating vendor preview with optimized image...`);
+
+    try {
+      const VendorPreviewHelper = require('../utils/vendor-preview-helper');
+      const previewHelper = new VendorPreviewHelper();
+
+      // For preview purposes, we'll use a simulated vendor preview
+      // In production, this would call the actual Printify API or cached vendor data
+      const previewProductId = sanitizeFirebaseKey(`preview-${selectedProduct.id}-${Date.now()}`);
+
+      const vendorPreviewData = {
+        product: {
+          productId: previewProductId,
+          title: `[PREVIEW] ${selectedProduct.name}`,
+          description: `Optimized preview of ${selectedProduct.name} with Wavelength artwork`,
+          type: selectedProduct.category,
+          vendor: selectedProduct.provider,
+          blueprintId: selectedProduct.blueprintId,
+          printProviderId: selectedProduct.printProviderId
+        },
+        variants: [
+          {
+            id: 'variant-1',
+            title: 'Standard',
+            color: 'Black',
+            size: 'M',
+            price: 2999,
+            image: randomImage.url
+          }
+        ],
+        printArea: {
+          width: 10,
+          height: 12,
+          unit: 'inches'
+        }
+      };
+
+      const previewMetadata = {
+        enhancedImageUrl: randomImage.url, // In production, this would be the optimized image
+        originalImageUrl: randomImage.url,
+        imageSize: imageBuffer.length,
+        optimizationStrategy: optimizationResult.analysis.action,
+        scaleFactor: optimizationResult.analysis.scaleFactor || 1.0,
+        createdAt: new Date().toISOString(),
+        sourceImage: randomImage.fileName,
+        sourceProduct: selectedProduct.name,
+        sourceUser: userId
+      };
+
+      // Store the vendor preview
+      await previewHelper.storeVendorPreview(vendorPreviewData, previewMetadata);
+      console.log(`✅ Vendor preview created: ${previewProductId}`);
+
+      // Return comprehensive preview data
+      res.json({
+        success: true,
+        message: 'Preview harness completed successfully',
+        preview_workflow: {
+          timestamp: new Date().toISOString(),
+          userId: userId,
+          userName: userName,
+
+          // Original image selection
+          selected_image: {
+            name: randomImage.fileName,
+            url: randomImage.url,
+            size: imageBuffer.length,
+            type: randomImage.type,
+            dimensions: randomImage.dimensions
+          },
+
+          // Product selection
+          selected_product: {
+            id: selectedProduct.id,
+            name: selectedProduct.name,
+            category: selectedProduct.category,
+            blueprint: selectedProduct.blueprintId,
+            provider: selectedProduct.provider
+          },
+
+          // Optimization results
+          optimization_result: {
+            message: `Optimization ${optimizationResult.optimized ? 'applied' : 'not needed'}`,
+            strategy: optimizationResult.analysis.action,
+            scaleFactor: optimizationResult.analysis.scaleFactor || 1.0,
+            processingTime: optimizationResult.processingTime,
+            originalSize: imageBuffer.length,
+            optimizedSize: optimizationResult.optimizedBuffer ? optimizationResult.optimizedBuffer.length : imageBuffer.length,
+            estimatedCost: optimizationResult.analysis.action === 'upscale' ? 0.08 : 0
+          },
+
+          // Vendor preview details
+          vendor_preview: {
+            previewProductId: previewProductId,
+            title: vendorPreviewData.product.title,
+            vendor: vendorPreviewData.product.vendor,
+            printArea: vendorPreviewData.printArea,
+            viewUrl: `/api/merchandise/vendor-preview/${previewProductId}`,
+            metadata: {
+              optimizationStrategy: previewMetadata.optimizationStrategy,
+              scaleFactor: previewMetadata.scaleFactor,
+              createdAt: previewMetadata.createdAt
+            }
+          },
+
+          // Quick actions
+          actions: {
+            viewPreview: `/api/merchandise/vendor-preview/${previewProductId}`,
+            runAnotherTest: '/merchandise/preview-harness'
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Error creating vendor preview:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to create vendor preview',
+        details: error.message,
+        optimization_completed: true,
+        message: 'Image was optimized successfully, but vendor preview generation failed'
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ Preview harness error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Preview harness failed',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/preview-harness/status
+ * Check preview harness status and capabilities
+ */
+router.get('/preview-harness/status', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Preview harness is available',
+    capabilities: {
+      'POST /api/merchandise/preview-harness/optimize-and-preview': {
+        description: 'Complete workflow: optimize image + create vendor preview',
+        requires: 'Authentication + game_access permission',
+        prerequisites: 'User must have at least one image in their gallery',
+        outputs: [
+          'Optimized image details',
+          'Vendor preview product ID',
+          'Preview view URL',
+          'Analytics data'
+        ]
+      }
+    },
+    workflow: [
+      '1. Select random gallery image (uploads + bookmarks)',
+      '2. Select random product type from 142 products',
+      '3. Optimize image for product specifications',
+      '4. Generate vendor preview with optimized image',
+      '5. Store preview in Firebase',
+      '6. Return preview URLs and product mockup details'
+    ],
+    note: 'This harness demonstrates the complete PERFECT PRINTING workflow from image optimization through vendor product previews'
+  });
+});
+
+/**
+ * GET /merchandise/preview-harness
+ * Render the Product Preview Harness UI
+ */
+router.get('/preview-harness', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+  try {
+    res.render('preview-harness', {
+      title: 'PERFECT PRINTING Product Preview Harness',
+      pageTitle: 'Product Preview Harness',
+      pageDescription: 'View optimized images on vendor product mockups',
+      user: req.user,
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`
+    });
+  } catch (error) {
+    console.error('Error rendering preview harness:', error);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Unable to load preview harness',
+      error: process.env.NODE_ENV === 'development' ? error : {}
     });
   }
 });

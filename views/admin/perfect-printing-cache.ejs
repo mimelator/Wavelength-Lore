@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Wavelength Lore Admin</title>
+    <link rel="stylesheet" href="/css/admin-styles.css">
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .admin-page-wrapper {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 20px 0;
+            position: fixed;
+            width: 250px;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .admin-sidebar-header {
+            padding: 20px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+        }
+
+        .admin-sidebar-header h2 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #1f2937;
+        }
+
+        .admin-sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+
+        .admin-sidebar-menu li {
+            margin: 0;
+        }
+
+        .admin-sidebar-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: #6b7280;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .admin-sidebar-menu a:hover {
+            background: #f3f4f6;
+            border-left-color: #6366f1;
+            color: #1f2937;
+        }
+
+        .admin-sidebar-menu a.active {
+            background: #f3f4f6;
+            border-left-color: #6366f1;
+            color: #6366f1;
+            font-weight: 600;
+        }
+
+        .admin-main-content {
+            margin-left: 250px;
+            padding: 40px;
+        }
+
+        .admin-header-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-header-section h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            color: #1f2937;
+        }
+
+        .admin-header-section p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 1.1em;
+        }
+
+        .breadcrumb {
+            color: #9ca3af;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .breadcrumb a {
+            color: #6366f1;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .metric-label {
+            color: #9ca3af;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #6366f1;
+            margin-bottom: 10px;
+        }
+
+        .metric-subtitle {
+            color: #6b7280;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status-excellent {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-good {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-needs-attention {
+            background: #fee2e2;
+            color: #7f1d1d;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .section-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #1f2937;
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        thead {
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        th {
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #6b7280;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .recommendation-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f9fafb;
+            border-left: 4px solid #6366f1;
+            border-radius: 6px;
+        }
+
+        .recommendation-item.high {
+            border-left-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .recommendation-item.medium {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .recommendation-title {
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .recommendation-text {
+            color: #6b7280;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .btn-primary {
+            background: #6366f1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #6b7280;
+            font-size: 1.1em;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e5e7eb;
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .message {
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #7f1d1d;
+        }
+
+        .message.info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .insight-box {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .insight-title {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .insight-text {
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+        .timestamp {
+            color: #9ca3af;
+            font-size: 0.85em;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .admin-page-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                display: none;
+            }
+
+            .admin-main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .inline-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .stat {
+            background: #f9fafb;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.85em;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #6366f1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-page-wrapper">
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-header">
+                <h2>🎨 PERFECT PRINTING</h2>
+            </div>
+            <ul class="admin-sidebar-menu">
+                <li><a href="/admin/vendor-research/overview" class="nav-link">Dashboard Overview</a></li>
+                <li><a href="/merchandise/cache-admin" class="nav-link active">Cache Analytics</a></li>
+                <li><a href="/merchandise" class="nav-link">Merchandise Store</a></li>
+                <li><a href="/admin" class="nav-link">Back to Admin</a></li>
+            </ul>
+        </aside>
+
+        <main class="admin-main-content">
+            <div class="admin-header-section">
+                <h1>🎨 PERFECT PRINTING Cache Analytics</h1>
+                <p>Real-time monitoring and management of product image optimization cache</p>
+                <div class="breadcrumb">
+                    <a href="/admin">Admin</a> /
+                    <a href="/admin/vendor-research/overview">Vendor Research</a> /
+                    Cache Analytics
+                </div>
+            </div>
+
+            <div id="messages"></div>
+
+            <!-- Metrics Grid -->
+            <div class="dashboard-grid" id="metricsGrid">
+                <div class="metric-card">
+                    <div class="loading"><div class="spinner"></div> Loading metrics...</div>
+                </div>
+            </div>
+
+            <!-- Product Rankings Section -->
+            <div class="section-card">
+                <h2 class="section-title">📊 Product Optimization Rankings</h2>
+                <p style="color: #6b7280; margin: 0 0 20px 0;">Top 10 products by optimization activity and cost savings</p>
+                <div id="productsTable" class="loading">
+                    <div class="spinner"></div> Loading product metrics...
+                </div>
+            </div>
+
+            <!-- Health & Recommendations -->
+            <div class="section-card">
+                <h2 class="section-title">💡 Health Assessment & Recommendations</h2>
+                <div id="healthSection" class="loading">
+                    <div class="spinner"></div> Loading health insights...
+                </div>
+            </div>
+
+            <!-- Storage Management -->
+            <div class="section-card">
+                <h2 class="section-title">💾 Storage Management</h2>
+                <div id="storageSection" class="loading">
+                    <div class="spinner"></div> Loading storage statistics...
+                </div>
+            </div>
+
+            <!-- Cache Controls -->
+            <div class="section-card">
+                <h2 class="section-title">⚙️ Cache Maintenance Controls</h2>
+                <p style="color: #6b7280; margin: 0 0 20px 0;">Manage cache cleanup, retention policies, and optimization</p>
+                <div id="controlsSection" class="loading">
+                    <div class="spinner"></div> Loading controls...
+                </div>
+            </div>
+
+            <!-- Top Optimizations -->
+            <div class="section-card">
+                <h2 class="section-title">⭐ Top Performing Optimizations</h2>
+                <p style="color: #6b7280; margin: 0 0 20px 0;">Most valuable cached items that deliver the most benefit</p>
+                <div id="topTable" class="loading">
+                    <div class="spinner"></div> Loading top optimizations...
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE = '/api/merchandise';
+        const REFRESH_INTERVAL = 30000; // 30 seconds
+
+        async function loadAllMetrics() {
+            try {
+                const [stats, metrics, health, storage, policy, top] = await Promise.all([
+                    fetch(`${API_BASE}/cache/statistics`).then(r => r.json()).catch(e => ({ success: false, error: e.message })),
+                    fetch(`${API_BASE}/cache/product-metrics`).then(r => r.json()).catch(e => ({ success: false, error: e.message })),
+                    fetch(`${API_BASE}/cache/health`).then(r => r.json()).catch(e => ({ success: false, error: e.message })),
+                    fetch(`${API_BASE}/cache/storage`).then(r => r.json()).catch(e => ({ success: false, error: e.message })),
+                    fetch(`${API_BASE}/cache/policy`).then(r => r.json()).catch(e => ({ success: false, error: e.message })),
+                    fetch(`${API_BASE}/cache/top-optimizations?limit=10`).then(r => r.json()).catch(e => ({ success: false, error: e.message }))
+                ]);
+
+                if (stats.success) displayMetrics(stats.cache);
+                if (metrics.success) displayProductMetrics(metrics.metrics?.productMetrics || {});
+                if (health.success) displayHealth(health.health);
+                if (storage.success) displayStorage(storage.storage);
+                if (policy.success) displayControls(policy.policy);
+                if (top.success) displayTopOptimizations(top.results?.topOptimizations || []);
+
+            } catch (error) {
+                showMessage(`Failed to load metrics: ${error.message}`, 'error');
+            }
+        }
+
+        function displayMetrics(stats) {
+            const grid = document.getElementById('metricsGrid');
+            const hitRatePercent = (stats.hitRate * 100).toFixed(1);
+
+            grid.innerHTML = `
+                <div class="metric-card">
+                    <div class="metric-label">📊 Cache Hit Rate</div>
+                    <div class="metric-value">${hitRatePercent}%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${hitRatePercent}%"></div>
+                    </div>
+                    <span class="status-badge ${hitRatePercent >= 85 ? 'status-excellent' : hitRatePercent >= 70 ? 'status-good' : 'status-needs-attention'}">
+                        ${hitRatePercent >= 85 ? '✅ Excellent' : hitRatePercent >= 70 ? '👍 Good' : '⚠️ Needs Attention'}
+                    </span>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">🎯 Cache Hits</div>
+                    <div class="metric-value">${stats.cacheHits.toLocaleString()}</div>
+                    <div class="metric-subtitle">Successful cache retrievals</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">❌ Cache Misses</div>
+                    <div class="metric-value">${stats.cacheMisses.toLocaleString()}</div>
+                    <div class="metric-subtitle">Optimizations needed</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">💰 Cost Savings</div>
+                    <div class="metric-value">$${stats.estimatedCostSavings.toFixed(2)}</div>
+                    <div class="metric-subtitle">Avoided upscaling costs</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">📈 Enhancements</div>
+                    <div class="metric-value">${stats.enhancementsCreated}</div>
+                    <div class="metric-subtitle">Reused ${stats.enhancementsReused.toLocaleString()}x</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">🖼️ Fingerprints</div>
+                    <div class="metric-value">${stats.totalFingerprints.toLocaleString()}</div>
+                    <div class="metric-subtitle">Unique images tracked</div>
+                </div>
+            `;
+        }
+
+        function displayProductMetrics(products) {
+            const container = document.getElementById('productsTable');
+            const sorted = Object.entries(products)
+                .sort((a, b) => (b[1].totalRequests || 0) - (a[1].totalRequests || 0))
+                .slice(0, 10);
+
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No product metrics available yet</div></div>';
+                return;
+            }
+
+            let html = '<table><thead><tr><th>Product</th><th>Optimizations</th><th>Reuses</th><th>Reuse Rate</th><th>Avg Time</th><th>Cost/User</th></tr></thead><tbody>';
+            sorted.forEach(([key, data]) => {
+                html += `<tr>
+                    <td><strong>${key}</strong></td>
+                    <td>${data.timesOptimized}</td>
+                    <td>${data.timesReused.toLocaleString()}</td>
+                    <td>${data.reuseRate}</td>
+                    <td>${(data.avgOptimizationTime / 1000).toFixed(1)}s</td>
+                    <td>$${data.costPerUser.toFixed(4)}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function displayHealth(health) {
+            const container = document.getElementById('healthSection');
+            let html = `<div class="insight-box">
+                <div class="insight-title">Overall Health: ${health.overall_health.status.replace(/_/g, ' ').toUpperCase()}</div>
+                <div class="insight-text">Score: ${health.overall_health.score}/100</div>
+            </div>`;
+
+            if (health.insights?.length > 0) {
+                html += '<h3 style="font-size: 1.1em; color: #1f2937; margin: 20px 0 15px 0;">✨ Key Insights</h3>';
+                health.insights.forEach(insight => {
+                    if (insight.data) {
+                        html += `<div style="margin-bottom: 15px;">
+                            <strong style="color: #1f2937;">${insight.title}</strong>
+                            <ul style="margin: 8px 0 0 20px; padding-left: 0;">
+                                ${insight.data.map(item => `<li style="color: #6b7280; margin-bottom: 4px;">${item.product}: ${item.requests} requests (${item.reuseRate})</li>`).join('')}
+                            </ul>
+                        </div>`;
+                    } else {
+                        html += `<div style="color: #6b7280; margin-bottom: 10px;">${insight.message}</div>`;
+                    }
+                });
+            }
+
+            if (health.recommendations?.length > 0) {
+                html += '<h3 style="font-size: 1.1em; color: #1f2937; margin: 20px 0 15px 0;">💡 Recommendations</h3>';
+                health.recommendations.forEach(rec => {
+                    html += `<div class="recommendation-item ${rec.priority}">
+                        <div class="recommendation-title">${rec.title}</div>
+                        <div class="recommendation-text">${rec.suggestion}</div>
+                        ${rec.current ? `<div style="margin-top: 8px; color: #9ca3af; font-size: 0.9em;">Current: ${rec.current} → Target: ${rec.target}</div>` : ''}
+                    </div>`;
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        function displayStorage(storage) {
+            const container = document.getElementById('storageSection');
+            const breakdown = Object.entries(storage.sizeByAge)
+                .map(([age, size]) => `<div class="stat"><div class="stat-label">${age.replace(/_/g, ' ')}</div><div class="stat-value" style="font-size: 1.2em;">${size}</div></div>`)
+                .join('');
+
+            container.innerHTML = `
+                <div class="inline-stats">
+                    <div class="stat">
+                        <div class="stat-label">Total Storage</div>
+                        <div class="stat-value" style="font-size: 1.2em;">${storage.totalSize.gigabytes} GB</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Items Cached</div>
+                        <div class="stat-value" style="font-size: 1.2em;">${storage.itemCount}</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Avg Item Size</div>
+                        <div class="stat-value" style="font-size: 1.2em;">${(storage.avgItemSize / 1024).toFixed(2)} KB</div>
+                    </div>
+                </div>
+                <h3 style="font-size: 1.1em; color: #1f2937; margin: 20px 0 15px 0;">Storage by Age</h3>
+                <div class="inline-stats">${breakdown}</div>
+            `;
+        }
+
+        function displayControls(policy) {
+            const container = document.getElementById('controlsSection');
+            const policyItems = Object.entries(policy)
+                .map(([key, value]) => `<li style="margin-bottom: 8px;"><strong>${key.replace(/([A-Z])/g, ' $1').trim()}:</strong> ${value}</li>`)
+                .join('');
+
+            container.innerHTML = `
+                <h3 style="font-size: 1.1em; color: #1f2937; margin-bottom: 15px;">Current Retention Policy</h3>
+                <ul style="margin: 0; padding-left: 20px; color: #6b7280;">${policyItems}</ul>
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="runMaintenance(true)">🔍 Preview Cleanup (Dry Run)</button>
+                    <button class="btn-primary" onclick="runMaintenance(false)">🧹 Run Maintenance</button>
+                    <button class="btn-danger" onclick="runAggressiveMaintenance()">⚡ Aggressive Cleanup</button>
+                </div>
+            `;
+        }
+
+        function displayTopOptimizations(items) {
+            const container = document.getElementById('topTable');
+
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No optimizations available yet</div></div>';
+                return;
+            }
+
+            let html = '<table><thead><tr><th>Product</th><th>Reused</th><th>Avg Time</th><th>Time Saved</th><th>Cost Saved</th></tr></thead><tbody>';
+            items.forEach(item => {
+                html += `<tr>
+                    <td><strong>${item.productKey}</strong></td>
+                    <td>${item.timesReused}</td>
+                    <td>${(item.avgOptimizationTime / 1000).toFixed(1)}s</td>
+                    <td>${(item.totalBenefit / 60).toFixed(1)} min</td>
+                    <td><strong>$${item.costSaved.toFixed(2)}</strong></td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        async function runMaintenance(dryRun) {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '⏳ Running...';
+
+            try {
+                const res = await fetch(`${API_BASE}/cache/maintenance?dryRun=${dryRun}`, { method: 'POST' });
+                const data = await res.json();
+
+                if (data.success) {
+                    if (dryRun) {
+                        showMessage(`Dry run complete: Would remove ${data.result.analysis?.candidates?.length || 0} items`, 'info');
+                    } else {
+                        showMessage(`Maintenance complete: Removed ${data.result.removed} items, freed ${data.result.spaceSaved.megabytes} MB`, 'success');
+                        setTimeout(loadAllMetrics, 1000);
+                    }
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        async function runAggressiveMaintenance() {
+            if (!confirm('⚠️ Aggressive cleanup removes more items. Continue?')) return;
+            try {
+                const res = await fetch(`${API_BASE}/cache/maintenance?dryRun=false&aggressive=true`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    showMessage(`Aggressive cleanup complete: Removed ${data.result.removed} items, freed ${data.result.spaceSaved.megabytes} MB`, 'success');
+                    setTimeout(loadAllMetrics, 1000);
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        function showMessage(msg, type = 'info') {
+            const container = document.getElementById('messages');
+            container.innerHTML = `<div class="message ${type}">${msg}</div>`;
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+
+        // Load metrics on page load
+        loadAllMetrics();
+
+        // Refresh every 30 seconds
+        setInterval(loadAllMetrics, REFRESH_INTERVAL);
+
+        // Set active nav item
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
