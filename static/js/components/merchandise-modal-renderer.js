@@ -440,35 +440,86 @@ class MerchandiseModalRenderer {
 
           <!-- Border Width & Color (Hidden until enabled) -->
           <div id="border-options-container" style="display: none;">
-            <!-- Width Buttons -->
+            <!-- Width Buttons - Radio Style (Single Line) -->
             <div class="border-width-section">
               <label class="section-label">Width:</label>
-              <div class="width-buttons-grid compact-grid">
+              <div class="width-buttons-grid radio-grid">
                 ${widths.map(width => `
-                  <button
-                    class="width-btn compact-btn"
-                    data-border-width="${width.value}"
-                    data-border-pixels="${width.pixels}"
-                    title="${width.label} (${width.pixels}px)"
-                  >
-                    ${width.label}
-                  </button>
+                  <label class="width-radio-label">
+                    <input
+                      type="radio"
+                      name="border-width"
+                      class="width-radio-input"
+                      data-border-width="${width.value}"
+                      data-border-pixels="${width.pixels}"
+                      value="${width.value}"
+                      ${width.value === 0 ? 'checked' : ''}
+                    />
+                    <span class="radio-custom"></span>
+                    <span class="radio-label">${width.label}</span>
+                  </label>
                 `).join('')}
               </div>
             </div>
 
-            <!-- Color Palette -->
+            <!-- Color Palette - Dropdown Select with Optgroups -->
             <div class="border-color-section">
               <label class="section-label">Color:</label>
-              <div class="color-palette-grid compact-grid">
-                ${colors.map(color => `
-                  <button
-                    class="color-palette-btn compact-btn"
-                    data-border-color="${color.hex}"
-                    title="${color.name}"
-                    style="background-color: ${color.hex};"
-                  ></button>
-                `).join('')}
+              <div class="color-select-wrapper">
+                <select class="border-color-select" id="border-color-select">
+                  <optgroup label="Primary Colors">
+                    <option value="#FF0000">Red</option>
+                    <option value="#0000FF">Blue</option>
+                    <option value="#FFFF00">Yellow</option>
+                    <option value="#00AA00">Green</option>
+                    <option value="#AA00AA">Purple</option>
+                    <option value="#FF8800">Orange</option>
+                  </optgroup>
+                  <optgroup label="Pastel Colors">
+                    <option value="#FFB6C1">Soft Pink</option>
+                    <option value="#ADD8E6">Soft Blue</option>
+                    <option value="#FFFFE0">Soft Yellow</option>
+                    <option value="#90EE90">Soft Green</option>
+                    <option value="#DDA0DD">Soft Purple</option>
+                    <option value="#FFDAB9">Soft Peach</option>
+                  </optgroup>
+                  <optgroup label="Dark Colors">
+                    <option value="#8B0000">Dark Red</option>
+                    <option value="#00008B">Dark Blue</option>
+                    <option value="#006400">Dark Green</option>
+                    <option value="#4B0082">Dark Purple</option>
+                    <option value="#654321">Dark Brown</option>
+                    <option value="#404040">Dark Gray</option>
+                  </optgroup>
+                  <optgroup label="Metallic Colors">
+                    <option value="#FFD700">Gold</option>
+                    <option value="#C0C0C0">Silver</option>
+                    <option value="#B76E79">Rose Gold</option>
+                    <option value="#CD7F32">Bronze</option>
+                    <option value="#B87333">Copper</option>
+                    <option value="#E5E4E2">Platinum</option>
+                  </optgroup>
+                  <optgroup label="Vibrant/Neon Colors">
+                    <option value="#FF1493">Hot Pink</option>
+                    <option value="#39FF14">Neon Green</option>
+                    <option value="#0080FF">Neon Blue</option>
+                    <option value="#BF00FF">Electric Purple</option>
+                    <option value="#00FFFF">Cyan</option>
+                    <option value="#BFFF00">Lime</option>
+                  </optgroup>
+                  <optgroup label="Neutral Colors">
+                    <option value="#FFFFFF">White</option>
+                    <option value="#000000" selected>Black</option>
+                    <option value="#D3D3D3">Light Gray</option>
+                    <option value="#808080">Medium Gray</option>
+                    <option value="#FFFDD0">Cream</option>
+                    <option value="#F5F5DC">Beige</option>
+                  </optgroup>
+                </select>
+                <div class="selected-color-preview">
+                  <span class="color-swatch" id="border-color-swatch" style="background-color: #000000;"></span>
+                  <span class="color-label" id="border-color-label">Black</span>
+                </div>
               </div>
             </div>
 
@@ -1646,18 +1697,6 @@ class MerchandiseModalRenderer {
         this.updateCustomizationSummary(modal);
       }
 
-      // Border width button clicks
-      if (e.target.classList.contains('width-btn')) {
-        this.handleBorderWidthSelection(e.target, modal);
-        this.updateCustomizationSummary(modal);
-      }
-
-      // Border color button clicks
-      if (e.target.classList.contains('color-palette-btn')) {
-        this.handleBorderColorSelection(e.target, modal);
-        this.updateCustomizationSummary(modal);
-      }
-
       // Update preview button
       if (e.target.classList.contains('update-preview-btn')) {
         const productId = e.target.dataset.productId;
@@ -1700,6 +1739,18 @@ class MerchandiseModalRenderer {
 
     // Change event delegation (for selects and inputs)
     modal.addEventListener('change', (e) => {
+      // Border width radio inputs
+      if (e.target.classList.contains('width-radio-input')) {
+        this.handleBorderWidthSelection(e.target, modal);
+        this.updateCustomizationSummary(modal);
+      }
+
+      // Border color dropdown
+      if (e.target.classList.contains('border-color-select')) {
+        this.handleBorderColorDropdown(e.target, modal);
+        this.updateCustomizationSummary(modal);
+      }
+
       // Size dropdown
       if (e.target.classList.contains('product-size-select')) {
         modal.dataset.selectedSize = e.target.value;
@@ -1726,24 +1777,23 @@ class MerchandiseModalRenderer {
    * @param {HTMLElement} button - Width button element
    * @param {HTMLElement} modal - Modal element
    */
-  handleBorderWidthSelection(button, modal) {
-    const borderWidth = button.dataset.borderWidth;
-    const borderPixels = button.dataset.borderPixels;
+  handleBorderWidthSelection(input, modal) {
+    const borderWidth = input.dataset.borderWidth;
+    const borderPixels = input.dataset.borderPixels;
 
-    // Update UI - show selection
-    modal.querySelectorAll('.width-btn').forEach(btn => btn.classList.remove('selected'));
-    button.classList.add('selected');
-
-    // Update display
-    this.updateBorderSelectionDisplay(modal);
+    // Get the label text for debugging
+    const label = input.closest('.width-radio-label')?.querySelector('.radio-label')?.textContent || borderWidth;
 
     // Store in modal state
     modal.dataset.selectedBorderWidth = borderWidth;
     modal.dataset.selectedBorderPixels = borderPixels;
 
+    // Update display
+    this.updateBorderSelectionDisplay(modal);
+
     // Debug logging
     if (this.debugMode) {
-      this.debugLog(`Border width selected: ${button.textContent.trim()} (${borderPixels}px)`, 'info', {
+      this.debugLog(`Border width selected: ${label} (${borderPixels}px)`, 'info', {
         value: borderWidth,
         pixels: borderPixels
       });
@@ -1759,7 +1809,7 @@ class MerchandiseModalRenderer {
     const borderColor = button.dataset.borderColor;
 
     // Update UI - show selection
-    modal.querySelectorAll('.color-palette-btn').forEach(btn => btn.classList.remove('selected'));
+    modal.querySelectorAll('.compact-color-btn').forEach(btn => btn.classList.remove('selected'));
     button.classList.add('selected');
 
     // Update display
@@ -1772,6 +1822,41 @@ class MerchandiseModalRenderer {
     if (this.debugMode) {
       this.debugLog(`Border color selected: ${borderColor}`, 'info', {
         color: borderColor
+      });
+    }
+  }
+
+  /**
+   * Handle border color dropdown selection
+   * @param {HTMLElement} select - Select element
+   * @param {HTMLElement} modal - Modal element
+   */
+  handleBorderColorDropdown(select, modal) {
+    const borderColor = select.value;
+    const selectedText = select.options[select.selectedIndex].text;
+
+    // Update color swatch preview
+    const swatch = modal.querySelector('#border-color-swatch');
+    const label = modal.querySelector('#border-color-label');
+
+    if (swatch) {
+      swatch.style.backgroundColor = borderColor;
+    }
+    if (label) {
+      label.textContent = selectedText;
+    }
+
+    // Update display
+    this.updateBorderSelectionDisplay(modal);
+
+    // Store in modal state
+    modal.dataset.selectedBorderColor = borderColor;
+
+    // Debug logging
+    if (this.debugMode) {
+      this.debugLog(`Border color selected: ${selectedText} (${borderColor})`, 'info', {
+        color: borderColor,
+        name: selectedText
       });
     }
   }

@@ -33,16 +33,20 @@ router.get('/', groupAuth.requireAction('game_access_member'), (req, res) => {
  * 🎯 GO-LIVE UPDATE: Now accessible to all authenticated members!
  */
 router.get('/wavelength-gems', groupAuth.requireAction('game_access_member'), (req, res) => {
+    const { getActiveTheme } = require('../config/game-themes');
+    const theme = getActiveTheme();
+    
     res.render('games/wavelength-gems', {
-        title: 'Wavelength Gems',
+        title: `${theme.prefix}: Crystal Harvest`,
         currentPage: 'wavelength-gems',
         breadcrumbs: [
             { name: 'Games', url: '/games' },
-            { name: 'Wavelength Gems', url: null }
+            { name: 'Crystal Harvest', url: null }
         ],
         cdnUrl: process.env.CDN_URL,
         version: `v${Date.now()}`,
-        userGroups: req.userGroups || [] // Pass user groups for permission checks
+        userGroups: req.userGroups || [],
+        theme: theme // Pass theme data to the game page
     });
 });
 
@@ -127,18 +131,16 @@ router.get('/:gameId', (req, res, next) => {
         });
     }
 
-    // Generic game page for other games
-    res.render('games/game-page', {
-        title: 'Game',
-        currentPage: 'game',
-        gameId: gameId,
-        userGroups: req.userGroups,
-        breadcrumbs: [
-            { name: 'Games', url: '/games' },
-            { name: 'Game', url: null }
-        ],
-        cdnUrl: process.env.CDN_URL,
-        version: `v${Date.now()}`
+    // For games without specific routes, show coming soon message
+    const { getActiveTheme } = require('../config/game-themes');
+    const theme = getActiveTheme();
+    
+    res.status(404).json({
+        success: false,
+        error: 'Game not found',
+        message: `Game "${gameId}" is not yet available`,
+        available_games: ['wavelength-gems', 'lore-puzzle-master', 'wavelength-lore-jigsaw'],
+        redirect_suggestion: '/games'
     });
 });
 

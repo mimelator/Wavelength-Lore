@@ -3597,6 +3597,13 @@
   min-height: 32px;
 }
 
+/* Override for new compact color buttons - allow inline styles to show through */
+.color-palette-grid.compact-grid .color-palette-btn.compact-btn.compact-color-btn {
+  background-color: unset !important;
+  background: unset !important;
+  border-radius: 8px;
+}
+
 .color-palette-btn.compact-btn:hover {
   border-color: #999;
   transform: scale(1.05);
@@ -3624,6 +3631,132 @@
   font-weight: 600;
   color: #667eea;
   margin-left: 4px;
+}
+
+/* Radio Button Grid Layout - Single Horizontal Line */
+.radio-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Radio Button Label Styling */
+.width-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  border: 2px solid #ddd;
+  transition: all 0.2s ease;
+  background: white;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.width-radio-label:hover {
+  border-color: #999;
+  background: #f5f5f5;
+}
+
+/* Hide actual radio input */
+.width-radio-input {
+  display: none;
+}
+
+/* Custom radio button appearance */
+.radio-custom {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #999;
+  border-radius: 50%;
+  background: white;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.width-radio-input:checked + .radio-custom {
+  border-color: #667eea;
+  background: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.width-radio-input:checked + .radio-custom::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+}
+
+/* Label text styling */
+.radio-label {
+  flex-grow: 1;
+  color: #333;
+}
+
+.width-radio-input:checked ~ .radio-label {
+  color: #667eea;
+  font-weight: 600;
+}
+
+/* Checked state for entire label */
+.width-radio-input:checked + .radio-custom ~ * {
+  color: #667eea;
+}
+
+/* Parent label checked state */
+.width-radio-label:has(.width-radio-input:checked) {
+  border-color: #667eea;
+  background: #f0f2ff;
+  color: #667eea;
+}
+
+/* Compact Color Buttons - 25% Size with Rounded Edges */
+.compact-colors.color-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 24px);
+  gap: 6px;
+  width: auto;
+}
+
+.compact-colors.color-palette-grid .compact-color-btn {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: auto;
+  flex-shrink: 0;
+  /* Ensure background color shows from inline style */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+}
+
+.compact-colors.color-palette-grid .compact-color-btn:hover {
+  border-color: #999;
+  transform: scale(1.15);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.compact-colors.color-palette-grid .compact-color-btn.selected {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px #667eea;
 }
 
 /* Production Options Section */

@@ -469,7 +469,18 @@
         }
 
         function launchGame(gameId) {
-            window.location.href = `/games/${gameId}`;
+            // Direct mapping to working game URLs
+            const gameRoutes = {
+                'wavelength-gems': '/games/wavelength-gems',
+                'lore-puzzle-master': '/games/lore-puzzle-master', 
+                'wavelength-lore-jigsaw': '/games/wavelength-lore-jigsaw'
+            };
+            
+            // Use direct route if available, otherwise fallback to generic
+            const gameUrl = gameRoutes[gameId] || `/games/${gameId}`;
+            
+            console.log(`🎮 Launching game: ${gameId} → ${gameUrl}`);
+            window.location.href = gameUrl;
         }
 
         function showError(message) {
