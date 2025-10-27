@@ -141,7 +141,8 @@ class MerchandiseStore {
     });
     
     this.eventBus.on('product.addToCart', (data) => {
-      this.handleAddToCart(data.productId);
+      // Pass full data including customization
+      this.handleAddToCart(data.productId, data.customization, data.quantity);
     });
     
     // Cart Renderer Events
@@ -3066,21 +3067,47 @@ class MerchandiseStore {
   }
 
   /**
-   * Handle add to cart from ProductCardRenderer
+   * Handle add to cart from ProductCardRenderer or Customization Modal
+   * @param {string} productId - Product ID
+   * @param {Object} customization - Optional customization data (effects, borders, size, etc.)
+   * @param {number} quantity - Quantity to add (default 1)
    */
-  handleAddToCart(productId) {
+  handleAddToCart(productId, customization = null, quantity = 1) {
     console.log('🛒 Add to cart:', productId);
+    console.log('🎨 Customization:', customization);
+    console.log('📦 Quantity:', quantity);
+
     const product = this.products.find(p => (p.id || p.productId) === productId);
     if (product && this.validationService.isProductComplete(product)) {
-      this.cartService.addItem({
+      // Use customized image if available, otherwise use default preview
+      const imageUrl = customization?.customizedImageUrl || product.previewImage;
+
+      const cartItem = {
         productId: productId,
         variantId: 'default',
         title: product.title,
         price: product.price || 19.95,
-        image: product.previewImage,
-        quantity: 1
-      });
-      this.showSuccess('Product added to cart!');
+        image: imageUrl,
+        quantity: quantity || 1
+      };
+
+      // Add customization data to cart item if provided
+      if (customization) {
+        cartItem.customization = {
+          effects: customization.effects || {},
+          borderEnabled: customization.borderEnabled || false,
+          borderWidth: customization.borderWidth || 0,
+          borderWidthPixels: customization.borderWidthPixels || 0,
+          borderColor: customization.borderColor || '#000000',
+          size: customization.size,
+          customizedImageUrl: customization.customizedImageUrl,
+          timestamp: customization.timestamp
+        };
+        console.log('💾 Saving customization with cart item:', cartItem.customization);
+      }
+
+      this.cartService.addItem(cartItem);
+      this.showSuccess(`Product added to cart! (Qty: ${quantity})`);
     } else {
       this.showError('Product needs to be completed before adding to cart');
     }

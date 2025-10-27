@@ -107,7 +107,7 @@ function generateGamesWithTheme(theme = ACTIVE_THEME) {
     // 1. Enhanced Wavelength Gems
     const gems = BASE_GAMES.gems;
     games.push({
-        id: `${theme}-gem-quest`,
+        id: 'wavelength-gems', // Stable ID - never changes
         title: `${themeConfig.prefix}: Crystal Harvest`,
         description: `${themeConfig.callToAction} Gather mystical ice crystals using ${gems.lore_connection.toLowerCase()}.`,
         category: 'strategic-puzzle',
@@ -132,7 +132,7 @@ function generateGamesWithTheme(theme = ACTIVE_THEME) {
     // 2. Enhanced Lore Puzzle Master  
     const lore = BASE_GAMES.lore_puzzle;
     games.push({
-        id: `${theme}-lore-master`,
+        id: 'lore-puzzle-master', // Stable ID - never changes
         title: `${themeConfig.prefix}: Wisdom Trials`,
         description: `Challenge your lore knowledge! Navigate complex puzzles using ${themeConfig.lore_focus.toLowerCase()}.`,
         category: 'knowledge-strategy',
@@ -157,7 +157,7 @@ function generateGamesWithTheme(theme = ACTIVE_THEME) {
     // 3. NEW: Jigsaw Puzzle Game
     const jigsaw = BASE_GAMES.jigsaw;
     games.push({
-        id: `${theme}-lore-tapestry`,
+        id: 'wavelength-lore-jigsaw', // Stable ID - never changes
         title: `${themeConfig.prefix}: Lore Tapestry`,
         description: `${themeConfig.callToAction} Reconstruct legendary Middle-earth scenes with strategic time bonuses. (VIP Only - Coming Soon)`,
         category: 'strategic-reconstruction',

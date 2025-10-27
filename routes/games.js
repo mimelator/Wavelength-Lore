@@ -47,6 +47,28 @@ router.get('/wavelength-gems', groupAuth.requireAction('game_access_member'), (r
 });
 
 /**
+ * Lore Puzzle Master - Knowledge-based strategic puzzles
+ * 🎯 GO-LIVE UPDATE: Now accessible to all authenticated members!
+ */
+router.get('/lore-puzzle-master', groupAuth.requireAction('game_access_member'), (req, res) => {
+    const { getActiveTheme } = require('../config/game-themes');
+    const theme = getActiveTheme();
+    
+    res.render('games/lore-puzzle-master', {
+        title: `${theme.prefix}: Wisdom Trials`,
+        currentPage: 'lore-puzzle-master',
+        breadcrumbs: [
+            { name: 'Games', url: '/games' },
+            { name: 'Wisdom Trials', url: null }
+        ],
+        cdnUrl: process.env.CDN_URL,
+        version: `v${Date.now()}`,
+        userGroups: req.userGroups || [],
+        theme: theme
+    });
+});
+
+/**
  * 🧩 NEW: Wavelength Lore Jigsaw Puzzle Game
  * Strategic puzzle reconstruction with lore-based imagery
  * 🔒 DEVELOPMENT: Still VIP-only as it's under development
@@ -76,8 +98,8 @@ router.get('/wavelength-lore-jigsaw', groupAuth.requireAction('game_access'), (r
 router.get('/:gameId', (req, res, next) => {
     const gameId = req.params.gameId;
     
-    // Check if it's a jigsaw puzzle game with any theme - these are VIP-only (still under development)
-    if (gameId.includes('lore-tapestry') || gameId.includes('jigsaw')) {
+    // Check if it's a jigsaw puzzle game - VIP-only (still under development)
+    if (gameId === 'wavelength-lore-jigsaw') {
         return groupAuth.requireAction('game_access')(req, res, next);
     }
     
@@ -86,8 +108,8 @@ router.get('/:gameId', (req, res, next) => {
 }, (req, res) => {
     const gameId = req.params.gameId;
     
-    // Check if it's a jigsaw puzzle game with any theme
-    if (gameId.includes('lore-tapestry') || gameId.includes('jigsaw')) {
+    // Check if it's a jigsaw puzzle game
+    if (gameId === 'wavelength-lore-jigsaw') {
         const { getActiveTheme } = require('../config/game-themes');
         const theme = getActiveTheme();
         
@@ -139,8 +161,8 @@ router.get('/api/list', groupAuth.requireAction('game_access_member'), async (re
         
         // Filter games based on access level
         const availableGames = allThemedGames.map(game => {
-            // Jigsaw puzzle is VIP-only and coming soon
-            if (game.id.includes('lore-tapestry') || game.id.includes('jigsaw') || game.vip_exclusive) {
+            // Jigsaw puzzle is VIP-only (still under development)
+            if (game.id === 'wavelength-lore-jigsaw') {
                 if (!hasVipAccess) {
                     return {
                         ...game,
@@ -173,8 +195,8 @@ router.get('/api/list', groupAuth.requireAction('game_access_member'), async (re
             userAccess: {
                 hasVipAccess: hasVipAccess,
                 canPlayAllGames: hasVipAccess,
-                memberGames: availableGames.filter(g => !g.id.includes('lore-tapestry')).length,
-                vipGames: availableGames.filter(g => g.id.includes('lore-tapestry')).length
+                memberGames: availableGames.filter(g => g.id !== 'wavelength-lore-jigsaw').length,
+                vipGames: availableGames.filter(g => g.id === 'wavelength-lore-jigsaw').length
             },
             meta: {
                 generated: new Date().toISOString(),
@@ -200,8 +222,8 @@ router.get('/api/list', groupAuth.requireAction('game_access_member'), async (re
 router.get('/api/:gameId', (req, res, next) => {
     const gameId = req.params.gameId;
     
-    // Jigsaw puzzle games require VIP access
-    if (gameId.includes('lore-tapestry') || gameId.includes('jigsaw')) {
+    // Jigsaw puzzle game requires VIP access
+    if (gameId === 'wavelength-lore-jigsaw') {
         return groupAuth.requireAction('game_access')(req, res, next);
     }
     
