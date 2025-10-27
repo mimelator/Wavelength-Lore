@@ -155,21 +155,21 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    <script src="/js/wavelength-data-loader.js"></script>
     <script>
-        const videos = JSON.parse(`<%- JSON.stringify(videos).replace(/</g, '\u003c') %>`);
-        $(document).ready(function(){
-            Object.keys(videos).forEach(season => {
-                $(`#carousel-${season}`).slick({
-                    infinite: true,
-                    slidesToShow: window.innerWidth <= 768 ? 2 : 3, // Show 2 slides on mobile, 3 otherwise
-                    slidesToScroll: 1,
-                    autoplay: true,
-                    autoplaySpeed: 4000,
-                    dots: true,
-                    arrows: true
-                });
-            });
+        // Safe data loading - no more JSON parsing errors!
+        $(document).ready(async function(){
+            try {
+                await window.WavelengthLoader.initializeCarousels();
+                console.log('✅ Wavelength site initialized successfully');
+            } catch (error) {
+                console.error('❌ Failed to initialize Wavelength:', error);
+                // Fallback: Show loading message or retry
+                $('.loading-indicator').text('Failed to load content. Please refresh the page.');
+            }
         });
+        
+        // Legacy code removed - now using safe API loading approach
     </script>
 </body>
 </html>

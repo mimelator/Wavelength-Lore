@@ -110,6 +110,9 @@ function configureMiddleware(app) {
 function configureStaticFiles(app) {
   // Serve static files from the static directory
   app.use(express.static(path.join(__dirname, '../static')));
+  
+  // Serve public files (modern approach)
+  app.use(express.static(path.join(__dirname, '../public')));
 
   // Also serve static files under /static/ path for CDN compatibility in local development
   app.use('/static', express.static(path.join(__dirname, '../static')));
@@ -367,6 +370,10 @@ function configureAPIRoutes(app, adminRateLimit, adminAuthStrict) {
   // Import and use game API routes
   const gameApiRoutes = require('../routes/gameApi');
   app.use('/api/games', gameApiRoutes);
+
+  // Import and use Wavelength data API routes (safe data loading)
+  const wavelengthApiRoutes = require('../routes/api');
+  app.use('/api', wavelengthApiRoutes);
 
   // Import and use group management API routes with authentication and rate limiting
   const groupApiRoutes = require('../routes/groupApi');

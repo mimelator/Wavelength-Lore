@@ -27,6 +27,9 @@ router.get('/', async (req, res) => {
     
     const videos = await fetchDataAsAdmin('videos');
     
+    // Store videos data in app for API access
+    req.app.set('videosData', videos);
+    
     res.render('index', {
       title: 'Welcome to Wavelength Lore',
       pageTitle: 'Wavelength Lore - Animated Storytelling Universe',

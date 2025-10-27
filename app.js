@@ -77,6 +77,33 @@ async function createApp() {
   // Configure API routes
   configureAPIRoutes(app, adminRateLimit, adminAuthStrict);
 
+  // Add Wavelength data API routes (TEMPORARY - should be in middleware)
+  app.get('/api/health', (req, res) => {
+    res.status(200).json({
+      success: true,
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      service: 'Wavelength API'
+    });
+  });
+
+  app.get('/api/seasons', (req, res) => {
+    try {
+      const videosData = req.app.get('videosData') || {};
+      res.json({
+        success: true,
+        data: videosData,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('API Error - seasons:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to load seasons data'
+      });
+    }
+  });
+
   // Add simple health check endpoint for App Runner (no authentication required)
   app.get('/health', (_req, res) => {
     res.status(200).json({
