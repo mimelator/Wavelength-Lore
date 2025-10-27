@@ -3802,22 +3802,23 @@ router.post('/openai-upscaler/test', ensureAuthenticated, groupAuth.requireActio
     const upscaledImageUrl = `/upscaled-images/${upscaledFilename}`;
 
     // Return success
+    const scaleFactor = Math.max(targetWidth / 100, targetHeight / 100);
     res.json({
       success: true,
       message: 'OpenAI upscaling test completed successfully',
       analysis: {
         action: 'upscale',
-        scaleFactor: analysis.scaleFactor,
+        scaleFactor: scaleFactor,
         processingTime: duration,
         originalSize: imageSize,
-        targetDimensions: analysis.targetDimensions
+        targetDimensions: { width: targetWidth, height: targetHeight }
       },
       metadata: {
         imageId: imageId,
         imageName: imageName,
         imageUrl: imageUrl,
         upscaledImageUrl: upscaledImageUrl,
-        upscalerUsed: 'openai',
+        upscalerUsed: upscaledResult.method || 'openai',
         timestamp: new Date().toISOString()
       }
     });

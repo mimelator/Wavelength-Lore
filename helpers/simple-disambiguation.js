@@ -322,8 +322,24 @@ function applySmartLinkingSimple(text, currentUrl = null) {
         }
       } else {
         // Multiple matches with no exact character match - use disambiguation modal
-        const conflictsJson = JSON.stringify(uniqueConflicts).replace(/"/g, '&quot;');
-        replacementHtml = `<span class="disambiguation-link" onclick="openDisambiguationModal(this)" data-phrase="${originalText}" data-conflicts="${conflictsJson}">${originalText}</span>`;
+        // 🔥 FIX: Properly escape JSON data to prevent parsing errors
+        const conflictsJson = JSON.stringify(uniqueConflicts)
+          .replace(/\\/g, '\\\\')   // Escape backslashes
+          .replace(/"/g, '&quot;')  // Escape quotes  
+          .replace(/'/g, '&#x27;')  // Escape single quotes
+          .replace(/</g, '&lt;')    // Escape less than
+          .replace(/>/g, '&gt;')    // Escape greater than
+          .replace(/&/g, '&amp;');  // Escape ampersands (do this last)
+        
+        // Also escape the phrase data attribute
+        const escapedPhrase = originalText
+          .replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#x27;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+          
+        replacementHtml = `<span class="disambiguation-link" onclick="openDisambiguationModal(this)" data-phrase="${escapedPhrase}" data-conflicts="${conflictsJson}">${originalText}</span>`;
       }
     } else {
       // Single match - create direct link with appropriate class
@@ -370,7 +386,24 @@ function getSimpleDisambiguationScript(cdnUrlParam = '') {
       
       function openDisambiguationModal(element) {
         const phrase = element.dataset.phrase;
-        const conflicts = JSON.parse(element.dataset.conflicts.replace(/&quot;/g, '"'));
+        let conflicts;
+        
+        try {
+          // 🔥 FIX: Properly unescape JSON data to prevent parsing errors
+          const conflictsData = element.dataset.conflicts
+            .replace(/&amp;/g, '&')     // Unescape ampersands (do this first)
+            .replace(/&lt;/g, '<')      // Unescape less than
+            .replace(/&gt;/g, '>')      // Unescape greater than
+            .replace(/&#x27;/g, "'")    // Unescape single quotes
+            .replace(/&quot;/g, '"')    // Unescape quotes
+            .replace(/\\\\/g, '\\');    // Unescape backslashes
+          conflicts = JSON.parse(conflictsData);
+        } catch (error) {
+          console.error('Failed to parse disambiguation data:', error);
+          console.error('Raw data:', element.dataset.conflicts);
+          console.error('Processed data:', conflictsData);
+          return; // Don't show modal if data is corrupted
+        }
         
         // Create modal if it doesn't exist
         let modal = document.getElementById('disambiguation-modal');

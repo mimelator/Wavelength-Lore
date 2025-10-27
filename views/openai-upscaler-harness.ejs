@@ -357,44 +357,6 @@
             </div>
         </div>
 
-        <!-- Border Customization Panel -->
-        <div class="card full-width" id="borderPanel" style="display: none;">
-            <h2>🖼️ Border Customization</h2>
-
-            <!-- Border Enable Toggle -->
-            <div style="margin-bottom: 20px;">
-                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                    <input type="checkbox" id="borderEnabled" onchange="updateBorderUI()">
-                    <span style="font-weight: 600;">Enable Border</span>
-                </label>
-            </div>
-
-            <div id="borderControls" style="display: none;">
-                <!-- Border Width Selection -->
-                <div class="control-group" style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Border Width</label>
-                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;" id="widthButtons"></div>
-                </div>
-
-                <!-- Border Color Palette -->
-                <div class="control-group">
-                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Border Color (36 Options)</label>
-                    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;" id="colorPalette"></div>
-                </div>
-
-                <!-- Selected Border Preview -->
-                <div style="margin-top: 15px; padding: 15px; background: #f9f9f9; border-radius: 6px;">
-                    <small style="color: #666;">Selected: <span id="borderPreview" style="font-weight: 600;"></span></small>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="applyBorderAndEffects()" style="flex: 1;">✨ Continue to Effects</button>
-                <button onclick="closeBorderPanel()" style="flex: 1; background: #ccc; color: #333;">Cancel</button>
-            </div>
-        </div>
-
         <!-- Effect Customization Panel -->
         <div class="card full-width" id="effectsPanel" style="display: none;">
             <h2>✨ Customize with Effects</h2>
@@ -522,8 +484,8 @@
 
             addLog(`Image ready at: ${imageUrl}`, 'info');
 
-            // Show border customization panel first, then effects
-            setTimeout(() => showBorderPanel(), 500);
+            // Show effects panel which now includes border customization
+            setTimeout(() => showEffectsPanel(), 500);
         }
 
         // ============================================================
@@ -554,13 +516,8 @@
             const container = document.getElementById('effectsContainer');
             container.innerHTML = '';
 
-            // Render each category (skip border category - it's handled separately)
+            // Render each category
             availableEffects.categories.forEach(category => {
-                // Skip border customization category - it's handled in its own panel
-                if (category.id === 'border') {
-                    return;
-                }
-
                 const categoryDiv = document.createElement('div');
                 categoryDiv.style.padding = '15px';
                 categoryDiv.style.background = '#f9f9f9';
@@ -575,19 +532,209 @@
 
                 categoryDiv.appendChild(categoryTitle);
 
-                // Render toggles for this category
-                if (category.effects && Array.isArray(category.effects)) {
-                    category.effects.forEach(effectKey => {
-                        const effect = availableEffects.effectTypes[effectKey];
-                        if (effect) {
-                            const toggle = createEffectToggle(effectKey, effect);
-                            categoryDiv.appendChild(toggle);
-                        }
-                    });
+                // Handle border customization category differently
+                if (category.id === 'border') {
+                    renderBorderCustomization(categoryDiv);
+                } else {
+                    // Render toggles for standard effect categories
+                    if (category.effects && Array.isArray(category.effects)) {
+                        category.effects.forEach(effectKey => {
+                            const effect = availableEffects.effectTypes[effectKey];
+                            if (effect) {
+                                const toggle = createEffectToggle(effectKey, effect);
+                                categoryDiv.appendChild(toggle);
+                            }
+                        });
+                    }
                 }
 
                 container.appendChild(categoryDiv);
             });
+        }
+
+        function renderBorderCustomization(containerDiv) {
+            // Border enable toggle
+            const toggleContainer = document.createElement('div');
+            toggleContainer.style.marginBottom = '15px';
+            toggleContainer.style.padding = '10px';
+            toggleContainer.style.background = 'white';
+            toggleContainer.style.borderRadius = '4px';
+            toggleContainer.style.display = 'flex';
+            toggleContainer.style.alignItems = 'center';
+            toggleContainer.style.gap = '10px';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = 'borderEnabled';
+            checkbox.style.width = '18px';
+            checkbox.style.height = '18px';
+            checkbox.style.cursor = 'pointer';
+            checkbox.checked = enabledEffects.borderEnabled || false;
+
+            checkbox.onchange = () => {
+                enabledEffects.borderEnabled = checkbox.checked;
+                const controlsDiv = document.getElementById('borderControlsInEffects');
+                if (controlsDiv) {
+                    controlsDiv.style.display = checkbox.checked ? 'block' : 'none';
+                }
+                console.log(`Border enabled: ${checkbox.checked}`);
+            };
+
+            const label = document.createElement('label');
+            label.htmlFor = 'borderEnabled';
+            label.style.cursor = 'pointer';
+            label.style.flex = '1';
+            label.style.display = 'flex';
+            label.style.flexDirection = 'column';
+            label.style.gap = '3px';
+
+            const name = document.createElement('div');
+            name.textContent = '✨ Enable Border';
+            name.style.fontWeight = '600';
+            name.style.color = '#333';
+            name.style.fontSize = '0.95em';
+
+            const desc = document.createElement('div');
+            desc.textContent = 'Add decorative borders to your image';
+            desc.style.fontSize = '0.85em';
+            desc.style.color = '#666';
+
+            label.appendChild(name);
+            label.appendChild(desc);
+            toggleContainer.appendChild(checkbox);
+            toggleContainer.appendChild(label);
+            containerDiv.appendChild(toggleContainer);
+
+            // Border controls (hidden until enabled)
+            const controlsDiv = document.createElement('div');
+            controlsDiv.id = 'borderControlsInEffects';
+            controlsDiv.style.display = enabledEffects.borderEnabled ? 'block' : 'none';
+            controlsDiv.style.marginTop = '10px';
+            controlsDiv.style.paddingTop = '10px';
+            controlsDiv.style.borderTop = '1px solid #ddd';
+
+            // Border width selector
+            const widthLabel = document.createElement('div');
+            widthLabel.textContent = 'Width:';
+            widthLabel.style.fontSize = '0.85em';
+            widthLabel.style.fontWeight = '600';
+            widthLabel.style.marginBottom = '8px';
+            widthLabel.style.color = '#333';
+            controlsDiv.appendChild(widthLabel);
+
+            const widthContainer = document.createElement('div');
+            widthContainer.style.display = 'grid';
+            widthContainer.style.gridTemplateColumns = 'repeat(5, 1fr)';
+            widthContainer.style.gap = '5px';
+            widthContainer.style.marginBottom = '12px';
+
+            borderOptions.widths.forEach(width => {
+                const btn = document.createElement('button');
+                btn.textContent = width.label;
+                btn.style.padding = '8px';
+                btn.style.fontSize = '0.8em';
+                btn.style.borderRadius = '4px';
+                btn.style.border = '2px solid #ddd';
+                btn.style.background = 'white';
+                btn.style.cursor = 'pointer';
+                btn.style.transition = 'all 0.2s';
+
+                btn.onclick = () => {
+                    enabledEffects.borderWidth = width.value;
+                    enabledEffects.borderWidthPixels = width.pixels;
+
+                    // Update button styles
+                    document.querySelectorAll('#borderControlsInEffects button:not(.color-btn)').forEach(b => {
+                        b.style.border = '2px solid #ddd';
+                        b.style.background = 'white';
+                    });
+                    btn.style.border = '2px solid #667eea';
+                    btn.style.background = '#f0f2ff';
+
+                    updateBorderPreview();
+                };
+
+                widthContainer.appendChild(btn);
+            });
+
+            controlsDiv.appendChild(widthContainer);
+
+            // Border color selector
+            const colorLabel = document.createElement('div');
+            colorLabel.textContent = 'Color (36 options):';
+            colorLabel.style.fontSize = '0.85em';
+            colorLabel.style.fontWeight = '600';
+            colorLabel.style.marginBottom = '8px';
+            colorLabel.style.color = '#333';
+            controlsDiv.appendChild(colorLabel);
+
+            const colorContainer = document.createElement('div');
+            colorContainer.style.display = 'grid';
+            colorContainer.style.gridTemplateColumns = 'repeat(6, 1fr)';
+            colorContainer.style.gap = '5px';
+            colorContainer.style.marginBottom = '12px';
+
+            borderOptions.colors.forEach(color => {
+                const btn = document.createElement('button');
+                btn.className = 'color-btn';
+                btn.style.width = '100%';
+                btn.style.aspectRatio = '1';
+                btn.style.background = color.hex;
+                btn.style.border = '2px solid #ddd';
+                btn.style.borderRadius = '4px';
+                btn.style.cursor = 'pointer';
+                btn.title = color.name;
+                btn.style.transition = 'all 0.2s';
+
+                btn.onclick = () => {
+                    enabledEffects.borderColor = color.hex;
+
+                    // Update button styles
+                    document.querySelectorAll('#borderControlsInEffects .color-btn').forEach(b => {
+                        b.style.boxShadow = 'none';
+                    });
+                    btn.style.boxShadow = '0 0 0 3px #667eea';
+
+                    updateBorderPreview();
+                };
+
+                colorContainer.appendChild(btn);
+            });
+
+            controlsDiv.appendChild(colorContainer);
+
+            // Border preview
+            const previewDiv = document.createElement('div');
+            previewDiv.style.padding = '10px';
+            previewDiv.style.background = '#f5f5f5';
+            previewDiv.style.borderRadius = '4px';
+            previewDiv.style.fontSize = '0.85em';
+            previewDiv.style.color = '#666';
+
+            const previewLabel = document.createElement('strong');
+            previewLabel.textContent = 'Selected: ';
+            previewLabel.style.color = '#333';
+
+            const previewValue = document.createElement('span');
+            previewValue.id = 'borderPreviewInEffects';
+            previewValue.textContent = 'None';
+            previewValue.style.fontWeight = '600';
+            previewValue.style.color = '#667eea';
+
+            previewDiv.appendChild(previewLabel);
+            previewDiv.appendChild(previewValue);
+            controlsDiv.appendChild(previewDiv);
+
+            containerDiv.appendChild(controlsDiv);
+        }
+
+        function updateBorderPreview() {
+            const preview = document.getElementById('borderPreviewInEffects');
+            if (preview) {
+                const width = borderOptions.widths.find(w => w.value === enabledEffects.borderWidth)?.label || 'None';
+                const colorName = borderOptions.colors.find(c => c.hex === enabledEffects.borderColor)?.name || 'Unknown';
+                preview.textContent = `${width} / ${colorName}`;
+            }
         }
 
         function createEffectToggle(effectKey, effectConfig) {
@@ -675,7 +822,7 @@
                 return;
             }
 
-            // Check if any effects are enabled
+            // Check if any effects are enabled (including border)
             const hasEnabledEffects = Object.values(enabledEffects).some(e => e === true);
             if (!hasEnabledEffects) {
                 addLog('💡 No effects selected. Enable at least one effect to apply.', 'info');
@@ -683,7 +830,16 @@
             }
 
             addLog('🎨 Applying effects to image...', 'info');
-            addLog(`   Enabled: ${Object.entries(enabledEffects).filter(([k, v]) => v).map(([k]) => availableEffects.effectTypes[k].name).join(', ')}`, 'info');
+            const enabledList = Object.entries(enabledEffects)
+                .filter(([k, v]) => v === true)
+                .map(([k]) => {
+                    if (k === 'borderEnabled') {
+                        return `🖼️ Border (${enabledEffects.borderWidth ? borderOptions.widths.find(w => w.value === enabledEffects.borderWidth)?.label || 'Custom' : 'Default'})`;
+                    }
+                    return availableEffects.effectTypes[k]?.name || k;
+                })
+                .join(', ');
+            addLog(`   Enabled: ${enabledList}`, 'info');
             updateProgress(30);
 
             try {
@@ -1153,32 +1309,6 @@
         function updateBorderUI() {
             const enabled = document.getElementById('borderEnabled').checked;
             document.getElementById('borderControls').style.display = enabled ? 'block' : 'none';
-        }
-
-        function showBorderPanel() {
-            const panel = document.getElementById('borderPanel');
-            if (panel) {
-                panel.style.display = 'block';
-                addLog('🖼️ Border customization panel is ready!', 'info');
-            }
-        }
-
-        function closeBorderPanel() {
-            const panel = document.getElementById('borderPanel');
-            if (panel) {
-                panel.style.display = 'none';
-            }
-        }
-
-        function applyBorderAndEffects() {
-            const borderEnabled = document.getElementById('borderEnabled').checked;
-            if (borderEnabled) {
-                addLog(`🖼️ Border selected: ${selectedBorderWidth.label} / ${selectedBorderColor}`, 'info');
-            } else {
-                addLog('⏭️ Skipping border customization', 'info');
-            }
-            closeBorderPanel();
-            showEffectsPanel();
         }
 
         // Load templates and gallery on startup

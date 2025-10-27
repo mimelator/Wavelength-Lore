@@ -153,13 +153,6 @@ const effectsConfig = {
    */
   categories: [
     {
-      id: 'border',
-      name: '🖼️ Border Customization',
-      description: 'Add decorative borders with custom colors and widths',
-      type: 'customization',
-      borderEnabled: false
-    },
-    {
       id: 'color',
       name: '🎨 Color Effects',
       description: 'Enhance colors and warmth',
@@ -170,6 +163,12 @@ const effectsConfig = {
       name: '✨ Atmospheric Effects',
       description: 'Lighting and mood',
       effects: ['glow', 'dramatic', 'lightning']
+    },
+    {
+      id: 'border',
+      name: '🖼️ Border Customization',
+      description: 'Add decorative borders with custom colors and widths',
+      type: 'customization'
     }
   ],
 
