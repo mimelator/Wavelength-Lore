@@ -184,15 +184,16 @@ async function createApp() {
   
   // Mount admin compatibility test routes (admin only)
   app.use('/admin', adminCompatibilityRoutes);
-  
-  // Catalog Explorer - accessible to all users
-  app.get('/catalog-explorer', (req, res) => {
-    console.log('📁 Serving catalog explorer');
-    res.render('catalog-explorer', {
-      title: 'Wavelength Catalog Explorer',
-      user: req.user || null
-    });
-  });
+
+// Route for browser test
+app.get('/merchandise-store-browser-test', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'merchandise-store-browser-test.html'));
+});
+
+// Route for simple merchandise test
+app.get('/simple-merch-test', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'simple-merch-test.html'));
+});
 
   // Mount content routes
   app.use('/', contentRoutes);
