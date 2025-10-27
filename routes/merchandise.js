@@ -13,6 +13,7 @@ const groupAuth = require('../middleware/groupAuth');
 const AutoEnhancedPrintifyService = require('../services/auto-enhanced-printify-service');
 const MerchandiseDatabase = require('../services/merchandise-database');
 const galleryStorage = require('../utils/gallery/storage');
+const { getUserBookmarks } = require('../services/firebase/galleryService');
 const axios = require('axios');
 const { generateProductTitle, prettifyImageName } = require('../utils/product-name-formatter');
 const { 
@@ -1810,6 +1811,7 @@ router.get('/product-catalog', async (req, res) => {
  * GET /api/gallery
  * Get user's gallery images (public endpoint, requires authentication)
  * Returns all user gallery images suitable for merchandise creation
+ * Includes both uploaded images and bookmarked content images
  */
 router.get('/gallery', ensureAuthenticated, async (req, res) => {
   try {
@@ -1817,24 +1819,46 @@ router.get('/gallery', ensureAuthenticated, async (req, res) => {
 
     const userId = req.user.uid;
 
-    // Get gallery images from storage
-    const galleryImages = await galleryStorage.listUserGalleryImages(userId);
+    // Get S3 uploaded images
+    const s3Images = await galleryStorage.listUserGalleryImages(userId);
+    console.log(`📊 Found ${s3Images.length} S3 images for user ${userId}`);
 
-    // Format gallery images for response
-    const formattedImages = galleryImages.map(image => ({
+    // Get Firebase bookmarks (content image references)
+    const bookmarks = await getUserBookmarks(userId);
+    console.log(`📊 Found ${bookmarks.length} bookmarked content images for user ${userId}`);
+
+    // Format S3 uploaded images
+    const formattedS3Images = s3Images.map(image => ({
       id: path.basename(image.relativePath),
       url: image.url,
-      title: image.title || path.basename(image.relativePath),
-      uploadedAt: image.uploadedAt,
+      title: image.originalName || image.fileName || path.basename(image.relativePath),
+      uploadedAt: image.uploadedAt || image.lastModified,
       size: image.size,
       dimensions: image.dimensions,
-      format: path.extname(image.relativePath).slice(1).toLowerCase()
+      format: path.extname(image.relativePath).slice(1).toLowerCase(),
+      type: 'uploaded'
     }));
+
+    // Format bookmarked images
+    const formattedBookmarks = bookmarks.map(bookmark => ({
+      id: bookmark.bookmarkId,
+      url: bookmark.url,
+      title: bookmark.title,
+      uploadedAt: bookmark.savedAt,
+      size: 0,
+      dimensions: null,
+      format: 'unknown',
+      type: 'bookmark'
+    }));
+
+    // Combine both types
+    const allImages = [...formattedS3Images, ...formattedBookmarks];
+    console.log(`📤 Sending ${allImages.length} total images (${formattedS3Images.length} uploaded + ${formattedBookmarks.length} bookmarked)`);
 
     res.json({
       success: true,
-      images: formattedImages,
-      total: formattedImages.length,
+      images: allImages,
+      total: allImages.length,
       userId: userId
     });
   } catch (error) {
@@ -1850,6 +1874,7 @@ router.get('/gallery', ensureAuthenticated, async (req, res) => {
 /**
  * GET /api/gallery/:imageId
  * Get specific gallery image details
+ * Searches both uploaded images and bookmarked content
  */
 router.get('/gallery/:imageId', ensureAuthenticated, async (req, res) => {
   try {
@@ -1858,28 +1883,50 @@ router.get('/gallery/:imageId', ensureAuthenticated, async (req, res) => {
 
     console.log(`🖼️ Fetching gallery image: ${imageId}`);
 
-    // Get all user images and find the specific one
-    const galleryImages = await galleryStorage.listUserGalleryImages(userId);
-    const image = galleryImages.find(img => path.basename(img.relativePath) === imageId);
+    // Try to find as uploaded image first
+    const s3Images = await galleryStorage.listUserGalleryImages(userId);
+    let image = s3Images.find(img => path.basename(img.relativePath) === imageId);
 
-    if (!image) {
-      return res.status(404).json({
-        success: false,
-        error: 'Gallery image not found'
+    if (image) {
+      return res.json({
+        success: true,
+        image: {
+          id: path.basename(image.relativePath),
+          url: image.url,
+          title: image.originalName || image.fileName || path.basename(image.relativePath),
+          uploadedAt: image.uploadedAt || image.lastModified,
+          size: image.size,
+          dimensions: image.dimensions,
+          format: path.extname(image.relativePath).slice(1).toLowerCase(),
+          type: 'uploaded'
+        }
       });
     }
 
-    res.json({
-      success: true,
-      image: {
-        id: path.basename(image.relativePath),
-        url: image.url,
-        title: image.title || path.basename(image.relativePath),
-        uploadedAt: image.uploadedAt,
-        size: image.size,
-        dimensions: image.dimensions,
-        format: path.extname(image.relativePath).slice(1).toLowerCase()
-      }
+    // Try to find as bookmark
+    const bookmarks = await getUserBookmarks(userId);
+    const bookmark = bookmarks.find(bm => bm.bookmarkId === imageId);
+
+    if (bookmark) {
+      return res.json({
+        success: true,
+        image: {
+          id: bookmark.bookmarkId,
+          url: bookmark.url,
+          title: bookmark.title,
+          uploadedAt: bookmark.savedAt,
+          size: 0,
+          dimensions: null,
+          format: 'unknown',
+          type: 'bookmark'
+        }
+      });
+    }
+
+    // Image not found
+    res.status(404).json({
+      success: false,
+      error: 'Gallery image not found'
     });
   } catch (error) {
     console.error('Error fetching gallery image:', error);
