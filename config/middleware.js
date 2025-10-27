@@ -117,6 +117,12 @@ function configureStaticFiles(app) {
   // Serve debug files for development and testing
   app.use('/debug', express.static(path.join(__dirname, '../debug')));
 
+  // Serve upscaled images from public/upscaled-images directory
+  app.use('/upscaled-images', express.static(path.join(__dirname, '../public/upscaled-images'), {
+    maxAge: '1d',
+    etag: false
+  }));
+
   // Handle gallery images in local development via S3 proxy
   if (process.env.CDN_URL && process.env.CDN_URL.includes('localhost')) {
     console.log('🖼️ Using Gallery S3 Proxy for local development');

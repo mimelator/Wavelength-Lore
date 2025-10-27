@@ -291,19 +291,27 @@
                 </div>
 
                 <div class="control-group" id="singleImageGroup">
-                    <label>Select Image:</label>
-                    <input type="file" id="imageInput" accept="image/*">
-                    <small style="color: #666; margin-top: 5px; display: block;">Recommended: 400x300px or smaller</small>
-                </div>
-
-                <div class="control-group" id="targetDimensionsGroup">
-                    <label>Target Width (pixels):</label>
-                    <input type="number" id="targetWidth" value="3000" min="100" max="4800">
+                    <label>Select Gallery Image:</label>
+                    <select id="gallerySelect" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
+                        <option value="">Loading gallery images...</option>
+                    </select>
+                    <small style="color: #666; margin-top: 5px; display: block;">Images from your registered Wavelength gallery</small>
                 </div>
 
                 <div class="control-group">
-                    <label>Target Height (pixels):</label>
-                    <input type="number" id="targetHeight" value="3600" min="100" max="4800">
+                    <label>Product Template:</label>
+                    <select id="templateSelect" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px;" onchange="updateTemplateInfo()">
+                        <option value="">Loading templates...</option>
+                    </select>
+                    <small style="color: #666; margin-top: 5px; display: block;">Choose a template with predefined optimization settings</small>
+                </div>
+
+                <div class="control-group" id="templateInfoGroup" style="display: none; background: #f5f5f5; padding: 12px; border-radius: 6px; margin-top: 10px;">
+                    <div style="margin-bottom: 8px;">
+                        <strong style="color: #333;">Template Configuration:</strong>
+                    </div>
+                    <div id="templateInfo" style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                    </div>
                 </div>
 
                 <div class="control-group" id="batchCountGroup" style="display: none;">
@@ -409,6 +417,54 @@
             document.getElementById('avgTime').textContent = avgTime + 'ms';
         }
 
+        function displayUpscaledImage(imageUrl, imageName) {
+            const previewContainer = document.getElementById('previewContainer');
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = `Upscaled: ${imageName}`;
+            img.className = 'image-preview';
+            img.style.maxHeight = '400px';
+            img.style.maxWidth = '100%';
+
+            // Create a download link
+            const downloadLink = document.createElement('a');
+            downloadLink.href = imageUrl;
+            downloadLink.download = `upscaled-${imageName}.jpg`;
+            downloadLink.style.marginTop = '10px';
+            downloadLink.style.display = 'inline-block';
+            downloadLink.style.padding = '8px 15px';
+            downloadLink.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            downloadLink.style.color = 'white';
+            downloadLink.style.borderRadius = '6px';
+            downloadLink.style.textDecoration = 'none';
+            downloadLink.style.fontWeight = '600';
+            downloadLink.textContent = '📥 Download Upscaled Image';
+
+            // Create a new view link
+            const viewLink = document.createElement('a');
+            viewLink.href = imageUrl;
+            viewLink.target = '_blank';
+            viewLink.style.marginTop = '10px';
+            viewLink.style.marginLeft = '10px';
+            viewLink.style.display = 'inline-block';
+            viewLink.style.padding = '8px 15px';
+            viewLink.style.background = '#f5f5f5';
+            viewLink.style.color = '#667eea';
+            viewLink.style.border = '2px solid #667eea';
+            viewLink.style.borderRadius = '6px';
+            viewLink.style.textDecoration = 'none';
+            viewLink.style.fontWeight = '600';
+            viewLink.textContent = '🔗 Open in New Tab';
+
+            previewContainer.innerHTML = '';
+            previewContainer.appendChild(img);
+            previewContainer.appendChild(document.createElement('br'));
+            previewContainer.appendChild(downloadLink);
+            previewContainer.appendChild(viewLink);
+
+            addLog(`Image ready at: ${imageUrl}`, 'info');
+        }
+
         async function runTest() {
             addLog('Starting OpenAI upscaler test...', 'info');
             updateProgress(0);
@@ -427,28 +483,27 @@
         }
 
         async function runSingleTest() {
-            const imageInput = document.getElementById('imageInput');
-            if (!imageInput.files.length) {
-                addLog('❌ Please select an image first', 'error');
+            const selectedImageId = document.getElementById('gallerySelect').value;
+            const selectedTemplateId = document.getElementById('templateSelect').value;
+
+            if (!selectedImageId) {
+                addLog('❌ Please select a gallery image first', 'error');
                 return;
             }
 
-            const file = imageInput.files[0];
+            if (!selectedTemplateId) {
+                addLog('❌ Please select a product template first', 'error');
+                return;
+            }
+
+            const template = availableTemplates[selectedTemplateId];
+            const targetDimensions = template.imageOptimization.targetDimensions;
 
             try {
                 updateProgress(20);
-                addLog(`📁 Processing image: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`, 'info');
-
-                // Convert file to base64
-                addLog('Converting image to base64...', 'info');
-                const reader = new FileReader();
-                const base64Promise = new Promise((resolve, reject) => {
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-                const imageDataUrl = await base64Promise;
-                updateProgress(40);
+                addLog(`📁 Selected image ID: ${selectedImageId}`, 'info');
+                addLog(`📦 Using template: ${template.name}`, 'info');
+                addLog(`📏 Target: ${targetDimensions.width}×${targetDimensions.height}px @ ${template.imageOptimization.targetDpi}DPI`, 'info');
 
                 const startTime = Date.now();
 
@@ -456,11 +511,14 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        image: imageDataUrl,
-                        targetWidth: document.getElementById('targetWidth').value,
-                        targetHeight: document.getElementById('targetHeight').value
+                        imageId: selectedImageId,
+                        templateId: selectedTemplateId,
+                        targetWidth: targetDimensions.width,
+                        targetHeight: targetDimensions.height
                     })
                 });
+
+                updateProgress(50);
 
                 const data = await response.json();
                 const duration = Date.now() - startTime;
@@ -473,6 +531,13 @@
                     addLog(`✅ OpenAI upscaling successful (${duration}ms)`, 'success');
                     addLog(`   Strategy: ${data.analysis.action}`, 'success');
                     addLog(`   Scale Factor: ${data.analysis.scaleFactor}`, 'success');
+                    addLog(`   Image URL: ${data.metadata.imageUrl}`, 'info');
+
+                    // Display upscaled image
+                    if (data.metadata.upscaledImageUrl) {
+                        displayUpscaledImage(data.metadata.upscaledImageUrl, data.metadata.imageName);
+                        addLog(`🖼️ Upscaled image ready for viewing`, 'success');
+                    }
                 } else {
                     testStats.failed++;
                     addLog(`❌ Upscaling failed: ${data.error}`, 'error');
@@ -495,16 +560,60 @@
 
         async function runBatchTest() {
             const count = parseInt(document.getElementById('batchCount').value);
-            addLog(`Starting batch test with ${count} iterations...`, 'info');
+            const selectedTemplateId = document.getElementById('templateSelect').value;
+
+            if (!selectedTemplateId) {
+                addLog('❌ Please select a product template first', 'error');
+                return;
+            }
+
+            const template = availableTemplates[selectedTemplateId];
+            const targetDimensions = template.imageOptimization.targetDimensions;
+
+            addLog(`Starting batch test with ${count} random gallery images...`, 'info');
+            addLog(`📦 Using template: ${template.name}`, 'info');
 
             for (let i = 0; i < count; i++) {
-                addLog(`Batch test ${i + 1}/${count}...`, 'info');
-                updateProgress((i + 1) / count * 100);
-                // Simulate batch test - you'd implement actual batch logic
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                try {
+                    addLog(`[Batch ${i + 1}/${count}] Running test with random gallery image...`, 'info');
+
+                    const response = await fetch('/api/merchandise/openai-upscaler/test-batch', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            templateId: selectedTemplateId,
+                            targetWidth: targetDimensions.width,
+                            targetHeight: targetDimensions.height
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    testStats.total++;
+                    if (response.ok) {
+                        testStats.success++;
+                        testStats.times.push(data.analysis.processingTime);
+                        addLog(`  ✅ Test ${i + 1} passed - ${data.analysis.processingTime}ms`, 'success');
+
+                        // Display the last upscaled image
+                        if (data.metadata.upscaledImageUrl) {
+                            displayUpscaledImage(data.metadata.upscaledImageUrl, data.metadata.imageName);
+                        }
+                    } else {
+                        testStats.failed++;
+                        addLog(`  ❌ Test ${i + 1} failed: ${data.error}`, 'error');
+                    }
+
+                    updateProgress((i + 1) / count * 100);
+                } catch (error) {
+                    testStats.failed++;
+                    testStats.total++;
+                    addLog(`  ❌ Test ${i + 1} error: ${error.message}`, 'error');
+                }
             }
 
             updateStats();
+            updateProgress(100);
         }
 
         async function runGalleryTest() {
@@ -595,22 +704,106 @@
             }
         }
 
-        // Image preview
-        document.getElementById('imageInput')?.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const previewContainer = document.getElementById('previewContainer');
-                    previewContainer.innerHTML = `<img src="${event.target.result}" class="image-preview" alt="Preview">`;
-                };
-                reader.readAsDataURL(file);
+        // Store templates globally for easy access
+        let availableTemplates = {};
+
+        // Load available templates
+        async function loadTemplates() {
+            try {
+                addLog('Loading product templates...', 'info');
+                const response = await fetch('/api/merchandise/templates-list');
+                const data = await response.json();
+
+                if (!data.success || !data.templates || data.templates.length === 0) {
+                    addLog('⚠️ No templates found', 'warn');
+                    return;
+                }
+
+                const select = document.getElementById('templateSelect');
+                select.innerHTML = ''; // Clear loading message
+
+                data.templates.forEach(template => {
+                    availableTemplates[template.id] = template;
+                    const option = document.createElement('option');
+                    option.value = template.id;
+                    option.text = template.name;
+                    select.appendChild(option);
+                });
+
+                // Select first template by default
+                if (select.options.length > 0) {
+                    select.selectedIndex = 0;
+                    updateTemplateInfo();
+                    addLog(`✅ Loaded ${data.templates.length} product templates`, 'success');
+                }
+            } catch (error) {
+                addLog(`❌ Failed to load templates: ${error.message}`, 'error');
             }
-        });
+        }
+
+        // Update template info display
+        function updateTemplateInfo() {
+            const templateId = document.getElementById('templateSelect').value;
+            if (!templateId || !availableTemplates[templateId]) {
+                document.getElementById('templateInfoGroup').style.display = 'none';
+                return;
+            }
+
+            const template = availableTemplates[templateId];
+            const info = template.imageOptimization;
+
+            let infoHtml = `
+                <div>📦 <strong>${template.name}</strong></div>
+                <div>🎨 Category: ${template.category}</div>
+                <div>📏 Dimensions: ${info.targetDimensions.width} × ${info.targetDimensions.height} px</div>
+                <div>📐 DPI: ${info.targetDpi}</div>
+                <div>🤖 Upscaling: ${info.allowUpscaling ? 'Enabled' : 'Disabled'}</div>
+                ${template.userMessages ? `<div style="margin-top: 8px; font-style: italic;">💬 "${template.userMessages.complete}"</div>` : ''}
+            `;
+
+            document.getElementById('templateInfo').innerHTML = infoHtml;
+            document.getElementById('templateInfoGroup').style.display = 'block';
+        }
+
+        // Load gallery images on page load
+        async function loadGalleryImages() {
+            try {
+                addLog('Loading gallery images from server...', 'info');
+                const response = await fetch('/api/merchandise/gallery-list');
+                const data = await response.json();
+
+                if (!data.success || !data.images || data.images.length === 0) {
+                    addLog('⚠️ No gallery images found', 'warn');
+                    return;
+                }
+
+                const select = document.getElementById('gallerySelect');
+                select.innerHTML = ''; // Clear loading message
+
+                data.images.forEach(img => {
+                    const option = document.createElement('option');
+                    option.value = img.id;
+                    option.text = img.name || img.title || 'Unnamed Image';
+                    select.appendChild(option);
+                });
+
+                // Select first image by default
+                if (select.options.length > 0) {
+                    select.selectedIndex = 0;
+                    addLog(`✅ Loaded ${data.images.length} gallery images`, 'success');
+                }
+            } catch (error) {
+                addLog(`❌ Failed to load gallery images: ${error.message}`, 'error');
+            }
+        }
+
+        // Load templates and gallery on startup
+        loadTemplates();
+        loadGalleryImages();
 
         // Initial log
         addLog('OpenAI Upscaler Harness Ready', 'success');
-        addLog('Select test mode and upload an image to begin', 'info');
+        addLog('Select a template and gallery image to begin', 'info');
     </script>
 </body>
 </html>

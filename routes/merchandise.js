@@ -3221,96 +3221,198 @@ router.get('/preview-harness', ensureAuthenticated, groupAuth.requireAction('gam
 });
 
 /**
+ * GET /api/merchandise/templates-list
+ * Get list of available product templates for OpenAI upscaler testing
+ */
+router.get('/templates-list', (req, res) => {
+  try {
+    const productTemplates = require('../config/productTemplates');
+
+    // Convert templates object to array format for UI
+    const templates = Object.values(productTemplates).map(template => ({
+      id: template.id,
+      name: template.name,
+      category: template.category,
+      description: template.description,
+      imageOptimization: template.imageOptimization,
+      userMessages: template.userMessages,
+      printify: template.printify
+    }));
+
+    res.json({
+      success: true,
+      templates: templates,
+      totalCount: templates.length
+    });
+
+  } catch (error) {
+    console.error('❌ Templates list error:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch templates list',
+      details: error.message,
+      templates: []
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/gallery-list
+ * Get list of user's gallery images for selection
+ */
+router.get('/gallery-list', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+  try {
+    const userId = req.user.uid;
+
+    console.log(`\n📁 Fetching gallery list for user: ${userId}`);
+
+    // Get S3 uploaded images
+    const s3Images = await galleryStorage.listUserGalleryImages(userId);
+    console.log(`📊 S3 images found: ${s3Images.length}`);
+
+    // Get Firebase bookmarks
+    const bookmarks = await getUserBookmarks(userId);
+    console.log(`📊 Firebase bookmarks found: ${bookmarks.length}`);
+
+    // Combine both sources
+    const allGalleryImages = [...s3Images, ...bookmarks];
+
+    if (allGalleryImages.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'No gallery images found',
+        images: []
+      });
+    }
+
+    // Format images for UI dropdown
+    const formattedImages = allGalleryImages.map((img, index) => ({
+      id: img.id || img._id || img.bookmarkId || index,
+      name: img.name || img.title || img.alt || `Image ${index + 1}`,
+      url: img.url || img.imageUrl,
+      source: img.url && img.url.includes('s3') ? 'S3' : 'Firebase'
+    }));
+
+    res.json({
+      success: true,
+      images: formattedImages,
+      totalCount: allGalleryImages.length
+    });
+
+  } catch (error) {
+    console.error('❌ Gallery list error:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch gallery list',
+      details: error.message,
+      images: []
+    });
+  }
+});
+
+/**
  * POST /api/merchandise/openai-upscaler/test
- * Test OpenAI upscaler with a single image
- * Accepts FormData with 'image', 'targetWidth', 'targetHeight' fields
+ * Test OpenAI upscaler with a gallery image
+ * Fetches image server-side from Firebase/S3 by ID
  */
 router.post('/openai-upscaler/test', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
   try {
     // Verify database is ready
     if (!ensureDatabaseReady(res)) return;
 
+    const userId = req.user.uid;
+    const imageId = req.body.imageId;
+    const targetWidth = parseInt(req.body.targetWidth) || 3000;
+    const targetHeight = parseInt(req.body.targetHeight) || 3600;
+
+    if (!imageId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing imageId',
+        details: 'Please provide a valid gallery image ID'
+      });
+    }
+
     console.log(`\n🤖 OpenAI Upscaler Test Started`);
-    console.log(`📊 Request body type:`, Object.keys(req).slice(0, 5));
-    console.log(`📊 Request files:`, req.files ? Object.keys(req.files) : 'none');
-
-    let imageBuffer;
-    let imageName = 'test-image';
-    let imageSize;
-
-    // Try to get image from req.files (express-fileupload) first
-    if (req.files && req.files.image) {
-      console.log(`📁 Image from req.files (express-fileupload)`);
-      imageBuffer = req.files.image.data;
-      imageName = req.files.image.name || 'test-image';
-      imageSize = req.files.image.size;
-    }
-    // Fallback: Try to get image from req.body.image (if sent as base64)
-    else if (req.body.image) {
-      console.log(`📁 Image from req.body (base64)`);
-      const imageData = req.body.image;
-
-      // If it's a data URL, extract the base64 part
-      if (typeof imageData === 'string' && imageData.includes('base64,')) {
-        imageBuffer = Buffer.from(imageData.split('base64,')[1], 'base64');
-        imageSize = imageBuffer.length;
-      } else if (typeof imageData === 'string') {
-        // Plain base64
-        imageBuffer = Buffer.from(imageData, 'base64');
-        imageSize = imageBuffer.length;
-      } else {
-        throw new Error('Invalid image format in request body');
-      }
-    }
-    // Try raw body (application/octet-stream)
-    else if (req.body && req.body instanceof Buffer) {
-      console.log(`📁 Image from raw body buffer`);
-      imageBuffer = req.body;
-      imageSize = imageBuffer.length;
-    }
-    else {
-      console.error(`❌ No image found in request:`, {
-        files: !!req.files,
-        body: !!req.body,
-        bodyKeys: req.body ? Object.keys(req.body) : []
-      });
-      return res.status(400).json({
-        success: false,
-        error: 'No image provided',
-        details: 'Image must be sent as FormData with "image" field, or as base64 in request body, or as raw buffer'
-      });
-    }
-
-    if (!imageBuffer) {
-      return res.status(400).json({
-        success: false,
-        error: 'Unable to parse image data',
-        details: 'Could not extract image buffer from request'
-      });
-    }
-
-    const targetWidth = parseInt(req.body.targetWidth || req.query.targetWidth) || 3000;
-    const targetHeight = parseInt(req.body.targetHeight || req.query.targetHeight) || 3600;
-
-    console.log(`📁 Image: ${imageName} (${(imageSize / 1024).toFixed(2)} KB)`);
+    console.log(`📁 User ID: ${userId}`);
+    console.log(`📁 Image ID: ${imageId}`);
     console.log(`📏 Target: ${targetWidth}x${targetHeight}px`);
+
+    // Fetch image from gallery by ID (server-side)
+    console.log(`📊 Fetching image from gallery...`);
+    const s3Images = await galleryStorage.listUserGalleryImages(userId);
+    const bookmarks = await getUserBookmarks(userId);
+    const allGalleryImages = [...s3Images, ...bookmarks];
+
+    // Find image by ID or index
+    let imageUrl;
+    let imageName;
+    let selectedImage;
+
+    // Try to match by ID first
+    selectedImage = allGalleryImages.find(img =>
+      img.id === imageId ||
+      img._id === imageId ||
+      img.bookmarkId === imageId
+    );
+
+    // If not found by ID, try by index (imageId might be numeric)
+    if (!selectedImage && !isNaN(imageId)) {
+      selectedImage = allGalleryImages[parseInt(imageId)];
+    }
+
+    if (!selectedImage) {
+      return res.status(404).json({
+        success: false,
+        error: 'Image not found',
+        details: `Could not find gallery image with ID: ${imageId}`
+      });
+    }
+
+    // Get image URL from selected image
+    if (selectedImage.url && selectedImage.url.includes('s3.amazonaws.com')) {
+      imageUrl = selectedImage.url;
+      imageName = selectedImage.name || 'gallery-image';
+    } else if (selectedImage.imageUrl) {
+      imageUrl = selectedImage.imageUrl;
+      imageName = selectedImage.title || selectedImage.alt || 'gallery-image';
+    } else if (selectedImage.url) {
+      imageUrl = selectedImage.url;
+      imageName = selectedImage.title || selectedImage.name || 'gallery-image';
+    } else {
+      return res.status(400).json({
+        success: false,
+        error: 'No valid image URL',
+        details: 'Selected gallery image has no accessible URL'
+      });
+    }
+
+    console.log(`✅ Found image: ${imageName}`);
+    console.log(`📥 Downloading from: ${imageUrl.substring(0, 50)}...`);
+
+    // Download image from URL (server-side)
+    const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+    const imageBuffer = Buffer.from(imageResponse.data);
+    const imageSize = imageBuffer.length;
+
+    console.log(`✅ Downloaded: ${(imageSize / 1024).toFixed(2)} KB`);
 
     const startTime = Date.now();
 
-    // Create temporary analysis object for upscaler
+    // Create analysis object for upscaler
     const analysis = {
-      originalDimensions: { width: 100, height: 100 },  // Will be detected by optimizer
+      originalDimensions: { width: 100, height: 100 },
       targetDimensions: { width: targetWidth, height: targetHeight },
       action: 'upscale',
       scaleFactor: Math.max(targetWidth / 100, targetHeight / 100),
-      currentFormat: 'jpeg' // Default to jpeg, can be detected from actual image
+      currentFormat: 'jpeg'
     };
 
     console.log(`📊 Calling ImageOptimizer.upscaleWithOpenAI()...`);
 
     const optimizer = new ImageOptimizer();
 
-    // Call OpenAI upscaler directly
+    // Call OpenAI upscaler
     let upscaledBuffer;
     try {
       upscaledBuffer = await optimizer.upscaleWithOpenAI(imageBuffer, analysis);
@@ -3324,6 +3426,35 @@ router.post('/openai-upscaler/test', ensureAuthenticated, groupAuth.requireActio
 
     console.log(`✅ Test completed in ${duration}ms`);
 
+    // Save upscaled image to public directory
+    console.log(`💾 Saving upscaled image...`);
+    const path = require('path');
+    const fs = require('fs').promises;
+
+    // Create upscaled-images directory if it doesn't exist
+    const upscaledDir = path.join(__dirname, '../public/upscaled-images');
+    try {
+      await fs.mkdir(upscaledDir, { recursive: true });
+    } catch (mkdirError) {
+      console.warn(`⚠️ Could not create upscaled-images directory:`, mkdirError.message);
+    }
+
+    // Generate unique filename with timestamp and user ID
+    const timestamp = Date.now();
+    const upscaledFilename = `upscaled-${userId}-${timestamp}.jpg`;
+    const upscaledFilepath = path.join(upscaledDir, upscaledFilename);
+
+    try {
+      await fs.writeFile(upscaledFilepath, upscaledBuffer);
+      console.log(`✅ Saved: ${upscaledFilename}`);
+    } catch (saveError) {
+      console.error(`⚠️ Could not save upscaled image:`, saveError.message);
+      // Continue anyway - return response with or without upscaled image URL
+    }
+
+    // Generate viewable URL
+    const upscaledImageUrl = `/upscaled-images/${upscaledFilename}`;
+
     // Return success
     res.json({
       success: true,
@@ -3336,6 +3467,10 @@ router.post('/openai-upscaler/test', ensureAuthenticated, groupAuth.requireActio
         targetDimensions: analysis.targetDimensions
       },
       metadata: {
+        imageId: imageId,
+        imageName: imageName,
+        imageUrl: imageUrl,
+        upscaledImageUrl: upscaledImageUrl,
         upscalerUsed: 'openai',
         timestamp: new Date().toISOString()
       }
@@ -3343,7 +3478,150 @@ router.post('/openai-upscaler/test', ensureAuthenticated, groupAuth.requireActio
 
   } catch (error) {
     console.error('❌ OpenAI upscaler test error:', error.message);
-    console.error('Stack:', error.stack);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      details: error.response?.data || error.message
+    });
+  }
+});
+
+/**
+ * POST /api/merchandise/openai-upscaler/test-batch
+ * Test OpenAI upscaler with a random gallery image
+ * Used for batch testing mode
+ */
+router.post('/openai-upscaler/test-batch', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+  try {
+    // Verify database is ready
+    if (!ensureDatabaseReady(res)) return;
+
+    const userId = req.user.uid;
+    const targetWidth = parseInt(req.body.targetWidth) || 3000;
+    const targetHeight = parseInt(req.body.targetHeight) || 3600;
+
+    console.log(`\n🤖 OpenAI Upscaler Batch Test Started`);
+    console.log(`📁 User ID: ${userId}`);
+
+    // Fetch gallery images
+    const s3Images = await galleryStorage.listUserGalleryImages(userId);
+    const bookmarks = await getUserBookmarks(userId);
+    const allGalleryImages = [...s3Images, ...bookmarks];
+
+    if (allGalleryImages.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'No gallery images found',
+        details: 'User has no images to test'
+      });
+    }
+
+    // Select random image
+    const randomIndex = Math.floor(Math.random() * allGalleryImages.length);
+    const selectedImage = allGalleryImages[randomIndex];
+
+    console.log(`✅ Selected random image (${randomIndex + 1}/${allGalleryImages.length})`);
+
+    // Get image URL
+    let imageUrl;
+    let imageName;
+
+    if (selectedImage.url && selectedImage.url.includes('s3.amazonaws.com')) {
+      imageUrl = selectedImage.url;
+      imageName = selectedImage.name || 'gallery-image';
+    } else if (selectedImage.imageUrl) {
+      imageUrl = selectedImage.imageUrl;
+      imageName = selectedImage.title || 'gallery-image';
+    } else if (selectedImage.url) {
+      imageUrl = selectedImage.url;
+      imageName = selectedImage.name || selectedImage.title || 'gallery-image';
+    } else {
+      return res.status(400).json({
+        success: false,
+        error: 'No valid image URL',
+        details: 'Could not find accessible URL for selected image'
+      });
+    }
+
+    console.log(`📁 Image: ${imageName}`);
+
+    // Download image from URL (server-side)
+    const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+    const imageBuffer = Buffer.from(imageResponse.data);
+    const imageSize = imageBuffer.length;
+
+    console.log(`✅ Downloaded: ${(imageSize / 1024).toFixed(2)} KB`);
+
+    const startTime = Date.now();
+
+    // Create analysis object
+    const analysis = {
+      originalDimensions: { width: 100, height: 100 },
+      targetDimensions: { width: targetWidth, height: targetHeight },
+      action: 'upscale',
+      scaleFactor: Math.max(targetWidth / 100, targetHeight / 100),
+      currentFormat: 'jpeg'
+    };
+
+    // Call OpenAI upscaler
+    const optimizer = new ImageOptimizer();
+    const upscaledBuffer = await optimizer.upscaleWithOpenAI(imageBuffer, analysis);
+
+    const duration = Date.now() - startTime;
+
+    console.log(`✅ Test completed in ${duration}ms`);
+
+    // Save upscaled image to public directory
+    console.log(`💾 Saving upscaled image...`);
+    const path = require('path');
+    const fs = require('fs').promises;
+
+    // Create upscaled-images directory if it doesn't exist
+    const upscaledDir = path.join(__dirname, '../public/upscaled-images');
+    try {
+      await fs.mkdir(upscaledDir, { recursive: true });
+    } catch (mkdirError) {
+      console.warn(`⚠️ Could not create upscaled-images directory:`, mkdirError.message);
+    }
+
+    // Generate unique filename with timestamp and user ID
+    const timestamp = Date.now();
+    const upscaledFilename = `upscaled-${userId}-${timestamp}.jpg`;
+    const upscaledFilepath = path.join(upscaledDir, upscaledFilename);
+
+    try {
+      await fs.writeFile(upscaledFilepath, upscaledBuffer);
+      console.log(`✅ Saved: ${upscaledFilename}`);
+    } catch (saveError) {
+      console.error(`⚠️ Could not save upscaled image:`, saveError.message);
+      // Continue anyway - return response with or without upscaled image URL
+    }
+
+    // Generate viewable URL
+    const upscaledImageUrl = `/upscaled-images/${upscaledFilename}`;
+
+    // Return success
+    res.json({
+      success: true,
+      message: 'Batch test completed successfully',
+      analysis: {
+        action: 'upscale',
+        scaleFactor: analysis.scaleFactor,
+        processingTime: duration,
+        originalSize: imageSize,
+        targetDimensions: analysis.targetDimensions
+      },
+      metadata: {
+        imageName: imageName,
+        imageUrl: imageUrl,
+        upscaledImageUrl: upscaledImageUrl,
+        upscalerUsed: 'openai',
+        timestamp: new Date().toISOString()
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Batch test error:', error.message);
     res.status(500).json({
       success: false,
       error: error.message,
