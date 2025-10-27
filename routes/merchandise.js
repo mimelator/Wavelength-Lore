@@ -2054,6 +2054,11 @@ router.post('/optimize-for-product', ensureAuthenticated, async (req, res) => {
       // Cache hit! Return cached result immediately
       console.log(`✨ CACHE HIT - Returning cached optimization`);
 
+      // Record cache reuse for analytics
+      cacheAnalytics.recordCacheReuse(productKey).catch(err =>
+        console.warn('Failed to record cache reuse:', err.message)
+      );
+
       return res.json({
         success: true,
         cacheHit: true,
@@ -2178,6 +2183,16 @@ router.post('/optimize-for-product-confirm', ensureAuthenticated, async (req, re
     const stats = optimizer.getStats(imgBuffer, result.optimizedBuffer);
 
     console.log(`✅ Optimization complete: ${result.message}`);
+
+    // Record optimization for analytics
+    console.log(`📊 Recording optimization metrics...`);
+    cacheAnalytics.recordOptimization(productKey, {
+      processingTime: result.processingTime,
+      scaleFactor: result.analysis.scaleFactor,
+      costEstimate: result.analysis.strategy === 'UPSCALE' ? 0.08 : 0
+    }).catch(err =>
+      console.warn('Failed to record optimization:', err.message)
+    );
 
     // STORE IN CACHE for future users
     console.log(`💾 Storing optimized image in cache for reuse...`);
