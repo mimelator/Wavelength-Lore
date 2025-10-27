@@ -29,7 +29,7 @@ router.get('/', groupAuth.requireAction('game_access_member'), (req, res) => {
 });
 
 /**
- * Wavelength Gems - Match-3 Puzzle Game
+ * THE SHIRE BATTLEGAMES: Crystal Harvest - Match-3 Puzzle Game
  * 🎯 GO-LIVE UPDATE: Now accessible to all authenticated members!
  */
 router.get('/wavelength-gems', groupAuth.requireAction('game_access_member'), (req, res) => {

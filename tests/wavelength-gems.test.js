@@ -1,9 +1,9 @@
 /**
- * Wavelength Gems Test Suite
+ * THE SHIRE BATTLEGAMES: Crystal Harvest Test Suite
  * Comprehensive tests for match-3 game engine logic
  */
 
-describe('Wavelength Gems Engine', () => {
+describe('THE SHIRE BATTLEGAMES: Crystal Harvest Engine', () => {
     // Game configuration
     const GAME_CONFIG = {
         ROWS: 8,

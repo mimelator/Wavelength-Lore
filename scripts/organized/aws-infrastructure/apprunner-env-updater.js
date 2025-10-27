@@ -198,6 +198,10 @@ class AppRunnerEnvUpdater {
       'PRINTIFY_ENVIRONMENT',
       'PRINTIFY_MOCK_MODE',
       
+      // Stripe Configuration
+      'STRIPE_SECRET_KEY',
+      'STRIPE_PUBLISHABLE_KEY',
+      'STRIPE_ENVIRONMENT',
 
 
     ];

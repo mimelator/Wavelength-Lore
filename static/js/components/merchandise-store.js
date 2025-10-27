@@ -178,6 +178,10 @@ class MerchandiseStore {
     this.eventBus.on('dialog.cancelled', (data) => {
       this.handleDialogCancelled(data.modalId);
     });
+
+    this.eventBus.on('product.goToProductOptions', (data) => {
+      this.handleGoToProductOptions(data.productId, data.customization);
+    });
   }
   
   /**
@@ -3169,7 +3173,61 @@ class MerchandiseStore {
       this.render();
     }
   }
-  
+
+  /**
+   * Handle transition to product options page after preview
+   * Closes customization modals and shows product options for size/quantity/variants
+   * @param {string} productId - Product ID (may be blueprint product ID)
+   * @param {Object} customization - Customization data with effects, borders, and customizedImageUrl
+   */
+  handleGoToProductOptions(productId, customization) {
+    console.log('🎯 Going to product options:', productId);
+    console.log('🎨 Customization:', customization);
+
+    // Try to find the product in the products array
+    // If it's a blueprint product (format: categoryId-blueprintId), it won't be in the array
+    let product = this.products.find(p => (p.id || p.productId) === productId);
+
+    if (!product) {
+      console.log('⚠️ Product not in array, likely a blueprint product. Creating temp product object.');
+
+      // For blueprint products, we still have the customization data
+      // Create a temporary product object that we can work with
+      // The actual product will be created when user adds to cart
+      product = {
+        id: productId,
+        productId: productId,
+        title: `Custom Product ${productId}`,
+        previewImage: customization.customizedImageUrl || '/images/previews/generic-product-preview.svg',
+        isCustomized: true,
+        customization: customization
+      };
+
+      console.log('✅ Temporary product object created:', product);
+    } else {
+      // Store customization data on the existing product
+      if (!product.customization) {
+        product.customization = {};
+      }
+      product.customization = {
+        ...product.customization,
+        ...customization
+      };
+      console.log('💾 Customization stored on product');
+    }
+
+    // Store the product in a temporary location for the current session
+    // This allows us to display it without modifying the main products array
+    this.currentCustomizedProduct = product;
+
+    // TODO: Next phase - Generate Printify mockup image
+    // For now, show success and indicate we're ready for product options
+    this.showSuccess('✨ Perfect! Now select your size and quantity.');
+
+    // Re-render to show product with customization data
+    this.render();
+  }
+
   /**
    * Handle modal close from ModalRenderer
    */

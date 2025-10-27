@@ -4278,4 +4278,103 @@ router.get('/openai-upscaler/status', (req, res) => {
   });
 });
 
+/**
+ * POST /api/merchandise/generate-printify-mockup
+ *
+ * Generates a Printify product mockup with the customized artwork
+ * This creates a product on Printify that shows the artwork on the actual merchandise
+ *
+ * Request body:
+ * {
+ *   customizedImageUrl: string - URL to the customized artwork image
+ *   productId: string - Blueprint product ID (e.g., "70-999")
+ *   productTitle: string - Title for the product
+ *   blueprintId: string - Printify blueprint ID
+ *   printProviderId: string - Printify print provider ID
+ * }
+ */
+router.post('/generate-printify-mockup', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+  try {
+    console.log('🎨 MOCKUP GENERATION: Starting Printify mockup creation');
+
+    const {
+      customizedImageUrl,
+      productId,
+      productTitle,
+      blueprintId,
+      printProviderId
+    } = req.body;
+
+    // Validate required fields
+    if (!customizedImageUrl || !productId || !blueprintId || !printProviderId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: customizedImageUrl, productId, blueprintId, printProviderId'
+      });
+    }
+
+    console.log(`📥 Downloading customized image from: ${customizedImageUrl}`);
+
+    // Download the customized image from the URL
+    const imageResponse = await axios.get(customizedImageUrl, {
+      responseType: 'arraybuffer',
+      timeout: 30000
+    });
+
+    const imageBuffer = Buffer.from(imageResponse.data);
+    console.log(`✅ Image downloaded: ${(imageBuffer.length / 1024).toFixed(2)} KB`);
+
+    // Create the Printify product with the customized image
+    console.log(`🖼️  Creating Printify product with blueprint ${blueprintId}`);
+
+    const mockupResult = await printifyService.createCustomProductWithBlueprintAndAutoEnhancement(
+      imageBuffer,
+      `customized-${productId}-${Date.now()}.webp`,
+      {
+        title: productTitle || `Custom Wavelength Merchandise - ${productId}`,
+        description: 'Custom merchandise created with Wavelength effects and customization',
+        blueprintId: blueprintId,
+        printProviderId: printProviderId,
+        tags: ['wavelength', 'custom', 'effects'],
+        basePrice: 2099,
+        userId: req.user.uid,
+        originalImageId: productId
+      }
+    );
+
+    if (!mockupResult.success) {
+      console.error('❌ Printify product creation failed:', mockupResult.error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to create Printify mockup: ' + mockupResult.error
+      });
+    }
+
+    console.log('✅ Printify product created successfully');
+    console.log(`   Product ID: ${mockupResult.productId}`);
+    console.log(`   Variants: ${mockupResult.variants?.length || 0}`);
+
+    // Return the mockup details
+    res.json({
+      success: true,
+      mockup: {
+        productId: mockupResult.productId,
+        title: mockupResult.title,
+        variants: mockupResult.variants,
+        images: mockupResult.images,
+        tags: mockupResult.tags,
+        uploadedImage: mockupResult.uploadedImage,
+        imageEnhancement: mockupResult.imageEnhancement
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error generating Printify mockup:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate mockup: ' + (error.message || 'Unknown error')
+    });
+  }
+});
+
 module.exports = router;

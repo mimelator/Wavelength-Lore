@@ -11,6 +11,10 @@ const { ECRClient, DescribeRepositoriesCommand, DescribeImagesCommand } = requir
 const chalk = require('chalk');
 const fs = require('fs');
 const path = require('path');
+const dotenv = require('dotenv');
+
+// Load environment variables
+dotenv.config();
 
 class WavelengthDeploymentStatus {
     constructor() {
@@ -58,15 +62,33 @@ class WavelengthDeploymentStatus {
         console.log(chalk.yellow('🏃 Checking App Runner status...'));
         
         try {
+            // Use the full ARN from environment if available
+            const serviceArn = process.env.APPRUNNER_SERVICE_ARN || 
+                `arn:aws:apprunner:us-east-1:${process.env.AWS_ACCOUNT_ID || '123456789012'}:service/${this.serviceName}`;
+            
+            if (!process.env.APPRUNNER_SERVICE_ARN) {
+                return {
+                    status: 'Unknown',
+                    message: 'Service ARN required for detailed status',
+                    serviceName: this.serviceName
+                };
+            }
+            
             const command = new DescribeServiceCommand({
-                ServiceArn: `arn:aws:apprunner:us-east-1:${process.env.AWS_ACCOUNT_ID || '123456789012'}:service/${this.serviceName}`
+                ServiceArn: serviceArn
             });
             
-            // For now, return mock data since we need the full ARN
+            const result = await this.appRunner.send(command);
+            const service = result.Service;
+            
             return {
-                status: 'Unknown',
-                message: 'Service ARN required for detailed status',
-                serviceName: this.serviceName
+                status: service.Status,
+                message: `Service is ${service.Status.toLowerCase()}`,
+                serviceName: service.ServiceName,
+                serviceUrl: service.ServiceUrl,
+                createdAt: service.CreatedAt,
+                updatedAt: service.UpdatedAt,
+                source: service.SourceConfiguration?.ImageRepository?.ImageIdentifier || 'Not available'
             };
             
         } catch (error) {
@@ -96,8 +118,7 @@ class WavelengthDeploymentStatus {
             // Get recent images
             const imagesCommand = new DescribeImagesCommand({
                 repositoryName: this.ecrRepository,
-                maxResults: 5,
-                imageIds: []
+                maxResults: 5
             });
             
             const imagesResult = await this.ecr.send(imagesCommand);
@@ -209,14 +230,21 @@ class WavelengthDeploymentStatus {
         }
         console.log('');
         
-        // Overall Health
-        const isHealthy = status.local.dockerfileExists && 
-                         status.local.nodeModulesExists && 
-                         status.local.gitStatus === 'Clean';
+        // Overall Health - Check critical components
+        const localHealthy = status.local.dockerfileExists && status.local.nodeModulesExists;
+        const ecrHealthy = status.ecr.status !== 'Error';
+        const appRunnerHealthy = status.appRunner.status === 'RUNNING';
+        const isHealthy = localHealthy && ecrHealthy && appRunnerHealthy;
         
         console.log(chalk.cyan('🌊 OVERALL HEALTH:'));
-        console.log(isHealthy ? chalk.green('   ✅ HEALTHY - Ready for deployment') : 
-                               chalk.yellow('   ⚠️ ATTENTION NEEDED - Check issues above'));
+        if (isHealthy) {
+            console.log(chalk.green('   ✅ HEALTHY - All systems operational'));
+        } else {
+            console.log(chalk.yellow('   ⚠️ ATTENTION NEEDED - Check issues above'));
+            if (!localHealthy) console.log(chalk.red('      • Local environment issues detected'));
+            if (!ecrHealthy) console.log(chalk.red('      • ECR repository issues detected'));  
+            if (!appRunnerHealthy) console.log(chalk.red('      • App Runner service not running'));
+        }
     }
 
     /**

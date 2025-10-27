@@ -215,7 +215,7 @@ class MerchandiseModalRenderer {
       const modalId = `customize-modal-${product.id}`;
 
       return `
-        <div class="modal-overlay fullscreen-overlay" data-modal-id="${modalId}">
+        <div class="modal-overlay fullscreen-overlay" data-modal-id="${modalId}" data-product-id="${product.id}" data-product-title="${product.title}" data-product-image="${product.previewImage || product.image || ''}">
           <div class="modal-dialog customization-modal fullscreen-customization" role="dialog" aria-labelledby="${modalId}-title">
             <!-- Header -->
             <div class="customization-header">
@@ -291,8 +291,8 @@ class MerchandiseModalRenderer {
                 <button class="btn-secondary cancel-customization-btn" data-modal-id="${modalId}">
                   Cancel
                 </button>
-                <button class="btn-primary add-to-cart-customized-btn" data-product-id="${product.id}">
-                  <span>🛒</span> Add to Cart
+                <button class="btn-primary preview-finished-product-btn" data-product-id="${product.id}">
+                  <span>✨</span> Preview Finished Product
                 </button>
               </div>
             </div>
@@ -548,43 +548,9 @@ class MerchandiseModalRenderer {
       { value: 'xl', label: 'Extra Large' }
     ];
 
-    return `
-      <div class="compact-section production-section" data-section="production">
-        <div class="section-header" data-toggle="production">
-          <span class="section-title">📦 Product Options</span>
-          <span class="section-toggle">▼</span>
-        </div>
-        <div class="section-content" id="production-content">
-          <!-- Size Selection -->
-          <div class="production-option">
-            <label class="option-label" for="product-size-select">Size:</label>
-            <select id="product-size-select" class="product-size-select">
-              <option value="">Choose a size...</option>
-              ${sizes.map(size => `
-                <option value="${size.value}">${size.label}</option>
-              `).join('')}
-            </select>
-          </div>
-
-          <!-- Quantity Selection -->
-          <div class="production-option">
-            <label class="option-label" for="product-quantity-input">Quantity:</label>
-            <div class="quantity-selector">
-              <button class="qty-btn qty-minus" data-action="decrease">−</button>
-              <input
-                id="product-quantity-input"
-                type="number"
-                class="qty-input"
-                value="1"
-                min="1"
-                max="99"
-              />
-              <button class="qty-btn qty-plus" data-action="increase">+</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
+    return ``;
+    // Production options (size, quantity) are now handled on the main product page, not in this customization modal
+    // Users will choose these after seeing the product preview
   }
 
   /**
@@ -685,7 +651,93 @@ class MerchandiseModalRenderer {
       return this.renderModalError('preview');
     }
   }
-  
+
+  /**
+   * Render finished product preview - Shows merchandise mockup with personalized artwork
+   * @param {Object} product - Product object with customization data
+   * @param {Object} customization - Customization object with effects and customizedImageUrl
+   * @returns {string} HTML string for finished product preview modal
+   */
+  renderFinishedProductPreview(product, customization) {
+    try {
+      const modalId = `finished-product-preview-${product.id}`;
+      const customizedImageUrl = customization?.customizedImageUrl || product.previewImage;
+
+      return `
+        <div class="modal-overlay" data-modal-id="${modalId}">
+          <div class="modal-dialog finished-product-preview" role="dialog" aria-labelledby="${modalId}-title">
+            <div class="modal-header">
+              <h3 id="${modalId}-title">
+                <span class="modal-icon">✨</span>
+                Your Finished ${product.title}
+              </h3>
+              <button class="modal-close-btn" data-modal-id="${modalId}" aria-label="Close modal">
+                <span>✕</span>
+              </button>
+            </div>
+
+            <div class="modal-body finished-product-body">
+              <div class="finished-product-content">
+                <!-- Merchandise Mockup Section -->
+                <div class="merchandise-mockup-section">
+                  <div class="mockup-container">
+                    <img src="${product.mockupImage || product.previewImage}"
+                         alt="${product.title} mockup"
+                         class="mockup-base-image" />
+                    <div class="custom-artwork-overlay">
+                      <img src="${customizedImageUrl}"
+                           alt="Your custom artwork"
+                           class="custom-artwork" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Product Info Section -->
+                <div class="finished-product-info">
+                  <div class="product-name">
+                    <h2>${product.title}</h2>
+                  </div>
+
+                  <div class="customization-summary">
+                    <h4>Your Customizations:</h4>
+                    <div class="customization-details" id="finished-product-customization-${product.id}">
+                      <!-- Will be populated by JavaScript -->
+                      <p class="loading-text">Loading customization details...</p>
+                    </div>
+                  </div>
+
+                  <div class="product-actions-info">
+                    <p class="friendly-message">
+                      ✨ Love what you see? Add to cart and choose your size and quantity on the next step!
+                    </p>
+                    <p class="edit-message">
+                      Want to change something? Go back and customize again - we'll save your choices!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <div class="modal-actions finished-product-actions">
+                <button class="btn-secondary back-to-customize-btn" data-product-id="${product.id}">
+                  ← Back to Customize
+                </button>
+                <button class="btn-primary add-to-cart-from-finished-btn" data-product-id="${product.id}">
+                  <span>🛒</span> Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+    } catch (error) {
+      console.error('Error rendering finished product preview:', error);
+      return this.renderModalError('finishedProduct');
+    }
+  }
+
   /**
    * Render shopping cart modal
    * @param {Object} cartSummary - Cart summary object
@@ -1707,10 +1759,12 @@ class MerchandiseModalRenderer {
         this.handleUpdatePreview(productId, modal);
       }
 
-      // Add to cart with customization button
-      if (e.target.classList.contains('add-to-cart-customized-btn')) {
+      // Preview finished product button
+      if (e.target.classList.contains('preview-finished-product-btn')) {
         const productId = e.target.dataset.productId;
-        this.handleAddToCartFullscreen(productId, modal);
+        console.log('✨ Preview Finished Product button clicked, productId:', productId);
+        console.log('📋 Modal element:', modal);
+        this.handlePreviewFinishedProduct(productId, modal);
       }
 
       // Cancel customization button
@@ -2289,6 +2343,229 @@ class MerchandiseModalRenderer {
     // Close modal
     const modalId = modal.dataset.modalId;
     this.hideModal(modalId);
+  }
+
+  /**
+   * Handle preview finished product - Show merchandise mockup with custom artwork
+   * @param {string} productId - Product ID
+   * @param {HTMLElement} modal - Customization modal element
+   */
+  async handlePreviewFinishedProduct(productId, modal) {
+    console.log('🎬 handlePreviewFinishedProduct called with productId:', productId);
+
+    if (this.debugMode) {
+      this.debugLog(`Preview finished product: ${productId}`, 'info');
+    }
+
+    try {
+      console.log('📊 Step 1: Gathering customization data');
+      // Gather all customization data
+      const selectedEffects = JSON.parse(modal.dataset.selectedEffects || '{}');
+      const borderCustomization = this.gatherBorderCustomization(modal);
+      const customizedImageUrl = modal.dataset.customizedImageUrl;
+      console.log('✅ Customization data gathered:', { customizedImageUrl, borderCustomization });
+
+      // Validate that we have a customized image
+      if (!customizedImageUrl) {
+        alert('Please click "Update Preview" first to generate your customized artwork.');
+        return;
+      }
+
+      console.log('📊 Step 2: Building customization object');
+      // Build customization object
+      const customization = {
+        effects: selectedEffects,
+        borderEnabled: borderCustomization.borderEnabled,
+        borderWidth: borderCustomization.borderWidth,
+        borderWidthPixels: borderCustomization.borderWidthPixels,
+        borderColor: borderCustomization.borderColor,
+        customizedImageUrl: customizedImageUrl,
+        timestamp: new Date().toISOString()
+      };
+      console.log('✅ Customization object built:', customization);
+
+      if (this.debugMode) {
+        this.debugLog(`Customization for finished product preview`, 'info', customization);
+      }
+
+      console.log('📊 Step 3: Getting product data from modal');
+      // Get product data from modal attributes
+      const productTitle = modal.closest('.modal-overlay')?.dataset.productTitle || 'Product';
+      const productImage = modal.closest('.modal-overlay')?.dataset.productImage || '/images/previews/generic-product-preview.svg';
+      console.log('✅ Product data retrieved:', { productTitle, productImage });
+
+      // Create a minimal product object from available data
+      const product = {
+        id: productId,
+        title: productTitle,
+        previewImage: productImage,
+        mockupImage: productImage // Use same image as mockup for now
+      };
+      console.log('✅ Product object created:', product);
+
+      if (!product.id) {
+        console.error(`Product ID not found`);
+        alert('Product information missing. Please try again.');
+        return;
+      }
+
+      // Store customization in modal for later use
+      modal.dataset.finalCustomization = JSON.stringify(customization);
+
+      console.log('📊 Step 4: Rendering finished product preview');
+      // Render and show finished product preview
+      const previewHTML = this.renderFinishedProductPreview(product, customization);
+      console.log('✅ Preview HTML rendered, length:', previewHTML.length);
+
+      const previewContainer = document.createElement('div');
+      previewContainer.innerHTML = previewHTML;
+      const previewModal = previewContainer.firstElementChild;
+      console.log('✅ Preview modal created:', previewModal);
+
+      console.log('📊 Step 5: Appending modal to body');
+      // Append to body
+      document.body.appendChild(previewModal);
+      console.log('✅ Modal appended to body');
+
+      console.log('📊 Step 6: Setting up event handlers');
+      // Setup event listeners for preview modal
+      this.setupFinishedProductPreviewHandlers(previewModal, productId, customization);
+      console.log('✅ Event handlers set up');
+
+      // Update customization summary in preview
+      this.updateFinishedProductCustomizationSummary(previewModal, customization);
+
+      if (this.debugMode) {
+        this.debugLog(`Finished product preview displayed`, 'success');
+      }
+
+    } catch (error) {
+      console.error('Error in handlePreviewFinishedProduct:', error);
+      alert('Error generating product preview. Please try again.');
+    }
+  }
+
+  /**
+   * Setup event handlers for finished product preview modal
+   * @param {HTMLElement} modal - Preview modal element
+   * @param {string} productId - Product ID
+   * @param {Object} customization - Customization object
+   */
+  setupFinishedProductPreviewHandlers(modal, productId, customization) {
+    // Back to customize button
+    const backBtn = modal.querySelector('.back-to-customize-btn');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        this.hideModal(modal.querySelector('.modal-overlay').dataset.modalId);
+        // Customization modal should still be open underneath
+        if (this.debugMode) {
+          this.debugLog('Returned to customization', 'info');
+        }
+      });
+    }
+
+    // Add to cart from finished product button
+    const addToCartBtn = modal.querySelector('.add-to-cart-from-finished-btn');
+    if (addToCartBtn) {
+      addToCartBtn.addEventListener('click', () => {
+        this.handleAddToCartFromFinishedProduct(productId, customization);
+      });
+    }
+
+    // Close button
+    const closeBtn = modal.querySelector('.modal-close-btn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        this.hideModal(modal.querySelector('.modal-overlay').dataset.modalId);
+      });
+    }
+  }
+
+  /**
+   * Update customization summary in finished product preview
+   * @param {HTMLElement} modal - Preview modal element
+   * @param {Object} customization - Customization object
+   */
+  updateFinishedProductCustomizationSummary(modal, customization) {
+    const summaryDiv = modal.querySelector('[id^="finished-product-customization-"]');
+    if (!summaryDiv) return;
+
+    const details = [];
+
+    // Effects
+    const enabledEffects = Object.entries(customization.effects || {})
+      .filter(([key, value]) => value)
+      .map(([key]) => this.formatEffectName(key));
+
+    if (enabledEffects.length > 0) {
+      details.push(`<strong>Effects:</strong> ${enabledEffects.join(', ')}`);
+    } else {
+      details.push('<strong>Effects:</strong> None');
+    }
+
+    // Border
+    if (customization.borderEnabled) {
+      details.push(`<strong>Border:</strong> ${customization.borderWidth} (${customization.borderColor})`);
+    } else {
+      details.push('<strong>Border:</strong> None');
+    }
+
+    if (details.length > 0) {
+      summaryDiv.innerHTML = details.map(detail => `<p>${detail}</p>`).join('');
+    }
+  }
+
+  /**
+   * Handle add to cart from finished product preview
+   * Transitions to main page's product options (size, quantity)
+   * @param {string} productId - Product ID
+   * @param {Object} customization - Customization object
+   */
+  handleAddToCartFromFinishedProduct(productId, customization) {
+    if (this.debugMode) {
+      this.debugLog(`Add to cart from finished product preview`, 'info');
+    }
+
+    // Close the preview modal
+    const previewModal = document.querySelector(`[data-modal-id="finished-product-preview-${productId}"]`);
+    const customizationModal = document.querySelector('[data-modal-id^="customization-modal-"]');
+
+    if (previewModal) {
+      previewModal.parentElement.remove();
+    }
+    if (customizationModal) {
+      customizationModal.parentElement.remove();
+    }
+
+    // Emit event with customization data
+    // The merchandise store should handle navigating to product options
+    if (this.eventBus) {
+      this.eventBus.emit('product.goToProductOptions', {
+        productId: productId,
+        customization: customization
+      });
+    }
+
+    if (this.debugMode) {
+      this.debugLog(`Transitioning to product options page`, 'success');
+    }
+  }
+
+  /**
+   * Helper: Format effect name for display
+   * @param {string} effectKey - Effect key (e.g., 'colorGrade')
+   * @returns {string} Formatted effect name
+   */
+  formatEffectName(effectKey) {
+    const effectNames = {
+      'colorGrade': 'Color Grade',
+      'bloom': 'Bloom',
+      'vignette': 'Vignette',
+      'lightning': 'Lightning',
+      'edgeBlur': 'Edge Blur',
+      'filmGrain': 'Film Grain'
+    };
+    return effectNames[effectKey] || effectKey;
   }
 
   /**

@@ -77,6 +77,8 @@ class AppRunnerEnvSync {
       // Core Application
       'NODE_ENV',
       'PORT',
+      'NODE_PORT',
+      'NGINX_PORT',
       'SITE_URL',
       'CDN_URL',
       'VERSION',
@@ -96,6 +98,8 @@ class AppRunnerEnvSync {
       // AWS Configuration
       'ACCESS_KEY_ID',
       'SECRET_ACCESS_KEY',
+      'AWS_ACCESS_KEY_ID',
+      'AWS_SECRET_ACCESS_KEY',
       'AWS_ACCOUNT_ID',
       'AWS_REGION',
       'APPRUNNER_SERVICE_ARN',
