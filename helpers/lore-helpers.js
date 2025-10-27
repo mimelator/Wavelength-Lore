@@ -96,7 +96,7 @@ async function fetchLoreFromDatabase() {
         
         // Transform database lore to helper format
         if (loreItem && loreItem.id && loreItem.title) {
-          allLore.push({
+          const transformedLore = {
             id: loreItem.id,
             title: loreItem.title,
             name: loreItem.title, // Use title as name for consistency
@@ -108,7 +108,51 @@ async function fetchLoreFromDatabase() {
             type: loreItem.type,
             visible: loreItem.visible, // Legacy field (keep for backwards compatibility)
             hidden: loreItem.hidden // New visibility field
-          });
+          };
+
+          // Add enhanced fields for GitHub Issue #55 CTA support
+          if (loreItem.enhanced_title) {
+            transformedLore.enhanced_title = loreItem.enhanced_title;
+            
+            // Parse combined enhanced_title into separate fields for template compatibility
+            const enhancedText = loreItem.enhanced_title;
+            
+            if (enhancedText.includes('TAGLINE:')) {
+              const taglinePart = enhancedText.split('TAGLINE:')[1];
+              if (taglinePart) {
+                transformedLore.tagline = taglinePart.split('DESCRIPTION:')[0].trim();
+              }
+            }
+            
+            if (enhancedText.includes('DESCRIPTION:')) {
+              const descPart = enhancedText.split('DESCRIPTION:')[1];
+              if (descPart) {
+                transformedLore.enhanced_description = descPart.split('CTA_HOOK:')[0].trim();
+              }
+            }
+            
+            if (enhancedText.includes('CTA_HOOK:')) {
+              const ctaPart = enhancedText.split('CTA_HOOK:')[1];
+              if (ctaPart) {
+                transformedLore.cta_hook = ctaPart.split('POWER_STATEMENT:')[0].trim();
+              }
+            }
+            
+            if (enhancedText.includes('POWER_STATEMENT:')) {
+              const powerPart = enhancedText.split('POWER_STATEMENT:')[1];
+              if (powerPart) {
+                transformedLore.power_statement = powerPart.trim();
+              }
+            }
+          }
+
+          // Also support individual enhanced fields if they exist
+          if (loreItem.tagline) transformedLore.tagline = loreItem.tagline;
+          if (loreItem.enhanced_description) transformedLore.enhanced_description = loreItem.enhanced_description;
+          if (loreItem.cta_hook) transformedLore.cta_hook = loreItem.cta_hook;
+          if (loreItem.power_statement) transformedLore.power_statement = loreItem.power_statement;
+
+          allLore.push(transformedLore);
         }
       }
       

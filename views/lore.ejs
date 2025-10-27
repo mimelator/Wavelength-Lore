@@ -106,6 +106,67 @@
             </div>
         </section>
 
+        <!-- Enhanced Lore CTA Content from GitHub Issue #55 -->
+        <% if (lore.enhanced_title || lore.tagline || lore.enhanced_description || lore.cta_hook || lore.power_statement) { %>
+        <section class="enhanced-lore-section" style="margin: 40px 0; padding: 30px; background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 50%, #8b4513 100%); border-radius: 20px; color: white; text-align: center; border: 3px solid #ffd700; box-shadow: 0 8px 20px rgba(0,0,0,0.4);">
+            <% if (lore.enhanced_title) { %>
+                <div style="font-size: 3rem; margin-bottom: 20px;">⚡</div>
+                <h2 style="color: #ffd700; font-size: 1.8rem; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
+                    <%= lore.enhanced_title.split('TAGLINE:')[0].replace(/^["']|["']$/g, '').trim() %>
+                </h2>
+            <% } %>
+            
+            <% if (lore.tagline || (lore.enhanced_title && lore.enhanced_title.includes('TAGLINE:'))) { %>
+                <% const tagline = lore.tagline || (lore.enhanced_title && lore.enhanced_title.includes('TAGLINE:') ? lore.enhanced_title.split('TAGLINE:')[1].split('DESCRIPTION:')[0].replace(/^["']|["']$/g, '').trim() : '') %>
+                <% if (tagline) { %>
+                    <div class="lore-tagline" style="background: rgba(255,215,0,0.2); padding: 15px 25px; border-radius: 15px; margin: 20px auto; max-width: 600px; border: 2px solid rgba(255,215,0,0.3);">
+                        <p style="margin: 0; font-size: 1.2rem; color: #ffd700; font-style: italic; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+                            "<%= tagline %>"
+                        </p>
+                    </div>
+                <% } %>
+            <% } %>
+            
+            <% if (lore.enhanced_description || (lore.enhanced_title && lore.enhanced_title.includes('DESCRIPTION:'))) { %>
+                <% const enhancedDesc = lore.enhanced_description || (lore.enhanced_title && lore.enhanced_title.includes('DESCRIPTION:') ? lore.enhanced_title.split('DESCRIPTION:')[1].split('CTA_HOOK:')[0].trim() : '') %>
+                <% if (enhancedDesc) { %>
+                    <div class="enhanced-description" style="margin: 25px 0; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 12px; backdrop-filter: blur(5px);">
+                        <div class="content-with-links">
+                            <p style="font-size: 1.1rem; line-height: 1.6; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); margin: 0;">
+                                <%- simpleSmartLinking(enhancedDesc) %>
+                            </p>
+                        </div>
+                    </div>
+                <% } %>
+            <% } %>
+            
+            <% if (lore.cta_hook || (lore.enhanced_title && lore.enhanced_title.includes('CTA_HOOK:'))) { %>
+                <% const ctaHook = lore.cta_hook || (lore.enhanced_title && lore.enhanced_title.includes('CTA_HOOK:') ? lore.enhanced_title.split('CTA_HOOK:')[1].split('POWER_STATEMENT:')[0].trim() : '') %>
+                <% if (ctaHook) { %>
+                    <div class="cta-hook" style="margin: 30px 0; padding: 20px; background: linear-gradient(45deg, #8b0000 0%, #cd5c5c 100%); border-radius: 15px; border: 2px solid #ffd700;">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">🔥</div>
+                        <p style="font-size: 1.3rem; font-weight: bold; color: #ffd700; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
+                            <%= ctaHook %>
+                        </p>
+                    </div>
+                <% } %>
+            <% } %>
+            
+            <% if (lore.power_statement || (lore.enhanced_title && lore.enhanced_title.includes('POWER_STATEMENT:'))) { %>
+                <% const powerStatement = lore.power_statement || (lore.enhanced_title && lore.enhanced_title.includes('POWER_STATEMENT:') ? lore.enhanced_title.split('POWER_STATEMENT:')[1].replace(/['"]$/, '').trim() : '') %>
+                <% if (powerStatement) { %>
+                    <div class="power-statement" style="margin: 25px 0; padding: 18px; background: linear-gradient(135deg, #4b0082 0%, #8a2be2 100%); border-radius: 12px; border: 2px solid #ffd700;">
+                        <div style="font-size: 1.8rem; margin-bottom: 8px;">⚡</div>
+                        <h4 style="color: #ffd700; margin-bottom: 10px; font-size: 1.1rem;">POWER UNLEASHED:</h4>
+                        <p style="font-size: 1rem; color: #fff; margin: 0; line-height: 1.5; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+                            <%= powerStatement %>
+                        </p>
+                    </div>
+                <% } %>
+            <% } %>
+        </section>
+        <% } %>
+
         <!-- Enhanced Lore Investigation CTA Section -->
         <% if (lore.investigation_cta) { %>
         <section class="lore-cta-section" style="margin: 40px 0; padding: 25px; background: linear-gradient(135deg, #8b4513 0%, #d2691e 100%); border-radius: 15px; color: white; text-align: center; border: 3px solid #ffd700;">

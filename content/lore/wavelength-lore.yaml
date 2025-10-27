@@ -25,6 +25,7 @@ nature:
       - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760989393441-07b0d406748b6074.png
       - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760989393442-5fba7a9094a34495.png
       - https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760988441604-8c397d464dd02a6d.png
+    enhanced_title: '"Daphne: The Enchantress of Fragrance" TAGLINE: "Beware the allure of the Daphne flower; its scent is a seductive veil hiding a perilous truth." DESCRIPTION: The Daphne flower, with its intoxicating aroma that dances between sweetness and spice, is not merely a botanical marvel—it is a potent instrument of enchantment. Legends whisper of its ability to ensnare the hearts and minds of those who inhale its fragrance, drawing them into a web of obsession. However, this captivating beauty masks a dark corruption that can twist the will of even the purest souls, leading them down a path of despair and chaos. CTA_HOOK: Are you ready to uncover the secrets of the Daphne flower and its role in the battle against darkness? POWER_STATEMENT: Those who harness the essence of Daphne can wield its enchanting power to manipulate emotions, but at a grave cost—each use drains their own spirit, binding them closer to the flower''s sinister will.'
 villain:
   - id: goblin
     title: Goblins
@@ -47,6 +48,7 @@ villain:
       - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.webp
       - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-064.webp
     hidden: false
+    enhanced_title: '"Goblins: Agents of Chaos and Misery" TAGLINE: "Born from darkness, these creatures thrive on fear, spreading chaos wherever they roam." DESCRIPTION: Goblins are not merely creatures; they are the embodiment of malevolence, capable of donning any disguise to infiltrate the hearts of the unsuspecting. Fueled by an insatiable lust for power, they revel in sowing discord and despair. Each goblin is a puppet of the insidious Virus of Hatred, Fear, and Greed, transforming them into harbingers of ruin. As they swarm together in their dreaded Misery of Goblins, they seek to unleash a wave of corruption that threatens to engulf all that is good in the Shire. CTA_HOOK: How will the Shire Folk and Wavelength confront this relentless tide of darkness? Discover the epic struggles that unfold as they battle against the very essence of despair! POWER_STATEMENT: When united, Goblins wield a destructive force that can bend reality itself, infecting the very fabric of hope with their relentless greed and hatred.'
   - id: goblin-king
     title: Goblin King
     type: villain
@@ -73,6 +75,7 @@ villain:
       - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-039.webp
       - /images/seasons/season2/episodes/episode2/images/Psychopath-13.webp
     hidden: false
+    enhanced_title: '"The Goblin King: Harbinger of Desolation" TAGLINE: "A tyrant whose insatiable greed threatens to plunge the Shire into eternal darkness." DESCRIPTION: The Goblin King reigns supreme over his Misery of Goblins, a twisted horde that thrives on chaos and destruction. Guided by the ruthless decree of "Goblin''s Rule," he believes that dominance is the only law that matters. His relentless pursuit of power drives him to invade the Shire, igniting the fierce Battle of the Shire. As the stakes rise, the Goblin King''s malevolence corrupts all he touches, leaving a trail of despair and ruin in his wake. His greed blinds him to the clever traps set by Lucky, leading to a deadly confrontation that claims the life of the valiant Maurice, forever altering the fate of the Shire. CTA_HOOK: Will the Shire folk rise against this embodiment of evil, or will they fall victim to his dark ambition? POWER_STATEMENT: The Goblin King wields the destructive force of fear and manipulation, turning allies into enemies and igniting chaos wherever he treads.'
   - id: misery
     title: Misery of Goblins
     type: villain
@@ -95,6 +98,7 @@ villain:
       - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.webp
       - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-064.webp
     hidden: false
+    enhanced_title: '"The Misery of Goblins: The Corrupted Horde of Greed" TAGLINE: "A relentless swarm, fueled by insatiable greed, bent on spreading darkness and despair across the Shire." DESCRIPTION: "The Misery of Goblins is no ordinary horde; it is a nightmarish legion enthralled by the Goblin King’s sinister will. These creatures, corrupted by an unquenchable thirst for treasure, are driven to wreak havoc and chaos wherever they tread. Their greed transforms them into mindless instruments of destruction, making them the perfect pawns in the Goblin King''s grand schemes. With every shiny trinket they seize, they plunge deeper into the abyss of avarice, leaving ruin in their wake." CTA_HOOK: "What fate awaits the Shire if this malevolent force is unleashed? Discover how the Shire Folk and Wavelength must confront this darkness!" POWER_STATEMENT: "The Misery of Goblins grants the Goblin King unparalleled control over the weak-willed, allowing him to unleash chaos and despair with a mere whisper, turning allies into enemies and hope into fear."'
 thing:
   - id: ice-blue-diamond
     title: Ice Blue Diamond
@@ -115,6 +119,7 @@ thing:
       - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-28.webp
       - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.webp
     hidden: false
+    enhanced_title: 'The Relic of Infinite Greed TAGLINE: The jewel that awakens the darkest desires of the heart. DESCRIPTION: The Ice Blue Diamond, known as the Relic of Infinite Greed, is not merely a stunning gemstone; it is a beacon of corruption that calls to the greedy and power-hungry. Found only in the perilous lairs of Ice Dragons, its mesmerizing blue hue hides a sinister allure, capable of ensnaring even the noblest souls. As adventurers brave treacherous ice caves to claim this coveted treasure, they risk awakening its malevolent spirit. In the hands of the Goblin King, this diamond became a weapon of unimaginable power, fueling his insatiable lust for domination and chaos during the Battle for the Shire. CTA_HOOK: Will you resist the seductive call of the Ice Blue Diamond, or will you succumb to its corrupting influence? POWER_STATEMENT: Wielding this relic grants the bearer an insatiable hunger for power, twisting their very essence into a relentless force of greed and destruction.'
   - id: ice-dragons
     title: Ice Dragons
     type: thing
@@ -136,6 +141,7 @@ thing:
       - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-15.webp
       - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-14.webp
     hidden: false
+    enhanced_title: '"Ice Dragons: Guardians of Frozen Fury" TAGLINE: "These titanic beasts wield the fury of winter, their icy breath a harbinger of doom for those who dare intrude." DESCRIPTION: "In the desolate expanse of the far North, Ice Dragons reign supreme, their majestic forms cloaked in shimmering scales of frost. Feared and revered by all, these formidable guardians protect their sacred lair—the only source of the coveted Ice Blue Diamonds. The stakes are high; to trespass upon their territory is to invite a wrath as chilling as the blizzards they command. Those who seek these precious gems must reckon with the terrifying consequence of awakening their icy fury." CTA_HOOK: "Dare you venture into the realm of the Ice Dragons? Discover how their power intertwines with the fate of the Shire and the battle against the Goblin King!" POWER_STATEMENT: "The Ice Dragons possess the ability to unleash devastating winter storms, freezing foes in their tracks and summoning blizzards that can obliterate entire armies."'
   - id: ice-whales
     title: Ice Whales
     type: thing
@@ -153,6 +159,7 @@ thing:
       - /images/seasons/season3/episodes/episode2/images/Ice_Whale-18.webp
       - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-01.webp
     hidden: false
+    enhanced_title: '"The Ice Whales: Harbingers of Frozen Terror" TAGLINE: "These malevolent leviathans unleash chaos upon the seas, feeding on despair and destruction." DESCRIPTION: "In the treacherous depths of the far, frozen North, Ice Whales reign as the most feared creatures of the ocean. Unlike any ordinary whale, their ferocity knows no bounds; they thrive on chaos and will tear apart anything that crosses their path. With every hunt, the Shire Folk confront not just these monstrous beasts but also the darkness that threatens to consume their very souls. The stakes are high, for failing to conquer the Ice Whales could spell doom for their fragile community at the Ice Fortress." CTA_HOOK: "Will the Shire Folk rise to the challenge and harness the power of unity against these vile creatures, or will they succumb to the icy grip of despair?" POWER_STATEMENT: "By defeating an Ice Whale, one can gain the strength of the ocean''s fury, unlocking powers that can turn the tide in the battle against the Goblin King and his minions."'
 place:
   - id: ice-fortress
     title: Ice Fortress
@@ -174,6 +181,7 @@ place:
       - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-19.webp
       - /images/seasons/season3/episodes/episode7/images/PrepareForBattle-15.webp
     hidden: false
+    enhanced_title: '"The Ice Fortress: Bastion of Frozen Resolve" TAGLINE: "Within these glacial walls lies the power to either shield the innocent or unleash unspeakable terror." DESCRIPTION: The Ice Fortress stands as a towering sentinel of ice, a majestic yet haunting stronghold within the desolate frozen landscape. Home to the Frostborne, its denizens embody both warmth and welcome, offering sanctuary to all who seek refuge. Yet, this beauty masks a chilling truth—should the fortress fall into the wrong hands, its ice magic could become a weapon of unimaginable destruction, corrupting all it touches and plunging the realm into eternal winter. CTA_HOOK: Will the Ice Fortress become a sanctuary for healing, or will it succumb to darkness and chaos? Discover how its fate intertwines with the struggle against the Goblin King''s wicked ambitions! POWER_STATEMENT: The fortress grants control over the elemental forces of ice, capable of freezing entire armies in their tracks or unleashing blizzards that can obliterate landscapes, making it a powerful asset in the battle for the Shire.'
   - id: shire-sanctuary
     title: Shire Sanctuary
     type: place
@@ -191,6 +199,7 @@ place:
       - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.webp
       - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-08.webp
     hidden: false
+    enhanced_title: '"The Shire Sanctuary: Bastion of Hope Amidst Shadows" TAGLINE: "A sacred refuge, yet a target for darkness, where the line between healing and despair blurs." DESCRIPTION: Nestled in the heart of the Shire, the Shire Sanctuary stands as a beacon of tranquility, but its peace is threatened by the sinister forces lurking beyond its borders. Once a place where weary souls find solace, it now faces the specter of corruption, as the remnants of the Goblin King''s tyranny linger like shadows. The kind-hearted Shire Folk, guardians of this sanctuary, tirelessly tend to its vibrant flowers, but whispers of fear taint their songs. In the aftermath of the Battle for the Shire, Wavelength’s impromptu concerts strive to rekindle hope, yet every note played reverberates with the stakes of a world on the brink of chaos. CTA_HOOK: Will the Shire Sanctuary endure as a refuge against encroaching darkness, or will it fall victim to the lingering despair? Discover how this sanctuary''s fate intertwines with the Shire''s struggle for freedom! POWER_STATEMENT: The Shire Sanctuary possesses the power to heal both body and spirit, yet its vulnerability can unleash despair if overrun, turning hope into a weapon wielded by evil.'
   - id: the-shire
     title: The Shire
     type: place
@@ -207,6 +216,7 @@ place:
       - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-18.webp
       - /images/seasons/season4/episodes/episode5/images/TheShireFortress-19.webp
     hidden: false
+    enhanced_title: '"The Shire: Heart of Tranquility, Battleground of Shadows" TAGLINE: "A peaceful realm now teetering on the brink of darkness, threatened by the sinister forces of greed and despair." DESCRIPTION: The Shire, once a tranquil haven where nature flourished and harmony reigned among the Shire Folk, now stands as a battleground for survival. Its rolling green hills and crystal-clear streams are marred by the scars of corruption left by the Goblin King’s sinister influence. As the Goblins'' greed festers, the very essence of this idyllic land is at stake, and the Shire Folk must rally to reclaim their home from the clutches of tyranny. Here, amidst the whispers of nature, lies a sanctuary—once a stage for Wavelength''s legendary concerts—now a symbol of hope and resistance against encroaching darkness. Will they rise to defend their cherished homeland? CTA_HOOK: Are you ready to uncover the secrets that could save the Shire from its impending doom? POWER_STATEMENT: The Shire''s heart, when corrupted, can unleash a wave of despair that empowers the Goblin King, turning the land''s beauty into a weapon against its own people.'
 band:
   - id: wavelength
     title: Wavelength
@@ -227,3 +237,4 @@ band:
       - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-1.webp
       - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-7.webp
     hidden: false
+    enhanced_title: '"Wavelength: The Harmonious Guardians of the Shire" TAGLINE: "In a world torn asunder by the Goblin King, their music is the last beacon of hope against darkness." DESCRIPTION: Wavelength is not just a band; they are a family united by a mission to reclaim their home from the clutches of despair. Born from the ashes of the Battle of the Shire, their music weaves tales of bravery and loss, echoing the stakes of a land ravaged by greed and malevolence. Each note they play is a rallying cry against the corruption that threatens to consume their beloved Shire, as they strive to transform their grief into a powerful force for good. CTA_HOOK: Will their melodies be enough to awaken the spirit of the Shire and rally its folk against the looming shadow? Discover how Wavelength''s journey intertwines with the fate of their homeland! POWER_STATEMENT: Through their enchanting harmonies, Wavelength possesses the power to inspire unity and resilience, igniting the hearts of the Shire Folk to rise and reclaim their lives from tyranny.'
