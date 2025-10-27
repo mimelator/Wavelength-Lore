@@ -2055,8 +2055,10 @@ router.post('/optimize-for-product', ensureAuthenticated, async (req, res) => {
       console.log(`✨ CACHE HIT - Returning cached optimization`);
 
       // Record cache reuse for analytics
-      cacheAnalytics.recordCacheReuse(productKey).catch(err =>
-        console.warn('Failed to record cache reuse:', err.message)
+      cacheAnalytics.recordCacheReuse(productKey).then(result => {
+        console.log(`📊 Cache reuse recorded for ${productKey}:`, result);
+      }).catch(err =>
+        console.warn('❌ Failed to record cache reuse:', err.message)
       );
 
       return res.json({
@@ -2190,8 +2192,10 @@ router.post('/optimize-for-product-confirm', ensureAuthenticated, async (req, re
       processingTime: result.processingTime,
       scaleFactor: result.analysis.scaleFactor,
       costEstimate: result.analysis.strategy === 'UPSCALE' ? 0.08 : 0
+    }).then(recordResult => {
+      console.log(`📊 Optimization recorded for ${productKey}:`, recordResult);
     }).catch(err =>
-      console.warn('Failed to record optimization:', err.message)
+      console.warn('❌ Failed to record optimization:', err.message)
     );
 
     // STORE IN CACHE for future users
