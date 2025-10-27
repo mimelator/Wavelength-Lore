@@ -109,6 +109,75 @@
         </section>
 
 
+        <!-- Enhanced Character CTA Section -->
+        <section class="character-cta-section" style="margin: 40px 0; padding: 30px; background: linear-gradient(135deg, #8360c3 0%, #2ebf91 100%); border-radius: 15px; color: white; text-align: center;">
+            <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Dive Deeper into <%= character.title %>'s World</h3>
+            
+            <div class="character-cta-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 25px 0;">
+                
+                <!-- Explore Episodes CTA -->
+                <div class="cta-card" style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🎬</div>
+                    <h4 style="margin-bottom: 10px;">Watch Their Episodes</h4>
+                    <p style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 15px;">See <%= character.title %> in action across the Wavelength universe</p>
+                    <a href="/" class="cta-btn"
+                       style="background: #ff6b6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 20px; font-weight: bold; transition: all 0.3s ease; display: inline-block;"
+                       onmouseover="this.style.background='#ff5252'; this.style.transform='translateY(-2px)'"
+                       onmouseout="this.style.background='#ff6b6b'; this.style.transform='translateY(0)'">
+                        Find Episodes
+                    </a>
+                </div>
+                
+                <!-- Explore Connections CTA -->
+                <div class="cta-card" style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🔗</div>
+                    <h4 style="margin-bottom: 10px;">Character Network</h4>
+                    <p style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 15px;">Discover how <%= character.title %> connects to other heroes</p>
+                    <a href="/characters" class="cta-btn"
+                       style="background: #74b9ff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 20px; font-weight: bold; transition: all 0.3s ease; display: inline-block;"
+                       onmouseover="this.style.background='#0984e3'; this.style.transform='translateY(-2px)'"
+                       onmouseout="this.style.background='#74b9ff'; this.style.transform='translateY(0)'">
+                        Explore Network
+                    </a>
+                </div>
+                
+                <!-- Lore Deep Dive CTA -->
+                <div class="cta-card" style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">📚</div>
+                    <h4 style="margin-bottom: 10px;">Uncover Lore</h4>
+                    <p style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 15px;">Dive into the deeper mysteries surrounding <%= character.title %></p>
+                    <a href="/lore" class="cta-btn"
+                       style="background: #a29bfe; color: white; padding: 10px 20px; text-decoration: none; border-radius: 20px; font-weight: bold; transition: all 0.3s ease; display: inline-block;"
+                       onmouseover="this.style.background='#6c5ce7'; this.style.transform='translateY(-2px)'"
+                       onmouseout="this.style.background='#a29bfe'; this.style.transform='translateY(0)'">
+                        Explore Lore
+                    </a>
+                </div>
+                
+            </div>
+            
+            <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
+                <p style="opacity: 0.9; font-size: 0.95rem; margin-bottom: 15px;">
+                    Every character holds secrets that span across episodes and lore
+                </p>
+                <a href="/forum/create?category=general&characterName=<%= encodeURIComponent(character.title) %>&characterId=<%= character.id %>" 
+                   class="community-cta"
+                   style="background: rgba(255,255,255,0.2); color: white; padding: 12px 25px; text-decoration: none; border-radius: 25px; border: 2px solid rgba(255,255,255,0.3); transition: all 0.3s ease; display: inline-block; font-weight: bold;"
+                   onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.style.transform='translateY(-2px)'"
+                   onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='translateY(0)'">
+                    💭 Share Your Theories About <%= character.title %>
+                </a>
+            </div>
+        </section>
+
+        <style>
+        @media (max-width: 768px) {
+            .character-cta-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+        </style>
+
         <div id="imageModal" class="modal">
             <span class="modal-close">&times;</span>
             <img class="modal-content" id="fullSizeImage">
