@@ -43,12 +43,53 @@ router.get('/wavelength-gems', groupAuth.requireAction('game_access'), (req, res
 });
 
 /**
- * Individual game page (generic template for future games)
- * Template for launching hosted games
+ * 🧩 NEW: Wavelength Lore Jigsaw Puzzle Game
+ * Strategic puzzle reconstruction with lore-based imagery
+ */
+router.get('/wavelength-lore-jigsaw', groupAuth.requireAction('game_access'), (req, res) => {
+    const { getActiveTheme } = require('../config/game-themes');
+    const theme = getActiveTheme();
+    
+    res.render('games/wavelength-lore-jigsaw', {
+        title: `${theme.prefix}: Lore Tapestry`,
+        currentPage: 'wavelength-lore-jigsaw',
+        breadcrumbs: [
+            { name: 'Games', url: '/games' },
+            { name: 'Lore Tapestry', url: null }
+        ],
+        cdnUrl: process.env.CDN_URL,
+        version: `v${Date.now()}`,
+        userGroups: req.userGroups || [],
+        theme: theme
+    });
+});
+
+/**
+ * Support themed game routes (e.g., /games/shire-lore-tapestry)
  */
 router.get('/:gameId', groupAuth.requireAction('game_access'), (req, res) => {
     const gameId = req.params.gameId;
+    
+    // Check if it's a jigsaw puzzle game with any theme
+    if (gameId.includes('lore-tapestry') || gameId.includes('jigsaw')) {
+        const { getActiveTheme } = require('../config/game-themes');
+        const theme = getActiveTheme();
+        
+        return res.render('games/wavelength-lore-jigsaw', {
+            title: `${theme.prefix}: Lore Tapestry`,
+            currentPage: gameId,
+            breadcrumbs: [
+                { name: 'Games', url: '/games' },
+                { name: 'Lore Tapestry', url: null }
+            ],
+            cdnUrl: process.env.CDN_URL,
+            version: `v${Date.now()}`,
+            userGroups: req.userGroups || [],
+            theme: theme
+        });
+    }
 
+    // Generic game page for other games
     res.render('games/game-page', {
         title: 'Game',
         currentPage: 'game',
@@ -62,6 +103,8 @@ router.get('/:gameId', groupAuth.requireAction('game_access'), (req, res) => {
         version: `v${Date.now()}`
     });
 });
+
+
 
 /**
  * API endpoint to fetch available games

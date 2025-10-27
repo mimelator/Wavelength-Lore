@@ -1640,6 +1640,10 @@ class MerchandiseModalRenderer {
       // Update preview button
       if (e.target.classList.contains('update-preview-btn')) {
         const productId = e.target.dataset.productId;
+        console.log('🔄 Update Preview button clicked:', productId);
+        if (this.debugMode) {
+          this.debugLog(`Update preview clicked for product: ${productId}`, 'info');
+        }
         this.handleUpdatePreview(productId, modal);
       }
 
@@ -2009,13 +2013,17 @@ class MerchandiseModalRenderer {
    * @param {HTMLElement} modal - Modal element
    */
   async handleUpdatePreview(productId, modal) {
+    console.log('📝 handleUpdatePreview called with productId:', productId);
     if (this.debugMode) {
       this.debugLog(`Update preview for product: ${productId}`, 'info');
     }
 
     // Gather all selected effects from modal state
     const selectedEffects = JSON.parse(modal.dataset.selectedEffects || '{}');
+    console.log('📋 Selected effects from modal:', selectedEffects);
+
     const borderCustomization = this.gatherBorderCustomization(modal);
+    console.log('🎨 Border customization:', borderCustomization);
 
     const effectParams = {
       ...selectedEffects,
@@ -2027,8 +2035,10 @@ class MerchandiseModalRenderer {
 
     // Check if any effects are actually selected
     const hasAnyEffect = Object.values(selectedEffects).some(v => v === true) || borderCustomization.borderEnabled;
+    console.log('✅ Has any effect selected?', hasAnyEffect, 'Selected effects:', Object.values(selectedEffects), 'Border enabled:', borderCustomization.borderEnabled);
 
     if (!hasAnyEffect) {
+      console.warn('⚠️ No effects selected - showing alert');
       alert('Please select at least one effect to apply.');
       return;
     }
@@ -2041,6 +2051,9 @@ class MerchandiseModalRenderer {
     const previewImage = modal.querySelector(`#customization-preview-image-${productId}`);
     const statusText = modal.querySelector(`#preview-status-text-${productId}`);
 
+    console.log('🖼️ Preview image element found:', !!previewImage);
+    console.log('📝 Status text element found:', !!statusText);
+
     if (previewImage && statusText) {
       previewImage.style.opacity = '0.5';
       statusText.textContent = 'Applying effects...';
@@ -2048,6 +2061,9 @@ class MerchandiseModalRenderer {
 
     try {
       // Call effects API
+      console.log('🌐 Making API call to /api/merchandise/openai-upscaler/apply-effects');
+      console.log('📦 Request payload:', { productId, effectParams });
+
       const response = await fetch('/api/merchandise/openai-upscaler/apply-effects', {
         method: 'POST',
         headers: {
@@ -2059,11 +2075,14 @@ class MerchandiseModalRenderer {
         })
       });
 
+      console.log('✅ API response received:', response.status, response.statusText);
+
       if (!response.ok) {
         throw new Error(`API error: ${response.statusText}`);
       }
 
       const result = await response.json();
+      console.log('✨ API result:', result);
 
       if (this.debugMode) {
         this.debugLog(`Preview effects applied successfully`, 'success', result);
