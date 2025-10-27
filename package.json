@@ -32,6 +32,7 @@
     "test:cli": "node wavelength-cli-test-harness.js",  
     "test:cli-features": "node wavelength-cli-test-harness.js",
     "demo:cli": "node wavelength-cli-showcase.js",
+    "demo:create": "node wavelength-content-creation-demo.js",
     "showcase:cli": "node wavelength-cli-showcase.js"
   },
   "dependencies": {

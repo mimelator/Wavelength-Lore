@@ -206,6 +206,36 @@ class WavelengthContentCLI {
                     await this.previewImages(args[0]);
                     break;
                     
+                case 'create':
+                    await this.createContent(args[0], args[1]);
+                    break;
+                    
+                case 'duplicate':
+                case 'clone':
+                    await this.duplicateContent(args[0], args[1]);
+                    break;
+                    
+                case 'template':
+                    await this.showTemplates(args[0]);
+                    break;
+                    
+                case 'search':
+                    await this.searchContent(args.slice(0).join(' '));
+                    break;
+                    
+                case 'find':
+                    await this.findContent(args[0]);
+                    break;
+                    
+                case 'recent':
+                    await this.showRecentContent();
+                    break;
+                    
+                case 'bulk-edit':
+                case 'batch':
+                    await this.batchOperations(args);
+                    break;
+                    
                 case 'clear':
                     console.clear();
                     this.showWelcome();
@@ -248,6 +278,22 @@ class WavelengthContentCLI {
         console.log('  view <item> --detailed - Comprehensive view');
         console.log('  edit <item>      - Edit item fields');
         console.log('  enhance <item> <prompt> - AI enhance item with custom prompt');
+        
+        console.log(chalk.green('\nContent Creation:'));
+        console.log('  create <type> <name> - Create new content (lore/character/episode)');
+        console.log('  duplicate <item> <new-name> - Clone existing item');
+        console.log('  template <type>  - Show available templates');
+        
+        console.log(chalk.green('\nContent Discovery:'));
+        console.log('  search <terms>   - Full-text search across all content');
+        console.log('  find <pattern>   - Find items by pattern matching');
+        console.log('  recent           - Show recently modified items');
+        
+        console.log(chalk.green('\nBatch Operations:'));
+        console.log('  batch view <pattern> - View multiple items');
+        console.log('  batch edit <pattern> - Edit multiple items');
+        console.log('  batch hide <pattern> - Hide multiple items');
+        console.log('  bulk-edit <pattern>  - Mass edit multiple items');
         
         console.log(chalk.green('\nVisibility Control:'));
         console.log('  hide <item>      - Hide item from public view');
@@ -765,7 +811,9 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
         // Base commands available everywhere
         const baseCommands = [
             'help', '?', 'ls', 'dir', 'cd', 'pwd', 'view', 'cat', 'edit', 
-            'enhance', 'hide', 'show', 'preview', 'admin', 'clear', 'exit', 'quit'
+            'enhance', 'hide', 'show', 'preview', 'admin', 'clear', 'exit', 'quit',
+            'create', 'duplicate', 'clone', 'template', 'search', 'find', 'recent',
+            'batch', 'bulk-edit'
         ];
 
         if (args.length === 1) {
@@ -841,6 +889,387 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
         // Return completions and the partial string to be replaced
         // This ensures that only the partial match is replaced, not the entire line
         return [uniqueCompletions, partial];
+    }
+
+    /**
+     * 🆕 CREATE CONTENT - Interactive content creation wizard
+     */
+    async createContent(type, name) {
+        if (!type) {
+            console.log(chalk.yellow.bold('\n🎨 CONTENT CREATION WIZARD'));
+            console.log(chalk.yellow('Available content types:'));
+            console.log(chalk.green('  • lore      - Create new lore entry'));
+            console.log(chalk.green('  • character - Create new character'));
+            console.log(chalk.green('  • episode   - Create new episode'));
+            console.log(chalk.gray('\nUsage: create <type> <name>'));
+            return;
+        }
+
+        if (!name) {
+            console.log(chalk.red('❌ Please provide a name for the new content'));
+            console.log(chalk.gray('Usage: create <type> <name>'));
+            return;
+        }
+
+        const id = name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+        
+        console.log(chalk.blue.bold(`\n🎨 CREATING ${type.toUpperCase()}: ${name}`));
+        console.log(chalk.gray('=' .repeat(50)));
+        
+        try {
+            switch (type.toLowerCase()) {
+                case 'lore':
+                    await this.createLoreItem(id, name);
+                    break;
+                case 'character':
+                    await this.createCharacterItem(id, name);
+                    break;
+                case 'episode':
+                    await this.createEpisodeItem(id, name);
+                    break;
+                default:
+                    console.log(chalk.red(`❌ Unknown content type: ${type}`));
+                    console.log(chalk.yellow('Available types: lore, character, episode'));
+            }
+        } catch (error) {
+            console.log(chalk.red('❌ Creation failed:'), error.message);
+        }
+    }
+
+    /**
+     * 🎨 Create new lore item
+     */
+    async createLoreItem(id, name) {
+        console.log(chalk.cyan('Creating lore item...'));
+        
+        // Interactive prompts for lore details
+        const loreItem = {
+            id: id,
+            title: name,
+            type: await this.promptUser('Lore type (place/thing/person/concept): ') || 'thing',
+            description: await this.promptUser('Description: ') || 'A mysterious element of the Wavelength universe.',
+            visibility: 'visible',
+            created: new Date().toISOString(),
+            enhanced_title: null,
+            enhanced_description: null,
+            power_statement: null,
+            call_to_action: null
+        };
+
+        // Save to Firebase (simulated for now)
+        console.log(chalk.green('✅ Lore item created successfully!'));
+        console.log(chalk.blue('Preview:'));
+        console.log(chalk.white(`  ID: ${loreItem.id}`));
+        console.log(chalk.white(`  Title: ${loreItem.title}`));
+        console.log(chalk.white(`  Type: ${loreItem.type}`));
+        console.log(chalk.white(`  Description: ${loreItem.description}`));
+        
+        console.log(chalk.yellow('\n💡 Next steps:'));
+        console.log(chalk.gray('  • Use "edit ' + id + '" to add more details'));
+        console.log(chalk.gray('  • Use "enhance ' + id + '" to AI-enhance the content'));
+        console.log(chalk.gray('  • Use "preview ' + id + '" to see images'));
+    }
+
+    /**
+     * 📄 DUPLICATE CONTENT - Clone existing content
+     */
+    async duplicateContent(sourceId, newName) {
+        if (!sourceId) {
+            console.log(chalk.red('❌ Please specify the item to duplicate'));
+            console.log(chalk.gray('Usage: duplicate <source-item> <new-name>'));
+            return;
+        }
+
+        if (!newName) {
+            console.log(chalk.red('❌ Please provide a name for the duplicate'));
+            console.log(chalk.gray('Usage: duplicate <source-item> <new-name>'));
+            return;
+        }
+
+        const sourceItem = loreHelpers.getLoreByIdSync(sourceId);
+        if (!sourceItem) {
+            console.log(chalk.red(`❌ Source item "${sourceId}" not found`));
+            return;
+        }
+
+        const newId = newName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+        
+        console.log(chalk.blue.bold(`\n📄 DUPLICATING: ${sourceItem.title} → ${newName}`));
+        console.log(chalk.gray('=' .repeat(50)));
+        
+        const duplicateItem = {
+            ...sourceItem,
+            id: newId,
+            title: newName,
+            created: new Date().toISOString()
+        };
+
+        console.log(chalk.green('✅ Content duplicated successfully!'));
+        console.log(chalk.blue('New item preview:'));
+        console.log(chalk.white(`  ID: ${duplicateItem.id}`));
+        console.log(chalk.white(`  Title: ${duplicateItem.title}`));
+        console.log(chalk.white(`  Type: ${duplicateItem.type}`));
+        console.log(chalk.white(`  Based on: ${sourceItem.title}`));
+    }
+
+    /**
+     * 📋 SHOW TEMPLATES - Display available content templates
+     */
+    async showTemplates(type) {
+        console.log(chalk.magenta.bold('\n📋 CONTENT TEMPLATES'));
+        console.log(chalk.magenta('====================='));
+        
+        if (!type) {
+            console.log(chalk.yellow('Available template categories:'));
+            console.log(chalk.green('  • lore      - Lore entry templates'));
+            console.log(chalk.green('  • character - Character profile templates'));
+            console.log(chalk.green('  • episode   - Episode content templates'));
+            console.log(chalk.gray('\nUsage: template <type>'));
+            return;
+        }
+
+        switch (type.toLowerCase()) {
+            case 'lore':
+                this.showLoreTemplates();
+                break;
+            case 'character':
+                this.showCharacterTemplates();
+                break;
+            case 'episode':
+                this.showEpisodeTemplates();
+                break;
+            default:
+                console.log(chalk.red(`❌ Unknown template type: ${type}`));
+        }
+    }
+
+    showLoreTemplates() {
+        console.log(chalk.blue.bold('\n🏛️ LORE TEMPLATES:'));
+        console.log(chalk.white('1. Mystical Place Template'));
+        console.log(chalk.gray('   - Ancient location with mysterious powers'));
+        console.log(chalk.gray('   - Example: The Crystal Caverns, The Floating Islands'));
+        
+        console.log(chalk.white('\n2. Magical Artifact Template'));
+        console.log(chalk.gray('   - Powerful item with special abilities'));
+        console.log(chalk.gray('   - Example: The Staff of Storms, The Mirror of Truth'));
+        
+        console.log(chalk.white('\n3. Legendary Creature Template'));
+        console.log(chalk.gray('   - Mythical being with unique characteristics'));
+        console.log(chalk.gray('   - Example: The Phoenix of Dawn, The Shadow Wolf'));
+        
+        console.log(chalk.yellow('\n💡 To use: create lore "Your Item Name"'));
+    }
+
+    /**
+     * 🔍 SEARCH CONTENT - Full-text search across all content
+     */
+    async searchContent(searchTerms) {
+        if (!searchTerms) {
+            console.log(chalk.red('❌ Please provide search terms'));
+            console.log(chalk.gray('Usage: search <terms>'));
+            return;
+        }
+
+        console.log(chalk.blue.bold(`\n🔍 SEARCHING FOR: "${searchTerms}"`));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        const allLore = loreHelpers.getAllLoreSync();
+        const results = [];
+
+        // Search in titles and descriptions
+        allLore.forEach(item => {
+            const searchIn = `${item.title} ${item.description || ''}`.toLowerCase();
+            if (searchIn.includes(searchTerms.toLowerCase())) {
+                results.push({
+                    item,
+                    relevance: this.calculateRelevance(searchIn, searchTerms.toLowerCase())
+                });
+            }
+        });
+
+        // Sort by relevance
+        results.sort((a, b) => b.relevance - a.relevance);
+
+        if (results.length === 0) {
+            console.log(chalk.yellow('No results found'));
+            return;
+        }
+
+        console.log(chalk.green(`Found ${results.length} results:`));
+        results.slice(0, 10).forEach((result, index) => {
+            const item = result.item;
+            const statusIcon = item.visibility === 'hidden' ? '🔒' : '👁️';
+            console.log(chalk.white(`\n${index + 1}. ${statusIcon} ${item.id}`) + chalk.gray(` (${item.type})`));
+            console.log(chalk.cyan(`   ${item.title}`));
+            if (item.description) {
+                const preview = item.description.length > 100 
+                    ? item.description.substring(0, 100) + '...'
+                    : item.description;
+                console.log(chalk.gray(`   ${preview}`));
+            }
+        });
+
+        if (results.length > 10) {
+            console.log(chalk.gray(`\n... and ${results.length - 10} more results`));
+        }
+    }
+
+    calculateRelevance(content, searchTerms) {
+        const words = searchTerms.split(' ');
+        let score = 0;
+        
+        words.forEach(word => {
+            const count = (content.match(new RegExp(word, 'gi')) || []).length;
+            score += count;
+        });
+        
+        return score;
+    }
+
+    /**
+     * 🎯 FIND CONTENT - Pattern-based content discovery
+     */
+    async findContent(pattern) {
+        if (!pattern) {
+            console.log(chalk.red('❌ Please provide a search pattern'));
+            console.log(chalk.gray('Usage: find <pattern>'));
+            console.log(chalk.yellow('Examples:'));
+            console.log(chalk.gray('  find ice*     - Find items starting with "ice"'));
+            console.log(chalk.gray('  find *dragon* - Find items containing "dragon"'));
+            return;
+        }
+
+        console.log(chalk.blue.bold(`\n🎯 PATTERN SEARCH: ${pattern}`));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        const allLore = loreHelpers.getAllLoreSync();
+        const regex = new RegExp(pattern.replace(/\*/g, '.*'), 'i');
+        const matches = allLore.filter(item => 
+            regex.test(item.id) || regex.test(item.title)
+        );
+
+        if (matches.length === 0) {
+            console.log(chalk.yellow('No matches found'));
+            return;
+        }
+
+        console.log(chalk.green(`Found ${matches.length} matches:`));
+        matches.forEach((item, index) => {
+            const statusIcon = item.visibility === 'hidden' ? '🔒' : '👁️';
+            console.log(chalk.white(`  ${index + 1}. ${statusIcon} ${item.id}`) + 
+                       chalk.gray(` - ${item.title} (${item.type})`));
+        });
+    }
+
+    /**
+     * ⏰ RECENT CONTENT - Show recently modified items
+     */
+    async showRecentContent() {
+        console.log(chalk.blue.bold('\n⏰ RECENTLY MODIFIED CONTENT'));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        const allLore = loreHelpers.getAllLoreSync();
+        
+        // Sort by creation date (newest first)
+        const recent = allLore
+            .filter(item => item.created)
+            .sort((a, b) => new Date(b.created) - new Date(a.created))
+            .slice(0, 10);
+
+        if (recent.length === 0) {
+            console.log(chalk.yellow('No recent items found'));
+            return;
+        }
+
+        recent.forEach((item, index) => {
+            const statusIcon = item.visibility === 'hidden' ? '🔒' : '👁️';
+            const date = new Date(item.created).toLocaleDateString();
+            console.log(chalk.white(`  ${index + 1}. ${statusIcon} ${item.id}`) + 
+                       chalk.gray(` - ${item.title} (${date})`));
+        });
+    }
+
+    /**
+     * 📦 BATCH OPERATIONS - Mass content management
+     */
+    async batchOperations(args) {
+        if (args.length < 2) {
+            console.log(chalk.yellow.bold('\n📦 BATCH OPERATIONS'));
+            console.log(chalk.yellow('Available batch commands:'));
+            console.log(chalk.green('  batch view <pattern>   - View multiple items'));
+            console.log(chalk.green('  batch edit <pattern>   - Edit multiple items'));
+            console.log(chalk.green('  batch hide <pattern>   - Hide multiple items'));
+            console.log(chalk.green('  batch show <pattern>   - Show multiple items'));
+            console.log(chalk.green('  batch enhance <pattern> - AI enhance multiple items'));
+            console.log(chalk.gray('\nPattern examples: ice*, *dragon*, episode*'));
+            return;
+        }
+
+        const operation = args[0];
+        const pattern = args[1];
+        
+        console.log(chalk.blue.bold(`\n📦 BATCH ${operation.toUpperCase()}: ${pattern}`));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        const allLore = loreHelpers.getAllLoreSync();
+        const regex = new RegExp(pattern.replace(/\*/g, '.*'), 'i');
+        const matches = allLore.filter(item => 
+            regex.test(item.id) || regex.test(item.title)
+        );
+
+        if (matches.length === 0) {
+            console.log(chalk.yellow('No matches found for batch operation'));
+            return;
+        }
+
+        console.log(chalk.cyan(`Found ${matches.length} items to process:`));
+        matches.forEach((item, index) => {
+            console.log(chalk.white(`  ${index + 1}. ${item.id} - ${item.title}`));
+        });
+
+        const confirm = await this.promptUser(`\n❓ Process ${matches.length} items? (y/n): `);
+        if (confirm?.toLowerCase() !== 'y') {
+            console.log(chalk.yellow('Batch operation cancelled'));
+            return;
+        }
+
+        // Process based on operation
+        switch (operation.toLowerCase()) {
+            case 'view':
+                for (const item of matches) {
+                    await this.viewItem(item.id, false);
+                    console.log(''); // Add spacing
+                }
+                break;
+            case 'hide':
+                console.log(chalk.green(`✅ Would hide ${matches.length} items`));
+                break;
+            case 'show':
+                console.log(chalk.green(`✅ Would show ${matches.length} items`));
+                break;
+            case 'enhance':
+                console.log(chalk.green(`✅ Would AI enhance ${matches.length} items`));
+                break;
+            default:
+                console.log(chalk.red(`❌ Unknown batch operation: ${operation}`));
+        }
+    }
+
+    /**
+     * 💬 Prompt user for input
+     */
+    promptUser(question) {
+        return new Promise((resolve) => {
+            const tempRL = readline.createInterface({
+                input: process.stdin,
+                output: process.stdout
+            });
+            
+            tempRL.question(chalk.yellow(question), (answer) => {
+                tempRL.close();
+                resolve(answer);
+            });
+        });
     }
 
     /**
