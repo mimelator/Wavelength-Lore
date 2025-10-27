@@ -85,7 +85,7 @@ class WavelengthContentCLI {
             console.log(chalk.green('  📚 lore/') + chalk.gray('    - Places, things, concepts, and ideas'));
             console.log(chalk.green('  👥 characters/') + chalk.gray(' - Character profiles and details'));
             console.log(chalk.green('  📺 episodes/') + chalk.gray('   - Episode content and metadata'));
-        } else if (this.currentPath === '/lore/') {
+        } else if (this.currentPath.includes('/lore')) {
             const allLore = loreHelpers.getAllLoreSync();
             console.log(chalk.gray(`  Found ${allLore.length} lore entries:`));
             
@@ -104,7 +104,7 @@ class WavelengthContentCLI {
                     console.log(chalk.white(`    ${icon} ${item.id}`) + chalk.gray(` - ${item.title}`) + hiddenLabel);
                 });
             });
-        } else if (this.currentPath === '/characters/') {
+        } else if (this.currentPath.includes('/characters')) {
             try {
                 const allCharacters = characterHelpers.getAllCharactersSync();
                 console.log(chalk.gray(`  Found ${allCharacters.length} characters:`));
@@ -116,7 +116,7 @@ class WavelengthContentCLI {
             } catch (error) {
                 console.log(chalk.yellow('  ⚠️ Characters not yet loaded'));
             }
-        } else if (this.currentPath === '/episodes/') {
+        } else if (this.currentPath.includes('/episodes')) {
             try {
                 const allEpisodes = episodeHelpers.getAllEpisodesSync();
                 console.log(chalk.gray(`  Found ${allEpisodes.length} episodes:`));
@@ -339,13 +339,17 @@ class WavelengthContentCLI {
         } else if (path.startsWith('/')) {
             this.currentPath = path.endsWith('/') ? path : path + '/';
         } else {
-            // Relative path
+            // Relative path - clean up to avoid double slashes
+            const cleanPath = path.replace(/\/$/, ''); // Remove trailing slash from input
             if (this.currentPath === '/') {
-                this.currentPath = '/' + path + '/';
+                this.currentPath = '/' + cleanPath + '/';
             } else {
-                this.currentPath += path + '/';
+                this.currentPath = this.currentPath.replace(/\/$/, '') + '/' + cleanPath + '/';
             }
         }
+        
+        // Clean up any double slashes
+        this.currentPath = this.currentPath.replace(/\/+/g, '/');
         
         console.log(chalk.green(`📍 Changed to: ${this.currentPath}`));
         this.showCurrentDirectory();
