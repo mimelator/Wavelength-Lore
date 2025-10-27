@@ -31,6 +31,12 @@ class WavelengthAdminToolkit {
                 description: 'Check deployment and build status',
                 script: 'deployment-status.js',
                 icon: '📊'
+            },
+            'chatbot': {
+                name: 'Chatbot Admin',
+                description: 'Interactive lore chatbot administration',
+                script: 'chatbot-admin.js',
+                icon: '🤖'
             }
         };
     }
@@ -50,9 +56,11 @@ class WavelengthAdminToolkit {
         });
         
         console.log(chalk.yellow('Usage:'));
-        console.log(chalk.white('  node cli-admin-tools/index.js <tool> [options]'));
-        console.log(chalk.white('  Example: node cli-admin-tools/index.js sync'));
-        console.log(chalk.white('  Example: node cli-admin-tools/index.js cache --status'));
+        console.log(chalk.white('  npm run cli:admin <tool> [options]'));
+        console.log(chalk.white('  Example: npm run cli:admin sync'));
+        console.log(chalk.white('  Example: npm run cli:admin cache --status'));
+        console.log(chalk.white('  Example: npm run cli:admin chatbot health'));
+        console.log(chalk.white('  Example: npm run cli:admin chatbot query "Who is Andrew?"'));
         console.log('');
         
         console.log(chalk.green('🌟 Pristine Tools - Isolated & Reliable'));
@@ -118,6 +126,28 @@ class WavelengthAdminToolkit {
                         await toolInstance.quickCheck();
                     } else {
                         await toolInstance.getStatus();
+                    }
+                } else if (toolKey === 'chatbot') {
+                    // Handle chatbot subcommands
+                    const subCommand = args[0] || 'help';
+                    const subArgs = args.slice(1);
+                    
+                    if (subCommand === 'health') {
+                        await toolInstance.checkHealth();
+                    } else if (subCommand === 'test') {
+                        await toolInstance.runTests();
+                    } else if (subCommand === 'chat') {
+                        await toolInstance.startInteractiveChat();
+                    } else if (subCommand === 'query') {
+                        const question = subArgs.join(' ');
+                        if (question) {
+                            await toolInstance.sendQuery(question);
+                        } else {
+                            console.log(chalk.red('❌ Please provide a question'));
+                            console.log(chalk.yellow('Example: npm run cli:admin chatbot query "Who is Andrew?"'));
+                        }
+                    } else {
+                        toolInstance.showHelp();
                     }
                 }
             }
