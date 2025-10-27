@@ -22,10 +22,23 @@
 
     <%- include('partials/footer') %>
 
-    <!-- Load product navigator component -->
-
+    <!-- REFACTOR: Load all services in dependency order -->
     
-    <!-- Load merchandise store component -->
+    <!-- Event Bus (foundation) -->
+    <script src="/js/services/wavelength-event-bus.js?v=<%= version %>" onerror="console.error('❌ Failed to load wavelength-event-bus.js')"></script>
+    
+    <!-- Core Services -->
+    <script src="/js/services/MerchandiseApiService.js?v=<%= version %>" onerror="console.error('❌ Failed to load MerchandiseApiService.js')"></script>
+    <script src="/js/services/merchandise-cart-service.js?v=<%= version %>" onerror="console.error('❌ Failed to load merchandise-cart-service.js')"></script>
+    <script src="/js/services/merchandise-product-validation-service.js?v=<%= version %>" onerror="console.error('❌ Failed to load merchandise-product-validation-service.js')"></script>
+    
+    <!-- PHASE 2: UI Renderer Components (depend on services) -->
+    <script src="/js/components/merchandise-product-card-renderer.js?v=<%= version %>" onerror="console.error('❌ Failed to load merchandise-product-card-renderer.js')"></script>
+    <script src="/js/components/merchandise-cart-renderer.js?v=<%= version %>" onerror="console.error('❌ Failed to load merchandise-cart-renderer.js')"></script>
+    <script src="/js/components/merchandise-category-grid-renderer.js?v=<%= version %>" onerror="console.error('❌ Failed to load merchandise-category-grid-renderer.js')"></script>
+    <script src="/js/components/merchandise-modal-renderer.js?v=<%= version %>" onerror="console.error('❌ Failed to load merchandise-modal-renderer.js')"></script>
+    
+    <!-- Main Component (depends on services and UI renderers) -->
     <script src="/js/components/merchandise-store.js?v=<%= version %>" onerror="console.error('❌ Failed to load merchandise-store.js')"></script>
     
     <script>
@@ -33,9 +46,40 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🛍️ Merchandise Store page loaded');
             
-            // Check if MerchandiseStore class is available
+            // REFACTOR: Check if all required services and UI renderers are available
+            const requiredServices = [
+                'WavelengthEventBus',
+                'MerchandiseApiService', 
+                'MerchandiseCartService',
+                'MerchandiseProductValidationService',
+                'MerchandiseProductCardRenderer',
+                'MerchandiseCartRenderer',
+                'MerchandiseCategoryGridRenderer',
+                'MerchandiseModalRenderer',
+                'MerchandiseStore'
+            ];
+            
+            const missingServices = requiredServices.filter(service => typeof window[service] === 'undefined');
+            
+            if (missingServices.length > 0) {
+                console.error('❌ Required services not found:', missingServices);
+                const container = document.getElementById('merchandise-store');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="merchandise-store">
+                            <div class="store-header">
+                                <h1>🛍️ Merchandise Store</h1>
+                                <p style="color: #ff6b6b;">Failed to load store services: ${missingServices.join(', ')}</p>
+                                <p style="color: #ff6b6b; font-size: 0.9rem;">Please refresh the page.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+                return;
+            }
+            
             if (typeof MerchandiseStore === 'undefined') {
-                console.error('❌ MerchandiseStore class not found! Script may have failed to load.');
+                console.error('❌ MerchandiseStore class not found! Store component failed to load.');
                 const container = document.getElementById('merchandise-store');
                 if (container) {
                     container.innerHTML = `

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Merchandise Store Component Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .loading { background: #fff3cd; color: #856404; }
+        .test-output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .component-demo {
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            background: #fafafa;
+        }
+        .demo-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🌊 Simple Merchandise Store Component Test</h1>
+        <p>Testing our refactored UI components in isolation</p>
+        
+        <button onclick="runSimpleTests()" id="testBtn">🚀 Run Simple Tests</button>
+        
+        <div id="testResults"></div>
+        <div class="test-output" id="testOutput">Ready to run tests...</div>
+        
+        <div class="component-demo">
+            <div class="demo-title">🎨 ProductCardRenderer Demo</div>
+            <div id="productCardDemo">Click "Run Simple Tests" to see component output</div>
+        </div>
+        
+        <div class="component-demo">
+            <div class="demo-title">🛒 CartRenderer Demo</div>
+            <div id="cartDemo">Click "Run Simple Tests" to see component output</div>
+        </div>
+        
+        <div class="component-demo">
+            <div class="demo-title">📋 CategoryGridRenderer Demo</div>
+            <div id="categoryDemo">Click "Run Simple Tests" to see component output</div>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const output = document.getElementById('testOutput');
+            output.textContent += message + '\n';
+            output.scrollTop = output.scrollHeight;
+            console.log(message);
+        }
+        
+        function addTestResult(name, passed, error = '') {
+            const results = document.getElementById('testResults');
+            const result = document.createElement('div');
+            result.className = `test-result ${passed ? 'pass' : 'fail'}`;
+            result.textContent = `${passed ? '✅' : '❌'} ${name}${error ? ': ' + error : ''}`;
+            results.appendChild(result);
+        }
+        
+        async function runSimpleTests() {
+            const btn = document.getElementById('testBtn');
+            btn.disabled = true;
+            btn.textContent = '🔄 Running Tests...';
+            
+            // Clear previous results
+            document.getElementById('testResults').innerHTML = '';
+            document.getElementById('testOutput').textContent = '';
+            
+            log('🌊 Starting Simple Merchandise Store Tests...');
+            log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            
+            // Test 1: Basic JavaScript functionality
+            try {
+                log('\n📝 Test 1: Basic JavaScript functionality');
+                const testObj = { test: true };
+                const testArray = [1, 2, 3];
+                const testFunction = () => 'hello';
+                
+                if (testObj.test && testArray.length === 3 && testFunction() === 'hello') {
+                    addTestResult('Basic JavaScript functionality', true);
+                    log('✅ JavaScript basics working');
+                } else {
+                    addTestResult('Basic JavaScript functionality', false, 'Basic operations failed');
+                    log('❌ JavaScript basics failed');
+                }
+            } catch (error) {
+                addTestResult('Basic JavaScript functionality', false, error.message);
+                log('❌ JavaScript error: ' + error.message);
+            }
+            
+            // Test 2: DOM manipulation
+            try {
+                log('\n📝 Test 2: DOM manipulation');
+                const testDiv = document.createElement('div');
+                testDiv.innerHTML = '<p>Test content</p>';
+                
+                if (testDiv.querySelector('p') && testDiv.querySelector('p').textContent === 'Test content') {
+                    addTestResult('DOM manipulation', true);
+                    log('✅ DOM manipulation working');
+                } else {
+                    addTestResult('DOM manipulation', false, 'DOM operations failed');
+                    log('❌ DOM manipulation failed');
+                }
+            } catch (error) {
+                addTestResult('DOM manipulation', false, error.message);
+                log('❌ DOM error: ' + error.message);
+            }
+            
+            // Test 3: Check if our files are accessible
+            try {
+                log('\n📝 Test 3: File accessibility check');
+                
+                const testFiles = [
+                    '/js/services/wavelength-event-bus.js',
+                    '/js/services/MerchandiseApiService.js',
+                    '/js/components/merchandise-product-card-renderer.js'
+                ];
+                
+                let filesAccessible = 0;
+                let totalFiles = testFiles.length;
+                
+                for (const file of testFiles) {
+                    try {
+                        const response = await fetch(file, { method: 'HEAD' });
+                        if (response.ok) {
+                            filesAccessible++;
+                            log(`✅ File accessible: ${file}`);
+                        } else {
+                            log(`❌ File not accessible: ${file} (${response.status})`);
+                        }
+                    } catch (fetchError) {
+                        log(`❌ File fetch error: ${file} - ${fetchError.message}`);
+                    }
+                }
+                
+                if (filesAccessible === totalFiles) {
+                    addTestResult('File accessibility', true);
+                    log('✅ All test files accessible');
+                } else {
+                    addTestResult('File accessibility', false, `Only ${filesAccessible}/${totalFiles} files accessible`);
+                    log(`⚠️ Only ${filesAccessible}/${totalFiles} files accessible`);
+                }
+            } catch (error) {
+                addTestResult('File accessibility', false, error.message);
+                log('❌ File accessibility error: ' + error.message);
+            }
+            
+            // Test 4: Create mock components to test our architecture
+            try {
+                log('\n📝 Test 4: Mock component architecture');
+                
+                // Create a simple mock EventBus
+                class MockEventBus {
+                    constructor() {
+                        this.events = {};
+                    }
+                    on(event, callback) {
+                        if (!this.events[event]) this.events[event] = [];
+                        this.events[event].push(callback);
+                    }
+                    emit(event, data) {
+                        if (this.events[event]) {
+                            this.events[event].forEach(cb => cb(data));
+                        }
+                    }
+                }
+                
+                // Create a simple mock renderer
+                class MockProductRenderer {
+                    constructor(options) {
+                        this.eventBus = options.eventBus;
+                        this.validationService = options.validationService;
+                    }
+                    
+                    renderProductsGrid(products) {
+                        if (!products || products.length === 0) {
+                            return '<div class="empty-state">No products available</div>';
+                        }
+                        return '<div class="product-grid">Mock product grid</div>';
+                    }
+                }
+                
+                // Test the mock architecture
+                const mockEventBus = new MockEventBus();
+                const mockValidationService = { isProductComplete: () => true };
+                
+                const mockRenderer = new MockProductRenderer({
+                    eventBus: mockEventBus,
+                    validationService: mockValidationService
+                });
+                
+                // Test event communication
+                let eventReceived = false;
+                mockEventBus.on('test.event', () => { eventReceived = true; });
+                mockEventBus.emit('test.event', {});
+                
+                // Test rendering
+                const emptyHtml = mockRenderer.renderProductsGrid([]);
+                const hasContentHtml = mockRenderer.renderProductsGrid([{ id: 1, title: 'Test' }]);
+                
+                if (eventReceived && 
+                    emptyHtml.includes('empty-state') && 
+                    hasContentHtml.includes('product-grid')) {
+                    addTestResult('Mock component architecture', true);
+                    log('✅ Mock component architecture working');
+                    
+                    // Demo the components
+                    document.getElementById('productCardDemo').innerHTML = emptyHtml;
+                    document.getElementById('cartDemo').innerHTML = '<div class="empty-cart">Your cart is empty</div>';
+                    document.getElementById('categoryDemo').innerHTML = '<div class="empty-categories">No categories available</div>';
+                    
+                } else {
+                    addTestResult('Mock component architecture', false, 'Architecture test failed');
+                    log('❌ Mock component architecture failed');
+                }
+                
+            } catch (error) {
+                addTestResult('Mock component architecture', false, error.message);
+                log('❌ Mock architecture error: ' + error.message);
+            }
+            
+            // Test 5: Try to load actual scripts dynamically
+            try {
+                log('\n📝 Test 5: Dynamic script loading test');
+                
+                const scriptUrl = '/js/services/wavelength-event-bus.js';
+                
+                const scriptLoadPromise = new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = scriptUrl;
+                    script.onload = () => {
+                        log('✅ Script loaded successfully: ' + scriptUrl);
+                        
+                        // Check if WavelengthEventBus is now available
+                        if (typeof WavelengthEventBus !== 'undefined') {
+                            log('✅ WavelengthEventBus class available');
+                            resolve(true);
+                        } else {
+                            log('❌ WavelengthEventBus class not found after loading');
+                            resolve(false);
+                        }
+                    };
+                    script.onerror = () => {
+                        log('❌ Script failed to load: ' + scriptUrl);
+                        reject(new Error('Script load failed'));
+                    };
+                    document.head.appendChild(script);
+                });
+                
+                const scriptLoaded = await scriptLoadPromise;
+                
+                if (scriptLoaded) {
+                    addTestResult('Dynamic script loading', true);
+                    log('✅ Dynamic script loading successful');
+                } else {
+                    addTestResult('Dynamic script loading', false, 'Script loaded but class not available');
+                    log('❌ Dynamic script loading failed');
+                }
+                
+            } catch (error) {
+                addTestResult('Dynamic script loading', false, error.message);
+                log('❌ Dynamic script loading error: ' + error.message);
+            }
+            
+            log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            log('🎯 Simple test suite completed!');
+            
+            btn.disabled = false;
+            btn.textContent = '✅ Tests Complete - Run Again';
+        }
+    </script>
+</body>
+</html>

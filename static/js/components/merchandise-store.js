@@ -2,12 +2,13 @@
  * Merchandise Store Frontend Component
  * 
  * Interactive interface for creating custom merchandise from gallery images
+ * REFACTORED: Now uses MerchandiseApiService for all API operations
  */
 
 class MerchandiseStore {
   constructor() {
+    // UI State
     this.selectedImage = null;
-    this.cart = [];
     this.products = [];
     this.productTypes = {};
     this.availableProducts = [];
@@ -16,15 +17,161 @@ class MerchandiseStore {
     this.enhancementStatus = { available: false };
     this.isInitializing = true;
     
-    console.log('🛍️ MerchandiseStore constructor called');
+    // REFACTOR: Initialize services for separated concerns
+    this.apiService = new MerchandiseApiService();
+    this.cartService = new MerchandiseCartService();
+    this.validationService = new MerchandiseProductValidationService();
+    this.eventBus = new WavelengthEventBus();
     
-    // Load cart from storage on initialization
-    this.loadCartFromStorage();
+    // PHASE 2 REFACTOR: Initialize UI renderers for modular UI components
+    this.productCardRenderer = new MerchandiseProductCardRenderer({
+      validationService: this.validationService,
+      eventBus: this.eventBus,
+      merchandiseStore: this
+    });
+    
+    this.cartRenderer = new MerchandiseCartRenderer({
+      cartService: this.cartService,
+      eventBus: this.eventBus,
+      merchandiseStore: this
+    });
+    
+    this.categoryGridRenderer = new MerchandiseCategoryGridRenderer({
+      validationService: this.validationService,
+      eventBus: this.eventBus,
+      merchandiseStore: this
+    });
+    
+    this.modalRenderer = new MerchandiseModalRenderer({
+      validationService: this.validationService,
+      eventBus: this.eventBus,
+      merchandiseStore: this
+    });
+    
+    // Configure services
+    this.cartService.setEventBus(this.eventBus);
+    this.eventBus.setDebugMode(false); // Enable for debugging
+    
+    // Set up event listeners for cross-component communication
+    this.setupServiceEventListeners();
+    
+    console.log('🛍️ MerchandiseStore constructor called with refactored services');
     
     // Add a simple health check
     this.healthCheck();
     
     this.init();
+  }
+  
+  /**
+   * Set up event listeners for service communication
+   */
+  setupServiceEventListeners() {
+    // Cart update events
+    this.eventBus.on('cart.updated', (data) => {
+      console.log('🛒 Cart updated:', data);
+      this.updateCartUI();
+    });
+    
+    // Product events
+    this.eventBus.on('product.created', (data) => {
+      console.log('📦 Product created:', data);
+      this.refreshProducts();
+    });
+    
+    this.eventBus.on('product.deleted', (data) => {
+      console.log('🗑️ Product deleted:', data);
+      this.refreshProducts();
+    });
+    
+    // UI events
+    this.eventBus.on('ui.loading', (isLoading) => {
+      this.setLoading(isLoading);
+    });
+    
+    this.eventBus.on('ui.error', (error) => {
+      this.showError(error.message || error);
+    });
+    
+    this.eventBus.on('ui.success', (message) => {
+      this.showSuccess(message);
+    });
+    
+    // PHASE 2: UI Renderer Events
+    this.setupUIRendererEventListeners();
+  }
+  
+  /**
+   * Set up event listeners for UI renderer interactions
+   */
+  setupUIRendererEventListeners() {
+    // Category Grid Renderer Events
+    this.eventBus.on('category.selected', (data) => {
+      this.handleCategorySelection(data.categoryId);
+    });
+    
+    this.eventBus.on('grid.search', (data) => {
+      this.handleProductSearch(data.searchTerm);
+    });
+    
+    this.eventBus.on('grid.filterChanged', (data) => {
+      this.handleFilterChange(data.filterType, data.filterValue);
+    });
+    
+    this.eventBus.on('grid.sortChanged', (data) => {
+      this.handleSortChange(data.sortBy);
+    });
+    
+    this.eventBus.on('grid.viewChanged', (data) => {
+      this.handleViewChange(data.viewType);
+    });
+    
+    // Product Card Renderer Events
+    this.eventBus.on('product.quickPreview', (data) => {
+      this.showProductPreview(data.productId);
+    });
+    
+    this.eventBus.on('product.customize', (data) => {
+      this.showCustomizationModal(data.productId);
+    });
+    
+    this.eventBus.on('product.addToCart', (data) => {
+      this.handleAddToCart(data.productId);
+    });
+    
+    // Cart Renderer Events
+    this.eventBus.on('cart.quantityChanged', (data) => {
+      this.handleCartQuantityChange(data.productId, data.variantId, data.quantity);
+    });
+    
+    this.eventBus.on('cart.itemRemoved', (data) => {
+      this.handleCartItemRemoval(data.productId, data.variantId);  
+    });
+    
+    this.eventBus.on('cart.cleared', () => {
+      this.handleCartClear();
+    });
+    
+    this.eventBus.on('cart.checkout', () => {
+      this.handleCheckout();
+    });
+    
+    // Modal Renderer Events
+    this.eventBus.on('modal.customizationSaved', (data) => {
+      this.handleCustomizationSave(data.productId, data.customization);
+    });
+    
+    this.eventBus.on('modal.closed', (data) => {
+      this.handleModalClosed(data.modalId);
+    });
+    
+    this.eventBus.on('dialog.confirmed', (data) => {
+      this.handleDialogConfirmed(data.modalId);
+    });
+    
+    this.eventBus.on('dialog.cancelled', (data) => {
+      this.handleDialogCancelled(data.modalId);
+    });
   }
   
   /**
@@ -248,8 +395,8 @@ class MerchandiseStore {
   
   async loadEnhancementStatus() {
     try {
-      const response = await fetch('/api/merchandise/enhancement-status');
-      const data = await response.json();
+      // REFACTOR: Use API service instead of direct fetch
+      const data = await this.apiService.loadEnhancementStatus();
       
       if (data.success) {
         this.enhancementStatus = data.enhancement;
@@ -267,13 +414,8 @@ class MerchandiseStore {
     try {
       this.setLoading(true, 'Loading your gallery images...');
       
-      const response = await fetch('/api/merchandise/gallery-images', {
-        headers: {
-          'Authorization': `Bearer ${this.getAuthToken()}`
-        }
-      });
-      
-      const data = await response.json();
+      // REFACTOR: Use API service instead of direct fetch
+      const data = await this.apiService.loadGalleryImages();
       
       if (data.success) {
         this.galleryImages = data.images;
@@ -294,13 +436,8 @@ class MerchandiseStore {
     try {
       this.setLoading(true, 'Loading product options...');
       
-      const response = await fetch('/api/merchandise/product-types');
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      // REFACTOR: Use API service instead of direct fetch
+      const data = await this.apiService.loadProductTypes();
       console.log('📋 Product types API response:', data);
       
       if (data.success && data.allProducts) {
@@ -340,13 +477,8 @@ class MerchandiseStore {
   
   async loadUserProducts() {
     try {
-      const response = await fetch('/api/merchandise/products', {
-        headers: {
-          'Authorization': `Bearer ${this.getAuthToken()}`
-        }
-      });
-      
-      const data = await response.json();
+      // REFACTOR: Use API service instead of direct fetch
+      const data = await this.apiService.loadUserProducts();
       
       if (data.success) {
         // Filter out any products that might be corrupted or invalid
@@ -484,23 +616,14 @@ class MerchandiseStore {
         }
       }, 5000); // Update every 5 seconds for longer process
       
-      const response = await fetch('/api/merchandise/create-product', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.getAuthToken()}`
-        },
-        body: JSON.stringify({
-          imageId,
-          imageUrl: imageData.url,
-          imageTitle: imageData.title || imageData.fileName,
-          productOptions
-        })
+      // REFACTOR: Use API service instead of direct fetch
+      const data = await this.apiService.createProduct(imageId, {
+        imageUrl: imageData.url,
+        imageTitle: imageData.title || imageData.fileName,
+        ...productOptions
       });
       
       clearInterval(productProgressInterval);
-      
-      const data = await response.json();
       
       if (data.success) {
         this.setLoading(true, 'Product created! Preparing final details...');
@@ -537,16 +660,8 @@ class MerchandiseStore {
    */
   async checkIfImageNeedsEnhancement(imageId) {
     try {
-      const response = await fetch('/api/merchandise/check-enhancement-status', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.getAuthToken()}`
-        },
-        body: JSON.stringify({ imageId })
-      });
-      
-      const data = await response.json();
+      // REFACTOR: Use API service instead of direct fetch
+      const data = await this.apiService.checkIfImageNeedsEnhancement(imageId);
       
       if (data.success) {
         // If there's no cached enhanced version, enhancement will be needed
@@ -619,22 +734,12 @@ class MerchandiseStore {
         this.setLoading(true, `🎽 Creating your ${productType} with your high-quality image...`, 50);
       }
       
-      const response = await fetch('/api/merchandise/create-guided-product', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.getAuthToken()}`
-        },
-        body: JSON.stringify({
-          imageId,
-          imageUrl: imageData.url,
-          imageTitle: imageData.title || imageData.fileName,
-          productType,
-          customOptions
-        })
+      // REFACTOR: Use API service instead of direct fetch
+      const data = await this.apiService.createGuidedProduct(imageId, productType, {
+        imageUrl: imageData.url,
+        imageTitle: imageData.title || imageData.fileName,
+        ...customOptions
       });
-      
-      const data = await response.json();
       
       if (data.success) {
         this.products.push(data.product);
@@ -679,36 +784,15 @@ class MerchandiseStore {
         throw new Error('Product not found');
       }
       
-      // Find the variant
-      const variant = product.variants.find(v => v.id === variantId);
-      if (!variant) {
-        throw new Error('Product variant not found');
-      }
+      // REFACTOR: Use cart service instead of direct cart manipulation
+      const result = this.cartService.addItem(product, variantId, quantity);
       
-      // Add to cart
-      const cartItem = {
-        productId,
-        variantId,
-        quantity,
-        product: product,
-        variant: variant,
-        price: variant.price
-      };
-      
-      // Check if item already in cart
-      const existingItemIndex = this.cart.findIndex(
-        item => item.productId === productId && item.variantId === variantId
-      );
-      
-      if (existingItemIndex >= 0) {
-        this.cart[existingItemIndex].quantity += quantity;
+      if (result.success) {
+        this.showSuccess('Added to cart!');
+        // Cart UI will be updated via event bus
       } else {
-        this.cart.push(cartItem);
+        throw new Error(result.message);
       }
-      
-      this.saveCartToStorage();
-      this.renderCart();
-      this.showSuccess('Added to cart!');
       
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -717,28 +801,23 @@ class MerchandiseStore {
   }
   
   removeFromCart(productId, variantId) {
-    this.cart = this.cart.filter(
-      item => !(item.productId === productId && item.variantId === variantId)
-    );
+    // REFACTOR: Use cart service instead of direct cart manipulation
+    const result = this.cartService.removeItem(productId, variantId);
     
-    this.saveCartToStorage();
-    this.renderCart();
+    if (!result.success) {
+      this.showError(result.message);
+    }
+    // Cart UI will be updated via event bus
   }
   
   updateCartQuantity(productId, variantId, quantity) {
-    const item = this.cart.find(
-      item => item.productId === productId && item.variantId === variantId
-    );
+    // REFACTOR: Use cart service instead of direct cart manipulation
+    const result = this.cartService.updateQuantity(productId, variantId, quantity);
     
-    if (item) {
-      if (quantity <= 0) {
-        this.removeFromCart(productId, variantId);
-      } else {
-        item.quantity = quantity;
-        this.saveCartToStorage();
-        this.renderCart();
-      }
+    if (!result.success) {
+      this.showError(result.message);
     }
+    // Cart UI will be updated via event bus
   }
   
   viewProductDetails(productId) {
@@ -824,28 +903,29 @@ class MerchandiseStore {
       
       // Step 1: Delete from database with comprehensive cleanup
       this.setLoading(true, '🗑️ Removing from database...', 25);
-      const deleteResponse = await fetch(`/api/merchandise/products/${productId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${this.getAuthToken()}`
-        }
-      });
       
-      if (!deleteResponse.ok && deleteResponse.status !== 404) {
-        const errorData = await deleteResponse.json().catch(() => ({}));
-        throw new Error(errorData.error || `Delete failed with status ${deleteResponse.status}`);
+      // REFACTOR: Use API service instead of direct fetch
+      try {
+        await this.apiService.deleteProduct(productId);
+      } catch (error) {
+        // Handle 404 as success (product already gone)
+        if (!error.message.includes('404')) {
+          throw error;
+        }
       }
       
       // Step 2: Verify deletion via API
       this.setLoading(true, '🔍 Verifying removal...', 50);
-      const verifyResponse = await fetch(`/api/merchandise/products/${productId}`, {
-        headers: {
-          'Authorization': `Bearer ${this.getAuthToken()}`
-        }
-      });
       
-      if (verifyResponse.ok) {
+      // REFACTOR: Use API service instead of direct fetch
+      try {
+        await this.apiService.getProduct(productId);
         throw new Error('Product still exists after deletion attempt');
+      } catch (error) {
+        // 404 is expected - product successfully deleted
+        if (!error.message.includes('404')) {
+          throw error;
+        }
       }
       
       // Step 3: Clear from cache and local storage
@@ -896,19 +976,8 @@ class MerchandiseStore {
   }
   
   getCartTotal() {
-    try {
-      if (!this.cart || this.cart.length === 0) {
-        return 0;
-      }
-      return this.cart.reduce((total, item) => {
-        const price = item.price || 0;
-        const quantity = item.quantity || 1;
-        return total + (price * quantity);
-      }, 0);
-    } catch (error) {
-      console.error('Error calculating cart total:', error);
-      return 0;
-    }
+    // REFACTOR: Use cart service instead of direct cart calculation
+    return this.cartService.getTotal();
   }
   
   async checkout() {
@@ -1327,20 +1396,8 @@ class MerchandiseStore {
     const uniqueBlueprintIds = [...new Set(blueprintIds)];
     
     try {
-      // Batch fetch blueprint previews
-      const response = await fetch('/api/merchandise/blueprint-previews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ blueprintIds: uniqueBlueprintIds })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      // REFACTOR: Use API service instead of direct fetch
+      const data = await this.apiService.loadBlueprintPreviews(uniqueBlueprintIds);
       
       if (!data.success) {
         throw new Error(data.error || 'Failed to fetch blueprint previews');
@@ -1589,89 +1646,13 @@ class MerchandiseStore {
   
   renderProducts() {
     try {
-      if (!this.products || this.products.length === 0) {
-        return `
-          <div class="empty-state">
-            <p>No custom products designed yet.</p>
-            <p>Select an image from your gallery to design your first product!</p>
-            ${this.selectedImage ? `
-              <button class="create-product-btn btn-primary">
-                Design Product from Selected Image
-              </button>
-            ` : ''}
-          </div>
-        `;
-      }
-      
-      // Separate complete and incomplete products
-    const validProducts = this.products.filter(p => p.id || p.productId);
-    const completeProducts = validProducts.filter(p => this.isProductComplete(p));
-    const incompleteProducts = validProducts.filter(p => !this.isProductComplete(p));
-    
-    let html = '';
-    
-    // Render complete products first
-    if (completeProducts.length > 0) {
-      html += completeProducts.map(product => {
-      const productId = product.id || product.productId;
-      const productTitle = product.title || 'Untitled Product';
-      // FIX: Ensure each product uses its own unique image
-      const productImage = (product.images && product.images.length > 0) 
-        ? product.images[0].src 
-        : (product.sourceImage?.url || '');
-      const productType = this.extractProductTypeFromProduct(product);
-      const productIcon = this.getProductIcon(productType);
-      const productDetails = this.getProductDetails(product);
-      
-      return `
-        <div class="product-card">
-          <div class="product-type-header">
-            <span class="product-type-icon">${productIcon}</span>
-            <span class="product-type-name">${this.getProductTypeName(productType)}</span>
-          </div>
-          <div class="product-image">
-            <img src="${productImage}" alt="${productTitle}" />
-            <div class="product-actions">
-              </button>
-              <button class="action-btn edit-product-btn" data-product-id="${productId}" title="Edit Product">
-                <span>✏️</span>
-              </button>
-              <button class="action-btn delete-product-btn" data-product-id="${productId}" title="Remove">
-                <span>🗑️</span>
-              </button>
-            </div>
-          </div>
-          <div class="product-info">
-            <h4>${productTitle}</h4>
-            <div class="product-details">
-              ${productDetails}
-            </div>
-            <div class="product-variants">
-              <div class="variant-summary">
-                <span class="variant-count">${(product.variants || []).length} variants available</span>
-                <span class="price-range">${this.getVariantPriceRange(product.variants)}</span>
-                <button class="view-variants-btn" data-product-id="${productId}">
-                  View Options
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-      }).join('');
-    }
-    
-    // Render incomplete products with status indicators
-    if (incompleteProducts.length > 0) {
-      html += `<div class="incomplete-products-section">
-        <h3 class="section-divider">🚧 Products Being Processed</h3>
-        ${incompleteProducts.map(product => this.renderIncompleteProduct(product)).join('')}
-      </div>`;
-    }
-    
-      return html;
+      // PHASE 2 REFACTOR: Use ProductCardRenderer for all product rendering
+      return this.productCardRenderer.renderProductsGrid(this.products, {
+        selectedImage: this.selectedImage,
+        showCreateButton: true
+      });
     } catch (error) {
-      console.error('Error rendering products:', error);
+      console.error('Error rendering products with ProductCardRenderer:', error);
       return `
         <div class="empty-state">
           <p>Error loading products.</p>
@@ -1682,39 +1663,41 @@ class MerchandiseStore {
   }
   
   isProductComplete(product) {
-    const hasVariants = product.variants && product.variants.length > 0;
-    const hasImages = product.images && product.images.length > 0;
-    const hasSourceImage = product.sourceImage && product.sourceImage.url;
-    
-    // A product is complete if it has:
-    // 1. Variants AND images (normal case for clothing)
-    // 2. OR just images with source image (some products like mugs might work differently)
-    // 3. OR has at least source image and some processing data (minimum viable)
-    return (hasVariants && hasImages) || 
-           (hasImages && hasSourceImage) ||
-           (hasSourceImage && product.title && !this.isProductBroken(product));
+    // REFACTOR: Use validation service instead of inline validation logic
+    return this.validationService.isProductComplete(product);
   }
   
   /**
    * Check if a product is broken (completely unusable)
    */
   isProductBroken(product) {
-    const hasVariants = product.variants && product.variants.length > 0;
-    const hasImages = product.images && product.images.length > 0;
-    const hasSourceImage = product.sourceImage && product.sourceImage.url;
-    
-    // A product is broken if it has:
-    // 1. No variants AND no images AND no source image (completely empty)
-    // 2. OR if it's been in this state for more than 10 minutes (failed processing)
-    const isCompletelyEmpty = !hasVariants && !hasImages && !hasSourceImage;
-    
-    // Check if product is old and still incomplete (failed processing)
-    const createdAt = product.generatedAt || product.createdAt;
-    const isOldAndIncomplete = createdAt && 
-      (Date.now() - new Date(createdAt).getTime()) > 10 * 60 * 1000 && // 10 minutes
-      !hasVariants && !hasImages;
-    
-    return isCompletelyEmpty || isOldAndIncomplete;
+    // REFACTOR: Use validation service instead of inline validation logic
+    return this.validationService.isProductBroken(product);
+  }
+  
+  /**
+   * Helper methods for service-based architecture
+   */
+  
+  updateCartUI() {
+    // Update cart display using cart service data
+    this.renderCart();
+  }
+  
+  async refreshProducts() {
+    // Reload products from API
+    try {
+      await this.loadUserProducts();
+      this.render();
+    } catch (error) {
+      console.error('Error refreshing products:', error);
+      this.showError('Failed to refresh products');
+    }
+  }
+  
+  getCartSummary() {
+    // Get cart summary from cart service
+    return this.cartService.getSummary();
   }
   
   renderIncompleteProduct(product) {
@@ -1855,60 +1838,10 @@ class MerchandiseStore {
   
   renderCart() {
     try {
-      if (!this.cart || this.cart.length === 0) {
-        return `
-          <div class="empty-cart">
-            <p>Your cart is empty</p>
-          </div>
-        `;
-      }
-    
-
-    
-      const cartTotal = this.getCartTotal();
-      
-      return `
-        <div class="cart-items">
-          ${this.cart.map(item => {
-            if (!item || !item.product) {
-              console.warn('Invalid cart item:', item);
-              return '';
-            }
-            
-            return `
-              <div class="cart-item">
-                <img src="${(item.product.images && item.product.images.length > 0) ? item.product.images[0].src : (item.product.sourceImage?.url || '')}" alt="${item.product.title || 'Product'}" 
-                     onerror="this.src='/images/placeholder.jpg'" />
-                <div class="item-details">
-                  <h4>${item.product.title || 'Untitled Product'}</h4>
-                  <p>${item.variant?.title || 'Variant'}</p>
-                  <div class="quantity-controls">
-                    <button onclick="merchandiseStore.updateCartQuantity('${item.productId}', '${item.variantId}', ${item.quantity - 1})">-</button>
-                    <span>${item.quantity || 1}</span>
-                    <button onclick="merchandiseStore.updateCartQuantity('${item.productId}', '${item.variantId}', ${item.quantity + 1})">+</button>
-                  </div>
-                </div>
-                <div class="item-price">
-                  <span>$${(((item.price || 0) * (item.quantity || 1)) / 100).toFixed(2)}</span>
-                  <button class="remove-from-cart" 
-                          data-product-id="${item.productId}" 
-                          data-variant-id="${item.variantId}">
-                    Remove
-                  </button>
-                </div>
-              </div>
-            `;
-          }).filter(html => html).join('')}
-        </div>
-        <div class="cart-total">
-          <div class="total-line">
-            <strong>Total: $${((cartTotal || 0) / 100).toFixed(2)}</strong>
-          </div>
-          <button class="checkout-btn btn-primary">Proceed to Checkout</button>
-        </div>
-      `;
+      // PHASE 2 REFACTOR: Use CartRenderer for all cart rendering
+      return this.cartRenderer.renderCart();
     } catch (error) {
-      console.error('Error rendering cart:', error);
+      console.error('Error rendering cart with CartRenderer:', error);
       return `
         <div class="empty-cart">
           <p>Error loading cart. Please refresh the page.</p>
@@ -1918,37 +1851,9 @@ class MerchandiseStore {
   }
   
   renderModals() {
-    return `
-      <!-- Product Creation Modal -->
-      <div id="product-creation-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-          <span class="close">&times;</span>
-          <h2>Create Custom Product</h2>
-          <p class="modal-info">Product title will be automatically generated from your image name.</p>
-          <form id="product-creation-form">
-            <div class="form-group">
-              <label for="product-tags">Tags (comma-separated)</label>
-              <input type="text" id="product-tags" placeholder="custom, art, wavelength" />
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="btn-primary">Create Product</button>
-              <button type="button" class="btn-secondary cancel-btn">Cancel</button>
-            </div>
-          </form>
-        </div>
-      </div>
-      
-      <!-- Checkout Modal -->
-      <div id="checkout-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-          <span class="close">&times;</span>
-          <h2>Checkout</h2>
-          <div id="checkout-content">
-            <!-- Checkout form will be populated here -->
-          </div>
-        </div>
-      </div>
-    `;
+    // PHASE 2 REFACTOR: ModalRenderer handles modal creation dynamically
+    // No need to pre-render static modals - they're created on demand
+    return `<!-- Modal container - modals created dynamically by ModalRenderer -->`;
   }
   
   selectImage(imageId) {
@@ -3361,6 +3266,185 @@ class MerchandiseStore {
       this.cart = [];
     }
   }
+  
+  // PHASE 2 REFACTOR: UI Renderer Event Handlers
+  
+  /**
+   * Handle category selection from CategoryGridRenderer
+   */
+  handleCategorySelection(categoryId) {
+    console.log('🎯 Category selected:', categoryId);
+    // Filter products by category and re-render
+    this.currentCategoryFilter = categoryId;
+    this.render();
+  }
+  
+  /**
+   * Handle product search from CategoryGridRenderer  
+   */
+  handleProductSearch(searchTerm) {
+    console.log('🔍 Product search:', searchTerm);
+    this.currentSearchTerm = searchTerm;
+    this.render();
+  }
+  
+  /**
+   * Handle filter changes from CategoryGridRenderer
+   */
+  handleFilterChange(filterType, filterValue) {
+    console.log('🔧 Filter changed:', filterType, filterValue);
+    this.currentFilters = this.currentFilters || {};
+    this.currentFilters[filterType] = filterValue;
+    this.render();
+  }
+  
+  /**
+   * Handle sort changes from CategoryGridRenderer
+   */
+  handleSortChange(sortBy) {
+    console.log('📊 Sort changed:', sortBy);
+    this.currentSort = sortBy;
+    this.render();
+  }
+  
+  /**
+   * Handle view changes from CategoryGridRenderer
+   */
+  handleViewChange(viewType) {
+    console.log('👁️ View changed:', viewType);
+    this.currentViewType = viewType;
+    // Update UI classes without full re-render
+    const grid = document.querySelector('.product-grid');
+    if (grid) {
+      grid.dataset.view = viewType;
+    }
+  }
+  
+  /**
+   * Show product preview modal using ModalRenderer
+   */
+  showProductPreview(productId) {
+    console.log('👁️ Show product preview:', productId);
+    const product = this.products.find(p => (p.id || p.productId) === productId);
+    if (product) {
+      const modalHtml = this.modalRenderer.renderPreviewModal(product);
+      this.modalRenderer.showModal(modalHtml);
+    }
+  }
+  
+  /**
+   * Show customization modal using ModalRenderer
+   */
+  showCustomizationModal(productId) {
+    console.log('🎨 Show customization modal:', productId);
+    const product = this.products.find(p => (p.id || p.productId) === productId);
+    if (product) {
+      const modalHtml = this.modalRenderer.renderCustomizationModal(product);
+      this.modalRenderer.showModal(modalHtml);
+    }
+  }
+  
+  /**
+   * Handle add to cart from ProductCardRenderer
+   */
+  handleAddToCart(productId) {
+    console.log('🛒 Add to cart:', productId);
+    const product = this.products.find(p => (p.id || p.productId) === productId);
+    if (product && this.validationService.isProductComplete(product)) {
+      this.cartService.addItem({
+        productId: productId,
+        variantId: 'default',
+        title: product.title,
+        price: product.price || 19.95,
+        image: product.previewImage,
+        quantity: 1
+      });
+      this.showSuccess('Product added to cart!');
+    } else {
+      this.showError('Product needs to be completed before adding to cart');
+    }
+  }
+  
+  /**
+   * Handle cart quantity changes from CartRenderer
+   */
+  handleCartQuantityChange(productId, variantId, quantity) {
+    console.log('📝 Cart quantity change:', productId, variantId, quantity);
+    if (quantity <= 0) {
+      this.cartService.removeItem(productId, variantId);
+    } else {
+      this.cartService.updateQuantity(productId, variantId, quantity);
+    }
+    this.render(); // Re-render to update cart display
+  }
+  
+  /**
+   * Handle cart item removal from CartRenderer
+   */
+  handleCartItemRemoval(productId, variantId) {
+    console.log('🗑️ Remove cart item:', productId, variantId);
+    this.cartService.removeItem(productId, variantId);
+    this.render(); // Re-render to update cart display
+  }
+  
+  /**
+   * Handle cart clear from CartRenderer  
+   */
+  handleCartClear() {
+    console.log('🧹 Clear cart');
+    this.cartService.clear();
+    this.render(); // Re-render to update cart display
+  }
+  
+  /**
+   * Handle checkout from CartRenderer
+   */
+  handleCheckout() {
+    console.log('💳 Handle checkout');
+    const cartSummary = this.cartService.getSummary();
+    if (!cartSummary.isEmpty) {
+      const modalHtml = this.modalRenderer.renderCartModal(cartSummary);
+      this.modalRenderer.showModal(modalHtml);
+    }
+  }
+  
+  /**
+   * Handle customization save from ModalRenderer
+   */
+  handleCustomizationSave(productId, customization) {
+    console.log('💾 Save customization:', productId, customization);
+    // Update product with customization
+    const product = this.products.find(p => (p.id || p.productId) === productId);
+    if (product) {
+      product.customization = customization;
+      this.showSuccess('Customization saved!');
+      this.render();
+    }
+  }
+  
+  /**
+   * Handle modal close from ModalRenderer
+   */
+  handleModalClosed(modalId) {
+    console.log('❌ Modal closed:', modalId);
+    // Any cleanup needed when modals close
+  }
+  
+  /**
+   * Handle dialog confirmation from ModalRenderer
+   */
+  handleDialogConfirmed(modalId) {
+    console.log('✅ Dialog confirmed:', modalId);
+    // Handle confirmation actions
+  }
+  
+  /**
+   * Handle dialog cancellation from ModalRenderer
+   */
+  handleDialogCancelled(modalId) {
+    console.log('❌ Dialog cancelled:', modalId);
+    // Handle cancellation actions
+  }
 }
 
 // Initialize when DOM is ready
@@ -3370,4 +3454,9 @@ class MerchandiseStore {
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = MerchandiseStore;
+}
+
+// Make available in browser global scope
+if (typeof window !== 'undefined') {
+  window.MerchandiseStore = MerchandiseStore;
 }

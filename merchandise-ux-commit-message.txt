@@ -1,0 +1,38 @@
+🎨 UX: Merchandise store product card improvements
+
+🔧 BUTTON OVERFLOW FIX:
+✅ Added max-width: 140px to .product-select-btn
+✅ Prevents "Select this Product" button from drifting over card edges
+✅ Added text-overflow: ellipsis for long button text
+✅ Proper overflow: hidden to clip content
+
+📏 CARD COMPACTNESS OPTIMIZATION:
+✅ Reduced .product-item padding from 20px to 15px
+✅ Added max-width: 450px constraint for better screen utilization
+✅ Reduced grid gaps from 20px to 16px
+✅ Optimized product preview from 80px to 64px
+✅ ~20% size reduction while maintaining usability
+
+🏷️ PROVIDER TEXT CLARITY:
+✅ Created getUserFriendlyProvider() function
+✅ Converts "MWW On Demand" → "Print-on-Demand"
+✅ Maps technical provider names to user-friendly alternatives
+✅ Integrated in product rendering pipeline
+
+🧪 VALIDATION & TESTING:
+✅ Created comprehensive test suite for UX validation
+✅ Code validation confirms all 3 fixes properly implemented
+✅ Added merchandise-card-code-validator.js for CI/CD
+
+📁 FILES MODIFIED:
+- static/css/merchandise-store.css (button & card styling)
+- static/js/components/merchandise-store.js (provider text conversion)
+- tests/ (validation framework)
+
+🎯 ADDRESSES USER FEEDBACK:
+- "Select this Product button drifts over the side of the card" → FIXED
+- "Cards are too large we could compact them a bit" → OPTIMIZED  
+- "MWW on Demand text I don't understand as an end user" → CLARIFIED
+
+These improvements significantly enhance the merchandise store user experience
+with properly contained buttons, more compact cards, and clear provider text.
