@@ -38,7 +38,7 @@
       <button id="delete-selected" style="display: none;">Delete Selected</button>
       <button id="download-all">Download All</button>
       <button id="start-screensaver">Start Screensaver</button>
-      <a href="/merchandise" class="merch-link-button">🛍️ Visit Merch Store</a>
+      <a href="/merchandise" class="merch-link-button" id="merch-link-button" style="display: none;">🛍️ Visit Merch Store</a>
     </div>
     
     <!-- Carousel View -->
@@ -204,6 +204,23 @@
   <script>
     // Pass user groups to JavaScript
     window.userGroups = <%- JSON.stringify(user?.groups || []) %>;
+    
+    // Show merchandise link only for VIP members
+    document.addEventListener('DOMContentLoaded', function() {
+      const hasVipAccess = window.userGroups && (
+        window.userGroups.includes('vip') ||
+        window.userGroups.includes('content_manager') ||
+        window.userGroups.includes('admin') ||
+        window.userGroups.includes('super_admin')
+      );
+      
+      if (hasVipAccess) {
+        const merchButton = document.getElementById('merch-link-button');
+        if (merchButton) {
+          merchButton.style.display = 'inline-block';
+        }
+      }
+    });
   </script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>

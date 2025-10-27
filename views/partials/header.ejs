@@ -35,8 +35,8 @@
       <li><a href="/radio">🎵 Experience Music</a></li>
       <li><a href="/search">🔍 Discover More</a></li>
       
-      <!-- New Promotional CTA -->
-      <li class="promo-cta-nav">
+      <!-- VIP-Only Merchandise Store CTA -->
+      <li id="merchandise-nav-item" class="promo-cta-nav" style="display: none;">
         <a href="/merchandise" class="promo-nav-link">🛍️ Get Merch</a>
       </li>
       
@@ -138,6 +138,12 @@
                     const gamesNavItem = document.getElementById('games-nav-item');
                     if (gamesNavItem) {
                       gamesNavItem.style.display = 'block';
+                    }
+                    
+                    // Show merchandise store link for VIP members
+                    const merchandiseNavItem = document.getElementById('merchandise-nav-item');
+                    if (merchandiseNavItem) {
+                      merchandiseNavItem.style.display = 'block';
                     }
                     
                     // Show VIP AI Assistant floating icon for same access levels as games
