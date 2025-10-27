@@ -886,7 +886,8 @@ class MerchandiseStore {
     const currentSettings = this.extractCurrentSettings(product);
     
     // Show customization modal with current settings
-    this.showProductCustomizationModal(productType, productConfig, imageData, currentSettings, product);
+    // Emit event for new fullscreen customization modal
+    this.eventBus.emit("product.customize", { productId: product.id || product.productId });
   }
   
 
@@ -1036,14 +1037,6 @@ class MerchandiseStore {
       // Guided product creation
       if (e.target.classList.contains('create-guided-product-btn')) {
         this.showGuidedProductCreationModal();
-      }
-      
-      // Product type selection from navigator
-      if (e.target.classList.contains('select-product-btn')) {
-        const productType = e.target.dataset.productType;
-        const blueprintId = e.target.dataset.blueprintId;
-        const printProviderId = e.target.dataset.printProviderId;
-        this.selectProductType(productType, blueprintId, printProviderId);
       }
     });
     
@@ -1907,7 +1900,6 @@ class MerchandiseStore {
             const blueprintId = e.target.dataset.blueprint;
             const providerId = e.target.dataset.provider;
             console.log('🎯 Product selected:', productType, blueprintId, providerId);
-            this.selectProductType(productType, blueprintId, providerId);
           } else if (e.target.classList.contains('category-card') || e.target.closest('.category-card')) {
             const card = e.target.closest('.category-card') || e.target;
             const categoryKey = card.dataset.category;
@@ -1944,40 +1936,6 @@ class MerchandiseStore {
     };
     
     tryInitialize();
-  }
-  
-  async selectProductType(productType, blueprintId, printProviderId) {
-    if (!this.selectedImage) {
-      this.showError('Please select an image first');
-      return;
-    }
-    
-    // Get selected image data
-    const selectedImageData = this.galleryImages.find(img => img.id === this.selectedImage);
-    if (!selectedImageData) {
-      this.showError('Selected image not found');
-      return;
-    }
-    
-    const imageContext = this.extractImageContext(selectedImageData);
-    
-    // Create product configuration from catalog data
-    const productConfig = {
-      id: `${blueprintId}-${printProviderId}`,
-      name: productType,
-      blueprintId: blueprintId,
-      printProviderId: printProviderId,
-      basePrice: 1999, // Default price
-      popularSizes: ['S', 'M', 'L', 'XL'],
-      availableColors: ['Black', 'White', 'Navy', 'Gray']
-    };
-    
-    // Show combined customization modal directly
-    this.showProductCustomizationModal(productType, productConfig, selectedImageData, {
-      ...imageContext,
-      selectedSize: 'M',
-      selectedColor: 'Black'
-    });
   }
   
   extractImageContext(imageData) {
@@ -2106,313 +2064,13 @@ class MerchandiseStore {
   
 
   
-  showProductCustomizationModal(productType, productConfig, imageData, imageContext, existingProduct = null) {
-    const isUpdate = !!existingProduct;
-    
-    // DEBUG: Log the product type mapping flow
-    console.log('🔍 showProductCustomizationModal called with:');
-    console.log('  productType:', productType);
-    console.log('  productConfig:', productConfig);
-    
-    // Fix Issue 1: Use proper product type name instead of undefined productConfig.name
-    const productTypeName = this.getProductTypeName(productType);
-    console.log('  productTypeName result:', productTypeName);
-    
-    const modalTitle = isUpdate ? `✏️ Update Your ${productTypeName}` : `✨ Design Your ${productTypeName}`;
-    const buttonText = isUpdate ? 'Update Product' : 'Design Product';
-    
-    console.log('  Final modal title:', modalTitle);
-    
-    // Remove any existing customization modals to prevent duplicate form field IDs
-    document.querySelectorAll('.product-customization-modal, #productCustomizationModal').forEach(el => el.remove());
-    
-    // Create modal
-    const modal = document.createElement('div');
-    modal.className = 'modal product-customization-modal';
-    modal.id = 'productCustomizationModal';
-    modal.innerHTML = `
-      <div class="modal-content customization-content">
-        <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
-        
-        <h2>${modalTitle}</h2>
-        
-        <div class="customization-layout">
-          <!-- Left side: Live Preview -->
-          <div class="preview-section">
-            <h3>Live Preview</h3>
-            <div class="preview-container">
-              <div class="image-preview-with-border">
-                <h4>Your Image Preview</h4>
-                <img id="borderedImagePreview" src="${imageData.thumbnailUrl}" alt="Image Preview" />
-                <div id="borderLoadingSpinner" class="loading-spinner" style="display: none;"></div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Right side: Customization Options -->
-          <div class="options-section">
-            <div class="option-group">
-              <h3>👕 Product Options</h3>
-              <div class="size-color-grid">
-                <div class="option-item">
-                  <label for="productSize">Size</label>
-                  <select id="productSize" class="option-select">
-                    ${productConfig.popularSizes.map(size => `
-                      <option value="${size}" ${size === (imageContext.selectedSize || 'M') ? 'selected' : ''}>${size}</option>
-                    `).join('')}
-                  </select>
-                </div>
-                
-                <div class="option-item">
-                  <label for="productColor">Color</label>
-                  <select id="productColor" class="option-select">
-                    ${productConfig.availableColors.map(color => `
-                      <option value="${color}" ${color === (imageContext.selectedColor || 'Black') ? 'selected' : ''}>${color}</option>
-                    `).join('')}
-                  </select>
-                </div>
-              </div>
-            </div>
-            
-            <div class="option-group">
-              <h3>🎨 Border Style</h3>
-              <select id="borderStyleSelect" class="border-style-select">
-                <option value="none">No Border</option>
-                <option value="solid-thin">Thin Black Border</option>
-                <option value="solid-medium" selected>Medium Black Border</option>
-                <option value="solid-thick">Thick Black Border</option>
-                <option value="solid-white">White Border</option>
-                <option value="gradient-fade">Gradient Fade</option>
-                <option value="wavelength-theme">Wavelength Theme</option>
-              </select>
-              <p class="option-description">Choose a border style to enhance your image</p>
-            </div>
-            
-
-            
-            <div class="pricing-section">
-              <div class="price-display">
-                <span class="price-label">Starting Price:</span>
-                <span class="price-value">$${(productConfig.basePrice / 100).toFixed(2)}</span>
-              </div>
-            </div>
-            
-            <div class="modal-actions">
-              <button class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
-              <button class="btn-primary" id="createProductBtn">
-                ${buttonText}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-    
-    document.body.appendChild(modal);
-    modal.style.display = 'block';
-    
-    // Setup event listeners
-    this.setupCustomizationModalListeners(modal, productType, productConfig, imageData, imageContext, existingProduct);
-  }
-  
-  generateProductName(productType, imageContext, imageData) {
-    const productConfig = this.findProductConfig(productType);
-    if (!productConfig || !productConfig.nameTemplates) {
-      return 'Custom Wavelength Product';
-    }
-    
-    // Pick a template based on available context
-    let template = productConfig.nameTemplates[0]; // Default to first template
-    
-    if (imageContext.characterName && productConfig.nameTemplates.some(t => t.includes('{characterName}'))) {
-      template = productConfig.nameTemplates.find(t => t.includes('{characterName}'));
-    } else if (imageContext.episodeNumber && productConfig.nameTemplates.some(t => t.includes('{episodeNumber}'))) {
-      template = productConfig.nameTemplates.find(t => t.includes('{episodeNumber}'));
-    } else if (imageContext.seasonName && productConfig.nameTemplates.some(t => t.includes('{seasonName}'))) {
-      template = productConfig.nameTemplates.find(t => t.includes('{seasonName}'));
-    }
-    
-    // Replace placeholders
-    let name = template
-      .replace('{characterName}', imageContext.characterName || 'Character')
-      .replace('{episodeNumber}', imageContext.episodeNumber || 'X')
-      .replace('{seasonName}', imageContext.seasonName || 'Season')
-      .replace('{locationName}', imageContext.locationName || 'Adventure');
-    
-    return name;
-  }
-  
-  setupCustomizationModalListeners(modal, productType, productConfig, imageData, imageContext, existingProduct = null) {
-    const borderSelect = modal.querySelector('#borderStyleSelect');
-    const createBtn = modal.querySelector('#createProductBtn');
-    const sizeSelect = modal.querySelector('#productSize');
-    const colorSelect = modal.querySelector('#productColor');
-
-    
-    // Color change listener (mockup removed)
-    colorSelect.addEventListener('change', () => {
-      // Color selection handled, no mockup to update
-    });
-    
-    // Border style change listener
-    let borderUpdateTimeout = null;
-    borderSelect.addEventListener('change', async () => {
-      if (borderUpdateTimeout) {
-        clearTimeout(borderUpdateTimeout);
-      }
-      
-      borderUpdateTimeout = setTimeout(async () => {
-        await this.updateBorderPreview(modal, imageData, borderSelect.value);
-      }, 300);
-    });
-    
-    // Initial border preview
-    this.updateBorderPreview(modal, imageData, borderSelect.value);
-    
-    // Create/Update product button
-    createBtn.addEventListener('click', async () => {
-      const isUpdate = !!existingProduct;
-      const buttonText = isUpdate ? 'Updating...' : 'Designing...';
-      const progressText = isUpdate ? '🔄 Updating your product...' : '🎨 Preparing your custom product...';
-      
-      // Show loading immediately
-      this.ensureLoadingModalExists();
-      this.setLoading(true, progressText, 10);
-      createBtn.disabled = true;
-      createBtn.textContent = buttonText;
-      
-      const customization = {
-        borderStyle: borderSelect.value,
-        defaultSize: sizeSelect.value,
-        defaultColor: colorSelect.value
-      };
-      
-      try {
-        if (isUpdate) {
-          await this.updateCustomizedProduct(existingProduct, productType, imageData, imageContext, customization);
-        } else {
-          await this.createCustomizedProduct(productType, imageData, imageContext, customization);
-        }
-        
-        // Close customization modal and show success
-        modal.remove();
-        this.setLoading(false);
-      } catch (error) {
-        console.error('Error in product creation/update:', error);
-        this.setLoading(false);
-        createBtn.disabled = false;
-        createBtn.textContent = isUpdate ? 'Update Product' : 'Design Product';
-        // Don't remove modal on error so user can retry
-      }
-    });
-  }
-  
-  async updateBorderPreview(modal, imageData, borderStyle) {
-    const previewImg = modal.querySelector('#borderedImagePreview');
-    const spinner = modal.querySelector('#borderLoadingSpinner');
-    
-    if (borderStyle === 'none') {
-      previewImg.src = imageData.thumbnailUrl;
-      return;
-    }
-    
-    // Show loading spinner
-    spinner.style.display = 'block';
-    
-    try {
-      // Map border style to configuration
-      const borderConfig = this.getBorderConfig(borderStyle);
-      
-      // Call border preview API
-      const response = await fetch('/api/merchandise/border-preview', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.getAuthToken()}`
-        },
-        body: JSON.stringify({
-          sourceImageUrl: imageData.url,
-          borderConfig: borderConfig,
-          options: {
-            format: 'webp',
-            quality: 85
-          }
-        })
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.borderedImageUrl) {
-          previewImg.src = data.borderedImageUrl;
-        } else {
-          console.error('Failed to generate border preview:', data.error);
-          previewImg.src = imageData.thumbnailUrl;
-        }
-      } else {
-        console.error('Failed to generate border preview');
-        previewImg.src = imageData.thumbnailUrl;
-      }
-    } catch (error) {
-      console.error('Error generating border preview:', error);
-      previewImg.src = imageData.thumbnailUrl;
-    } finally {
-      spinner.style.display = 'none';
-    }
-  }
-  
-  getBorderConfig(borderStyle) {
-    const configs = {
-      'solid-thin': {
-        type: 'solid',
-        color: '#000000',
-        width: 5,
-        opacity: 1
-      },
-      'solid-medium': {
-        type: 'solid',
-        color: '#000000',
-        width: 15,
-        opacity: 1
-      },
-      'solid-thick': {
-        type: 'solid',
-        color: '#000000',
-        width: 30,
-        opacity: 1
-      },
-      'solid-white': {
-        type: 'solid',
-        color: '#FFFFFF',
-        width: 15,
-        opacity: 1
-      },
-      'gradient-fade': {
-        type: 'gradient',
-        gradientType: 'linear',
-        colors: ['#000000', '#ffffff'],
-        width: 20,
-        direction: '45deg'
-      },
-      'wavelength-theme': {
-        type: 'wavelength-theme',
-        theme: 'goblin-king',
-        elements: ['crowns', 'gems'],
-        density: 'medium',
-        colorScheme: 'dark',
-        width: 20
-      }
-    };
-    
-    return configs[borderStyle] || configs['solid-medium'];
-  }
-  
   async createCustomizedProduct(productType, imageData, imageContext, customization) {
     try {
       // Prepare product options with productType information
       const productOptions = {
         ...imageContext,
         productType: productType, // Pass the selected product type
-        borderConfig: customization.borderStyle !== 'none' ? this.getBorderConfig(customization.borderStyle) : null,
+        borderConfig: null, // Border config removed - now handled in customization modal
         defaultVariant: {
           size: customization.defaultSize,
           color: customization.defaultColor
