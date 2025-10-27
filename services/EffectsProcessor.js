@@ -42,7 +42,7 @@ class EffectsProcessor {
 
       // Apply effects in optimal order
       pipeline = await this.applyColorGrading(pipeline, finalParams);
-      pipeline = await this.applyLightingEffects(pipeline, finalParams);
+      pipeline = await this.applyLightingEffects(pipeline, finalParams, imageMetadata);
       pipeline = await this.applySpecialEffects(pipeline, finalParams, imageMetadata);
 
       // Convert to WebP for preview
@@ -117,21 +117,21 @@ class EffectsProcessor {
   /**
    * Apply lighting effects (bloom, vignette)
    */
-  async applyLightingEffects(pipeline, params) {
+  async applyLightingEffects(pipeline, params, imageMetadata = {}) {
     try {
       // Vignette effect (darken edges)
       if (params.vignette > 0) {
-        pipeline = await this.applyVignette(pipeline, params.vignette);
+        pipeline = await this.applyVignette(pipeline, params.vignette, imageMetadata);
       }
 
       // Bloom effect (glow)
       if (params.bloom > 0) {
-        pipeline = await this.applyBloom(pipeline, params.bloom);
+        pipeline = await this.applyBloom(pipeline, params.bloom, imageMetadata);
       }
 
       // Edge blur effect
       if (params.blur > 0) {
-        pipeline = await this.applyEdgeBlur(pipeline, params.blur);
+        pipeline = await this.applyEdgeBlur(pipeline, params.blur, imageMetadata);
       }
 
       return pipeline;
@@ -163,22 +163,26 @@ class EffectsProcessor {
   /**
    * Apply vignette (darkened edges for focus)
    */
-  async applyVignette(pipeline, intensity) {
+  async applyVignette(pipeline, intensity, imageMetadata = {}) {
     try {
       // Create vignette SVG overlay
       const vignetteIntensity = Math.max(0, Math.min(1, intensity));
       const opacity = vignetteIntensity;
 
-      // SVG for radial gradient vignette
+      // Get image dimensions
+      const width = imageMetadata.width || 1000;
+      const height = imageMetadata.height || 1000;
+
+      // SVG for radial gradient vignette with correct dimensions
       const vignetteOverlay = Buffer.from(`
-        <svg width="1000" height="1000" xmlns="http://www.w3.org/2000/svg">
+        <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <radialGradient id="vignette" cx="50%" cy="50%" r="65%">
               <stop offset="0%" style="stop-color:rgba(0,0,0,0);stop-opacity:1" />
               <stop offset="100%" style="stop-color:rgba(0,0,0,${opacity});stop-opacity:1" />
             </radialGradient>
           </defs>
-          <rect width="1000" height="1000" fill="url(#vignette)" />
+          <rect width="${width}" height="${height}" fill="url(#vignette)" />
         </svg>
       `);
 
@@ -201,15 +205,16 @@ class EffectsProcessor {
    * Apply bloom/glow effect
    * Creates a soft glow on bright areas
    */
-  async applyBloom(pipeline, intensity) {
+  async applyBloom(pipeline, intensity, imageMetadata = {}) {
     try {
       const bloomIntensity = Math.max(0, Math.min(1, intensity));
 
       if (bloomIntensity === 0) return pipeline;
 
       // Create a blurred version for bloom effect
-      const metadata = await pipeline.metadata();
-      const bloomBuffer = await Sharp(await pipeline.toBuffer())
+      // Ensure the bloom buffer has the same dimensions as the source
+      const pipelineBuffer = await pipeline.toBuffer();
+      const bloomBuffer = await Sharp(pipelineBuffer)
         .blur(20 + bloomIntensity * 40) // 20-60px blur
         .modulate({
           saturation: 1 + bloomIntensity * 0.5
@@ -236,14 +241,15 @@ class EffectsProcessor {
   /**
    * Apply edge blur for depth of field effect
    */
-  async applyEdgeBlur(pipeline, blurStrength) {
+  async applyEdgeBlur(pipeline, blurStrength, imageMetadata = {}) {
     try {
       const strength = Math.max(0, Math.min(10, blurStrength));
 
       if (strength === 0) return pipeline;
 
       // Create a blur mask that's strongest at edges
-      const metadata = await pipeline.metadata();
+      // Use provided metadata if available, otherwise get from pipeline
+      const metadata = Object.keys(imageMetadata).length > 0 ? imageMetadata : await pipeline.metadata();
       const width = metadata.width;
       const height = metadata.height;
 
