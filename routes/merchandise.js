@@ -4024,6 +4024,9 @@ router.post('/openai-upscaler/apply-effects', ensureAuthenticated, groupAuth.req
     const effectsProcessor = new EffectsProcessor();
     const effectsConfig = require('../config/effectsConfig');
 
+    // Log received effect params for debugging
+    console.log(`📥 Received effectParams:`, JSON.stringify(effectParams || {}, null, 2));
+
     // Build effects from enabled toggles
     const finalEffectParams = effectsConfig.buildEffectsFromToggles(effectParams || {});
 

@@ -499,60 +499,106 @@
         async function loadEffects() {
             try {
                 const response = await fetch('/api/merchandise/openai-upscaler/effects-list');
-                const data = await response.json();
-
-                if (data.success) {
-                    availableEffects = data;
-                    console.log('✨ Loaded effects:', data);
-                    renderEffectsUI();
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
+
+                const data = await response.json();
+                console.log('📥 Effects API Response:', data);
+
+                if (!data.success) {
+                    throw new Error('API returned success: false');
+                }
+
+                if (!data.categories || !Array.isArray(data.categories)) {
+                    throw new Error('Missing or invalid categories array in response');
+                }
+
+                if (!data.effectTypes || typeof data.effectTypes !== 'object') {
+                    throw new Error('Missing or invalid effectTypes object in response');
+                }
+
+                availableEffects = data;
+                console.log('✨ Loaded effects successfully');
+                renderEffectsUI();
             } catch (error) {
-                console.error('Error loading effects:', error);
+                console.error('❌ Error loading effects:', error);
                 addLog(`❌ Could not load effects: ${error.message}`, 'error');
             }
         }
 
         function renderEffectsUI() {
-            const container = document.getElementById('effectsContainer');
-            container.innerHTML = '';
-
-            // Render each category
-            availableEffects.categories.forEach(category => {
-                const categoryDiv = document.createElement('div');
-                categoryDiv.style.padding = '15px';
-                categoryDiv.style.background = '#f9f9f9';
-                categoryDiv.style.borderRadius = '6px';
-                categoryDiv.style.border = '2px solid #e0e0e0';
-
-                const categoryTitle = document.createElement('h3');
-                categoryTitle.textContent = category.name;
-                categoryTitle.style.color = '#667eea';
-                categoryTitle.style.fontSize = '1.1em';
-                categoryTitle.style.marginBottom = '12px';
-
-                categoryDiv.appendChild(categoryTitle);
-
-                // Handle border customization category differently
-                if (category.id === 'border') {
-                    renderBorderCustomization(categoryDiv);
-                } else {
-                    // Render toggles for standard effect categories
-                    if (category.effects && Array.isArray(category.effects)) {
-                        category.effects.forEach(effectKey => {
-                            const effect = availableEffects.effectTypes[effectKey];
-                            if (effect) {
-                                const toggle = createEffectToggle(effectKey, effect);
-                                categoryDiv.appendChild(toggle);
-                            }
-                        });
-                    }
+            try {
+                const container = document.getElementById('effectsContainer');
+                if (!container) {
+                    console.error('Effects container not found');
+                    return;
                 }
 
-                container.appendChild(categoryDiv);
-            });
+                if (!availableEffects.categories) {
+                    console.error('Available effects categories not loaded');
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                // Render each category
+                availableEffects.categories.forEach((category, index) => {
+                    try {
+                        const categoryDiv = document.createElement('div');
+                        categoryDiv.style.padding = '15px';
+                        categoryDiv.style.background = '#f9f9f9';
+                        categoryDiv.style.borderRadius = '6px';
+                        categoryDiv.style.border = '2px solid #e0e0e0';
+
+                        const categoryTitle = document.createElement('h3');
+                        categoryTitle.textContent = category.name;
+                        categoryTitle.style.color = '#667eea';
+                        categoryTitle.style.fontSize = '1.1em';
+                        categoryTitle.style.marginBottom = '12px';
+
+                        categoryDiv.appendChild(categoryTitle);
+
+                        // Handle border customization category differently
+                        if (category.id === 'border') {
+                            renderBorderCustomization(categoryDiv);
+                        } else {
+                            // Render toggles for standard effect categories
+                            if (category.effects && Array.isArray(category.effects)) {
+                                category.effects.forEach(effectKey => {
+                                    const effect = availableEffects.effectTypes[effectKey];
+                                    if (effect) {
+                                        const toggle = createEffectToggle(effectKey, effect);
+                                        categoryDiv.appendChild(toggle);
+                                    }
+                                });
+                            }
+                        }
+
+                        container.appendChild(categoryDiv);
+                    } catch (categoryError) {
+                        console.error(`Error rendering category ${index}:`, categoryError);
+                    }
+                });
+                console.log('✅ Effects UI rendered successfully');
+            } catch (error) {
+                console.error('Fatal error in renderEffectsUI:', error);
+                addLog(`❌ Could not render effects: ${error.message}`, 'error');
+            }
         }
 
         function renderBorderCustomization(containerDiv) {
+            // Check if borderOptions is loaded
+            if (!borderOptions.widths || !borderOptions.colors) {
+                console.warn('Border options not yet loaded, will retry when ready');
+                const placeholder = document.createElement('div');
+                placeholder.style.padding = '10px';
+                placeholder.style.color = '#666';
+                placeholder.textContent = '⏳ Loading border options...';
+                containerDiv.appendChild(placeholder);
+                return;
+            }
+
             // Border enable toggle
             const toggleContainer = document.createElement('div');
             toggleContainer.style.marginBottom = '15px';
@@ -1247,68 +1293,15 @@
                 const data = await response.json();
                 if (data.success) {
                     borderOptions = data;
-                    renderBorderUI();
-                    addLog(`✅ Loaded ${data.totalColors} border colors and ${data.totalWidths} width options`, 'info');
+                    console.log('✅ Border options loaded:', data);
+                    addLog(`✅ Loaded ${data.colors.length} border colors and ${data.widths.length} width options`, 'info');
+                    // Re-render effects UI to populate border customization now that borderOptions is available
+                    renderEffectsUI();
                 }
             } catch (error) {
                 console.error('Error loading border options:', error);
                 addLog(`⚠️ Could not load border options: ${error.message}`, 'warn');
             }
-        }
-
-        function renderBorderUI() {
-            // Render width buttons
-            const widthContainer = document.getElementById('widthButtons');
-            widthContainer.innerHTML = '';
-            borderOptions.widths.forEach(width => {
-                const btn = document.createElement('button');
-                btn.textContent = width.label;
-                btn.style.padding = '10px';
-                btn.style.borderRadius = '4px';
-                btn.style.border = '2px solid #ddd';
-                btn.style.cursor = 'pointer';
-                btn.style.background = 'white';
-                btn.onclick = () => selectBorderWidth(width);
-                widthContainer.appendChild(btn);
-            });
-
-            // Render color palette
-            const colorContainer = document.getElementById('colorPalette');
-            colorContainer.innerHTML = '';
-            borderOptions.colors.forEach(color => {
-                const btn = document.createElement('button');
-                btn.style.width = '100%';
-                btn.style.aspectRatio = '1';
-                btn.style.background = color.hex;
-                btn.style.border = '2px solid #ddd';
-                btn.style.borderRadius = '4px';
-                btn.style.cursor = 'pointer';
-                btn.title = color.name;
-                btn.onclick = () => selectBorderColor(color);
-                colorContainer.appendChild(btn);
-            });
-        }
-
-        function selectBorderWidth(width) {
-            selectedBorderWidth = width;
-            updateBorderPreview();
-        }
-
-        function selectBorderColor(color) {
-            selectedBorderColor = color.hex;
-            updateBorderPreview();
-        }
-
-        function updateBorderPreview() {
-            const preview = document.getElementById('borderPreview');
-            const width = selectedBorderWidth.label || 'None';
-            const colorName = borderOptions.colors.find(c => c.hex === selectedBorderColor)?.name || 'Unknown';
-            preview.textContent = `${width} / ${colorName}`;
-        }
-
-        function updateBorderUI() {
-            const enabled = document.getElementById('borderEnabled').checked;
-            document.getElementById('borderControls').style.display = enabled ? 'block' : 'none';
         }
 
         // Load templates and gallery on startup

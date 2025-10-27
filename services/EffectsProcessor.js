@@ -51,7 +51,8 @@ class EffectsProcessor {
 
       // Apply border if specified in effectParams
       let finalProcessed = processed;
-      if (effectParams.borderEnabled && effectParams.borderWidth > 0 && effectParams.borderColor) {
+      if (effectParams.borderEnabled && effectParams.borderWidthPixels > 0 && effectParams.borderColor) {
+        console.log(`🖼️ Applying border: ${effectParams.borderWidthPixels}px, Color: ${effectParams.borderColor}`);
         const BorderProcessor = require('./BorderProcessor');
         const borderProcessor = new BorderProcessor();
         finalProcessed = await borderProcessor.applyBorder(processed, {
@@ -60,6 +61,7 @@ class EffectsProcessor {
           widthPixels: effectParams.borderWidthPixels,
           colorHex: effectParams.borderColor
         });
+        console.log(`✅ Border applied successfully`);
       }
 
       console.log(`✅ Effects applied successfully`);

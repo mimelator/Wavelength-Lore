@@ -209,8 +209,18 @@ const effectsConfig = {
       lightning: 0
     };
 
-    // Apply each enabled effect's preset
+    // Border customization parameters
+    const borderParams = {};
+
+    // Apply each enabled effect's preset and collect border params
     for (const [toggleKey, enabled] of Object.entries(enabledToggles)) {
+      // Handle border parameters separately
+      if (toggleKey === 'borderEnabled' || toggleKey === 'borderColor' || toggleKey === 'borderWidth' || toggleKey === 'borderWidthPixels') {
+        borderParams[toggleKey] = enabledToggles[toggleKey];
+        continue;
+      }
+
+      // Process standard effects
       if (enabled) {
         const effect = this.effectTypes[toggleKey];
         if (effect && effect.preset) {
@@ -219,6 +229,9 @@ const effectsConfig = {
         }
       }
     }
+
+    // Merge border parameters into final effects
+    Object.assign(finalEffects, borderParams);
 
     return finalEffects;
   }

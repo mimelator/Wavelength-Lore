@@ -6,6 +6,9 @@
  * being both a place and an episode).
  */
 
+// Import JSON escaping utilities for safe data attribute handling
+const { escapeJsonForHtml, escapeTextForHtml } = require('../utils/json-escaping-utils');
+
 // Store helper instances and CDN URL
 let characterHelpers, loreHelpers, episodeHelpers, cdnUrl;
 
@@ -322,22 +325,10 @@ function applySmartLinkingSimple(text, currentUrl = null) {
         }
       } else {
         // Multiple matches with no exact character match - use disambiguation modal
-        // 🔥 FIX: Properly escape JSON data to prevent parsing errors
-        const conflictsJson = JSON.stringify(uniqueConflicts)
-          .replace(/\\/g, '\\\\')   // Escape backslashes
-          .replace(/"/g, '&quot;')  // Escape quotes  
-          .replace(/'/g, '&#x27;')  // Escape single quotes
-          .replace(/</g, '&lt;')    // Escape less than
-          .replace(/>/g, '&gt;')    // Escape greater than
-          .replace(/&/g, '&amp;');  // Escape ampersands (do this last)
-        
-        // Also escape the phrase data attribute
-        const escapedPhrase = originalText
-          .replace(/&/g, '&amp;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#x27;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;');
+        // 🔥 FIX: Use reusable JSON escaping utilities for safe data attributes
+        const conflictsJsonString = JSON.stringify(uniqueConflicts);
+        const conflictsJson = escapeJsonForHtml(conflictsJsonString);
+        const escapedPhrase = escapeTextForHtml(originalText);
           
         replacementHtml = `<span class="disambiguation-link" onclick="openDisambiguationModal(this)" data-phrase="${escapedPhrase}" data-conflicts="${conflictsJson}">${originalText}</span>`;
       }
@@ -384,24 +375,32 @@ function getSimpleDisambiguationScript(cdnUrlParam = '') {
       // Set CDN URL for image paths
       window.cdnUrl = '${cdnUrlParam}';
       
+      // Import Wavelength JSON utilities (loaded via separate script tag)
+      const { unescapeJsonFromHtml } = window.WavelengthJsonUtils || {};
+      
       function openDisambiguationModal(element) {
         const phrase = element.dataset.phrase;
         let conflicts;
         
         try {
-          // 🔥 FIX: Properly unescape JSON data to prevent parsing errors
+          // 🔥 FIX: Use proper client-side JSON unescaping
+          // Client-side unescaping - matches server-side escaping order
           const conflictsData = element.dataset.conflicts
-            .replace(/&amp;/g, '&')     // Unescape ampersands (do this first)
-            .replace(/&lt;/g, '<')      // Unescape less than
-            .replace(/&gt;/g, '>')      // Unescape greater than
+            .replace(/\\\\/g, '\\')     // Unescape backslashes first
             .replace(/&#x27;/g, "'")    // Unescape single quotes
-            .replace(/&quot;/g, '"')    // Unescape quotes
-            .replace(/\\\\/g, '\\');    // Unescape backslashes
+            .replace(/&quot;/g, '"')    // Unescape quotes  
+            .replace(/&gt;/g, '>')      // Unescape greater than
+            .replace(/&lt;/g, '<')      // Unescape less than
+            .replace(/&amp;/g, '&');    // Unescape ampersands last
+          
           conflicts = JSON.parse(conflictsData);
+          
+          if (!conflicts) {
+            throw new Error('Failed to parse conflicts data');
+          }
         } catch (error) {
           console.error('Failed to parse disambiguation data:', error);
           console.error('Raw data:', element.dataset.conflicts);
-          console.error('Processed data:', conflictsData);
           return; // Don't show modal if data is corrupted
         }
         
