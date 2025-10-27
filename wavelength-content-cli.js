@@ -357,60 +357,103 @@ class WavelengthContentCLI {
             return;
         }
         
-        // Try to find the item in current context
-        let item = null;
-        
-        if (this.currentPath.includes('/lore/') || this.currentPath === '/lore/') {
-            item = loreHelpers.getLoreByIdSync(itemId);
-        }
+        // Use the comprehensive findItemById method
+        const item = this.findItemById(itemId);
         
         if (!item) {
             console.log(chalk.red(`❌ Item "${itemId}" not found`));
             return;
         }
         
-        console.log(chalk.blue.bold(`\n🔍 ${detailed ? 'COMPREHENSIVE' : 'QUICK'} VIEW: ${item.title}`));
+        // Determine content type for better display
+        const contentType = this.currentPath.includes('/episodes/') ? 'episode' : 
+                           this.currentPath.includes('/characters/') ? 'character' : 'lore';
+        
+        console.log(chalk.blue.bold(`\n🔍 ${detailed ? 'COMPREHENSIVE' : 'QUICK'} VIEW: ${item.title || item.name}`));
         console.log(chalk.gray('=' .repeat(50)));
         
         console.log(chalk.cyan('ID:'), item.id);
-        console.log(chalk.cyan('Type:'), item.type);
+        
+        if (contentType === 'episode') {
+            console.log(chalk.cyan('Season:'), item.season);
+            console.log(chalk.cyan('Episode:'), item.episode);
+            if (item.url) console.log(chalk.cyan('URL:'), item.url);
+            if (item.youtubeLink) console.log(chalk.cyan('YouTube:'), item.youtubeLink);
+        } else if (contentType === 'character') {
+            if (item.name) console.log(chalk.cyan('Name:'), item.name);
+            if (item.role) console.log(chalk.cyan('Role:'), item.role);
+        } else {
+            console.log(chalk.cyan('Type:'), item.type);
+        }
+        
         console.log(chalk.cyan('Visibility:'), item.hidden ? chalk.red('HIDDEN') : chalk.green('VISIBLE'));
         
         if (detailed) {
             console.log(chalk.cyan('\nDescription:'));
             console.log(chalk.white(item.description || 'No description'));
             
-            if (item.enhanced_title) {
-                console.log(chalk.cyan('\nEnhanced Title:'));
-                console.log(chalk.yellow(item.enhanced_title));
+            // Episode-specific fields
+            if (contentType === 'episode') {
+                if (item.keywords && item.keywords.length > 0) {
+                    console.log(chalk.cyan('\nKeywords:'));
+                    console.log(chalk.gray(item.keywords.join(', ')));
+                }
+                if (item.image) {
+                    console.log(chalk.cyan('\nImage:'));
+                    console.log(chalk.white(item.image));
+                }
             }
             
-            if (item.tagline) {
-                console.log(chalk.cyan('\nTagline:'));
-                console.log(chalk.magenta(item.tagline));
+            // Lore-specific enhanced fields
+            if (contentType === 'lore') {
+                if (item.enhanced_title) {
+                    console.log(chalk.cyan('\nEnhanced Title:'));
+                    console.log(chalk.yellow(item.enhanced_title));
+                }
+                
+                if (item.tagline) {
+                    console.log(chalk.cyan('\nTagline:'));
+                    console.log(chalk.magenta(item.tagline));
+                }
+                
+                if (item.cta_hook) {
+                    console.log(chalk.cyan('\nCTA Hook:'));
+                    console.log(chalk.green(item.cta_hook));
+                }
+                
+                if (item.power_statement) {
+                    console.log(chalk.cyan('\nPower Statement:'));
+                    console.log(chalk.red(item.power_statement));
+                }
+                
+                if (item.image_gallery && item.image_gallery.length > 0) {
+                    console.log(chalk.cyan('\nImages:'));
+                    item.image_gallery.forEach((img, i) => {
+                        console.log(chalk.white(`  ${i + 1}. ${img}`));
+                    });
+                }
             }
             
-            if (item.cta_hook) {
-                console.log(chalk.cyan('\nCTA Hook:'));
-                console.log(chalk.green(item.cta_hook));
-            }
-            
-            if (item.power_statement) {
-                console.log(chalk.cyan('\nPower Statement:'));
-                console.log(chalk.red(item.power_statement));
-            }
-            
-            if (item.image_gallery && item.image_gallery.length > 0) {
-                console.log(chalk.cyan('\nImages:'));
-                item.image_gallery.forEach((img, i) => {
-                    console.log(chalk.white(`  ${i + 1}. ${img}`));
-                });
+            // Character-specific fields
+            if (contentType === 'character') {
+                if (item.traits && item.traits.length > 0) {
+                    console.log(chalk.cyan('\nTraits:'));
+                    console.log(chalk.gray(item.traits.join(', ')));
+                }
+                if (item.backstory) {
+                    console.log(chalk.cyan('\nBackstory:'));
+                    console.log(chalk.white(item.backstory));
+                }
             }
         } else {
             const preview = item.description ? item.description.substring(0, 100) + '...' : 'No description';
             console.log(chalk.white(preview));
             
-            if (item.enhanced_title) {
+            if (contentType === 'episode' && item.keywords) {
+                console.log(chalk.gray(`🏷️  ${item.keywords.slice(0, 3).join(', ')}${item.keywords.length > 3 ? '...' : ''}`));
+            }
+            
+            if (contentType === 'lore' && item.enhanced_title) {
                 console.log(chalk.yellow('✨ Enhanced with dramatic CTAs'));
             }
         }
