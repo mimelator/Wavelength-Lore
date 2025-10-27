@@ -1226,10 +1226,12 @@ class MerchandiseStore {
     const productsHTML = categoryData.products.map(product => `
       <div class="product-item">
         <div class="product-preview">
-          <div class="product-preview-placeholder">
-            <div class="product-preview-icon">
-              ${this.getCategoryIcon(product.category)}
-            </div>
+          <div class="product-preview-image" data-blueprint-id="${product.blueprintId}">
+            <img class="blueprint-preview-img" 
+                 src="/images/previews/loading-preview.svg" 
+                 alt="${product.name} Preview"
+                 onerror="this.src='/images/previews/generic-product-preview.svg'"
+                 style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
             <div class="product-preview-text">${product.name}</div>
           </div>
         </div>
@@ -1285,6 +1287,80 @@ class MerchandiseStore {
     };
   }
 
+  async loadBlueprintPreviews() {
+    console.log('🎨 Loading blueprint preview images...');
+    
+    // Find all product preview containers
+    const previewContainers = document.querySelectorAll('.product-preview-image[data-blueprint-id]');
+    
+    if (previewContainers.length === 0) {
+      console.log('📷 No blueprint previews to load');
+      return;
+    }
+    
+    console.log(`🔍 Found ${previewContainers.length} blueprint previews to load`);
+    
+    // Collect all unique blueprint IDs
+    const blueprintIds = Array.from(previewContainers).map(container => 
+      parseInt(container.dataset.blueprintId)
+    ).filter(id => !isNaN(id));
+    
+    const uniqueBlueprintIds = [...new Set(blueprintIds)];
+    
+    try {
+      // Batch fetch blueprint previews
+      const response = await fetch('/api/merchandise/blueprint-previews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ blueprintIds: uniqueBlueprintIds })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch blueprint previews');
+      }
+      
+      console.log(`✅ Loaded ${data.previews.length} blueprint previews`);
+      
+      // Update each preview image
+      data.previews.forEach(preview => {
+        if (preview.success) {
+          // Find all containers for this blueprint ID
+          const containers = document.querySelectorAll(`.product-preview-image[data-blueprint-id="${preview.blueprintId}"]`);
+          
+          containers.forEach(container => {
+            const img = container.querySelector('.blueprint-preview-img');
+            if (img) {
+              // Set the preview image source
+              img.src = preview.previewImage;
+              img.alt = `${preview.name} Preview`;
+              
+              console.log(`🖼️ Updated preview for blueprint ${preview.blueprintId}: ${preview.name}`);
+            }
+          });
+        }
+      });
+      
+    } catch (error) {
+      console.error('❌ Error loading blueprint previews:', error);
+      
+      // Fallback: Set all images to generic preview
+      previewContainers.forEach(container => {
+        const img = container.querySelector('.blueprint-preview-img');
+        if (img && img.src.includes('loading-preview.svg')) {
+          img.src = '/images/previews/generic-product-preview.svg';
+        }
+      });
+    }
+  }
+
   getCategoryDescription(categoryKey) {
     const descriptions = {
       't-shirt': 'Classic cotton t-shirts perfect for everyday wear',
@@ -1322,6 +1398,8 @@ class MerchandiseStore {
     const container = document.getElementById('category-navigation-container');
     if (container) {
       this.renderCategoryProducts(container);
+      // Load blueprint preview images after rendering
+      this.loadBlueprintPreviews();
     }
   }
 
