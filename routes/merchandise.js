@@ -7,6 +7,7 @@
 
 const express = require('express');
 const router = express.Router();
+const path = require('path');
 const { ensureAuthenticated } = require('../middleware/auth');
 const groupAuth = require('../middleware/groupAuth');
 const AutoEnhancedPrintifyService = require('../services/auto-enhanced-printify-service');
@@ -1742,5 +1743,152 @@ async function refundPayment(paymentId) {
   // TODO: Implement refund logic with your payment processor
   console.log('Refunding payment:', paymentId);
 }
+
+// ========================================
+// NEW ENDPOINTS FOR MERCHANDISE REFACTORING
+// ========================================
+
+/**
+ * GET /api/enhancement/status
+ * Get AI image enhancement service status
+ * This is an alias to /api/merchandise/enhancement-status
+ */
+router.get('/enhancement/status', (req, res) => {
+  try {
+    const status = printifyService.getEnhancementStatus();
+    res.json({
+      success: true,
+      enhancement: status
+    });
+  } catch (error) {
+    console.error('Error checking enhancement status:', error);
+    res.json({
+      success: true,
+      enhancement: {
+        available: false,
+        services: { sharp: true },
+        recommendation: 'Basic upscaling only',
+        error: error.message
+      }
+    });
+  }
+});
+
+/**
+ * GET /api/product-catalog
+ * Get complete product catalog with all available products and categories
+ */
+router.get('/product-catalog', async (req, res) => {
+  try {
+    console.log('📚 Fetching complete product catalog...');
+
+    const catalog = {
+      success: true,
+      allProducts: getAllProducts(),
+      categories: Object.keys(ProductTypes).map(key => ({
+        id: key,
+        name: ProductTypes[key].name,
+        description: ProductTypes[key].description,
+        icon: ProductTypes[key].icon
+      })),
+      totalProducts: getAllProducts().length,
+      timestamp: new Date().toISOString()
+    };
+
+    res.json(catalog);
+  } catch (error) {
+    console.error('Error fetching product catalog:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch product catalog',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/gallery
+ * Get user's gallery images (public endpoint, requires authentication)
+ * Returns all user gallery images suitable for merchandise creation
+ */
+router.get('/gallery', ensureAuthenticated, async (req, res) => {
+  try {
+    console.log('🖼️ Fetching gallery images for merchandise...');
+
+    const userId = req.user.uid;
+
+    // Get gallery images from storage
+    const galleryImages = await galleryStorage.listUserGalleryImages(userId);
+
+    // Format gallery images for response
+    const formattedImages = galleryImages.map(image => ({
+      id: path.basename(image.relativePath),
+      url: image.url,
+      title: image.title || path.basename(image.relativePath),
+      uploadedAt: image.uploadedAt,
+      size: image.size,
+      dimensions: image.dimensions,
+      format: path.extname(image.relativePath).slice(1).toLowerCase()
+    }));
+
+    res.json({
+      success: true,
+      images: formattedImages,
+      total: formattedImages.length,
+      userId: userId
+    });
+  } catch (error) {
+    console.error('Error fetching gallery images:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch gallery images',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/gallery/:imageId
+ * Get specific gallery image details
+ */
+router.get('/gallery/:imageId', ensureAuthenticated, async (req, res) => {
+  try {
+    const { imageId } = req.params;
+    const userId = req.user.uid;
+
+    console.log(`🖼️ Fetching gallery image: ${imageId}`);
+
+    // Get all user images and find the specific one
+    const galleryImages = await galleryStorage.listUserGalleryImages(userId);
+    const image = galleryImages.find(img => path.basename(img.relativePath) === imageId);
+
+    if (!image) {
+      return res.status(404).json({
+        success: false,
+        error: 'Gallery image not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      image: {
+        id: path.basename(image.relativePath),
+        url: image.url,
+        title: image.title || path.basename(image.relativePath),
+        uploadedAt: image.uploadedAt,
+        size: image.size,
+        dimensions: image.dimensions,
+        format: path.extname(image.relativePath).slice(1).toLowerCase()
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching gallery image:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch gallery image',
+      details: error.message
+    });
+  }
+});
 
 module.exports = router;
