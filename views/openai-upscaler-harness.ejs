@@ -554,8 +554,13 @@
             const container = document.getElementById('effectsContainer');
             container.innerHTML = '';
 
-            // Render each category
+            // Render each category (skip border category - it's handled separately)
             availableEffects.categories.forEach(category => {
+                // Skip border customization category - it's handled in its own panel
+                if (category.id === 'border') {
+                    return;
+                }
+
                 const categoryDiv = document.createElement('div');
                 categoryDiv.style.padding = '15px';
                 categoryDiv.style.background = '#f9f9f9';
@@ -571,13 +576,15 @@
                 categoryDiv.appendChild(categoryTitle);
 
                 // Render toggles for this category
-                category.effects.forEach(effectKey => {
-                    const effect = availableEffects.effectTypes[effectKey];
-                    if (effect) {
-                        const toggle = createEffectToggle(effectKey, effect);
-                        categoryDiv.appendChild(toggle);
-                    }
-                });
+                if (category.effects && Array.isArray(category.effects)) {
+                    category.effects.forEach(effectKey => {
+                        const effect = availableEffects.effectTypes[effectKey];
+                        if (effect) {
+                            const toggle = createEffectToggle(effectKey, effect);
+                            categoryDiv.appendChild(toggle);
+                        }
+                    });
+                }
 
                 container.appendChild(categoryDiv);
             });

@@ -3738,26 +3738,33 @@ router.post('/openai-upscaler/test', ensureAuthenticated, groupAuth.requireActio
 
     const startTime = Date.now();
 
-    // Create analysis object for upscaler
-    const analysis = {
-      originalDimensions: { width: 100, height: 100 },
-      targetDimensions: { width: targetWidth, height: targetHeight },
-      action: 'upscale',
-      scaleFactor: Math.max(targetWidth / 100, targetHeight / 100),
-      currentFormat: 'jpeg'
-    };
+    // Use the full upscaling service with Global Image Cache support
+    const ImageUpscalingService = require('../services/image-upscaling-service');
+    const upscalingService = new ImageUpscalingService();
 
-    console.log(`📊 Calling ImageOptimizer.upscaleWithOpenAI()...`);
+    console.log(`📊 Upscaling with cache support...`);
 
-    const optimizer = new ImageOptimizer();
-
-    // Call OpenAI upscaler
+    let upscaledResult;
     let upscaledBuffer;
     try {
-      upscaledBuffer = await optimizer.upscaleWithOpenAI(imageBuffer, analysis);
-      console.log(`✅ OpenAI upscaling succeeded`);
+      upscaledResult = await upscalingService.upscaleImage(
+        imageBuffer,
+        {
+          method: 'openai',
+          contentType: 'photo',
+          originalDimensions: { width: 100, height: 100 },
+          targetDimensions: { width: targetWidth, height: targetHeight }
+        }
+      );
+
+      if (!upscaledResult.success) {
+        throw new Error(upscaledResult.error || 'Upscaling failed');
+      }
+
+      console.log(`✅ Upscaling succeeded (Method: ${upscaledResult.method})`);
+      upscaledBuffer = upscaledResult.upscaledBuffer;
     } catch (error) {
-      console.error(`❌ OpenAI upscaling failed:`, error.message);
+      console.error(`❌ Upscaling failed:`, error.message);
       throw error;
     }
 
