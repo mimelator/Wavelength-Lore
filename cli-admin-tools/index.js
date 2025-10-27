@@ -32,11 +32,15 @@ class WavelengthAdminToolkit {
                 script: 'deployment-status.js',
                 icon: '📊'
             },
-            'chatbot': {
+                        'chatbot': {
                 name: 'Chatbot Admin',
                 description: 'Interactive lore chatbot administration',
                 script: 'chatbot-admin.js',
-                icon: '🤖'
+            },
+            'aws': {
+                name: 'AWS Manager',
+                description: 'Clean room AWS infrastructure management',
+                script: 'aws-admin.js',
             }
         };
     }
@@ -61,6 +65,8 @@ class WavelengthAdminToolkit {
         console.log(chalk.white('  Example: npm run cli:admin cache --status'));
         console.log(chalk.white('  Example: npm run cli:admin chatbot health'));
         console.log(chalk.white('  Example: npm run cli:admin chatbot query "Who is Andrew?"'));
+        console.log(chalk.white('  Example: npm run cli:admin aws cloudfront list'));
+        console.log(chalk.white('  Example: npm run cli:admin aws apprunner status'));
         console.log('');
         
         console.log(chalk.green('🌟 Pristine Tools - Isolated & Reliable'));
@@ -127,6 +133,24 @@ class WavelengthAdminToolkit {
                     } else {
                         await toolInstance.getStatus();
                     }
+                } else if (toolKey === 'aws') {
+                    // Handle AWS subcommands
+                    const service = args[0] || 'help';
+                    const operation = args[1] || 'help';
+                    const subArgs = args.slice(2);
+                    
+                    // Parse options
+                    const options = {};
+                    for (let i = 0; i < subArgs.length; i += 2) {
+                        if (subArgs[i]?.startsWith('--')) {
+                            const key = subArgs[i].substring(2);
+                            const value = subArgs[i + 1];
+                            options[key] = value;
+                        }
+                    }
+                    
+                    await toolInstance.handleCommand(service, operation, options);
+                    
                 } else if (toolKey === 'chatbot') {
                     // Handle chatbot subcommands
                     const subCommand = args[0] || 'help';
