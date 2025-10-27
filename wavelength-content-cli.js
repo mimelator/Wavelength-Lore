@@ -379,6 +379,10 @@ class WavelengthContentCLI {
                     await this.showRecentContent();
                     break;
                     
+                case 'query':
+                    await this.queryServer(args);
+                    break;
+                    
                 case 'bulk-edit':
                 case 'batch':
                     await this.batchOperations(args);
@@ -436,6 +440,7 @@ class WavelengthContentCLI {
         console.log('  search <terms>   - Full-text search across all content');
         console.log('  find <pattern>   - Find items by pattern matching');
         console.log('  recent           - Show recently modified items');
+        console.log('  query <type>     - Direct server queries (stats, hidden, type, etc.)');
         
         console.log(chalk.green('\nBatch Operations:'));
         console.log('  batch view <pattern> - View multiple items');
@@ -1721,7 +1726,303 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
     }
 
     /**
-     * 📦 BATCH OPERATIONS - Mass content management
+     * � QUERY SERVER - Direct Firebase queries
+     */
+    async queryServer(args) {
+        if (args.length === 0) {
+            console.log(chalk.blue.bold('\n🔍 WAVELENGTH SERVER QUERY'));
+            console.log(chalk.gray('=' .repeat(50)));
+            console.log(chalk.yellow('Available query types:'));
+            console.log(chalk.gray('  • query stats           - Show database statistics'));
+            console.log(chalk.gray('  • query hidden          - Show all hidden content'));
+            console.log(chalk.gray('  • query type <type>     - Filter by content type'));
+            console.log(chalk.gray('  • query recent <days>   - Show content from last N days'));
+            console.log(chalk.gray('  • query search <term>   - Search all fields for term'));
+            console.log(chalk.gray('  • query validate        - Check data integrity'));
+            console.log(chalk.gray('  • query backup          - Show backup status'));
+            return;
+        }
+
+        const queryType = args[0].toLowerCase();
+        const queryParam = args.slice(1).join(' ');
+
+        try {
+            switch (queryType) {
+                case 'stats':
+                    await this.queryStats();
+                    break;
+                case 'hidden':
+                    await this.queryHidden();
+                    break;
+                case 'type':
+                    await this.queryByType(queryParam);
+                    break;
+                case 'recent':
+                    await this.queryRecent(parseInt(queryParam) || 7);
+                    break;
+                case 'search':
+                    await this.querySearch(queryParam);
+                    break;
+                case 'validate':
+                    await this.queryValidate();
+                    break;
+                case 'backup':
+                    await this.queryBackup();
+                    break;
+                default:
+                    console.log(chalk.red(`❌ Unknown query type: ${queryType}`));
+                    console.log(chalk.gray('Type "query" to see available options'));
+            }
+        } catch (error) {
+            console.log(chalk.red(`❌ Query failed: ${error.message}`));
+        }
+    }
+
+    async queryStats() {
+        console.log(chalk.blue.bold('\n📊 DATABASE STATISTICS'));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        const allLore = loreHelpers.getAllLoreSync();
+        const allCharacters = characterHelpers.getAllCharactersSync();
+        const allEpisodes = episodeHelpers.getAllEpisodesSync();
+
+        // Lore stats
+        const loreByType = {};
+        const hiddenLore = allLore.filter(item => item.hidden || item.visibility === 'hidden');
+        allLore.forEach(item => {
+            loreByType[item.type] = (loreByType[item.type] || 0) + 1;
+        });
+
+        // Character stats
+        const charactersByRole = {};
+        allCharacters.forEach(char => {
+            const role = char.role || char.type || 'other';
+            charactersByRole[role] = (charactersByRole[role] || 0) + 1;
+        });
+
+        // Episode stats
+        const episodesBySeason = {};
+        allEpisodes.forEach(ep => {
+            const season = ep.season || 'unknown';
+            episodesBySeason[season] = (episodesBySeason[season] || 0) + 1;
+        });
+
+        console.log(chalk.cyan(`📚 Total Lore Items: ${allLore.length}`));
+        console.log(chalk.gray(`   Hidden: ${hiddenLore.length}`));
+        Object.keys(loreByType).forEach(type => {
+            console.log(chalk.gray(`   ${type}: ${loreByType[type]}`));
+        });
+
+        console.log(chalk.cyan(`\n👥 Total Characters: ${allCharacters.length}`));
+        Object.keys(charactersByRole).forEach(role => {
+            console.log(chalk.gray(`   ${role}: ${charactersByRole[role]}`));
+        });
+
+        console.log(chalk.cyan(`\n📺 Total Episodes: ${allEpisodes.length}`));
+        Object.keys(episodesBySeason).forEach(season => {
+            console.log(chalk.gray(`   ${season}: ${episodesBySeason[season]}`));
+        });
+
+        // Database health
+        const withImages = allLore.filter(item => item.image || (item.image_gallery && item.image_gallery.length > 0));
+        const withEnhancement = allLore.filter(item => item.enhanced_content || item.enhanced_cta);
+        
+        console.log(chalk.yellow(`\n🎨 Content Quality:`));
+        console.log(chalk.gray(`   Items with images: ${withImages.length}/${allLore.length}`));
+        console.log(chalk.gray(`   Items with AI enhancement: ${withEnhancement.length}/${allLore.length}`));
+    }
+
+    async queryHidden() {
+        console.log(chalk.blue.bold('\n🔒 HIDDEN CONTENT'));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        const allLore = loreHelpers.getAllLoreSync();
+        const hiddenLore = allLore.filter(item => item.hidden || item.visibility === 'hidden');
+
+        if (hiddenLore.length === 0) {
+            console.log(chalk.green('✅ No hidden content found'));
+            return;
+        }
+
+        hiddenLore.forEach((item, index) => {
+            console.log(chalk.yellow(`  ${index + 1}. ${item.id}`) + chalk.gray(` - ${item.title}`));
+            console.log(chalk.gray(`     Type: ${item.type} | Created: ${item.created || 'unknown'}`));
+        });
+        
+        console.log(chalk.cyan(`\n📊 Total hidden items: ${hiddenLore.length}`));
+    }
+
+    async queryByType(type) {
+        if (!type) {
+            console.log(chalk.red('❌ Please specify a content type'));
+            return;
+        }
+
+        console.log(chalk.blue.bold(`\n📂 CONTENT BY TYPE: ${type.toUpperCase()}`));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        const allLore = loreHelpers.getAllLoreSync();
+        const filtered = allLore.filter(item => item.type && item.type.toLowerCase() === type.toLowerCase());
+
+        if (filtered.length === 0) {
+            console.log(chalk.yellow(`No items found for type: ${type}`));
+            return;
+        }
+
+        filtered.forEach((item, index) => {
+            const statusIcon = item.hidden ? '🔒' : '👁️';
+            console.log(chalk.white(`  ${index + 1}. ${statusIcon} ${item.id}`) + chalk.gray(` - ${item.title}`));
+        });
+        
+        console.log(chalk.cyan(`\n📊 Found ${filtered.length} items of type "${type}"`));
+    }
+
+    async queryRecent(days) {
+        console.log(chalk.blue.bold(`\n⏰ CONTENT FROM LAST ${days} DAYS`));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        const allLore = loreHelpers.getAllLoreSync();
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - days);
+
+        const recent = allLore.filter(item => {
+            if (!item.created) return false;
+            const createdDate = new Date(item.created);
+            return createdDate >= cutoffDate;
+        }).sort((a, b) => new Date(b.created) - new Date(a.created));
+
+        if (recent.length === 0) {
+            console.log(chalk.yellow(`No content found from the last ${days} days`));
+            return;
+        }
+
+        recent.forEach((item, index) => {
+            const statusIcon = item.hidden ? '🔒' : '👁️';
+            const date = new Date(item.created).toLocaleDateString();
+            console.log(chalk.white(`  ${index + 1}. ${statusIcon} ${item.id}`) + 
+                       chalk.gray(` - ${item.title} (${date})`));
+        });
+        
+        console.log(chalk.cyan(`\n📊 Found ${recent.length} items from last ${days} days`));
+    }
+
+    async querySearch(searchTerm) {
+        if (!searchTerm) {
+            console.log(chalk.red('❌ Please specify a search term'));
+            return;
+        }
+
+        console.log(chalk.blue.bold(`\n🔍 SEARCH RESULTS: "${searchTerm}"`));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        const allLore = loreHelpers.getAllLoreSync();
+        const searchLower = searchTerm.toLowerCase();
+        
+        const results = allLore.filter(item => {
+            return (item.title && item.title.toLowerCase().includes(searchLower)) ||
+                   (item.id && item.id.toLowerCase().includes(searchLower)) ||
+                   (item.content && item.content.toLowerCase().includes(searchLower)) ||
+                   (item.type && item.type.toLowerCase().includes(searchLower));
+        });
+
+        if (results.length === 0) {
+            console.log(chalk.yellow(`No results found for: ${searchTerm}`));
+            return;
+        }
+
+        results.forEach((item, index) => {
+            const statusIcon = item.hidden ? '🔒' : '👁️';
+            console.log(chalk.white(`  ${index + 1}. ${statusIcon} ${item.id}`) + chalk.gray(` - ${item.title}`));
+            console.log(chalk.gray(`     Type: ${item.type}`));
+            
+            // Show snippet of matching content
+            if (item.content && item.content.toLowerCase().includes(searchLower)) {
+                const snippet = item.content.substring(0, 100) + '...';
+                console.log(chalk.gray(`     "${snippet}"`));
+            }
+        });
+        
+        console.log(chalk.cyan(`\n📊 Found ${results.length} matches`));
+    }
+
+    async queryValidate() {
+        console.log(chalk.blue.bold('\n✅ DATA VALIDATION'));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        const allLore = loreHelpers.getAllLoreSync();
+        const issues = [];
+
+        // Check for missing required fields
+        allLore.forEach(item => {
+            if (!item.id) issues.push(`Missing ID: ${JSON.stringify(item)}`);
+            if (!item.title) issues.push(`Missing title: ${item.id}`);
+            if (!item.type) issues.push(`Missing type: ${item.id}`);
+            if (!item.content) issues.push(`Missing content: ${item.id}`);
+        });
+
+        // Check for duplicate IDs
+        const ids = allLore.map(item => item.id);
+        const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
+        duplicates.forEach(id => issues.push(`Duplicate ID: ${id}`));
+
+        if (issues.length === 0) {
+            console.log(chalk.green('✅ All data validation checks passed!'));
+        } else {
+            console.log(chalk.red(`❌ Found ${issues.length} issues:`));
+            issues.forEach((issue, index) => {
+                console.log(chalk.yellow(`  ${index + 1}. ${issue}`));
+            });
+        }
+    }
+
+    async queryBackup() {
+        console.log(chalk.blue.bold('\n💾 BACKUP STATUS'));
+        console.log(chalk.gray('=' .repeat(50)));
+        
+        const fs = require('fs');
+        const path = require('path');
+        
+        // Check for backup directories
+        const backupDirs = ['backup', 'backups', '.git'];
+        const backupInfo = [];
+        
+        backupDirs.forEach(dir => {
+            const dirPath = path.join(process.cwd(), dir);
+            if (fs.existsSync(dirPath)) {
+                const stats = fs.statSync(dirPath);
+                backupInfo.push({
+                    name: dir,
+                    path: dirPath,
+                    modified: stats.mtime
+                });
+            }
+        });
+        
+        if (backupInfo.length === 0) {
+            console.log(chalk.yellow('⚠️  No backup directories found'));
+        } else {
+            backupInfo.forEach(backup => {
+                console.log(chalk.green(`✅ ${backup.name}/`));
+                console.log(chalk.gray(`   Path: ${backup.path}`));
+                console.log(chalk.gray(`   Last modified: ${backup.modified.toLocaleString()}`));
+            });
+        }
+        
+        // Git status
+        try {
+            const { exec } = require('child_process');
+            exec('git log -1 --format="%h %s %cr"', (error, stdout) => {
+                if (!error) {
+                    console.log(chalk.cyan(`\n📝 Latest Git commit: ${stdout.trim()}`));
+                }
+            });
+        } catch (e) {
+            // Git not available
+        }
+    }
+
+    /**
+     * �📦 BATCH OPERATIONS - Mass content management
      */
     async batchOperations(args) {
         if (args.length < 2) {
