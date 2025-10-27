@@ -1175,12 +1175,14 @@ class MerchandiseStore {
               <span class="stat-number">${categoryData.products.length}</span>
               <span class="stat-label">Products</span>
             </div>
+            ${stats.providerCount > 0 ? `
             <div class="stat-item">
               <span class="stat-number">${stats.providerCount}</span>
               <span class="stat-label">Providers</span>
             </div>
+            ` : ''}
             <div class="stat-item">
-              <span class="stat-price">$${stats.priceRange}</span>
+              <span class="stat-price">${stats.priceRange}</span>
               <span class="stat-label">Price Range</span>
             </div>
           </div>
@@ -1207,6 +1209,12 @@ class MerchandiseStore {
   }
 
   renderCategoryProducts(container) {
+    // Initialize categoryView if it doesn't exist
+    if (!this.categoryView) {
+      console.error('❌ CategoryView not initialized when rendering products');
+      return;
+    }
+    
     console.log('📦 Rendering products for category:', this.categoryView.selectedCategory);
     
     const categoryData = this.productCategories[this.categoryView.selectedCategory];
@@ -1217,13 +1225,25 @@ class MerchandiseStore {
 
     const productsHTML = categoryData.products.map(product => `
       <div class="product-item">
-        <div class="product-icon">${this.getCategoryIcon(product.category)}</div>
+        <div class="product-preview">
+          ${product.imageUrl ? `
+            <img src="${product.imageUrl}" alt="${product.name}" class="product-preview-image" 
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="product-fallback-icon" style="display: none;">
+              ${this.getCategoryIcon(product.category)}
+            </div>
+          ` : `
+            <div class="product-fallback-icon">
+              ${this.getCategoryIcon(product.category)}
+            </div>
+          `}
+        </div>
         <div class="product-info">
           <h4 class="product-name">${product.name}</h4>
           <p class="product-description">${product.description || 'Custom merchandise item'}</p>
           <div class="product-details">
-            <span class="product-price">$${this.getEstimatedPrice(product.category)}</span>
-            <span class="product-provider">${product.provider}</span>
+            <span class="product-price">${this.getEstimatedPrice(product.category)}</span>
+            ${product.provider ? `<span class="product-provider">${product.provider}</span>` : ''}
           </div>
         </div>
         <button class="select-simple-product product-select-btn" 
@@ -1256,13 +1276,17 @@ class MerchandiseStore {
 
   getCategoryStats(products) {
     const providers = new Set(products.map(p => p.provider));
-    const prices = products.map(p => this.getEstimatedPrice(p.category));
+    // Parse price strings to numbers (remove $ and convert to float)
+    const prices = products.map(p => {
+      const priceStr = this.getEstimatedPrice(p.category);
+      return parseFloat(priceStr.replace('$', ''));
+    });
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     
     return {
       providerCount: providers.size,
-      priceRange: minPrice === maxPrice ? `${minPrice}` : `${minPrice}-${maxPrice}`
+      priceRange: minPrice === maxPrice ? `$${minPrice.toFixed(2)}` : `$${minPrice.toFixed(2)}-${maxPrice.toFixed(2)}`
     };
   }
 
@@ -1287,6 +1311,15 @@ class MerchandiseStore {
   }
 
   showCategoryProducts(categoryKey) {
+    // Initialize categoryView if it doesn't exist
+    if (!this.categoryView) {
+      this.categoryView = {
+        currentView: 'categories',
+        selectedCategory: null,
+        categoryData: {}
+      };
+    }
+    
     this.categoryView.currentView = 'products';
     this.categoryView.selectedCategory = categoryKey;
     
@@ -1298,6 +1331,15 @@ class MerchandiseStore {
   }
 
   showCategoryCards() {
+    // Initialize categoryView if it doesn't exist
+    if (!this.categoryView) {
+      this.categoryView = {
+        currentView: 'categories',
+        selectedCategory: null,
+        categoryData: {}
+      };
+    }
+    
     this.categoryView.currentView = 'categories';
     this.categoryView.selectedCategory = null;
     

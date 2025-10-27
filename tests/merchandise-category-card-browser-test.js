@@ -237,22 +237,53 @@ class MerchandiseCategoryCardBrowserTest {
                 throw new Error('No category cards displayed');
             }
             
-            // Verify expected categories are present
+            // Verify expected categories are present with price validation
             const categoryData = await this.page.evaluate(() => {
                 const cards = Array.from(document.querySelectorAll('.category-card'));
-                return cards.map(card => ({
-                    name: card.querySelector('.category-name, h3')?.textContent?.trim(),
-                    icon: card.querySelector('.category-icon')?.textContent?.trim(),
-                    stats: card.querySelector('.category-stats, .stats')?.textContent?.trim(),
-                    description: card.querySelector('.category-description, .description')?.textContent?.trim(),
-                    clickable: card.style.cursor === 'pointer' || card.hasAttribute('data-category')
-                }));
+                return cards.map(card => {
+                    const priceElement = card.querySelector('.stat-price');
+                    const priceText = priceElement?.textContent?.trim();
+                    
+                    return {
+                        name: card.querySelector('.category-name, h3')?.textContent?.trim(),
+                        icon: card.querySelector('.category-icon')?.textContent?.trim(),
+                        stats: card.querySelector('.category-stats, .stats')?.textContent?.trim(),
+                        description: card.querySelector('.category-description, .description')?.textContent?.trim(),
+                        clickable: card.style.cursor === 'pointer' || card.hasAttribute('data-category'),
+                        priceRange: priceText,
+                        priceElement: !!priceElement
+                    };
+                });
             });
             
             console.log('  📋 Category cards analysis:');
             categoryData.slice(0, 5).forEach((cat, i) => {
-                console.log(`     ${i + 1}. ${cat.icon} ${cat.name} - ${cat.stats?.substring(0, 30)}...`);
+                console.log(`     ${i + 1}. ${cat.icon} ${cat.name} - Price: ${cat.priceRange || 'No price'}`);
             });
+            
+            // Enhanced price validation
+            const priceIssues = [];
+            const validPricePattern = /^\$?\d+(\.\d{2})?(-\d+(\.\d{2})?)?$/;
+            
+            categoryData.forEach((cat, index) => {
+                if (!cat.priceElement) {
+                    priceIssues.push(`Card ${index + 1} (${cat.name}): Missing price element`);
+                } else if (!cat.priceRange) {
+                    priceIssues.push(`Card ${index + 1} (${cat.name}): Empty price range`);
+                } else if (cat.priceRange.includes('NaN')) {
+                    priceIssues.push(`Card ${index + 1} (${cat.name}): Price contains NaN - "${cat.priceRange}"`);
+                } else if (!validPricePattern.test(cat.priceRange.replace('$', ''))) {
+                    priceIssues.push(`Card ${index + 1} (${cat.name}): Invalid price format - "${cat.priceRange}"`);
+                }
+            });
+            
+            if (priceIssues.length > 0) {
+                console.log('  ❌ Price validation issues found:');
+                priceIssues.forEach(issue => console.log(`     - ${issue}`));
+                throw new Error(`Price calculation issues detected: ${priceIssues.length} problems found`);
+            } else {
+                console.log('  ✅ All category cards have valid price ranges (no NaN detected)');
+            }
             
             const validCategories = categoryData.filter(cat => cat.name && cat.name.length > 0);
             if (validCategories.length === 0) {
