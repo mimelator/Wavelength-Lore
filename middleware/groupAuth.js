@@ -110,8 +110,9 @@ class GroupAuthentication {
 
     // Define action-to-permission mappings
     this.actionPermissions = {
-      // Game access
-      'game_access': ['vip', 'content_manager', 'admin', 'super_admin'],
+      // Game access - Updated for go-live!
+      'game_access': ['vip', 'content_manager', 'admin', 'super_admin'], // VIP games (jigsaw puzzle)
+      'game_access_member': ['verified_user', 'trusted_user', 'vip', 'content_manager', 'moderator', 'admin', 'super_admin'], // All authenticated members
 
       // Admin panel access
       'admin_panel_access': ['admin', 'super_admin'],

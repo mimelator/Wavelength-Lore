@@ -9,10 +9,10 @@ const { groupAuth } = require('../middleware/groupAuth');
 const { generateGamesWithTheme, getActiveTheme } = require('../config/game-themes');
 
 /**
- * VIP Games Hub - Main landing page for games
- * Accessible only to VIP and higher tier users
+ * Games Hub - Main landing page for games
+ * 🎯 GO-LIVE UPDATE: Now accessible to all authenticated members!
  */
-router.get('/', groupAuth.requireAction('game_access'), (req, res) => {
+router.get('/', groupAuth.requireAction('game_access_member'), (req, res) => {
     res.render('games/hub', {
         title: 'Wavelength Games Hub',
         currentPage: 'games-hub',
@@ -27,8 +27,9 @@ router.get('/', groupAuth.requireAction('game_access'), (req, res) => {
 
 /**
  * Wavelength Gems - Match-3 Puzzle Game
+ * 🎯 GO-LIVE UPDATE: Now accessible to all authenticated members!
  */
-router.get('/wavelength-gems', groupAuth.requireAction('game_access'), (req, res) => {
+router.get('/wavelength-gems', groupAuth.requireAction('game_access_member'), (req, res) => {
     res.render('games/wavelength-gems', {
         title: 'Wavelength Gems',
         currentPage: 'wavelength-gems',
@@ -45,6 +46,7 @@ router.get('/wavelength-gems', groupAuth.requireAction('game_access'), (req, res
 /**
  * 🧩 NEW: Wavelength Lore Jigsaw Puzzle Game
  * Strategic puzzle reconstruction with lore-based imagery
+ * 🔒 DEVELOPMENT: Still VIP-only as it's under development
  */
 router.get('/wavelength-lore-jigsaw', groupAuth.requireAction('game_access'), (req, res) => {
     const { getActiveTheme } = require('../config/game-themes');
@@ -66,8 +68,19 @@ router.get('/wavelength-lore-jigsaw', groupAuth.requireAction('game_access'), (r
 
 /**
  * Support themed game routes (e.g., /games/shire-lore-tapestry)
+ * 🎯 SMART ACCESS CONTROL: Different games have different access levels
  */
-router.get('/:gameId', groupAuth.requireAction('game_access'), (req, res) => {
+router.get('/:gameId', (req, res, next) => {
+    const gameId = req.params.gameId;
+    
+    // Check if it's a jigsaw puzzle game with any theme - these are VIP-only (still under development)
+    if (gameId.includes('lore-tapestry') || gameId.includes('jigsaw')) {
+        return groupAuth.requireAction('game_access')(req, res, next);
+    }
+    
+    // All other games are available to authenticated members
+    return groupAuth.requireAction('game_access_member')(req, res, next);
+}, (req, res) => {
     const gameId = req.params.gameId;
     
     // Check if it's a jigsaw puzzle game with any theme
@@ -109,26 +122,55 @@ router.get('/:gameId', groupAuth.requireAction('game_access'), (req, res) => {
 /**
  * API endpoint to fetch available games
  * Now using configurable theme system for easy name iteration!
+ * 🎯 GO-LIVE UPDATE: Available to all authenticated members
  */
-router.get('/api/list', groupAuth.requireAction('game_access'), async (req, res) => {
+router.get('/api/list', groupAuth.requireAction('game_access_member'), async (req, res) => {
     try {
         // Generate games using the active theme configuration
-        const themedGames = generateGamesWithTheme();
+        const allThemedGames = generateGamesWithTheme();
         const activeTheme = getActiveTheme();
+        
+        // 🎯 GO-LIVE FILTERING: Show different games based on user access level
+        const userGroups = req.userGroups || ['user'];
+        const hasVipAccess = req.groupAuth && req.groupAuth.canPerform('game_access');
+        
+        // Filter games based on access level
+        const availableGames = allThemedGames.map(game => {
+            // Jigsaw puzzle is VIP-only (still under development)
+            if (game.id.includes('lore-tapestry') || game.id.includes('jigsaw')) {
+                if (!hasVipAccess) {
+                    return {
+                        ...game,
+                        status: 'vip-required',
+                        cta_primary: 'VIP Required',
+                        description: `${game.description} (VIP access required - game under development)`,
+                        access_note: 'This game is currently exclusive to VIP members while under development.'
+                    };
+                }
+            }
+            return game;
+        });
         
         res.json({
             success: true,
-            games: themedGames,
+            games: availableGames,
             theme: {
                 name: activeTheme.prefix,
                 atmosphere: activeTheme.atmosphere,
                 callToAction: activeTheme.callToAction
             },
             userGroup: req.userGroups[0] || 'user',
+            userAccess: {
+                hasVipAccess: hasVipAccess,
+                canPlayAllGames: hasVipAccess,
+                memberGames: availableGames.filter(g => !g.id.includes('lore-tapestry')).length,
+                vipGames: availableGames.filter(g => g.id.includes('lore-tapestry')).length
+            },
             meta: {
                 generated: new Date().toISOString(),
-                total_games: themedGames.length,
-                theme_applied: true
+                total_games: availableGames.length,
+                theme_applied: true,
+                go_live_filtering: true
             }
         });
     } catch (error) {
@@ -143,8 +185,19 @@ router.get('/api/list', groupAuth.requireAction('game_access'), async (req, res)
 
 /**
  * API endpoint to get a specific game's metadata
+ * 🎯 GO-LIVE UPDATE: Smart access control per game
  */
-router.get('/api/:gameId', groupAuth.requireAction('game_access'), async (req, res) => {
+router.get('/api/:gameId', (req, res, next) => {
+    const gameId = req.params.gameId;
+    
+    // Jigsaw puzzle games require VIP access
+    if (gameId.includes('lore-tapestry') || gameId.includes('jigsaw')) {
+        return groupAuth.requireAction('game_access')(req, res, next);
+    }
+    
+    // Other games available to all authenticated members
+    return groupAuth.requireAction('game_access_member')(req, res, next);
+}, async (req, res) => {
     try {
         const gameId = req.params.gameId;
         const themedGames = generateGamesWithTheme();
@@ -179,8 +232,9 @@ router.get('/api/:gameId', groupAuth.requireAction('game_access'), async (req, r
  * 🎯 EASY THEME ITERATION ENDPOINT
  * For quick testing of different naming themes
  * Usage: GET /games/api/preview-theme/rivendell
+ * 🎯 GO-LIVE UPDATE: Available to all authenticated members
  */
-router.get('/api/preview-theme/:theme', groupAuth.requireAction('game_access'), async (req, res) => {
+router.get('/api/preview-theme/:theme', groupAuth.requireAction('game_access_member'), async (req, res) => {
     try {
         const { switchTheme, getAllThemes } = require('../config/game-themes');
         const requestedTheme = req.params.theme;

@@ -1515,8 +1515,9 @@ class MerchandiseModalRenderer {
    * @param {HTMLElement} modal - Modal element
    */
   setupModalEventListeners(modal) {
+    console.log('📋 setupModalEventListeners called for modal:', modal.dataset.modalId);
     const modalId = modal.dataset.modalId;
-    
+
     // Close button handlers
     modal.addEventListener('click', (e) => {
       if (e.target.classList.contains('modal-close-btn') ||
@@ -1548,12 +1549,18 @@ class MerchandiseModalRenderer {
    * @param {HTMLElement} modal - Modal element
    */
   setupCustomModalHandlers(modal) {
+    console.log('⚙️ setupCustomModalHandlers called, modal classes:', modal.className);
     if (modal.classList.contains('customization-modal')) {
+      console.log('✅ Detected customization-modal - calling setupCustomizationModalHandlers');
       this.setupCustomizationModalHandlers(modal);
     } else if (modal.classList.contains('cart-modal')) {
+      console.log('🛒 Detected cart-modal');
       this.setupCartModalHandlers(modal);
     } else if (modal.classList.contains('confirmation-dialog')) {
+      console.log('⚠️ Detected confirmation-dialog');
       this.setupConfirmationDialogHandlers(modal);
+    } else {
+      console.warn('❌ Unknown modal type:', modal.className);
     }
   }
   
@@ -1562,6 +1569,7 @@ class MerchandiseModalRenderer {
    * @param {HTMLElement} modal - Customization modal element
    */
   setupCustomizationModalHandlers(modal) {
+    console.log('🎯 setupCustomizationModalHandlers called');
     // Initialize modal state for tracking selections
     modal.dataset.selectedEffects = JSON.stringify({});
     modal.dataset.selectedBorderWidth = '0';
@@ -1572,6 +1580,7 @@ class MerchandiseModalRenderer {
 
     // Click event delegation
     modal.addEventListener('click', (e) => {
+      console.log('🖱️ Modal click detected on:', e.target.className, e.target.tagName);
       // Section toggle (collapse/expand)
       if (e.target.closest('.section-header')) {
         const section = e.target.closest('.compact-section');
