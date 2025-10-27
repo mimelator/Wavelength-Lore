@@ -86,6 +86,30 @@ router.get('/', ensureAuthenticated, groupAuth.requireAction('game_access'), asy
 });
 
 /**
+ * GET /merchandise/test-harness
+ * Render the PERFECT PRINTING test harness UI
+ */
+router.get('/test-harness', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+  try {
+    res.render('test-harness', {
+      title: 'PERFECT PRINTING Test Harness',
+      pageTitle: 'Test Harness',
+      pageDescription: 'Test the image optimization and product creation pipeline',
+      user: req.user,
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`
+    });
+  } catch (error) {
+    console.error('Error rendering test harness:', error);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Unable to load test harness',
+      error: process.env.NODE_ENV === 'development' ? error : {}
+    });
+  }
+});
+
+/**
  * GET /merchandise/debug
  * Debug page for testing merchandise store (development only)
  */
