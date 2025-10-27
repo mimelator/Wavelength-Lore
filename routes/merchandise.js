@@ -2300,4 +2300,264 @@ router.get('/templates/:templateId', (req, res) => {
   }
 });
 
+/**
+ * CACHE ANALYTICS ENDPOINTS
+ * Phase 2B: Analytics, metrics, and cache management
+ */
+
+// Import analytics services
+const CacheAnalyticsService = require('../services/cache-analytics-service');
+const CacheLifecycleService = require('../services/cache-lifecycle-service');
+
+const cacheAnalytics = new CacheAnalyticsService();
+const cacheLifecycle = new CacheLifecycleService();
+
+/**
+ * GET /api/merchandise/cache/statistics
+ * Get overall cache performance statistics
+ */
+router.get('/cache/statistics', async (req, res) => {
+  try {
+    const stats = await cacheAnalytics.getCacheStatistics();
+
+    if (!stats.success) {
+      return res.status(500).json({
+        success: false,
+        error: stats.error
+      });
+    }
+
+    res.json({
+      success: true,
+      cache: stats
+    });
+
+  } catch (error) {
+    console.error('Error getting cache statistics:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get cache statistics',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/cache/product-metrics
+ * Get product-specific optimization metrics
+ */
+router.get('/cache/product-metrics', async (req, res) => {
+  try {
+    const metrics = await cacheAnalytics.getProductMetrics();
+
+    if (!metrics.success) {
+      return res.status(500).json({
+        success: false,
+        error: metrics.error
+      });
+    }
+
+    res.json({
+      success: true,
+      metrics
+    });
+
+  } catch (error) {
+    console.error('Error getting product metrics:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get product metrics',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/cache/health
+ * Get cache health recommendations and insights
+ */
+router.get('/cache/health', async (req, res) => {
+  try {
+    const health = await cacheAnalytics.getCacheHealthRecommendations();
+
+    if (!health.success) {
+      return res.status(500).json({
+        success: false,
+        error: health.error
+      });
+    }
+
+    res.json({
+      success: true,
+      health
+    });
+
+  } catch (error) {
+    console.error('Error getting cache health:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get cache health',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/cache/top-optimizations
+ * Get top performing cached optimizations
+ */
+router.get('/cache/top-optimizations', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const results = await cacheAnalytics.getTopOptimizations(limit);
+
+    if (!results.success) {
+      return res.status(500).json({
+        success: false,
+        error: results.error
+      });
+    }
+
+    res.json({
+      success: true,
+      results
+    });
+
+  } catch (error) {
+    console.error('Error getting top optimizations:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get top optimizations',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/cache/storage
+ * Get cache storage statistics
+ */
+router.get('/cache/storage', async (req, res) => {
+  try {
+    const storage = await cacheLifecycle.getCacheStorageStats();
+
+    if (!storage.success) {
+      return res.status(500).json({
+        success: false,
+        error: storage.error
+      });
+    }
+
+    res.json({
+      success: true,
+      storage
+    });
+
+  } catch (error) {
+    console.error('Error getting storage stats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get storage statistics',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/merchandise/cache/maintenance
+ * Run cache maintenance (cleanup old entries)
+ * Query params:
+ *   - dryRun: boolean (default: true) - Preview changes without making them
+ *   - aggressive: boolean (default: false) - More aggressive cleanup
+ *   - maxAge: number (default: 90) - Max age in days
+ */
+router.post('/cache/maintenance', async (req, res) => {
+  try {
+    // Require admin authentication in production
+    if (process.env.NODE_ENV === 'production' && !req.user?.isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error: 'Admin access required'
+      });
+    }
+
+    const options = {
+      dryRun: req.query.dryRun !== 'false', // default true for safety
+      aggressive: req.query.aggressive === 'true',
+      maxAge: parseInt(req.query.maxAge) || 90
+    };
+
+    console.log(`🚀 Starting cache maintenance with options:`, options);
+    const result = await cacheLifecycle.runCacheMaintenance(options);
+
+    res.json({
+      success: true,
+      result
+    });
+
+  } catch (error) {
+    console.error('Error running cache maintenance:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to run cache maintenance',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/cache/policy
+ * Get current cache retention policy
+ */
+router.get('/cache/policy', (req, res) => {
+  try {
+    const policy = cacheLifecycle.getRetentionPolicy();
+
+    res.json({
+      success: true,
+      policy
+    });
+
+  } catch (error) {
+    console.error('Error getting cache policy:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get cache policy',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/merchandise/cache/policy
+ * Update cache retention policy (admin only)
+ */
+router.post('/cache/policy', (req, res) => {
+  try {
+    // Require admin authentication in production
+    if (process.env.NODE_ENV === 'production' && !req.user?.isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error: 'Admin access required'
+      });
+    }
+
+    const newPolicy = cacheLifecycle.configureRetentionPolicy(req.body);
+
+    res.json({
+      success: true,
+      policy: newPolicy,
+      message: 'Cache retention policy updated'
+    });
+
+  } catch (error) {
+    console.error('Error updating cache policy:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update cache policy',
+      details: error.message
+    });
+  }
+});
+
 module.exports = router;
