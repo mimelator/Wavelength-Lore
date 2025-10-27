@@ -23,7 +23,16 @@
     "wavelength:commit": "node wavelength-enhanced-docker-committer.js",
     "test:merchandise": "node tests/merchandise-page-browser-test.js",
     "test:category-cards": "node tests/merchandise-category-card-browser-test.js",
-    "test:merchandise-full": "node tests/run-merchandise-tests.js"
+    "test:merchandise-full": "node tests/run-merchandise-tests.js",
+    "cli": "node wavelength-content-cli.js",
+    "cli:start": "node wavelength-content-cli.js",
+    "cli:admin": "node cli-admin-tools/index.js",
+    "cli:sync": "node cli-admin-tools/sync-assets.js",
+    "cli:status": "node cli-admin-tools/deployment-status.js --quick",
+    "test:cli": "node wavelength-cli-test-harness.js",  
+    "test:cli-features": "node wavelength-cli-test-harness.js",
+    "demo:cli": "node wavelength-cli-showcase.js",
+    "showcase:cli": "node wavelength-cli-showcase.js"
   },
   "dependencies": {
     "@aws-sdk/client-apprunner": "^3.917.0",
