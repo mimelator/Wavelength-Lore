@@ -37,9 +37,9 @@ class EffectsProcessor {
       let pipeline = Sharp(imageBuffer);
 
       // Apply effects in optimal order
-      pipeline = await this.applyColorGrading(pipeline, validated);
-      pipeline = await this.applyLightingEffects(pipeline, validated);
-      pipeline = await this.applySpecialEffects(pipeline, validated);
+      pipeline = await this.applyColorGrading(pipeline, finalParams);
+      pipeline = await this.applyLightingEffects(pipeline, finalParams);
+      pipeline = await this.applySpecialEffects(pipeline, finalParams);
 
       // Convert to WebP for preview
       const processed = await pipeline
