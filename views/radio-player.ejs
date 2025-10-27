@@ -64,8 +64,8 @@
         <div class="radio-player" id="radioPlayer">
             <button class="mobile-expand-btn" id="mobileExpandBtn" aria-label="Expand player"></button>
             <div class="player-header">
-                <h1 class="radio-title">✨ Wavelength Radio ✨</h1>
-                <p class="radio-subtitle">Journey through the sounds of the Shire</p>
+                <h1 class="radio-title">📻 WAVELENGTH LORE: THE SHIRE BROADCAST 📻</h1>
+                <p class="radio-subtitle">Listen Live to the soundtrack of the war! Tune in for the full Wavelength discography—every track is a spell, a shield, or an anthem for the battle against the Goblin King.</p>
             </div>
 
             <!-- Album art / now playing visual -->
@@ -78,6 +78,10 @@
 
             <!-- Now playing info -->
             <div class="now-playing">
+                <div class="broadcast-status">
+                    <div class="broadcast-label" id="broadcastLabel">🎵 THE SHIRE BROADCAST 🎵</div>
+                    <div class="lore-status" id="loreStatus">Select a track to tune in...</div>
+                </div>
                 <div class="track-info">
                     <h2 id="trackTitle">Select a song to begin</h2>
                     <p id="trackEpisode">Season - • Episode -</p>
@@ -114,6 +118,12 @@
 
             <!-- Audio element -->
             <audio id="audioPlayer" preload="metadata"></audio>
+
+            <!-- Live Broadcast CTA -->
+            <div class="live-broadcast-cta">
+                <div class="live-indicator">🔴 LIVE</div>
+                <div class="broadcast-message">TUNE IN NOW: The Shire Broadcast is Live!</div>
+            </div>
 
             <!-- Playback controls -->
             <div class="controls">
@@ -192,6 +202,35 @@
                 <% }); %>
             </div>
         </div>
+        </div>
+
+        <!-- Engagement Hooks Section -->
+        <div class="engagement-hooks-section">
+            <div class="engagement-header">
+                <h3>🎵 HEARD A TRACK YOU LOVE? 🎵</h3>
+            </div>
+            <div class="engagement-actions">
+                <div class="engagement-action">
+                    <div class="engagement-number">1.</div>
+                    <div class="engagement-content">
+                        <h4>📺 Read the Story</h4>
+                        <p>Discover the episode and scene that track saved the day!</p>
+                        <a href="/episodes" class="engagement-btn story-btn">
+                            🎬 Browse Episodes
+                        </a>
+                    </div>
+                </div>
+                <div class="engagement-action">
+                    <div class="engagement-number">2.</div>
+                    <div class="engagement-content">
+                        <h4>💬 Discuss the Music</h4>
+                        <p>Join the conversation on the Forum's Music & Art board!</p>
+                        <a href="/forum/music-art" class="engagement-btn forum-btn">
+                            🎨 Join Discussion
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

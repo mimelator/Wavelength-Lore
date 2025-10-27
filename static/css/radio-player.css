@@ -338,9 +338,66 @@ html {
     50% { transform: scale(1.1); opacity: 0.6; }
 }
 
+/* Live Broadcast CTA */
+.live-broadcast-cta {
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: linear-gradient(135deg, rgba(255, 69, 0, 0.1), rgba(255, 0, 0, 0.1));
+    border: 2px solid rgba(255, 69, 0, 0.3);
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255, 69, 0, 0.2);
+}
+
+.live-indicator {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff4500, #ff0000);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    animation: pulse 2s ease-in-out infinite;
+    margin-bottom: 8px;
+}
+
+.broadcast-message {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #ff4500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
 /* Now Playing */
 .now-playing {
     margin: 30px 0;
+}
+
+/* Broadcast Status */
+.broadcast-status {
+    text-align: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-radius: 12px;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.broadcast-label {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #667eea;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.lore-status {
+    font-size: 0.9rem;
+    color: #764ba2;
+    font-style: italic;
+    font-weight: 500;
 }
 
 .track-info {
@@ -2369,5 +2426,154 @@ body.screensaver-active .mystical-canvas {
     .screensaver-lyrics {
         padding: 10px 20px;
         height: 80px;
+    }
+}
+
+/* Engagement Hooks Section */
+.engagement-hooks-section {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 20px;
+    padding: 30px;
+    margin: 30px 0;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.1);
+}
+
+.engagement-header h3 {
+    font-size: 1.8rem;
+    color: #667eea;
+    margin: 0 0 25px 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+.engagement-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.engagement-action {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9));
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.engagement-action:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.4);
+}
+
+.engagement-number {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.engagement-content h4 {
+    font-size: 1.3rem;
+    color: #333;
+    margin: 0 0 10px 0;
+    font-weight: bold;
+}
+
+.engagement-content p {
+    font-size: 1rem;
+    color: #666;
+    margin: 0 0 20px 0;
+    line-height: 1.5;
+}
+
+.engagement-btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.engagement-btn:hover {
+    background: linear-gradient(135deg, #764ba2, #667eea);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.story-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+}
+
+.story-btn:hover {
+    background: linear-gradient(135deg, #ee5a52, #ff6b6b);
+}
+
+.forum-btn {
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+}
+
+.forum-btn:hover {
+    background: linear-gradient(135deg, #44a08d, #4ecdc4);
+}
+
+/* Mobile Responsiveness for Engagement Hooks */
+@media (max-width: 768px) {
+    .engagement-hooks-section {
+        padding: 20px;
+        margin: 20px 0;
+    }
+    
+    .engagement-header h3 {
+        font-size: 1.4rem;
+        margin-bottom: 20px;
+    }
+    
+    .engagement-actions {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .engagement-action {
+        padding: 20px;
+    }
+    
+    .engagement-content h4 {
+        font-size: 1.1rem;
+    }
+    
+    .engagement-content p {
+        font-size: 0.9rem;
+    }
+    
+    .engagement-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
     }
 }

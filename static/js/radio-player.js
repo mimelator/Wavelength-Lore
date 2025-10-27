@@ -752,6 +752,9 @@ class WavelengthRadio {
         document.getElementById('trackTitle').textContent = track.title;
         document.getElementById('trackEpisode').textContent = `Season ${track.season} • Episode ${track.episode}`;
 
+        // Update broadcast status with in-world narrative
+        this.updateBroadcastStatus(track);
+
         // Get the playlist item for this track
         const playlistItem = document.querySelector(`.playlist-item[data-index="${this.currentTrackIndex}"]`);
 
@@ -768,6 +771,63 @@ class WavelengthRadio {
             // Show episode info section
             document.getElementById('episodeInfoSection').style.display = 'block';
         }
+    }
+
+    // Update broadcast status with lore-driven labels
+    updateBroadcastStatus(track) {
+        const broadcastLabel = document.getElementById('broadcastLabel');
+        const loreStatus = document.getElementById('loreStatus');
+        
+        if (!broadcastLabel || !loreStatus) return;
+
+        // Generate lore-based broadcast label based on track content
+        let broadcastType, loreMessage;
+        
+        // Battle/conflict tracks
+        if (track.title.toLowerCase().includes('battle') || 
+            track.title.toLowerCase().includes('war') ||
+            track.title.toLowerCase().includes('fight') ||
+            track.title.toLowerCase().includes('goblin')) {
+            broadcastType = '⚔️ BATTLE REPORT';
+            loreMessage = `ON AIR: The Battle Hymn of ${track.title}`;
+        }
+        // Character-focused tracks
+        else if (track.title.toLowerCase().includes('daphne') ||
+                 track.title.toLowerCase().includes('king') ||
+                 this.hasCharacterFocus(track)) {
+            broadcastType = '👑 HERO TRANSMISSION';
+            loreMessage = `LORE TRACK: The Chronicles of ${track.title}`;
+        }
+        // Location/environment tracks  
+        else if (track.title.toLowerCase().includes('shire') ||
+                 track.title.toLowerCase().includes('fortress') ||
+                 track.title.toLowerCase().includes('ice')) {
+            broadcastType = '🏰 REALM UPDATE';
+            loreMessage = `LOCATION REPORT: ${track.title}`;
+        }
+        // Emotional/story tracks
+        else if (track.title.toLowerCase().includes('dream') ||
+                 track.title.toLowerCase().includes('mourning') ||
+                 track.title.toLowerCase().includes('falling')) {
+            broadcastType = '💫 SAGA CHRONICLES';
+            loreMessage = `STORY WAVE: The Tale of ${track.title}`;
+        }
+        // Default magical/mystical
+        else {
+            broadcastType = '✨ MYSTICAL FREQUENCIES';
+            loreMessage = `SPELL TRACK: ${track.title} - Music as Magic`;
+        }
+
+        broadcastLabel.textContent = broadcastType;
+        loreStatus.textContent = loreMessage;
+    }
+
+    // Helper function to detect character-focused tracks
+    hasCharacterFocus(track) {
+        // Check if track has character data or certain character-related keywords
+        return (track.characters && track.characters.length > 0) ||
+               track.title.toLowerCase().includes('charm') ||
+               track.title.toLowerCase().includes('history');
     }
 
     // Update play button
