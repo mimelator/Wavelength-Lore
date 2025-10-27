@@ -29,6 +29,7 @@
     "cli:admin": "node cli-admin-tools/index.js",
     "cli:sync": "node cli-admin-tools/sync-assets.js",
     "cli:status": "node cli-admin-tools/deployment-status.js --quick",
+    "admin:env-sync": "node scripts/unified/apprunner-env-sync.js",
     "test:cli": "node wavelength-cli-test-harness.js",
     "test:cli-features": "node wavelength-cli-test-harness.js",
     "demo:cli": "node wavelength-cli-showcase.js",
