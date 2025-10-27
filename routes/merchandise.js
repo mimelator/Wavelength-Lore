@@ -93,12 +93,26 @@ router.get('/debug', async (req, res) => {
   if (process.env.NODE_ENV !== 'development') {
     return res.status(404).json({ error: 'Not found' });
   }
-  
+
   try {
     res.sendFile(require('path').join(__dirname, '../debug/test-merchandise-simple.html'));
   } catch (error) {
     console.error('Error serving debug page:', error);
     res.status(500).json({ error: 'Failed to load debug page' });
+  }
+});
+
+/**
+ * GET /merchandise/cache-admin
+ * Cache administration dashboard
+ * Shows analytics, metrics, and cache management controls
+ */
+router.get('/cache-admin', (req, res) => {
+  try {
+    res.sendFile(require('path').join(__dirname, '../static/html/cache-admin-dashboard.html'));
+  } catch (error) {
+    console.error('Error serving cache admin dashboard:', error);
+    res.status(500).json({ error: 'Failed to load cache admin dashboard' });
   }
 });
 
