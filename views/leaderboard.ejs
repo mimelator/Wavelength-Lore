@@ -372,6 +372,19 @@
                     return;
                 }
                 
+                // Check if user is authenticated
+                const { getAuth } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+                const auth = getAuth();
+                const currentUser = auth.currentUser;
+                
+                if (!currentUser) {
+                    console.log('❌ User not authenticated, cannot load leaderboard');
+                    document.getElementById('leaderboardContent').innerHTML = 
+                        '<div class="no-data">🔐 Authentication required to view leaderboard.<br><br>Please wait while we authenticate you...</div>';
+                    return;
+                }
+                
+                console.log('✅ User authenticated:', currentUser.uid);
                 console.log('✅ Firebase ready, loading multi-game leaderboard data...');
                 console.log('🔍 About to call loadMultiGameLeaderboard');
                 console.log('Function exists:', typeof loadMultiGameLeaderboard);
@@ -768,15 +781,102 @@
             });
         }
 
+        // Initialize Firebase Auth and check authentication
+        async function initializeAuthentication() {
+            try {
+                // Load Firebase Auth module
+                const { getAuth, onAuthStateChanged, signInAnonymously } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+                
+                const auth = getAuth();
+                
+                // Wait for auth state to be determined
+                return new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Authentication timeout'));
+                    }, 10000);
+                    
+                    onAuthStateChanged(auth, (user) => {
+                        clearTimeout(timeout);
+                        
+                        if (user) {
+                            console.log('✅ User authenticated:', user.uid);
+                            resolve(user);
+                        } else {
+                            console.log('🔐 No user authenticated, signing in anonymously...');
+                            // Sign in anonymously for leaderboard access
+                            signInAnonymously(auth)
+                                .then((result) => {
+                                    console.log('✅ Anonymous authentication successful:', result.user.uid);
+                                    resolve(result.user);
+                                })
+                                .catch((error) => {
+                                    console.error('❌ Anonymous authentication failed:', error);
+                                    reject(error);
+                                });
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('❌ Failed to initialize authentication:', error);
+                throw error;
+            }
+        }
+
         // Initialize everything when page loads
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                loadLeaderboard();
-                setupFilterTabs();
+            document.addEventListener('DOMContentLoaded', async () => {
+                try {
+                    // Wait for Firebase to be ready
+                    if (!window.firebaseDB) {
+                        await new Promise(resolve => {
+                            const checkFirebase = () => {
+                                if (window.firebaseDB) {
+                                    resolve();
+                                } else {
+                                    setTimeout(checkFirebase, 100);
+                                }
+                            };
+                            checkFirebase();
+                        });
+                    }
+                    
+                    // Initialize authentication before loading leaderboard
+                    await initializeAuthentication();
+                    loadLeaderboard();
+                    setupFilterTabs();
+                } catch (error) {
+                    console.error('❌ Authentication or initialization failed:', error);
+                    document.getElementById('leaderboardContent').innerHTML = 
+                        '<div class="no-data">❌ Authentication required to view leaderboard.<br><br>Please refresh the page to retry.</div>';
+                }
             });
         } else {
-            loadLeaderboard();
-            setupFilterTabs();
+            (async () => {
+                try {
+                    // Wait for Firebase to be ready
+                    if (!window.firebaseDB) {
+                        await new Promise(resolve => {
+                            const checkFirebase = () => {
+                                if (window.firebaseDB) {
+                                    resolve();
+                                } else {
+                                    setTimeout(checkFirebase, 100);
+                                }
+                            };
+                            checkFirebase();
+                        });
+                    }
+                    
+                    // Initialize authentication before loading leaderboard
+                    await initializeAuthentication();
+                    loadLeaderboard();
+                    setupFilterTabs();
+                } catch (error) {
+                    console.error('❌ Authentication or initialization failed:', error);
+                    document.getElementById('leaderboardContent').innerHTML = 
+                        '<div class="no-data">❌ Authentication required to view leaderboard.<br><br>Please refresh the page to retry.</div>';
+                }
+            })();
         }
         
         // Fallback timeout in case Firebase never loads
