@@ -300,6 +300,11 @@ class WavelengthContentCLI {
     async handleCommand(input) {
         const [command, ...args] = input.split(' ');
         
+        // Check if we're in preview mode and handle preview commands
+        if (this.previewContext && this.handlePreviewCommand(input.trim())) {
+            return;
+        }
+        
         try {
             switch (command.toLowerCase()) {
                 case 'help':
@@ -687,22 +692,281 @@ Please provide an enhanced version that improves the item according to the reque
         }
         
         if (images.length > 0) {
-            console.log(chalk.green(`🖼️ Opening ${images.length} image(s) for "${item.title}"...`));
+            console.log(chalk.green(`🖼️ Found ${images.length} image(s) for "${item.title}"`));
             const { exec } = require('child_process');
+            const path = require('path');
+            const fs = require('fs');
             
+            // Display images with CDN URLs
+            const cdnBase = 'https://wavelengthlore.com';
+            console.log('');
             images.forEach((imageUrl, index) => {
                 if (imageUrl && imageUrl.trim()) {
+                    const cdnUrl = imageUrl.startsWith('http') ? imageUrl : `${cdnBase}${imageUrl}`;
                     console.log(chalk.gray(`  ${index + 1}. ${imageUrl}`));
-                    exec(`open "${imageUrl}"`, (error) => {
-                        if (error) {
-                            console.log(chalk.yellow(`⚠️ Could not auto-open image ${index + 1}, URL: ${imageUrl}`));
-                        }
-                    });
+                    console.log(chalk.blue(`     🌐 ${cdnUrl}`));
                 }
             });
+            
+            // Set up preview mode for next command
+            console.log('');
+            console.log(chalk.yellow('💡 Preview Options:'));
+            console.log(chalk.gray('  • Type "gallery" to open HTML gallery in browser (recommended)'));
+            console.log(chalk.gray('  • Type a number (1-' + images.length + ') to open that specific image'));
+            console.log(chalk.gray('  • Type "first" to open just the first image'));
+            console.log(chalk.gray('  • Press Enter to continue'));
+            
+            // Store the preview context for the next command
+            this.previewContext = {
+                item: item,
+                images: images,
+                cdnBase: cdnBase
+            };
         } else {
             console.log(chalk.yellow('No images found for this item'));
         }
+    }
+
+    handlePreviewCommand(input) {
+        if (!this.previewContext) return false;
+        
+        const { item, images, cdnBase } = this.previewContext;
+        const { exec } = require('child_process');
+        const trimmedInput = input.trim().toLowerCase();
+        
+        if (trimmedInput === 'gallery') {
+            console.log(chalk.green('🎨 Creating image gallery...'));
+            this.createImageGallery(item.title, images, cdnBase);
+            this.previewContext = null; // Clear context
+            return true;
+        } else if (trimmedInput === 'first' && images.length > 0) {
+            const firstImage = images[0];
+            const cdnUrl = firstImage.startsWith('http') ? firstImage : `${cdnBase}${firstImage}`;
+            console.log(chalk.green(`🌐 Opening: ${cdnUrl}`));
+            exec(`open "${cdnUrl}"`);
+            this.previewContext = null; // Clear context
+            this.showPrompt();
+            return true;
+        } else if (trimmedInput === '' || trimmedInput === 'skip') {
+            this.previewContext = null; // Clear context
+            this.showPrompt();
+            return true;
+        } else {
+            const imageNum = parseInt(trimmedInput);
+            if (imageNum >= 1 && imageNum <= images.length) {
+                const selectedImage = images[imageNum - 1];
+                const cdnUrl = selectedImage.startsWith('http') ? selectedImage : `${cdnBase}${selectedImage}`;
+                console.log(chalk.green(`🌐 Opening image ${imageNum}: ${cdnUrl}`));
+                exec(`open "${cdnUrl}"`);
+                this.previewContext = null; // Clear context
+                this.showPrompt();
+                return true;
+            } else {
+                // Not a valid preview command, clear context and let normal command handling take over
+                console.log(chalk.yellow('Exiting preview mode...'));
+                this.previewContext = null;
+                return false;
+            }
+        }
+    }
+
+    createImageGallery(title, images, cdnBase) {
+        const fs = require('fs');
+        const path = require('path');
+        const { exec } = require('child_process');
+        
+        const galleryHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title} - Image Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff, #f0f8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .image-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+        
+        .image-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+        }
+        
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .image-card:hover .gallery-image {
+            transform: scale(1.05);
+        }
+        
+        .image-info {
+            padding: 15px;
+        }
+        
+        .image-title {
+            font-weight: bold;
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .image-path {
+            font-size: 0.85rem;
+            color: #666;
+            word-break: break-all;
+            line-height: 1.4;
+        }
+        
+        .image-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            backdrop-filter: blur(5px);
+        }
+        
+        .wavelength-logo {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            color: #667eea;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            body {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🖼️ ${title}</h1>
+        <p>Image Gallery • ${images.length} images</p>
+    </div>
+    
+    <div class="gallery">
+        ${images.map((imageUrl, index) => {
+            const cdnUrl = imageUrl.startsWith('http') ? imageUrl : `${cdnBase}${imageUrl}`;
+            const fileName = imageUrl.split('/').pop();
+            return `
+                <div class="image-card">
+                    <div class="image-container">
+                        <img src="${cdnUrl}" alt="Image ${index + 1}" class="gallery-image" loading="lazy">
+                        <div class="image-overlay">${index + 1}/${images.length}</div>
+                    </div>
+                    <div class="image-info">
+                        <div class="image-title">${fileName}</div>
+                        <div class="image-path">${imageUrl}</div>
+                    </div>
+                </div>`;
+        }).join('')}
+    </div>
+    
+    <div class="wavelength-logo">
+        🌊 Wavelength CLI
+    </div>
+</body>
+</html>`;
+        
+        // Create temporary HTML file
+        const tempDir = path.join(process.cwd(), 'temp');
+        if (!fs.existsSync(tempDir)) {
+            fs.mkdirSync(tempDir, { recursive: true });
+        }
+        
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const galleryPath = path.join(tempDir, `gallery-${title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}.html`);
+        
+        fs.writeFileSync(galleryPath, galleryHtml);
+        
+        console.log(chalk.green(`✅ Gallery created: ${galleryPath}`));
+        console.log(chalk.blue('🌐 Opening in browser...'));
+        
+        exec(`open "${galleryPath}"`, (error) => {
+            if (error) {
+                console.log(chalk.yellow(`⚠️ Could not auto-open gallery: ${error.message}`));
+                console.log(chalk.gray(`Manual path: ${galleryPath}`));
+            }
+            this.showPrompt();
+        });
     }
 
     /**
