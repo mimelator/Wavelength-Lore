@@ -2661,20 +2661,45 @@ router.post('/test-harness/optimize-random', ensureAuthenticated, groupAuth.requ
     const userId = req.user.uid;
     const userName = req.user.displayName || 'Test User';
 
-    // Step 1: Get user's gallery images
+    // Step 1: Get user's gallery images (both S3 uploads AND bookmarks)
     console.log(`🖼️  Fetching gallery images for user: ${userId}`);
     const s3Images = await galleryStorage.listUserGalleryImages(userId);
+    const { getUserBookmarks } = require('../services/firebase/galleryService');
+    const bookmarks = await getUserBookmarks(userId);
 
-    if (!s3Images || s3Images.length === 0) {
+    // Combine both S3 images and bookmarks
+    const allGalleryImages = [];
+
+    if (s3Images && s3Images.length > 0) {
+      allGalleryImages.push(...s3Images.map(img => ({
+        ...img,
+        type: 'uploaded',
+        url: img.url || img.url
+      })));
+    }
+
+    if (bookmarks && bookmarks.length > 0) {
+      allGalleryImages.push(...bookmarks.map(bookmark => ({
+        fileName: bookmark.title || bookmark.fileName,
+        url: bookmark.url,
+        type: 'bookmark',
+        bookmarkId: bookmark.bookmarkId,
+        title: bookmark.title
+      })));
+    }
+
+    if (!allGalleryImages || allGalleryImages.length === 0) {
       return res.status(400).json({
         success: false,
-        error: 'No gallery images found. Please upload an image first.',
-        details: 'User has no images in their gallery'
+        error: 'No gallery images found. Please upload an image or bookmark content first.',
+        details: 'User has no images or bookmarks in their gallery'
       });
     }
 
+    console.log(`✅ Found ${allGalleryImages.length} gallery images (${s3Images?.length || 0} uploads + ${bookmarks?.length || 0} bookmarks)`);
+
     // Randomly select an image
-    const randomImage = s3Images[Math.floor(Math.random() * s3Images.length)];
+    const randomImage = allGalleryImages[Math.floor(Math.random() * allGalleryImages.length)];
     console.log(`✅ Selected random image: ${randomImage.fileName}`);
 
     // Step 2: Get all product types and randomly select one

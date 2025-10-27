@@ -16,8 +16,12 @@
       ".read": true,
       ".write": "auth != null && auth.token.isScript == true"
     },
+    "leaderboard": {
+      ".read": true,
+      ".write": "auth != null && auth.token.isScript == true"
+    },
     "users": {
-      ".read": "auth != null",
+      ".read": true,
       "$userId": {
         ".write": "auth != null && (auth.uid == $userId || auth.token.isScript == true)",
         "radioPlayerStats": {
