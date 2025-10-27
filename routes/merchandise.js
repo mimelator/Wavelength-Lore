@@ -37,6 +37,67 @@ function sanitizeFirebaseKey(key) {
     .replace(/^_|_$/g, '');        // Remove leading/trailing underscores
 }
 
+/**
+ * Map product categories to specification keys based on available specs
+ * This creates a single source of truth for all category→spec mappings
+ *
+ * PRODUCT CATEGORIES (from product-types.js):
+ *   - Apparel: t-shirt, women-tee, premium-tshirt, heavy-cotton-tee, hoodie, zip-hoodie, sweatshirt, tank-top
+ *   - Home: blanket, pillow, canvas, coffee-mug, travel-mug
+ *   - Accessories: backpack, fanny-pack, hat, laptop-sleeve, phone-case, tote-bag, notebook, sticker, infant-wear, specialty-item
+ *
+ * AVAILABLE SPECIFICATIONS (from productSpecifications.js):
+ *   - apparel-tshirt, apparel-hoodie, apparel-tank
+ *   - home-blanket, home-pillow-16x16, home-pillow-20x20, home-canvas-24x36
+ *   - drinkware-mug-ceramic, drinkware-mug-travel
+ */
+function mapCategoryToSpecKey(productCategory) {
+  // Normalize input
+  const category = (productCategory || '').toLowerCase().trim();
+
+  // T-SHIRT VARIANTS - All map to apparel-tshirt
+  if (category === 't-shirt' || category === 'women-tee' || category === 'premium-tshirt' || category === 'heavy-cotton-tee') {
+    return 'apparel-tshirt';
+  }
+
+  // HOODIE/SWEATSHIRT VARIANTS - All map to apparel-hoodie
+  if (category === 'hoodie' || category === 'zip-hoodie' || category === 'sweatshirt') {
+    return 'apparel-hoodie';
+  }
+
+  // TANK TOP VARIANTS
+  if (category === 'tank-top') {
+    return 'apparel-tank';
+  }
+
+  // HOME PRODUCTS
+  if (category === 'blanket') {
+    return 'home-blanket';
+  }
+
+  if (category === 'pillow') {
+    return 'home-pillow-20x20';  // Default to larger size for better visual impact
+  }
+
+  if (category === 'canvas') {
+    return 'home-canvas-24x36';
+  }
+
+  // DRINKWARE
+  if (category === 'coffee-mug' || category === 'mug') {
+    return 'drinkware-mug-ceramic';
+  }
+
+  if (category === 'travel-mug') {
+    return 'drinkware-mug-travel';
+  }
+
+  // UNMAPPED CATEGORIES - Log warning and default to most common spec
+  // This handles: backpack, fanny-pack, hat, laptop-sleeve, phone-case, tote-bag, notebook, sticker, infant-wear, specialty-item
+  console.warn(`⚠️  Unmapped product category "${category}" - defaulting to apparel-tshirt spec`);
+  return 'apparel-tshirt';
+}
+
 // Use the singleton instances of the services.
 const merchandiseDB = require('../services/merchandise-database'); 
 const printifyService = new AutoEnhancedPrintifyService();
@@ -2751,23 +2812,8 @@ router.post('/test-harness/optimize-random', ensureAuthenticated, groupAuth.requ
 
       const optimizer = new ImageOptimizer();
 
-      // optimizeForProduct takes imageBuffer and specKey
-      // The spec key is based on the product category (e.g., 'apparel-tshirt')
-      // For now, try with the product category directly
-      let specKey = selectedProduct.category;
-
-      // If it's a simple category like 't-shirt', try to find matching spec
-      // Common mappings: 't-shirt' -> 'apparel-tshirt', 'hoodie' -> 'apparel-hoodie'
-      if (specKey === 't-shirt') {
-        specKey = 'apparel-tshirt';
-      } else if (specKey === 'heavy-cotton-tee') {
-        specKey = 'apparel-tshirt';  // Fallback to standard tshirt specs
-      } else if (specKey.includes('hoodie')) {
-        specKey = 'apparel-hoodie';
-      } else if (specKey.includes('tank')) {
-        specKey = 'apparel-tank';
-      }
-
+      // Map product category to optimization spec key
+      const specKey = mapCategoryToSpecKey(selectedProduct.category);
       console.log(`📋 Using spec key: ${specKey} (product category: ${selectedProduct.category})`);
 
       const result = await optimizer.optimizeForProduct(imageBuffer, specKey);
@@ -2965,19 +3011,7 @@ router.post('/preview-harness/optimize-and-preview', ensureAuthenticated, groupA
     console.log(`🎨 Optimizing image for product: ${selectedProduct.name}`);
 
     const optimizer = new ImageOptimizer();
-    let specKey = selectedProduct.category;
-
-    // Map common categories to spec keys
-    if (specKey === 't-shirt') {
-      specKey = 'apparel-tshirt';
-    } else if (specKey === 'heavy-cotton-tee') {
-      specKey = 'apparel-tshirt';
-    } else if (specKey.includes('hoodie')) {
-      specKey = 'apparel-hoodie';
-    } else if (specKey.includes('tank')) {
-      specKey = 'apparel-tank';
-    }
-
+    const specKey = mapCategoryToSpecKey(selectedProduct.category);
     console.log(`📋 Using spec key: ${specKey} (product category: ${selectedProduct.category})`);
 
     const optimizationResult = await optimizer.optimizeForProduct(imageBuffer, specKey);
@@ -3184,6 +3218,275 @@ router.get('/preview-harness', ensureAuthenticated, groupAuth.requireAction('gam
       error: process.env.NODE_ENV === 'development' ? error : {}
     });
   }
+});
+
+/**
+ * POST /api/merchandise/openai-upscaler/test
+ * Test OpenAI upscaler with a single image
+ * Accepts FormData with 'image', 'targetWidth', 'targetHeight' fields
+ */
+router.post('/openai-upscaler/test', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+  try {
+    // Verify database is ready
+    if (!ensureDatabaseReady(res)) return;
+
+    console.log(`\n🤖 OpenAI Upscaler Test Started`);
+    console.log(`📊 Request body type:`, Object.keys(req).slice(0, 5));
+    console.log(`📊 Request files:`, req.files ? Object.keys(req.files) : 'none');
+
+    let imageBuffer;
+    let imageName = 'test-image';
+    let imageSize;
+
+    // Try to get image from req.files (express-fileupload) first
+    if (req.files && req.files.image) {
+      console.log(`📁 Image from req.files (express-fileupload)`);
+      imageBuffer = req.files.image.data;
+      imageName = req.files.image.name || 'test-image';
+      imageSize = req.files.image.size;
+    }
+    // Fallback: Try to get image from req.body.image (if sent as base64)
+    else if (req.body.image) {
+      console.log(`📁 Image from req.body (base64)`);
+      const imageData = req.body.image;
+
+      // If it's a data URL, extract the base64 part
+      if (typeof imageData === 'string' && imageData.includes('base64,')) {
+        imageBuffer = Buffer.from(imageData.split('base64,')[1], 'base64');
+        imageSize = imageBuffer.length;
+      } else if (typeof imageData === 'string') {
+        // Plain base64
+        imageBuffer = Buffer.from(imageData, 'base64');
+        imageSize = imageBuffer.length;
+      } else {
+        throw new Error('Invalid image format in request body');
+      }
+    }
+    // Try raw body (application/octet-stream)
+    else if (req.body && req.body instanceof Buffer) {
+      console.log(`📁 Image from raw body buffer`);
+      imageBuffer = req.body;
+      imageSize = imageBuffer.length;
+    }
+    else {
+      console.error(`❌ No image found in request:`, {
+        files: !!req.files,
+        body: !!req.body,
+        bodyKeys: req.body ? Object.keys(req.body) : []
+      });
+      return res.status(400).json({
+        success: false,
+        error: 'No image provided',
+        details: 'Image must be sent as FormData with "image" field, or as base64 in request body, or as raw buffer'
+      });
+    }
+
+    if (!imageBuffer) {
+      return res.status(400).json({
+        success: false,
+        error: 'Unable to parse image data',
+        details: 'Could not extract image buffer from request'
+      });
+    }
+
+    const targetWidth = parseInt(req.body.targetWidth || req.query.targetWidth) || 3000;
+    const targetHeight = parseInt(req.body.targetHeight || req.query.targetHeight) || 3600;
+
+    console.log(`📁 Image: ${imageName} (${(imageSize / 1024).toFixed(2)} KB)`);
+    console.log(`📏 Target: ${targetWidth}x${targetHeight}px`);
+
+    const startTime = Date.now();
+
+    // Create temporary analysis object for upscaler
+    const analysis = {
+      originalDimensions: { width: 100, height: 100 },  // Will be detected by optimizer
+      targetDimensions: { width: targetWidth, height: targetHeight },
+      action: 'upscale',
+      scaleFactor: Math.max(targetWidth / 100, targetHeight / 100),
+      currentFormat: 'jpeg' // Default to jpeg, can be detected from actual image
+    };
+
+    console.log(`📊 Calling ImageOptimizer.upscaleWithOpenAI()...`);
+
+    const optimizer = new ImageOptimizer();
+
+    // Call OpenAI upscaler directly
+    let upscaledBuffer;
+    try {
+      upscaledBuffer = await optimizer.upscaleWithOpenAI(imageBuffer, analysis);
+      console.log(`✅ OpenAI upscaling succeeded`);
+    } catch (error) {
+      console.error(`❌ OpenAI upscaling failed:`, error.message);
+      throw error;
+    }
+
+    const duration = Date.now() - startTime;
+
+    console.log(`✅ Test completed in ${duration}ms`);
+
+    // Return success
+    res.json({
+      success: true,
+      message: 'OpenAI upscaling test completed successfully',
+      analysis: {
+        action: 'upscale',
+        scaleFactor: analysis.scaleFactor,
+        processingTime: duration,
+        originalSize: imageSize,
+        targetDimensions: analysis.targetDimensions
+      },
+      metadata: {
+        upscalerUsed: 'openai',
+        timestamp: new Date().toISOString()
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ OpenAI upscaler test error:', error.message);
+    console.error('Stack:', error.stack);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      details: error.response?.data || error.message
+    });
+  }
+});
+
+/**
+ * GET /merchandise/openai-upscaler
+ * Render the OpenAI Upscaler Test Harness UI
+ */
+router.get('/openai-upscaler', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+  try {
+    res.render('openai-upscaler-harness', {
+      title: 'OpenAI Upscaler Test Harness',
+      pageTitle: 'OpenAI Upscaler Harness',
+      pageDescription: 'Test and debug OpenAI image upscaling',
+      user: req.user,
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`
+    });
+  } catch (error) {
+    console.error('Error rendering OpenAI upscaler harness:', error);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Unable to load OpenAI upscaler harness',
+      error: process.env.NODE_ENV === 'development' ? error : {}
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/gallery-random-image
+ * Get a random image from user's gallery (S3 uploads + Firebase bookmarks)
+ */
+router.get('/gallery-random-image', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+  try {
+    const userId = req.user.uid;
+
+    console.log(`\n📁 Fetching random gallery image for user: ${userId}`);
+
+    // Get S3 uploaded images
+    const s3Images = await galleryStorage.listUserGalleryImages(userId);
+    console.log(`📊 S3 images found: ${s3Images.length}`);
+
+    // Get Firebase bookmarks
+    const bookmarks = await getUserBookmarks(userId);
+    console.log(`📊 Firebase bookmarks found: ${bookmarks.length}`);
+
+    // Combine both sources
+    const allGalleryImages = [...s3Images, ...bookmarks];
+
+    if (allGalleryImages.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'No gallery images found',
+        details: 'User has no S3 uploads or bookmarked images'
+      });
+    }
+
+    // Select random image
+    const randomIndex = Math.floor(Math.random() * allGalleryImages.length);
+    const randomImage = allGalleryImages[randomIndex];
+
+    console.log(`✅ Selected random image: ${randomImage.name || randomImage.title}`);
+
+    // Determine the source and get proper URL
+    let imageUrl;
+    let imageName;
+    let imageSize;
+
+    if (randomImage.url && randomImage.url.includes('s3.amazonaws.com')) {
+      // S3 image
+      imageUrl = randomImage.url;
+      imageName = randomImage.name || 'gallery-image.jpg';
+      imageSize = randomImage.size ? (randomImage.size / 1024).toFixed(2) : 'unknown';
+    } else if (randomImage.imageUrl) {
+      // Firebase bookmark
+      imageUrl = randomImage.imageUrl;
+      imageName = randomImage.title || randomImage.alt || 'gallery-image.jpg';
+      imageSize = 'unknown';
+    } else if (randomImage.url) {
+      // Generic image with URL
+      imageUrl = randomImage.url;
+      imageName = randomImage.title || randomImage.name || 'gallery-image.jpg';
+      imageSize = 'unknown';
+    } else {
+      throw new Error('No valid image URL found in gallery');
+    }
+
+    res.json({
+      success: true,
+      imageName,
+      imageUrl,
+      size: imageSize,
+      source: imageUrl.includes('s3') ? 'S3' : 'Firebase',
+      totalImages: allGalleryImages.length
+    });
+
+  } catch (error) {
+    console.error('❌ Gallery API error:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch gallery image',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/openai-upscaler/status
+ * Get OpenAI upscaler configuration and status
+ */
+router.get('/openai-upscaler/status', (req, res) => {
+  const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
+
+  res.json({
+    title: 'OpenAI Upscaler Status',
+    status: hasOpenAIKey ? 'ready' : 'not-configured',
+    configured: hasOpenAIKey,
+    features: {
+      'Vision API Analysis': true,
+      'Sharpening Enhancement': true,
+      'Cubic Interpolation': true,
+      'Saturation Boost': true
+    },
+    endpoints: {
+      'POST /api/merchandise/openai-upscaler/test': {
+        description: 'Test OpenAI upscaling with a single image',
+        requires: 'Authentication + game_access permission',
+        parameters: {
+          image: 'Binary image file',
+          targetWidth: 'Target width in pixels (default: 3000)',
+          targetHeight: 'Target height in pixels (default: 3600)'
+        }
+      },
+      'GET /api/merchandise/openai-upscaler/status': {
+        description: 'Get OpenAI upscaler configuration status'
+      }
+    },
+    note: 'This harness helps debug OpenAI API integration and test upscaling quality'
+  });
 });
 
 module.exports = router;

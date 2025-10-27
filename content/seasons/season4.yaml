@@ -1,30 +1,50 @@
-description: 'Act 3 of the Battle of the Shire: The Shire Folk are determined to reclaim the Shire and their dear homes from the Goblin King.'
+description: >-
+  Act 3 of the Battle of the Shire: The Shire Folk are determined to reclaim the
+  Shire and their dear homes from the Goblin King.
 episodes:
   episode1:
     audio: /images/seasons/season4/episodes/episode1/LockedAndLoaded_v3.mp3
     carouselImages:
-      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-1.webp
-      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-2.webp
-      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-3.webp
-      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-4.webp
-      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-5.webp
-      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-6.webp
-      - /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-7.webp
-      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-02.webp
-      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-03.webp
-      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-05.webp
-      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-06.webp
-      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-07.webp
-      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-10.webp
-      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-13.webp
-      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-14.webp
-      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-16.webp
-      - /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-18.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-1.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-2.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-3.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-4.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-5.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-6.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/campsite-towards-the-shire-7.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-02.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-03.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-05.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-06.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-07.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-10.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-13.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-14.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-16.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/LockedAndLoadedCampsiteAndGoblinKing-18.webp
       - /images/seasons/season4/episodes/episode1/images/RebuildTheShire-08.webp
       - /images/seasons/season4/episodes/episode1/images/RebuildTheShire-10.webp
       - /images/seasons/season4/episodes/episode1/images/RebuildTheShire-12.webp
       - /images/seasons/season4/episodes/episode1/images/RebuildTheShire-15.webp
-      - /images/seasons/season4/episodes/episode1/images/WereComingForYou-10.webp
+      - >-
+        /images/seasons/season4/episodes/episode1/images/WereComingForYou-10.webp
     description: Nothing will stop us now from reclaiming our Shire.
     hidden: false
     image: /images/seasons/season4/episodes/episode1/image.webp
@@ -36,20 +56,53 @@ episodes:
       - ready
       - battle
       - preparation
-    lyrics: Welcome to the Icy Fortress We've got room, and food to Spare When you're here you'll be protected under our care at the icy fortress!
-    story: In \"Locked and Loaded,\" the Shire folk rise up with fierce determination to reclaim their homeland from the clutches of the nefarious Goblin King. After regrouping at the Ice Fortress, they prepare for an epic confrontation, fueled by hope and the unbreakable bond of community. As they rally together, armed with elven bows and magical arrows, they embody a spirit of defiance against tyranny, declaring that nothing will stop them from taking back their cherished homes. The episode culminates in a thrilling showdown, where the Shire folk confront their fears and emerge victorious, though they know the Goblin King may one day return. Experience the exhilarating power of unity and resilience in this electrifying chapter of the Wavelength saga!
+    lyrics: >-
+      Welcome to the Icy Fortress We've got room, and food to Spare When you're
+      here you'll be protected under our care at the icy fortress!
+    story: >-
+      In \"Locked and Loaded,\" the Shire folk rise up with fierce determination
+      to reclaim their homeland from the clutches of the nefarious Goblin King.
+      After regrouping at the Ice Fortress, they prepare for an epic
+      confrontation, fueled by hope and the unbreakable bond of community. As
+      they rally together, armed with elven bows and magical arrows, they embody
+      a spirit of defiance against tyranny, declaring that nothing will stop
+      them from taking back their cherished homes. The episode culminates in a
+      thrilling showdown, where the Shire folk confront their fears and emerge
+      victorious, though they know the Goblin King may one day return.
+      Experience the exhilarating power of unity and resilience in this
+      electrifying chapter of the Wavelength saga!
     title: Locked And Loaded
     youtubeLink: https://youtu.be/9dUMX2KhR54
-    original_story_summary: Wavelength and the Shire Folk escape the Goblin Invasion of the dear Shire, and flee to the far, frozen North.  There they find a place to recover and plan at the Ice Fortress. THe Ice Fortress is a safe haven for all, where everyone is welcome, no matter wealth or looks or race.
+    original_story_summary: >-
+      Wavelength and the Shire Folk escape the Goblin Invasion of the dear
+      Shire, and flee to the far, frozen North.  There they find a place to
+      recover and plan at the Ice Fortress. THe Ice Fortress is a safe haven for
+      all, where everyone is welcome, no matter wealth or looks or race.
+    cliffhanger_hook: >-
+      But when the Shire folk finally gather their strength and march toward the
+      horizon, a chilling howl echoes through the air—revealing that the Goblin
+      King has summoned an ancient beast to thwart their plans.
+      NEXT_EPISODE_TEASE: As the battle intensifies, alliances will be tested
+      and secrets unveiled in the heart of the Shire.
+    next_episode_tease: >-
+      As the battle intensifies, alliances will be tested and secrets unveiled
+      in the heart of the Shire.
+    cta_tagline: Will courage be enough to reclaim home?
   episode2:
     audio: /images/seasons/season4/episodes/episode2/TheKingHasFled_v1.mp3
     carouselImages:
-      - /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-1.webp
-      - /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-2.webp
-      - /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-3.webp
-      - /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-4.webp
-      - /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-5.webp
-      - /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-6.webp
+      - >-
+        /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-1.webp
+      - >-
+        /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-2.webp
+      - >-
+        /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-3.webp
+      - >-
+        /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-4.webp
+      - >-
+        /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-5.webp
+      - >-
+        /images/seasons/season4/episodes/episode2/images/ruins-of-the-shire-6.webp
       - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-10.webp
       - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-13.webp
       - /images/seasons/season4/episodes/episode2/images/TheKingHasFled-14.webp
@@ -72,11 +125,38 @@ episodes:
       - lair
       - lies
       - goblin-king
-    lyrics: The Goblin King has fled the battle He can spread no more lies in the Shire No more lying in the shire! No Lies!
-    story: In the gripping episode titled \"The King has Fled\" from the \"Battle of the Shire\" season, the Shire Folk rally their courage and resolve after a devastating conflict with the Goblin King. As they reclaim their beloved home, they discover that the Goblin King has escaped with the royal treasures and the Shire Royal Family—King, Queen, and Princess—still in his clutches. This harrowing twist ignites a fire in the hearts of the Shire Folk, who realize their fight is far from over. Determined to rescue their loved ones and restore peace, they prepare for an inevitable confrontation with the cunning Goblin King. With themes of resilience and unity, this episode sets the stage for an epic showdown that will redefine their lives forever!
+    lyrics: >-
+      The Goblin King has fled the battle He can spread no more lies in the
+      Shire No more lying in the shire! No Lies!
+    story: >-
+      In the gripping episode titled \"The King has Fled\" from the \"Battle of
+      the Shire\" season, the Shire Folk rally their courage and resolve after a
+      devastating conflict with the Goblin King. As they reclaim their beloved
+      home, they discover that the Goblin King has escaped with the royal
+      treasures and the Shire Royal Family—King, Queen, and Princess—still in
+      his clutches. This harrowing twist ignites a fire in the hearts of the
+      Shire Folk, who realize their fight is far from over. Determined to rescue
+      their loved ones and restore peace, they prepare for an inevitable
+      confrontation with the cunning Goblin King. With themes of resilience and
+      unity, this episode sets the stage for an epic showdown that will redefine
+      their lives forever!
     title: The King has Fled
     youtubeLink: https://youtu.be/SMqrc-2wdAA
-    original_story_summary: The Goblin king being a coward at heart, fled the battle before it began, fleeing with his main GOblin Misery back to his swampy lair.  He took with him captives from the Shire, including the Royal Family.  Behind the GOblin King he left a token force to hold the Shire, so that the Shire Folk wouldn't pursue him.
+    original_story_summary: >-
+      The Goblin king being a coward at heart, fled the battle before it began,
+      fleeing with his main GOblin Misery back to his swampy lair.  He took with
+      him captives from the Shire, including the Royal Family.  Behind the
+      GOblin King he left a token force to hold the Shire, so that the Shire
+      Folk wouldn't pursue him.
+    cliffhanger_hook: >-
+      But when the Shire Folk finally believed they had driven the Goblin King
+      away for good, a chilling howl echoed through the night, signaling his
+      return with a darker force at his command. NEXT_EPISODE_TEASE: As shadows
+      gather and alliances shift, the true battle for the Shire begins anew.
+    next_episode_tease: >-
+      As shadows gather and alliances shift, the true battle for the Shire
+      begins anew.
+    cta_tagline: Will courage triumph over looming darkness?
   episode3:
     audio: /images/seasons/season4/episodes/episode3/GoblinsRule_v2.mp3
     carouselImages:
@@ -88,15 +168,24 @@ episodes:
       - /images/seasons/season4/episodes/episode3/images/GoblinsRule-24.webp
       - /images/seasons/season4/episodes/episode3/images/GoblinsRule-25.webp
       - /images/seasons/season4/episodes/episode3/images/GoblinsRule-26.webp
-      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-1.webp
-      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-2.webp
-      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-3.webp
-      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-4.webp
-      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-5.webp
-      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-6.webp
-      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-7.webp
-      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-8.webp
-      - /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-9.webp
+      - >-
+        /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-1.webp
+      - >-
+        /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-2.webp
+      - >-
+        /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-3.webp
+      - >-
+        /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-4.webp
+      - >-
+        /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-5.webp
+      - >-
+        /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-6.webp
+      - >-
+        /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-7.webp
+      - >-
+        /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-8.webp
+      - >-
+        /images/seasons/season4/episodes/episode3/images/shire-wooden-amphitheater-9.webp
     description: The only goblin rule for you is that Goblins gonna Rule all over you
     hidden: false
     image: /images/seasons/season4/episodes/episode3/image.webp
@@ -111,11 +200,43 @@ episodes:
       - misery
       - goblin king
       - goblin-king
-    lyrics: The Only Goblin Rule for You Is that goblins gonna Rule all over you!  It's no mystery that i'd lie to you It's just the way that the Goblin King's rule!  When I'm speaking you can bet That I'm lying to you It's just the way that the Goblin King's rule!  It's no mystery that i'd lie to you... ...that i'd lie to you, and you, and you...
-    story: In the gripping episode \"Goblin's Rule\" from the \"Battle of the Shire\" season, the Shire folk find themselves in the throes of despair as the Goblin King and his Misery of Goblins tighten their grip on their once-peaceful home. The Shire is a shadow of its former self, with the royal family abducted and the community living in fear under the Goblin King's tyrannical rule. However, hope emerges as a courageous blacksmith, a respected elder of the village, rises to unite the Shire folk in a bold rebellion. With determination and newfound strength, they prepare to confront their oppressor, aiming to reclaim their land and restore harmony. As the stakes reach an all-time high, the battle between light and darkness unfolds, revealing the true power of unity against corruption.
+    lyrics: >-
+      The Only Goblin Rule for You Is that goblins gonna Rule all over you! 
+      It's no mystery that i'd lie to you It's just the way that the Goblin
+      King's rule!  When I'm speaking you can bet That I'm lying to you It's
+      just the way that the Goblin King's rule!  It's no mystery that i'd lie to
+      you... ...that i'd lie to you, and you, and you...
+    story: >-
+      In the gripping episode \"Goblin's Rule\" from the \"Battle of the Shire\"
+      season, the Shire folk find themselves in the throes of despair as the
+      Goblin King and his Misery of Goblins tighten their grip on their
+      once-peaceful home. The Shire is a shadow of its former self, with the
+      royal family abducted and the community living in fear under the Goblin
+      King's tyrannical rule. However, hope emerges as a courageous blacksmith,
+      a respected elder of the village, rises to unite the Shire folk in a bold
+      rebellion. With determination and newfound strength, they prepare to
+      confront their oppressor, aiming to reclaim their land and restore
+      harmony. As the stakes reach an all-time high, the battle between light
+      and darkness unfolds, revealing the true power of unity against
+      corruption.
     title: Goblin's Rule
     youtubeLink: https://youtu.be/UcTy2Wf4kUg
-    original_story_summary: There is only one motivation for a Goblin, and that is to rule over others.  This is the case for all Goblins, from the lowliest grunt to the Goblin King himself.  The Goblin King rules by lying, cheating, and stealing.  He has no honor, and no respect for others.  The only rule that the Goblin King has is that Goblins gonna rule all over you.
+    original_story_summary: >-
+      There is only one motivation for a Goblin, and that is to rule over
+      others.  This is the case for all Goblins, from the lowliest grunt to the
+      Goblin King himself.  The Goblin King rules by lying, cheating, and
+      stealing.  He has no honor, and no respect for others.  The only rule that
+      the Goblin King has is that Goblins gonna rule all over you.
+    cliffhanger_hook: >-
+      But when the moon hung high, illuminating the Goblin King's sinister grin,
+      a chilling whisper echoed through the Shire—a prophecy of doom that
+      foretold the rise of an ancient force that even the Goblin King feared.
+      NEXT_EPISODE_TEASE: As the Shire folk rally their courage, an unexpected
+      ally emerges from the shadows, offering hope in the darkest of times.
+    next_episode_tease: >-
+      As the Shire folk rally their courage, an unexpected ally emerges from the
+      shadows, offering hope in the darkest of times.
+    cta_tagline: Will the Shire reclaim its lost dream?
   episode4:
     audio: /images/seasons/season4/episodes/episode4/IceBlueGreed_v2.mp3
     carouselImages:
@@ -126,15 +247,24 @@ episodes:
       - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-25.webp
       - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.webp
       - /images/seasons/season4/episodes/episode4/images/IceBlueGreed-28.webp
-      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-1.webp
-      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-2.webp
-      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-3.webp
-      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-4.webp
-      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-5.webp
-      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-6.webp
-      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-7.webp
-      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-8.webp
-      - /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-9.webp
+      - >-
+        /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-1.webp
+      - >-
+        /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-2.webp
+      - >-
+        /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-3.webp
+      - >-
+        /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-4.webp
+      - >-
+        /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-5.webp
+      - >-
+        /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-6.webp
+      - >-
+        /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-7.webp
+      - >-
+        /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-8.webp
+      - >-
+        /images/seasons/season4/episodes/episode4/images/shire-wooden-amphitheater-9.webp
     description: There's no way that the King can resist the trap set by Lucky
     hidden: false
     image: /images/seasons/season4/episodes/episode4/image.webp
@@ -150,11 +280,43 @@ episodes:
       - lure
       - ice blue diamond
       - goblin-king
-    lyrics: Yes, we've all heard 'bout the Goblin Greed Now the goblin king has his greed fixed on...    ...an Ice BLue Diamond  Lucky set a trap, trap for Goblin Greed Showed a goblin spy an irresistible diamond... ...stored at the shire  There's no way that the King can resist The deadly lure that lucky cast
-    story: In the thrilling episode \"Ice Blue Greed\" from the \"Battle of the Shire\" saga, the Shire folk band together in a desperate bid to reclaim their homeland from the clutches of the Goblin King. As they uncover the depths of the Goblin King's avarice, they set an ingenious trap, using a mesmerizing Ice Blue Diamond to lure him into a confrontation. Tensions rise as the Shire folk prepare for battle, fueled by their desire to rid their land of the corruption left behind by the goblins. With stakes higher than ever, Wavelength stands at the forefront, ready to fight for their home and the dreams that bind them together. Will their determination and clever strategy be enough to turn the tide in this epic showdown? Tune in to witness a tale of courage, unity, and the unyielding spirit of the Shire!
+    lyrics: >-
+      Yes, we've all heard 'bout the Goblin Greed Now the goblin king has his
+      greed fixed on...    ...an Ice BLue Diamond  Lucky set a trap, trap for
+      Goblin Greed Showed a goblin spy an irresistible diamond... ...stored at
+      the shire  There's no way that the King can resist The deadly lure that
+      lucky cast
+    story: >-
+      In the thrilling episode \"Ice Blue Greed\" from the \"Battle of the
+      Shire\" saga, the Shire folk band together in a desperate bid to reclaim
+      their homeland from the clutches of the Goblin King. As they uncover the
+      depths of the Goblin King's avarice, they set an ingenious trap, using a
+      mesmerizing Ice Blue Diamond to lure him into a confrontation. Tensions
+      rise as the Shire folk prepare for battle, fueled by their desire to rid
+      their land of the corruption left behind by the goblins. With stakes
+      higher than ever, Wavelength stands at the forefront, ready to fight for
+      their home and the dreams that bind them together. Will their
+      determination and clever strategy be enough to turn the tide in this epic
+      showdown? Tune in to witness a tale of courage, unity, and the unyielding
+      spirit of the Shire!
     title: Ice Blue Greed
     youtubeLink: https://youtu.be/LlhYGbc2xXM
-    original_story_summary: The Shire FOlk know that the Goblin King is a coward, and that he won't openly attack a fortified shire without a good reason.  Lucky sets a trap for the Goblin King, using an irresistible Ice Blue Diamond as bait. The much coveted Ice Blue Diamonds can only be found in the far, frozen North as they are guarded by the fearsome Ice Dragons.
+    original_story_summary: >-
+      The Shire FOlk know that the Goblin King is a coward, and that he won't
+      openly attack a fortified shire without a good reason.  Lucky sets a trap
+      for the Goblin King, using an irresistible Ice Blue Diamond as bait. The
+      much coveted Ice Blue Diamonds can only be found in the far, frozen North
+      as they are guarded by the fearsome Ice Dragons.
+    cliffhanger_hook: >-
+      But when Lucky's trap is finally sprung, an unexpected twist reveals that
+      the Goblin King has anticipated their every move, and darkness looms over
+      the Shire once more. NEXT_EPISODE_TEASE: As the battle escalates, secrets
+      long buried will emerge, testing the bonds of the Shire folk and
+      Wavelength like never before.
+    next_episode_tease: >-
+      As the battle escalates, secrets long buried will emerge, testing the
+      bonds of the Shire folk and Wavelength like never before.
+    cta_tagline: Will they reclaim their dream or fall?
   episode5:
     audio: /images/seasons/season4/episodes/episode5/TheShireFortress_v2.mp3
     carouselImages:
@@ -162,21 +324,36 @@ episodes:
       - /images/seasons/season4/episodes/episode5/images/GoblinsRule-22.webp
       - /images/seasons/season4/episodes/episode5/images/GoblinsRule-25.webp
       - /images/seasons/season4/episodes/episode5/images/GoblinsRule-26.webp
-      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-13.webp
-      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-15.webp
-      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-16.webp
-      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-18.webp
-      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-19.webp
-      - /images/seasons/season4/episodes/episode5/images/TheShireFortress-20.webp
-      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-1.webp
-      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-2.webp
-      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-3.webp
-      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-4.webp
-      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-5.webp
-      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-6.webp
-      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-7.webp
-      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-8.webp
-      - /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-9.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/TheShireFortress-13.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/TheShireFortress-15.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/TheShireFortress-16.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/TheShireFortress-18.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/TheShireFortress-19.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/TheShireFortress-20.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-1.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-2.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-3.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-4.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-5.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-6.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-7.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-8.webp
+      - >-
+        /images/seasons/season4/episodes/episode5/images/shire-wooden-amphitheater-9.webp
     description: Do you want to live under the rule of the hateful and Cruel?
     hidden: false
     image: /images/seasons/season4/episodes/episode5/image.webp
@@ -192,59 +369,126 @@ episodes:
       - cruel
       - lucky
       - goblin-king
-    lyrics: Reinforce those Ramparts Get everything done Got to fortify the shire before they come  Do you want to live under the rule Of the hateful and cruel? Build a Shire FOrtress!  HIgh Towers and Layered Defenses helps us with any attack any attack! We need to train everyday to learn how to keep  the goblins away Build a Shire FOrtress!  Do you want to live a life of freedom? Then Build a Shire FOrtress!
-    story: In \"The Shire Fortress,\" the Shire Folk unite with unwavering determination to reclaim their homeland from the clutches of the Goblin King and his Misery of Goblins. As they rally together, they construct formidable defenses, transforming the Shire into a bastion of hope and resilience against tyranny. With each stone laid and each bowstring drawn, the Shire Folk train relentlessly, preparing for the inevitable clash that will determine their fate. The stakes are high as they confront not only the physical threat of the Goblin King but also the emotional scars left by his ruthless reign. Will the strength of community and the power of their dreams be enough to restore peace to the Shire? Join Wavelength on this thrilling journey of courage, unity, and the fight for freedom!
+    lyrics: >-
+      Reinforce those Ramparts Get everything done Got to fortify the shire
+      before they come  Do you want to live under the rule Of the hateful and
+      cruel? Build a Shire FOrtress!  HIgh Towers and Layered Defenses helps us
+      with any attack any attack! We need to train everyday to learn how to
+      keep  the goblins away Build a Shire FOrtress!  Do you want to live a life
+      of freedom? Then Build a Shire FOrtress!
+    story: >-
+      In \"The Shire Fortress,\" the Shire Folk unite with unwavering
+      determination to reclaim their homeland from the clutches of the Goblin
+      King and his Misery of Goblins. As they rally together, they construct
+      formidable defenses, transforming the Shire into a bastion of hope and
+      resilience against tyranny. With each stone laid and each bowstring drawn,
+      the Shire Folk train relentlessly, preparing for the inevitable clash that
+      will determine their fate. The stakes are high as they confront not only
+      the physical threat of the Goblin King but also the emotional scars left
+      by his ruthless reign. Will the strength of community and the power of
+      their dreams be enough to restore peace to the Shire? Join Wavelength on
+      this thrilling journey of courage, unity, and the fight for freedom!
     title: The Shire Fortress
     youtubeLink: https://youtu.be/YsREhnlW8B8
-    original_story_summary: Knowing that Lucky's trap was set, the Shire Folk set about fortifying the Shire to withstand the coming Goblin attack. They know that the Goblin's will be relentless in their attack, and that they will stop at nothing to reclaim the Shire in order to satisfy the Goblin King's greed.  They will do whatever it takes to not have to submit to the rule of the goblin king.
+    original_story_summary: >-
+      Knowing that Lucky's trap was set, the Shire Folk set about fortifying the
+      Shire to withstand the coming Goblin attack. They know that the Goblin's
+      will be relentless in their attack, and that they will stop at nothing to
+      reclaim the Shire in order to satisfy the Goblin King's greed.  They will
+      do whatever it takes to not have to submit to the rule of the goblin king.
   episode6:
     audio: /images/seasons/season4/episodes/episode6/BattleOfTheShire_v4.mp3
     carouselImages:
-      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-01.webp
-      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-02.webp
-      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-03.webp
-      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-04.webp
-      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-05.webp
-      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-06.webp
-      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-07.webp
-      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-08.webp
-      - /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-09.webp
-      - /images/seasons/season4/episodes/episode6/images/death-of-the-goblin-king-1.webp
-      - /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-1.webp
-      - /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-2.webp
-      - /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-3.webp
-      - /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-4.webp
-      - /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-5.webp
-      - /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-6.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-007.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-010.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-013.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-017.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-018.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-019.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-020.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-021.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-028.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-030.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-031.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-039.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-047.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-049.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-051.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-052.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-053.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-056.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-057.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-058.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-059.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-060.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-061.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-063.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-064.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-065.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-066.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-068.webp
-      - /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-01.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-02.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-03.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-04.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-05.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-06.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-07.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-08.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/campsite-towards-the-shire2-09.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/death-of-the-goblin-king-1.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-1.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-2.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-3.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-4.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-5.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/shire-evening-amphitheater-6.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-007.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-010.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-013.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-017.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-018.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-019.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-020.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-021.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-028.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-030.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-031.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-039.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-047.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-049.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-051.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-052.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-053.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-056.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-057.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-058.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-059.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-060.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-061.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-063.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-064.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-065.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-066.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-068.webp
+      - >-
+        /images/seasons/season4/episodes/episode6/images/TheBattleOfTheShire-070.webp
     description: Shoot for the king; stopping his lies are the key to everything
     hidden: false
     image: /images/seasons/season4/episodes/episode6/image.webp
@@ -260,26 +504,71 @@ episodes:
       - defeated
       - goblin-king
       - goblins
-    lyrics: You've gotta Shoot, Shoot for the King Stopping his lies are the keys to Everything We must destroy, The Mic of the King Stopping his lies are the keys to Everything  There's a goblin misery, with a goblin war machine  No matter what we try the king's armor is much to strong Our magic arrows don't have any affects to stop the king's battle song  We’ve only got three ballista arrows To stop the Goblin Misery We’ll take out the war machine, the mic then the goblin king   We're getting Desperate Down to our final option Bring out the mighty Ballista And aim for the throat of the goblin  The Goblin King Is not much more than a lying machine To kill the king Put an arrow his throat to stop his singing  Aim for the throat of the goblin  king Stop his lies  Free your lives  We killed the king The Goblins are defeated The Gobling King is Dead Yes, we've won back the shire! We'll never have to hear him again Or his misery of liars   Yes we're back to our shire We're Home Yes we're back to the shire
-    story: In the gripping episode \"Battle of the Shire,\" the Shire Folk rise up against the tyrannical Goblin King and his Misery of Goblins, determined to reclaim their beloved homeland. As devastation looms and their royal family is taken captive, the Shire Folk fortify their defenses and train for battle, fueled by a newfound resolve to end the Goblin King's reign of terror. With the help of the courageous band Wavelength, they unleash their fury in a climactic showdown that showcases their bravery and unity. The battle culminates in a desperate attempt to defeat the Goblin King once and for all, aiming for his throat with their last remaining ballista arrows. Victorious yet battle-weary, the Shire Folk reclaim their land, heralding a new era of hope as they rebuild their shattered community and celebrate their freedom from oppression.
+    lyrics: >-
+      You've gotta Shoot, Shoot for the King Stopping his lies are the keys to
+      Everything We must destroy, The Mic of the King Stopping his lies are the
+      keys to Everything  There's a goblin misery, with a goblin war machine  No
+      matter what we try the king's armor is much to strong Our magic arrows
+      don't have any affects to stop the king's battle song  We’ve only got
+      three ballista arrows To stop the Goblin Misery We’ll take out the war
+      machine, the mic then the goblin king   We're getting Desperate Down to
+      our final option Bring out the mighty Ballista And aim for the throat of
+      the goblin  The Goblin King Is not much more than a lying machine To kill
+      the king Put an arrow his throat to stop his singing  Aim for the throat
+      of the goblin  king Stop his lies  Free your lives  We killed the king The
+      Goblins are defeated The Gobling King is Dead Yes, we've won back the
+      shire! We'll never have to hear him again Or his misery of liars   Yes
+      we're back to our shire We're Home Yes we're back to the shire
+    story: >-
+      In the gripping episode \"Battle of the Shire,\" the Shire Folk rise up
+      against the tyrannical Goblin King and his Misery of Goblins, determined
+      to reclaim their beloved homeland. As devastation looms and their royal
+      family is taken captive, the Shire Folk fortify their defenses and train
+      for battle, fueled by a newfound resolve to end the Goblin King's reign of
+      terror. With the help of the courageous band Wavelength, they unleash
+      their fury in a climactic showdown that showcases their bravery and unity.
+      The battle culminates in a desperate attempt to defeat the Goblin King
+      once and for all, aiming for his throat with their last remaining ballista
+      arrows. Victorious yet battle-weary, the Shire Folk reclaim their land,
+      heralding a new era of hope as they rebuild their shattered community and
+      celebrate their freedom from oppression.
     title: Battle of the Shire
     youtubeLink: https://youtu.be/GIpZ5yX6qn8
-    original_story_summary: The Goblin King, driven by his insatiable greed for the Ice Blue Diamond, leads his goblin horde to attack the fortified Shire. The Shire Folk, prepared and determined, stand united to defend their home and freedom. The battle is fierce, with both sides showing great courage and resilience. In the end, the Shire Folk's determination and unity prevail, and they successfully defend their home from the Goblin King's forces.
+    original_story_summary: >-
+      The Goblin King, driven by his insatiable greed for the Ice Blue Diamond,
+      leads his goblin horde to attack the fortified Shire. The Shire Folk,
+      prepared and determined, stand united to defend their home and freedom.
+      The battle is fierce, with both sides showing great courage and
+      resilience. In the end, the Shire Folk's determination and unity prevail,
+      and they successfully defend their home from the Goblin King's forces.
   episode7:
     audio: /images/seasons/season4/episodes/episode7/SongOfMourning_v1.mp3
     carouselImages:
-      - /images/seasons/season4/episodes/episode7/images/TheBattleOfTheShire-027.webp
-      - /images/seasons/season4/episodes/episode7/images/TheBattleOfTheShire-031.webp
-      - /images/seasons/season4/episodes/episode7/images/TheSongOfMourning-02.webp
-      - /images/seasons/season4/episodes/episode7/images/TheSongOfMourning-09.webp
-      - /images/seasons/season4/episodes/episode7/images/TheSongOfMourning-22.webp
-      - /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-1.webp
-      - /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-2.webp
-      - /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-3.webp
-      - /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-4.webp
-      - /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-5.webp
-      - /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-7.webp
-    description: There's a time for mourning, when we'll share stories at night about our loved ones passing, and how we hold those memories tight.
+      - >-
+        /images/seasons/season4/episodes/episode7/images/TheBattleOfTheShire-027.webp
+      - >-
+        /images/seasons/season4/episodes/episode7/images/TheBattleOfTheShire-031.webp
+      - >-
+        /images/seasons/season4/episodes/episode7/images/TheSongOfMourning-02.webp
+      - >-
+        /images/seasons/season4/episodes/episode7/images/TheSongOfMourning-09.webp
+      - >-
+        /images/seasons/season4/episodes/episode7/images/TheSongOfMourning-22.webp
+      - >-
+        /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-1.webp
+      - >-
+        /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-2.webp
+      - >-
+        /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-3.webp
+      - >-
+        /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-4.webp
+      - >-
+        /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-5.webp
+      - >-
+        /images/seasons/season4/episodes/episode7/images/burial-bonfire-at-the-shire-7.webp
+    description: >-
+      There's a time for mourning, when we'll share stories at night about our
+      loved ones passing, and how we hold those memories tight.
     hidden: false
     image: /images/seasons/season4/episodes/episode7/image.webp
     keywords:
@@ -294,11 +583,41 @@ episodes:
       - orphans
       - loss
       - eloquence
-    lyrics: There is a time for mourning where we share stories at night, ...About a loved one's passing and how we hold those memories tight.  This is the song of Mourning
-    story: In the poignant episode \"Song of Mourning\" from the \"Battle of the Shire\" arc, Wavelength grapples with profound loss as they mourn their beloved drummer, Magical Maurice, who perished during the devastating battle against the Goblin King. Amidst their grief, they encounter Daphne, a talented young orphan and daughter of the Shire's Concert Master, who steps into the role of drummer, bringing both hope and tension to the band. As they navigate their sorrow and celebrate the resilience of the Shire Folk, Wavelength performs a heartfelt tribute in the form of the \"Song of Mourning,\" honoring those lost while reinforcing the importance of cherishing memories. This emotional journey not only strengthens their bond but also ignites a fierce determination to reclaim their home from the clutches of misery. Ultimately, Daphne’s arrival signals a new chapter for Wavelength, as they prepare to rise from their grief and fight for a brighter future in the Shire.
+    lyrics: >-
+      There is a time for mourning where we share stories at night, ...About a
+      loved one's passing and how we hold those memories tight.  This is the
+      song of Mourning
+    story: >-
+      In the poignant episode \"Song of Mourning\" from the \"Battle of the
+      Shire\" arc, Wavelength grapples with profound loss as they mourn their
+      beloved drummer, Magical Maurice, who perished during the devastating
+      battle against the Goblin King. Amidst their grief, they encounter Daphne,
+      a talented young orphan and daughter of the Shire's Concert Master, who
+      steps into the role of drummer, bringing both hope and tension to the
+      band. As they navigate their sorrow and celebrate the resilience of the
+      Shire Folk, Wavelength performs a heartfelt tribute in the form of the
+      \"Song of Mourning,\" honoring those lost while reinforcing the importance
+      of cherishing memories. This emotional journey not only strengthens their
+      bond but also ignites a fierce determination to reclaim their home from
+      the clutches of misery. Ultimately, Daphne’s arrival signals a new chapter
+      for Wavelength, as they prepare to rise from their grief and fight for a
+      brighter future in the Shire.
     title: Song of Mourning
     youtubeLink: https://youtu.be/JLSTXP3ipnQ
-    original_story_summary: 'After the battle, the Shire Folk take time to mourn their losses and honor the memories of those who have passed. Wavelength didn''t escape unscathed, as Wavelength''s Drummer: Magical Maurice was lost in the battle.   Many others were killed, and many orphans were left behind.   One of the orphans is Daphne the daughter of the Shire''s Concert Master, who was also killed in the battle along with her father. Daphne is left to take care of her younger brother, and as she is a prodigy on the drums, she takes up the mantle of Wavelength''s drummer. Meanwhile, Eloquence, Wavelength''s Bass player is devestated by the loss of Magical Maurice, who was his best friend.  He is not impressed with the idea of Daphne taking over as Wavelength''s drummer, especially as Daphne seems to be such a bitter person. The Song of Mourning is a tribute to those who have passed, and a reminder to hold onto the memories of our loved ones.'
+    original_story_summary: >-
+      After the battle, the Shire Folk take time to mourn their losses and honor
+      the memories of those who have passed. Wavelength didn't escape unscathed,
+      as Wavelength's Drummer: Magical Maurice was lost in the battle.   Many
+      others were killed, and many orphans were left behind.   One of the
+      orphans is Daphne the daughter of the Shire's Concert Master, who was also
+      killed in the battle along with her father. Daphne is left to take care of
+      her younger brother, and as she is a prodigy on the drums, she takes up
+      the mantle of Wavelength's drummer. Meanwhile, Eloquence, Wavelength's
+      Bass player is devestated by the loss of Magical Maurice, who was his best
+      friend.  He is not impressed with the idea of Daphne taking over as
+      Wavelength's drummer, especially as Daphne seems to be such a bitter
+      person. The Song of Mourning is a tribute to those who have passed, and a
+      reminder to hold onto the memories of our loved ones.
   episode8:
     audio: /images/seasons/season4/episodes/episode8/TheShireDream_v1.mp3
     carouselImages:
@@ -309,13 +628,19 @@ episodes:
       - /images/seasons/season4/episodes/episode8/images/IceBlueGreed-22.webp
       - /images/seasons/season4/episodes/episode8/images/IceFortress-20.webp
       - /images/seasons/season4/episodes/episode8/images/RebuildTheShire-02.webp
-      - /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-017.webp
-      - /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-018.webp
-      - /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-020.webp
-      - /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-051.webp
-      - /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-062.webp
+      - >-
+        /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-017.webp
+      - >-
+        /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-018.webp
+      - >-
+        /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-020.webp
+      - >-
+        /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-051.webp
+      - >-
+        /images/seasons/season4/episodes/episode8/images/TheBattleOfTheShire-062.webp
       - /images/seasons/season4/episodes/episode8/images/TheKingHasFled-23.webp
-      - /images/seasons/season4/episodes/episode8/images/TheSongOfMourning-22.webp
+      - >-
+        /images/seasons/season4/episodes/episode8/images/TheSongOfMourning-22.webp
       - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-01.webp
       - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-02.webp
       - /images/seasons/season4/episodes/episode8/images/shire-sanctuary-03.webp
@@ -340,11 +665,44 @@ episodes:
       - darkness
       - daylight
       - daphne
-    lyrics: Some only live for money, Some only live for power. But we have a different dream  Some only shoot for power, Some only live to kill.  The shire dream, Is a different dream for all humanity We dream the shire dream  We have just one life, one life to live. I'll choose to be free and find the shire dream in me.  Some goblins live in the darkness, Others like to Rule in daylight.  I'll choose to be free and find the shire dream in me.
-    story: In \"The Shire Dream,\" the aftermath of the battle against the Goblin King sees the Shire Folk striving to reclaim their peace and rebuild their homeland. With the weight of loss on their shoulders, Wavelength’s newest member, Daphne—a talented drummer and orphan—rises to the challenge, uniting the community through the power of music. As they confront their grief and embrace hope, the Shire Folk discover a shared vision of freedom and harmony, singing the anthem of resilience that echoes throughout the land. This episode is a poignant reminder of the strength found in unity and the enduring spirit of the Shire as they dream of a brighter future, free from tyranny. Join Wavelength on this emotional journey as they turn pain into purpose, inspiring all to find the Shire dream within themselves!
+    lyrics: >-
+      Some only live for money, Some only live for power. But we have a
+      different dream  Some only shoot for power, Some only live to kill.  The
+      shire dream, Is a different dream for all humanity We dream the shire
+      dream  We have just one life, one life to live. I'll choose to be free and
+      find the shire dream in me.  Some goblins live in the darkness, Others
+      like to Rule in daylight.  I'll choose to be free and find the shire dream
+      in me.
+    story: >-
+      In \"The Shire Dream,\" the aftermath of the battle against the Goblin
+      King sees the Shire Folk striving to reclaim their peace and rebuild their
+      homeland. With the weight of loss on their shoulders, Wavelength’s newest
+      member, Daphne—a talented drummer and orphan—rises to the challenge,
+      uniting the community through the power of music. As they confront their
+      grief and embrace hope, the Shire Folk discover a shared vision of freedom
+      and harmony, singing the anthem of resilience that echoes throughout the
+      land. This episode is a poignant reminder of the strength found in unity
+      and the enduring spirit of the Shire as they dream of a brighter future,
+      free from tyranny. Join Wavelength on this emotional journey as they turn
+      pain into purpose, inspiring all to find the Shire dream within
+      themselves!
     title: The Shire Dream
     youtubeLink: https://youtu.be/iVerMZpk4dM
-    original_story_summary: The Goblin King can no longer spread his lies in the Shire, and the Shire Folk can finally live in peace. Wavelength has lost a member, but they have gained a new one in Daphne, who has proven herself to be a worthy drummer. What happens next to Daphne and Wavelength will be told over the next many seasons to come....
+    original_story_summary: >-
+      The Goblin King can no longer spread his lies in the Shire, and the Shire
+      Folk can finally live in peace. Wavelength has lost a member, but they
+      have gained a new one in Daphne, who has proven herself to be a worthy
+      drummer. What happens next to Daphne and Wavelength will be told over the
+      next many seasons to come....
+    cliffhanger_hook: >-
+      But when the first rays of dawn break over the Shire, a shadow looms on
+      the horizon, hinting that the Goblin King’s reign of terror may not be
+      over yet. NEXT_EPISODE_TEASE: As whispers of a new threat arise, the Shire
+      Folk must unite once more to protect their fragile peace.
+    next_episode_tease: >-
+      As whispers of a new threat arise, the Shire Folk must unite once more to
+      protect their fragile peace.
+    cta_tagline: Will they rise to face the darkness?
 image: ''
 seasonLink: https://www.youtube.com/playlist?list=PLO3KUVl6gwUaXP0a6Gd8F2yt8zBpDNszV
 title: Battle of the Shire

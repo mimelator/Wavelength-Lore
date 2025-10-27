@@ -49,8 +49,9 @@ function configureMiddleware(app) {
   }
 
   // Body parser middleware for JSON requests
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  // Increased limit to 50MB to support base64-encoded image uploads for OpenAI upscaler
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
   
   // Cookie parser middleware to read cookies from requests
   app.use(cookieParser());

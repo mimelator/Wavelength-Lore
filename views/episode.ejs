@@ -104,21 +104,38 @@
             <h2>Summary</h2>
             <div class="content-with-links episode-summary">
                 <p><%- simpleSmartLinking(summary) %></p>
+                
+                <!-- Enhanced Cliffhanger Hook (New Schema Field) -->
+                <% if (typeof cliffhanger_hook !== 'undefined' && cliffhanger_hook) { %>
+                <div class="cliffhanger-hook" style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, rgba(255, 69, 0, 0.1), rgba(255, 140, 0, 0.1)); border-left: 4px solid #ff6b35; border-radius: 8px;">
+                    <p style="font-style: italic; color: #ff6b35; font-weight: bold; margin: 0; font-size: 1.1rem;">
+                        <%- cliffhanger_hook %>
+                    </p>
+                </div>
+                <% } %>
             </div>
         </section>
 
-        <!-- Next Episode Cliffhanger CTA -->
+        <!-- Next Episode Cliffhanger CTA (Enhanced with Schema Fields) -->
         <% if (nextLink) { %>
         <section class="next-episode-cta" style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(75, 0, 130, 0.1)); border: 2px solid rgba(138, 43, 226, 0.3); border-radius: 15px; padding: 25px; margin: 30px 0; text-align: center; position: relative; overflow: hidden;">
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.05), transparent 70%); pointer-events: none;"></div>
             
             <div style="position: relative; z-index: 1;">
                 <h3 style="color: #ffd700; font-size: 1.8rem; margin-bottom: 15px; text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);">
-                    🎬 What Happens Next?
+                    <% if (typeof cta_tagline !== 'undefined' && cta_tagline) { %>
+                        🎬 <%= cta_tagline %>
+                    <% } else { %>
+                        🎬 What Happens Next?
+                    <% } %>
                 </h3>
                 
                 <p style="color: #e0e0e0; font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6;">
-                    The story continues and the stakes get higher...
+                    <% if (typeof next_episode_tease !== 'undefined' && next_episode_tease) { %>
+                        <%= next_episode_tease %>
+                    <% } else { %>
+                        The story continues and the stakes get higher...
+                    <% } %>
                 </p>
                 
                 <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px;">

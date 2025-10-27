@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Upscaler Harness</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="file"],
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="file"]:focus,
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .secondary-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .stat-box {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .log-container {
+            background: #1e1e1e;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 6px;
+            height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin-top: 15px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 3px 0;
+            border-left: 3px solid transparent;
+            padding-left: 8px;
+        }
+
+        .log-info {
+            color: #0f0;
+            border-left-color: #0f0;
+        }
+
+        .log-warn {
+            color: #ff0;
+            border-left-color: #ff0;
+        }
+
+        .log-error {
+            color: #f00;
+            border-left-color: #f00;
+        }
+
+        .log-success {
+            color: #0f0;
+            border-left-color: #0f0;
+        }
+
+        .timestamp {
+            color: #666;
+            font-size: 0.8em;
+            margin-right: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #ddd;
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-height: 300px;
+            border-radius: 6px;
+            margin-top: 15px;
+            object-fit: contain;
+            background: #f5f5f5;
+            border: 2px dashed #667eea;
+        }
+
+        .test-modes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .mode-btn {
+            padding: 10px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .mode-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .mode-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .test-modes {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 OpenAI Upscaler Harness</h1>
+            <p>Test, debug, and optimize OpenAI image upscaling integration</p>
+        </div>
+
+        <div class="main-grid">
+            <!-- Control Panel -->
+            <div class="card">
+                <h2>Test Controls</h2>
+
+                <div class="control-group">
+                    <label>Test Mode:</label>
+                    <div class="test-modes">
+                        <button class="mode-btn active" onclick="setMode('single')">Single Image</button>
+                        <button class="mode-btn" onclick="setMode('batch')">Batch Test</button>
+                        <button class="mode-btn" onclick="setMode('gallery')">Gallery Random</button>
+                    </div>
+                </div>
+
+                <div class="control-group" id="singleImageGroup">
+                    <label>Select Image:</label>
+                    <input type="file" id="imageInput" accept="image/*">
+                    <small style="color: #666; margin-top: 5px; display: block;">Recommended: 400x300px or smaller</small>
+                </div>
+
+                <div class="control-group" id="targetDimensionsGroup">
+                    <label>Target Width (pixels):</label>
+                    <input type="number" id="targetWidth" value="3000" min="100" max="4800">
+                </div>
+
+                <div class="control-group">
+                    <label>Target Height (pixels):</label>
+                    <input type="number" id="targetHeight" value="3600" min="100" max="4800">
+                </div>
+
+                <div class="control-group" id="batchCountGroup" style="display: none;">
+                    <label>Number of Tests:</label>
+                    <input type="number" id="batchCount" value="3" min="1" max="10">
+                </div>
+
+                <div class="button-group">
+                    <button onclick="runTest()">▶ Run Test</button>
+                    <button class="secondary-btn" onclick="clearLogs()">🗑️ Clear Logs</button>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-label">Tests Run</div>
+                        <div class="stat-value" id="testCount">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Success Rate</div>
+                        <div class="stat-value" id="successRate">0%</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Avg Time</div>
+                        <div class="stat-value" id="avgTime">0ms</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Status</div>
+                        <div class="stat-value" id="status">Ready</div>
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Image Preview -->
+            <div class="card">
+                <h2>Image Preview</h2>
+                <div id="previewContainer" style="text-align: center;">
+                    <p style="color: #999;">No image selected</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs -->
+        <div class="card full-width">
+            <h2>Live Logs</h2>
+            <div class="log-container" id="logContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'single';
+        let testStats = {
+            total: 0,
+            success: 0,
+            failed: 0,
+            totalTime: 0,
+            times: []
+        };
+
+        function setMode(mode) {
+            currentMode = mode;
+
+            // Update button states
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Show/hide relevant controls
+            document.getElementById('singleImageGroup').style.display = mode === 'single' ? 'block' : 'none';
+            document.getElementById('batchCountGroup').style.display = mode === 'batch' ? 'block' : 'none';
+
+            addLog(`Switched to ${mode} mode`, 'info');
+        }
+
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logContainer = document.getElementById('logContainer');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.innerHTML = `<span class="timestamp">[${timestamp}]</span>${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('logContainer').innerHTML = '';
+            addLog('Logs cleared', 'info');
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        function updateStats() {
+            document.getElementById('testCount').textContent = testStats.total;
+            const successRate = testStats.total > 0 ? Math.round((testStats.success / testStats.total) * 100) : 0;
+            document.getElementById('successRate').textContent = successRate + '%';
+            const avgTime = testStats.times.length > 0
+                ? Math.round(testStats.times.reduce((a, b) => a + b, 0) / testStats.times.length)
+                : 0;
+            document.getElementById('avgTime').textContent = avgTime + 'ms';
+        }
+
+        async function runTest() {
+            addLog('Starting OpenAI upscaler test...', 'info');
+            updateProgress(0);
+            document.getElementById('status').textContent = 'Running...';
+
+            if (currentMode === 'single') {
+                await runSingleTest();
+            } else if (currentMode === 'batch') {
+                await runBatchTest();
+            } else if (currentMode === 'gallery') {
+                await runGalleryTest();
+            }
+
+            document.getElementById('status').textContent = 'Complete';
+            updateProgress(100);
+        }
+
+        async function runSingleTest() {
+            const imageInput = document.getElementById('imageInput');
+            if (!imageInput.files.length) {
+                addLog('❌ Please select an image first', 'error');
+                return;
+            }
+
+            const file = imageInput.files[0];
+
+            try {
+                updateProgress(20);
+                addLog(`📁 Processing image: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`, 'info');
+
+                // Convert file to base64
+                addLog('Converting image to base64...', 'info');
+                const reader = new FileReader();
+                const base64Promise = new Promise((resolve, reject) => {
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+                const imageDataUrl = await base64Promise;
+                updateProgress(40);
+
+                const startTime = Date.now();
+
+                const response = await fetch('/api/merchandise/openai-upscaler/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: imageDataUrl,
+                        targetWidth: document.getElementById('targetWidth').value,
+                        targetHeight: document.getElementById('targetHeight').value
+                    })
+                });
+
+                const data = await response.json();
+                const duration = Date.now() - startTime;
+
+                testStats.total++;
+                testStats.times.push(duration);
+
+                if (response.ok) {
+                    testStats.success++;
+                    addLog(`✅ OpenAI upscaling successful (${duration}ms)`, 'success');
+                    addLog(`   Strategy: ${data.analysis.action}`, 'success');
+                    addLog(`   Scale Factor: ${data.analysis.scaleFactor}`, 'success');
+                } else {
+                    testStats.failed++;
+                    addLog(`❌ Upscaling failed: ${data.error}`, 'error');
+                    if (data.details) {
+                        addLog(`   Details: ${data.details}`, 'error');
+                    }
+                }
+
+                updateProgress(80);
+                updateStats();
+                updateProgress(100);
+
+            } catch (error) {
+                testStats.failed++;
+                testStats.total++;
+                addLog(`❌ Request error: ${error.message}`, 'error');
+                updateStats();
+            }
+        }
+
+        async function runBatchTest() {
+            const count = parseInt(document.getElementById('batchCount').value);
+            addLog(`Starting batch test with ${count} iterations...`, 'info');
+
+            for (let i = 0; i < count; i++) {
+                addLog(`Batch test ${i + 1}/${count}...`, 'info');
+                updateProgress((i + 1) / count * 100);
+                // Simulate batch test - you'd implement actual batch logic
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            updateStats();
+        }
+
+        async function runGalleryTest() {
+            try {
+                addLog('Fetching random gallery image...', 'info');
+                updateProgress(15);
+
+                // Call API to get a random gallery image
+                const galleryResponse = await fetch('/api/merchandise/gallery-random-image', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!galleryResponse.ok) {
+                    throw new Error(`Gallery API error: ${galleryResponse.status}`);
+                }
+
+                const galleryData = await galleryResponse.json();
+
+                if (!galleryData.success || !galleryData.imageUrl) {
+                    throw new Error(galleryData.error || 'No image returned');
+                }
+
+                addLog(`✅ Retrieved image: ${galleryData.imageName}`, 'success');
+                addLog(`   Size: ${galleryData.size} KB`, 'info');
+                updateProgress(30);
+
+                // Download the image
+                addLog('Downloading image...', 'info');
+                const imageResponse = await fetch(galleryData.imageUrl);
+                const imageBlob = await imageResponse.blob();
+
+                addLog(`✅ Downloaded: ${(imageBlob.size / 1024).toFixed(2)} KB`, 'success');
+                updateProgress(50);
+
+                // Convert blob to base64
+                addLog('Converting image to base64...', 'info');
+                const reader = new FileReader();
+                const base64Promise = new Promise((resolve, reject) => {
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(imageBlob);
+                });
+                const imageDataUrl = await base64Promise;
+
+                addLog('Testing OpenAI upscaler...', 'info');
+                updateProgress(60);
+
+                const startTime = Date.now();
+                const testResponse = await fetch('/api/merchandise/openai-upscaler/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: imageDataUrl,
+                        targetWidth: document.getElementById('targetWidth').value,
+                        targetHeight: document.getElementById('targetHeight').value
+                    })
+                });
+
+                const testData = await testResponse.json();
+                const duration = Date.now() - startTime;
+
+                testStats.total++;
+                testStats.times.push(duration);
+
+                if (testResponse.ok) {
+                    testStats.success++;
+                    addLog(`✅ OpenAI upscaling successful (${duration}ms)`, 'success');
+                    addLog(`   Strategy: ${testData.analysis.action}`, 'success');
+                    addLog(`   Scale Factor: ${testData.analysis.scaleFactor.toFixed(2)}`, 'success');
+                } else {
+                    testStats.failed++;
+                    addLog(`❌ Upscaling failed: ${testData.error}`, 'error');
+                    if (testData.details) {
+                        addLog(`   Details: ${testData.details}`, 'error');
+                    }
+                }
+
+                updateProgress(90);
+                updateStats();
+                updateProgress(100);
+
+            } catch (error) {
+                testStats.failed++;
+                testStats.total++;
+                addLog(`❌ Gallery test error: ${error.message}`, 'error');
+                updateStats();
+            }
+        }
+
+        // Image preview
+        document.getElementById('imageInput')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const previewContainer = document.getElementById('previewContainer');
+                    previewContainer.innerHTML = `<img src="${event.target.result}" class="image-preview" alt="Preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Initial log
+        addLog('OpenAI Upscaler Harness Ready', 'success');
+        addLog('Select test mode and upload an image to begin', 'info');
+    </script>
+</body>
+</html>
