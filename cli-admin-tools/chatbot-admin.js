@@ -1,35 +1,58 @@
 #!/usr/bin/env node
 
 /**
- * 🤖 WAVELENGTH CHATBOT ADMIN TOOL
- * ================================
- * Admin interface for interacting with the Wavelength Lore chatbot
- * Provides testing, querying, and health checking capabilities
+ * WAVELENGTH CHATBOT ADMIN TOOL
+ * =============================
+ * 
+ * Administrative interface for managing and testing the Wavelength Lore chatbot.
+ * Provides health checks, message testing, and interactive chat capabilities.
  */
 
 const https = require('https');
 const readline = require('readline');
 const chalk = require('chalk');
+const dotenv = require('dotenv');
 
-class ChatbotAdminTool {
+// Load environment variables
+dotenv.config();
+
+class ChatbotAdmin {
   constructor() {
-    // Load environment variables
-    this.loadEnvVars();
+    this.chatbotUrl = 'us-central1-wavelength-lore.cloudfunctions.net';
+    this.apiKey = process.env.CHATBOT_API_KEY;
     
+    // Set up config object for compatibility
     this.config = {
-      apiUrl: process.env.CHATBOT_API_URL || 'https://ai-wavelengthlore.web.app',
-      apiKey: process.env.CHATBOT_API_KEY || process.env.CHATBOT_JWT_SECRET,
+      apiUrl: `https://${this.chatbotUrl}/legacy/chat`,
+      apiKey: this.apiKey,
       timeout: 30000
     };
+    
+    if (!this.apiKey) {
+      console.error(chalk.red('❌ Error: CHATBOT_API_KEY environment variable not set'));
+      console.error(chalk.yellow('💡 Make sure .env file contains CHATBOT_API_KEY=your_api_key'));
+      process.exit(1);
+    }
+  }
 
-    this.testQuestions = [
-      "What is Wavelength Lore about?",
-      "Who is Andrew in the story?",
-      "Tell me about Season 1",
-      "What characters exist in Wavelength?",
-      "Describe the Ice Fortress",
-      "What happened in the latest episode?"
-    ];
+  /**
+   * Clean HTML markup from response text
+   */
+  cleanHtmlResponse(htmlText) {
+    if (!htmlText || typeof htmlText !== 'string') {
+      return htmlText;
+    }
+    
+    // Remove HTML tags but preserve the text content
+    return htmlText
+      .replace(/<[^>]*>/g, '') // Remove all HTML tags
+      .replace(/&nbsp;/g, ' ') // Replace non-breaking spaces
+      .replace(/&amp;/g, '&')  // Replace HTML entities
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .trim(); // Remove leading/trailing whitespace
   }
 
   /**
@@ -336,9 +359,12 @@ class ChatbotAdminTool {
             const response = JSON.parse(data);
             
             if (res.statusCode === 200 && (response.response || response.success)) {
+              const rawMessage = response.response || response.message || 'Response received';
+              const cleanMessage = this.cleanHtmlResponse(rawMessage);
+              
               resolve({
                 success: true,
-                message: response.response || response.message || 'Response received',
+                message: cleanMessage,
                 responseTime: responseTime,
                 metadata: response.metadata,
                 usage: response.usage
@@ -447,4 +473,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = ChatbotAdminTool;
+module.exports = ChatbotAdmin;
