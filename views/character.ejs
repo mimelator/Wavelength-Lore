@@ -7,6 +7,9 @@
 </head>
 <body>
     <%- include('partials/header') %>
+    
+    <!-- Load Wavelength Dynamic CTA System -->
+    <script src="<%= cdnUrl %>/js/wavelength-cta-system.js"></script>
 
     <nav class="character-navigation-top">
         <% if (previousCharacter) { %>
@@ -72,12 +75,27 @@
             </p>
         </section>
 
-        <section class="character-banner" style="background-image: url('<%= character.image.startsWith('http') ? character.image : cdnUrl + character.image %>');">"
-            
+        <section class="character-banner" style="background-image: url('<%= character.image.startsWith('http') ? character.image : cdnUrl + character.image %>');">
+            <!-- Authentic Character Tagline Integration -->
+            <% if (character.tagline) { %>
+                <div class="character-tagline" style="background: rgba(0,0,0,0.7); padding: 15px 25px; border-radius: 25px; margin: 20px auto; max-width: 600px; backdrop-filter: blur(10px);">
+                    <h2 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); font-style: italic;">
+                        "<%= character.tagline %>"
+                    </h2>
+                </div>
+            <% } %>
         </section>
 
         <section class="character-description">
             <p><%- linkifyEpisodes(linkifyLore(linkifyCharacters(character.description))) %></p>
+            
+            <!-- Character Stakes Integration -->
+            <% if (character.stakes) { %>
+                <div class="character-stakes" style="margin-top: 25px; padding: 20px; background: linear-gradient(135deg, rgba(139,69,19,0.1) 0%, rgba(184,134,11,0.1) 100%); border-left: 4px solid #b8860b; border-radius: 8px;">
+                    <h4 style="color: #b8860b; margin-bottom: 10px; font-size: 1.1rem;">⚔️ The Stakes</h4>
+                    <p style="color: #333; font-style: italic; margin: 0;"><%- character.stakes %></p>
+                </div>
+            <% } %>
         </section>
 
         <section class="character-connections">
@@ -115,7 +133,7 @@
             
             <div class="character-cta-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 25px 0;">
                 
-                <!-- Explore Episodes CTA -->
+                <!-- Explore Episodes CTA with Authentic Content -->
                 <div class="cta-card" style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);">
                     <div style="font-size: 2rem; margin-bottom: 10px;">🎬</div>
                     <h4 style="margin-bottom: 10px;">Watch Their Episodes</h4>
@@ -124,20 +142,26 @@
                        style="background: #ff6b6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 20px; font-weight: bold; transition: all 0.3s ease; display: inline-block;"
                        onmouseover="this.style.background='#ff5252'; this.style.transform='translateY(-2px)'"
                        onmouseout="this.style.background='#ff6b6b'; this.style.transform='translateY(0)'">
-                        Find Episodes
+                        <%= character.cta_text || 'Find Episodes' %>
                     </a>
                 </div>
                 
-                <!-- Explore Connections CTA -->
+                <!-- Explore Connections CTA with Dynamic Content -->
                 <div class="cta-card" style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);">
                     <div style="font-size: 2rem; margin-bottom: 10px;">🔗</div>
                     <h4 style="margin-bottom: 10px;">Character Network</h4>
-                    <p style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 15px;">Discover how <%= character.title %> connects to other heroes</p>
+                    <p style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 15px;">
+                        <% if (character.stakes && character.stakes.length > 100) { %>
+                            <%= character.stakes.substring(0, 80) %>...
+                        <% } else { %>
+                            Discover how <%= character.title %> connects to other heroes
+                        <% } %>
+                    </p>
                     <a href="/characters" class="cta-btn"
                        style="background: #74b9ff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 20px; font-weight: bold; transition: all 0.3s ease; display: inline-block;"
                        onmouseover="this.style.background='#0984e3'; this.style.transform='translateY(-2px)'"
                        onmouseout="this.style.background='#74b9ff'; this.style.transform='translateY(0)'">
-                        Explore Network
+                        <%= character.cta_text || 'Explore Network' %>
                     </a>
                 </div>
                 

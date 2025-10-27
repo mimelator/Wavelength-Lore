@@ -330,6 +330,16 @@ router.get('/character/:characterId', async (req, res) => {
         return res.status(404).send('Character not found');
       }
 
+      // Debug: Log character CTA fields
+      console.log(`🎭 DEBUG - Character ${characterId} CTA fields:`, {
+        tagline: character.tagline,
+        stakes: character.stakes,
+        cta_text: character.cta_text,
+        hasTagline: !!character.tagline,
+        hasStakes: !!character.stakes,
+        hasCTA: !!character.cta_text
+      });
+
       // Check visibility - if hidden and user is not a content creator, show 404
       if (character.hidden && !res.locals.isContentCreator) {
         return res.status(404).send('Character not found');
@@ -373,7 +383,11 @@ router.get('/character/:characterId', async (req, res) => {
           description: character.description,
           primary_image: character.primary_image,
           image: character.image,
-          image_gallery: character.image_gallery
+          image_gallery: character.image_gallery,
+          // Enhanced CTA fields from Phase 2 schema
+          tagline: character.tagline,
+          stakes: character.stakes,
+          cta_text: character.cta_text
         },
         allCharacters: allCharacters.map(char => ({
           id: char.id,
@@ -517,7 +531,11 @@ router.get('/lore/:loreId', async (req, res) => {
         primary_image: loreItem.primary_image,
         image: loreItem.image,
         image_gallery: loreItem.image_gallery,
-        type: loreItem.type
+        type: loreItem.type,
+        // Enhanced CTA fields from Phase 2 schema
+        intrigue_hook: loreItem.intrigue_hook,
+        mystery_level: loreItem.mystery_level,
+        investigation_cta: loreItem.investigation_cta
       },
       previousLore,
       nextLore,

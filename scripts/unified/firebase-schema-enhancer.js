@@ -74,8 +74,7 @@ async function createBackup() {
     
     // Backup characters
     if (shouldUpdateCharacters) {
-      const charactersSnapshot = await db.ref('characters').once('value');
-      const charactersData = charactersSnapshot.val();
+      const charactersData = await firebaseUtils.fetchFromFirebase('characters');
       if (charactersData) {
         await fs.writeFile(
           path.join(backupDir, `characters-${timestamp}.json`),
@@ -87,8 +86,7 @@ async function createBackup() {
     
     // Backup episodes  
     if (shouldUpdateEpisodes) {
-      const videosSnapshot = await db.ref('videos').once('value');
-      const videosData = videosSnapshot.val();
+      const videosData = await firebaseUtils.fetchFromFirebase('videos');
       if (videosData) {
         await fs.writeFile(
           path.join(backupDir, `videos-${timestamp}.json`),
@@ -100,8 +98,7 @@ async function createBackup() {
     
     // Backup lore
     if (shouldUpdateLore) {
-      const loreSnapshot = await db.ref('lore').once('value');
-      const loreData = loreSnapshot.val();
+      const loreData = await firebaseUtils.fetchFromFirebase('lore');
       if (loreData) {
         await fs.writeFile(
           path.join(backupDir, `lore-${timestamp}.json`),

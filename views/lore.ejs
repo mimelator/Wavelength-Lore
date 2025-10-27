@@ -81,8 +81,23 @@
 
         <br>
 
-        <section class="lore-banner" style="background-image: url('<%= lore.image.startsWith('http') ? lore.image : cdnUrl + lore.image %>');">"
-            
+        <section class="lore-banner" style="background-image: url('<%= lore.image.startsWith('http') ? lore.image : cdnUrl + lore.image %>');">
+            <!-- Authentic Lore Intrigue Hook Integration -->
+            <% if (lore.intrigue_hook) { %>
+                <div class="lore-intrigue-hook" style="background: rgba(139,69,19,0.9); padding: 20px 30px; border-radius: 15px; margin: 25px auto; max-width: 700px; backdrop-filter: blur(10px); border: 2px solid rgba(184,134,11,0.5);">
+                    <div style="color: #ffd700; font-size: 1.8rem; margin-bottom: 10px; text-align: center;">🔍</div>
+                    <p style="margin: 0; font-size: 1.1rem; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); line-height: 1.4; text-align: center; font-style: italic;">
+                        <%= lore.intrigue_hook %>
+                    </p>
+                    <% if (lore.mystery_level) { %>
+                        <div style="margin-top: 15px; padding: 8px 15px; background: rgba(0,0,0,0.4); border-radius: 20px; text-align: center;">
+                            <span style="color: #ffd700; font-size: 0.9rem; font-weight: bold;">
+                                🌟 Mystery Level: <%= lore.mystery_level %>
+                            </span>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
         </section>
 
         <section class="lore-description">
@@ -90,6 +105,27 @@
                 <p><%- simpleSmartLinking(lore.description) %></p>
             </div>
         </section>
+
+        <!-- Enhanced Lore Investigation CTA Section -->
+        <% if (lore.investigation_cta) { %>
+        <section class="lore-cta-section" style="margin: 40px 0; padding: 25px; background: linear-gradient(135deg, #8b4513 0%, #d2691e 100%); border-radius: 15px; color: white; text-align: center; border: 3px solid #ffd700;">
+            <div style="font-size: 2.5rem; margin-bottom: 15px;">🕵️‍♀️</div>
+            <h3 style="margin-bottom: 15px; font-size: 1.4rem; color: #ffd700;">Dive Deeper into the Mystery</h3>
+            <p style="font-size: 1rem; opacity: 0.9; margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                <% if (lore.intrigue_hook && lore.intrigue_hook.length > 100) { %>
+                    <%= lore.intrigue_hook.substring(0, 120) %>...
+                <% } else { %>
+                    Uncover the secrets and mysteries surrounding <%= lore.title %>
+                <% } %>
+            </p>
+            <a href="/lore" class="investigation-cta-btn"
+               style="background: #ffd700; color: #8b4513; padding: 12px 25px; text-decoration: none; border-radius: 25px; font-weight: bold; transition: all 0.3s ease; display: inline-block; border: 2px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.3);"
+               onmouseover="this.style.background='#ffed4e'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.4)'"
+               onmouseout="this.style.background='#ffd700'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.3)'">
+                <%= lore.investigation_cta %>
+            </a>
+        </section>
+        <% } %>
 
         <section class="lore-connections">
             <h3>Related Lore</h3>
