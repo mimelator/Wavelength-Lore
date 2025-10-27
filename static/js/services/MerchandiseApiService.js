@@ -120,7 +120,7 @@ class MerchandiseApiService {
    */
   async loadProductTypes() {
     console.log('📂 MerchandiseApiService: Loading product types...');
-    return await this.makeRequest('/api/product-catalog');
+    return await this.makeRequest('/api/merchandise/product-catalog');
   }
 
   /**
@@ -148,7 +148,7 @@ class MerchandiseApiService {
    */
   async loadGalleryImages() {
     console.log('🖼️ MerchandiseApiService: Loading gallery images...');
-    return await this.makeRequest('/api/gallery');
+    return await this.makeRequest('/api/merchandise/gallery');
   }
 
   /**
@@ -156,7 +156,7 @@ class MerchandiseApiService {
    */
   async getGalleryImage(imageId) {
     console.log('🔍 MerchandiseApiService: Getting gallery image:', imageId);
-    return await this.makeRequest(`/api/gallery/${imageId}`);
+    return await this.makeRequest(`/api/merchandise/gallery/${imageId}`);
   }
 
   // ========================================
@@ -168,9 +168,9 @@ class MerchandiseApiService {
    */
   async loadEnhancementStatus() {
     console.log('⚡ MerchandiseApiService: Loading enhancement status...');
-    
+
     try {
-      return await this.makeRequest('/api/enhancement/status');
+      return await this.makeRequest('/api/merchandise/enhancement/status');
     } catch (error) {
       console.warn('Enhancement API not available, returning default status');
       return { available: false, reason: 'Service unavailable' };
