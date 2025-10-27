@@ -132,7 +132,12 @@ class MerchandiseStore {
     });
     
     this.eventBus.on('product.customize', (data) => {
-      this.showCustomizationModal(data.productId);
+      // Handle both existing products (data.productId) and new blueprint selections (data.productConfig)
+      if (data.productConfig) {
+        this.showCustomizationModalForBlueprint(data.productConfig, data.blueprintId, data.providerId);
+      } else if (data.productId) {
+        this.showCustomizationModal(data.productId);
+      }
     });
     
     this.eventBus.on('product.addToCart', (data) => {
@@ -1899,7 +1904,27 @@ class MerchandiseStore {
             const productType = e.target.dataset.product;
             const blueprintId = e.target.dataset.blueprint;
             const providerId = e.target.dataset.provider;
+            const blueprintName = e.target.dataset.name;
             console.log('🎯 Product selected:', productType, blueprintId, providerId);
+
+            // Create product config from blueprint data
+            const productConfig = {
+              id: `${blueprintId}-${providerId}`,
+              name: blueprintName || productType,
+              blueprintId: blueprintId,
+              printProviderId: providerId,
+              basePrice: 1999,
+              popularSizes: ['S', 'M', 'L', 'XL'],
+              availableColors: ['Black', 'White', 'Navy', 'Gray']
+            };
+
+            // Emit event to open customization modal
+            console.log('📱 Emitting product.customize event with productConfig:', productConfig);
+            this.eventBus.emit('product.customize', {
+              productConfig: productConfig,
+              blueprintId: blueprintId,
+              providerId: providerId
+            });
           } else if (e.target.classList.contains('category-card') || e.target.closest('.category-card')) {
             const card = e.target.closest('.category-card') || e.target;
             const categoryKey = card.dataset.category;
@@ -2994,7 +3019,39 @@ class MerchandiseStore {
       this.modalRenderer.showModal(modalHtml);
     }
   }
-  
+
+  /**
+   * Show customization modal for new blueprint selection (not an existing product)
+   */
+  showCustomizationModalForBlueprint(productConfig, blueprintId, providerId) {
+    console.log('🎨 Show customization modal for blueprint:', blueprintId, providerId, productConfig);
+
+    // Create a temporary product object for the modal renderer
+    const product = {
+      id: productConfig.id,
+      productId: productConfig.id,
+      title: productConfig.name,
+      name: productConfig.name,
+      blueprintId: blueprintId,
+      printProviderId: providerId,
+      price: productConfig.basePrice / 100, // Convert cents to dollars
+      basePrice: productConfig.basePrice,
+      sourceImage: this.selectedImage ? { id: this.selectedImage } : null,
+      variants: {},
+      customization: {
+        colorEffects: [],
+        atmosphericEffects: [],
+        borderStyle: 'none',
+        borderColor: '#000000',
+        borderWidth: 0
+      }
+    };
+
+    // Render and show the customization modal
+    const modalHtml = this.modalRenderer.renderCustomizationModal(product);
+    this.modalRenderer.showModal(modalHtml);
+  }
+
   /**
    * Handle add to cart from ProductCardRenderer
    */

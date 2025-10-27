@@ -6,6 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const { groupAuth } = require('../middleware/groupAuth');
+const { generateGamesWithTheme, getActiveTheme } = require('../config/game-themes');
 
 /**
  * VIP Games Hub - Main landing page for games
@@ -64,32 +65,28 @@ router.get('/:gameId', groupAuth.requireAction('game_access'), (req, res) => {
 
 /**
  * API endpoint to fetch available games
+ * Now using configurable theme system for easy name iteration!
  */
 router.get('/api/list', groupAuth.requireAction('game_access'), async (req, res) => {
     try {
-        // This will be populated with games from Firebase
-        // For now, return placeholder structure
+        // Generate games using the active theme configuration
+        const themedGames = generateGamesWithTheme();
+        const activeTheme = getActiveTheme();
+        
         res.json({
             success: true,
-            games: [
-                {
-                    id: 'wavelength-gems',
-                    title: 'Wavelength Gems',
-                    description: 'Match the ice blue gems in this addictive match-3 puzzle game featuring Wavelength characters and elements',
-                    thumbnail: '/images/games/wavelength-gems-ice-diamond.svg',
-                    status: 'live',
-                    releaseDate: '2024-10-21'
-                },
-                {
-                    id: 'lore-puzzle',
-                    title: 'Lore Puzzle Master',
-                    description: 'Solve puzzles based on Wavelength lore and characters',
-                    thumbnail: '/images/games/lore-puzzle.jpg',
-                    status: 'coming-soon',
-                    releaseDate: '2026-Q1'
-                },
-        ],
-            userGroup: req.userGroups[0] || 'user'
+            games: themedGames,
+            theme: {
+                name: activeTheme.prefix,
+                atmosphere: activeTheme.atmosphere,
+                callToAction: activeTheme.callToAction
+            },
+            userGroup: req.userGroups[0] || 'user',
+            meta: {
+                generated: new Date().toISOString(),
+                total_games: themedGames.length,
+                theme_applied: true
+            }
         });
     } catch (error) {
         console.error('Error fetching games:', error);
@@ -107,16 +104,23 @@ router.get('/api/list', groupAuth.requireAction('game_access'), async (req, res)
 router.get('/api/:gameId', groupAuth.requireAction('game_access'), async (req, res) => {
     try {
         const gameId = req.params.gameId;
+        const themedGames = generateGamesWithTheme();
+        const game = themedGames.find(g => g.id === gameId);
 
-        // This will fetch from Firebase in production
+        if (!game) {
+            return res.status(404).json({
+                success: false,
+                error: 'Game not found',
+                available_games: themedGames.map(g => g.id)
+            });
+        }
+
         res.json({
             success: true,
             game: {
-                id: gameId,
-                title: 'Game Title',
-                description: 'Game description',
-                status: 'coming-soon',
-                url: `/games/${gameId}`
+                ...game,
+                url: `/games/${gameId}`,
+                launch_ready: game.status === 'live'
             }
         });
     } catch (error) {
@@ -124,6 +128,36 @@ router.get('/api/:gameId', groupAuth.requireAction('game_access'), async (req, r
         res.status(500).json({
             success: false,
             error: 'Failed to fetch game'
+        });
+    }
+});
+
+/**
+ * 🎯 EASY THEME ITERATION ENDPOINT
+ * For quick testing of different naming themes
+ * Usage: GET /games/api/preview-theme/rivendell
+ */
+router.get('/api/preview-theme/:theme', groupAuth.requireAction('game_access'), async (req, res) => {
+    try {
+        const { switchTheme, getAllThemes } = require('../config/game-themes');
+        const requestedTheme = req.params.theme;
+        
+        // Get preview of games with requested theme
+        const previewGames = switchTheme(requestedTheme);
+        
+        res.json({
+            success: true,
+            theme: requestedTheme,
+            games: previewGames,
+            available_themes: getAllThemes(),
+            note: 'This is a preview - to activate permanently, update ACTIVE_THEME in config/game-themes.js'
+        });
+    } catch (error) {
+        console.error('Theme preview error:', error);
+        res.status(400).json({
+            success: false,
+            error: error.message,
+            available_themes: getAllThemes()
         });
     }
 });
