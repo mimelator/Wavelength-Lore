@@ -189,16 +189,51 @@ class ChatbotAdminTool {
     console.log(chalk.yellow('Example: "Who is Andrew?" or "What happened in Season 1?"'));
     console.log('');
 
+    // First check if chatbot is accessible
+    console.log(chalk.gray('🔍 Checking chatbot connection...'));
+    try {
+      const healthCheck = await this.sendMessage('Hello');
+      if (!healthCheck.success) {
+        console.log(chalk.red('❌ Chatbot connection failed. Please check configuration.'));
+        console.log(chalk.red(`   Error: ${healthCheck.error}`));
+        return;
+      }
+      console.log(chalk.green('✅ Chatbot connected successfully!\n'));
+    } catch (error) {
+      console.log(chalk.red('❌ Cannot connect to chatbot. Please check your configuration.'));
+      console.log(chalk.red(`   Error: ${error.message}`));
+      return;
+    }
+
     const rl = readline.createInterface({
       input: process.stdin,
-      output: process.stdout
+      output: process.stdout,
+      terminal: true
+    });
+
+    // Ensure proper cleanup
+    const cleanup = () => {
+      rl.close();
+      process.exit(0);
+    };
+
+    // Handle Ctrl+C gracefully
+    process.on('SIGINT', () => {
+      console.log(chalk.yellow('\n🛑 Interrupted by user. Goodbye!'));
+      cleanup();
     });
 
     const askQuestion = () => {
       rl.question(chalk.cyan('🤖 Ask: '), async (question) => {
+        if (!question) {
+          console.log(chalk.yellow('Please enter a question or "exit" to quit.'));
+          askQuestion();
+          return;
+        }
+
         if (question.toLowerCase().trim() === 'exit') {
           console.log(chalk.green('\n👋 Goodbye! Chat session ended.'));
-          rl.close();
+          cleanup();
           return;
         }
 
@@ -222,10 +257,12 @@ class ChatbotAdminTool {
           console.log(chalk.red(`❌ Connection error: ${error.message}\n`));
         }
 
-        askQuestion();
+        // Continue the conversation
+        setImmediate(askQuestion);
       });
     };
 
+    // Start the conversation
     askQuestion();
   }
 
@@ -349,6 +386,7 @@ class ChatbotAdminTool {
     console.log(chalk.white('  🧪 test       - Run functionality tests'));
     console.log(chalk.white('  💬 chat       - Interactive chat mode'));
     console.log(chalk.white('  🎯 query      - Send single query'));
+    console.log(chalk.white('  🎭 demo       - Demo mode (mock responses)'));
     console.log(chalk.white('  📋 help       - Show this help\n'));
     
     console.log(chalk.yellow('Usage Examples:'));

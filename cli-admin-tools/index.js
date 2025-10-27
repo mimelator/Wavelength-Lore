@@ -146,6 +146,25 @@ class WavelengthAdminToolkit {
                             console.log(chalk.red('❌ Please provide a question'));
                             console.log(chalk.yellow('Example: npm run cli:admin chatbot query "Who is Andrew?"'));
                         }
+                    } else if (subCommand === 'demo') {
+                        // Demo mode with mock responses
+                        console.log(chalk.cyan('🎭 WAVELENGTH CHATBOT DEMO MODE'));
+                        console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+                        console.log(chalk.yellow('This is a demo mode showing how the chatbot interface works.'));
+                        console.log(chalk.white('The actual chatbot API appears to be offline.\n'));
+                        
+                        const demoResponses = {
+                            "who is andrew": "Andrew is a central character in Wavelength Lore, known for his adventures across the dimensional realms.",
+                            "what is wavelength": "Wavelength Lore is an epic science fiction saga featuring interdimensional travel and complex character relationships.",
+                            "season 1": "Season 1 introduces the core characters and establishes the foundational lore of the Wavelength universe."
+                        };
+                        
+                        const question = subArgs.join(' ').toLowerCase();
+                        const response = demoResponses[question] || "I'm a demo response! The real chatbot would have detailed lore information about that topic.";
+                        
+                        console.log(chalk.green(`💡 Demo Answer: ${response}`));
+                        console.log(chalk.gray('⏱️  Demo response time: 50ms'));
+                        console.log(chalk.yellow('\n💡 Once the chatbot API is configured, this will connect to the real lore database!'));
                     } else {
                         toolInstance.showHelp();
                     }
