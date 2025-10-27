@@ -28,26 +28,45 @@ class EffectsProcessor {
         blur: effectParams.blur ?? 0,
         brightness: effectParams.brightness ?? 1.0,
         contrast: effectParams.contrast ?? 1.0,
-        lightning: effectParams.lightning ?? 0
+        lightning: effectParams.lightning ?? 0,
+        mask: effectParams.mask ?? null,
+        featherEdges: effectParams.featherEdges ?? 0,
+        featherFalloff: effectParams.featherFalloff ?? 'smooth'
       };
 
       console.log(`🎨 Processing image with effects:`, finalParams);
 
-      // Start with Sharp pipeline
+      // Start with Sharp pipeline for color/lighting effects
       let pipeline = Sharp(imageBuffer);
 
-      // Apply effects in optimal order
+      // Apply color and lighting effects first
       pipeline = await this.applyColorGrading(pipeline, finalParams);
       pipeline = await this.applyLightingEffects(pipeline, finalParams);
       pipeline = await this.applySpecialEffects(pipeline, finalParams);
 
-      // Convert to WebP for preview
-      const processed = await pipeline
+      // Convert to buffer for mask processing
+      let processed = await pipeline
         .webp({
           quality: effectsConfig.processing.webpQuality,
           alphaQuality: effectsConfig.processing.webpAlphaQuality
         })
         .toBuffer();
+
+      // Apply mask effects if specified
+      if (finalParams.mask) {
+        const MaskProcessor = require('./MaskProcessor');
+        const maskProcessor = new MaskProcessor();
+        processed = await maskProcessor.processWithMask(processed, {
+          mask: finalParams.mask,
+          featherEdges: finalParams.featherEdges,
+          featherFalloff: finalParams.featherFalloff
+        });
+      } else if (finalParams.featherEdges > 0) {
+        // Apply feathering without mask if only feather is enabled
+        const MaskProcessor = require('./MaskProcessor');
+        const maskProcessor = new MaskProcessor();
+        processed = await maskProcessor.applyFeatherOnly(processed, finalParams.featherEdges, finalParams.featherFalloff);
+      }
 
       console.log(`✅ Effects applied successfully`);
       return processed;

@@ -556,6 +556,7 @@
             container.style.gap = '10px';
             container.style.cursor = 'pointer';
             container.style.transition = 'all 0.2s';
+            container.setAttribute('data-effect-group', effectConfig.group || 'none');
 
             container.onmouseover = () => {
                 container.style.background = '#f5f5f5';
@@ -574,6 +575,17 @@
             checkbox.checked = false;
 
             checkbox.onchange = () => {
+                // Handle exclusive mask effects (only one can be active at a time)
+                if (effectConfig.group === 'mask' && checkbox.checked) {
+                    // Uncheck all other masks in the same group
+                    document.querySelectorAll('[data-effect-group="mask"] input[type="checkbox"]').forEach(cb => {
+                        if (cb.id !== checkbox.id) {
+                            cb.checked = false;
+                            const key = cb.id.replace('effect-', '');
+                            enabledEffects[key] = false;
+                        }
+                    });
+                }
                 enabledEffects[effectKey] = checkbox.checked;
                 console.log(`Effect ${effectKey}: ${checkbox.checked ? 'enabled' : 'disabled'}`);
             };
