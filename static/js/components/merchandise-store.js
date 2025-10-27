@@ -3026,6 +3026,15 @@ class MerchandiseStore {
   showCustomizationModalForBlueprint(productConfig, blueprintId, providerId) {
     console.log('🎨 Show customization modal for blueprint:', blueprintId, providerId, productConfig);
 
+    // Get the currently selected image for preview
+    let previewImageUrl = '/images/previews/generic-product-preview.svg';
+    if (this.selectedImage) {
+      const imageData = this.galleryImages.find(img => img.id === this.selectedImage);
+      if (imageData && imageData.url) {
+        previewImageUrl = imageData.url;
+      }
+    }
+
     // Create a temporary product object for the modal renderer
     const product = {
       id: productConfig.id,
@@ -3036,6 +3045,8 @@ class MerchandiseStore {
       printProviderId: providerId,
       price: productConfig.basePrice / 100, // Convert cents to dollars
       basePrice: productConfig.basePrice,
+      image: previewImageUrl,
+      previewImage: previewImageUrl,
       sourceImage: this.selectedImage ? { id: this.selectedImage } : null,
       variants: {},
       customization: {
@@ -3046,6 +3057,8 @@ class MerchandiseStore {
         borderWidth: 0
       }
     };
+
+    console.log('📦 Created temporary product object:', product);
 
     // Render and show the customization modal
     const modalHtml = this.modalRenderer.renderCustomizationModal(product);
