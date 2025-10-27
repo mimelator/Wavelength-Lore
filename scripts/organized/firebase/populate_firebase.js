@@ -12,14 +12,16 @@ const fs = require('fs');
 const path = require('path');
 
 // Use environment utilities for proper .env loading
-const { initScriptEnv } = require('./utils/env-loader');
+require('dotenv').config({ path: '../../../.env' });
+console.log("INIT. FOUND FIREBASE")
+console.log(process.env.FIREBASE_SERVICE_ACCOUNT)
 
 // Use existing Firebase admin utilities
 const { 
   initializeFirebaseAdmin, 
   writeDataAsAdmin, 
   isFirebaseAdminReady 
-} = require('../helpers/firebase-admin-utils');
+} = require('../../../helpers/firebase-admin-utils');
 
 // Initialize environment with required Firebase variables
 const requiredEnvVars = [
@@ -27,13 +29,11 @@ const requiredEnvVars = [
   'PROJECT_ID'
 ];
 
-// Load environment variables
-initScriptEnv(requiredEnvVars);
 
 // Determine if we're running from scripts directory or project root
 const isRunningFromScripts = __dirname.endsWith('scripts');
 const rootPath = isRunningFromScripts ? path.join(__dirname, '..') : __dirname;
-const contentPath = path.join(rootPath, 'content');
+const contentPath = path.join(rootPath, '../../../content');
 
 // CLI Usage Documentation
 /*

@@ -132,7 +132,27 @@ function detectConflictsForTerm(term) {
  * @returns {string} Text with smart linking applied
  */
 function applySmartLinkingSimple(text, currentUrl = null) {
-  let result = text;
+    let result = text;
+  
+  // =================================================================================
+  // FIX: Unescape the single-line YAML flow-style string back to a regular string.
+  // This converts the literal two-character sequences \n and \" back into 
+  // actual newlines and double quotes, allowing the smart linker to process
+  // it correctly and preventing visible \n in the final output.
+  // We assume the input text has been escaped with:
+  // 1. Literal '\n' to represent newlines.
+  // 2. Literal '\"' to represent double quotes.
+  // 3. Literal '\\' to represent a single backslash.
+  // =================================================================================
+  
+  // 1. Convert escaped backslashes '\\' to a single backslash '\' for the next step,
+  //    but only if they are not part of an escaped quote or newline.
+  //    (In many cases, a simple replace chain is sufficient and safer for known escapes)
+  let unescapedText = text.replace(/\\n/g, '\n');  // Replace literal '\n' with actual newline
+  unescapedText = unescapedText.replace(/\\"/g, '"'); // Replace literal '\"' with actual double quote
+
+  // Use the unescaped text for all subsequent processing
+  result = unescapedText;
   
   // Collect all potential terms from all helpers with their conflict info
   const termMap = new Map();

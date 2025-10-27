@@ -1,0 +1,1321 @@
+- season_title: 'Prelude: Life in the Shire'
+  episode_title: My Lucky Charm
+  episode_key: episode1
+  original_story_summary: >-
+    Wavelength is performing a Shire favorite about their mascot, Lucky the
+    Leprechaun, who brings them good luck and helps them overcome challenges.
+    The song celebrates the joy and positivity that Lucky brings to their lives.
+    Unfortunately, the lyrics in the song include a dig at the goblins, about
+    how they don't need anyone, which is ironic because goblins are known for
+    being selfish and greedy. Eventually, the Goblin King hears about this song
+    and becomes very angry, feeling insulted by the lyrics, and vows to get
+    revenge on Wavelength and the Shire Folk.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "My Lucky Charm" from Season:
+    "Prelude: Life in the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the enchanting episode "My Lucky Charm" from the "Prelude: Life in the
+    Shire," the traveling band Wavelength performs a heartwarming concert for
+    the Shire folk, celebrating their beloved mascot, Lucky the Leprechaun. As
+    the melodies fill the air, joy and camaraderie reign until an unexpected
+    twist arises—a cheeky lyric about goblins sparks the ire of the Goblin King,
+    who feels insulted and vows revenge. Tensions rise as Wavelength's playful
+    tribute to luck and friendship inadvertently ignites a brewing conflict with
+    the greedy goblins. With themes of unity and resilience, this episode
+    masterfully blends music and storytelling, setting the stage for an epic
+    showdown as the Shire folk must rally together to protect their home and
+    stand against the impending goblin threat. Join Wavelength on this
+    unforgettable journey filled with charm, mischief, and the magic of
+    community!
+  success: true
+  metadata:
+    processingTimeMs: 5739
+    linksAdded: 20
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 7483
+    completionTokens: 178
+    totalTokens: 7661
+- season_title: 'Prelude: Life in the Shire'
+  episode_title: Keep On
+  episode_key: episode10
+  original_story_summary: >-
+    Wavelength focuses on the importance of relationships and the power of love
+    and connection. The song emphasizes the significance of hearing and
+    expressing love through simple yet meaningful words.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Keep On" from Season:
+    "Prelude: Life in the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the heartfelt episode "Keep On" from the "Prelude: Life in the Shire,"
+    Wavelength explores the profound power of love and connection through the
+    lens of perseverance. As the band faces the looming threat of the Goblin
+    King, they reflect on the importance of relationships and the simple yet
+    powerful words that express love. The narrative unfolds as they inspire each
+    other to keep searching for meaning and hope amidst uncertainty, reminding
+    listeners that true strength lies in their bonds. With an uplifting melody
+    and poignant lyrics, "Keep On" resonates deeply, encouraging everyone to
+    hold onto what truly matters as they navigate life's challenges. Join
+    Wavelength on this emotional journey of resilience, where every note played
+    echoes the unwavering spirit of friendship and love!
+  success: true
+  metadata:
+    processingTimeMs: 3826
+    linksAdded: 16
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 6099
+    completionTokens: 145
+    totalTokens: 6244
+- season_title: 'Prelude: Life in the Shire'
+  episode_title: Back to the Shire (Encore)
+  episode_key: episode11
+  original_story_summary: >-
+    Wavelength makes an annual pilgrimage back to the Shire, a place of peace,
+    community, and gifted artisanship. The song celebrates the simple pleasures
+    of life in the Shire and the sense of belonging that comes from being part
+    of a close-knit community.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Back to the Shire (Encore)"
+    from Season: "Prelude: Life in the Shire". The summary should be engaging,
+    4-5 sentences long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the enchanting episode "Back to the Shire (Encore)" from the "Prelude:
+    Life in the Shire," Wavelength returns to their beloved homeland to
+    celebrate the resilience of the Shire Folk after the devastating invasion of
+    the Goblin King. The core conflict arises as the band grapples with the
+    lingering shadows of loss and uncertainty, determined to rekindle hope
+    through the power of music. As they perform a heartfelt encore, the melodies
+    weave a tapestry of memories, uniting the Shire Folk in a collective
+    defiance against despair. The outcome is a triumphant resurgence of
+    community spirit and joy, as the Shire Folk find strength in their shared
+    experiences and the promise of brighter days ahead. This episode beautifully
+    captures the essence of healing, reminding us that even in the face of
+    adversity, music can illuminate the path to recovery and unity.
+  success: true
+  metadata:
+    processingTimeMs: 4131
+    linksAdded: 19
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 5053
+    completionTokens: 169
+    totalTokens: 5222
+- season_title: 'Prelude: Life in the Shire'
+  episode_title: Jump Right In!
+  episode_key: episode2
+  original_story_summary: >-
+    Wavelength performs a song about taking chances and embracing new
+    experiences, which is especially important to them as they are a touring
+    band and love to explore new places and meet new people, cultures, and
+    ideas.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Jump Right In!" from Season:
+    "Prelude: Life in the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the vibrant episode "Jump Right In!" from Season: "Prelude: Life in the
+    Shire," Wavelength embarks on a thrilling adventure that explores the power
+    of choice and the excitement of new experiences. As the band performs a
+    lively song that encourages listeners to embrace spontaneity, they are
+    reminded that life is filled with unexpected turns. The episode emphasizes
+    the importance of making decisions, even when faced with uncertainty,
+    showcasing how each choice can lead to new friendships, cultures, and ideas.
+    With an infectious energy and uplifting spirit, Wavelength inspires everyone
+    to take that leap of faith and dive into life's adventures headfirst. Join
+    them as they celebrate the beauty of living in the moment and the joy of
+    connection in the enchanting Shire!
+  success: true
+  metadata:
+    processingTimeMs: 3731
+    linksAdded: 13
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 6046
+    completionTokens: 147
+    totalTokens: 6193
+- season_title: 'Prelude: Life in the Shire'
+  episode_title: Dream with Me
+  episode_key: episode3
+  original_story_summary: >-
+    Wavelength performs a heartfelt song about dreaming together and the power
+    of unity and shared aspirations. The song emphasizes the importance of
+    connection and collaboration in achieving dreams and overcoming challenges.
+    The lyrics convey a sense of hope and optimism, encouraging listeners to
+    believe in the possibility of a brighter future when people come together
+    with a common purpose.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Dream with Me" from Season:
+    "Prelude: Life in the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the enchanting episode "Dream with Me," Wavelength takes audiences on a
+    heartfelt journey that celebrates the power of unity and shared aspirations.
+    Set against the backdrop of the idyllic Shire, the band performs a soulful
+    song that explores the magic of dreams realized when two souls come
+    together. As they harmonize, listeners are transported to a world where hope
+    flourishes, and the bonds of connection illuminate even the darkest paths.
+    The episode emphasizes the importance of collaboration in overcoming life's
+    challenges, leaving viewers inspired to believe in the possibility of a
+    brighter future. Join Wavelength as they invite you to dream alongside them
+    and discover the transformative strength found in togetherness.
+  success: true
+  metadata:
+    processingTimeMs: 2828
+    linksAdded: 13
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 6298
+    completionTokens: 129
+    totalTokens: 6427
+- season_title: 'Prelude: Life in the Shire'
+  episode_title: Daphne
+  episode_key: episode4
+  original_story_summary: >-
+    Wavelength performs a song about the Daphne flower, which is known for its
+    intoxicating fragrance that attracts both pollinators and humans. It
+    explores themes of attraction, desire, and the allure of beauty, many of
+    which King David expresses for Daphne.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Daphne" from Season:
+    "Prelude: Life in the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the poignant episode titled "Daphne" from the season "Prelude: Life in
+    the Shire," we witness the emergence of a new hero amidst heartbreak and
+    loss. Following the tragic death of her father, the Shire's Concert Master,
+    young Daphne is thrust into a world of responsibility as she cares for her
+    younger brother. With her prodigious talent on the drums, she steps into the
+    spotlight, joining Wavelength as their new drummer. However, her journey is
+    fraught with conflict, as Eloquence, Wavelength's bass player and grieving
+    friend of the fallen Magical Maurice, struggles to accept her presence,
+    viewing her bitterness as a barrier. Through the hauntingly beautiful "Song
+    of Mourning," Daphne learns to channel her pain into music, transforming her
+    sorrow into a powerful tribute to those lost, ultimately forging her path to
+    acceptance and belonging within the band.
+  success: true
+  metadata:
+    processingTimeMs: 5205
+    linksAdded: 15
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4431
+    completionTokens: 173
+    totalTokens: 4604
+- season_title: 'Prelude: Life in the Shire'
+  episode_title: Falling
+  episode_key: episode5
+  original_story_summary: >-
+    Wavelength performs a song about the exhilarating feeling of falling in love
+    and the joy that comes with it. Perhaps foreshadowing what Daphne and her
+    partner might feel for each other as their relationship blossoms.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Falling" from Season:
+    "Prelude: Life in the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    I'm sorry, but I don't have information about an episode titled "Falling"
+    from the season "Prelude: Life in the Shire." However, I can provide
+    detailed summaries of episodes from other seasons of Wavelength, such as the
+    conflicts and resolutions in episodes like "Countdown," "A Misery of
+    Goblins," or "Slow Time." Let me know if you'd like to hear about any of
+    those or explore another aspect of the Wavelength-Lore universe!
+  success: true
+  metadata:
+    processingTimeMs: 2437
+    linksAdded: 8
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 6250
+    completionTokens: 93
+    totalTokens: 6343
+- season_title: 'Prelude: Life in the Shire'
+  episode_title: Once More
+  episode_key: episode6
+  original_story_summary: >-
+    Wavelength performs a poignant song about cherishing memories and the
+    importance of remembering loved ones who have passed away. The song reflects
+    on the enduring impact that these individuals have on our lives and the
+    comfort that comes from holding onto their memory.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Once More" from Season:
+    "Prelude: Life in the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the enchanting episode "Once More" from the season "Prelude: Life in the
+    Shire," Wavelength takes us on a nostalgic journey through the serene beauty
+    of the Shire, where laughter and music fill the air. As the band reflects on
+    their cherished memories, they are confronted with the shadows of impending
+    turmoil—the Goblin King and his Misery threatening their beloved home. The
+    heart of the conflict lies in the band’s struggle to unite the Shire Folk
+    against the creeping darkness, igniting a spark of hope through their music.
+    With a powerful anthem that resonates with resilience and camaraderie,
+    Wavelength inspires the Shire Folk to stand together and reclaim their joy.
+    This pivotal moment sets the stage for an epic battle against despair, as
+    they vow to protect their way of life "once more."
+  success: true
+  metadata:
+    processingTimeMs: 3421
+    linksAdded: 20
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 6250
+    completionTokens: 161
+    totalTokens: 6411
+- season_title: 'Prelude: Life in the Shire'
+  episode_title: History Lessons
+  episode_key: episode7
+  original_story_summary: >-
+    Wavelength performs a reflective song about learning from the past and the
+    importance of history in shaping our present and future. The song encourages
+    listeners to remember the lessons of history and to use that knowledge to
+    make better choices moving forward.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "History Lessons" from Season:
+    "Prelude: Life in the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    I'm sorry, but I don't have information about an episode titled "History
+    Lessons" from the Wavelength universe. However, I can help you with
+    summaries and details from other episodes like "Countdown," "A Misery of
+    Goblins," or "Slow Time." If you'd like to know more about those, just let
+    me know!
+  success: true
+  metadata:
+    processingTimeMs: 1846
+    linksAdded: 5
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4934
+    completionTokens: 66
+    totalTokens: 5000
+- season_title: 'Prelude: Life in the Shire'
+  episode_title: Life in the Shire
+  episode_key: episode8
+  original_story_summary: >-
+    Wavelength performs an uplifting song about the joys of living in the Shire,
+    a place of peace, community, and gifted artisanship. The song celebrates the
+    simple pleasures of life in the Shire and the sense of belonging that comes
+    from being part of a close-knit community.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Life in the Shire" from
+    Season: "Prelude: Life in the Shire". The summary should be engaging, 4-5
+    sentences long, and suitable for marketing copy.
+  chatbot_response: >-
+    In "Life in the Shire," we are introduced to the idyllic realm of the Shire,
+    where peace and harmony reign among its vibrant landscape and beloved Shire
+    Folk. This tranquil life is beautifully depicted through Wavelength's
+    enchanting melodies, capturing the essence of community and connection.
+    However, the serenity is shattered when the Goblin King launches a
+    devastating invasion, plunging the Shire into chaos and despair. As the
+    Shire Folk grapple with loss and uncertainty, they unite with Wavelength to
+    reclaim their home, igniting a spark of hope that promises to restore their
+    cherished way of life. This episode sets the stage for an epic battle
+    against darkness, highlighting the resilience of the Shire Folk and their
+    determination to defend their beloved homeland.
+  success: true
+  metadata:
+    processingTimeMs: 3826
+    linksAdded: 20
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 5450
+    completionTokens: 148
+    totalTokens: 5598
+- season_title: 'Prelude: Life in the Shire'
+  episode_title: Feed the Crows
+  episode_key: episode9
+  original_story_summary: >-
+    Wavelength performs a soulful song about finding solace and healing in
+    nature. The song emphasizes the therapeutic power of connecting with the
+    natural world and the comfort that comes from being surrounded by its
+    beauty.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Feed the Crows" from Season:
+    "Prelude: Life in the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the enchanting episode "Feed the Crows," the idyllic life of the Shire is
+    beautifully illustrated through the eyes of Wavelength, a band of spirited
+    musicians who find joy in their simple existence. However, their peace is
+    threatened as ominous shadows loom over their beloved home. The episode
+    explores the delicate balance between joy and sorrow as the Shire Folk face
+    the encroaching darkness of the Goblin King’s tyranny. Through heartfelt
+    melodies and vibrant performances, Wavelength rallies the community,
+    reminding them of the power of unity and resilience in the face of despair.
+    As the episode unfolds, the stakes rise, leading to an emotional crescendo
+    that sets the stage for the epic battles to come, leaving viewers eagerly
+    anticipating the fate of the Shire and its beloved inhabitants.
+  success: true
+  metadata:
+    processingTimeMs: 3227
+    linksAdded: 15
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4970
+    completionTokens: 153
+    totalTokens: 5123
+- season_title: Fall of the Shire
+  episode_title: Goblin King
+  episode_key: episode1
+  original_story_summary: >-
+    After the Goblin King found out about the insult at the Shire, he decided to
+    invade with his Misery of Goblins. Wavelength didn't realize what was
+    happening until it was too late. The Goblins took over the Shire and
+    Wavelength was forced to perform a Concert for the Goblin King.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Goblin King" from Season:
+    "Fall of the Shire". The summary should be engaging, 4-5 sentences long, and
+    suitable for marketing copy.
+  chatbot_response: >-
+    In the gripping episode "Goblin King" from the "Fall of the Shire" season,
+    the Shire Folk find themselves in the throes of despair as the malevolent
+    Goblin King and his Misery of Goblins lay siege to their beloved land. With
+    their Royal Family abducted and the once-peaceful Shire turned into a realm
+    of chaos, the resilient Shire Folk rally under the leadership of a revered
+    blacksmith, determined to reclaim their home. As tensions escalate,
+    Wavelength joins forces with the Shire to devise a daring plan to confront
+    the Goblin King and break his grip on their lives. The climactic battle
+    unfolds with heart-pounding stakes, culminating in a fierce showdown where
+    courage, unity, and sacrifice intertwine. Ultimately, the Shire Folk emerge
+    victorious, but not without loss, forever altering the fate of both the land
+    and the band, as they strive to rebuild and restore their Shire Dream amidst
+    the echoes of their harrowing journey.
+  success: true
+  metadata:
+    processingTimeMs: 4930
+    linksAdded: 20
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 3865
+    completionTokens: 198
+    totalTokens: 4063
+- season_title: Fall of the Shire
+  episode_title: Psychopath
+  episode_key: episode2
+  original_story_summary: >-
+    Wavelength is forced to perform for the Goblin King. So thinking quickly on
+    the spot,    Wavelength writes a song about being a Psychopath, hoping to
+    impress the Goblin King with Worldview   that any Goblin could appreciate.
+    This helps to put the Goblin King off of his guard in order to escape.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Psychopath" from Season:
+    "Fall of the Shire". The summary should be engaging, 4-5 sentences long, and
+    suitable for marketing copy.
+  chatbot_response: >-
+    In the gripping episode "Psychopath" from the "Fall of the Shire" season,
+    Wavelength finds themselves at the mercy of the sinister Goblin King, who
+    demands a performance to entertain his ruthless followers. With quick wit
+    and a blend of courage, Wavelength crafts a provocative song that delves
+    into the psyche of a psychopath, hoping to resonate with the Goblin King's
+    twisted worldview. As the music unfolds, it serves not only as a distraction
+    but also as a clever ploy to outsmart their captor. This electrifying moment
+    is a testament to Wavelength's resilience and resourcefulness in the face of
+    danger. Ultimately, the performance becomes a pivotal turning point,
+    allowing Wavelength to escape the Goblin King's clutches and reignite hope
+    for the Shire's future.
+  success: true
+  metadata:
+    processingTimeMs: 4347
+    linksAdded: 18
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 5623
+    completionTokens: 158
+    totalTokens: 5781
+- season_title: Fall of the Shire
+  episode_title: Countdown
+  episode_key: episode3
+  original_story_summary: >-
+    Wavelength is struck by the realization that the Goblins mean to kill and
+    rule the Shire Forever. They realize that in times of crisis, people come
+    together to help each other, and the most important resource you have in
+    times of crisis is your friends and family.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Countdown" from Season: "Fall
+    of the Shire". The summary should be engaging, 4-5 sentences long, and
+    suitable for marketing copy.
+  chatbot_response: >-
+    In the gripping episode "Countdown" from the "Fall of the Shire" season,
+    Wavelength faces a harrowing realization: the Goblins intend to kill and
+    rule the Shire forever. As time runs out, Wavelength understands that true
+    strength lies in the bonds of friendship and family during crises. With a
+    powerful melody echoing through the air, they embrace the urgency of their
+    situation, reminding themselves to hold tight to their loved ones in the
+    face of impending terror. This poignant moment illuminates the importance of
+    unity and resilience, setting the stage for an epic struggle against the
+    Goblin King’s oppressive reign. Join Wavelength on this emotional journey as
+    they prepare to reclaim their home and stand against the darkness!
+  success: true
+  metadata:
+    processingTimeMs: 3322
+    linksAdded: 17
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 5600
+    completionTokens: 143
+    totalTokens: 5743
+- season_title: Fall of the Shire
+  episode_title: A Misery of Goblins
+  episode_key: episode4
+  original_story_summary: >-
+    In order to understand how to escape the Goblins, Wavelength tries to
+    understand their worldview. Wavelength realizes that Goblins are driven by
+    Misery, and that they want to spread Misery to everyone. Wavelength decides
+    to write a song that celebrates Misery in order to better understand the
+    Goblins. This allows him to find a way to escape the Goblins and save the
+    Shire.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "A Misery of Goblins" from
+    Season: "Fall of the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the gripping episode "A Misery of Goblins" from the "Fall of the Shire"
+    season, Wavelength embarks on a perilous journey to understand the twisted
+    psyche of their goblin adversaries. As they delve into the dark world of the
+    Goblins, they uncover that Misery is not just a byproduct of their
+    existence, but a driving force they seek to spread among all. Determined to
+    break this cycle of despair, Wavelength crafts a poignant song that
+    celebrates the resilience of the Shire folk and aims to subvert the Goblins'
+    influence. This powerful narrative culminates in a dramatic confrontation,
+    where the band must harness their newfound understanding to escape the
+    clutches of the Goblins and protect their beloved Shire. With heart-stirring
+    melodies and themes of unity, this episode captures the essence of hope
+    amidst darkness, making it an unforgettable chapter in their epic saga!
+  success: true
+  metadata:
+    processingTimeMs: 5335
+    linksAdded: 20
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4817
+    completionTokens: 182
+    totalTokens: 4999
+- season_title: Fall of the Shire
+  episode_title: Slow Time
+  episode_key: episode5
+  original_story_summary: >-
+    Wavelength is about to make a large decision that will affect the future of
+    the Shire.  They could either save themselves by giving in to the Goblins,
+    or they could try to fight back and save the Shire. But in order to rescue
+    the Shire Folk, they know that they must be willing to risk their own
+    safety. Wavelength realizes that in order to make the right decision, they
+    must take their time and think about what is truly important in life.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Slow Time" from Season: "Fall
+    of the Shire". The summary should be engaging, 4-5 sentences long, and
+    suitable for marketing copy.
+  chatbot_response: >-
+    In the gripping episode "Slow Time" from the season "Fall of the Shire,"
+    Wavelength stands at a critical crossroads as they face the looming threat
+    of the Goblin King and his horde. With the fate of the Shire hanging in the
+    balance, Wavelength grapples with a monumental decision: to succumb to the
+    Goblins' greed or to muster the courage to fight back and save their beloved
+    home. As tensions rise, they learn that taking a moment to reflect can lead
+    to clarity and purpose, urging them to consider what truly matters in life.
+    With heartfelt resolve, they unite as a team, realizing that friendship and
+    shared dreams are their greatest weapons against the darkness. Will they
+    rise to reclaim their freedom, or will the shadow of despair engulf the
+    Shire forever? Tune in to witness this poignant battle of choices in "Slow
+    Time!"
+  success: true
+  metadata:
+    processingTimeMs: 4328
+    linksAdded: 18
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 5668
+    completionTokens: 171
+    totalTokens: 5839
+- season_title: Fall of the Shire
+  episode_title: Won't See it Coming
+  episode_key: episode6
+  original_story_summary: >-
+    Wavelength realizes that the Goblins are not able to understand science
+    because they are not able to learn. Wavelength uses this knowledge to create
+    a plan to escape the Goblins by using science to create a distraction.
+    Wavelength creates a machine that creates a loud noise that scares the
+    Goblins away, allowing Wavelength to escape and save the Shire.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Won't See it Coming" from
+    Season: "Fall of the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the gripping episode "Won't See it Coming" from the "Fall of the Shire"
+    season, Wavelength confronts the cunning and chaotic Goblins who remain
+    blissfully unaware of the looming threat that science poses to their reign.
+    As they devise a clever plan, Wavelength harnesses their understanding of
+    chaos and technology to create a distraction—a loud noise that disrupts the
+    Goblins' misguided existence. This strategic move not only allows Wavelength
+    to escape but also serves as a powerful reminder of the importance of
+    knowledge and adaptability in the face of adversity. As the Shire Folk rally
+    together, they prepare for the ultimate showdown against the Goblin King,
+    setting the stage for an electrifying battle for their home. With
+    heart-pounding tension and clever wit, this episode showcases the resilience
+    of friendship and the fight for freedom in a world overshadowed by misery.
+  success: true
+  metadata:
+    processingTimeMs: 3812
+    linksAdded: 18
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 5426
+    completionTokens: 173
+    totalTokens: 5599
+- season_title: Fall of the Shire
+  episode_title: Say Goodbye to the Shire
+  episode_key: episode7
+  original_story_summary: >-
+    Wavelength springs the trap that put the Goblins to sleep.  Wavelength and
+    the Shire Folk escape the Goblins and  begin their long journey to the far,
+    frozen North, where their adventure continues in Season 3: The Ice Fortress.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Say Goodbye to the Shire"
+    from Season: "Fall of the Shire". The summary should be engaging, 4-5
+    sentences long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the gripping episode "Say Goodbye to the Shire," the beloved Shire is
+    plunged into chaos as the Goblin King unleashes his Misery upon its peaceful
+    inhabitants. With the Royal Family captured and the Shirefolk left in
+    despair, Wavelength rallies to unite the community and ignite a powerful
+    resistance. As they confront the harsh reality of loss and betrayal, the
+    band must face their own grief while inspiring hope among their fellow
+    Shirelings. This emotional journey culminates in a heart-stirring battle for
+    freedom, where every note played becomes a rallying cry against the
+    darkness. Will the Shirefolk reclaim their home, or will they forever be
+    haunted by the Goblin King's tyranny? Join Wavelength in this unforgettable
+    chapter of their saga as they say goodbye to the Shire they once knew and
+    fight for a brighter future!
+  success: true
+  metadata:
+    processingTimeMs: 4268
+    linksAdded: 20
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4917
+    completionTokens: 168
+    totalTokens: 5085
+- season_title: Ice Fortress
+  episode_title: Ice Fortress
+  episode_key: episode1
+  original_story_summary: >-
+    Wavelength and the Shire Folk escape the Goblin Invasion of the dear Shire,
+    and flee to the far, frozen North.  There they find a place to recover and
+    plan at the Ice Fortress. THe Ice Fortress is a safe haven for all, where
+    everyone is welcome, no matter wealth or looks or race.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Ice Fortress" from Season:
+    "Ice Fortress". The summary should be engaging, 4-5 sentences long, and
+    suitable for marketing copy.
+  chatbot_response: >-
+    In the thrilling episode "Ice Fortress," the Shirefolk, led by the intrepid
+    band Wavelength, embark on a perilous journey to the far, frozen North after
+    narrowly escaping the clutches of the Goblin King. Seeking refuge within the
+    majestic Ice Fortress, they hope to heal their wounds and devise a daring
+    plan to reclaim their beloved Shire from the tyrannical goblins. As tensions
+    rise, the Shirefolk must confront not only the chilling environment but also
+    the ferocious Ice Whales that inhabit these treacherous waters, symbolizing
+    their struggle for strength and survival. With the stakes higher than ever,
+    alliances are forged, and the spirit of community shines brightly as they
+    prepare for the ultimate battle against darkness. This captivating tale of
+    resilience and unity promises to resonate with audiences, inviting them to
+    witness the power of music and courage in overcoming adversity.
+  success: true
+  metadata:
+    processingTimeMs: 4231
+    linksAdded: 17
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4320
+    completionTokens: 174
+    totalTokens: 4494
+- season_title: Ice Fortress
+  episode_title: Ice Whales
+  episode_key: episode2
+  original_story_summary: >-
+    While at the Ice Fortress, the Shire Folk realize they need time to heal. 
+    The Ice Whale Hunt is an  annual tradition at the Ice Fortress, and the
+    Shire Folk decide to join in.  They know that they need to learn how to
+    fight against the Goblins, and the Ice Whale Hunt is a good time to test
+    their mettle. The Ice Whales are the most evil creatures in the deep oceans
+    of the far, Frozen North.  However, while completey submerged in the deep
+    depths most of the year, once a year they migrate up to the surface to
+    feed.   This is where the Ice Whale Hunt takes place.  The Shire Folk must
+    work together to take down these evil beasts, and bring back food to the Ice
+    Fortress.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Ice Whales" from Season: "Ice
+    Fortress". The summary should be engaging, 4-5 sentences long, and suitable
+    for marketing copy.
+  chatbot_response: >-
+    In the gripping episode "Ice Whales" from the "Ice Fortress" season of
+    Wavelength, the Shire Folk find themselves on a desperate quest for survival
+    after fleeing the clutches of the Goblin King. As they seek refuge in the
+    icy stronghold of the dwarves, they realize that healing and sustenance are
+    essential to reclaiming their homeland. This leads them to embark on a
+    perilous Ice Whale Hunt, where they confront the most fearsome creatures of
+    the deep, known for their evil nature. United by their shared struggle, the
+    Shire Folk learn to harness their strength and resilience, proving that even
+    in desperate times, community and courage can prevail. Join Wavelength as
+    they weave an exhilarating tale of survival, camaraderie, and the fight
+    against darkness!
+  success: true
+  metadata:
+    processingTimeMs: 3233
+    linksAdded: 16
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4474
+    completionTokens: 155
+    totalTokens: 4629
+- season_title: Ice Fortress
+  episode_title: Sneak Attack
+  episode_key: episode3
+  original_story_summary: >-
+    The goblins enjoy spreading terror by sending raiding parties up to the far,
+    frozen North to harass and spy on the Shire Folk. The goblins surpise the
+    Shire Folk, but the Shire Folk are ready for them.  They fight back and send
+    the goblins running. One more sign that the Shire Folk are getting stronger,
+    and the goblins will need something special to defend the Shire.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Sneak Attack" from Season:
+    "Ice Fortress". The summary should be engaging, 4-5 sentences long, and
+    suitable for marketing copy.
+  chatbot_response: >-
+    In the thrilling episode "Sneak Attack" from the "Ice Fortress" season of
+    Wavelength, the Shire Folk, having escaped the clutches of the Goblin King,
+    find themselves in the icy sanctuary of the Ice Fortress. However, their
+    respite is short-lived as the goblins relentlessly send raiding parties to
+    harass them, spreading terror and chaos. Determined to protect their
+    newfound home and rally their spirits, the Shire Folk devise clever
+    strategies to confront these wicked intruders. As tensions escalate, they
+    must unite and harness their courage to defend against the goblin menace,
+    setting the stage for a gripping showdown. Will they succeed in thwarting
+    the goblins' nefarious plans, or will darkness once again threaten their
+    safety? Join Wavelength on this exhilarating journey of resilience and
+    bravery!
+  success: true
+  metadata:
+    processingTimeMs: 3469
+    linksAdded: 20
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 5529
+    completionTokens: 162
+    totalTokens: 5691
+- season_title: Ice Fortress
+  episode_title: Frozen Peace
+  episode_key: episode4
+  original_story_summary: >-
+    After the Sneak Attack by the Goblins, the Shire FOlk take some more time to
+    rest and heal. They know that they will need to be at their best to take
+    back the Shire from the Goblins. They sing a song of hope, and of peace, as
+    they look out over the frozen shore of the far, frozen North.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Frozen Peace" from Season:
+    "Ice Fortress". The summary should be engaging, 4-5 sentences long, and
+    suitable for marketing copy.
+  chatbot_response: >-
+    In the gripping episode "Frozen Peace" from the *Ice Fortress* season of
+    Wavelength, the Shirefolk find refuge in the majestic Ice Fortress after
+    their harrowing escape from the clutches of the Goblin King. As they gather
+    under the protective embrace of this icy haven, they heal their wounds and
+    strategize for the daunting battle ahead. The haunting melodies of their
+    music echo through the fortress, uniting them in hope and resilience as they
+    dream of reclaiming their beloved Shire. Amidst the frozen landscape, the
+    Shirefolk come to terms with their losses, vowing to rebuild their home and
+    restore peace. This poignant chapter beautifully weaves themes of
+    camaraderie, strength, and the enduring spirit of community, setting the
+    stage for an epic confrontation against their formidable foes.
+  success: true
+  metadata:
+    processingTimeMs: 3830
+    linksAdded: 16
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4354
+    completionTokens: 158
+    totalTokens: 4512
+- season_title: Ice Fortress
+  episode_title: Rebuild The Shire
+  episode_key: episode5
+  original_story_summary: >-
+    While at the Ice Fortress, the Shire Folk start the process of dreaming what
+    their new Shire will be like. They value freedom, community, and safety
+    above all else.  With that in mind, they begin to craft their plans to
+    rebuild the Shire.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Rebuild The Shire" from
+    Season: "Ice Fortress". The summary should be engaging, 4-5 sentences long,
+    and suitable for marketing copy.
+  chatbot_response: >-
+    In the gripping episode "Rebuild The Shire" from the "Ice Fortress" season,
+    the Shirefolk, having escaped the clutches of the Goblin King, find refuge
+    in the majestic Ice Fortress. Here, amidst icy tranquility, they band
+    together with Wavelength to heal and strategize for their impending battle
+    to reclaim their beloved home. As they share dreams of restoration and
+    resilience, they rally their spirits and fortify their resolve, vowing to
+    rebuild their Shire into a sanctuary of peace and safety. With themes of
+    hope and unity resonating through powerful melodies, this episode showcases
+    the Shirefolk's unwavering determination to rise from the ashes and stand
+    strong against the shadows of despair. Join them on this emotional journey
+    as they prepare to confront their past and forge a brighter future!
+  success: true
+  metadata:
+    processingTimeMs: 4227
+    linksAdded: 18
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4465
+    completionTokens: 159
+    totalTokens: 4624
+- season_title: Ice Fortress
+  episode_title: We're Coming For You
+  episode_key: episode6
+  original_story_summary: >-
+    The Goblins have spies everywhere, and they know that the Shire Folk are
+    getting stronger.  The Shire Folk aren't making it a secret of their
+    intentions to take back the Shire.  The Goblins know that they will need
+    something special to defend the Shire.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "We're Coming For You" from
+    Season: "Ice Fortress". The summary should be engaging, 4-5 sentences long,
+    and suitable for marketing copy.
+  chatbot_response: >-
+    In the gripping episode "We're Coming For You" from the "Ice Fortress"
+    season of Wavelength, the Shirefolk, fueled by their desire to reclaim their
+    homeland from the clutches of the Goblin King, rally together with the band
+    Wavelength to strategize their return. The chilling atmosphere of the Ice
+    Fortress provides a temporary refuge as they prepare for a decisive
+    confrontation against their foes. With an anthem of determination, the
+    Shirefolk declare their unwavering resolve to rebuild their Shire dream,
+    defying the Goblin King's oppressive rule. As tensions mount, the stage is
+    set for an epic showdown where courage and community will clash with greed
+    and tyranny. This episode captures the heart of resilience and hope, making
+    it a must-see for fans eager to witness the fight for freedom!
+  success: true
+  metadata:
+    processingTimeMs: 3234
+    linksAdded: 19
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 3654
+    completionTokens: 157
+    totalTokens: 3811
+- season_title: Ice Fortress
+  episode_title: Prepare for Battle
+  episode_key: episode7
+  original_story_summary: >-
+    The Shire Folk have healed and are ready to take back the Shire.  They know
+    that they will need to be at their best to take back the Shire from the
+    Goblins. They are determined to succeed, and they know that they will need
+    to work together to defeat the Goblins.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Prepare for Battle" from
+    Season: "Ice Fortress". The summary should be engaging, 4-5 sentences long,
+    and suitable for marketing copy.
+  chatbot_response: >-
+    In the thrilling episode "Prepare for Battle" from the "Ice Fortress" season
+    of Wavelength, the Shirefolk and their allies find themselves at a crucial
+    turning point in their quest to reclaim their homeland from the clutches of
+    the Goblin King. After seeking refuge in the Ice Fortress, they gather
+    strength and strategize for an impending confrontation, determined to end
+    the reign of misery that has plagued their lives. With a heart-pounding mix
+    of courage and camaraderie, they train in preparation for battle, honing
+    their skills and uniting their resolve. As tensions rise and the call to
+    arms echoes through the frosty air, the Shirefolk stand ready to march back
+    into the fray, fueled by the desire to restore peace to their beloved Shire.
+    This captivating episode showcases themes of resilience and hope, setting
+    the stage for an epic showdown that promises to leave audiences on the edge
+    of their seats!
+  success: true
+  metadata:
+    processingTimeMs: 4429
+    linksAdded: 15
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4259
+    completionTokens: 182
+    totalTokens: 4441
+- season_title: Battle of the Shire
+  episode_title: Locked And Loaded
+  episode_key: episode1
+  original_story_summary: >-
+    Wavelength and the Shire Folk escape the Goblin Invasion of the dear Shire,
+    and flee to the far, frozen North.  There they find a place to recover and
+    plan at the Ice Fortress. THe Ice Fortress is a safe haven for all, where
+    everyone is welcome, no matter wealth or looks or race.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Locked And Loaded" from
+    Season: "Battle of the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In "Locked and Loaded," the Shire folk rise up with fierce determination to
+    reclaim their homeland from the clutches of the nefarious Goblin King. After
+    regrouping at the Ice Fortress, they prepare for an epic confrontation,
+    fueled by hope and the unbreakable bond of community. As they rally
+    together, armed with elven bows and magical arrows, they embody a spirit of
+    defiance against tyranny, declaring that nothing will stop them from taking
+    back their cherished homes. The episode culminates in a thrilling showdown,
+    where the Shire folk confront their fears and emerge victorious, though they
+    know the Goblin King may one day return. Experience the exhilarating power
+    of unity and resilience in this electrifying chapter of the Wavelength saga!
+  success: true
+  metadata:
+    processingTimeMs: 4130
+    linksAdded: 16
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4722
+    completionTokens: 148
+    totalTokens: 4870
+- season_title: Battle of the Shire
+  episode_title: The King has Fled
+  episode_key: episode2
+  original_story_summary: >-
+    The Goblin king being a coward at heart, fled the battle before it began,
+    fleeing with his main GOblin Misery back to his swampy lair.  He took with
+    him captives from the Shire, including the Royal Family.  Behind the GOblin
+    King he left a token force to hold the Shire, so that the Shire Folk
+    wouldn't pursue him.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "The King has Fled" from
+    Season: "Battle of the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the gripping episode titled "The King has Fled" from the "Battle of the
+    Shire" season, the Shire Folk rally their courage and resolve after a
+    devastating conflict with the Goblin King. As they reclaim their beloved
+    home, they discover that the Goblin King has escaped with the royal
+    treasures and the Shire Royal Family—King, Queen, and Princess—still in his
+    clutches. This harrowing twist ignites a fire in the hearts of the Shire
+    Folk, who realize their fight is far from over. Determined to rescue their
+    loved ones and restore peace, they prepare for an inevitable confrontation
+    with the cunning Goblin King. With themes of resilience and unity, this
+    episode sets the stage for an epic showdown that will redefine their lives
+    forever!
+  success: true
+  metadata:
+    processingTimeMs: 3802
+    linksAdded: 16
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 3935
+    completionTokens: 155
+    totalTokens: 4090
+- season_title: Battle of the Shire
+  episode_title: Goblin's Rule
+  episode_key: episode3
+  original_story_summary: >-
+    There is only one motivation for a Goblin, and that is to rule over others. 
+    This is the case for all Goblins, from the lowliest grunt to the Goblin King
+    himself.  The Goblin King rules by lying, cheating, and stealing.  He has no
+    honor, and no respect for others.  The only rule that the Goblin King has is
+    that Goblins gonna rule all over you.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Goblin's Rule" from Season:
+    "Battle of the Shire". The summary should be engaging, 4-5 sentences long,
+    and suitable for marketing copy.
+  chatbot_response: >-
+    In the gripping episode "Goblin's Rule" from the "Battle of the Shire"
+    season, the Shire folk find themselves in the throes of despair as the
+    Goblin King and his Misery of Goblins tighten their grip on their
+    once-peaceful home. The Shire is a shadow of its former self, with the royal
+    family abducted and the community living in fear under the Goblin King's
+    tyrannical rule. However, hope emerges as a courageous blacksmith, a
+    respected elder of the village, rises to unite the Shire folk in a bold
+    rebellion. With determination and newfound strength, they prepare to
+    confront their oppressor, aiming to reclaim their land and restore harmony.
+    As the stakes reach an all-time high, the battle between light and darkness
+    unfolds, revealing the true power of unity against corruption.
+  success: true
+  metadata:
+    processingTimeMs: 3535
+    linksAdded: 19
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 3866
+    completionTokens: 167
+    totalTokens: 4033
+- season_title: Battle of the Shire
+  episode_title: Ice Blue Greed
+  episode_key: episode4
+  original_story_summary: >-
+    The Shire FOlk know that the Goblin King is a coward, and that he won't
+    openly attack a fortified shire without a good reason.  Lucky sets a trap
+    for the Goblin King, using an irresistible Ice Blue Diamond as bait. The
+    much coveted Ice Blue Diamonds can only be found in the far, frozen North as
+    they are guarded by the fearsome Ice Dragons.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Ice Blue Greed" from Season:
+    "Battle of the Shire". The summary should be engaging, 4-5 sentences long,
+    and suitable for marketing copy.
+  chatbot_response: >-
+    In the thrilling episode "Ice Blue Greed" from the "Battle of the Shire"
+    saga, the Shire folk band together in a desperate bid to reclaim their
+    homeland from the clutches of the Goblin King. As they uncover the depths of
+    the Goblin King's avarice, they set an ingenious trap, using a mesmerizing
+    Ice Blue Diamond to lure him into a confrontation. Tensions rise as the
+    Shire folk prepare for battle, fueled by their desire to rid their land of
+    the corruption left behind by the goblins. With stakes higher than ever,
+    Wavelength stands at the forefront, ready to fight for their home and the
+    dreams that bind them together. Will their determination and clever strategy
+    be enough to turn the tide in this epic showdown? Tune in to witness a tale
+    of courage, unity, and the unyielding spirit of the Shire!
+  success: true
+  metadata:
+    processingTimeMs: 3997
+    linksAdded: 20
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4505
+    completionTokens: 174
+    totalTokens: 4679
+- season_title: Battle of the Shire
+  episode_title: The Shire Fortress
+  episode_key: episode5
+  original_story_summary: >-
+    Knowing that Lucky's trap was set, the Shire Folk set about fortifying the
+    Shire to withstand the coming Goblin attack. They know that the Goblin's
+    will be relentless in their attack, and that they will stop at nothing to
+    reclaim the Shire in order to satisfy the Goblin King's greed.  They will do
+    whatever it takes to not have to submit to the rule of the goblin king.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "The Shire Fortress" from
+    Season: "Battle of the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In "The Shire Fortress," the Shire Folk unite with unwavering determination
+    to reclaim their homeland from the clutches of the Goblin King and his
+    Misery of Goblins. As they rally together, they construct formidable
+    defenses, transforming the Shire into a bastion of hope and resilience
+    against tyranny. With each stone laid and each bowstring drawn, the Shire
+    Folk train relentlessly, preparing for the inevitable clash that will
+    determine their fate. The stakes are high as they confront not only the
+    physical threat of the Goblin King but also the emotional scars left by his
+    ruthless reign. Will the strength of community and the power of their dreams
+    be enough to restore peace to the Shire? Join Wavelength on this thrilling
+    journey of courage, unity, and the fight for freedom!
+  success: true
+  metadata:
+    processingTimeMs: 3629
+    linksAdded: 20
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4370
+    completionTokens: 156
+    totalTokens: 4526
+- season_title: Battle of the Shire
+  episode_title: Battle of the Shire
+  episode_key: episode6
+  original_story_summary: >-
+    The Goblin King, driven by his insatiable greed for the Ice Blue Diamond,
+    leads his goblin horde to attack the fortified Shire. The Shire Folk,
+    prepared and determined, stand united to defend their home and freedom. The
+    battle is fierce, with both sides showing great courage and resilience. In
+    the end, the Shire Folk's determination and unity prevail, and they
+    successfully defend their home from the Goblin King's forces.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Battle of the Shire" from
+    Season: "Battle of the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the gripping episode "Battle of the Shire," the Shire Folk rise up
+    against the tyrannical Goblin King and his Misery of Goblins, determined to
+    reclaim their beloved homeland. As devastation looms and their royal family
+    is taken captive, the Shire Folk fortify their defenses and train for
+    battle, fueled by a newfound resolve to end the Goblin King's reign of
+    terror. With the help of the courageous band Wavelength, they unleash their
+    fury in a climactic showdown that showcases their bravery and unity. The
+    battle culminates in a desperate attempt to defeat the Goblin King once and
+    for all, aiming for his throat with their last remaining ballista arrows.
+    Victorious yet battle-weary, the Shire Folk reclaim their land, heralding a
+    new era of hope as they rebuild their shattered community and celebrate
+    their freedom from oppression.
+  success: true
+  metadata:
+    processingTimeMs: 3528
+    linksAdded: 20
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4236
+    completionTokens: 172
+    totalTokens: 4408
+- season_title: Battle of the Shire
+  episode_title: Song of Mourning
+  episode_key: episode7
+  original_story_summary: >-
+    After the battle, the Shire Folk take time to mourn their losses and honor
+    the memories of those who have passed. Wavelength didn't escape unscathed,
+    as Wavelength's Drummer: Magical Maurice was lost in the battle.   Many
+    others were killed, and many orphans were left behind.   One of the orphans
+    is Daphne the daughter of the Shire's Concert Master, who was also killed in
+    the battle along with her father. Daphne is left to take care of her younger
+    brother, and as she is a prodigy on the drums, she takes up the mantle of
+    Wavelength's drummer. Meanwhile, Eloquence, Wavelength's Bass player is
+    devestated by the loss of Magical Maurice, who was his best friend.  He is
+    not impressed with the idea of Daphne taking over as Wavelength's drummer,
+    especially as Daphne seems to be such a bitter person. The Song of Mourning
+    is a tribute to those who have passed, and a reminder to hold onto the
+    memories of our loved ones.
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "Song of Mourning" from
+    Season: "Battle of the Shire". The summary should be engaging, 4-5 sentences
+    long, and suitable for marketing copy.
+  chatbot_response: >-
+    In the poignant episode "Song of Mourning" from the "Battle of the Shire"
+    arc, Wavelength grapples with profound loss as they mourn their beloved
+    drummer, Magical Maurice, who perished during the devastating battle against
+    the Goblin King. Amidst their grief, they encounter Daphne, a talented young
+    orphan and daughter of the Shire's Concert Master, who steps into the role
+    of drummer, bringing both hope and tension to the band. As they navigate
+    their sorrow and celebrate the resilience of the Shire Folk, Wavelength
+    performs a heartfelt tribute in the form of the "Song of Mourning," honoring
+    those lost while reinforcing the importance of cherishing memories. This
+    emotional journey not only strengthens their bond but also ignites a fierce
+    determination to reclaim their home from the clutches of misery. Ultimately,
+    Daphne’s arrival signals a new chapter for Wavelength, as they prepare to
+    rise from their grief and fight for a brighter future in the Shire.
+  success: true
+  metadata:
+    processingTimeMs: 4933
+    linksAdded: 19
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4968
+    completionTokens: 193
+    totalTokens: 5161
+- season_title: Battle of the Shire
+  episode_title: The Shire Dream
+  episode_key: episode8
+  original_story_summary: >-
+    The Goblin King can no longer spread his lies in the Shire, and the Shire
+    Folk can finally live in peace. Wavelength has lost a member, but they have
+    gained a new one in Daphne, who has proven herself to be a worthy drummer.
+    What happens next to Daphne and Wavelength will be told over the next many
+    seasons to come....
+  prompt_sent: >-
+    Please provide a detailed, narrative summary of the core story, conflict,
+    and outcome for the Wavelength episode titled "The Shire Dream" from Season:
+    "Battle of the Shire". The summary should be engaging, 4-5 sentences long,
+    and suitable for marketing copy.
+  chatbot_response: >-
+    In "The Shire Dream," the aftermath of the battle against the Goblin King
+    sees the Shire Folk striving to reclaim their peace and rebuild their
+    homeland. With the weight of loss on their shoulders, Wavelength’s newest
+    member, Daphne—a talented drummer and orphan—rises to the challenge, uniting
+    the community through the power of music. As they confront their grief and
+    embrace hope, the Shire Folk discover a shared vision of freedom and
+    harmony, singing the anthem of resilience that echoes throughout the land.
+    This episode is a poignant reminder of the strength found in unity and the
+    enduring spirit of the Shire as they dream of a brighter future, free from
+    tyranny. Join Wavelength on this emotional journey as they turn pain into
+    purpose, inspiring all to find the Shire dream within themselves!
+  success: true
+  metadata:
+    processingTimeMs: 3509
+    linksAdded: 20
+    dynamicLinkingEnabled: true
+    contentFiltered: false
+    responseTruncated: false
+    webSearchUsed: false
+    securityFlags: []
+    warnings: []
+  usage:
+    promptTokens: 4634
+    completionTokens: 160
+    totalTokens: 4794

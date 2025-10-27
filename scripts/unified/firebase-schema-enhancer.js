@@ -47,7 +47,8 @@ const flags = {
   loreOnly: args.includes('--lore'),
   analyticsOnly: args.includes('--analytics'),
   backup: args.includes('--backup'),
-  rollback: args.includes('--rollback')
+  rollback: args.includes('--rollback'),
+  useAuthenticContent: args.includes('--use-authentic-content')
 };
 
 // Determine what to update
@@ -122,8 +123,14 @@ async function createBackup() {
 /**
  * Enhance character schema with CTA fields
  */
-async function enhanceCharacterSchema() {
+async function enhanceCharacterSchema(authenticCharacterContent = null) {
   console.log('🦸 Enhancing character schema...');
+  
+  if (authenticCharacterContent) {
+    console.log('✨ Using authentic content from Wavelength Chatbot');
+  } else {
+    console.log('📝 Using generic content generation');
+  }
   
   const charactersData = await firebaseUtils.fetchFromFirebase('characters');
   
@@ -139,21 +146,36 @@ async function enhanceCharacterSchema() {
     const characterUpdates = {};
     let hasUpdates = false;
     
+    // Get authentic content for this character if available
+    const authenticCTA = authenticCharacterContent && authenticCharacterContent[characterId];
+    
     // Add tagline field
     if (!character.tagline) {
-      characterUpdates.tagline = generateCharacterTagline(character);
+      if (authenticCTA && authenticCTA.tagline) {
+        characterUpdates.tagline = authenticCTA.tagline;
+      } else {
+        characterUpdates.tagline = generateCharacterTagline(character);
+      }
       hasUpdates = true;
     }
     
     // Add stakes field
     if (!character.stakes) {
-      characterUpdates.stakes = generateCharacterStakes(character);
+      if (authenticCTA && authenticCTA.stakes) {
+        characterUpdates.stakes = authenticCTA.stakes;
+      } else {
+        characterUpdates.stakes = generateCharacterStakes(character);
+      }
       hasUpdates = true;
     }
     
     // Add cta_text field
     if (!character.cta_text) {
-      characterUpdates.cta_text = generateCharacterCTA(character);
+      if (authenticCTA && authenticCTA.cta_text) {
+        characterUpdates.cta_text = authenticCTA.cta_text;
+      } else {
+        characterUpdates.cta_text = generateCharacterCTA(character);
+      }
       hasUpdates = true;
     }
     
@@ -183,8 +205,14 @@ async function enhanceCharacterSchema() {
 /**
  * Enhance episode schema with CTA fields
  */
-async function enhanceEpisodeSchema() {
+async function enhanceEpisodeSchema(authenticEpisodeContent = null) {
   console.log('🎬 Enhancing episode schema...');
+  
+  if (authenticEpisodeContent) {
+    console.log('✨ Using authentic content from Wavelength Chatbot');
+  } else {
+    console.log('📝 Using generic content generation');
+  }
   
   const videosData = await firebaseUtils.fetchFromFirebase('videos');
   
@@ -202,21 +230,37 @@ async function enhanceEpisodeSchema() {
         const episodeUpdates = {};
         let hasUpdates = false;
         
+        // Create episode key for authentic content lookup
+        const episodeKey = `${seasonId}_${episodeId}`;
+        const authenticCTA = authenticEpisodeContent && authenticEpisodeContent[episodeKey];
+        
         // Add cliffhanger field
         if (!episode.cliffhanger) {
-          episodeUpdates.cliffhanger = generateEpisodeCliffhanger(episode);
+          if (authenticCTA && authenticCTA.cliffhanger) {
+            episodeUpdates.cliffhanger = authenticCTA.cliffhanger;
+          } else {
+            episodeUpdates.cliffhanger = generateEpisodeCliffhanger(episode);
+          }
           hasUpdates = true;
         }
         
         // Add next_episode_tease field
         if (!episode.next_episode_tease) {
-          episodeUpdates.next_episode_tease = generateNextEpisodeTease(episode, seasonId, episodeId);
+          if (authenticCTA && authenticCTA.next_episode_tease) {
+            episodeUpdates.next_episode_tease = authenticCTA.next_episode_tease;
+          } else {
+            episodeUpdates.next_episode_tease = generateNextEpisodeTease(episode, seasonId, episodeId);
+          }
           hasUpdates = true;
         }
         
         // Add discussion_prompt field
         if (!episode.discussion_prompt) {
-          episodeUpdates.discussion_prompt = generateDiscussionPrompt(episode);
+          if (authenticCTA && authenticCTA.discussion_prompt) {
+            episodeUpdates.discussion_prompt = authenticCTA.discussion_prompt;
+          } else {
+            episodeUpdates.discussion_prompt = generateDiscussionPrompt(episode);
+          }
           hasUpdates = true;
         }
         
@@ -248,8 +292,14 @@ async function enhanceEpisodeSchema() {
 /**
  * Enhance lore schema with CTA fields
  */
-async function enhanceLoreSchema() {
+async function enhanceLoreSchema(authenticLoreContent = null) {
   console.log('📚 Enhancing lore schema...');
+  
+  if (authenticLoreContent) {
+    console.log('✨ Using authentic content from Wavelength Chatbot');
+  } else {
+    console.log('📝 Using generic content generation');
+  }
   
   const loreData = await firebaseUtils.fetchFromFirebase('lore');
   
@@ -265,21 +315,36 @@ async function enhanceLoreSchema() {
     const loreUpdates = {};
     let hasUpdates = false;
     
+    // Get authentic content for this lore item if available
+    const authenticCTA = authenticLoreContent && authenticLoreContent[loreId];
+    
     // Add intrigue_hook field
     if (!lore.intrigue_hook) {
-      loreUpdates.intrigue_hook = generateIntrigueHook(lore);
+      if (authenticCTA && authenticCTA.intrigue_hook) {
+        loreUpdates.intrigue_hook = authenticCTA.intrigue_hook;
+      } else {
+        loreUpdates.intrigue_hook = generateIntrigueHook(lore);
+      }
       hasUpdates = true;
     }
     
     // Add mystery_level field
     if (!lore.mystery_level) {
-      loreUpdates.mystery_level = assignMysteryLevel(lore);
+      if (authenticCTA && authenticCTA.mystery_level) {
+        loreUpdates.mystery_level = authenticCTA.mystery_level;
+      } else {
+        loreUpdates.mystery_level = assignMysteryLevel(lore);
+      }
       hasUpdates = true;
     }
     
     // Add investigation_cta field
     if (!lore.investigation_cta) {
-      loreUpdates.investigation_cta = generateInvestigationCTA(lore);
+      if (authenticCTA && authenticCTA.investigation_cta) {
+        loreUpdates.investigation_cta = authenticCTA.investigation_cta;
+      } else {
+        loreUpdates.investigation_cta = generateInvestigationCTA(lore);
+      }
       hasUpdates = true;
     }
     
@@ -545,6 +610,56 @@ async function updateSecurityRules() {
 }
 
 /**
+ * Generate authentic content using Wavelength Chatbot
+ */
+async function generateAuthenticContent() {
+  try {
+    console.log('🤖 GENERATING AUTHENTIC CONTENT');
+    console.log('===============================');
+    
+    const { WavelengthContentGenerator } = require('./wavelength-content-generator.js');
+    const generator = new WavelengthContentGenerator();
+    
+    // Test connection first
+    console.log('🔍 Testing chatbot connection...');
+    const connected = await generator.testConnection();
+    
+    if (!connected) {
+      console.log('⚠️  Chatbot unavailable, skipping authentic content generation');
+      return null;
+    }
+    
+    // Fetch current Firebase data
+    console.log('📡 Fetching current Firebase data...');
+    const firebaseData = {
+      characters: await firebaseUtils.fetchFromFirebase('characters'),
+      episodes: await firebaseUtils.fetchFromFirebase('episodes'), 
+      lore: await firebaseUtils.fetchFromFirebase('lore')
+    };
+    
+    console.log(`📊 Data loaded: ${Object.keys(firebaseData.characters || {}).length} characters, ${Object.keys(firebaseData.episodes || {}).length} episodes, ${Object.keys(firebaseData.lore || {}).length} lore items`);
+    
+    // Generate authentic content
+    console.log('✨ Generating authentic CTA content...');
+    const authenticContent = await generator.generateAllContent(firebaseData);
+    
+    // Save generated content for reference
+    if (!flags.dryRun) {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      await generator.saveContentToFile(authenticContent, `firebase-enhancement-${timestamp}.json`);
+    }
+    
+    console.log('🎉 Authentic content generation complete!\n');
+    return authenticContent;
+    
+  } catch (error) {
+    console.error(`❌ Authentic content generation failed: ${error.message}`);
+    console.log('⚠️  Falling back to generic content generation\n');
+    return null;
+  }
+}
+
+/**
  * Main execution
  */
 async function main() {
@@ -564,17 +679,23 @@ async function main() {
       console.log('🔍 DRY RUN MODE - No changes will be made\n');
     }
     
+    // Generate authentic content if requested
+    let authenticContent = null;
+    if (flags.useAuthenticContent) {
+      authenticContent = await generateAuthenticContent();
+    }
+    
     // Update schemas
     if (shouldUpdateCharacters) {
-      await enhanceCharacterSchema();
+      await enhanceCharacterSchema(authenticContent?.characters);
     }
     
     if (shouldUpdateEpisodes) {
-      await enhanceEpisodeSchema();
+      await enhanceEpisodeSchema(authenticContent?.episodes);
     }
     
     if (shouldUpdateLore) {
-      await enhanceLoreSchema();
+      await enhanceLoreSchema(authenticContent?.lore);
     }
     
     if (shouldUpdateAnalytics) {

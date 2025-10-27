@@ -124,6 +124,25 @@ class MerchandiseStore {
     return priceMap[category] || '$19.95';
   }
   
+  /**
+   * Convert technical provider names to user-friendly text
+   */
+  getUserFriendlyProvider(providerName) {
+    if (!providerName) return '';
+    
+    // Convert technical provider names to user-friendly alternatives
+    const providerMap = {
+      'MWW On Demand': 'Print-on-Demand',
+      'MWW': 'Print Service',
+      'Printful': 'Printful',
+      'Printify': 'Custom Print',
+      'Gooten': 'Print Service',
+      'SPOD': 'Print Service'
+    };
+    
+    return providerMap[providerName] || 'Custom Print';
+  }
+  
   async init() {
     console.log('🛍️ Initializing Merchandise Store');
     
@@ -1240,7 +1259,7 @@ class MerchandiseStore {
           <p class="product-description">${product.description || 'Custom merchandise item'}</p>
           <div class="product-details">
             <span class="product-price">${this.getEstimatedPrice(product.category)}</span>
-            ${product.provider ? `<span class="product-provider">${product.provider}</span>` : ''}
+            ${product.provider ? `<span class="product-provider">${this.getUserFriendlyProvider(product.provider)}</span>` : ''}
           </div>
         </div>
         <button class="select-simple-product product-select-btn" 

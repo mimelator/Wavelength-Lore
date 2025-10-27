@@ -14,10 +14,12 @@
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 
 class WavelengthContentGenerator {
   constructor() {
-    this.chatbotUrl = 'ai.wavelengthlore.com';
+    this.chatbotUrl = 'us-central1-wavelength-lore.cloudfunctions.net';
+    this.apiKey = process.env.CHATBOT_API_KEY;
     this.rateLimitDelay = 2000; // 2 seconds between requests
     this.cache = new Map(); // Cache responses to avoid duplicate API calls
   }
@@ -39,11 +41,12 @@ class WavelengthContentGenerator {
       const options = {
         hostname: this.chatbotUrl,
         port: 443,
-        path: '/chat',
+        path: '/legacy/chat',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(postData)
+          'Content-Length': Buffer.byteLength(postData),
+          'X-API-Key': this.apiKey
         }
       };
 
@@ -59,13 +62,22 @@ class WavelengthContentGenerator {
         res.on('end', () => {
           try {
             const response = JSON.parse(data);
-            const message = response.message || response.error || 'No response';
             
-            // Cache the response
-            this.cache.set(cacheKey, message);
-            
-            console.log(`✅ Received response (${message.length} chars)`);
-            resolve(message);
+            if (response.success) {
+              const message = response.response || 'No response';
+              
+              // Clean HTML links from response
+              const cleanedMessage = this.cleanHTMLLinks(message);
+              
+              // Cache the cleaned response
+              this.cache.set(cacheKey, cleanedMessage);
+              
+              console.log(`✅ Received response (${cleanedMessage.length} chars)`);
+              resolve(cleanedMessage);
+            } else {
+              console.error(`❌ API Error: ${response.error || 'Unknown error'}`);
+              reject(new Error(`API Error: ${response.error || 'Unknown error'}`));
+            }
           } catch (error) {
             console.error(`❌ JSON Parse Error: ${error.message}`);
             reject(new Error(`Invalid response: ${data.substring(0, 100)}`));
@@ -183,6 +195,24 @@ class WavelengthContentGenerator {
       console.error(`❌ Error generating lore CTA for ${loreTitle}: ${error.message}`);
       return this.getFallbackLoreCTA(loreTitle);
     }
+  }
+
+  /**
+   * Clean HTML links from chatbot response
+   */
+  cleanHTMLLinks(response) {
+    if (!response) return '';
+    
+    // Remove HTML links but keep the text content
+    let cleaned = response.replace(/<a[^>]*>([^<]+)<\/a>/g, '$1');
+    
+    // Remove any remaining HTML tags
+    cleaned = cleaned.replace(/<[^>]*>/g, '');
+    
+    // Clean up extra whitespace
+    cleaned = cleaned.replace(/\s+/g, ' ').trim();
+    
+    return cleaned;
   }
 
   /**
