@@ -2086,7 +2086,9 @@ class MerchandiseModalRenderer {
 
       // Call effects API
       console.log('🌐 Making API call to /api/merchandise/openai-upscaler/apply-effects');
-      console.log('📦 Request payload:', { upscaledImageUrl: imageUrl, effectParams });
+      console.log('📦 Image URL:', imageUrl);
+      console.log('📦 effectParams:', effectParams);
+      console.log('📦 Full request payload:', JSON.stringify({ upscaledImageUrl: imageUrl, effectParams }, null, 2));
 
       const response = await fetch('/api/merchandise/openai-upscaler/apply-effects', {
         method: 'POST',
@@ -2123,7 +2125,18 @@ class MerchandiseModalRenderer {
       }
 
     } catch (error) {
-      console.error('Error updating preview:', error);
+      console.error('❌ Error updating preview:', error);
+      console.error('Error message:', error.message);
+      console.error('Full error object:', error);
+
+      // Try to get API error response
+      try {
+        if (error.response && error.response.data) {
+          console.error('API error response:', error.response.data);
+        }
+      } catch (e) {
+        // Ignore
+      }
 
       if (this.debugMode) {
         this.debugLog(`Error updating preview: ${error.message}`, 'error', error);
