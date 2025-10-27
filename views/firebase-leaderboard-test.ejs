@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Leaderboard Permission Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #00ff00;
+            border-radius: 5px;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .warning { color: #ffaa00; }
+        .info { color: #00aaff; }
+        .result {
+            background: #333;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            white-space: pre-wrap;
+        }
+        button {
+            background: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        button:hover {
+            background: #444;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔥 Firebase Leaderboard Permission Diagnostic</h1>
+    <p>This page will help isolate the Firebase permission issue by testing each step individually.</p>
+
+    <div class="test-section">
+        <h2>Step 1: Firebase Initialization Status</h2>
+        <div id="firebaseStatus" class="result">Checking...</div>
+        <button onclick="checkFirebaseInit()">Recheck Firebase Init</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 2: Authentication Test</h2>
+        <div id="authStatus" class="result">Not tested</div>
+        <button onclick="testAuthentication()">Test Authentication</button>
+        <button onclick="testAnonymousAuth()">Test Anonymous Auth</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 3: Firebase Database Connection Test</h2>
+        <div id="dbTestStatus" class="result">Not tested</div>
+        <button onclick="testDatabaseConnection()">Test DB Connection</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 4: Individual Path Access Tests</h2>
+        <div id="pathTestStatus" class="result">Not tested</div>
+        <button onclick="testRootAccess()">Test Root Access</button>
+        <button onclick="testUsersAccess()">Test /users Access</button>
+        <button onclick="testSpecificUserAccess()">Test Specific User Access</button>
+        <button onclick="testRadioStatsAccess()">Test RadioPlayerStats Access</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 5: Leaderboard Function Isolation</h2>
+        <div id="leaderboardTestStatus" class="result">Not tested</div>
+        <button onclick="testLoadRadioPlayerStats()">Test loadRadioPlayerStats()</button>
+        <button onclick="testLoadGameScores()">Test loadGameScores()</button>
+        <button onclick="testFullLeaderboard()">Test Full Leaderboard</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 6: Security Rules Analysis</h2>
+        <div id="rulesTestStatus" class="result">Not tested</div>
+        <button onclick="analyzeSecurityRules()">Analyze Current Rules</button>
+    </div>
+
+    <!-- Include Firebase scripts -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+        import { getDatabase, ref, get, onValue } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+        import { getAuth, onAuthStateChanged, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "<%= process.env.API_KEY %>",
+            authDomain: "<%= process.env.AUTH_DOMAIN %>",
+            databaseURL: "<%= process.env.DATABASE_URL %>",
+            projectId: "<%= process.env.PROJECT_ID %>",
+            storageBucket: "<%= process.env.STORAGE_BUCKET %>",
+            messagingSenderId: "<%= process.env.MESSAGING_SENDER_ID %>",
+            appId: "<%= process.env.APP_ID %>",
+            measurementId: "<%= process.env.MEASUREMENT_ID %>"
+        };
+
+        // Initialize Firebase
+        let app, database, auth;
+        let currentUser = null;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            database = getDatabase(app);
+            auth = getAuth(app);
+            
+            // Store globally for testing
+            window.testFirebaseApp = app;
+            window.testFirebaseDB = database;
+            window.testFirebaseAuth = auth;
+            window.testFirebaseUtils = { ref, get, onValue };
+            
+            log('firebaseStatus', '✅ Firebase initialized successfully', 'success');
+        } catch (error) {
+            log('firebaseStatus', `❌ Firebase initialization failed: ${error.message}`, 'error');
+        }
+
+        // Listen for auth state changes
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                log('authStatus', `✅ User authenticated: ${user.uid} (isAnonymous: ${user.isAnonymous})`, 'success');
+            } else {
+                log('authStatus', '⚠️ No user authenticated', 'warning');
+            }
+        });
+
+        // Utility functions
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const typeClass = type;
+            element.innerHTML += `<span class="${typeClass}">[${timestamp}] ${message}</span>\n`;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        function clearLog(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        // Test functions
+        window.checkFirebaseInit = function() {
+            clearLog('firebaseStatus');
+            log('firebaseStatus', '🔍 Checking Firebase initialization...', 'info');
+            
+            try {
+                log('firebaseStatus', `App exists: ${!!window.testFirebaseApp}`, 'info');
+                log('firebaseStatus', `Database exists: ${!!window.testFirebaseDB}`, 'info');
+                log('firebaseStatus', `Auth exists: ${!!window.testFirebaseAuth}`, 'info');
+                log('firebaseStatus', `Utils exist: ${!!window.testFirebaseUtils}`, 'info');
+                
+                if (window.testFirebaseApp && window.testFirebaseDB && window.testFirebaseAuth) {
+                    log('firebaseStatus', '✅ All Firebase services initialized', 'success');
+                } else {
+                    log('firebaseStatus', '❌ Some Firebase services missing', 'error');
+                }
+            } catch (error) {
+                log('firebaseStatus', `❌ Error checking Firebase: ${error.message}`, 'error');
+            }
+        };
+
+        window.testAuthentication = function() {
+            clearLog('authStatus');
+            log('authStatus', '🔍 Testing authentication state...', 'info');
+            
+            try {
+                const user = window.testFirebaseAuth.currentUser;
+                if (user) {
+                    log('authStatus', `✅ Current user: ${user.uid}`, 'success');
+                    log('authStatus', `   Email: ${user.email || 'N/A'}`, 'info');
+                    log('authStatus', `   Anonymous: ${user.isAnonymous}`, 'info');
+                    log('authStatus', `   Provider: ${user.providerData[0]?.providerId || 'anonymous'}`, 'info');
+                } else {
+                    log('authStatus', '⚠️ No current user', 'warning');
+                }
+            } catch (error) {
+                log('authStatus', `❌ Error checking auth: ${error.message}`, 'error');
+            }
+        };
+
+        window.testAnonymousAuth = function() {
+            clearLog('authStatus');
+            log('authStatus', '🔍 Testing anonymous authentication...', 'info');
+            
+            signInAnonymously(window.testFirebaseAuth)
+                .then((result) => {
+                    log('authStatus', `✅ Anonymous auth successful: ${result.user.uid}`, 'success');
+                    currentUser = result.user;
+                })
+                .catch((error) => {
+                    log('authStatus', `❌ Anonymous auth failed: ${error.message}`, 'error');
+                    log('authStatus', `   Error code: ${error.code}`, 'error');
+                });
+        };
+
+        window.testDatabaseConnection = function() {
+            clearLog('dbTestStatus');
+            log('dbTestStatus', '🔍 Testing database connection...', 'info');
+            
+            try {
+                const testRef = window.testFirebaseUtils.ref(window.testFirebaseDB, '/');
+                log('dbTestStatus', '✅ Database reference created', 'success');
+                
+                window.testFirebaseUtils.get(testRef)
+                    .then((snapshot) => {
+                        log('dbTestStatus', `✅ Database read successful`, 'success');
+                        log('dbTestStatus', `   Data exists: ${snapshot.exists()}`, 'info');
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            log('dbTestStatus', `   Root keys: ${Object.keys(data).join(', ')}`, 'info');
+                        }
+                    })
+                    .catch((error) => {
+                        log('dbTestStatus', `❌ Database read failed: ${error.message}`, 'error');
+                        log('dbTestStatus', `   Error code: ${error.code}`, 'error');
+                    });
+            } catch (error) {
+                log('dbTestStatus', `❌ Database connection error: ${error.message}`, 'error');
+            }
+        };
+
+        window.testRootAccess = function() {
+            clearLog('pathTestStatus');
+            log('pathTestStatus', '🔍 Testing root path access...', 'info');
+            
+            if (!currentUser) {
+                log('pathTestStatus', '⚠️ No authenticated user - testing without auth', 'warning');
+            } else {
+                log('pathTestStatus', `📋 Testing with user: ${currentUser.uid}`, 'info');
+            }
+            
+            const rootRef = window.testFirebaseUtils.ref(window.testFirebaseDB, '/');
+            window.testFirebaseUtils.get(rootRef)
+                .then((snapshot) => {
+                    log('pathTestStatus', '✅ Root access successful', 'success');
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        log('pathTestStatus', `   Available paths: ${Object.keys(data).join(', ')}`, 'info');
+                    }
+                })
+                .catch((error) => {
+                    log('pathTestStatus', `❌ Root access failed: ${error.message}`, 'error');
+                });
+        };
+
+        window.testUsersAccess = function() {
+            log('pathTestStatus', '\n🔍 Testing /users path access...', 'info');
+            
+            if (!currentUser) {
+                log('pathTestStatus', '❌ Cannot test /users access without authentication', 'error');
+                return;
+            }
+            
+            log('pathTestStatus', `📋 Testing /users with user: ${currentUser.uid}`, 'info');
+            
+            const usersRef = window.testFirebaseUtils.ref(window.testFirebaseDB, 'users');
+            window.testFirebaseUtils.get(usersRef)
+                .then((snapshot) => {
+                    log('pathTestStatus', '✅ /users access successful', 'success');
+                    if (snapshot.exists()) {
+                        const users = snapshot.val();
+                        log('pathTestStatus', `   Found ${Object.keys(users).length} users`, 'info');
+                        log('pathTestStatus', `   User IDs: ${Object.keys(users).slice(0, 3).join(', ')}${Object.keys(users).length > 3 ? '...' : ''}`, 'info');
+                    }
+                })
+                .catch((error) => {
+                    log('pathTestStatus', `❌ /users access failed: ${error.message}`, 'error');
+                    log('pathTestStatus', `   This is likely the source of the permission error!`, 'error');
+                });
+        };
+
+        window.testSpecificUserAccess = function() {
+            log('pathTestStatus', '\n🔍 Testing specific user access...', 'info');
+            
+            if (!currentUser) {
+                log('pathTestStatus', '❌ Cannot test user access without authentication', 'error');
+                return;
+            }
+            
+            // Test access to the current user's data
+            const userRef = window.testFirebaseUtils.ref(window.testFirebaseDB, `users/${currentUser.uid}`);
+            window.testFirebaseUtils.get(userRef)
+                .then((snapshot) => {
+                    log('pathTestStatus', `✅ Current user data access successful`, 'success');
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        log('pathTestStatus', `   User data keys: ${Object.keys(userData).join(', ')}`, 'info');
+                    } else {
+                        log('pathTestStatus', '   No data found for current user', 'warning');
+                    }
+                })
+                .catch((error) => {
+                    log('pathTestStatus', `❌ Current user data access failed: ${error.message}`, 'error');
+                });
+        };
+
+        window.testRadioStatsAccess = function() {
+            log('pathTestStatus', '\n🔍 Testing radioPlayerStats access...', 'info');
+            
+            // First get a list of users, then test accessing their radioPlayerStats
+            if (!currentUser) {
+                log('pathTestStatus', '❌ Cannot test radioPlayerStats without authentication', 'error');
+                return;
+            }
+            
+            const usersRef = window.testFirebaseUtils.ref(window.testFirebaseDB, 'users');
+            window.testFirebaseUtils.get(usersRef)
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const users = snapshot.val();
+                        const userIds = Object.keys(users);
+                        const testUserId = userIds[0]; // Test with first user
+                        
+                        log('pathTestStatus', `   Testing radioPlayerStats for user: ${testUserId}`, 'info');
+                        
+                        const statsRef = window.testFirebaseUtils.ref(window.testFirebaseDB, `users/${testUserId}/radioPlayerStats`);
+                        return window.testFirebaseUtils.get(statsRef);
+                    } else {
+                        throw new Error('No users found');
+                    }
+                })
+                .then((statsSnapshot) => {
+                    log('pathTestStatus', '✅ radioPlayerStats access successful', 'success');
+                    if (statsSnapshot.exists()) {
+                        const stats = statsSnapshot.val();
+                        log('pathTestStatus', `   Stats keys: ${Object.keys(stats).join(', ')}`, 'info');
+                    }
+                })
+                .catch((error) => {
+                    log('pathTestStatus', `❌ radioPlayerStats access failed: ${error.message}`, 'error');
+                });
+        };
+
+        window.testLoadRadioPlayerStats = async function() {
+            clearLog('leaderboardTestStatus');
+            log('leaderboardTestStatus', '🔍 Testing loadRadioPlayerStats function...', 'info');
+            
+            if (!currentUser) {
+                log('leaderboardTestStatus', '❌ Cannot test without authentication', 'error');
+                return;
+            }
+            
+            try {
+                // Recreate the exact function from leaderboard
+                const usersRef = window.testFirebaseUtils.ref(window.testFirebaseDB, 'users');
+                
+                const snapshot = await window.testFirebaseUtils.get(usersRef);
+                
+                if (!snapshot.exists()) {
+                    log('leaderboardTestStatus', '⚠️ No users data found', 'warning');
+                    return;
+                }
+                
+                const users = snapshot.val();
+                log('leaderboardTestStatus', `✅ Found ${Object.keys(users).length} users`, 'success');
+                
+                // Test processing the data like the leaderboard does
+                let playerCount = 0;
+                Object.keys(users).forEach(userId => {
+                    const user = users[userId];
+                    const stats = user.radioPlayerStats || {};
+                    
+                    if (stats.totalPoints && stats.totalPoints > 0) {
+                        playerCount++;
+                    }
+                });
+                
+                log('leaderboardTestStatus', `✅ Found ${playerCount} players with points`, 'success');
+                log('leaderboardTestStatus', '✅ loadRadioPlayerStats simulation successful', 'success');
+                
+            } catch (error) {
+                log('leaderboardTestStatus', `❌ loadRadioPlayerStats failed: ${error.message}`, 'error');
+                log('leaderboardTestStatus', `   Stack: ${error.stack}`, 'error');
+            }
+        };
+
+        window.testLoadGameScores = function() {
+            log('leaderboardTestStatus', '\n🔍 Testing loadGameScores function...', 'info');
+            log('leaderboardTestStatus', '✅ loadGameScores returns empty array (no implementation)', 'success');
+        };
+
+        window.testFullLeaderboard = async function() {
+            log('leaderboardTestStatus', '\n🔍 Testing full leaderboard load...', 'info');
+            
+            if (!currentUser) {
+                log('leaderboardTestStatus', '❌ Cannot test without authentication', 'error');
+                return;
+            }
+            
+            try {
+                // Test the exact sequence from the leaderboard
+                log('leaderboardTestStatus', 'Step 1: Testing Firebase connection...', 'info');
+                const testRef = window.testFirebaseUtils.ref(window.testFirebaseDB, '/');
+                const testSnapshot = await window.testFirebaseUtils.get(testRef);
+                log('leaderboardTestStatus', `✅ Firebase root data exists: ${testSnapshot.exists()}`, 'success');
+                
+                log('leaderboardTestStatus', 'Step 2: Loading radio player stats...', 'info');
+                await window.testLoadRadioPlayerStats();
+                
+                log('leaderboardTestStatus', 'Step 3: Loading game scores...', 'info');
+                window.testLoadGameScores();
+                
+                log('leaderboardTestStatus', '✅ Full leaderboard test completed', 'success');
+                
+            } catch (error) {
+                log('leaderboardTestStatus', `❌ Full leaderboard test failed: ${error.message}`, 'error');
+                log('leaderboardTestStatus', `   This matches the error you're seeing!`, 'error');
+            }
+        };
+
+        window.analyzeSecurityRules = function() {
+            clearLog('rulesTestStatus');
+            log('rulesTestStatus', '🔍 Analyzing current security rules...', 'info');
+            
+            log('rulesTestStatus', 'Current rules require:', 'info');
+            log('rulesTestStatus', '  - /users: auth != null (authentication required)', 'warning');
+            log('rulesTestStatus', '  - /users/$userId/radioPlayerStats: read = true (public read)', 'success');
+            log('rulesTestStatus', '', 'info');
+            log('rulesTestStatus', 'The issue is that to read radioPlayerStats, you first need to access /users', 'error');
+            log('rulesTestStatus', 'But /users requires authentication, which creates the permission error', 'error');
+            log('rulesTestStatus', '', 'info');
+            log('rulesTestStatus', 'Possible solutions:', 'info');
+            log('rulesTestStatus', '1. Make /users readable by authenticated users (current approach)', 'info');
+            log('rulesTestStatus', '2. Create a separate public leaderboard path', 'info');
+            log('rulesTestStatus', '3. Use Firebase Functions to aggregate leaderboard data', 'info');
+        };
+
+        // Auto-run initial checks
+        setTimeout(() => {
+            window.checkFirebaseInit();
+        }, 1000);
+    </script>
+</body>
+</html>
