@@ -268,60 +268,61 @@ class GlobalImageCache {
 
   /**
    * Get enhanced image from global cache
-   * @param {string} contentHash - Content hash of original image
+   * Supports both simple content hash and product-specific cache keys
+   * @param {string} cacheKey - Content hash OR product-specific key (contentHash-productKey)
    * @returns {Promise<Object|null>} Enhanced image data or null
    */
-  async getGlobalEnhancedImage(contentHash) {
+  async getGlobalEnhancedImage(cacheKey) {
     try {
       this.initializeDatabase();
-      
+
       console.log('🔍 FIREBASE LOOKUP: Checking for enhanced image...');
-      console.log(`📍 Looking up: globalImageCache/enhancedImages/${contentHash}`);
-      
-      const snapshot = await this.globalCacheRef.child(contentHash).once('value');
-      
+      console.log(`📍 Looking up: globalImageCache/enhancedImages/${cacheKey}`);
+
+      const snapshot = await this.globalCacheRef.child(cacheKey).once('value');
+
       if (snapshot.exists()) {
         const enhancedData = snapshot.val();
-        
+
         console.log('✅ FIREBASE LOOKUP SUCCESS:');
-        console.log(`   Content Hash: ${contentHash}`);
+        console.log(`   Cache Key: ${cacheKey}`);
         console.log(`   Enhancement URL: ${enhancedData.enhancedImageUrl}`);
         console.log(`   S3 Key: ${enhancedData.s3Key}`);
         console.log(`   Method: ${enhancedData.enhancementMethod}`);
         console.log(`   Created: ${new Date(enhancedData.createdAt).toISOString()}`);
         console.log(`   Usage Count: ${enhancedData.usageCount}`);
-        
+
         // Update usage statistics
         console.log('📊 Updating usage statistics...');
-        await this.globalCacheRef.child(contentHash).update({
+        await this.globalCacheRef.child(cacheKey).update({
           usageCount: admin.database.ServerValue.increment(1),
           lastUsedAt: admin.database.ServerValue.TIMESTAMP
         });
-        
+
         // Update cache statistics
         await this.updateCacheStats('cache_hits', 1);
-        
-        console.log(`🎯 Cache HIT: Global enhanced image found for ${contentHash}`);
-        
+
+        console.log(`🎯 Cache HIT: Global enhanced image found for ${cacheKey}`);
+
         return enhancedData;
       }
-      
+
       console.log('❌ FIREBASE LOOKUP MISS:');
-      console.log(`   Content Hash: ${contentHash}`);
-      console.log(`   Path checked: globalImageCache/enhancedImages/${contentHash}`);
+      console.log(`   Cache Key: ${cacheKey}`);
+      console.log(`   Path checked: globalImageCache/enhancedImages/${cacheKey}`);
       console.log(`   Result: No enhanced image found`);
-      
+
       // Update cache statistics
       await this.updateCacheStats('cache_misses', 1);
-      
+
       return null;
-      
+
     } catch (error) {
       console.error('❌ FIREBASE LOOKUP FAILED:');
-      console.error(`   Content Hash: ${contentHash}`);
+      console.error(`   Cache Key: ${cacheKey}`);
       console.error(`   Error: ${error.message}`);
       console.error(`   Stack: ${error.stack}`);
-      
+
       return null;
     }
   }

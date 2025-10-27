@@ -15,13 +15,84 @@
 const Sharp = require('sharp');
 const axios = require('axios');
 const path = require('path');
+const crypto = require('crypto');
 const productSpecifications = require('../config/productSpecifications');
 const productTemplates = require('../config/productTemplates');
+const GlobalImageCache = require('./global-image-cache');
 
 class ImageOptimizer {
   constructor() {
     this.maxProcessingTime = 180000; // 3 minutes max
     this.progressCallbacks = [];
+    this.globalCache = new GlobalImageCache();
+  }
+
+  /**
+   * Generate content-based fingerprint for image
+   * @param {Buffer} imageBuffer - Image data
+   * @returns {string} SHA-256 hash
+   */
+  generateImageFingerprint(imageBuffer) {
+    return crypto.createHash('sha256').update(imageBuffer).digest('hex');
+  }
+
+  /**
+   * Generate product-specific cache key
+   * Enables separate cache entries for each product type
+   * @param {string} contentHash - Image content hash
+   * @param {string} productKey - Product identifier
+   * @returns {string} Product-specific cache key
+   */
+  generateProductCacheKey(contentHash, productKey) {
+    return `${contentHash}-${productKey}`;
+  }
+
+  /**
+   * Check if optimized version exists in cache for this product
+   * @param {Buffer} imageBuffer - Original image
+   * @param {string} productKey - Product identifier
+   * @returns {Promise<Object>} Cache result with optimized buffer or null
+   */
+  async checkProductCache(imageBuffer, productKey) {
+    try {
+      const contentHash = this.generateImageFingerprint(imageBuffer);
+      const productCacheKey = this.generateProductCacheKey(contentHash, productKey);
+
+      this.emitProgress('CACHE_CHECK', `Checking cache for optimized version...`);
+
+      // Check if we have this exact optimization cached
+      const cachedEnhancedData = await this.globalCache.getGlobalEnhancedImage(productCacheKey);
+
+      if (cachedEnhancedData && cachedEnhancedData.enhancedImageUrl) {
+        console.log(`⚡ CACHE HIT: Found optimized image for ${productKey}`);
+        console.log(`   Previously optimized ${cachedEnhancedData.usageCount} times`);
+        console.log(`   Original enhancement took ${cachedEnhancedData.processingTime}ms`);
+
+        this.emitProgress('CACHE_HIT', `✨ Using cached optimization from ${cachedEnhancedData.usageCount} other users!`, 100);
+
+        return {
+          cached: true,
+          enhancedImageUrl: cachedEnhancedData.enhancedImageUrl,
+          s3Key: cachedEnhancedData.s3Key,
+          metadata: {
+            originalDimensions: cachedEnhancedData.originalDimensions,
+            enhancedDimensions: cachedEnhancedData.enhancedDimensions,
+            scaleFactor: cachedEnhancedData.scaleFactor,
+            processingTime: cachedEnhancedData.processingTime,
+            usageCount: cachedEnhancedData.usageCount,
+            enhancementMethod: cachedEnhancedData.enhancementMethod,
+            createdAt: cachedEnhancedData.createdAt
+          }
+        };
+      }
+
+      console.log(`📦 CACHE MISS: No optimization found for ${productKey}, will process...`);
+      return { cached: false };
+
+    } catch (error) {
+      console.warn('Cache check error (proceeding with optimization):', error.message);
+      return { cached: false, error: error.message };
+    }
   }
 
   /**
@@ -430,6 +501,65 @@ class ImageOptimizer {
     return await Sharp(imageBuffer)
       .jpeg({ quality: 90, progressive: true })
       .toBuffer();
+  }
+
+  /**
+   * Store optimized image in cache for reuse across users/products
+   * @param {Buffer} originalBuffer - Original image
+   * @param {Buffer} optimizedBuffer - Optimized image
+   * @param {string} productKey - Product identifier
+   * @param {Object} analysis - Image analysis result
+   * @param {number} processingTime - Time taken to optimize
+   * @param {string} enhancedImageUrl - S3 URL of optimized image
+   * @param {string} s3Key - S3 storage key
+   * @returns {Promise<Object>} Cache storage result
+   */
+  async storeCachedOptimization(originalBuffer, optimizedBuffer, productKey, analysis, processingTime, enhancedImageUrl, s3Key) {
+    try {
+      const contentHash = this.generateImageFingerprint(originalBuffer);
+      const productCacheKey = this.generateProductCacheKey(contentHash, productKey);
+
+      const enhancementData = {
+        enhancedImageUrl,
+        s3Key,
+        enhancementMethod: 'ImageOptimizer-product-specific',
+        originalDimensions: {
+          width: analysis.currentDimensions.width,
+          height: analysis.currentDimensions.height
+        },
+        enhancedDimensions: {
+          width: analysis.targetDimensions.width,
+          height: analysis.targetDimensions.height
+        },
+        scaleFactor: analysis.scaleFactor,
+        qualityMetrics: {
+          targetDpi: analysis.targetDpi,
+          strategy: analysis.strategy,
+          compressionApplied: true
+        },
+        processingTime,
+        fileSize: optimizedBuffer.length
+      };
+
+      console.log(`💾 Storing optimized image in cache...`);
+      console.log(`   Cache Key: ${productCacheKey}`);
+      console.log(`   Product: ${analysis.product}`);
+
+      const result = await this.globalCache.storeGlobalEnhancedImage(productCacheKey, enhancementData);
+
+      if (result.success) {
+        console.log(`✅ Cache storage successful`);
+        console.log(`   Future users will benefit from this optimization!`);
+        return { success: true, cacheKey: productCacheKey };
+      } else {
+        console.warn(`⚠️ Cache storage failed: ${result.error}`);
+        return { success: false, error: result.error };
+      }
+
+    } catch (error) {
+      console.warn('Cache storage error (optimization still successful):', error.message);
+      return { success: false, error: error.message };
+    }
   }
 
   /**
