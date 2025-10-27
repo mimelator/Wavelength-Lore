@@ -228,65 +228,94 @@ class ChatbotAdmin {
       return;
     }
 
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-      terminal: true
-    });
-
-    // Ensure proper cleanup
-    const cleanup = () => {
-      rl.close();
-      process.exit(0);
-    };
-
-    // Handle Ctrl+C gracefully
-    process.on('SIGINT', () => {
-      console.log(chalk.yellow('\n🛑 Interrupted by user. Goodbye!'));
-      cleanup();
-    });
-
-    const askQuestion = () => {
-      rl.question(chalk.cyan('🤖 Ask: '), async (question) => {
-        if (!question) {
-          console.log(chalk.yellow('Please enter a question or "exit" to quit.'));
-          askQuestion();
-          return;
-        }
-
-        if (question.toLowerCase().trim() === 'exit') {
-          console.log(chalk.green('\n👋 Goodbye! Chat session ended.'));
-          cleanup();
-          return;
-        }
-
-        if (!question.trim()) {
-          console.log(chalk.yellow('Please enter a question or "exit" to quit.'));
-          askQuestion();
-          return;
-        }
-
-        try {
-          console.log(chalk.gray('🤔 Thinking...'));
-          const response = await this.sendMessage(question.trim());
-          
-          if (response.success) {
-            console.log(chalk.green(`💡 Answer: ${response.message}`));
-            console.log(chalk.gray(`⏱️  Response time: ${response.responseTime}ms\n`));
-          } else {
-            console.log(chalk.red(`❌ Error: ${response.error}\n`));
-          }
-        } catch (error) {
-          console.log(chalk.red(`❌ Connection error: ${error.message}\n`));
-        }
-
-        // Continue the conversation
-        setImmediate(askQuestion);
+    // Return a promise that resolves when the chat session ends
+    return new Promise((resolve) => {
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+        terminal: true
       });
-    };
 
-    // Start the conversation
-    askQuestion();
+      // Ensure proper cleanup
+      const cleanup = () => {
+        rl.close();
+        resolve();
+      };
+
+      // Handle Ctrl+C gracefully
+      const sigintHandler = () => {
+        console.log(chalk.yellow('\n🛑 Interrupted by user. Goodbye!'));
+        cleanup();
+      };
+      
+      process.on('SIGINT', sigintHandler);
+
+      // Handle readline close event
+      rl.on('close', () => {
+        console.log(chalk.green('\n👋 Chat session ended.'));
+        process.removeListener('SIGINT', sigintHandler);
+        resolve();
+      });
+
+      const askQuestion = () => {
+        // Check if readline is still open before asking
+        if (rl.closed) {
+          return;
+        }
+        
+        rl.question(chalk.cyan('🤖 Ask: '), async (question) => {
+          // Handle EOF (Ctrl+D or piped input ending)
+          if (question === null) {
+            console.log(chalk.green('\n👋 Goodbye! Chat session ended.'));
+            process.removeListener('SIGINT', sigintHandler);
+            cleanup();
+            return;
+          }
+          
+          if (!question) {
+            console.log(chalk.yellow('Please enter a question or "exit" to quit.'));
+            setImmediate(askQuestion);
+            return;
+          }
+
+          if (question.toLowerCase().trim() === 'exit') {
+            console.log(chalk.green('\n👋 Goodbye! Chat session ended.'));
+            process.removeListener('SIGINT', sigintHandler);
+            cleanup();
+            return;
+          }
+
+          if (!question.trim()) {
+            console.log(chalk.yellow('Please enter a question or "exit" to quit.'));
+            setImmediate(askQuestion);
+            return;
+          }
+
+          try {
+            console.log(chalk.gray('🤔 Thinking...'));
+            const response = await this.sendMessage(question.trim());
+            
+            if (response.success) {
+              console.log(chalk.green(`💡 Answer: ${response.message}`));
+              console.log(chalk.gray(`⏱️  Response time: ${response.responseTime}ms\n`));
+            } else {
+              console.log(chalk.red(`❌ Error: ${response.error}\n`));
+            }
+          } catch (error) {
+            console.log(chalk.red(`❌ Connection error: ${error.message}\n`));
+          }
+
+          // Continue the conversation only if readline is still open
+          if (!rl.closed) {
+            setImmediate(askQuestion);
+          }
+        });
+      };
+
+      // Start the conversation
+      console.log(chalk.gray('Ready for your first question...'));
+      askQuestion();
+    });
   }
 
   /**
