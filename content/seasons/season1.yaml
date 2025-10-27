@@ -148,6 +148,11 @@ episodes:
       Wavelength focuses on the importance of relationships and the power of
       love and connection. The song emphasizes the significance of hearing and
       expressing love through simple yet meaningful words.
+    cliffhanger_hook: >-
+      But as Wavelength celebrates the power of love and connection, dark forces are already mobilizing in the shadows, preparing to test whether their bonds are strong enough to survive the storm that's coming.
+    next_episode_tease: >-
+      Love will be their greatest strength—and their most vulnerable target.
+    cta_tagline: Can love keep them together when everything falls apart?
   episode11:
     audio: /images/seasons/season1/episodes/episode11/BackToTheShire_v18.mp3
     carouselImages:
@@ -239,6 +244,11 @@ episodes:
       community, and gifted artisanship. The song celebrates the simple
       pleasures of life in the Shire and the sense of belonging that comes from
       being part of a close-knit community.
+    cliffhanger_hook: >-
+      But as Wavelength's triumphant return fills the Shire with celebration, a sinister presence watches from the shadows, knowing that this moment of perfect peace is the ideal time to strike and shatter their world forever.
+    next_episode_tease: >-
+      The greatest victories often precede the darkest defeats.
+    cta_tagline: What happens when paradise becomes a target?
   episode2:
     audio: /images/seasons/season1/episodes/episode2/JumpRightIn_v25.mp3
     carouselImages:
@@ -316,6 +326,11 @@ episodes:
       experiences, which is especially important to them as they are a touring
       band and love to explore new places and meet new people, cultures, and
       ideas.
+    cliffhanger_hook: >-
+      But as Wavelength encourages everyone to jump right in, they remain unaware that something sinister has already taken the leap—lurking in the shadows, ready to strike when they least expect it.
+    next_episode_tease: >-
+      Sometimes taking chances means facing the consequences of what follows.
+    cta_tagline: What happens when courage meets chaos?
   episode3:
     audio: /images/seasons/season1/episodes/episode3/DreamWithMe_v5.mp3
     carouselImages:
@@ -390,6 +405,11 @@ episodes:
       challenges. The lyrics convey a sense of hope and optimism, encouraging
       listeners to believe in the possibility of a brighter future when people
       come together with a common purpose.
+    cliffhanger_hook: >-
+      But as the Shire folk drift into peaceful dreams, a nightmare begins to stir in the depths of the goblin realm, where dark visions of conquest and revenge consume the Goblin King's restless sleep.
+    next_episode_tease: >-
+      When dreams collide with nightmares, which vision will shape reality?
+    cta_tagline: Can shared dreams overcome dark nightmares?
   episode4:
     audio: https://df5sj8f594cdx.cloudfront.net/audio/season1/episode4.mp3
     carouselImages:
@@ -445,10 +465,8 @@ episodes:
       explores themes of attraction, desire, and the allure of beauty, many of
       which King David expresses for Daphne.
     cliffhanger_hook: >-
-      But when the haunting rhythm of Daphne’s drums echoes through the Shire, a
+      But when the haunting rhythm of Daphne's drums echoes through the Shire, a
       shadow looms on the horizon, hinting at a darkness that has yet to awaken.
-      NEXT_EPISODE_TEASE: As whispers of the Goblin King's return grow louder,
-      Wavelength must unite to protect their home and their hearts.
     next_episode_tease: >-
       As whispers of the Goblin King's return grow louder, Wavelength must unite
       to protect their home and their hearts.
@@ -501,13 +519,7 @@ episodes:
       ah-ha-ha-ha I am falling in love with you  Time marches forward and things
       aren't as easy now I keep coming back to the things that matter most to me
     story: >-
-      I'm sorry, but I don't have information about an episode titled
-      \"Falling\" from the season \"Prelude: Life in the Shire.\" However, I can
-      provide detailed summaries of episodes from other seasons of Wavelength,
-      such as the conflicts and resolutions in episodes like \"Countdown,\" \"A
-      Misery of Goblins,\" or \"Slow Time.\" Let me know if you'd like to hear
-      about any of those or explore another aspect of the Wavelength-Lore
-      universe!
+      In the emotionally charged episode "Falling" from the "Prelude: Life in the Shire," Wavelength faces their most vulnerable moments as the weight of loss and heartbreak threatens to tear the band apart. As they struggle with the aftermath of Maurice's death and the growing tension with the Goblin King, each member confronts their own fears of falling - falling apart, falling behind, or falling into despair. Through haunting melodies and raw emotional performances, this episode explores themes of vulnerability, resilience, and the courage it takes to keep moving forward when everything seems to be crumbling. The Shire folk witness Wavelength's most human side as they learn that sometimes falling is the first step toward finding the strength to rise again.
     title: Falling
     youtubeLink: https://youtu.be/LKDfiCHGeNs
     original_story_summary: >-
@@ -515,15 +527,10 @@ episodes:
       love and the joy that comes with it. Perhaps foreshadowing what Daphne and
       her partner might feel for each other as their relationship blossoms.
     cliffhanger_hook: >-
-      But when the shadows of the Goblin King loomed over the Shire, a chilling
-      whisper echoed through the trees, revealing a betrayal that could shatter
-      their last hope. NEXT_EPISODE_TEASE: As Wavelength races against time,
-      they must unearth ancient secrets to reclaim their home before darkness
-      consumes them all.
+      But as the melody of love fades, a shadow falls across the Shire, and the whispers of an ancient darkness begin to stir, threatening to turn their falling in love into a fall from grace.
     next_episode_tease: >-
-      As Wavelength races against time, they must unearth ancient secrets to
-      reclaim their home before darkness consumes them all.
-    cta_tagline: Will friendship triumph over dark treachery?
+      Love may bloom, but can it survive when the very ground beneath them starts to crumble?
+    cta_tagline: Will love conquer the coming storm?
   episode6:
     audio: /images/seasons/season1/episodes/episode6/OnceMore_v20.mp3
     carouselImages:
@@ -587,6 +594,11 @@ episodes:
       importance of remembering loved ones who have passed away. The song
       reflects on the enduring impact that these individuals have on our lives
       and the comfort that comes from holding onto their memory.
+    cliffhanger_hook: >-
+      But as Wavelength honors the memory of those they've lost, a chilling realization dawns—their song of remembrance has awakened something that was meant to stay buried, and now the past threatens to consume the present.
+    next_episode_tease: >-
+      Some memories are doors that should never be opened.
+    cta_tagline: What price comes with remembering the forgotten?
   episode7:
     audio: /images/seasons/season1/episodes/episode7/HistoryLessons_v8.mp3
     carouselImages:
@@ -625,11 +637,7 @@ episodes:
       remember you  la-da-da-da-da (I will remember) You're a precious jewel who
       Shines with the stars at night   forever, I'll remember you
     story: >-
-      I'm sorry, but I don't have information about an episode titled \"History
-      Lessons\" from the Wavelength universe. However, I can help you with
-      summaries and details from other episodes like \"Countdown,\" \"A Misery
-      of Goblins,\" or \"Slow Time.\" If you'd like to know more about those,
-      just let me know!
+      In the profound episode "History Lessons" from the "Prelude: Life in the Shire," Wavelength delves deep into the ancient lore and forgotten wisdom of their world. As they uncover the true history of the Shire and the long-standing conflict with the Goblin King, the band discovers that the patterns of the past are repeating themselves. Through haunting melodies that echo through time, they learn that understanding history is not just about remembering the past, but about recognizing the lessons that can guide them through present challenges. This episode serves as both a memorial to those lost and a roadmap for the battles ahead, as Wavelength realizes that their music carries the weight of generations.
     title: History Lessons
     youtubeLink: https://youtu.be/PTTLo-Oetl4
     original_story_summary: >-
@@ -641,8 +649,7 @@ episodes:
       But when Wavelength discovers a hidden prophecy buried deep within the
       ancient ruins of the Shire, they realize that the fate of their world
       hinges on a choice that could either unite the Shirefolk or doom them to
-      eternal servitude under the Goblin King. NEXT_EPISODE_TEASE: As secrets
-      unravel, alliances will be tested like never before.
+      eternal servitude under the Goblin King.
     next_episode_tease: As secrets unravel, alliances will be tested like never before.
     cta_tagline: Will they rise or fall in darkness?
   episode8:
@@ -725,8 +732,6 @@ episodes:
       But when a shadow looms over the horizon, the once-peaceful melodies of
       the Shire are drowned out by the sinister chants of the Goblin King,
       threatening to shatter their tranquil existence forever.
-      NEXT_EPISODE_TEASE: As darkness descends, the Shire Folk must rally
-      together to defend their home against an encroaching misery.
     next_episode_tease: >-
       As darkness descends, the Shire Folk must rally together to defend their
       home against an encroaching misery.
@@ -808,6 +813,11 @@ episodes:
       nature. The song emphasizes the therapeutic power of connecting with the
       natural world and the comfort that comes from being surrounded by its
       beauty.
+    cliffhanger_hook: >-
+      But as Wavelength feeds the crows with hope and healing, they unknowingly attract a different kind of scavenger—one that feeds on despair and grows stronger with each act of kindness it corrupts.
+    next_episode_tease: >-
+      Sometimes the greatest acts of mercy become the deadliest traps.
+    cta_tagline: Can compassion survive when it becomes a weapon?
 image: /images/seasons/season1/image.webp
 seasonLink: >-
   https://youtube.com/playlist?list=PLO3KUVl6gwUb_ZrCoj7-ev92oC9Rvo0aH&si=9wxVs9LrMiCFfu85

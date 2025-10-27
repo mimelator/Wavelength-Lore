@@ -113,6 +113,16 @@
                     </p>
                 </div>
                 <% } %>
+
+                <!-- Next Episode Tease Section -->
+                <% if (typeof next_episode_tease !== 'undefined' && next_episode_tease) { %>
+                <div class="next-episode-tease" style="margin-top: 15px; padding: 12px 18px; background: linear-gradient(135deg, rgba(138, 43, 226, 0.08), rgba(75, 0, 130, 0.08)); border: 1px solid rgba(138, 43, 226, 0.2); border-radius: 10px; position: relative;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.03), transparent 50%); pointer-events: none;"></div>
+                    <p style="margin: 0; color: #8a2be2; font-weight: 500; font-size: 1rem; position: relative; z-index: 1;">
+                        <span style="color: #ffd700; font-weight: bold;">↪️ Coming Next:</span> <%- next_episode_tease %>
+                    </p>
+                </div>
+                <% } %>
             </div>
         </section>
 

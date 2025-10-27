@@ -357,6 +357,43 @@
             </div>
         </div>
 
+        <!-- Effect Customization Panel -->
+        <div class="card full-width" id="effectsPanel" style="display: none;">
+            <h2>✨ Customize with Effects</h2>
+
+            <!-- Effect Presets -->
+            <div class="control-group">
+                <label>Effect Presets:</label>
+                <div class="preset-buttons" id="presetButtons" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;"></div>
+            </div>
+
+            <!-- Custom Effect Sliders -->
+            <div class="control-group" id="customEffectsContainer">
+                <label>Custom Effect Parameters:</label>
+                <div id="effectSliders" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;"></div>
+            </div>
+
+            <!-- Before/After Toggle -->
+            <div class="control-group">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: normal;">
+                    <input type="checkbox" id="beforeAfterToggle" style="width: auto; cursor: pointer;">
+                    <span>Show Before/After Comparison</span>
+                </label>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="applyEffects()" style="flex: 1;">🎨 Apply Effects</button>
+                <button onclick="closeEffectsPanel()" style="flex: 1; background: #ccc; color: #333;">Cancel</button>
+            </div>
+
+            <!-- Effect Preview -->
+            <div id="effectsPreview" style="margin-top: 20px; text-align: center; display: none;">
+                <h3 style="color: #667eea; margin-bottom: 10px;">Customized Preview</h3>
+                <img id="effectsPreviewImage" src="" alt="Effects Preview" style="max-height: 400px; max-width: 100%; border-radius: 6px; border: 2px solid #667eea;">
+            </div>
+        </div>
+
         <!-- Logs -->
         <div class="card full-width">
             <h2>Live Logs</h2>
@@ -463,6 +500,238 @@
             previewContainer.appendChild(viewLink);
 
             addLog(`Image ready at: ${imageUrl}`, 'info');
+
+            // Show effects panel when image is displayed
+            setTimeout(() => showEffectsPanel(), 500);
+        }
+
+        // ============================================================
+        // EFFECTS SYSTEM FUNCTIONS
+        // ============================================================
+
+        let availableEffects = {};
+        let currentEffectParams = {};
+        let lastUpscaledImageUrl = null;
+
+        async function loadEffects() {
+            try {
+                const response = await fetch('/api/merchandise/openai-upscaler/effects-list');
+                const data = await response.json();
+
+                if (data.success) {
+                    availableEffects = data;
+                    console.log('✨ Loaded effects:', data);
+                    renderEffectsUI();
+                }
+            } catch (error) {
+                console.error('Error loading effects:', error);
+                addLog(`❌ Could not load effects: ${error.message}`, 'error');
+            }
+        }
+
+        function renderEffectsUI() {
+            // Render preset buttons
+            const presetsContainer = document.getElementById('presetButtons');
+            presetsContainer.innerHTML = '';
+
+            availableEffects.presets.forEach(preset => {
+                const btn = document.createElement('button');
+                btn.textContent = `${preset.icon} ${preset.name}`;
+                btn.className = 'preset-btn';
+                btn.style.padding = '10px';
+                btn.style.background = 'white';
+                btn.style.border = '2px solid #667eea';
+                btn.style.borderRadius = '6px';
+                btn.style.cursor = 'pointer';
+                btn.style.fontWeight = '600';
+                btn.style.color = '#667eea';
+                btn.style.transition = 'all 0.3s';
+
+                btn.onclick = () => selectPreset(preset.id, btn);
+                presetsContainer.appendChild(btn);
+            });
+
+            // Render effect sliders
+            const slidersContainer = document.getElementById('effectSliders');
+            slidersContainer.innerHTML = '';
+
+            // Custom category has all effects
+            const customCategory = availableEffects.categories.find(c => c.id === 'custom');
+            if (customCategory) {
+                customCategory.effects.forEach(effectKey => {
+                    const effect = availableEffects.effectTypes[effectKey];
+                    if (effect && effect.type === 'slider') {
+                        const sliderGroup = createEffectSlider(effectKey, effect);
+                        slidersContainer.appendChild(sliderGroup);
+                    }
+                });
+            }
+        }
+
+        function createEffectSlider(effectKey, effectConfig) {
+            const container = document.createElement('div');
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.gap = '5px';
+
+            const label = document.createElement('label');
+            label.textContent = `${effectConfig.name}`;
+            label.style.fontSize = '0.9em';
+            label.style.fontWeight = '600';
+            label.style.color = '#333';
+
+            const input = document.createElement('input');
+            input.type = 'range';
+            input.min = effectConfig.min;
+            input.max = effectConfig.max;
+            input.step = effectConfig.step || 0.1;
+            input.value = effectConfig.default;
+            input.id = `effect-${effectKey}`;
+            input.style.cursor = 'pointer';
+            input.style.width = '100%';
+
+            const valueDisplay = document.createElement('span');
+            valueDisplay.textContent = `${effectConfig.default.toFixed(2)} ${effectConfig.unit || ''}`;
+            valueDisplay.style.fontSize = '0.85em';
+            valueDisplay.style.color = '#666';
+            valueDisplay.style.textAlign = 'center';
+
+            input.oninput = () => {
+                currentEffectParams[effectKey] = parseFloat(input.value);
+                valueDisplay.textContent = `${parseFloat(input.value).toFixed(2)} ${effectConfig.unit || ''}`;
+            };
+
+            // Initialize current param
+            currentEffectParams[effectKey] = effectConfig.default;
+
+            container.appendChild(label);
+            container.appendChild(input);
+            container.appendChild(valueDisplay);
+
+            return container;
+        }
+
+        function selectPreset(presetId, buttonElement) {
+            // Update active button
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.style.background = 'white';
+                btn.style.color = '#667eea';
+            });
+            buttonElement.style.background = '#667eea';
+            buttonElement.style.color = 'white';
+
+            // Load preset effects
+            const preset = availableEffects.presets.find(p => p.id === presetId);
+            if (preset) {
+                currentEffectParams = { ...preset.effects };
+                updateSliders();
+                addLog(`✨ Loaded preset: ${preset.name}`, 'info');
+            }
+        }
+
+        function updateSliders() {
+            Object.entries(currentEffectParams).forEach(([key, value]) => {
+                const slider = document.getElementById(`effect-${key}`);
+                if (slider) {
+                    slider.value = value;
+                    // Trigger display update
+                    slider.dispatchEvent(new Event('input'));
+                }
+            });
+        }
+
+        function showEffectsPanel() {
+            const panel = document.getElementById('effectsPanel');
+            if (panel) {
+                panel.style.display = 'block';
+                addLog('💡 Effects customization panel is ready!', 'info');
+            }
+        }
+
+        function closeEffectsPanel() {
+            const panel = document.getElementById('effectsPanel');
+            if (panel) {
+                panel.style.display = 'none';
+            }
+        }
+
+        async function applyEffects() {
+            if (!lastUpscaledImageUrl) {
+                addLog('❌ No upscaled image available. Run a test first!', 'error');
+                return;
+            }
+
+            addLog('🎨 Applying effects to image...', 'info');
+            updateProgress(30);
+
+            try {
+                // Find selected preset
+                let presetId = 'custom';
+                const presetButtons = document.querySelectorAll('.preset-btn');
+                presetButtons.forEach(btn => {
+                    if (btn.style.background === 'rgb(102, 126, 234)') {
+                        // Extract preset ID from button (approximate)
+                        presetId = 'custom'; // Default to custom
+                    }
+                });
+
+                const response = await fetch('/api/merchandise/openai-upscaler/apply-effects', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        upscaledImageUrl: lastUpscaledImageUrl,
+                        effectsPreset: presetId,
+                        effectParams: currentEffectParams
+                    })
+                });
+
+                updateProgress(70);
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    addLog(`✅ Effects applied successfully in ${data.analysis.processingTime}ms`, 'success');
+                    addLog(`   Processed size: ${(data.analysis.processedSize / 1024).toFixed(2)} KB`, 'info');
+
+                    if (data.metadata.customizedImageUrl) {
+                        // Display customized image
+                        displayCustomizedImage(data.metadata.customizedImageUrl, 'Customized Image');
+                        addLog(`🖼️ Customized image ready for viewing`, 'success');
+                    }
+                } else {
+                    addLog(`❌ Effects failed: ${data.error}`, 'error');
+                    if (data.details) {
+                        addLog(`   Details: ${data.details}`, 'error');
+                    }
+                }
+
+                updateProgress(100);
+
+            } catch (error) {
+                addLog(`❌ Error applying effects: ${error.message}`, 'error');
+                updateProgress(100);
+            }
+        }
+
+        function displayCustomizedImage(imageUrl, imageName) {
+            const previewDiv = document.getElementById('effectsPreview');
+            const previewImg = document.getElementById('effectsPreviewImage');
+
+            previewImg.src = imageUrl;
+            previewDiv.style.display = 'block';
+
+            // Also add to main preview
+            const mainPreviewContainer = document.getElementById('previewContainer');
+            const existingDownloadBtn = mainPreviewContainer.querySelector('a');
+            if (existingDownloadBtn) {
+                // Replace existing preview with customized version
+                const img = mainPreviewContainer.querySelector('img');
+                if (img) {
+                    img.src = imageUrl;
+                }
+            }
+
+            addLog(`Image customized: ${imageUrl}`, 'info');
         }
 
         async function runTest() {
@@ -535,6 +804,7 @@
 
                     // Display upscaled image
                     if (data.metadata.upscaledImageUrl) {
+                        lastUpscaledImageUrl = data.metadata.upscaledImageUrl;
                         displayUpscaledImage(data.metadata.upscaledImageUrl, data.metadata.imageName);
                         addLog(`🖼️ Upscaled image ready for viewing`, 'success');
                     }
@@ -800,6 +1070,7 @@
         // Load templates and gallery on startup
         loadTemplates();
         loadGalleryImages();
+        loadEffects();
 
         // Initial log
         addLog('OpenAI Upscaler Harness Ready', 'success');

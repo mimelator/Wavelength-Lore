@@ -302,6 +302,10 @@ router.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
         allCharacters: allCharacters || [],
         allLore: allLore || [],
         allEpisodes: episodeHelpers.getAllEpisodesSync(false) || [],
+        // Cliffhanger fields from enhanced schema
+        cliffhanger_hook: episode.cliffhanger_hook,
+        next_episode_tease: episode.next_episode_tease,
+        cta_tagline: episode.cta_tagline,
         req: req
       });
     } else {

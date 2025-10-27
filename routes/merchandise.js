@@ -3631,6 +3631,156 @@ router.post('/openai-upscaler/test-batch', ensureAuthenticated, groupAuth.requir
 });
 
 /**
+ * POST /api/merchandise/openai-upscaler/apply-effects
+ * Apply visual effects to upscaled images
+ * Supports color grading, lighting, and special effects
+ */
+router.post('/openai-upscaler/apply-effects', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+  try {
+    // Verify database is ready
+    if (!ensureDatabaseReady(res)) return;
+
+    const userId = req.user.uid;
+    const { upscaledImageUrl, effectsPreset, effectParams } = req.body;
+
+    if (!upscaledImageUrl) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing upscaledImageUrl',
+        details: 'Please provide URL of upscaled image to apply effects to'
+      });
+    }
+
+    console.log(`\n🎨 Applying Effects`);
+    console.log(`📁 User ID: ${userId}`);
+    console.log(`📷 Image URL: ${upscaledImageUrl.substring(0, 50)}...`);
+    console.log(`🎭 Preset: ${effectsPreset || 'custom'}`);
+
+    // Download the upscaled image from local storage
+    let imageUrl = upscaledImageUrl;
+
+    // Handle relative URLs
+    if (upscaledImageUrl.startsWith('/')) {
+      imageUrl = `http://localhost:${process.env.PORT || 3001}${upscaledImageUrl}`;
+    }
+
+    console.log(`📥 Downloading image from: ${imageUrl}`);
+
+    const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+    const imageBuffer = Buffer.from(imageResponse.data);
+    const imageSize = imageBuffer.length;
+
+    console.log(`✅ Downloaded: ${(imageSize / 1024).toFixed(2)} KB`);
+
+    // Prepare effect parameters
+    const EffectsProcessor = require('../services/EffectsProcessor');
+    const effectsProcessor = new EffectsProcessor();
+    const effectsConfig = require('../config/effectsConfig');
+
+    let finalEffectParams = {};
+
+    // Load preset if specified
+    if (effectsPreset && effectsPreset !== 'custom') {
+      const preset = effectsConfig.getPreset(effectsPreset);
+      if (preset) {
+        finalEffectParams = preset.effects;
+        console.log(`🎭 Loaded preset: ${preset.name}`);
+      }
+    }
+
+    // Override with custom parameters if provided
+    if (effectParams && typeof effectParams === 'object') {
+      finalEffectParams = { ...finalEffectParams, ...effectParams };
+      console.log(`🎨 Applied custom parameters`);
+    }
+
+    console.log(`📊 Final effects:`, finalEffectParams);
+
+    const startTime = Date.now();
+
+    // Process image with effects
+    let processedBuffer;
+    try {
+      processedBuffer = await effectsProcessor.processImage(imageBuffer, finalEffectParams);
+      console.log(`✅ Effects processing succeeded`);
+    } catch (error) {
+      console.error(`❌ Effects processing failed:`, error.message);
+      throw error;
+    }
+
+    const duration = Date.now() - startTime;
+
+    // Save processed image
+    console.log(`💾 Saving processed image...`);
+    const effectHash = effectsProcessor.generateEffectHash(finalEffectParams);
+    const baseName = `customized-${userId}-${effectHash}`;
+
+    let saveResult;
+    try {
+      saveResult = await effectsProcessor.saveProcessedImage(processedBuffer, baseName);
+      console.log(`✅ Saved: ${saveResult.filename}`);
+    } catch (saveError) {
+      console.error(`⚠️ Could not save processed image:`, saveError.message);
+      // Continue anyway - return response with buffer if save fails
+      saveResult = null;
+    }
+
+    console.log(`✅ Effects applied in ${duration}ms`);
+
+    // Return success
+    res.json({
+      success: true,
+      message: 'Effects applied successfully',
+      analysis: {
+        effectsPreset: effectsPreset || 'custom',
+        processingTime: duration,
+        originalSize: imageSize,
+        processedSize: processedBuffer.length
+      },
+      metadata: {
+        originalUrl: upscaledImageUrl,
+        effectParams: finalEffectParams,
+        customizedImageUrl: saveResult ? saveResult.url : null,
+        customizedImagePath: saveResult ? saveResult.path : null,
+        timestamp: new Date().toISOString()
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Apply effects error:', error.message);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      details: error.response?.data || error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/openai-upscaler/effects-list
+ * Get available effects and presets
+ */
+router.get('/openai-upscaler/effects-list', (req, res) => {
+  try {
+    const effectsConfig = require('../config/effectsConfig');
+
+    res.json({
+      success: true,
+      presets: Object.values(effectsConfig.presets),
+      categories: effectsConfig.categories,
+      effectTypes: effectsConfig.effectTypes,
+      totalPresets: Object.keys(effectsConfig.presets).length
+    });
+  } catch (error) {
+    console.error('❌ Error loading effects list:', error.message);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
  * GET /merchandise/openai-upscaler
  * Render the OpenAI Upscaler Test Harness UI
  */
