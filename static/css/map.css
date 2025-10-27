@@ -23,11 +23,23 @@
 
 .map-title {
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 10px;
   color: #2d1810;
   font-family: 'AnimeAce', serif;
   font-size: 2.5em;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+}
+
+.map-subtitle {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #5d4037;
+  font-family: 'AnimeAce', serif;
+  font-size: 1.3em;
+  font-style: italic;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  letter-spacing: 1px;
 }
 
 .map-description {
@@ -132,6 +144,80 @@
     padding: 10px;
   }
 }
+
+/* ==========================================
+   LOCATION PIN ANIMATIONS - Pulsing & Shimmering
+   ========================================== */
+
+/* Pulsing animation for clickable location pins */
+@keyframes pinPulse {
+  0% {
+    filter: drop-shadow(0 0 4px rgba(0, 123, 255, 0.3));
+    r: 25px;
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(0, 123, 255, 0.6));
+    r: 28px;
+  }
+  100% {
+    filter: drop-shadow(0 0 4px rgba(0, 123, 255, 0.3));
+    r: 25px;
+  }
+}
+
+/* Shimmering animation for enhanced visual appeal */
+@keyframes pinShimmer {
+  0% {
+    opacity: 0.6;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+  }
+  100% {
+    opacity: 0.6;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
+  }
+}
+
+/* Subtle glow animation for all clickable pins */
+@keyframes pinGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(0, 123, 255, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgba(0, 123, 255, 0.7));
+  }
+}
+
+/* Apply animation to clickable SVG circles (location pins) */
+.clickable:not(.click-target) {
+  animation: pinGlow 2.5s ease-in-out infinite;
+}
+
+/* Apply pulse effect to click-target elements (transparent hit areas) */
+.click-target {
+  animation: pinPulse 2s ease-in-out infinite;
+  pointer-events: all;
+}
+
+/* Enhanced hover effect with shimmer */
+.clickable:hover,
+.click-target:hover {
+  animation: pinShimmer 1s ease-in-out infinite;
+}
+
+/* Location overlay glow effect */
+.location-overlay {
+  animation: pinGlow 2.5s ease-in-out infinite;
+}
+
+.location-overlay:hover {
+  animation: pinShimmer 1s ease-in-out infinite;
+}
+
+/* ========================================== */
 
 /* Map Disambiguation Modal Styles */
 #map-disambiguation-container {
