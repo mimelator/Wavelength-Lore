@@ -18,6 +18,7 @@ class CacheAnalyticsService {
     this.cacheStatsRef = null;
     this.optimizationMetricsRef = null;
     this.initialized = false;
+    console.log('📊 CacheAnalyticsService instantiated');
   }
 
   /**
@@ -155,8 +156,10 @@ class CacheAnalyticsService {
    * @returns {Promise<Object>} Recording result
    */
   async recordOptimization(productKey, optimizationData = {}) {
+    console.log(`📊 recordOptimization called for ${productKey}`, optimizationData);
     try {
       this.initializeDatabase();
+      console.log(`📊 Database initialized, writing to ref...`);
 
       const productRef = this.optimizationMetricsRef.child(productKey);
 
@@ -195,8 +198,10 @@ class CacheAnalyticsService {
    * @returns {Promise<Object>} Recording result
    */
   async recordCacheReuse(productKey) {
+    console.log(`📊 recordCacheReuse called for ${productKey}`);
     try {
       this.initializeDatabase();
+      console.log(`📊 Database initialized for reuse, writing to ref...`);
 
       const productRef = this.optimizationMetricsRef.child(productKey);
 

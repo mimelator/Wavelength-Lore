@@ -297,24 +297,32 @@
         <div class="leaderboard-container">
             <div class="leaderboard-header">
                 <div class="trophy">🏆</div>
-                <h1>Global Leaderboard</h1>
-                <p>Top Players by Total Points</p>
+                <h1>THE WAVELENGTH LOREKEEPER'S HONOR ROLL</h1>
+                <p>Recognizing the most dedicated Lorekeepers! See which members have contributed the most to the Wavelength Atlas, shared the best theories, and earned the highest honor.</p>
+                
+                <!-- Call-to-Action for Non-Listed Users -->
+                <div class="honor-roll-cta" style="margin-top: 30px; padding: 25px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1)); border: 2px solid rgba(255, 215, 0, 0.3); border-radius: 15px;">
+                    <h3 style="color: #ffd700; margin: 0 0 15px 0; font-size: 1.3rem;">🌟 Want to join the ranks?</h3>
+                    <p style="margin: 0 0 15px 0; color: rgba(255, 255, 255, 0.9);">Every post counts! Climb the Honor Roll and gain respect, exclusive forum flair, and a chance for a feature in a community spotlight!</p>
+                    <a href="/forum" style="display: inline-block; background: linear-gradient(135deg, #ffd700, #ffa500); color: #000; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-right: 15px; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">📜 Share Your First Theory</a>
+                    <a href="/forum/categories/fan-theories" style="display: inline-block; background: rgba(138, 43, 226, 0.8); color: #fff; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">🧠 Explore Fan Theories</a>
+                </div>
                 
                 <div class="leaderboard-stats" id="leaderboardStats">
                     <div class="stat-box">
-                        <div class="label">Total Players</div>
+                        <div class="label">Total Lorekeepers</div>
                         <div class="value" id="totalPlayers">-</div>
                     </div>
                     <div class="stat-box">
-                        <div class="label">Combined Points</div>
+                        <div class="label">Combined Lore Points</div>
                         <div class="value" id="totalPoints">-</div>
                     </div>
                     <div class="stat-box">
-                        <div class="label">Active Games</div>
+                        <div class="label">Active Channels</div>
                         <div class="value" id="activeGames">-</div>
                     </div>
                     <div class="stat-box">
-                        <div class="label">Your Rank</div>
+                        <div class="label">Your Honor Rank</div>
                         <div class="value" id="yourRank">-</div>
                     </div>
                 </div>
@@ -322,18 +330,18 @@
 
             <!-- Game Filter Tabs -->
             <div class="game-filter-tabs">
-                <button class="tab-btn active" data-game="all">🏆 All Games</button>
-                <button class="tab-btn" data-game="radio">📻 Radio Player</button>
+                <button class="tab-btn active" data-game="all">🏆 All Achievements</button>
+                <button class="tab-btn" data-game="radio">🎵 Audio Archive</button>
                 <button class="tab-btn" data-game="wavelength-gems">💎 Wavelength Gems</button>
-                <button class="tab-btn" data-game="other-games">🎮 Other Games</button>
+                <button class="tab-btn" data-game="other-games">🎮 Other Quests</button>
             </div>
 
             <div class="leaderboard-table">
                 <div class="leaderboard-row header">
-                    <div>Rank</div>
-                    <div>Player</div>
-                    <div>Games</div>
-                    <div>Total Points</div>
+                    <div>Honor Rank</div>
+                    <div>Lorekeeper</div>
+                    <div>Contributions</div>
+                    <div>Lore Points</div>
                 </div>
                 <div id="leaderboardContent">
                     <div class="loading">
@@ -419,7 +427,7 @@
                 // If no data found, show helpful message
                 if (combinedData.length === 0) {
                     document.getElementById('leaderboardContent').innerHTML = 
-                        '<div class="no-data">🎮 No player data found yet!<br><br>Play some games or use the Radio Player to appear on the leaderboard.<br><br><a href="/radio" style="color: #667eea;">🎵 Try the Radio Player</a> or <a href="/games" style="color: #667eea;">🎮 Play Games</a></div>';
+                        '<div class="no-data">📚 The Honor Roll awaits its first Lorekeepers!<br><br>Begin your journey to lore mastery:<br><br><a href="/forum" style="color: #ffd700; font-weight: bold;">📜 Share Your First Theory</a> or <a href="/radio" style="color: #667eea; font-weight: bold;">� Explore the Audio Archive</a><br><br>Every contribution earns you honor and recognition in the Wavelength community!</div>';
                 }
 
             } catch (error) {
@@ -622,7 +630,7 @@
             }
             
             if (filteredPlayers.length === 0) {
-                content.innerHTML = '<div class="no-data">No players found for this filter!</div>';
+                content.innerHTML = '<div class="no-data">📜 No Lorekeepers found in this category!<br><br>Be the first to earn honor in this achievement area!</div>';
                 return;
             }
 
@@ -659,34 +667,43 @@
                 // Get first letter for avatar
                 const avatarLetter = player.userName.charAt(0).toUpperCase();
 
-                // Create game badges
+                // Get prestigious honor rank
+                const honorRank = getHonorRank(rank, displayPoints);
+
+                // Create game badges with lore-themed names
                 let gameBadges = '';
                 if (filter === 'all') {
                     if (player.radioPoints > 0) {
-                        gameBadges += '<span class="game-badge radio">📻 Radio</span>';
+                        gameBadges += '<span class="game-badge radio">🎵 Audio Archive</span>';
                     }
                     if (player.gamePoints > 0) {
-                        gameBadges += '<span class="game-badge gems">💎 Games</span>';
+                        gameBadges += '<span class="game-badge gems">💎 Quest Master</span>';
                     }
                 }
 
                 return `
                     <div class="leaderboard-row ${rowClass}">
-                        <div class="rank">${rankDisplay}</div>
+                        <div class="rank">
+                            ${rankDisplay}
+                            <div style="font-size: 0.7rem; margin-top: 2px; color: rgba(255,255,255,0.7);">#${rank}</div>
+                        </div>
                         <div class="player-info">
                             <div class="player-avatar">${avatarLetter}</div>
                             <div>
                                 <span class="player-name">${escapeHtml(player.userName)}</span>
                                 ${player.isCurrentUser ? '<span class="player-badge">You</span>' : ''}
+                                <div style="font-size: 0.8rem; color: #ffd700; margin-top: 3px; font-weight: bold;">
+                                    ${honorRank.title}
+                                </div>
                                 <div class="game-badges">${gameBadges}</div>
                             </div>
                         </div>
                         <div class="level">
                             ${filter === 'all' ? 
-                                `Radio: ${player.radioPoints.toLocaleString()}<br>Games: ${player.gamePoints.toLocaleString()}` :
+                                `Audio: ${player.radioPoints.toLocaleString()}<br>Quests: ${player.gamePoints.toLocaleString()}` :
                                 filter === 'radio' ? 
-                                    `<span class="level-badge">Lv ${player.radioLevel}</span>` :
-                                    `${player.gamesPlayed} games`
+                                    `<span class="level-badge">Level ${player.radioLevel}</span>` :
+                                    `${player.gamesPlayed} quests`
                             }
                         </div>
                         <div class="points">${displayPoints.toLocaleString()}</div>
@@ -699,6 +716,41 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        // Get prestigious lore-themed rank based on position
+        function getHonorRank(position, totalPoints) {
+            if (position <= 3) {
+                return {
+                    title: position === 1 ? "🏆 Grand Archivist" : position === 2 ? "👑 Wavelength Champion" : "⭐ Master Chronicler",
+                    description: "Ultimate prestige and exclusive status",
+                    tier: "legendary"
+                };
+            } else if (position <= 10) {
+                return {
+                    title: "🎖️ Master Lorekeeper",
+                    description: "High achievement, recognized expert status",
+                    tier: "master"
+                };
+            } else if (position <= 25) {
+                return {
+                    title: "📜 Certified Bard",
+                    description: "Respected storyteller and theorist",
+                    tier: "expert"
+                };
+            } else if (totalPoints >= 100) {
+                return {
+                    title: "🎭 Shire Messenger",
+                    description: "Active community contributor",
+                    tier: "veteran"
+                };
+            } else {
+                return {
+                    title: "🌟 Apprentice Bard",
+                    description: "Beginning the journey to lore mastery",
+                    tier: "apprentice"
+                };
+            }
         }
 
         // Setup filter tab event listeners
