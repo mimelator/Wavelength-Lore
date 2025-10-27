@@ -104,7 +104,7 @@ router.get('/debug', async (req, res) => {
 
 /**
  * GET /merchandise/cache-admin
- * Cache administration dashboard
+ * Cache administration dashboard (standalone)
  * Shows analytics, metrics, and cache management controls
  */
 router.get('/cache-admin', (req, res) => {
@@ -113,6 +113,31 @@ router.get('/cache-admin', (req, res) => {
   } catch (error) {
     console.error('Error serving cache admin dashboard:', error);
     res.status(500).json({ error: 'Failed to load cache admin dashboard' });
+  }
+});
+
+/**
+ * GET /admin/merchandise/perfect-printing-cache
+ * Cache administration dashboard integrated into admin panel
+ * Shows analytics, metrics, and cache management controls with admin styling
+ */
+router.get('/admin/merchandise/perfect-printing-cache', ensureAuthenticated, groupAuth.requireAction('admin'), async (req, res) => {
+  try {
+    console.log('🎨 Loading PERFECT PRINTING cache dashboard for admin...');
+
+    res.render('admin/perfect-printing-cache', {
+      title: 'PERFECT PRINTING - Cache Analytics',
+      user: req.user,
+      adminView: true
+    });
+
+  } catch (error) {
+    console.error('Error loading PERFECT PRINTING cache dashboard:', error);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Failed to load cache dashboard',
+      error: process.env.NODE_ENV === 'development' ? error : {}
+    });
   }
 });
 
