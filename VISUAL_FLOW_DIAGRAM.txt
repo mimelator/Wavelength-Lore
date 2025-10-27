@@ -1,0 +1,396 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║           MERCH STORE CUSTOMIZATION → PREVIEW FLOW - VISUAL GUIDE              ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+BEFORE FIX (BROKEN):
+═══════════════════════════════════════════════════════════════════════════════
+
+  USER SELECTS PRODUCT
+           ↓
+  ╔─ CUSTOMIZATION MODAL OPENS
+  │  └─ renderCustomizationModal()
+  │     └─ showModal()
+  │        └─ modal appended to body ✓
+  │           activeModals.add() ✓
+  │           setupModalEventListeners() ✓
+  │
+  ├─ User selects effects ✓
+  ├─ User clicks "Update Preview" ✓
+  │  └─ handleUpdatePreview()
+  │     └─ customizedImageUrl stored ✓
+  │        preview image updates ✓
+  │
+  └─ User clicks "Preview Finished Product" ❌
+     └─ handlePreviewFinishedProduct()
+        ├─ Gather customization data ✓
+        ├─ Build customization object ✓
+        ├─ Create preview HTML ✓
+        ├─ Append to body ✓
+        ├─ setupFinishedProductPreviewHandlers() ❌
+        │  └─ PROBLEM: Not in activeModals
+        │  └─ PROBLEM: No standard handlers
+        │  └─ PROBLEM: Customization modal still visible
+        │
+        └─ Result: ❌ Preview modal broken
+           - Can't close (no handlers)
+           - Can't go back (back button broken)
+           - User stuck or confused
+
+═══════════════════════════════════════════════════════════════════════════════
+
+AFTER FIX (WORKING):
+═══════════════════════════════════════════════════════════════════════════════
+
+  USER SELECTS PRODUCT
+           ↓
+  ╔─ CUSTOMIZATION MODAL OPENS
+  │  └─ renderCustomizationModal()
+  │     └─ showModal()
+  │        └─ modal appended to body ✓
+  │           activeModals.add() ✓
+  │           setupModalEventListeners() ✓
+  │           customizationModalId tracked ✓
+  │
+  ├─ User selects effects ✓
+  ├─ User clicks "Update Preview" ✓
+  │  └─ handleUpdatePreview()
+  │     └─ customizedImageUrl stored ✓
+  │        preview image updates ✓
+  │
+  └─ User clicks "Preview Finished Product" ✅
+     └─ handlePreviewFinishedProduct()
+        ├─ Gather customization data ✓
+        ├─ Build customization object ✓
+        ├─ Extract customization modal ID ✓ (FIX #1)
+        ├─ Create preview HTML ✓
+        │
+        ├─ Hide customization modal ✓ (FIX #1)
+        │  └─ style.display = 'none'
+        │  └─ Keep in DOM for restoration
+        │
+        ├─ Append preview modal to body ✓
+        ├─ Register in activeModals ✓ (FIX #2)
+        ├─ Setup standard modal handlers ✓ (FIX #2)
+        ├─ setupFinishedProductPreviewHandlers() ✓ (FIX #3)
+        │
+        └─ Result: ✅ Preview modal working
+           ├─ Preview opens smoothly
+           ├─ Close button works (Escape key works)
+           │
+           ├─ User clicks "Back to Customize"
+           │  └─ Preview modal hides ✓
+           │  └─ Customization modal restored ✓ (FIX #3)
+           │  └─ State intact ✓
+           │  └─ Focus restored ✓ (FIX #4)
+           │
+           └─ User can:
+              ✓ Preview again
+              ✓ Add to cart
+              ✓ Close modals properly
+
+═══════════════════════════════════════════════════════════════════════════════
+
+MODAL LIFECYCLE - DETAILED FLOW:
+═══════════════════════════════════════════════════════════════════════════════
+
+Phase 1: INITIALIZATION
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ Customization Modal                                                          │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  DOM: <div class="modal-overlay" data-modal-id="customize-modal-123">       │
+│       <div class="modal-dialog customization-modal">                        │
+│         ...                                                                 │
+│       </div>                                                                │
+│       </div>                                                                │
+│                                                                              │
+│  JavaScript State:                                                          │
+│  - modalRenderer.activeModals = Set { "customize-modal-123" }              │
+│  - modal.dataset.customizedImageUrl = "..." (after Update Preview)         │
+│  - modal.dataset.selectedEffects = {...}                                   │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+Phase 2: TRANSITION (When "Preview Finished Product" clicked)
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ Step 1: Gather Data                                                         │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Extract customizationModalId = "customize-modal-123"                         │
+│ Extract customizedImageUrl from modal.dataset                               │
+│ Validate that image URL exists                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ Step 2: Hide Customization Modal (NEW FIX #1)                               │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ customizationOverlay.style.display = 'none'  // Hidden, still in DOM        │
+│ customizationOverlay.classList.add('hidden-by-preview')                     │
+│                                                                              │
+│ Why? Allows back button to restore it without recreating it                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ Step 3: Create and Register Preview Modal (NEW FIX #2)                      │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Create: <div class="modal-overlay" data-modal-id="finished-product-456">   │
+│ DOM: document.body.appendChild(previewModal)                                │
+│ Register: modalRenderer.activeModals.add("finished-product-456")            │
+│                                                                              │
+│ Setup handlers:                                                             │
+│ - setupModalEventListeners() → standard close/escape handlers              │
+│ - setupFinishedProductPreviewHandlers() → custom back button logic         │
+│                                                                              │
+│ Why? Ensures preview modal is fully functional                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+Phase 3: PREVIEW MODAL ACTIVE
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ Customization Modal Status:    HIDDEN (display: none)                        │
+│ Preview Modal Status:          VISIBLE (display: block)                      │
+│ activeModals:                  { "finished-product-456" }                    │
+│                                                                              │
+│ User can:                                                                    │
+│ - View preview ✓                                                            │
+│ - Click "Back to Customize" → TRANSITION (see below)                       │
+│ - Click "Add to Cart" → Proceed to checkout                                │
+│ - Press Escape or Click X → Modal closes                                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+Phase 4: BACK NAVIGATION (NEW FIX #3)
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ User clicks "Back to Customize"                                             │
+│                                                                              │
+│ handleClick:                                                                │
+│ 1. hideModal("finished-product-456") → Remove from DOM, activeModals       │
+│                                                                              │
+│ 2. Query customization modal:                                               │
+│    const modal = document.querySelector(                                    │
+│      '[data-modal-id="customize-modal-123"]'                                │
+│    )                                                                        │
+│                                                                              │
+│ 3. Restore customization modal:                                             │
+│    modal.style.display = ''  // Remove display: none                       │
+│    modal.classList.remove('hidden-by-preview')                              │
+│    modal.classList.add('show')  // Animation class                          │
+│                                                                              │
+│ 4. Restore focus (NEW FIX #4):                                              │
+│    modal.querySelector('button:not([disabled])').focus()                    │
+│                                                                              │
+│ Result:                                                                      │
+│ ✓ Customization modal visible again                                        │
+│ ✓ All previous state intact (effects, borders, etc.)                       │
+│ ✓ User can make more changes or preview again                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+
+EVENT HANDLER FLOW:
+═══════════════════════════════════════════════════════════════════════════════
+
+Customization Modal Events:
+─────────────────────────────
+  Click "Update Preview"
+    ↓
+  handleUpdatePreview() (in modal handler)
+    ├─ Gather effects from modal.dataset
+    ├─ Call API: /api/merchandise/openai-upscaler/apply-effects
+    ├─ Update preview image
+    └─ Store URL: modal.dataset.customizedImageUrl ← CRITICAL!
+
+  Click "Preview Finished Product"
+    ↓
+  handlePreviewFinishedProduct() (in modal handler)
+    ├─ Extract customizationModalId
+    ├─ Hide customization modal
+    ├─ Create preview modal
+    ├─ Register in activeModals
+    ├─ Setup handlers
+    └─ Display preview
+
+Preview Modal Events:
+────────────────────
+  Click "Back to Customize"
+    ↓
+  setupFinishedProductPreviewHandlers() → backBtn listener
+    ├─ hideModal(previewModalId)
+    └─ Restore customization modal
+       ├─ document.querySelector('[data-modal-id="customize-modal-123"]')
+       ├─ style.display = ''
+       ├─ classList operations
+       └─ focus restoration
+
+  Click Close (X) or Press Escape
+    ↓
+  setupModalEventListeners() → modal-close-btn or Escape handler
+    ├─ hideModal(modalId)
+    └─ Remove from activeModals
+
+═══════════════════════════════════════════════════════════════════════════════
+
+MODAL STATE TRACKING:
+═══════════════════════════════════════════════════════════════════════════════
+
+Customization Modal State:
+┌────────────────────────────────────────────────────────────────────┐
+│ modal.dataset {                                                    │
+│   selectedEffects: '{"vibrancy":true,"warmth":false}'             │
+│   selectedBorderWidth: '2'                                         │
+│   selectedBorderPixels: '20'                                       │
+│   selectedBorderColor: '#FF0000'                                   │
+│   customizedImageUrl: 'https://cdn.../customized-123.png'  ← KEY │
+│   selectedQuantity: '1'                                            │
+│ }                                                                  │
+└────────────────────────────────────────────────────────────────────┘
+
+Preview Modal Data (in handler):
+┌────────────────────────────────────────────────────────────────────┐
+│ setupFinishedProductPreviewHandlers(                               │
+│   modal,            // preview modal element                       │
+│   productId,        // product being customized                    │
+│   customization,    // {effects, borderEnabled, ...}              │
+│   customizationModalId  // FOR RESTORATION ← KEY                   │
+│ )                                                                  │
+└────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+
+KEY IMPROVEMENTS VISUAL SUMMARY:
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─ FIX #1: Modal Stacking ─┐
+│ Before: ❌ Both visible   │
+│ After:  ✓ Hide custom   │
+│         ✓ Show preview  │
+│         ✓ Can restore   │
+└──────────────────────────┘
+
+┌─ FIX #2: Modal Registration ─────┐
+│ Before: ❌ No tracking            │
+│ After:  ✓ In activeModals         │
+│         ✓ Standard handlers       │
+│         ✓ Animation setup         │
+└───────────────────────────────────┘
+
+┌─ FIX #3: Back Navigation ────────────────┐
+│ Before: ❌ Back button broken            │
+│ After:  ✓ Finds hidden modal            │
+│         ✓ Unhides it                    │
+│         ✓ Removes tracking class        │
+│         ✓ Restores state                │
+└─────────────────────────────────────────┘
+
+┌─ FIX #4: Focus Management ──────────┐
+│ Before: ❌ Focus lost               │
+│ After:  ✓ Restores focus           │
+│         ✓ First focusable element  │
+└────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+
+DOM STRUCTURE COMPARISON:
+═══════════════════════════════════════════════════════════════════════════════
+
+Before Fix (BROKEN):
+<body>
+  <div class="modal-overlay" id="customize-modal-123">  ← Still visible!
+    <div class="modal-dialog customization-modal">
+      ...
+    </div>
+  </div>
+  <div class="modal-overlay" id="finished-product-456">  ← Overlap!
+    <div class="modal-dialog finished-product-preview">
+      ...
+    </div>
+  </div>
+</body>
+
+After Fix (WORKING):
+<body>
+  <div class="modal-overlay" id="customize-modal-123" style="display: none;">
+    ← Customization hidden but still in DOM
+    <div class="modal-dialog customization-modal">
+      ...
+    </div>
+  </div>
+  <div class="modal-overlay" id="finished-product-456" class="show">
+    ← Preview visible and fully functional
+    <div class="modal-dialog finished-product-preview">
+      ...
+    </div>
+  </div>
+</body>
+
+When user clicks "Back":
+<body>
+  <div class="modal-overlay" id="customize-modal-123" style="">
+    ← Customization visible again!
+    <div class="modal-dialog customization-modal">
+      ...
+    </div>
+  </div>
+  ← Preview removed from DOM
+</body>
+
+═══════════════════════════════════════════════════════════════════════════════
+
+FINAL STATE MACHINE:
+═══════════════════════════════════════════════════════════════════════════════
+
+                    ┌─ CLOSED ◄─┐
+                    │            │
+                    │            └─ X or Escape
+                    │
+                    ▼
+            ┌─ CUSTOMIZATION
+            │   MODAL VISIBLE
+            │      ▲
+            │      │ Back click
+            │      │
+      Load │      └─ Preview click
+            │
+            ▼
+      PREVIEW MODAL
+        VISIBLE
+  (Customization hidden
+     in background)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+CONSOLE OUTPUT TIMELINE:
+═══════════════════════════════════════════════════════════════════════════════
+
+00:00 - User clicks "Preview Finished Product"
+        🎬 handlePreviewFinishedProduct called with productId: ...
+
+00:01 - 📊 Step 1: Gathering customization data
+        ✅ Customization data gathered: {customizedImageUrl, ...}
+
+00:02 - 📊 Step 2: Building customization object
+        ✅ Customization object built: {...}
+
+00:03 - 📊 Step 3: Getting product data from modal
+        ✅ Product data retrieved: {title, image, modalId}
+
+00:04 - 📊 Step 4: Rendering finished product preview
+        ✅ Preview HTML rendered
+
+00:05 - 📊 Step 5: Managing modal stack
+        ✅ Customization modal hidden
+        ✅ Preview modal appended to body
+        ✅ Preview modal registered in activeModals
+
+00:06 - 📊 Step 6: Setting up standard modal handlers
+        ✅ Standard modal handlers set up
+
+00:07 - 📊 Step 7: Setting up custom preview handlers
+        ✅ Custom preview handlers set up
+        ✅ Customization summary updated
+
+PREVIEW MODAL NOW VISIBLE AND FUNCTIONAL!
+
+[User clicks "Back to Customize"]
+        🔙 Back to customize clicked
+        ✅ Restoring customization modal
+CUSTOMIZATION MODAL RESTORED!
+
+═══════════════════════════════════════════════════════════════════════════════

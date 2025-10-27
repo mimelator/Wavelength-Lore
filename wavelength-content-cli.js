@@ -2281,7 +2281,7 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
             if (this.currentPath.includes('/characters/')) {
                 collection = 'characters';
             } else if (this.currentPath.includes('/episodes/')) {
-                collection = 'episodes';
+                collection = 'videos'; // Episodes are stored as 'videos' in Firebase
             }
 
             console.log(chalk.cyan(`📤 Publishing to Firebase collection: ${collection}`));
@@ -2360,9 +2360,9 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
                 // Try to get characters and episodes too
                 try {
                     const charactersData = await firebaseAdminUtils.fetchDataAsAdmin('characters');
-                    const episodesData = await firebaseAdminUtils.fetchDataAsAdmin('episodes');
+                    const episodesData = await firebaseAdminUtils.fetchDataAsAdmin('videos'); // Episodes are stored as 'videos' in Firebase
                     console.log(chalk.gray(`   Characters: ${Object.keys(charactersData || {}).length}`));
-                    console.log(chalk.gray(`   Episodes: ${Object.keys(episodesData || {}).length}`));
+                    console.log(chalk.gray(`   Episodes (videos): ${Object.keys(episodesData || {}).length}`));
                 } catch (e) {
                     console.log(chalk.gray(`   Other collections: Not accessible or empty`));
                 }

@@ -1674,6 +1674,9 @@ class MerchandiseModalRenderer {
     } else if (modal.classList.contains('confirmation-dialog')) {
       console.log('⚠️ Detected confirmation-dialog');
       this.setupConfirmationDialogHandlers(modal);
+    } else if (modal.classList.contains('finished-product-preview')) {
+      console.log('🖼️ Detected finished-product-preview - custom handlers already set up');
+      // Custom handlers are set up in setupFinishedProductPreviewHandlers
     } else {
       console.warn('❌ Unknown modal type:', modal.className);
     }
@@ -2390,9 +2393,11 @@ class MerchandiseModalRenderer {
 
       console.log('📊 Step 3: Getting product data from modal');
       // Get product data from modal attributes
-      const productTitle = modal.closest('.modal-overlay')?.dataset.productTitle || 'Product';
-      const productImage = modal.closest('.modal-overlay')?.dataset.productImage || '/images/previews/generic-product-preview.svg';
-      console.log('✅ Product data retrieved:', { productTitle, productImage });
+      const customizationOverlay = modal.closest('.modal-overlay');
+      const customizationModalId = customizationOverlay?.dataset.modalId;
+      const productTitle = customizationOverlay?.dataset.productTitle || 'Product';
+      const productImage = customizationOverlay?.dataset.productImage || '/images/previews/generic-product-preview.svg';
+      console.log('✅ Product data retrieved:', { productTitle, productImage, customizationModalId });
 
       // Create a minimal product object from available data
       const product = {
@@ -2420,20 +2425,48 @@ class MerchandiseModalRenderer {
       const previewContainer = document.createElement('div');
       previewContainer.innerHTML = previewHTML;
       const previewModal = previewContainer.firstElementChild;
-      console.log('✅ Preview modal created:', previewModal);
+      const previewModalId = previewModal.dataset.modalId;
+      console.log('✅ Preview modal created:', previewModal, 'ID:', previewModalId);
 
-      console.log('📊 Step 5: Appending modal to body');
-      // Append to body
+      console.log('📊 Step 5: Managing modal stack');
+      // Hide the customization modal (don't remove, so back button can restore it)
+      if (customizationOverlay) {
+        customizationOverlay.style.display = 'none';
+        customizationOverlay.classList.add('hidden-by-preview');
+        console.log('✅ Customization modal hidden');
+      }
+
+      // Append preview modal to body
       document.body.appendChild(previewModal);
-      console.log('✅ Modal appended to body');
+      console.log('✅ Preview modal appended to body');
 
-      console.log('📊 Step 6: Setting up event handlers');
-      // Setup event listeners for preview modal
-      this.setupFinishedProductPreviewHandlers(previewModal, productId, customization);
-      console.log('✅ Event handlers set up');
+      // Register preview modal in active modals tracking
+      this.activeModals.add(previewModalId);
+      console.log('✅ Preview modal registered in activeModals:', previewModalId);
+
+      // Add show class for animation
+      requestAnimationFrame(() => {
+        previewModal.classList.add('show');
+        console.log('✅ Show class added for animation');
+      });
+
+      // Prevent body scroll
+      document.body.classList.add('modal-open');
+
+      console.log('📊 Step 6: Setting up standard modal handlers');
+      // Setup standard modal event listeners (close button, escape key, etc.)
+      const previewDialog = previewModal.querySelector('.modal-dialog') || previewModal;
+      this.setupModalEventListeners(previewDialog);
+      console.log('✅ Standard modal handlers set up');
+
+      console.log('📊 Step 7: Setting up custom preview handlers');
+      // Setup custom handlers for preview modal
+      this.setupFinishedProductPreviewHandlers(previewModal, productId, customization, customizationModalId);
+      console.log('✅ Custom preview handlers set up');
 
       // Update customization summary in preview
       this.updateFinishedProductCustomizationSummary(previewModal, customization);
+      console.log('✅ Customization summary updated');
 
       if (this.debugMode) {
         this.debugLog(`Finished product preview displayed`, 'success');
@@ -2441,6 +2474,10 @@ class MerchandiseModalRenderer {
 
     } catch (error) {
       console.error('Error in handlePreviewFinishedProduct:', error);
+      console.error('Error stack:', error.stack);
+      if (this.debugMode) {
+        this.debugLog(`Error in handlePreviewFinishedProduct: ${error.message}`, 'error', error);
+      }
       alert('Error generating product preview. Please try again.');
     }
   }
@@ -2450,14 +2487,51 @@ class MerchandiseModalRenderer {
    * @param {HTMLElement} modal - Preview modal element
    * @param {string} productId - Product ID
    * @param {Object} customization - Customization object
+   * @param {string} customizationModalId - ID of the customization modal to restore on back
    */
-  setupFinishedProductPreviewHandlers(modal, productId, customization) {
+  setupFinishedProductPreviewHandlers(modal, productId, customization, customizationModalId) {
+    // Get preview modal ID from the modal itself (it may be the overlay or a wrapper)
+    let previewModalId = modal.dataset.modalId;
+    if (!previewModalId && modal.querySelector('.modal-overlay')) {
+      previewModalId = modal.querySelector('.modal-overlay').dataset.modalId;
+    }
+    if (!previewModalId) {
+      console.error('❌ Could not find preview modal ID');
+      return;
+    }
+
     // Back to customize button
     const backBtn = modal.querySelector('.back-to-customize-btn');
     if (backBtn) {
       backBtn.addEventListener('click', () => {
-        this.hideModal(modal.querySelector('.modal-overlay').dataset.modalId);
-        // Customization modal should still be open underneath
+        console.log('🔙 Back to customize clicked');
+
+        // Hide the preview modal
+        this.hideModal(previewModalId);
+
+        // Restore the customization modal that was hidden
+        if (customizationModalId) {
+          const customizationOverlay = document.querySelector(
+            `[data-modal-id="${customizationModalId}"]`
+          );
+          if (customizationOverlay) {
+            console.log('✅ Restoring customization modal:', customizationModalId);
+            customizationOverlay.style.display = '';
+            customizationOverlay.classList.remove('hidden-by-preview');
+            customizationOverlay.classList.add('show');
+
+            // Restore focus
+            const firstFocusable = customizationOverlay.querySelector(
+              'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            if (firstFocusable) {
+              firstFocusable.focus();
+            }
+          } else {
+            console.warn('⚠️ Customization modal not found:', customizationModalId);
+          }
+        }
+
         if (this.debugMode) {
           this.debugLog('Returned to customization', 'info');
         }
@@ -2468,15 +2542,21 @@ class MerchandiseModalRenderer {
     const addToCartBtn = modal.querySelector('.add-to-cart-from-finished-btn');
     if (addToCartBtn) {
       addToCartBtn.addEventListener('click', () => {
+        console.log('🛒 Add to cart from finished product');
         this.handleAddToCartFromFinishedProduct(productId, customization);
       });
     }
 
-    // Close button
+    // Close button (handled by setupModalEventListeners, but ensure proper modal ID is passed)
+    // This provides extra safeguard
     const closeBtn = modal.querySelector('.modal-close-btn');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        this.hideModal(modal.querySelector('.modal-overlay').dataset.modalId);
+    if (closeBtn && !closeBtn.__addedListener) {
+      closeBtn.__addedListener = true; // Prevent duplicate listeners
+      closeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('❌ Close button clicked');
+        this.hideModal(previewModalId);
       });
     }
   }
