@@ -6,143 +6,80 @@
 
 const effectsConfig = {
   /**
-   * Available effect types that can be applied
+   * Available effect toggles - simple on/off functionality
    */
   effectTypes: {
-    colorTemperature: {
-      name: 'Color Temperature',
-      description: 'Warm (golden) to cool (blue) color grading',
-      type: 'slider',
-      min: 2000,
-      max: 8000,
-      default: 5500,
-      unit: 'Kelvin'
+    vibrancy: {
+      name: '🌈 Enhanced Vibrancy',
+      description: 'Boost color saturation and warmth',
+      type: 'toggle',
+      enabled: false,
+      preset: {
+        saturation: 1.4,
+        colorTemperature: 3800,
+        brightness: 1.08,
+        contrast: 1.15
+      }
     },
-    saturation: {
-      name: 'Saturation',
-      description: 'Color intensity from muted to vibrant',
-      type: 'slider',
-      min: 0.5,
-      max: 2.0,
-      default: 1.0,
-      step: 0.1
+    glow: {
+      name: '✨ Luminous Glow',
+      description: 'Add bloom effect for magical appearance',
+      type: 'toggle',
+      enabled: false,
+      preset: {
+        bloom: 0.6,
+        brightness: 1.05,
+        saturation: 1.1
+      }
     },
-    bloom: {
-      name: 'Bloom Glow',
-      description: 'Light glow effect on bright areas',
-      type: 'slider',
-      min: 0,
-      max: 1.0,
-      default: 0,
-      step: 0.1
-    },
-    vignette: {
-      name: 'Vignette',
-      description: 'Darkens edges for focus effect',
-      type: 'slider',
-      min: 0,
-      max: 1.0,
-      default: 0,
-      step: 0.1
-    },
-    blur: {
-      name: 'Edge Blur',
-      description: 'Soft focus on edges',
-      type: 'slider',
-      min: 0,
-      max: 10,
-      default: 0,
-      step: 0.5
-    },
-    brightness: {
-      name: 'Brightness',
-      description: 'Overall image brightness',
-      type: 'slider',
-      min: 0.7,
-      max: 1.3,
-      default: 1.0,
-      step: 0.05
-    },
-    contrast: {
-      name: 'Contrast',
-      description: 'Contrast enhancement',
-      type: 'slider',
-      min: 0.7,
-      max: 1.5,
-      default: 1.0,
-      step: 0.05
+    dramatic: {
+      name: '🎭 Dramatic Focus',
+      description: 'Dark vignette edges for product focus',
+      type: 'toggle',
+      enabled: false,
+      preset: {
+        vignette: 0.5,
+        contrast: 1.2,
+        blur: 2
+      }
     },
     lightning: {
-      name: 'Lightning Intensity',
-      description: 'Electric lightning strike effect',
-      type: 'slider',
-      min: 0,
-      max: 1.0,
-      default: 0,
-      step: 0.1
-    }
-  },
-
-  /**
-   * Pre-configured effect presets for quick application
-   * Users can customize from these starting points
-   */
-  presets: {
-    'vibrant-colors': {
-      id: 'vibrant-colors',
-      name: '✨ Vibrant Colors',
-      description: 'Enhanced saturation with warm, golden tones',
-      category: 'color',
-      icon: '🌈',
-      effects: {
-        saturation: 1.3,
-        colorTemperature: 4000,
-        bloom: 0.3,
-        brightness: 1.05,
-        contrast: 1.1,
-        vignette: 0.2,
-        blur: 0,
-        lightning: 0
-      },
-      userMessage: 'Perfect for showcasing vibrant designs on products. Enhanced colors with warm glow.'
-    },
-
-    'lightning-strike': {
-      id: 'lightning-strike',
       name: '⚡ Lightning Strike',
-      description: 'Dramatic cool tones with electric intensity',
-      category: 'atmospheric',
-      icon: '⚡',
-      effects: {
+      description: 'Electric cool tones with intense energy',
+      type: 'toggle',
+      enabled: false,
+      preset: {
+        lightning: 0.85,
+        colorTemperature: 6800,
         saturation: 1.2,
-        colorTemperature: 6500,
-        bloom: 0.5,
         brightness: 1.1,
-        contrast: 1.25,
+        contrast: 1.3,
         vignette: 0.4,
-        blur: 1,
-        lightning: 0.8
-      },
-      userMessage: 'Bold and dramatic. Creates striking contrast with cool electric tones and energy.'
+        bloom: 0.4
+      }
     },
-
-    'custom': {
-      id: 'custom',
-      name: '🎨 Custom Effects',
-      description: 'Mix and match your own effect combination',
-      category: 'custom',
-      icon: '🎨',
-      effects: {
-        saturation: 1.0,
-        colorTemperature: 5500,
-        bloom: 0.0,
-        brightness: 1.0,
-        contrast: 1.0,
-        vignette: 0.0,
-        blur: 0,
-        lightning: 0
-      },
-      userMessage: 'Build your own unique effect combination with individual sliders.'
+    warmth: {
+      name: '🔥 Golden Warmth',
+      description: 'Cozy warm tones perfect for home products',
+      type: 'toggle',
+      enabled: false,
+      preset: {
+        colorTemperature: 3500,
+        saturation: 1.2,
+        brightness: 1.1
+      }
+    },
+    coolness: {
+      name: '❄️ Cool Elegance',
+      description: 'Crisp cool tones for modern products',
+      type: 'toggle',
+      enabled: false,
+      preset: {
+        colorTemperature: 7200,
+        saturation: 1.15,
+        brightness: 1.05,
+        contrast: 1.1
+      }
     }
   },
 
@@ -152,24 +89,15 @@ const effectsConfig = {
   categories: [
     {
       id: 'color',
-      name: 'Color Effects',
-      description: 'Color grading and saturation adjustments',
-      icon: '🌈',
-      effects: ['saturation', 'colorTemperature', 'brightness', 'contrast']
+      name: '🎨 Color Effects',
+      description: 'Enhance colors and warmth',
+      effects: ['vibrancy', 'warmth', 'coolness']
     },
     {
       id: 'atmospheric',
-      description: 'Lighting and atmospheric effects',
-      name: 'Atmospheric',
-      icon: '✨',
-      effects: ['bloom', 'vignette', 'blur', 'lightning']
-    },
-    {
-      id: 'custom',
-      name: 'Custom Mix',
-      description: 'Create your own effect combination',
-      icon: '🎨',
-      effects: ['saturation', 'colorTemperature', 'bloom', 'vignette', 'blur', 'brightness', 'contrast', 'lightning']
+      name: '✨ Atmospheric Effects',
+      description: 'Lighting and mood',
+      effects: ['glow', 'dramatic', 'lightning']
     }
   ],
 
@@ -188,13 +116,6 @@ const effectsConfig = {
   },
 
   /**
-   * Helper function to get preset by ID
-   */
-  getPreset: function(presetId) {
-    return this.presets[presetId] || this.presets['custom'];
-  },
-
-  /**
    * Helper function to get effect configuration by type
    */
   getEffect: function(effectType) {
@@ -202,42 +123,33 @@ const effectsConfig = {
   },
 
   /**
-   * Validate effect parameters
+   * Build final effects from enabled toggles
+   * Combines presets of all enabled effects
    */
-  validateEffectParams: function(params) {
-    const validated = {};
+  buildEffectsFromToggles: function(enabledToggles = {}) {
+    const finalEffects = {
+      saturation: 1.0,
+      colorTemperature: 5500,
+      bloom: 0,
+      vignette: 0,
+      blur: 0,
+      brightness: 1.0,
+      contrast: 1.0,
+      lightning: 0
+    };
 
-    for (const [key, value] of Object.entries(params)) {
-      const effectConfig = this.effectTypes[key];
-
-      if (!effectConfig) {
-        console.warn(`Unknown effect type: ${key}`);
-        continue;
+    // Apply each enabled effect's preset
+    for (const [toggleKey, enabled] of Object.entries(enabledToggles)) {
+      if (enabled) {
+        const effect = this.effectTypes[toggleKey];
+        if (effect && effect.preset) {
+          // Merge the preset values
+          Object.assign(finalEffects, effect.preset);
+        }
       }
-
-      // Clamp value between min and max
-      const clamped = Math.max(
-        effectConfig.min,
-        Math.min(effectConfig.max, value)
-      );
-
-      validated[key] = clamped;
     }
 
-    return validated;
-  },
-
-  /**
-   * Merge effect parameters with defaults
-   */
-  mergeWithDefaults: function(customParams = {}) {
-    const defaults = {};
-
-    for (const [key, config] of Object.entries(this.effectTypes)) {
-      defaults[key] = config.default;
-    }
-
-    return { ...defaults, ...customParams };
+    return finalEffects;
   }
 };
 

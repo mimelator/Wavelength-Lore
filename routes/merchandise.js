@@ -3672,27 +3672,13 @@ router.post('/openai-upscaler/apply-effects', ensureAuthenticated, groupAuth.req
 
     console.log(`✅ Downloaded: ${(imageSize / 1024).toFixed(2)} KB`);
 
-    // Prepare effect parameters
+    // Prepare effect parameters from enabled toggles
     const EffectsProcessor = require('../services/EffectsProcessor');
     const effectsProcessor = new EffectsProcessor();
     const effectsConfig = require('../config/effectsConfig');
 
-    let finalEffectParams = {};
-
-    // Load preset if specified
-    if (effectsPreset && effectsPreset !== 'custom') {
-      const preset = effectsConfig.getPreset(effectsPreset);
-      if (preset) {
-        finalEffectParams = preset.effects;
-        console.log(`🎭 Loaded preset: ${preset.name}`);
-      }
-    }
-
-    // Override with custom parameters if provided
-    if (effectParams && typeof effectParams === 'object') {
-      finalEffectParams = { ...finalEffectParams, ...effectParams };
-      console.log(`🎨 Applied custom parameters`);
-    }
+    // Build effects from enabled toggles
+    const finalEffectParams = effectsConfig.buildEffectsFromToggles(effectParams || {});
 
     console.log(`📊 Final effects:`, finalEffectParams);
 
@@ -3758,7 +3744,7 @@ router.post('/openai-upscaler/apply-effects', ensureAuthenticated, groupAuth.req
 
 /**
  * GET /api/merchandise/openai-upscaler/effects-list
- * Get available effects and presets
+ * Get available effects and categories
  */
 router.get('/openai-upscaler/effects-list', (req, res) => {
   try {
@@ -3766,10 +3752,9 @@ router.get('/openai-upscaler/effects-list', (req, res) => {
 
     res.json({
       success: true,
-      presets: Object.values(effectsConfig.presets),
       categories: effectsConfig.categories,
       effectTypes: effectsConfig.effectTypes,
-      totalPresets: Object.keys(effectsConfig.presets).length
+      totalEffects: Object.keys(effectsConfig.effectTypes).length
     });
   } catch (error) {
     console.error('❌ Error loading effects list:', error.message);

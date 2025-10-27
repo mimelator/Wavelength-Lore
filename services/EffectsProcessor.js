@@ -19,11 +19,19 @@ class EffectsProcessor {
    */
   async processImage(imageBuffer, effectParams = {}) {
     try {
-      // Validate and merge with defaults
-      const params = effectsConfig.mergeWithDefaults(effectParams);
-      const validated = effectsConfig.validateEffectParams(params);
+      // Use provided params or defaults
+      const finalParams = {
+        saturation: effectParams.saturation ?? 1.0,
+        colorTemperature: effectParams.colorTemperature ?? 5500,
+        bloom: effectParams.bloom ?? 0,
+        vignette: effectParams.vignette ?? 0,
+        blur: effectParams.blur ?? 0,
+        brightness: effectParams.brightness ?? 1.0,
+        contrast: effectParams.contrast ?? 1.0,
+        lightning: effectParams.lightning ?? 0
+      };
 
-      console.log(`🎨 Processing image with effects:`, validated);
+      console.log(`🎨 Processing image with effects:`, finalParams);
 
       // Start with Sharp pipeline
       let pipeline = Sharp(imageBuffer);
