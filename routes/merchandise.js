@@ -16,10 +16,13 @@ const galleryStorage = require('../utils/gallery/storage');
 const { getUserBookmarks } = require('../services/firebase/galleryService');
 const axios = require('axios');
 const { generateProductTitle, prettifyImageName } = require('../utils/product-name-formatter');
-const { 
-  ProductTypes, 
-  generateProductName, 
-  generateProductDescription, 
+const ImageOptimizer = require('../services/ImageOptimizer');
+const productSpecifications = require('../config/productSpecifications');
+const productTemplates = require('../config/productTemplates');
+const {
+  ProductTypes,
+  generateProductName,
+  generateProductDescription,
   generateProductTags,
   findProductById,
   getAllProducts,
@@ -1933,6 +1936,310 @@ router.get('/gallery/:imageId', ensureAuthenticated, async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch gallery image',
+      details: error.message
+    });
+  }
+});
+
+// ========================================
+// PERFECT PRINTING - OPTIMIZATION ENDPOINTS
+// ========================================
+
+/**
+ * POST /api/merchandise/optimize-for-product
+ * Optimize image for a specific product type
+ *
+ * Handles:
+ * - Product specification validation
+ * - Image analysis (current dimensions, format)
+ * - Intelligent sizing (upscale/downscale/optimize)
+ * - Progress reporting (real-time updates to UI)
+ * - Transparent user messaging
+ *
+ * Request body:
+ * {
+ *   "imageBuffer": base64 or Buffer,
+ *   "productKey": "apparel-tshirt",
+ *   "fileName": "my-design.png"
+ * }
+ */
+router.post('/optimize-for-product', ensureAuthenticated, async (req, res) => {
+  try {
+    const { imageBuffer, productKey, fileName } = req.body;
+
+    if (!imageBuffer) {
+      return res.status(400).json({
+        success: false,
+        error: 'Image buffer is required'
+      });
+    }
+
+    if (!productKey) {
+      return res.status(400).json({
+        success: false,
+        error: 'Product key is required'
+      });
+    }
+
+    console.log(`🎨 Optimizing image for product: ${productKey}`);
+
+    // Validate product specification exists
+    const spec = productSpecifications.getSpecsByProductKey(productKey);
+    if (!spec) {
+      return res.status(404).json({
+        success: false,
+        error: `Product "${productKey}" not found in specifications`
+      });
+    }
+
+    // Convert base64 to Buffer if needed
+    let imgBuffer = imageBuffer;
+    if (typeof imageBuffer === 'string') {
+      imgBuffer = Buffer.from(imageBuffer, 'base64');
+    }
+
+    // Create optimizer instance
+    const optimizer = new ImageOptimizer();
+
+    // Set up progress callbacks to stream to client via SSE (if requested)
+    optimizer.onProgress((event) => {
+      // Progress events are logged for debugging
+      // In a real scenario, you could use WebSockets or Server-Sent Events
+    });
+
+    // Analyze image first (non-destructive)
+    const analysis = await optimizer.analyzeImage(imgBuffer, productKey);
+
+    // Get template recommendations
+    const applicableTemplates = productTemplates
+      .getAllTemplates()
+      .filter(templateId => {
+        const template = productTemplates.getTemplateById(templateId);
+        return template.productType === productKey;
+      })
+      .map(templateId => productTemplates.getTemplateInfo(templateId));
+
+    // Return analysis to user for decision
+    return res.json({
+      success: true,
+      analysis: {
+        currentDimensions: analysis.currentDimensions,
+        targetDimensions: analysis.targetDimensions,
+        strategy: analysis.strategy,
+        action: analysis.action,
+        message: analysis.message,
+        estimatedTime: analysis.estimatedTime,
+        scaleFactor: analysis.scaleFactor
+      },
+      product: {
+        key: productKey,
+        name: spec.name,
+        printArea: spec.printArea,
+        dpi: spec.imageSpec.recommendedDpi
+      },
+      templates: applicableTemplates,
+      nextSteps: [
+        '1. Review the optimization strategy above',
+        '2. Confirm you want to proceed',
+        '3. Send request to /optimize-for-product-confirm to perform actual optimization'
+      ]
+    });
+
+  } catch (error) {
+    console.error('Error analyzing image for optimization:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to analyze image',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/merchandise/optimize-for-product-confirm
+ * Confirm and execute image optimization
+ *
+ * After user reviews the analysis from the previous endpoint,
+ * they confirm and this performs the actual optimization.
+ *
+ * Request body:
+ * {
+ *   "imageBuffer": base64 or Buffer,
+ *   "productKey": "apparel-tshirt",
+ *   "confirm": true
+ * }
+ */
+router.post('/optimize-for-product-confirm', ensureAuthenticated, async (req, res) => {
+  try {
+    const { imageBuffer, productKey, confirm } = req.body;
+
+    if (!confirm) {
+      return res.status(400).json({
+        success: false,
+        error: 'Optimization must be confirmed'
+      });
+    }
+
+    console.log(`⚡ Executing optimization for product: ${productKey}`);
+
+    // Convert base64 to Buffer if needed
+    let imgBuffer = imageBuffer;
+    if (typeof imageBuffer === 'string') {
+      imgBuffer = Buffer.from(imageBuffer, 'base64');
+    }
+
+    const optimizer = new ImageOptimizer();
+
+    // Perform actual optimization
+    const result = await optimizer.optimizeForProduct(imgBuffer, productKey);
+
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        error: 'Optimization failed',
+        details: result.message
+      });
+    }
+
+    // Get file statistics
+    const stats = optimizer.getStats(imgBuffer, result.optimizedBuffer);
+
+    console.log(`✅ Optimization complete: ${result.message}`);
+
+    return res.json({
+      success: true,
+      optimizedImage: result.optimizedBuffer.toString('base64'),
+      analysis: result.analysis,
+      resultMetadata: result.resultMetadata,
+      processingTime: result.processingTime,
+      message: result.message,
+      stats: {
+        originalSize: stats.originalSize,
+        optimizedSize: stats.optimizedSize,
+        saved: stats.saved
+      },
+      readyForPrintify: true
+    });
+
+  } catch (error) {
+    console.error('Error executing optimization:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Optimization failed',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/product-specs/:productKey
+ * Get product specifications for a specific product
+ * Used to display product info and requirements to user
+ */
+router.get('/product-specs/:productKey', (req, res) => {
+  try {
+    const { productKey } = req.params;
+
+    const spec = productSpecifications.getSpecsByProductKey(productKey);
+    if (!spec) {
+      return res.status(404).json({
+        success: false,
+        error: `Product "${productKey}" not found`
+      });
+    }
+
+    res.json({
+      success: true,
+      productKey: productKey,
+      name: spec.name,
+      category: spec.category,
+      printMethod: spec.printMethod,
+      printArea: spec.printArea,
+      imageSpec: {
+        recommendedDpi: spec.imageSpec.recommendedDpi,
+        optimalDimensions: spec.imageSpec.optimalDimensions,
+        minDimensions: spec.imageSpec.minDimensions,
+        maxDimensions: spec.imageSpec.maxDimensions
+      },
+      placement: spec.placement,
+      notes: spec.notes
+    });
+  } catch (error) {
+    console.error('Error fetching product specs:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch product specifications',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/templates
+ * Get all available product templates
+ */
+router.get('/templates', (req, res) => {
+  try {
+    const allTemplates = productTemplates.getAllTemplates();
+
+    const templateList = allTemplates.map(templateId => {
+      const info = productTemplates.getTemplateInfo(templateId);
+      return {
+        id: templateId,
+        ...info
+      };
+    });
+
+    res.json({
+      success: true,
+      templates: templateList,
+      total: templateList.length
+    });
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch templates',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/templates/:templateId
+ * Get specific template details
+ */
+router.get('/templates/:templateId', (req, res) => {
+  try {
+    const { templateId } = req.params;
+
+    const template = productTemplates.getTemplateById(templateId);
+    if (!template) {
+      return res.status(404).json({
+        success: false,
+        error: `Template "${templateId}" not found`
+      });
+    }
+
+    res.json({
+      success: true,
+      template: {
+        id: template.id,
+        name: template.name,
+        category: template.category,
+        description: template.description,
+        productType: template.productType,
+        imageOptimization: template.imageOptimization,
+        printify: template.printify,
+        userMessages: template.userMessages,
+        success: template.success
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching template:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch template',
       details: error.message
     });
   }
