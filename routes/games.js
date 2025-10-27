@@ -13,13 +13,16 @@ const { generateGamesWithTheme, getActiveTheme } = require('../config/game-theme
  * 🎯 GO-LIVE UPDATE: Now accessible to all authenticated members!
  */
 router.get('/', groupAuth.requireAction('game_access_member'), (req, res) => {
+    const theme = getActiveTheme();
+    
     res.render('games/hub', {
-        title: 'Wavelength Games Hub',
+        title: `${theme.prefix}: Wavelength Game Hub`,
         currentPage: 'games-hub',
         breadcrumbs: [
-            { name: 'Games Hub', url: null }
+            { name: 'Strategic Training Hub', url: null }
         ],
         userGroups: req.userGroups,
+        theme: theme,
         cdnUrl: process.env.CDN_URL,
         version: `v${Date.now()}`
     });

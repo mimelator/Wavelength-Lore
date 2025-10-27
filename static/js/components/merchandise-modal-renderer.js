@@ -2081,9 +2081,12 @@ class MerchandiseModalRenderer {
     }
 
     try {
+      // Get the image URL from the preview image element
+      const imageUrl = previewImage?.src || '/images/previews/generic-product-preview.svg';
+
       // Call effects API
       console.log('🌐 Making API call to /api/merchandise/openai-upscaler/apply-effects');
-      console.log('📦 Request payload:', { productId, effectParams });
+      console.log('📦 Request payload:', { upscaledImageUrl: imageUrl, effectParams });
 
       const response = await fetch('/api/merchandise/openai-upscaler/apply-effects', {
         method: 'POST',
@@ -2091,7 +2094,7 @@ class MerchandiseModalRenderer {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          productId: productId,
+          upscaledImageUrl: imageUrl,
           effectParams: effectParams
         })
       });
