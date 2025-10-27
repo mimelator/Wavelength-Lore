@@ -2750,21 +2750,17 @@ router.post('/test-harness/optimize-random', ensureAuthenticated, groupAuth.requ
       console.log(`🎨 Optimizing image for product: ${selectedProduct.name}`);
 
       const optimizer = new ImageOptimizer();
-      const spec = productSpecifications.getSpecsByProductKey(selectedProduct.id);
 
-      if (!spec) {
-        console.warn(`⚠️  No specs found for ${selectedProduct.id}, using generic optimization`);
-      }
-
-      const result = await optimizer.optimize(imageBuffer, spec || {});
-      console.log(`✅ Optimization complete: ${result.message}`);
+      // optimizeForProduct takes imageBuffer and productKey
+      const result = await optimizer.optimizeForProduct(imageBuffer, selectedProduct.id);
+      console.log(`✅ Optimization complete - Strategy: ${result.analysis.action}`);
 
       // Record optimization analytics
       console.log(`📊 Recording optimization analytics...`);
       cacheAnalytics.recordOptimization(selectedProduct.id, {
         processingTime: result.processingTime,
-        scaleFactor: result.analysis.scaleFactor,
-        costEstimate: result.analysis.strategy === 'UPSCALE' ? 0.08 : 0,
+        scaleFactor: result.analysis.scaleFactor || 1.0,
+        costEstimate: result.analysis.action === 'upscale' ? 0.08 : 0,
         testRun: true
       }).then(recordResult => {
         console.log(`✅ Analytics recorded:`, recordResult);
@@ -2798,13 +2794,13 @@ router.post('/test-harness/optimize-random', ensureAuthenticated, groupAuth.requ
             status: 'test'
           },
           optimization_result: {
-            message: result.message,
-            strategy: result.analysis.strategy,
-            scaleFactor: result.analysis.scaleFactor,
+            message: `Optimization ${result.optimized ? 'applied' : 'not needed'}`,
+            strategy: result.analysis.action,
+            scaleFactor: result.analysis.scaleFactor || 1.0,
             processingTime: result.processingTime,
             originalSize: imageBuffer.length,
-            optimizedSize: result.optimizedBuffer ? result.optimizedBuffer.length : 'unknown',
-            estimatedCost: result.analysis.strategy === 'UPSCALE' ? 0.08 : 0
+            optimizedSize: result.optimizedBuffer ? result.optimizedBuffer.length : imageBuffer.length,
+            estimatedCost: result.analysis.action === 'upscale' ? 0.08 : 0
           }
         }
       });
