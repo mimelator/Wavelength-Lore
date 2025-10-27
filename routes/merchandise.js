@@ -2737,42 +2737,14 @@ router.post('/test-harness/optimize-random', ensureAuthenticated, groupAuth.requ
       });
     }
 
-    // Step 4: Create product with the image
+    // Step 4: Prepare test product metadata
     const productTitle = `[TEST] ${selectedProduct.name} - ${randomImage.fileName}`;
     const productDescription = `Auto-generated test product for PERFECT PRINTING optimization pipeline testing. Product: ${selectedProduct.name}. Source image: ${randomImage.fileName}.`;
+    const productKey = sanitizeFirebaseKey(`${selectedProduct.id}-${Date.now()}-test`);
 
-    console.log(`🎨 Creating product: ${productTitle}`);
+    console.log(`🎨 Prepared test product: ${productTitle} (Key: ${productKey})`);
 
     try {
-      // Create the product in the database
-      const productKey = sanitizeFirebaseKey(`${selectedProduct.id}-${Date.now()}-test`);
-
-      const newProduct = {
-        productId: productKey,
-        localId: productKey,
-        title: productTitle,
-        description: productDescription,
-        productType: selectedProduct.category,
-        blueprintId: selectedProduct.blueprintId,
-        printProviderId: selectedProduct.printProviderId,
-        sourceImage: {
-          url: randomImage.url,
-          title: randomImage.fileName,
-          dimensions: randomImage.dimensions
-        },
-        status: 'test',
-        isTestProduct: true,
-        createdAt: new Date().toISOString(),
-        createdBy: userId,
-        createdByName: userName,
-        imageBuffer: imageBuffer.toString('base64'),
-        imageSize: imageBuffer.length,
-        testHarnessRun: true
-      };
-
-      // Save to merchandise database
-      await merchandiseDB.saveProduct(newProduct);
-      console.log(`✅ Product created: ${productKey}`);
 
       // Step 5: Optimize image for this product
       console.log(`🎨 Optimizing image for product: ${selectedProduct.name}`);
