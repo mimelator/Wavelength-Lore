@@ -264,7 +264,7 @@ class EffectsProcessor {
 
   /**
    * Apply lightning strike effect
-   * Creates electric blue/white tones with enhanced vignette
+   * Creates electric blue/white tones with procedural lightning bolts and enhanced vignette
    */
   async applyLightningEffect(pipeline, intensity) {
     try {
@@ -296,6 +296,16 @@ class EffectsProcessor {
         }
       ]);
 
+      // Create procedural lightning bolts
+      const lightningBolts = this.generateLightningBolts(lightningIntensity);
+      pipeline = pipeline.composite([
+        {
+          input: lightningBolts,
+          blend: 'screen',
+          opacity: lightningIntensity * 0.7
+        }
+      ]);
+
       // Add strong vignette for drama
       const vignetteOverlay = Buffer.from(`
         <svg width="1000" height="1000" xmlns="http://www.w3.org/2000/svg">
@@ -322,6 +332,83 @@ class EffectsProcessor {
       console.error(`⚠️ Error applying lightning effect:`, error.message);
       return pipeline;
     }
+  }
+
+  /**
+   * Generate procedural lightning bolts
+   * Creates fractal-like branching lightning paths
+   */
+  generateLightningBolts(intensity) {
+    const width = 1000;
+    const height = 1000;
+    let svgContent = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>`;
+
+    // Generate 2-4 main lightning bolts
+    const boltCount = Math.ceil(2 + intensity * 2);
+
+    for (let b = 0; b < boltCount; b++) {
+      // Random starting position (top area)
+      const startX = Math.random() * width * 0.6 + width * 0.2;
+      const startY = 0;
+      const endX = startX + (Math.random() - 0.5) * width * 0.4;
+      const endY = height;
+
+      // Generate lightning path with fractal branching
+      const path = this.generateLightningPath(startX, startY, endX, endY, 5, intensity);
+
+      // Add glow effect (outer layer)
+      svgContent += `<path d="${path}" stroke="rgba(100,150,255,${0.3 * intensity})" stroke-width="8" fill="none" filter="url(#glow)" stroke-linecap="round"/>`;
+
+      // Add main bolt (bright)
+      svgContent += `<path d="${path}" stroke="rgba(200,220,255,${0.7 * intensity})" stroke-width="3" fill="none" filter="url(#glow)" stroke-linecap="round"/>`;
+
+      // Add core (very bright white)
+      svgContent += `<path d="${path}" stroke="rgba(255,255,255,${0.9 * intensity})" stroke-width="1" fill="none" stroke-linecap="round"/>`;
+
+      // Add secondary branches
+      const branchPoints = Math.floor(3 + intensity * 2);
+      for (let i = 0; i < branchPoints; i++) {
+        const branchT = Math.random();
+        const branchX = startX + (endX - startX) * branchT;
+        const branchY = startY + (endY - startY) * branchT;
+        const branchEndX = branchX + (Math.random() - 0.5) * width * 0.2;
+        const branchEndY = branchY + (Math.random() * height * 0.3);
+
+        const branchPath = this.generateLightningPath(branchX, branchY, branchEndX, branchEndY, 3, intensity * 0.6);
+        svgContent += `<path d="${branchPath}" stroke="rgba(150,200,255,${0.5 * intensity})" stroke-width="1.5" fill="none" filter="url(#glow)" stroke-linecap="round"/>`;
+      }
+    }
+
+    svgContent += `</svg>`;
+    return Buffer.from(svgContent);
+  }
+
+  /**
+   * Generate a fractal lightning path
+   */
+  generateLightningPath(x1, y1, x2, y2, depth, intensity, deviation = 20) {
+    if (depth === 0) {
+      return `L ${x2} ${y2}`;
+    }
+
+    // Find midpoint and offset it randomly
+    const midX = (x1 + x2) / 2 + (Math.random() - 0.5) * deviation * (1 + intensity);
+    const midY = (y1 + y2) / 2 + (Math.random() - 0.5) * deviation * (1 + intensity);
+
+    // Recursively generate left and right branches
+    const leftPath = this.generateLightningPath(x1, y1, midX, midY, depth - 1, intensity, deviation * 0.7);
+    const rightPath = this.generateLightningPath(midX, midY, x2, y2, depth - 1, intensity, deviation * 0.7);
+
+    return `${leftPath} ${rightPath}`;
   }
 
   /**
