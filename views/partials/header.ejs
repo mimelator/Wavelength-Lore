@@ -6,34 +6,39 @@
     <ul class="nav-links">
       <li><a href="/">🏠 Home</a></li>
 
-      <!-- Browse Dropdown -->
+      <!-- Enhanced Browse Dropdown -->
       <li class="has-dropdown">
-        <a href="#" onclick="return false;">📚 Browse</a>
+        <a href="#" onclick="return false;">🌊 Explore Universe</a>
         <ul class="dropdown">
-          <li><a href="/characters">🦸 Hero Gallery</a></li>
-          <li><a href="/lore">📖 Lore Gallery</a></li>
-          <li><a href="/map">🗺️ World Map</a></li>
+          <li><a href="/characters">🦸 Meet the Heroes</a></li>
+          <li><a href="/lore">📖 Uncover Mysteries</a></li>
+          <li><a href="/map">🗺️ Navigate Worlds</a></li>
         </ul>
       </li>
       
       <!-- Games - Now Top Level -->
       <li id="games-nav-item" class="featured-nav-item" style="display: none;">
-        <a href="/games" class="games-nav-link">🎮 Games</a>
+        <a href="/games" class="games-nav-link">🎮 Play & Earn</a>
       </li>
       
-      <!-- Community Dropdown -->
+      <!-- Enhanced Community Dropdown -->
       <li class="has-dropdown">
-        <a href="#" onclick="return false;">👥 Community</a>
+        <a href="#" onclick="return false;">✨ Join Community</a>
         <ul class="dropdown">
-          <li><a href="/forum">💬 Forum</a></li>
-          <li id="leaderboard-dropdown-item" style="display: none;"><a href="/leaderboard">🏆 Leaderboard</a></li>
-          <li id="profile-dropdown-item" style="display: none;"><a href="/forum/profile">👤 My Profile</a></li>
-          <li id="gallery-dropdown-item" style="display: none;"><a href="/my-gallery">🖼️ My Gallery</a></li>
+          <li><a href="/forum">� Share Theories</a></li>
+          <li id="leaderboard-dropdown-item" style="display: none;"><a href="/leaderboard">🏆 Compete & Win</a></li>
+          <li id="profile-dropdown-item" style="display: none;"><a href="/forum/profile">👤 Your Journey</a></li>
+          <li id="gallery-dropdown-item" style="display: none;"><a href="/my-gallery">🖼️ Your Collection</a></li>
         </ul>
       </li>
       
-      <li><a href="/radio">📻 Radio</a></li>
-      <li><a href="/search">🔍 Search</a></li>
+      <li><a href="/radio">🎵 Experience Music</a></li>
+      <li><a href="/search">🔍 Discover More</a></li>
+      
+      <!-- New Promotional CTA -->
+      <li class="promo-cta-nav">
+        <a href="/merchandise" class="promo-nav-link">🛍️ Get Merch</a>
+      </li>
       
       <li id="content-creator-nav-item" style="display: none;"><a href="/create">✨ Create</a></li>
       <li id="admin-nav-item" style="display: none;"><a href="/forum/admin">⚙️ Admin</a></li>
@@ -501,6 +506,53 @@
     100% {
       transform: scale(1.2);
       opacity: 0;
+    }
+  }
+
+  /* Promotional CTA Navigation Item */
+  .promo-cta-nav .promo-nav-link {
+    background: linear-gradient(135deg, #ff6b6b, #feca57) !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    color: white !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    position: relative !important;
+    overflow: hidden !important;
+    animation: promo-glow 3s ease-in-out infinite !important;
+  }
+
+  .promo-cta-nav .promo-nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .promo-cta-nav .promo-nav-link:hover::before {
+    left: 100%;
+  }
+
+  .promo-cta-nav .promo-nav-link:hover {
+    background: linear-gradient(135deg, #feca57, #ff6b6b) !important;
+    transform: translateY(-2px) scale(1.05) !important;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+  }
+
+  @keyframes promo-glow {
+    0%, 100% {
+      box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+    }
+    50% {
+      box-shadow: 0 4px 20px rgba(254, 202, 87, 0.5);
     }
   }
   
