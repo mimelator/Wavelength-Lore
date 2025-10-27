@@ -118,6 +118,48 @@
 <% } %>
 
 <footer>
+  <!-- Enhanced Footer CTA Section -->
+  <div class="footer-cta-section">
+    <div class="footer-cta-container">
+      <h3 class="footer-cta-title">Don't Miss the Next Mystery</h3>
+      <p class="footer-cta-subtitle">Join thousands exploring the Wavelength universe</p>
+      
+      <div class="footer-cta-grid">
+        <div class="footer-cta-card">
+          <div class="cta-icon">🎵</div>
+          <h4>Experience Every Episode</h4>
+          <p>Immerse yourself in music and mystery</p>
+          <a href="/" class="footer-cta-btn primary">Start Exploring</a>
+        </div>
+        
+        <div class="footer-cta-card">
+          <div class="cta-icon">👥</div>
+          <h4>Join the Community</h4>
+          <p>Share theories with fellow explorers</p>
+          <a href="/forum" class="footer-cta-btn secondary">Join Discussion</a>
+        </div>
+        
+        <div class="footer-cta-card">
+          <div class="cta-icon">🎬</div>
+          <h4>Watch on YouTube</h4>
+          <p>Full episodes with stunning visuals</p>
+          <a href="https://youtube.com/@WavelengthLore" target="_blank" class="footer-cta-btn tertiary">Subscribe Now</a>
+        </div>
+      </div>
+      
+      <div class="footer-newsletter">
+        <div class="newsletter-content">
+          <span class="newsletter-icon">✨</span>
+          <div class="newsletter-text">
+            <strong>Stay Connected</strong>
+            <span>Get notified of new episodes and lore reveals</span>
+          </div>
+          <a href="/forum" class="newsletter-btn">Join Community</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="footer-content">
     <p>&copy; 2025 Wavelength Lore. All rights reserved.</p>
     <nav>
@@ -138,11 +180,228 @@
   </div>
 </footer>
 <style>
+  /* Enhanced Footer CTA Section */
+  .footer-cta-section {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 60px 20px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .footer-cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="stars" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23stars)"/></svg>');
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .footer-cta-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-cta-title {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #ffd700, #ff6b6b, #667eea);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+  }
+
+  .footer-cta-subtitle {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+    opacity: 0.9;
+  }
+
+  .footer-cta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+  }
+
+  .footer-cta-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .footer-cta-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(102, 126, 234, 0.3);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+  }
+
+  .cta-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .footer-cta-card h4 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    color: #ffd700;
+  }
+
+  .footer-cta-card p {
+    margin-bottom: 20px;
+    opacity: 0.8;
+    line-height: 1.5;
+  }
+
+  .footer-cta-btn {
+    display: inline-block;
+    padding: 12px 25px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+
+  .footer-cta-btn.primary {
+    background: linear-gradient(135deg, #ff6b6b, #feca57);
+    color: white;
+  }
+
+  .footer-cta-btn.primary:hover {
+    background: linear-gradient(135deg, #feca57, #ff6b6b);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+  }
+
+  .footer-cta-btn.secondary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+  }
+
+  .footer-cta-btn.secondary:hover {
+    background: linear-gradient(135deg, #764ba2, #667eea);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  }
+
+  .footer-cta-btn.tertiary {
+    background: transparent;
+    color: #ffd700;
+    border: 2px solid #ffd700;
+  }
+
+  .footer-cta-btn.tertiary:hover {
+    background: #ffd700;
+    color: #1a1a2e;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+  }
+
+  .footer-newsletter {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 25px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+  }
+
+  .newsletter-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .newsletter-icon {
+    font-size: 2rem;
+    animation: sparkle 2s ease-in-out infinite;
+  }
+
+  @keyframes sparkle {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.1) rotate(5deg); }
+  }
+
+  .newsletter-text {
+    flex: 1;
+    text-align: left;
+  }
+
+  .newsletter-text strong {
+    display: block;
+    font-size: 1.2rem;
+    color: #ffd700;
+    margin-bottom: 5px;
+  }
+
+  .newsletter-text span {
+    opacity: 0.8;
+  }
+
+  .newsletter-btn {
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .newsletter-btn:hover {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+  }
+
   footer {
     background-color: #333;
     color: #fff;
     padding: 20px 0;
     text-align: center;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .footer-cta-title {
+      font-size: 2rem;
+    }
+
+    .footer-cta-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .footer-cta-card {
+      padding: 20px;
+    }
+
+    .newsletter-content {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .newsletter-text {
+      text-align: center;
+    }
   }
   .footer-content nav ul {
     list-style: none;
