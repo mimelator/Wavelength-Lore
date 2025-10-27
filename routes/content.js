@@ -539,7 +539,13 @@ router.get('/lore/:loreId', async (req, res) => {
         // Enhanced CTA fields from Phase 2 schema
         intrigue_hook: loreItem.intrigue_hook,
         mystery_level: loreItem.mystery_level,
-        investigation_cta: loreItem.investigation_cta
+        investigation_cta: loreItem.investigation_cta,
+        // Enhanced CTA fields from GitHub Issue #55
+        enhanced_title: loreItem.enhanced_title,
+        tagline: loreItem.tagline,
+        enhanced_description: loreItem.enhanced_description,
+        cta_hook: loreItem.cta_hook,
+        power_statement: loreItem.power_statement
       },
       previousLore,
       nextLore,
