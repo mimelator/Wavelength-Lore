@@ -84,7 +84,7 @@ class WavelengthContentCLI {
         if (this.currentPath === '/') {
             console.log(chalk.green('  📚 lore/') + chalk.gray('    - Places, things, concepts, and ideas'));
             console.log(chalk.green('  👥 characters/') + chalk.gray(' - Character profiles and details'));
-            console.log(chalk.green('  📺 episodes/') + chalk.gray('   - Episode content and metadata'));
+            console.log(chalk.green('  📺 episodes/') + chalk.gray('   - Episode content, stories, and metadata'));
         } else if (this.currentPath.includes('/lore')) {
             const allLore = loreHelpers.getAllLoreSync();
             console.log(chalk.gray(`  Found ${allLore.length} lore entries:`));
@@ -109,9 +109,34 @@ class WavelengthContentCLI {
                 const allCharacters = characterHelpers.getAllCharactersSync();
                 console.log(chalk.gray(`  Found ${allCharacters.length} characters:`));
                 
+                // Group by role/type for better organization
+                const charactersByRole = {};
                 allCharacters.forEach(character => {
-                    const hiddenLabel = character.hidden ? chalk.red('[HIDDEN]') : '';
-                    console.log(chalk.white(`    👤 ${character.id}`) + chalk.gray(` - ${character.name}`) + hiddenLabel);
+                    const role = character.role || character.type || 'other';
+                    if (!charactersByRole[role]) charactersByRole[role] = [];
+                    charactersByRole[role].push(character);
+                });
+                
+                // Sort roles with common ones first
+                const commonRoles = ['main', 'protagonist', 'antagonist', 'supporting', 'minor'];
+                const roleKeys = Object.keys(charactersByRole).sort((a, b) => {
+                    const aIndex = commonRoles.indexOf(a.toLowerCase());
+                    const bIndex = commonRoles.indexOf(b.toLowerCase());
+                    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+                    if (aIndex !== -1) return -1;
+                    if (bIndex !== -1) return 1;
+                    return a.localeCompare(b);
+                });
+                
+                roleKeys.forEach(role => {
+                    const roleName = role.charAt(0).toUpperCase() + role.slice(1);
+                    console.log(chalk.yellow(`\n  📂 ${roleName}/ (${charactersByRole[role].length} characters)`));
+                    charactersByRole[role].forEach(character => {
+                        const hiddenLabel = character.hidden ? chalk.red('[HIDDEN]') : '';
+                        const displayName = character.name || character.title || character.id;
+                        const roleIcon = this.getCharacterIcon(role);
+                        console.log(chalk.white(`    ${roleIcon} ${character.id}`) + chalk.gray(` - ${displayName}`) + hiddenLabel);
+                    });
                 });
             } catch (error) {
                 console.log(chalk.yellow('  ⚠️ Characters not yet loaded'));
@@ -121,9 +146,29 @@ class WavelengthContentCLI {
                 const allEpisodes = episodeHelpers.getAllEpisodesSync();
                 console.log(chalk.gray(`  Found ${allEpisodes.length} episodes:`));
                 
+                // Group by season for better organization
+                const episodesBySeason = {};
                 allEpisodes.forEach(episode => {
-                    const hiddenLabel = episode.hidden ? chalk.red('[HIDDEN]') : '';
-                    console.log(chalk.white(`    📺 ${episode.id}`) + chalk.gray(` - ${episode.title}`) + hiddenLabel);
+                    const season = episode.season || 'unknown';
+                    if (!episodesBySeason[season]) episodesBySeason[season] = [];
+                    episodesBySeason[season].push(episode);
+                });
+                
+                // Sort seasons
+                const seasons = Object.keys(episodesBySeason).sort((a, b) => {
+                    if (a === 'unknown') return 1;
+                    if (b === 'unknown') return -1;
+                    return a.localeCompare(b);
+                });
+                
+                seasons.forEach(season => {
+                    const seasonName = season === 'unknown' ? 'Unknown Season' : season.replace('season', 'Season ');
+                    const seasonIcon = this.getSeasonIcon(season);
+                    console.log(chalk.yellow(`\n  📂 ${seasonName}/ (${episodesBySeason[season].length} episodes)`));
+                    episodesBySeason[season].forEach(episode => {
+                        const hiddenLabel = episode.hidden ? chalk.red('[HIDDEN]') : '';
+                        console.log(chalk.white(`    ${seasonIcon} ${episode.id}`) + chalk.gray(` - ${episode.title}`) + hiddenLabel);
+                    });
                 });
             } catch (error) {
                 console.log(chalk.yellow('  ⚠️ Episodes not yet loaded'));
@@ -141,6 +186,29 @@ class WavelengthContentCLI {
             'band': '🎵'
         };
         return icons[type] || '📄';
+    }
+
+    getCharacterIcon(role) {
+        const icons = {
+            'main': '⭐',
+            'protagonist': '🦸',
+            'antagonist': '🦹',
+            'villain': '👹',
+            'supporting': '👥',
+            'minor': '👤',
+            'other': '👤'
+        };
+        return icons[role.toLowerCase()] || '👤';
+    }
+
+    getSeasonIcon(season) {
+        const icons = {
+            'season1': '🌱',
+            'season2': '🌿', 
+            'season3': '🌳',
+            'season4': '🍂'
+        };
+        return icons[season] || '📺';
     }
 
     setupEventHandlers() {
@@ -895,11 +963,37 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
                         const navOptions = ['..', '/'];
                         completions.push(...navOptions.filter(dir => dir.startsWith(partial)));
                         
-                        // Add current directory items
-                        if (this.currentPath.includes('/lore/')) {
-                            const allLore = loreHelpers.getAllLoreSync();
-                            const loreTypes = [...new Set(allLore.map(item => item.type))];
-                            completions.push(...loreTypes.map(type => type + '/').filter(dir => dir.startsWith(partial)));
+                        // Add current directory navigation options for each content type
+                        if (this.currentPath.includes('/lore')) {
+                            try {
+                                const allLore = loreHelpers.getAllLoreSync();
+                                const loreTypes = [...new Set(allLore.map(item => item.type))];
+                                completions.push(...loreTypes.map(type => type + '/').filter(dir => dir.startsWith(partial)));
+                            } catch (error) {
+                                // Lore might not be loaded yet
+                            }
+                        } else if (this.currentPath.includes('/episodes')) {
+                            try {
+                                const allEpisodes = episodeHelpers.getAllEpisodesSync();
+                                const seasons = [...new Set(allEpisodes.map(ep => ep.season))].sort();
+                                completions.push(...seasons.map(season => season + '/').filter(dir => dir.startsWith(partial)));
+                            } catch (error) {
+                                // Episodes might not be loaded yet
+                            }
+                        } else if (this.currentPath.includes('/characters')) {
+                            try {
+                                const allCharacters = characterHelpers.getAllCharactersSync();
+                                // For characters, we could group by role or type if those fields exist
+                                const roles = [...new Set(allCharacters
+                                    .map(char => char.role || char.type)
+                                    .filter(role => role)
+                                )].sort();
+                                if (roles.length > 0) {
+                                    completions.push(...roles.map(role => role + '/').filter(dir => dir.startsWith(partial)));
+                                }
+                            } catch (error) {
+                                // Characters might not be loaded yet
+                            }
                         }
                     }
                     break;
@@ -912,7 +1006,7 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
                 case 'show':
                 case 'preview':
                     // Suggest items based on current context
-                    if (this.currentPath.includes('/lore/') || this.currentPath === '/lore/') {
+                    if (this.currentPath.includes('/lore')) {
                         const allLore = loreHelpers.getAllLoreSync();
                         completions.push(...allLore.map(item => item.id).filter(id => id.startsWith(partial)));
                         
@@ -925,6 +1019,57 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
                                 }
                             });
                         });
+                    } else if (this.currentPath.includes('/episodes')) {
+                        try {
+                            const allEpisodes = episodeHelpers.getAllEpisodesSync();
+                            completions.push(...allEpisodes.map(item => item.id).filter(id => id.startsWith(partial)));
+                            
+                            // Also suggest by title words for fuzzy matching
+                            allEpisodes.forEach(item => {
+                                const titleWords = item.title.toLowerCase().split(' ');
+                                titleWords.forEach(word => {
+                                    if (word.startsWith(partial.toLowerCase()) && !completions.includes(item.id)) {
+                                        completions.push(item.id);
+                                    }
+                                });
+                            });
+                        } catch (error) {
+                            // Episodes might not be loaded yet
+                        }
+                    } else if (this.currentPath.includes('/characters')) {
+                        try {
+                            const allCharacters = characterHelpers.getAllCharactersSync();
+                            completions.push(...allCharacters.map(item => item.id).filter(id => id.startsWith(partial)));
+                            
+                            // Also suggest by character name words for fuzzy matching
+                            allCharacters.forEach(item => {
+                                const nameWords = (item.name || '').toLowerCase().split(' ');
+                                nameWords.forEach(word => {
+                                    if (word.startsWith(partial.toLowerCase()) && !completions.includes(item.id)) {
+                                        completions.push(item.id);
+                                    }
+                                });
+                            });
+                        } catch (error) {
+                            // Characters might not be loaded yet
+                        }
+                    } else {
+                        // If not in a specific context, suggest from all content types
+                        try {
+                            const allLore = loreHelpers.getAllLoreSync();
+                            const allEpisodes = episodeHelpers.getAllEpisodesSync();
+                            const allCharacters = characterHelpers.getAllCharactersSync();
+                            
+                            const allItems = [
+                                ...allLore.map(item => item.id),
+                                ...allEpisodes.map(item => item.id),
+                                ...allCharacters.map(item => item.id)
+                            ];
+                            
+                            completions.push(...allItems.filter(id => id.startsWith(partial)));
+                        } catch (error) {
+                            // Some content might not be loaded yet
+                        }
                     }
                     break;
             }
