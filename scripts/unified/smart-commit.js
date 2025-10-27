@@ -344,6 +344,9 @@ This commit adds [brief summary] to improve [area of improvement].
   async run(options = {}) {
     try {
       console.log('🤖 Smart Git Commit Tool\n');
+      
+      console.log('💡 TIP: Make sure commit-message.txt reflects your CURRENT work!');
+      console.log('   Previous messages may not match your latest changes.\n');
 
       // Check for changes
       const hasChanges = await this.checkForChanges();
@@ -425,7 +428,12 @@ This commit adds [brief summary] to improve [area of improvement].
         console.log('✅ No credentials detected in staged files');
       }
 
-      // Show commit message preview
+      // Show commit message preview with prominent warning
+      console.log('\n' + '🚨'.repeat(20));
+      console.log('⚠️  WARNING: VERIFY COMMIT MESSAGE MATCHES YOUR CURRENT WORK! ⚠️');
+      console.log('🔍 This message may be from previous work - UPDATE if needed!');
+      console.log('📝 Edit: nano commit-message.txt (or your preferred editor)');
+      console.log('🚨'.repeat(20));
       console.log('\n📝 Commit message:');
       console.log('─'.repeat(60));
       console.log(message);
@@ -441,7 +449,9 @@ This commit adds [brief summary] to improve [area of improvement].
 
       // Confirm commit in interactive mode
       if (options.interactive) {
-        const shouldCommit = await this.confirm('\nProceed with commit?');
+        console.log('\n💡 REMINDER: Does the commit message above match your current work?');
+        console.log('   If not, press Ctrl+C now and update commit-message.txt');
+        const shouldCommit = await this.confirm('\nProceed with commit? (Double-check message first!)');
         if (!shouldCommit) {
           console.log('❌ Commit cancelled');
           return;
