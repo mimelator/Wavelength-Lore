@@ -192,22 +192,8 @@ class MerchandiseStore {
           try {
             console.log('🚀 Initializing product navigator for pre-selected image...');
             
-            // Check if container exists before initializing
-            const container = document.getElementById('product-navigator');
-            if (!container) {
-              console.log('⏭️ Product navigator container not ready yet, will initialize on selectImage');
-              return;
-            }
-            
-            await this.initializeProductNavigator();
-            
-            // Verify navigator was created
-            const navigator = document.querySelector('.product-navigator, .simple-categories');
-            if (navigator) {
-              console.log('✅ Product navigator initialized successfully for pre-selected image');
-            } else {
-              console.log('⏭️ Product navigator will be initialized when image is selected');
-            }
+            // Category cards will be initialized when image is selected
+            console.log('✅ Ready for image selection - category cards will appear after image selection');
           } catch (error) {
             console.error('❌ Error initializing product navigator for pre-selected image:', error);
           }
@@ -1071,9 +1057,8 @@ class MerchandiseStore {
               <div class="selected-image-preview">
                 ${this.renderSelectedImagePreview()}
               </div>
-              <p class="section-description">Choose from our curated product selection</p>
-              <div id="product-navigator-container">
-                <div id="product-navigator"></div>
+              <div id="category-navigation-container">
+                <!-- Category cards will be rendered here -->
               </div>
             </div>
             ` : ''}
@@ -1153,199 +1138,317 @@ class MerchandiseStore {
       `;
     }
   }
-  
-  async initializeProductNavigator() {
-    const container = document.getElementById('product-navigator');
-    if (!container) {
-      console.error('❌ Product navigator container not found');
+  renderCategoryCards(container) {
+    console.log('🎴 Rendering category cards');
+    
+    // Priority order for categories (most popular first)
+    const categoryPriority = [
+      't-shirt', 'hoodie', 'coffee-mug', 'premium-tshirt', 'women-tee',
+      'canvas', 'tote-bag', 'pillow', 'hat', 'phone-case'
+    ];
+    
+    // Sort categories by priority, then alphabetically
+    const sortedCategories = Object.entries(this.productCategories).sort(([a], [b]) => {
+      const aPriority = categoryPriority.indexOf(a);
+      const bPriority = categoryPriority.indexOf(b);
+      if (aPriority !== -1 && bPriority !== -1) return aPriority - bPriority;
+      if (aPriority !== -1) return -1;
+      if (bPriority !== -1) return 1;
+      return a.localeCompare(b);
+    });
+
+    const categoryCardsHTML = sortedCategories.map(([categoryKey, categoryData]) => {
+      const stats = this.getCategoryStats(categoryData.products);
+      const description = this.getCategoryDescription(categoryKey);
+      
+      return `
+        <div class="category-card" data-category="${categoryKey}">
+          <div class="category-card-header">
+            <div class="category-icon-large">${this.getCategoryIcon(categoryKey)}</div>
+            <div class="category-info">
+              <h3 class="category-name">${categoryData.name}</h3>
+              <p class="category-description">${description}</p>
+            </div>
+          </div>
+          <div class="category-stats">
+            <div class="stat-item">
+              <span class="stat-number">${categoryData.products.length}</span>
+              <span class="stat-label">Products</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">${stats.providerCount}</span>
+              <span class="stat-label">Providers</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-price">$${stats.priceRange}</span>
+              <span class="stat-label">Price Range</span>
+            </div>
+          </div>
+          <div class="category-card-footer">
+            <button class="browse-category-btn">
+              Browse ${categoryData.name} <span class="arrow">→</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML = `
+      <div class="category-cards-view">
+        <div class="catalog-header">
+          <h2>🛍️ Choose Your Product Category</h2>
+          <p>Explore ${Object.keys(this.productCategories).length} categories with ${this.availableProducts.length} total products</p>
+        </div>
+        <div class="category-cards-grid">
+          ${categoryCardsHTML}
+        </div>
+      </div>
+    `;
+  }
+
+  renderCategoryProducts(container) {
+    console.log('📦 Rendering products for category:', this.categoryView.selectedCategory);
+    
+    const categoryData = this.productCategories[this.categoryView.selectedCategory];
+    if (!categoryData) {
+      console.error('Category data not found:', this.categoryView.selectedCategory);
       return;
     }
+
+    const productsHTML = categoryData.products.map(product => `
+      <div class="product-item">
+        <div class="product-icon">${this.getCategoryIcon(product.category)}</div>
+        <div class="product-info">
+          <h4 class="product-name">${product.name}</h4>
+          <p class="product-description">${product.description || 'Custom merchandise item'}</p>
+          <div class="product-details">
+            <span class="product-price">$${this.getEstimatedPrice(product.category)}</span>
+            <span class="product-provider">${product.provider}</span>
+          </div>
+        </div>
+        <button class="select-simple-product product-select-btn" 
+                data-product="${product.id}" 
+                data-blueprint="${product.blueprintId}" 
+                data-provider="${product.printProviderId}">
+          Select This Product
+        </button>
+      </div>
+    `).join('');
+
+    container.innerHTML = `
+      <div class="category-products-view">
+        <div class="category-header">
+          <button class="back-to-categories">← Back to Categories</button>
+          <div class="category-title-section">
+            <h2>
+              ${this.getCategoryIcon(this.categoryView.selectedCategory)} 
+              ${categoryData.name}
+            </h2>
+            <p>${this.getCategoryDescription(this.categoryView.selectedCategory)}</p>
+          </div>
+        </div>
+        <div class="products-grid">
+          ${productsHTML}
+        </div>
+      </div>
+    `;
+  }
+
+  getCategoryStats(products) {
+    const providers = new Set(products.map(p => p.provider));
+    const prices = products.map(p => this.getEstimatedPrice(p.category));
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
     
-    console.log('🔧 Initializing ProductNavigator...');
-    console.log('🔍 Checking ProductNavigator availability:', typeof ProductNavigator);
-    console.log('🔍 Product types available:', Object.keys(this.productTypes || {}));
+    return {
+      providerCount: providers.size,
+      priceRange: minPrice === maxPrice ? `${minPrice}` : `${minPrice}-${maxPrice}`
+    };
+  }
+
+  getCategoryDescription(categoryKey) {
+    const descriptions = {
+      't-shirt': 'Classic cotton t-shirts perfect for everyday wear',
+      'hoodie': 'Comfortable hoodies for cool weather and casual style',
+      'coffee-mug': 'Premium ceramic mugs for your morning coffee ritual',
+      'premium-tshirt': 'High-quality premium t-shirts with superior materials',
+      'women-tee': 'Stylish women\'s t-shirts with a flattering fit',
+      'canvas': 'Beautiful canvas prints to decorate your space',
+      'tote-bag': 'Practical and stylish tote bags for daily use',
+      'pillow': 'Soft decorative pillows to enhance your home',
+      'hat': 'Trendy hats and caps for sun protection and style',
+      'phone-case': 'Protective phone cases with custom designs',
+      'tank-top': 'Lightweight tank tops perfect for warm weather',
+      'long-sleeve': 'Long-sleeve shirts for cooler days',
+      'sweatshirt': 'Cozy sweatshirts for comfort and warmth'
+    };
     
-    // Check if we have product types data first
-    if (!this.productTypes || Object.keys(this.productTypes).length === 0) {
-      console.error('❌ No product types data available, cannot initialize ProductNavigator');
-      console.log('🔄 Attempting to reload product types...');
-      
-      // Try to reload product types once
-      try {
-        await this.loadProductTypes();
-        if (!this.productTypes || Object.keys(this.productTypes).length === 0) {
-          console.error('❌ Still no product types after reload');
-          this.renderSimpleCategories(container);
-          return;
-        }
-        console.log('✅ Product types reloaded successfully');
-      } catch (error) {
-        console.error('❌ Failed to reload product types:', error);
-        this.renderSimpleCategories(container);
-        return;
-      }
-    }
+    return descriptions[categoryKey] || 'Custom merchandise items with your favorite designs';
+  }
+
+  showCategoryProducts(categoryKey) {
+    this.categoryView.currentView = 'products';
+    this.categoryView.selectedCategory = categoryKey;
     
-    // Check if ProductNavigator class is available
-    if (typeof ProductNavigator === 'undefined') {
-      console.error('❌ ProductNavigator class not found, using simple categories');
-      this.renderSimpleCategories(container);
-      return;
-    }
-    
-    try {
-      // Initialize the ProductNavigator component
-      console.log('🚀 Creating ProductNavigator instance...');
-      this.productNavigator = new ProductNavigator('product-navigator', {
-        onProductSelect: (product) => {
-          console.log('✅ Product selected from navigator:', product);
-          
-          // Map blueprint title to product type
-          const productType = this.mapBlueprintToProductType(product.blueprint_title, product.blueprint_id);
-          
-          console.log('🔄 Mapped product type:', productType);
-          console.log('  From blueprint_title:', product.blueprint_title);
-          console.log('  From blueprint_id:', product.blueprint_id);
-          
-          this.selectProductType(
-            productType,
-            product.blueprint_id,
-            product.provider_id
-          );
-        },
-        showSearch: true,
-        showBreadcrumbs: true
-      });
-      
-      console.log('✅ ProductNavigator initialized successfully');
-      
-      // Verify it rendered properly with multiple checks
-      let verificationAttempts = 0;
-      const maxAttempts = 3;
-      
-      const verifyRendering = () => {
-        verificationAttempts++;
-        const categories = container.querySelectorAll('.category-card');
-        
-        if (categories.length > 0) {
-          console.log(`✅ Product categories rendered: ${categories.length} categories found`);
-          // Remove any fallback notices since full navigator loaded
-          const fallbackNotices = document.querySelectorAll('.fallback-notice, .error-notice');
-          fallbackNotices.forEach(notice => notice.remove());
-        } else if (verificationAttempts < maxAttempts) {
-          console.log(`⏳ Attempt ${verificationAttempts}: Categories still loading, retrying...`);
-          setTimeout(verifyRendering, 1000);
-        } else {
-          console.log('⚠️ ProductNavigator failed to render categories, using fallback');
-          this.renderSimpleCategories(container);
-        }
-      };
-      
-      setTimeout(verifyRendering, 1000);
-      
-    } catch (error) {
-      console.error('❌ Error creating ProductNavigator:', error);
-      console.error('Error details:', error.stack);
-      this.renderSimpleCategories(container);
+    // Re-render with new view
+    const container = document.getElementById('category-navigation-container');
+    if (container) {
+      this.renderCategoryProducts(container);
     }
   }
-  
-  /**
-   * Simple fallback category display
-   */
-  async renderSimpleCategories(container) {
-    console.log('🔧 Rendering simple categories using admin catalog approach');
+
+  showCategoryCards() {
+    this.categoryView.currentView = 'categories';
+    this.categoryView.selectedCategory = null;
     
-    // Use the same simple approach as admin catalog
-    if (this.availableProducts && this.availableProducts.length > 0) {
-      console.log(`📦 Using ${this.availableProducts.length} products from allProducts array`);
-      console.log(`� Available categories: ${Object.keys(this.productCategories).length}`);
-      
-      // Create category sections (same as admin approach but for user selection)
-      const categoryHTML = Object.entries(this.productCategories).map(([categoryKey, categoryData]) => `
-        <div class="category-section">
-          <h4 class="category-title">
-            ${this.getCategoryIcon(categoryKey)} ${categoryData.name}
-            <span class="product-count">(${categoryData.products.length} products)</span>
-          </h4>
-          <div class="category-products">
-            ${categoryData.products.slice(0, 6).map(product => `
-              <div class="simple-category" data-type="${product.id}">
-                <div class="category-icon">${this.getCategoryIcon(product.category)}</div>
-                <h5>${product.name}</h5>
-                <p class="product-desc">${product.description || 'Custom merchandise item'}</p>
-                <div class="product-price">$${this.getEstimatedPrice(product.category)}</div>
-                <button class="select-simple-product" 
-                        data-product="${product.id}" 
-                        data-blueprint="${product.blueprintId}" 
-                        data-provider="${product.printProviderId}">
-                  Select
-                </button>
-              </div>
-            `).join('')}
-            ${categoryData.products.length > 6 ? `
-              <div class="show-more-products">
-                <button class="btn-secondary show-all-in-category" data-category="${categoryKey}">
-                  Show all ${categoryData.products.length} ${categoryData.name.toLowerCase()} products
-                </button>
-              </div>
-            ` : ''}
-          </div>
-        </div>
-      `).join('');
-      
-      container.innerHTML = `
-        <div class="simple-categories">
-          <div class="catalog-header">
-            <h3>🛍️ Choose Your Product Type</h3>
-            <p>Select from ${this.availableProducts.length} validated products across ${Object.keys(this.productCategories).length} categories</p>
-          </div>
-          <div class="categories-container">
-            ${categoryHTML}
-          </div>
-        </div>
-      `;
+    // Re-render with new view
+    const container = document.getElementById('category-navigation-container');
+    if (container) {
+      this.renderCategoryCards(container);
+    }
+  }
+
+  handleShowMoreProducts(categoryKey) {
+    console.log(`🔄 Showing more products for category: ${categoryKey}`);
+    
+    const categoryData = this.productCategories[categoryKey];
+    if (!categoryData) return;
+    
+    const container = document.getElementById(`products-${categoryKey}`);
+    if (!container) return;
+    
+    const currentCount = container.children.length;
+    const isExpanded = this.progressiveDisclosure.expandedCategories.has(categoryKey);
+    
+    if (isExpanded) {
+      // Collapse to initial view
+      this.progressiveDisclosure.expandedCategories.delete(categoryKey);
+      this.animateProductsOut(container, this.progressiveDisclosure.initialShow);
+      this.updateProgressiveControls(categoryKey, categoryData, false);
     } else {
-      // If no product types loaded, try to reload once more
-      console.log('⚠️ No product types loaded for fallback, attempting final reload...');
+      // Show more products
+      const newCount = Math.min(currentCount + this.progressiveDisclosure.incrementBy, categoryData.products.length);
+      this.addMoreProducts(categoryKey, categoryData, currentCount, newCount);
+    }
+  }
+
+  handleShowAllProducts(categoryKey) {
+    console.log(`🔄 Showing all products for category: ${categoryKey}`);
+    
+    const categoryData = this.productCategories[categoryKey];
+    if (!categoryData) return;
+    
+    const container = document.getElementById(`products-${categoryKey}`);
+    if (!container) return;
+    
+    const currentCount = container.children.length;
+    this.progressiveDisclosure.expandedCategories.add(categoryKey);
+    this.addMoreProducts(categoryKey, categoryData, currentCount, categoryData.products.length);
+  }
+
+  addMoreProducts(categoryKey, categoryData, fromIndex, toIndex) {
+    const container = document.getElementById(`products-${categoryKey}`);
+    if (!container) return;
+    
+    const newProducts = categoryData.products.slice(fromIndex, toIndex);
+    
+    newProducts.forEach((product, index) => {
+      const productElement = document.createElement('div');
+      productElement.className = 'simple-category progressive-item progressive-new';
+      productElement.dataset.type = product.id;
+      productElement.style.animationDelay = `${index * 0.1}s`;
       
-      try {
-        await this.loadProductTypes();
-        
-        if (this.productTypes && Object.keys(this.productTypes).length > 0) {
-          console.log('✅ Product types loaded on retry, re-rendering fallback');
-          this.renderSimpleCategories(container);
-          return;
-        }
-      } catch (error) {
-        console.error('❌ Final reload attempt failed:', error);
-      }
-      
-      // If still no product types, show error
-      console.log('❌ No product types loaded after all attempts, showing error message');
-      container.innerHTML = `
-        <div class="simple-categories">
-          <div class="error-notice">
-            <p>❌ <strong>Failed to load product catalog.</strong></p>
-            <p>Please refresh the page to try again.</p>
-            <button onclick="location.reload()" class="btn-primary">Refresh Page</button>
-          </div>
-        </div>
+      productElement.innerHTML = `
+        <div class="category-icon">${this.getCategoryIcon(product.category)}</div>
+        <h5>${product.name}</h5>
+        <p class="product-desc">${product.description || 'Custom merchandise item'}</p>
+        <div class="product-price">$${this.getEstimatedPrice(product.category)}</div>
+        <button class="select-simple-product" 
+                data-product="${product.id}" 
+                data-blueprint="${product.blueprintId}" 
+                data-provider="${product.printProviderId}">
+          Select
+        </button>
       `;
+      
+      container.appendChild(productElement);
+      
+      // Trigger animation
+      setTimeout(() => {
+        productElement.classList.add('progressive-visible');
+      }, index * 50);
+    });
+    
+    // Update controls
+    const isFullyExpanded = toIndex >= categoryData.products.length;
+    if (isFullyExpanded) {
+      this.progressiveDisclosure.expandedCategories.add(categoryKey);
+    }
+    this.updateProgressiveControls(categoryKey, categoryData, isFullyExpanded);
+  }
+
+  animateProductsOut(container, keepCount) {
+    const items = Array.from(container.children);
+    const toRemove = items.slice(keepCount);
+    
+    toRemove.forEach((item, index) => {
+      setTimeout(() => {
+        item.classList.add('progressive-fade-out');
+        setTimeout(() => {
+          if (item.parentNode) {
+            item.parentNode.removeChild(item);
+          }
+        }, 300);
+      }, index * 50);
+    });
+  }
+
+  updateProgressiveControls(categoryKey, categoryData, isFullyExpanded) {
+    const categorySection = document.querySelector(`[data-category="${categoryKey}"]`);
+    const controlsContainer = categorySection?.querySelector('.progressive-controls');
+    
+    if (!controlsContainer) return;
+    
+    const container = document.getElementById(`products-${categoryKey}`);
+    const currentCount = container?.children.length || 0;
+    const hasMore = currentCount < categoryData.products.length;
+    
+    if (!hasMore) {
+      // Hide controls if no more products
+      controlsContainer.style.display = 'none';
+      return;
     }
     
-    console.log('✅ Simple categories rendered successfully');
+    controlsContainer.style.display = 'block';
     
-    // Add event listeners for simple category selection
-    container.addEventListener('click', (e) => {
-      if (e.target.classList.contains('select-simple-product')) {
-        const productType = e.target.dataset.product;
-        const blueprintId = e.target.dataset.blueprint;
-        const providerId = e.target.dataset.provider;
-        console.log('🎯 Simple category selected:', productType, blueprintId, providerId);
-        this.selectProductType(productType, blueprintId, providerId);
-      }
-    });
+    if (isFullyExpanded) {
+      controlsContainer.innerHTML = `
+        <button class="btn-secondary show-more-products" data-category="${categoryKey}">
+          Show less
+        </button>
+      `;
+    } else if (categoryData.products.length > this.progressiveDisclosure.maxBeforeShowAll) {
+      const remainingCount = categoryData.products.length - currentCount;
+      const nextIncrement = Math.min(this.progressiveDisclosure.incrementBy, remainingCount);
+      
+      controlsContainer.innerHTML = `
+        <button class="btn-secondary show-more-products" data-category="${categoryKey}">
+          Show ${nextIncrement} more ${categoryData.name.toLowerCase()}
+        </button>
+        <button class="btn-outline show-all-products" data-category="${categoryKey}">
+          Show all ${categoryData.products.length}
+        </button>
+      `;
+    } else {
+      const remainingCount = categoryData.products.length - currentCount;
+      const nextIncrement = Math.min(this.progressiveDisclosure.incrementBy, remainingCount);
+      
+      controlsContainer.innerHTML = `
+        <button class="btn-secondary show-more-products" data-category="${categoryKey}">
+          Show ${nextIncrement} more
+        </button>
+      `;
+    }
   }
   
   renderProducts() {
@@ -1717,19 +1820,78 @@ class MerchandiseStore {
     console.log('🖼️ Image selected:', imageId);
     this.render();
     
-    // Initialize the product navigator after rendering with error handling
-    setTimeout(async () => {
+    // Initialize category cards after rendering with retries
+    this.initializeCategoryCards();
+  }
+
+  async initializeCategoryCards() {
+    console.log('🎴 Starting category cards initialization...');
+    
+    // Wait for DOM to be ready after render
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    const tryInitialize = async () => {
+      attempts++;
+      console.log(`� Attempt ${attempts}: Looking for category navigation container...`);
+      
       try {
-        console.log('🚀 Initializing product navigator...');
-        await this.initializeProductNavigator();
-        
-        // Verify initialization success
-        setTimeout(() => {
-          const navigator = document.querySelector('.product-navigator, .simple-categories');
-          if (navigator) {
-            console.log('✅ Product navigator ready for image selection');
+        // Find the container
+        const container = document.getElementById('category-navigation-container');
+        if (!container) {
+          if (attempts < maxAttempts) {
+            console.log(`⏳ Container not found, retrying in 200ms...`);
+            setTimeout(tryInitialize, 200);
+            return;
+          } else {
+            console.error('❌ Category navigation container not found after all attempts');
+            const availableIds = Array.from(document.querySelectorAll('[id]')).map(el => el.id);
+            console.log('Available containers:', availableIds.slice(0, 10));
+            this.showError('Failed to initialize category selection. Please refresh the page.');
+            return;
           }
-        }, 200);
+        }
+        
+        console.log('✅ Found category navigation container!');
+        
+        // Make sure we have product categories loaded
+        if (!this.productCategories || Object.keys(this.productCategories).length === 0) {
+          console.log('📦 Loading product categories...');
+          await this.loadProductTypes();
+        }
+        
+        console.log(`📊 Ready to render ${Object.keys(this.productCategories).length} categories`);
+        this.renderCategoryCards(container);
+        console.log('✅ Category cards rendered successfully');
+        
+        // Add event listeners for category cards and product selection
+        container.addEventListener('click', (e) => {
+          if (e.target.classList.contains('select-simple-product')) {
+            const productType = e.target.dataset.product;
+            const blueprintId = e.target.dataset.blueprint;
+            const providerId = e.target.dataset.provider;
+            console.log('🎯 Product selected:', productType, blueprintId, providerId);
+            this.selectProductType(productType, blueprintId, providerId);
+          } else if (e.target.classList.contains('category-card') || e.target.closest('.category-card')) {
+            const card = e.target.closest('.category-card') || e.target;
+            const categoryKey = card.dataset.category;
+            console.log('🎯 Category card clicked:', categoryKey);
+            this.showCategoryProducts(categoryKey);
+          } else if (e.target.classList.contains('back-to-categories')) {
+            console.log('🔙 Back to categories');
+            this.showCategoryCards();
+          } else if (e.target.classList.contains('browse-category-btn')) {
+            const card = e.target.closest('.category-card');
+            if (card) {
+              const categoryKey = card.dataset.category;
+              console.log('🎯 Browse category button clicked:', categoryKey);
+              this.showCategoryProducts(categoryKey);
+            }
+          }
+        });
+        console.log('✅ Event listeners attached to category cards');
         
         // Auto-scroll to the Choose Product section for better UX
         const chooseProductSection = document.getElementById('choose-product-section');
@@ -1738,13 +1900,16 @@ class MerchandiseStore {
             behavior: 'smooth', 
             block: 'start' 
           });
-          console.log('📍 Auto-scrolled to Choose Product section after image selection');
+          console.log('📍 Auto-scrolled to Choose Product section');
         }
+        
       } catch (error) {
-        console.error('❌ Error initializing product navigator:', error);
+        console.error('❌ Error initializing category cards:', error);
         this.showError('Failed to load product categories. Please refresh the page.');
       }
-    }, 300);
+    };
+    
+    tryInitialize();
   }
   
   async selectProductType(productType, blueprintId, printProviderId) {

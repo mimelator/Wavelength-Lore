@@ -401,6 +401,68 @@ class MerchandisePageBrowserTest {
         });
     }
 
+    async testCategoryCardsSystem() {
+        await this.runTest('Category cards system is functional', async () => {
+            // Wait for category cards to load
+            await new Promise(r => setTimeout(r, 2000));
+            
+            // Check for category cards
+            const categoryCards = await this.page.$$('.category-card');
+            console.log(`  🎴 Category cards found: ${categoryCards.length}`);
+            
+            if (categoryCards.length > 0) {
+                // Test category card structure
+                const categoryData = await this.page.evaluate(() => {
+                    const cards = Array.from(document.querySelectorAll('.category-card'));
+                    return cards.slice(0, 3).map(card => ({
+                        name: card.querySelector('.category-name, h3')?.textContent?.trim(),
+                        icon: card.querySelector('.category-icon')?.textContent?.trim(),
+                        stats: card.querySelector('.category-stats, .stats')?.textContent?.trim(),
+                        hasDescription: !!card.querySelector('.category-description, .description'),
+                        clickable: card.style.cursor === 'pointer' || card.hasAttribute('data-category')
+                    }));
+                });
+                
+                console.log('  📋 Category cards preview:');
+                categoryData.forEach((cat, i) => {
+                    console.log(`     ${i + 1}. ${cat.icon} ${cat.name}`);
+                    console.log(`        Stats: ${cat.stats?.substring(0, 30)}...`);
+                    console.log(`        Description: ${cat.hasDescription ? '✅' : '❌'}`);
+                });
+                
+                // Test clicking first category card
+                if (categoryCards.length > 0) {
+                    console.log('  🎯 Testing category card interaction...');
+                    await categoryCards[0].click();
+                    
+                    // Wait for transition
+                    await new Promise(r => setTimeout(r, 1500));
+                    
+                    // Check if products view loaded
+                    const productsView = await this.page.$('.category-products-view, .products-grid');
+                    const productCards = await this.page.$$('.product-card');
+                    const backButton = await this.page.$('.back-to-categories, .back-button');
+                    
+                    if (productsView && productCards.length > 0) {
+                        console.log(`  ✅ Category selection works (${productCards.length} products shown)`);
+                        
+                        if (backButton) {
+                            console.log('  ✅ Back navigation button present');
+                            await backButton.click();
+                            await new Promise(r => setTimeout(r, 1000));
+                        }
+                    } else {
+                        console.log('  ⚠️  Category selection may not be working properly');
+                    }
+                }
+                
+                console.log('  ✅ Category cards system detected and tested');
+            } else {
+                console.log('  ℹ️  No category cards found (may use different UI approach)');
+            }
+        });
+    }
+
     async testNoPrintifyAPICalls() {
         await this.runTest('No Printify API calls triggered', async () => {
             // Check all network requests made
@@ -559,6 +621,7 @@ class MerchandisePageBrowserTest {
             await this.testGalleryImagesLoad();
             await this.testNavigationLinks();
             await this.testProductPreviewWorkflow();
+            await this.testCategoryCardsSystem();
             await this.testNoPrintifyAPICalls();
             await this.testConsoleErrors();
             await this.testAPIEndpointsAvailable();

@@ -20,7 +20,10 @@
     "wavelength:docker-test": "node wavelength-docker-validator.js",
     "wavelength:docker-fix": "node wavelength-docker-fix-plan.js",
     "wavelength:deploy": "node wavelength-docker-deploy.js",
-    "wavelength:commit": "node wavelength-enhanced-docker-committer.js"
+    "wavelength:commit": "node wavelength-enhanced-docker-committer.js",
+    "test:merchandise": "node tests/merchandise-page-browser-test.js",
+    "test:category-cards": "node tests/merchandise-category-card-browser-test.js",
+    "test:merchandise-full": "node tests/run-merchandise-tests.js"
   },
   "dependencies": {
     "@aws-sdk/client-apprunner": "^3.917.0",
