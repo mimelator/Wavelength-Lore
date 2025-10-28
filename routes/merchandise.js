@@ -531,7 +531,7 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
     const productTags = generateProductTags(productType, imageContext);
 
     // Download image from URL for processing with auto-enhancement
-    const imageBuffer = await downloadImageFromS3(imageUrl);
+    let imageBuffer = await downloadImageFromS3(imageUrl);
     if (!imageBuffer) {
       return res.status(400).json({
         success: false,
@@ -542,6 +542,29 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
     console.log('✅ Product configuration found:', productConfig.name);
     console.log('✅ Generated Name:', productName);
     console.log('✅ Image cached successfully, size:', (imageBuffer.length / 1024).toFixed(2), 'KB');
+
+    // 🎨 CRITICAL: Apply user customizations (effects, borders) BEFORE upscaling
+    if (imageContext && (imageContext.effects || imageContext.borderEnabled)) {
+      console.log('🎨 Applying user customizations before upscaling...');
+      const EffectsProcessor = require('../services/EffectsProcessor');
+      const effectsProcessor = new EffectsProcessor();
+      
+      try {
+        const customizedBuffer = await effectsProcessor.applyEffects(imageBuffer, imageContext);
+        if (customizedBuffer && customizedBuffer.length > 0) {
+          imageBuffer = customizedBuffer;
+          console.log('✅ User customizations applied, new size:', (imageBuffer.length / 1024).toFixed(2), 'KB');
+        } else {
+          console.warn('⚠️ Effects processing returned empty buffer, using original');
+        }
+      } catch (effectsError) {
+        console.error('❌ Effects processing failed:', effectsError.message);
+        console.warn('⚠️ Continuing with original image (no effects applied)');
+      }
+    } else {
+      console.log('ℹ️ No user customizations to apply');
+    }
+
     console.log('\n🖨️ [PRINTIFY API] Creating product with auto-enhancement...');
     console.log('   Product Type:', productType);
     console.log('   Blueprint ID (actual):', actualBlueprintId);

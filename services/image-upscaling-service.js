@@ -331,7 +331,43 @@ class ImageUpscalingService {
             
             // INTERFACE STANDARDIZATION: Use consistent structure
             // For buffer-based caching, use original imageBuffer as the enhanced result
-            const enhancedBuffer = cacheBuffer || imageBuffer;
+            let enhancedBuffer = cacheBuffer || imageBuffer;
+            
+            // 🎯 PRINTIFY FIX: Check cached image dimensions and post-process if needed
+            let finalBuffer = enhancedBuffer;
+            const PRINTIFY_MIN_SIZE = 1800;
+            
+            try {
+              const cachedMetadata = await sharp(enhancedBuffer).metadata();
+              console.log(`🔍 CACHED IMAGE DIMENSIONS: ${cachedMetadata.width}x${cachedMetadata.height}`);
+              
+              if (cachedMetadata.width < PRINTIFY_MIN_SIZE || cachedMetadata.height < PRINTIFY_MIN_SIZE) {
+                console.log(`⚡ CACHED IMAGE TOO SMALL! Upscaling from ${cachedMetadata.width}x${cachedMetadata.height} to ${PRINTIFY_MIN_SIZE}x${PRINTIFY_MIN_SIZE}`);
+                
+                // Post-process cached image to meet Printify requirements
+                finalBuffer = await sharp(enhancedBuffer)
+                  .resize(PRINTIFY_MIN_SIZE, PRINTIFY_MIN_SIZE, {
+                    fit: 'inside',
+                    withoutEnlargement: false
+                  })
+                  .png({ quality: 100 })
+                  .toBuffer();
+                
+                const finalMetadata = await sharp(finalBuffer).metadata();
+                console.log(`✅ POST-PROCESSED CACHED IMAGE: ${finalMetadata.width}x${finalMetadata.height}`);
+                
+                if (finalMetadata.width < PRINTIFY_MIN_SIZE || finalMetadata.height < PRINTIFY_MIN_SIZE) {
+                  console.error(`❌ Post-processing failed: ${finalMetadata.width}x${finalMetadata.height} still too small`);
+                } else {
+                  console.log(`🎯 PRINTIFY READY: Cached image successfully upscaled to ${finalMetadata.width}x${finalMetadata.height}`);
+                }
+              } else {
+                console.log(`✅ CACHED IMAGE SIZE OK: ${cachedMetadata.width}x${cachedMetadata.height} meets Printify requirements`);
+              }
+            } catch (dimensionError) {
+              console.error(`❌ Failed to check cached image dimensions: ${dimensionError.message}`);
+              // Continue with original buffer if dimension check fails
+            }
             
             const returnValue = {
               success: true,
@@ -339,11 +375,11 @@ class ImageUpscalingService {
               cached: true,    // CRITICAL: Set cached flag for test compatibility
               upscaledUrl: cacheResult.enhancedUrl,
               enhancedUrl: cacheResult.enhancedUrl,
-              upscaledBuffer: enhancedBuffer, // Use cached buffer or original if unavailable
-              printOptimized: enhancedBuffer, // Also set printOptimized for compatibility
+              upscaledBuffer: finalBuffer, // Use post-processed buffer
+              printOptimized: finalBuffer, // Also set printOptimized for compatibility
               s3Key: cacheResult.s3Key,
               fileName: cacheResult.fileName || options.fileName,
-              fileSize: cacheResult.fileSize || enhancedBuffer.length,
+              fileSize: cacheResult.fileSize || finalBuffer.length,
               usedCache: true,
               contentHash: cacheResult.contentHash,
               metadata: {
@@ -505,7 +541,7 @@ class ImageUpscalingService {
       // 2. Process the image to meet OpenAI requirements (square PNG, <4MB).
       // The 'edit' endpoint also requires a square PNG.
       const processedBuffer = await sharp(imageBuffer)
-        .resize(1024, 1024, { fit: 'cover' }) // Crop to be square
+        .resize(1800, 1800, { fit: 'cover' }) // Crop to be square for Printify minimum
         .ensureAlpha() // Ensure image has an alpha channel (RGBA) for OpenAI
         .png() // Convert to PNG
         .toBuffer();
@@ -533,7 +569,7 @@ class ImageUpscalingService {
           image: await toFile(processedBuffer, 'image.png', { type: 'image/png' }),
           prompt: prompt,
           n: 1,
-          size: '1024x1024',
+          size: '1024x1024', // OpenAI API only supports 1024x1024 - we'll upscale further with Sharp
           response_format: 'b64_json',
         }, {
           signal: controller.signal, // Pass the abort signal
@@ -549,19 +585,31 @@ class ImageUpscalingService {
         throw new Error('Invalid response from OpenAI API during image edit.');
       }
 
-      const upscaledBuffer = Buffer.from(response.data[0].b64_json, 'base64');
+      const openaiBuffer = Buffer.from(response.data[0].b64_json, 'base64');
+      
+      // 🚀 POST-PROCESS: Scale OpenAI result to meet Printify requirements (min 1800x1800)
+      console.log('🎯 Post-processing OpenAI result to meet Printify requirements...');
+      const finalBuffer = await sharp(openaiBuffer)
+        .resize(1800, 1800, { fit: 'inside', withoutEnlargement: false }) // Upscale to minimum Printify size
+        .sharpen(1.0, 1.0, 1.0) // Add sharpening to counteract upscaling blur
+        .png({ quality: 95 }) // High quality PNG
+        .toBuffer();
+      
+      const finalMetadata = await sharp(finalBuffer).metadata();
+      console.log(`✅ Final upscaled image: ${finalMetadata.width}x${finalMetadata.height}`);
       
       return {
         success: true,
-        method: 'openai-edit',
-        upscaledBuffer,
+        method: 'openai-edit-enhanced',
+        upscaledBuffer: finalBuffer,
         metadata: {
           prompt: prompt,
           model: 'dall-e-2', // The 'edit' endpoint uses DALL-E 2
           originalSize: imageBuffer.length,
-          upscaledSize: upscaledBuffer.length,
+          upscaledSize: finalBuffer.length,
           inputDimensions: (await sharp(imageBuffer).metadata()).width + 'x' + (await sharp(imageBuffer).metadata()).height,
-          processedDimensions: '1024x1024'
+          processedDimensions: `${finalMetadata.width}x${finalMetadata.height}`,
+          enhancementSteps: 'OpenAI 1024x1024 → Sharp upscale to 1800x1800 + sharpen'
         }
       };
       

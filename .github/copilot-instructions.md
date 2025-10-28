@@ -21,11 +21,8 @@ We focus on maximum efficiency using proven Node.js development tools and practi
 
 👨‍💻🤖 **DEVELOPERS AND AI AGENTS - USE NODE.JS:**
 ```bash
-# Use the 4 core unified tools directly
-node scripts/unified/test-runner.js validate --type character
-node scripts/unified/aws-manager.js deploy
-node scripts/unified/deployment-manager.js status
-node scripts/unified/smart-commit.js
+npm run cli
+
 ```
 
 

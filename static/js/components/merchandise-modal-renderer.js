@@ -17,6 +17,9 @@ class MerchandiseModalRenderer {
     this.activeModals = new Set(); // Track active modals
     this.debugMode = options.debugMode || false; // Enable debug panel
     this.debugLogs = []; // Store debug logs
+    
+    // Make this instance globally available for direct onclick handlers
+    window.modalRenderer = this;
   }
 
   /**
@@ -1772,6 +1775,7 @@ class MerchandiseModalRenderer {
 
       // Preview finished product button
       if (e.target.classList.contains('preview-finished-product-btn')) {
+        console.log('🚨🚨🚨 BUTTON CLICKED!!! 🚨🚨🚨');
         const productId = e.target.dataset.productId;
         console.log('✨ Preview Finished Product button clicked, productId:', productId);
         console.log('📋 Modal element:', modal);
@@ -1782,6 +1786,33 @@ class MerchandiseModalRenderer {
       if (e.target.classList.contains('cancel-customization-btn')) {
         const modalId = e.target.dataset.modalId;
         this.hideModal(modalId);
+      }
+
+      // Back to customize button (from preview modal)
+      if (e.target.classList.contains('back-to-customize-btn')) {
+        const customizationModalId = e.target.dataset.backTo;
+        console.log('🔙 Back to customize clicked, restoring modal:', customizationModalId);
+        
+        // Hide preview modal
+        const previewModal = e.target.closest('.modal-overlay');
+        if (previewModal) {
+          previewModal.remove();
+        }
+        
+        // Show customization modal again
+        const customizationModal = document.querySelector(`[data-modal-id="${customizationModalId}"]`);
+        if (customizationModal) {
+          customizationModal.style.display = 'flex';
+          console.log('✅ Customization modal restored');
+        }
+      }
+
+      // Add to cart button (from preview modal) 
+      if (e.target.classList.contains('add-to-cart-btn')) {
+        const productId = e.target.dataset.productId;
+        console.log('🛒 Add to cart clicked for product:', productId);
+        // This would integrate with cart functionality
+        alert('🛒 Product added to cart! (Cart integration not yet implemented)');
       }
 
       // Quantity +/- buttons
@@ -2362,6 +2393,7 @@ class MerchandiseModalRenderer {
    * @param {HTMLElement} modal - Customization modal element
    */
   async handlePreviewFinishedProduct(productId, modal) {
+    console.log('🚨🚨🚨 HANDLEPREVIEWFINISHEDPRODUCT CALLED!!! 🚨🚨🚨');
     console.log('🎬 🔥 UPDATED: handlePreviewFinishedProduct - Creating REAL product via Printify API!');
 
     if (this.debugMode) {
@@ -2439,13 +2471,31 @@ class MerchandiseModalRenderer {
 
       // 🔥 CALL THE MERCHANDISE STORE'S generatePrintifyMockup METHOD
       console.log('🔍 Checking for merchandise store instance...');
+      console.log('📊 Available on window:', Object.keys(window).filter(k => k.toLowerCase().includes('merch')));
+      console.log('📊 window.merchandiseStore:', window.merchandiseStore);
+      console.log('📊 window.MerchandiseStore:', window.MerchandiseStore);
+      
       const merchandiseStore = window.merchandiseStore; // Get reference to the main store
       console.log('📊 merchandiseStore found:', !!merchandiseStore);
       console.log('📊 generatePrintifyMockup method available:', !!(merchandiseStore && typeof merchandiseStore.generatePrintifyMockup === 'function'));
       
       if (!merchandiseStore) {
         console.error('❌ window.merchandiseStore is not available');
-        console.error('📊 Available on window:', Object.keys(window).filter(k => k.toLowerCase().includes('merch')));
+        console.error('📊 Trying window.store...');
+        console.log('📊 window.store:', window.store);
+        
+        // Try to use window.store as fallback
+        const fallbackStore = window.store;
+        if (fallbackStore && typeof fallbackStore.generatePrintifyMockup === 'function') {
+          console.log('✅ Using fallback store');
+          // Use fallback instead of throwing error immediately
+          await fallbackStore.generatePrintifyMockup(product, customization);
+          console.log('✅ PRINTIFY API CALL COMPLETED via FALLBACK!');
+          this.hideLoadingOverlay();
+          return; // Early return to skip the rest
+        }
+        
+        alert('❌ DEBUG: Merchandise store not available. Check console for details.');
         throw new Error('Merchandise store not available. Please refresh the page.');
       }
 
@@ -2481,6 +2531,10 @@ class MerchandiseModalRenderer {
         }
       }
 
+      // Show preview modal with finished product
+      console.log('📊 Step 6: Show finished product preview modal');
+      this.showFinishedProductPreview(product, customization, customizationModalId);
+
       // Show success message to user
       if (merchandiseStore && typeof merchandiseStore.showSuccess === 'function') {
         merchandiseStore.showSuccess('🎉 Your custom product has been created! Check it out below.');
@@ -2498,12 +2552,20 @@ class MerchandiseModalRenderer {
       }
 
     } catch (error) {
-      console.error('Error in handlePreviewFinishedProduct:', error);
-      console.error('Error stack:', error.stack);
+      console.error('💥 Error in handlePreviewFinishedProduct:', error);
+      console.error('💥 Error stack:', error.stack);
+      console.error('💥 Error name:', error.name);
+      console.error('💥 Error message:', error.message);
+      
+      // Hide loading overlay in case it's showing
+      this.hideLoadingOverlay();
+      
       if (this.debugMode) {
         this.debugLog(`Error in handlePreviewFinishedProduct: ${error.message}`, 'error', error);
       }
-      alert('Error generating product preview. Please try again.');
+      
+      // Show more detailed error to user
+      alert(`❌ DEBUG ERROR: ${error.message}\n\nCheck browser console for details.`);
     }
   }
 
@@ -2773,6 +2835,51 @@ class MerchandiseModalRenderer {
     // This would be implemented to update the summary section
     // based on current selections
     console.log('Updating customization summary...');
+  }
+
+  /**
+   * Show finished product preview modal
+   * @param {Object} product - Product object
+   * @param {Object} customization - Customization object  
+   * @param {string} customizationModalId - ID of customization modal to restore
+   */
+  showFinishedProductPreview(product, customization, customizationModalId) {
+    const previewModalId = `preview-finished-${product.id}-${Date.now()}`;
+    
+    const previewHTML = `
+      <div class="modal-overlay fullscreen-overlay" data-modal-id="${previewModalId}">
+        <div class="modal-dialog preview-modal">
+          <div class="modal-header">
+            <h3>🎉 Your Custom Product Preview</h3>
+            <button class="modal-close" data-close-modal="${previewModalId}">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="preview-content">
+              <div class="product-preview">
+                <img src="${customization.customizedImageUrl || product.previewImage}" 
+                     alt="${product.title}" class="preview-image">
+                <h4>${product.title}</h4>
+                <p class="customization-summary">
+                  ${customization.effects ? 'Effects applied' : 'No effects'} • 
+                  ${customization.borderEnabled ? 'Border added' : 'No border'}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary back-to-customize-btn" data-back-to="${customizationModalId}">
+              ← Back to Customize
+            </button>
+            <button class="btn-primary add-to-cart-btn" data-product-id="${product.id}">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', previewHTML);
+    console.log('✅ Finished product preview modal shown');
   }
 
   /**

@@ -263,10 +263,15 @@ class MerchStoreE2ETester {
       await this.waitForElement('.gallery-image-card');
     });
 
-    await this.testStep('Click first gallery image select button', async () => {
+    await this.testStep('Click gallery image select button (varied selection)', async () => {
       const selectButtons = await this.page.$$('.gallery-image-select');
       assert(selectButtons.length > 0, 'No select buttons found');
-      await selectButtons[0].click();
+      
+      // Choose different image based on availability (not always first)
+      const imageIndex = Math.min(2, selectButtons.length - 1); // Use 3rd image if available, else last
+      console.log(`     Available images: ${selectButtons.length}, selecting index: ${imageIndex}`);
+      
+      await selectButtons[imageIndex].click();
       await new Promise(resolve => setTimeout(resolve, 500));
     });
 
@@ -296,10 +301,25 @@ class MerchStoreE2ETester {
       await this.waitForElement('.browse-category-btn', 3000);
     });
 
-    await this.testStep('Click first category browse button', async () => {
+    await this.testStep('Click category browse button (varied selection)', async () => {
       const browseButtons = await this.page.$$('.browse-category-btn');
       assert(browseButtons.length > 0, 'No browse buttons found');
-      await browseButtons[0].click();
+      
+      // Get category names for logging
+      const categoryInfo = await this.page.$$eval('.browse-category-btn', buttons => 
+        buttons.map((btn, i) => ({
+          index: i,
+          text: btn.textContent.trim(),
+          category: btn.closest('.category-card')?.querySelector('.category-title')?.textContent?.trim() || 'Unknown'
+        }))
+      );
+      
+      // Choose different category based on test run (not always first)
+      const categoryIndex = Math.min(2, browseButtons.length - 1); // Use 3rd category if available, else last
+      console.log(`     Available categories: ${categoryInfo.length}`);
+      console.log(`     Selected category ${categoryIndex}: ${categoryInfo[categoryIndex]?.category || 'Unknown'}`);
+      
+      await browseButtons[categoryIndex].click();
       await new Promise(resolve => setTimeout(resolve, 800));
     });
 
@@ -309,10 +329,25 @@ class MerchStoreE2ETester {
       console.log(`     Found ${productItems.length} products`);
     });
 
-    await this.testStep('Click first product select button', async () => {
+    await this.testStep('Click product select button (varied selection)', async () => {
       const selectButtons = await this.page.$$('.product-select-btn');
       assert(selectButtons.length > 0, 'No product select buttons found');
-      await selectButtons[0].click();
+      
+      // Get product names for logging
+      const productInfo = await this.page.$$eval('.product-select-btn', buttons => 
+        buttons.map((btn, i) => ({
+          index: i,
+          name: btn.closest('.product-item')?.querySelector('.product-name')?.textContent?.trim() || 'Unknown Product',
+          type: btn.dataset.productType || 'unknown'
+        }))
+      );
+      
+      // Choose different product based on availability (not always first)
+      const productIndex = Math.min(1, selectButtons.length - 1); // Use 2nd product if available, else last
+      console.log(`     Available products: ${productInfo.length}`);
+      console.log(`     Selected product ${productIndex}: ${productInfo[productIndex]?.name || 'Unknown'} (${productInfo[productIndex]?.type || 'unknown'})`);
+      
+      await selectButtons[productIndex].click();
       await new Promise(resolve => setTimeout(resolve, 1000));
     });
   }
@@ -428,11 +463,29 @@ class MerchStoreE2ETester {
     });
 
     await this.testStep('Click "Preview Finished Product" button', async () => {
-      const previewBtn = await this.page.$('.preview-finished-product-btn');
-      assert(previewBtn, 'Preview Finished Product button not found');
-      await previewBtn.click();
-      // Wait for modal to open and render
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Wait for the modal to be fully rendered
+      await this.page.waitForSelector('.preview-finished-product-btn', { visible: true, timeout: 5000 });
+      
+      // Ensure button is clickable (not covered by other elements)
+      await this.page.waitForFunction(() => {
+        const btn = document.querySelector('.preview-finished-product-btn');
+        if (!btn) return false;
+        const rect = btn.getBoundingClientRect();
+        const elementAtPoint = document.elementFromPoint(rect.left + rect.width/2, rect.top + rect.height/2);
+        return elementAtPoint === btn || btn.contains(elementAtPoint);
+      }, { timeout: 5000 });
+      
+      // Click the button with JavaScript to ensure it works
+      await this.page.evaluate(() => {
+        const btn = document.querySelector('.preview-finished-product-btn');
+        if (btn) {
+          console.log('🎯 About to click Preview Finished Product button');
+          btn.click();
+        }
+      });
+      
+      // Wait for API call to start (look for "Creating Your Amazing Product" overlay)
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // 🔥 Check for server errors after API call
       try {
