@@ -2401,6 +2401,19 @@ class MerchandiseModalRenderer {
     const hasAnyEffect = Object.values(selectedEffects).some(v => v === true) || borderCustomization.borderEnabled;
     console.log('✅ Has any effect selected?', hasAnyEffect, 'Selected effects:', Object.values(selectedEffects), 'Border enabled:', borderCustomization.borderEnabled);
 
+    // 🔍 DIAGNOSTIC: Check for potential nested borders or effect duplication
+    if (borderCustomization.borderEnabled && borderCustomization.borderWidthPixels > 0) {
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('⚠️  BORDER APPLICATION DIAGNOSTIC:');
+      console.log('  borderEnabled:', borderCustomization.borderEnabled);
+      console.log('  borderWidth (option):', borderCustomization.borderWidth);
+      console.log('  borderWidthPixels (actual):', borderCustomization.borderWidthPixels);
+      console.log('  borderColor:', borderCustomization.borderColor);
+      console.log('  Current modal dataset.borderEnabled:', modal.dataset.borderEnabled);
+      console.log('  Full effectParams being sent to API:', JSON.stringify(effectParams, null, 2));
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    }
+
     if (!hasAnyEffect) {
       console.warn('⚠️ No effects selected - showing alert');
       alert('Please select at least one effect to apply.');
