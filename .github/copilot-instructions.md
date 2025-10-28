@@ -36,8 +36,6 @@ npm run cli
 • SPECIALIZED Wavelength lore and content management tools
 • STANDARD toolkit focused on reliability
 
-🎯 ENTRY POINT: /documentation/current-context/AI_COPILOT_PREFERENCES.md
-📚 METHODOLOGY: /documentation/ai-coding-workflows/AI_DEVELOPMENT_GUIDE.md
 
 ⚡ CRITICAL RULES (Non-Negotiable):
 • USE EXISTING SCRIPTS - Learn what exists first: ls -la scripts/unified/
@@ -56,14 +54,7 @@ npm run cli
 • Asking permission to repair tools that are malfunctioning - REQUIRED
 • Creating documents with wrong dates/facts - VERIFY FIRST: use `date` command
 • Making assumptions about basic information - USE VERIFICATION TOOLS
-• ❌ AVOIDING proven Node.js tools - USE THE 4 CORE UNIFIED SCRIPTS
 
-🔧 WAVELENGTH CORE TOOLS (Master These First):
-• Use `scripts/unified/smart-commit.js` for all git operations
-• Use `scripts/unified/aws-manager.js` for AWS operations
-• Use `scripts/unified/deployment-manager.js` for deployments
-• Use `scripts/unified/test-runner.js` for testing
-• ✅ USE: Standard Node.js and shell commands as needed
 
 🚀 WAVELENGTH DEVELOPMENT TOOLS:
 • 📚 FULL DOCUMENTATION: /docs/WAVELENGTH_TOOLS_DOCUMENTATION.md
@@ -80,39 +71,18 @@ npm run cli
 🔄 **WAVELENGTH DEVELOPMENT APPROACH - USE PROVEN TOOLS:**
 In the Wavelength Development world, we use proven, reliable Node.js and shell tools:
 
-**STANDARD COMMANDS (USE THESE):**          **WAVELENGTH UNIFIED TOOLS (PREFER THESE):**
-✅ curl -X GET https://api.com/data     →  ✅ Use curl or scripts/unified/aws-manager.js
-✅ echo "Hello World"                   →  ✅ Use echo or console.log
-✅ node script.js                       →  ✅ Use node directly or unified scripts
-✅ grep "error" server.log              →  ✅ Use grep or search tools  
-✅ cat package.json                     →  ✅ Use cat or file reading tools
-✅ ps aux | grep node                   →  ✅ Use ps or process monitoring
-✅ git status                           →  ✅ Use scripts/unified/smart-commit.js
 
 **🎆 WAVELENGTH APPROACH:** We use proven, reliable tools with the 4 unified scripts as the foundation!
 
 🧠 **DEVELOPMENT BEST PRACTICES - THINK BEFORE ACTING:**
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-⛔ **CHOOSE THE RIGHT TOOL:**
-• Need to commit code? → ✅ Use `scripts/unified/smart-commit.js`
-• Need to deploy? → ✅ Use `scripts/unified/deployment-manager.js`  
-• Need to test? → ✅ Use `scripts/unified/test-runner.js`
-• Need AWS operations? → ✅ Use `scripts/unified/aws-manager.js`
-• Need other operations? → ✅ Use standard Node.js/shell commands
 
 🎯 **DEVELOPMENT WORKFLOW:**
 TASK IDENTIFICATION → TOOL SELECTION → EXECUTION
 • "What am I trying to do?" → Identify the specific task
 • "Which tool is best?" → Choose unified script or standard command
 • "Execute with the right tool" → Use the most appropriate approach
-
-⚡ **DECISION TREE - ALWAYS ASK FIRST:**
-1. 🤔 "What am I trying to do?"
-2. 🔍 "Is there a WAVELENGTH UNIFIED SCRIPT for this?"
-3. 📚 "Check: smart-commit.js, aws-manager.js, deployment-manager.js, test-runner.js"
-4. ✅ "YES → Use WAVELENGTH UNIFIED SCRIPT"
-5. ❌ "NO → Use standard Node.js/shell command"
 
 🚨 **DEVELOPMENT PROTOCOL:**
 When choosing tools for development tasks:
@@ -128,40 +98,10 @@ When choosing tools for development tasks:
 • .current-notes.md (private workspace)
 • Any personal organization files
 
-🤖 AI CONTEXT FILES (Your Context Management):
-• GitHub Copilot: /documentation/current-context/GITHUB_COPILOT_CONTEXT.md
-• Amazon Q: /documentation/current-context/AMAZON_Q_CONTEXT.md
-• Claude: /documentation/current-context/CLAUDE_CONTEXT.md
-• Custom AI: /documentation/current-context/CUSTOM_AI_CONTEXT.md
 
-🚨 VIOLATION REPORTING (Required for All Policy Violations):
-• System: /documentation/ai-quality-control/AI_VIOLATION_TRACKING_SYSTEM.md
-• Format: [YYYY-MM-DD]-[COPILOT]-[ID].md in incidents/ directory
-• When violated: Document immediately, fix immediately, update guidance
-
-📋 COORDINATION (Required):
-• PROJECT_STATUS.md - Cross-AI project tracking
-• WORK_QUEUE.md - Task coordination (claim tasks here)
-• Never modify another AI's context file
 
 ⏰ EFFICIENCY FIRST - My time is valuable, optimize for speed and batch operations.
 
-🎯 WAVELENGTH DEVELOPMENT TOOLKIT STATUS: ✅ ACTIVE
-• Dev server management via Node.js scripts
-• Wavelength lore validation through content management
-• Firebase operations with project context
-• System administration with standard tools
-• Complete command line toolkit (standard tools)
-• Reliable Node.js development environment operational
 
-🛠️ WAVELENGTH SYSTEM TOOLKIT QUICK REFERENCE:
-• File ops: cat package.json, grep "error" server.log, find . -name "*.js"
-• System: ps aux, top, df -h, free -h, uptime
-• Network: ping google.com, netstat -tulpn, nslookup wavelengthlore.com
-• Dev: git status, npm audit, docker ps
-• Text: sort data.txt, jq '.name' config.json
-• Archives: tar -czf backup.tar.gz src/, rsync -av src/ dest/
-• Documentation: /docs/WAVELENGTH_TOOLS_DOCUMENTATION.md
-• Tests: npm test, node scripts/specific-test.js
 
 Ready? Start by reading your entry point document above! 🚀

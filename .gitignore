@@ -160,10 +160,6 @@ public/
 wavelength content 2 aws
 content/prompts/wavelength/Wavelength-Lore.code-workspace
 
-# Git commit messages (for smart-commit script)
-commit-message.txt
-.commit-message.txt
-COMMIT_MESSAGE.txt
 
 # Backup files
 *.backup
@@ -178,3 +174,4 @@ COMMIT_MESSAGE.txt
 .package-backups/
 .package.lock
 *.png
+.private-notes-never-ever-update.md
