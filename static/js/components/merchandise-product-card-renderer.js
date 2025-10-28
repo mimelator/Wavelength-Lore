@@ -110,12 +110,6 @@ class MerchandiseProductCardRenderer {
             ${productDetails}
           </div>
           <div class="product-variants">
-            ${variantInfo.count > 1 ? `
-              <div class="variant-summary">
-                <span class="variant-count">${variantInfo.count} variants available</span>
-                <span class="price-range">${variantInfo.priceRange}</span>
-              </div>
-            ` : ''}
             ${this.renderInlineVariants(product)}
           </div>
         </div>
@@ -639,7 +633,16 @@ class MerchandiseProductCardRenderer {
     
     // FEW VARIANTS (2-5): Individual chips with buttons
     if (variants.length <= 5) {
+      const prices = variants.map(v => v.price / 100);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      const priceRange = minPrice === maxPrice ? `$${minPrice.toFixed(2)}` : `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
+      
       return `
+        <div class="variant-summary">
+          <span class="variant-count">${variants.length} variants available</span>
+          <span class="price-range">${priceRange}</span>
+        </div>
         <div class="inline-variants few-variants">
           <h5>🎯 Available Options (${variants.length}):</h5>
           <div class="variant-chips">
@@ -661,7 +664,16 @@ class MerchandiseProductCardRenderer {
     }
     
     // MANY VARIANTS (6+): Dropdown selector + single cart button
+    const prices = variants.map(v => v.price / 100);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    const priceRange = minPrice === maxPrice ? `$${minPrice.toFixed(2)}` : `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
+    
     return `
+      <div class="variant-summary">
+        <span class="variant-count">${variants.length} variants available</span>
+        <span class="price-range">${priceRange}</span>
+      </div>
       <div class="inline-variants many-variants">
         <h5>🎯 Choose Your Option (${variants.length} available):</h5>
         <div class="variant-selector-container">

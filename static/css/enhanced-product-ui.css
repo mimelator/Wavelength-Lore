@@ -162,15 +162,7 @@
   transform: translateY(0) scale(0.98);
 }
 
-.add-to-cart-btn::before {
-  content: "🛒";
-  font-size: 1.2rem;
-}
-
-.add-to-cart-btn::after {
-  content: "Add to Cart";
-  font-weight: 600;
-}
+/* Removed pseudo-elements - button text is now handled in HTML for better control */
 
 /* =============================================================================
    EXPANDED VARIANTS DISPLAY - SHOW ALL VARIANTS CLEARLY
