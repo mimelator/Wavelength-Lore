@@ -1,0 +1,496 @@
+ ➜ 💾 Auto-storing enhanced image for Cotton Canvas Tote Bag in S3...
+✅ Upscaled image stored successfully: upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+✅ Enhanced image stored successfully at: upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+💾 Saving upscaled image to Global Cache...
+� GLOBAL CACHE SAVE: Starting save process...
+📄 Input type: object, has upscaled buffer: true
+📦 Using provided buffer (555890 bytes)
+🔑 Generated content hash: 4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d
+📊 ENHANCEMENT DATA TO STORE:
+{
+  "contentHash": "4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d",
+  "enhancedImageUrl": "https://d3ohg9sf8htmwk.cloudfront.net/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png",
+  "s3Key": "upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png",
+  "enhancementMethod": "openai",
+  "originalDimensions": {
+    "width": 1280,
+    "height": 896
+  },
+  "enhancedDimensions": {
+    "width": 1800,
+    "height": 1800
+  },
+  "scaleFactor": null,
+  "qualityMetrics": {},
+  "enhancementSource": "ImageUpscalingService",
+  "processingTime": 15922,
+  "fileSize": 1262804
+}
+💾 Storing enhancement data in Firebase...
+🔥 FIREBASE STORE: Starting Firebase write operation...
+📍 Target path: globalImageCache/enhancedImages/4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d
+📦 Data to store:
+{
+  "contentHash": "4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d",
+  "enhancedImageUrl": "https://d3ohg9sf8htmwk.cloudfront.net/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png",
+  "s3Key": "upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png",
+  "enhancementMethod": "openai",
+  "originalDimensions": {
+    "width": 1280,
+    "height": 896
+  },
+  "enhancedDimensions": {
+    "width": 1800,
+    "height": 1800
+  },
+  "scaleFactor": null,
+  "qualityMetrics": {},
+  "createdAt": {
+    ".sv": "timestamp"
+  },
+  "lastUsedAt": {
+    ".sv": "timestamp"
+  },
+  "usageCount": 1,
+  "enhancementSource": "ImageUpscalingService",
+  "processingTime": 15922,
+  "fileSize": 1262804,
+  "status": "active"
+}
+📝 Writing to Firebase database...
+✅ FIREBASE STORE SUCCESS:
+   Record written to: globalImageCache/enhancedImages/4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d
+   Enhancement URL: https://d3ohg9sf8htmwk.cloudfront.net/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   S3 Key: upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   Method: openai
+   File Size: 1262804 bytes
+📊 Updating cache statistics...
+✅ Cache statistics updated
+✅ GLOBAL CACHE SAVE SUCCESS:
+   Content Hash: 4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d
+   S3 Key: upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   Enhancement URL: https://d3ohg9sf8htmwk.cloudfront.net/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   Method: openai
+   File Size: 1262804 bytes
+✅ Successfully saved to Global Cache
+
+🔍 RUNTIME VALIDATION: Starting comprehensive validation...
+
+📋 RUNTIME VALIDATION validation-1761694283165-qiwovws1t
+================================================================================
+🕐 Started at: 2025-10-28T23:31:23.165Z
+
+🔍 STEP 1: Original Image Analysis
+--------------------------------------------------
+📄 Original Image:
+   Source: buffer
+   Size: 543 KB
+   Content Hash: 4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d
+
+🚀 STEP 2: Upscaled Result Analysis
+--------------------------------------------------
+🎨 Upscaled Image:
+   Success: true
+   Method: openai
+   Size: 1233 KB
+   Content Hash: d4bee149305fc6dc6fa440d2ed578e3bb3d03e48b20b315bce3730d197c5676a
+   S3 Key: upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   URL: https://d3ohg9sf8htmwk.cloudfront.net/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   Processing Time: 15922ms
+
+🔥 STEP 3: Global Cache Validation
+--------------------------------------------------
+💾 Global Cache Save:
+   Success: true
+   Content Hash: 4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d
+   Enhancement URL: https://d3ohg9sf8htmwk.cloudfront.net/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   S3 Key: upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   Method: openai
+   File Size: 1262804 bytes
+   ✅ Valid URL-based cache record
+
+🔍 STEP 4: Firebase Record Verification
+--------------------------------------------------
+🔍 FIREBASE LOOKUP: Checking for enhanced image...
+📍 Looking up: globalImageCache/enhancedImages/4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d
+✅ FIREBASE LOOKUP SUCCESS:
+   Cache Key: 4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d
+   Enhancement URL: https://d3ohg9sf8htmwk.cloudfront.net/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   S3 Key: upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   Method: openai
+   Created: 2025-10-28T23:31:23.134Z
+   Usage Count: 1
+📊 Updating usage statistics...
+🎯 Cache HIT: Global enhanced image found for 4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d
+🎯 Firebase Record Retrieved:
+   Content Hash: 4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d
+   Enhanced URL: https://d3ohg9sf8htmwk.cloudfront.net/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   S3 Key: upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   Method: openai
+   Created: 2025-10-28T23:31:23.134Z
+   Usage Count: 1
+   ✅ Retrieved record matches saved data
+
+🌐 STEP 5: API Availability Verification
+--------------------------------------------------
+🌍 Direct URL Access:
+   URL: https://d3ohg9sf8htmwk.cloudfront.net/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   Status: 200
+   Accessible: true
+🔓 Localhost bypass: Rate limiting skipped for ::1 on /upscaled/anonymous/Cotton%20Canvas%20Tote%20Bag-enhanced-1761694282021.png
+🔄 Proxy URL Access:
+   Proxy URL: http://localhost:3001/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png
+   Status: 404
+   Accessible: false
+
+📊 STEP 6: Quality Metrics
+--------------------------------------------------
+📈 Quality Metrics:
+   Size Increase: 127%
+   Processing Time: 15922ms
+   Quality Score: N/A
+
+📊 VALIDATION SUMMARY
+================================================================================
+🆔 Validation ID: validation-1761694283165-qiwovws1t
+⏱️  Completed at: 2025-10-28T23:31:23.670Z
+✅ Errors: 0
+⚠️  Warnings: 0
+
+🎉 VALIDATION RESULT: PASSED
+
+📋 COMPLETE VALIDATION DATA:
+{
+  "id": "validation-1761694283165-qiwovws1t",
+  "timestamp": "2025-10-28T23:31:23.165Z",
+  "originalImage": {
+    "source": "buffer",
+    "size": 555890,
+    "contentHash": "4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d",
+    "sizeKB": 543
+  },
+  "upscaledImage": {
+    "success": true,
+    "method": "openai",
+    "hasBuffer": true,
+    "s3Key": "upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png",
+    "url": "https://d3ohg9sf8htmwk.cloudfront.net/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png",
+    "processingTime": 15922,
+    "size": 1262804,
+    "sizeKB": 1233,
+    "contentHash": "d4bee149305fc6dc6fa440d2ed578e3bb3d03e48b20b315bce3730d197c5676a"
+  },
+  "globalCache": {
+    "saveAttempted": true,
+    "saveSuccess": true,
+    "contentHash": "4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d",
+    "enhancementData": {
+      "contentHash": "4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d",
+      "enhancedImageUrl": "https://d3ohg9sf8htmwk.cloudfront.net/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png",
+      "s3Key": "upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png",
+      "enhancementMethod": "openai",
+      "originalDimensions": {
+        "width": 1280,
+        "height": 896
+      },
+      "enhancedDimensions": {
+        "width": 1800,
+        "height": 1800
+      },
+      "scaleFactor": null,
+      "qualityMetrics": {},
+      "enhancementSource": "ImageUpscalingService",
+      "processingTime": 15922,
+      "fileSize": 1262804
+    },
+    "retrievalSuccess": true,
+    "retrievedRecord": {
+      "contentHash": "4f50fa4a0fc996fb142d415788343946b93cf304d14f79f926e6662b5803fe9d",
+      "createdAt": 1761694283134,
+      "enhancedDimensions": {
+        "height": 1800,
+        "width": 1800
+      },
+      "enhancedImageUrl": "https://d3ohg9sf8htmwk.cloudfront.net/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png",
+      "enhancementMethod": "openai",
+      "enhancementSource": "ImageUpscalingService",
+      "fileSize": 1262804,
+      "lastUsedAt": 1761694283134,
+      "originalDimensions": {
+        "height": 896,
+        "width": 1280
+      },
+      "processingTime": 15922,
+      "s3Key": "upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png",
+      "status": "active",
+      "usageCount": 1
+    }
+  },
+  "apiVerification": {
+    "directUrlAccess": {
+      "status": 200,
+      "accessible": true
+    },
+    "proxyUrlAccess": {
+      "status": 404,
+      "accessible": false,
+      "proxyUrl": "http://localhost:3001/upscaled/anonymous/Cotton Canvas Tote Bag-enhanced-1761694282021.png"
+    }
+  },
+  "errors": [],
+  "warnings": [],
+  "qualityMetrics": {
+    "sizeIncrease": 2.2716796488513915,
+    "sizeIncreasePercent": 127,
+    "processingTime": 15922
+  },
+  "isValid": true
+}
+✅ Upscaling produced buffer: 1262804 bytes
+✅ Upscaled image: 1800x1800, Format: png
+✅ UPSCALING COMPLETE - Returning proactive format information:
+   Buffer: 1262804 bytes (PNG)
+   FileName: Cotton Canvas Tote Bag.png
+✅ Image successfully upscaled
+✅ Upscaled image dimensions sufficient: 1800x1800
+✅ PROACTIVE: Using fileName from upscaler: Cotton Canvas Tote Bag.png
+
+🔥 APPLYING EFFECTS AFTER UPSCALING (Issue #96 Fix)
+   Effects to apply: {
+  saturation: 1.15,
+  colorTemperature: 12700,
+  bloom: 0,
+  vignette: 0,
+  blur: 0,
+  brightness: 1.05,
+  contrast: 1.1,
+  lightning: 0,
+  borderEnabled: false,
+  borderColor: '#000000',
+  borderWidth: 0,
+  borderWidthPixels: 0
+}
+🎨 Processing image with effects: {
+  saturation: 1.15,
+  colorTemperature: 12700,
+  bloom: 0,
+  vignette: 0,
+  blur: 0,
+  brightness: 1.05,
+  contrast: 1.1,
+  lightning: 0
+}
+📐 Image dimensions: 1800x1800
+📝 PROACTIVE FORMAT TRACKING: Effects processor maintaining PNG format for Printify compatibility
+✅ Effects applied successfully
+✅ Effects applied to upscaled image
+   Upscaled buffer size: 1233.21 KB
+   Effects-modified size: 1197.15 KB
+   ✅ finalBuffer updated with effects-modified version
+📝 PROACTIVE FORMAT TRACKING: Effects processor maintained PNG format for Printify compatibility
+   FileName remains: Cotton Canvas Tote Bag.png (PNG format preserved through effects pipeline)
+✅ Upscaled image dimensions verified: 1800x1800 - proceeding with upload
+✅ PROACTIVE UPLOAD: fileName matches buffer format (no reactive detection needed)
+   FileName: Cotton Canvas Tote Bag.png
+🔍 VALIDATE IMAGE DIAGNOSTICS: fileName="Cotton Canvas Tote Bag.png", bufferSize=1225877
+🔍 Detected image format: png (from buffer analysis)
+📤 PRINTIFY UPLOAD ATTEMPT:
+   📁 fileName: Cotton Canvas Tote Bag.png
+   📊 Buffer size: 1197.15 KB
+   🔤 Base64 size: 1596.20 KB
+   📏 Payload keys: [ 'file_name', 'contents' ]
+   🔤 Base64 preview: iVBORw0KGgoAAAANSUhEUgAABwgAAAcICAMAAAAfTWW0AAACqV...
+🔍 [PRINTIFY] createCustomProductWithBlueprint - variant structure:
+   Sample variant (first of 2):
+   - ID: 101409
+   - Title: Natural / 15" x 16"
+   - Has image field: NO
+   - Options: [4353,3636]
+   - All keys: id, sku, cost, price, title, grams, is_enabled, is_default, is_available, is_printify_express_eligible, options, quantity
+
+🖼️  [PRINTIFY] Images array (32 images):
+   Sample image (first of 32):
+   - ID: undefined
+   - URL: undefined
+   - Options: {}
+   - All keys: src, variant_ids, position, is_default, is_selected_for_publishing, order
+🔗 [ENRICH] Mapping 32 images to 2 variants
+   📊 Built variantId→image map with 2 variant mappings
+   🔍 Sample mapped image check:
+      Has src? ✅
+      src value: https://images-api.printify.com/mockup/6901525aa3a...
+      position: front
+   📌 Variant 101409: matchedImage keys = src, variant_ids, position, is_default, is_selected_for_publishing, order, src = ✅
+   📌 Variant 103598: matchedImage keys = src, variant_ids, position, is_default, is_selected_for_publishing, order, src = ✅
+✅ [ENRICH] Complete - 2/2 variants have images
+   🔍 First enriched variant image object:  {"url":"https://images-api.printify.com/mockup/6901525aa3a4eef7b202ec2b/101409/93895/cotton-canvas-tote-bag-cotton-canvas-tote-bag.jpg?camera_label=front","position":"front"}
+   🔍 First enriched variant image.id: NOT DEFINED
+   🔍 First enriched variant image.url: https://images-api.printify.com/mockup/6901525aa3a4eef7b202ec2b/101409/93895/cotton-canvas-tote-bag-cotton-canvas-tote-bag.jpg?camera_label=front
+
+✅ [ENRICH RESULT] 2/2 variants now have images
+   Sample enriched variant:
+   - Title: Natural / 15" x 16"
+   - Image URL: https://images-api.printify.com/mockup/6901525aa3a4eef7b202ec2b/101409/93895/cotton-canvas-tote-bag-cotton-canvas-tote-bag.jpg?camera_label=front
+
+✅ [PRINTIFY API] PRODUCT CREATED SUCCESSFULLY!
+   Product ID: 6901525aa3a4eef7b202ec2b
+   Variants created: 2
+   Images uploaded: 32
+   🔄 Image Auto-Enhanced: YES
+      Enhancement Source: upscaling
+
+💾 Storing product in Firebase database...
+✅ Stored product 6901525aa3a4eef7b202ec2b for user 4fdbYxJHjEP4xksk9sgFE3lgYUs2
+✅ Product stored in database
+
+📤 Sending response to client...
+   Product ID: 6901525aa3a4eef7b202ec2b
+   Message: Cotton Canvas Tote Bag created successfully! Image was automatically enhanced for better print quality.
+════════════════════════════════════════════════════════════════════════════════
+✅ [OPERATION COMPLETE] Product successfully created and stored
+
+CLIENT LOGS:
+
+🌊 WAVELENGTH DIAGNOSTICS LOADED
+merchandise-store.js?v=v1761694340437:5407 🔍 Use these functions in console:
+merchandise-store.js?v=v1761694340437:5408 • wavelengthStoreDiagnostics() - Store status
+merchandise-store.js?v=v1761694340437:5409 • wavelengthCartDiagnostics() - Cart status
+merchandise-store.js?v=v1761694340437:5410 • wavelengthFullDiagnostics() - Complete system scan
+image-capturer-init.js?v=v1761694340437:10 🖼️ Initializing Image Capturer
+image-capturer-init.js?v=v1761694340437:33 🔥 Firebase not available, checking for auth later
+merchandise:279 ⏳ Waiting for Firebase readiness helper...
+merchandise:327 menuIcon: <div class=​"menu-icon">​…​</div>​
+merchandise:328 navLinks: <ul class=​"nav-links">​…​</ul>​flex
+merchandise:1507 🛍️ Merchandise Store page loaded
+merchandise:1563 ✅ Server-side authentication detected, initializing store immediately
+merchandise-cart-service.js?v=v1761694340437:17 🛒 CART DIAGNOSTICS: MerchandiseCartService initializing...
+merchandise-cart-service.js?v=v1761694340437:19 🛒 CART DIAGNOSTICS: Initialized with 1 items from storage
+wavelength-pricing-service.js?v=v1761694340437:14573 💰 Wavelength Pricing Service initialized
+wavelength-pricing-service.js?v=v1761694340437:14574 📊 Products with pricing: 109
+wavelength-pricing-service.js?v=v1761694340437:14575 🏷️ Total variants: 1774
+wavelength-pricing-service.js?v=v1761694340437:14576 💵 Price range: $11.58 - $347.25
+stripe-checkout-service.js?v=v1761694340437:14 💳 StripeCheckoutService initializing...
+merchandise-store.js?v=v1761694340437:70 🛍️ MerchandiseStore constructor called with refactored services
+merchandise-store.js?v=v1761694340437:217 🌡️ Running merchandise store health check...
+merchandise-store.js?v=v1761694340437:237 ✅ Health check passed: Basic rendering works
+merchandise-store.js?v=v1761694340437:573 🛍️ Initializing Merchandise Store
+merchandise-store.js?v=v1761694340437:581 🔍 Loading enhancement status...
+MerchandiseApiService.js?v=v1761694340437:170 ⚡ MerchandiseApiService: Loading enhancement status...
+merchandise:1574 🔍 DIAGNOSTIC: Store instance reference stored on container: merchandise-store
+merchandise-store.js?v=v1761694340437:686 🎨 Enhancement status: {available: true, services: {…}, recommendation: 'AI enhancement available for artwork'}
+merchandise-store.js?v=v1761694340437:583 ✅ Enhancement status loaded: {available: true, services: {…}, recommendation: 'AI enhancement available for artwork'}
+merchandise-store.js?v=v1761694340437:586 🔍 Loading product types...
+merchandise-store.js?v=v1761694340437:4091 🔄 Skipping loading modal during initialization: Loading product options...
+MerchandiseApiService.js?v=v1761694340437:122 📂 MerchandiseApiService: Loading product types...
+global-radio-game.js?v=1761694340462:89 📻 Loaded 8 tracks (filtered by season 4)
+firebase-config.js?v=1761694340462:45 Firebase Auth persistence set to LOCAL for extended sessions
+firebase-config.js?v=1761694340462:157 🎯 Setting up auth state listener and token storage...
+firebase-config.js?v=1761694340462:193 ✅ Firebase initialized - auth listener active, token storage ready
+merchandise:162 🔥 Firebase available, checking auth state...
+firebase-readiness.js?v=v1761694340437:33 ✅ Firebase is ready - all callbacks executed
+firebase-config.js?v=1761694340462:160 � Auth state changed: User: 4fdbYxJHjEP4xksk9sgFE3lgYUs2
+firebase-config.js?v=1761694340462:162 👤 User authenticated, storing token...
+firebase-config.js?v=1761694340462:131 🔐 storeToken called with user: 4fdbYxJHjEP4xksk9sgFE3lgYUs2
+merchandise:174 👤 User authenticated, fetching groups...
+firebase-config.js?v=1761694340462:135 📝 Got ID token, length: 1150
+firebase-config.js?v=1761694340462:138 ✅ Firebase ID token stored in cookie
+merchandise:759 ✅ Firebase initialized successfully
+merchandise-store.js?v=v1761694340437:724 📋 Product types API response: {success: true, allProducts: Array(142), categories: Array(142), totalProducts: 142, timestamp: '2025-10-28T23:32:20.924Z'}
+merchandise-store.js?v=v1761694340437:754 📋 Loaded 142 products
+merchandise-store.js?v=v1761694340437:755 � Organized into 23 categories
+merchandise-store.js?v=v1761694340437:588 ✅ Product types loaded: 142 products in 23 categories
+merchandise-store.js?v=v1761694340437:589 🔍 Available products sample: (3) ['validated-413', 'validated-238', 'validated-1091']
+merchandise-store.js?v=v1761694340437:592 🔍 Loading gallery images...
+merchandise-store.js?v=v1761694340437:4091 🔄 Skipping loading modal during initialization: Loading your gallery images...
+MerchandiseApiService.js?v=v1761694340437:150 🖼️ MerchandiseApiService: Loading gallery images...
+merchandise-store.js?v=v1761694340437:4108 ⚠️ Loading modal not available
+(anonymous) @ merchandise-store.js?v=v1761694340437:4108
+setTimeout
+setLoading @ merchandise-store.js?v=v1761694340437:4101
+loadProductTypes @ merchandise-store.js?v=v1761694340437:768
+await in loadProductTypes
+init @ merchandise-store.js?v=v1761694340437:587
+await in init
+MerchandiseStore @ merchandise-store.js?v=v1761694340437:75
+(anonymous) @ merchandise:1568Understand this warning
+v3/:1 You may test your Stripe.js integration over HTTP. However, live Stripe.js integrations must use HTTPS.
+value @ v3/:1
+e @ v3/:1
+lv @ v3/:1
+loadStripeConfig @ stripe-checkout-service.js?v=v1761694340437:41
+await in loadStripeConfig
+initializeStripe @ stripe-checkout-service.js?v=v1761694340437:29
+StripeCheckoutService @ stripe-checkout-service.js?v=v1761694340437:15
+MerchandiseStore @ merchandise-store.js?v=v1761694340437:28
+(anonymous) @ merchandise:1568Understand this warning
+stripe-checkout-service.js?v=v1761694340437:42 ✅ Stripe initialized with public key
+merchandise:187 ✅ User groups loaded: (2) ['admin', 'content_manager']
+merchandise-store.js?v=v1761694340437:705 📸 Loaded 12 gallery images
+merchandise-store.js?v=v1761694340437:594 ✅ Gallery images loaded: 12 images
+merchandise-store.js?v=v1761694340437:616 🔍 Loading user products...
+MerchandiseApiService.js?v=v1761694340437:61 🔍 MerchandiseApiService: Loading user products...
+merchandise-store.js?v=v1761694340437:4108 ⚠️ Loading modal not available
+(anonymous) @ merchandise-store.js?v=v1761694340437:4108
+setTimeout
+setLoading @ merchandise-store.js?v=v1761694340437:4101
+loadGalleryImages @ merchandise-store.js?v=v1761694340437:714
+await in loadGalleryImages
+init @ merchandise-store.js?v=v1761694340437:593
+await in init
+MerchandiseStore @ merchandise-store.js?v=v1761694340437:75
+(anonymous) @ merchandise:1568Understand this warning
+merchandise-store.js?v=v1761694340437:788 📦 Loaded 3 valid user products
+merchandise-store.js?v=v1761694340437:618 ✅ User products loaded: 3 products
+merchandise-store.js?v=v1761694340437:621 🔧 Setting up event listeners...
+merchandise-store.js?v=v1761694340437:623 ✅ Event listeners setup complete
+merchandise-store.js?v=v1761694340437:626 🎨 Rendering initial state...
+merchandise-product-card-renderer.js?v=v1761694340437:668 🖼️ [CHIP] Variant: Natural / 15" x 16" | ID: 101409 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:668 🖼️ [CHIP] Variant: Black / 15" x 16" | ID: 103598 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:685 🎯 [CHIPS] Product 6901525aa3a4eef7b202ec2b: 2 variants - Chips rendered with image URLs
+merchandise-product-card-renderer.js?v=v1761694340437:668 🖼️ [CHIP] Variant: 68" × 92" | ID: 61418 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:668 🖼️ [CHIP] Variant: 88" × 88" | ID: 61419 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:668 🖼️ [CHIP] Variant: 104" × 88" | ID: 61420 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:668 🖼️ [CHIP] Variant: 68" × 88" | ID: 61421 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:685 🎯 [CHIPS] Product 6901514b9bdcd400590c8635: 4 variants - Chips rendered with image URLs
+merchandise-product-card-renderer.js?v=v1761694340437:710 🖼️ [DROPDOWN] Variant: XS | ID: 43001 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:710 🖼️ [DROPDOWN] Variant: S | ID: 43002 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:710 🖼️ [DROPDOWN] Variant: M | ID: 43003 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:710 🖼️ [DROPDOWN] Variant: L | ID: 43004 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:710 🖼️ [DROPDOWN] Variant: XL | ID: 43005 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:710 🖼️ [DROPDOWN] Variant: 2XL | ID: 43006 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:720 🎯 [DROPDOWN] Product 6901506eef37eb2d810bc538: 6 variants - Dropdown rendered with image URLs
+merchandise-store.js?v=v1761694340437:1501 ✅ Merchandise store rendered successfully
+merchandise-store.js?v=v1761694340437:628 ✅ Initial render complete
+merchandise-store.js?v=v1761694340437:648 🎉 Merchandise Store initialization complete!
+merchandise-product-card-renderer.js?v=v1761694340437:668 🖼️ [CHIP] Variant: Natural / 15" x 16" | ID: 101409 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:668 🖼️ [CHIP] Variant: Black / 15" x 16" | ID: 103598 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:685 🎯 [CHIPS] Product 6901525aa3a4eef7b202ec2b: 2 variants - Chips rendered with image URLs
+merchandise-product-card-renderer.js?v=v1761694340437:668 🖼️ [CHIP] Variant: 68" × 92" | ID: 61418 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:668 🖼️ [CHIP] Variant: 88" × 88" | ID: 61419 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:668 🖼️ [CHIP] Variant: 104" × 88" | ID: 61420 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:668 🖼️ [CHIP] Variant: 68" × 88" | ID: 61421 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:685 🎯 [CHIPS] Product 6901514b9bdcd400590c8635: 4 variants - Chips rendered with image URLs
+merchandise-product-card-renderer.js?v=v1761694340437:710 🖼️ [DROPDOWN] Variant: XS | ID: 43001 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:710 🖼️ [DROPDOWN] Variant: S | ID: 43002 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:710 🖼️ [DROPDOWN] Variant: M | ID: 43003 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:710 🖼️ [DROPDOWN] Variant: L | ID: 43004 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:710 🖼️ [DROPDOWN] Variant: XL | ID: 43005 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:710 🖼️ [DROPDOWN] Variant: 2XL | ID: 43006 | Image: ✅ Present
+merchandise-product-card-renderer.js?v=v1761694340437:720 🎯 [DROPDOWN] Product 6901506eef37eb2d810bc538: 6 variants - Dropdown rendered with image URLs
+merchandise-store.js?v=v1761694340437:1501 ✅ Merchandise store rendered successfully
+image-capturer-init.js?v=v1761694340437:37 🔥 Firebase now available, checking auth
+image-capturer-init.js?v=v1761694340437:40 �� User authenticated, enabling image capture
+image-capturer-init.js?v=v1761694340437:57 🖼️ Creating ImageCapturer instance
+image-capturer-init.js?v=v1761694340437:70 🚫 Merchandise page detected - Save to Gallery functionality disabled
+2global-radio-game.js?v=1761694340462:467 🔄 Settings refreshed: mode=random, season=4, favorites=1
+merchandise-store.js?v=v1761694340437:4683 🛒 Add to cart: 6901514b9bdcd400590c8635
+merchandise-store.js?v=v1761694340437:4684 📦 Variant ID: 61418
+merchandise-store.js?v=v1761694340437:4685 🎨 Customization: null
+merchandise-store.js?v=v1761694340437:4686 📦 Quantity: 1
+merchandise-store.js?v=v1761694340437:4717 �️ Calling cart service with: {product: {…}, variantId: '61418', quantity: 1}
+merchandise-cart-service.js?v=v1761694340437:357 📸 [EXTRACT-IMAGE] Product: Comforter - Comforter | VariantId: 61418
+merchandise-cart-service.js?v=v1761694340437:361    ├─ PRIORITY 1: Looking for variant image (variantId: 61418)
+merchandise-cart-service.js?v=v1761694340437:375    │  └─ Variant not found in product.variants
+merchandise-cart-service.js?v=v1761694340437:382    ├─ PRIORITY 2: Looking for product image
+merchandise-cart-service.js?v=v1761694340437:386    │  └─ Found product image: ✅ https://images-api.printify.com/mockup/6901514b9bdcd400590c8635/61418/2645/comforter-comforter.jpg?camera_label=front
+merchandise-store.js?v=v1761694340437:84 🛒 Cart updated: 
