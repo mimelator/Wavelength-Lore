@@ -371,99 +371,158 @@ class MerchandiseStore {
   }
   
   /**
-   * Estimate price using blueprint metadata API
+   * Get real-time dynamic pricing using Printify API
+   * Based on the working example pattern
    */
   async estimatePriceByBlueprint(blueprintId) {
+    const MAX_ATTEMPTS = 3;
+    const USD_CONVERSION_FACTOR = 100;
+    
     if (!blueprintId) {
       const errorMsg = `❌ PRICING FAILURE: No blueprint ID provided`;
       console.error(errorMsg);
       throw new Error(errorMsg);
     }
     
+    // Extract data we already have from our catalog (like the image example extracts metadata)
+    const matchingProduct = this.availableProducts?.find(product => 
+      product.blueprintId === parseInt(blueprintId) || 
+      String(product.blueprintId) === String(blueprintId)
+    );
+    
+    if (!matchingProduct) {
+      const errorMsg = `❌ PRICING FAILURE: Blueprint ${blueprintId} not found in catalog`;
+      console.error(errorMsg);
+      throw new Error(errorMsg);
+    }
+    
+    console.log(`🔍 Getting real-time pricing for Blueprint ${blueprintId} (${matchingProduct.name})`);
+    console.log(`🏭 Provider: ${matchingProduct.provider} (ID: ${matchingProduct.printProviderId})`);
+    
+    let attempts = 0;
+    let lastError = null;
+    
+    // Iterative approach like the image conversion example
+    while (attempts < MAX_ATTEMPTS) {
+      attempts++;
+      console.log(`⚡ Pricing attempt ${attempts}/${MAX_ATTEMPTS} for blueprint ${blueprintId}...`);
+      
+      try {
+        // Strategy 1: Try Printify API directly (like your example)
+        const printifyPrice = await this.fetchPrintifyVariantPricing(blueprintId, matchingProduct.printProviderId);
+        if (printifyPrice) {
+          console.log(`✅ SUCCESS: Real Printify pricing for ${matchingProduct.name} → ${printifyPrice}`);
+          return printifyPrice;
+        }
+        
+        // Strategy 2: Try our blueprint preview API
+        const previewPrice = await this.fetchBlueprintPreviewPricing(blueprintId);
+        if (previewPrice) {
+          console.log(`✅ SUCCESS: Blueprint preview pricing for ${matchingProduct.name} → ${previewPrice}`);
+          return previewPrice;
+        }
+        
+        // Strategy 3: Use catalog data if API calls fail
+        if (matchingProduct.variants && matchingProduct.variants.length > 0) {
+          const prices = matchingProduct.variants.map(variant => {
+            const price = variant.price || 0;
+            return typeof price === 'number' ? price / USD_CONVERSION_FACTOR : parseFloat(price) || 0;
+          }).filter(price => price > 0);
+          
+          if (prices.length > 0) {
+            const minPrice = Math.min(...prices);
+            const catalogPrice = `$${minPrice.toFixed(2)}`;
+            console.log(`✅ SUCCESS: Catalog pricing for ${matchingProduct.name} → ${catalogPrice}`);
+            return catalogPrice;
+          }
+        }
+        
+        // If we get here, this attempt failed
+        lastError = new Error(`Attempt ${attempts}: No pricing data available from any source`);
+        console.log(`⚠️ Attempt ${attempts} failed, trying next strategy...`);
+        
+      } catch (error) {
+        lastError = error;
+        console.log(`⚠️ Attempt ${attempts} failed: ${error.message}`);
+        
+        // Wait a bit before retrying (exponential backoff)
+        if (attempts < MAX_ATTEMPTS) {
+          await new Promise(resolve => setTimeout(resolve, attempts * 500));
+        }
+      }
+    }
+    
+    // All attempts failed - throw error to hide product
+    const errorMsg = `❌ PRICING FAILURE: Blueprint ${blueprintId} (${matchingProduct.name}) - all ${MAX_ATTEMPTS} pricing strategies failed`;
+    console.error(errorMsg);
+    console.error(`❌ Last error: ${lastError?.message || 'Unknown error'}`);
+    console.error(`❌ Product will be hidden from customers until pricing is available`);
+    throw new Error(errorMsg);
+  }
+  
+  /**
+   * Fetch pricing directly from Printify API (Strategy 1)
+   * Based on your working example
+   */
+  async fetchPrintifyVariantPricing(blueprintId, providerId) {
+    try {
+      // This matches your example's endpoint pattern
+      const endpoint = `/api/printify/variants/${blueprintId}/${providerId}`;
+      console.log(`🌐 Calling Printify variants API: ${endpoint}`);
+      
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Wavelength-Store/1.0'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Printify API error: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.variants && data.variants.length > 0) {
+        // Extract pricing like your example
+        const prices = data.variants.map(variant => {
+          const printifyCostCents = variant.price || 0;
+          return printifyCostCents / 100; // Convert cents to dollars
+        }).filter(price => price > 0);
+        
+        if (prices.length > 0) {
+          const minPrice = Math.min(...prices);
+          // Add markup for retail price (cost + margin)
+          const retailPrice = minPrice * 2.5; // 150% markup
+          return `$${retailPrice.toFixed(2)}`;
+        }
+      }
+      
+      return null;
+    } catch (error) {
+      console.log(`🔥 Printify API call failed: ${error.message}`);
+      return null;
+    }
+  }
+  
+  /**
+   * Fetch pricing from blueprint preview API (Strategy 2)
+   */
+  async fetchBlueprintPreviewPricing(blueprintId) {
     try {
       const response = await fetch(`/api/merchandise/blueprint-preview/${blueprintId}`);
       const data = await response.json();
       
-      if (data.success && data.category) {
-        console.log('🔍 Searching for blueprint pricing in dynamic catalog...');
-        
-        // First try to find the exact product with this blueprintId in our catalog
-        const matchingProduct = this.availableProducts?.find(product => 
-          product.blueprintId === parseInt(blueprintId) || 
-          String(product.blueprintId) === String(blueprintId)
-        );
-        
-        if (matchingProduct) {
-          console.log(`✅ Found product for blueprint ${blueprintId}:`, matchingProduct.name);
-          
-          // Use actual pricing from product variants if available
-          if (matchingProduct.variants && matchingProduct.variants.length > 0) {
-            const prices = matchingProduct.variants.map(variant => {
-              const price = variant.price || 0;
-              return typeof price === 'number' ? price / 100 : parseFloat(price) || 0;
-            }).filter(price => price > 0);
-            
-            if (prices.length > 0) {
-              const minPrice = Math.min(...prices);
-              console.log(`✅ DYNAMIC PRICING: Blueprint ${blueprintId} → $${minPrice.toFixed(2)} from real variants`);
-              return `$${minPrice.toFixed(2)}`;
-            }
-          }
-          
-          // Fallback to product's base price if variants unavailable
-          if (matchingProduct.basePrice) {
-            const price = matchingProduct.basePrice / 100;
-            console.log(`✅ DYNAMIC BASE PRICE: Blueprint ${blueprintId} → $${price.toFixed(2)}`);
-            return `$${price.toFixed(2)}`;
-          }
-        }
-        
-        // Secondary fallback: use category-based lookup in our catalog
-        const categoryProducts = this.availableProducts?.filter(product => 
-          product.category === data.category
-        );
-        
-        if (categoryProducts && categoryProducts.length > 0) {
-          // Get average price for this category from real products
-          const categoryPrices = [];
-          categoryProducts.forEach(product => {
-            if (product.variants && product.variants.length > 0) {
-              const productPrices = product.variants.map(v => {
-                const price = v.price || 0;
-                return typeof price === 'number' ? price / 100 : parseFloat(price) || 0;
-              }).filter(p => p > 0);
-              
-              if (productPrices.length > 0) {
-                categoryPrices.push(Math.min(...productPrices));
-              }
-            }
-          });
-          
-          if (categoryPrices.length > 0) {
-            const avgPrice = categoryPrices.reduce((sum, price) => sum + price, 0) / categoryPrices.length;
-            console.log(`✅ CATEGORY PRICING: ${data.category} → $${avgPrice.toFixed(2)} (average from ${categoryPrices.length} products)`);
-            return `$${avgPrice.toFixed(2)}`;
-          }
-        }
-        
-        console.log(`⚠️ No dynamic pricing found for blueprint ${blueprintId}, category ${data.category}`);
-        
-        // NO FALLBACKS - If we can't get real pricing, don't show the product
-        const errorMsg = `❌ PRICING FAILURE: Blueprint ${blueprintId} (category: ${data.category}) has no valid pricing data`;
-        console.error(errorMsg);
-        console.error(`❌ Printify API failed to provide pricing for this product`);
-        console.error(`❌ Product will be hidden from customers until pricing is available`);
-        throw new Error(errorMsg);
+      if (data.success && data.estimatedPrice) {
+        return data.estimatedPrice;
       }
+      
+      return null;
     } catch (error) {
-      const errorMsg = `❌ PRICING API ERROR: Blueprint ${blueprintId} API call failed - ${error.message}`;
-      console.error(errorMsg);
-      console.error(`❌ Product will be hidden from customers until pricing API is working`);
-      throw new Error(errorMsg);
+      console.log(`🔥 Blueprint preview API call failed: ${error.message}`);
+      return null;
     }
-    
-    // This should never be reached due to error throwing above
-    throw new Error(`❌ CRITICAL: Pricing system reached unreachable code for blueprint ${blueprintId}`);
   }
   
   /**
@@ -3579,10 +3638,34 @@ class MerchandiseStore {
   showCustomizationModal(productId) {
     console.log('🎨 Show customization modal:', productId);
     const product = this.products.find(p => (p.id || p.productId) === productId);
+
+    console.log('🔍 Found product object:', {
+      found: !!product,
+      productId,
+      productKeys: product ? Object.keys(product) : [],
+      productId_field: product?.productId,
+      product_id_field: product?.id,
+      hasImages: product && product.images && product.images.length > 0,
+      firstImageUrl: product?.images?.[0]?.url
+    });
+
     if (product) {
+      // Debug: Check what's in the product before preparing
+      console.log('📦 Raw product before preparation:', {
+        id: product.id,
+        productId: product.productId,
+        title: product.title,
+        images: product.images ? `[${product.images.length} images]` : 'undefined',
+        firstImageUrl: product.images?.[0]?.url,
+        sourceImage: product.sourceImage ? 'exists' : 'undefined',
+        previewImage: product.previewImage
+      });
+
       // Prepare product data with proper image fields for modal renderer
       const preparedProduct = {
         ...product,
+        // Ensure id is set (prefer id, fallback to productId)
+        id: product.id || product.productId,
         // Ensure image fields are set for modal renderer
         image: product.image || (product.images?.[0]?.url) || (product.previewImage) || '/images/previews/generic-product-preview.svg',
         previewImage: product.previewImage || (product.images?.[0]?.url) || (product.image) || '/images/previews/generic-product-preview.svg'
@@ -3590,14 +3673,20 @@ class MerchandiseStore {
 
       console.log('🎨 Prepared product for modal:', {
         id: preparedProduct.id,
+        productId: preparedProduct.productId,
         title: preparedProduct.title,
         image: preparedProduct.image,
         previewImage: preparedProduct.previewImage,
-        productType: preparedProduct.productType
+        productType: preparedProduct.productType,
+        hasImages: preparedProduct.images ? `[${preparedProduct.images.length}]` : 'none'
       });
 
       const modalHtml = this.modalRenderer.renderCustomizationModal(preparedProduct);
       this.modalRenderer.showModal(modalHtml);
+    } else {
+      console.error('❌ Product not found for ID:', productId);
+      console.log('📋 Available products in store:', this.products.length, 'products');
+      console.log('🔍 Available product IDs:', this.products.map(p => p.id || p.productId).slice(0, 5), '...');
     }
   }
 
