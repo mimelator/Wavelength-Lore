@@ -109,6 +109,10 @@ class MerchandiseStore {
       this.showSuccess(message);
     });
     
+    this.eventBus.on('ui.continueShopping', () => {
+      this.returnToPreviousShoppingPosition();
+    });
+    
     // PHASE 2: UI Renderer Events
     this.setupUIRendererEventListeners();
   }
@@ -2097,6 +2101,128 @@ class MerchandiseStore {
     this._eventListenersInitialized = false;
     if (this.debugMode) {
       console.log('🔄 Event listener initialization flag reset');
+    }
+  }
+  
+  /**
+   * Store current shopping position for return navigation
+   */
+  storeCurrentShoppingPosition() {
+    const currentPosition = {
+      scrollY: window.scrollY,
+      timestamp: Date.now(),
+      activeSection: this.getCurrentActiveSection()
+    };
+    
+    this._previousShoppingPosition = currentPosition;
+    
+    if (this.debugMode) {
+      console.log('📍 Stored shopping position:', currentPosition);
+    }
+  }
+  
+  /**
+   * Get the currently active section for better navigation context
+   */
+  getCurrentActiveSection() {
+    const sections = [
+      { id: 'choose-product-section', name: 'Product Selection' },
+      { id: 'merchandise-store', name: 'Gallery' }
+    ];
+    
+    // Find which section is currently in view
+    for (const section of sections) {
+      const element = document.getElementById(section.id) || document.querySelector(`.${section.id}`);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+          return section.name;
+        }
+      }
+    }
+    
+    return 'Store';
+  }
+  
+  /**
+   * Navigate to cart section with smooth scrolling
+   */
+  navigateToCart() {
+    const cartSection = document.querySelector('.cart-container') || 
+                       document.querySelector('[data-section="cart"]') ||
+                       document.querySelector('#cart-section');
+    
+    if (cartSection) {
+      // Add a brief delay to ensure cart UI is updated
+      setTimeout(() => {
+        cartSection.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+        
+        // Add visual highlight to cart
+        this.highlightCart();
+        
+        if (this.debugMode) {
+          console.log('🛒 Navigated to cart section');
+        }
+      }, 300); // Brief delay to ensure cart UI update completes
+    } else {
+      console.warn('⚠️ Cart section not found for navigation');
+    }
+  }
+  
+  /**
+   * Return to previous shopping position
+   */
+  returnToPreviousShoppingPosition() {
+    if (this._previousShoppingPosition) {
+      const position = this._previousShoppingPosition;
+      
+      // Smooth scroll back to previous position
+      window.scrollTo({
+        top: position.scrollY,
+        behavior: 'smooth'
+      });
+      
+      this.showSuccess(`Returned to ${position.activeSection} section`);
+      
+      if (this.debugMode) {
+        console.log('↩️ Returned to previous shopping position:', position);
+      }
+      
+      // Clear the stored position after use
+      this._previousShoppingPosition = null;
+    } else {
+      // Fallback: scroll to top of products section
+      const productsSection = document.querySelector('.products-grid') || 
+                             document.querySelector('#choose-product-section') ||
+                             document.querySelector('.gallery-grid');
+      
+      if (productsSection) {
+        productsSection.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+      
+      this.showSuccess('Returned to shopping');
+    }
+  }
+  
+  /**
+   * Add visual highlight to cart to draw attention
+   */
+  highlightCart() {
+    const cartContainer = document.querySelector('.cart-container');
+    if (cartContainer) {
+      // Add highlight class
+      cartContainer.classList.add('cart-highlight');
+      
+      // Remove highlight after animation
+      setTimeout(() => {
+        cartContainer.classList.remove('cart-highlight');
+      }, 2000);
     }
   }
   
@@ -4460,8 +4586,15 @@ class MerchandiseStore {
 
     // 🔥 CRITICAL FIX: Call cart service with proper parameters
     try {
+      // Store current position before navigating to cart
+      this.storeCurrentShoppingPosition();
+      
       this.cartService.addItem(productForCart, actualVariantId, quantity || 1);
       this.showSuccess(`Product added to cart! (Qty: ${quantity || 1})`);
+      
+      // Navigate to cart immediately after successful add
+      this.navigateToCart();
+      
     } catch (error) {
       console.error('Error adding to cart:', error);
       this.showError('Failed to add to cart: ' + error.message);

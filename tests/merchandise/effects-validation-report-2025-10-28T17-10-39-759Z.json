@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-10-28T17:10:39.567Z",
+  "testName": "Effects Validation - GitHub Issue #96",
+  "steps": [
+    {
+      "name": "Server connectivity",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:10:39.676Z",
+      "details": "Server is responding"
+    },
+    {
+      "name": "Test product prepared",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:10:39.676Z",
+      "details": {
+        "selectedEffects": [
+          "vibrancy",
+          "dramatic"
+        ],
+        "productType": "premium-tshirt"
+      }
+    },
+    {
+      "name": "API request",
+      "status": "FAIL",
+      "timestamp": "2025-10-28T17:10:39.759Z",
+      "details": "Status 404: Request failed with status code 404"
+    }
+  ],
+  "conclusion": "ERROR - Request failed with status code 404"
+}

@@ -1016,3 +1016,91 @@
     width: 100%;
   }
 }
+
+/* =============================================================================
+   CART NAVIGATION & HIGHLIGHT ANIMATIONS
+   ============================================================================= */
+
+/* Cart highlight animation when navigating after add-to-cart */
+.cart-highlight {
+  animation: cartPulse 2s ease-in-out;
+  position: relative;
+}
+
+.cart-highlight::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: linear-gradient(45deg, #4CAF50, #2196F3, #FF9800, #4CAF50);
+  background-size: 300% 300%;
+  border-radius: 15px;
+  z-index: -1;
+  animation: cartGlow 2s ease-in-out;
+}
+
+@keyframes cartPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@keyframes cartGlow {
+  0% { 
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+  50% { 
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+  100% { 
+    background-position: 0% 50%;
+    opacity: 0;
+  }
+}
+
+/* Enhanced continue shopping button */
+.continue-shopping-btn {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.continue-shopping-btn:hover {
+  background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+
+.continue-shopping-btn::before {
+  content: '←';
+  font-size: 1.1em;
+  transition: transform 0.3s ease;
+}
+
+.continue-shopping-btn:hover::before {
+  transform: translateX(-3px);
+}
+
+/* Cart section enhanced visibility */
+.cart-container {
+  position: relative;
+  scroll-margin-top: 80px; /* Account for any fixed headers */
+}
+
+/* Smooth scroll behavior for the entire page */
+html {
+  scroll-behavior: smooth;
+}
