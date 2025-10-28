@@ -4068,15 +4068,25 @@ class MerchandiseStore {
         }
         this.customizedProducts.push(result.product);
 
+        // 🔥 CRITICAL FIX: Preserve the ORIGINAL sourceImage (gallery image)
+        // The sourceImage should ALWAYS point to the original gallery image, not the customized version
+        // This ensures when editing, we use the original image as the base, not a previously customized image
+        const originalSourceImage = product.sourceImage;
+
         // Update current product with Printify details
         this.currentCustomizedProduct = {
           ...product,
           ...result.product,
+          // Explicitly restore the original sourceImage to prevent border stacking on re-edits
+          sourceImage: originalSourceImage || product.sourceImage,
           customization: customization,
           generatedAt: new Date().toISOString()
         };
 
         console.log('✅ Customized product stored:', this.currentCustomizedProduct);
+        console.log('🔍 SOURCE IMAGE PRESERVATION:');
+        console.log('  Original sourceImage preserved:', originalSourceImage?.url?.substring(0, 80));
+        console.log('  Current product sourceImage:', this.currentCustomizedProduct.sourceImage?.url?.substring(0, 80));
 
         // 🔥 CRITICAL FIX: Add the product to the products array so it appears in the UI immediately
         // Without this, users had to refresh the page to see their newly created product
