@@ -85,6 +85,21 @@
         "type": "string"
       },
       "description": "Associated locations"
+    },
+    "tagline": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Character's personal motto or catchphrase (displayed in character banner)"
+    },
+    "stakes": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "What the character has at risk or their core motivation"
+    },
+    "cta_text": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "Custom call-to-action button text (optional override)"
     }
   }
 }

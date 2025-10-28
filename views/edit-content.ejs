@@ -611,6 +611,31 @@
                     <div class="form-hint">Main content description (supports smart linking)</div>
                 </div>
 
+                <% if (contentType === 'character') { %>
+                <div class="form-group">
+                    <label class="form-label" for="tagline">🎭 Tagline</label>
+                    <input type="text" id="tagline" name="tagline" class="form-input"
+                           value="<%= contentData.tagline || '' %>" placeholder="Character's personal motto or catchphrase"
+                           maxlength="200">
+                    <div class="form-hint">A memorable phrase that captures the character's essence (max 200 characters)</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="stakes">⚔️ Stakes</label>
+                    <textarea id="stakes" name="stakes" class="form-textarea" placeholder="What does this character have at risk? What drives them?"
+                              maxlength="500"><%= contentData.stakes || '' %></textarea>
+                    <div class="form-hint">What the character has at risk or their core motivation (max 500 characters)</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="cta_text">🔗 CTA Button Text</label>
+                    <input type="text" id="cta_text" name="cta_text" class="form-input"
+                           value="<%= contentData.cta_text || '' %>" placeholder="e.g., Discover Journey, Explore Network"
+                           maxlength="100">
+                    <div class="form-hint">Custom call-to-action text for character buttons (optional, will override defaults)</div>
+                </div>
+                <% } %>
+
                 <% if (contentType === 'episode') { %>
                 <div class="form-group">
                     <label class="form-label" for="summary">Summary</label>
@@ -1849,6 +1874,13 @@
                 formData.carouselImages = getArrayValues('carouselImages');
             } else if (contentType === 'character' || contentType === 'lore') {
                 formData.image_gallery = getArrayValues('image_gallery');
+            }
+
+            // Add CTA fields for characters
+            if (contentType === 'character') {
+                formData.tagline = document.getElementById('tagline')?.value.trim() || '';
+                formData.stakes = document.getElementById('stakes')?.value.trim() || '';
+                formData.cta_text = document.getElementById('cta_text')?.value.trim() || '';
             }
 
             if (contentType === 'lore') {

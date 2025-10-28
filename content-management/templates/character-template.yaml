@@ -1,6 +1,9 @@
 id: ''
 title: ''
 description: ''
+tagline: ''  # Character's personal motto or catchphrase
+stakes: ''  # What the character has at risk or their core motivation
+cta_text: ''  # Custom CTA button text (optional)
 type: 'hero'  # hero, villain, neutral, creature, spirit
 keywords: []
 primary_image: ''

@@ -432,7 +432,8 @@ class WavelengthContentCLI {
         console.log(chalk.green('\nContent Management:'));
         console.log('  view <item>      - Quick view of item details');
         console.log('  view <item> --detailed - Comprehensive view');
-        console.log('  edit <item>      - Edit item fields');
+        console.log('  edit <item>      - Edit item fields (lore, characters, episodes)');
+        console.log('                     Character editing includes: tagline, stakes, CTA text');
         console.log('  enhance <item> <prompt> - AI enhance item with custom prompt');
         
         console.log(chalk.green('\nContent Creation:'));
@@ -991,34 +992,65 @@ Please provide an enhanced version that improves the item according to the reque
             console.log(chalk.red('❌ Please specify an item ID'));
             return;
         }
-        
-        const item = loreHelpers.getLoreByIdSync(itemId);
+
+        // Determine content type and find item
+        let item = null;
+        let contentType = 'lore';
+
+        // Try to find in current context first
+        if (this.currentPath.includes('/characters/')) {
+            try {
+                item = characterHelpers.getCharacterByIdSync(itemId);
+                contentType = 'character';
+            } catch (error) {
+                // Fall through
+            }
+        }
+
+        if (!item) {
+            item = loreHelpers.getLoreByIdSync(itemId);
+            contentType = 'lore';
+        }
+
         if (!item) {
             console.log(chalk.red(`❌ Item "${itemId}" not found`));
             return;
         }
-        
-        console.log(chalk.cyan(`🔧 EDITING: ${item.title}`));
+
+        console.log(chalk.cyan(`🔧 EDITING: ${item.title || item.name}`));
         console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
         console.log(chalk.yellow('Choose what to edit:'));
         console.log('');
-        
-        // Show all editable fields
-        const editableFields = [
-            { key: 'title', name: 'Title', current: item.title },
+
+        // Show editable fields based on content type
+        let editableFields = [
+            { key: 'title', name: 'Title', current: item.title || item.name },
             { key: 'description', name: 'Description', current: item.description },
             { key: 'keywords', name: 'Keywords', current: Array.isArray(item.keywords) ? item.keywords.join(', ') : item.keywords },
-            { key: 'type', name: 'Type', current: item.type },
             { key: 'image', name: 'Main Image URL', current: item.image },
             { key: 'gallery', name: 'Image Gallery', current: `${item.image_gallery?.length || 0} images` },
-            { key: 'visibility', name: 'Visibility', current: item.hidden ? 'Hidden' : 'Visible' },
-            { key: 'enhanced', name: 'Enhanced Fields', current: item.enhanced ? 'Has enhanced content' : 'No enhanced content' }
+            { key: 'visibility', name: 'Visibility', current: item.hidden ? 'Hidden' : 'Visible' }
         ];
-        
+
+        // Add content-type-specific fields
+        if (contentType === 'character') {
+            // Insert CTA fields after description for characters
+            editableFields.splice(3, 0,
+                { key: 'tagline', name: '🎭 Tagline', current: item.tagline || 'Not set' },
+                { key: 'stakes', name: '⚔️ Stakes', current: item.stakes || 'Not set' },
+                { key: 'cta_text', name: '🔗 CTA Button Text', current: item.cta_text || 'Not set' }
+            );
+        } else if (contentType === 'lore') {
+            editableFields.push(
+                { key: 'type', name: 'Type', current: item.type },
+                { key: 'enhanced', name: 'Enhanced Fields', current: item.enhanced ? 'Has enhanced content' : 'No enhanced content' }
+            );
+        }
+
         editableFields.forEach((field, index) => {
             console.log(chalk.white(`  ${index + 1}. ${field.name}`) + chalk.gray(` - ${field.current || 'Not set'}`));
         });
-        
+
         console.log('');
         console.log(chalk.cyan('Special Actions:'));
         console.log(chalk.white('  9. 🎨 Generate AI Image'));
@@ -1026,34 +1058,36 @@ Please provide an enhanced version that improves the item according to the reque
         console.log(chalk.white('  11. 🤖 AI Enhance All Fields'));
         console.log(chalk.white('  12. 💾 Save & Exit'));
         console.log(chalk.white('  0. Cancel'));
-        
+
         // Start interactive editing session
-        await this.interactiveEdit(item, editableFields);
+        await this.interactiveEdit(item, editableFields, contentType);
     }
 
     /**
      * 🎛️ Interactive editing session
      */
-    async interactiveEdit(item, editableFields) {
+    async interactiveEdit(item, editableFields, contentType = 'lore') {
         const prompt = (question) => {
             return new Promise((resolve) => {
                 this.rl.question(chalk.yellow(question), resolve);
             });
         };
-        
+
+        const maxChoice = editableFields.length + 4; // 4 special actions (9-12, 0)
+
         while (true) {
             console.log('');
-            const choice = await prompt('Enter your choice (1-12, or 0 to cancel): ');
+            const choice = await prompt(`Enter your choice (1-${editableFields.length}, 9-12, or 0 to cancel): `);
             const choiceNum = parseInt(choice);
-            
+
             if (choiceNum === 0) {
                 console.log(chalk.gray('Edit cancelled'));
                 break;
             } else if (choiceNum === 12) {
-                await this.saveItemChanges(item);
+                await this.saveItemChanges(item, contentType);
                 break;
             } else if (choiceNum === 11) {
-                await this.aiEnhanceAllFields(item);
+                await this.aiEnhanceAllFields(item, contentType);
             } else if (choiceNum === 10) {
                 await this.generateAIVideo(item);
             } else if (choiceNum === 9) {
@@ -1076,10 +1110,10 @@ Please provide an enhanced version that improves the item according to the reque
                 this.rl.question(chalk.yellow(question), resolve);
             });
         };
-        
+
         console.log(chalk.cyan(`\n📝 Editing: ${field.name}`));
         console.log(chalk.gray(`Current value: ${field.current || 'Not set'}`));
-        
+
         if (field.key === 'keywords') {
             const newValue = await prompt('Enter keywords (comma-separated): ');
             if (newValue.trim()) {
@@ -1097,6 +1131,22 @@ Please provide an enhanced version that improves the item according to the reque
             }
         } else if (field.key === 'gallery') {
             await this.manageImageGallery(item);
+        } else if (field.key === 'stakes') {
+            // Stakes can be longer, give multi-line hint
+            console.log(chalk.gray('(Type your response and press Enter. For longer text, use line breaks)'));
+            const newValue = await prompt(`Enter new ${field.name}: `);
+            if (newValue.trim()) {
+                item[field.key] = newValue.trim();
+                console.log(chalk.green(`✅ ${field.name} updated`));
+            }
+        } else if (field.key === 'description') {
+            // Description can be longer, give multi-line hint
+            console.log(chalk.gray('(Type your response and press Enter)'));
+            const newValue = await prompt(`Enter new ${field.name}: `);
+            if (newValue.trim()) {
+                item[field.key] = newValue.trim();
+                console.log(chalk.green(`✅ ${field.name} updated`));
+            }
         } else {
             const newValue = await prompt(`Enter new ${field.name}: `);
             if (newValue.trim()) {
@@ -1187,16 +1237,34 @@ Please provide an enhanced version that improves the item according to the reque
     /**
      * 🤖 AI enhance all fields using existing chatbot integration
      */
-    async aiEnhanceAllFields(item) {
+    async aiEnhanceAllFields(item, contentType = 'lore') {
         console.log(chalk.cyan('🤖 AI ENHANCING ALL FIELDS'));
-        
-        const enhancePrompt = `Please enhance this lore item with dramatic, engaging content:
-        
+
+        let enhancePrompt;
+
+        if (contentType === 'character') {
+            enhancePrompt = `Please enhance this character with dramatic, engaging content for the Wavelength universe:
+
+Title: ${item.title}
+Description: ${item.description}
+Current Tagline: ${item.tagline || 'Not set'}
+Current Stakes: ${item.stakes || 'Not set'}
+
+Please provide:
+1. An improved tagline (memorable character motto, max 200 chars)
+2. Stakes (what does this character have at risk, max 500 chars)
+3. Suggestions for CTA button text
+
+Make it dramatic and engaging to entice users to explore more about this character.`;
+        } else {
+            enhancePrompt = `Please enhance this lore item with dramatic, engaging content:
+
 Title: ${item.title}
 Type: ${item.type}
 Description: ${item.description}
 
 Please provide enhanced descriptions, dramatic taglines, and compelling calls-to-action that would engage users and make them want to explore more of the Wavelength universe.`;
+        }
 
         try {
             await this.enhanceWithAI(item.id, enhancePrompt);
@@ -1208,18 +1276,30 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
     /**
      * 💾 Save item changes to Firebase
      */
-    async saveItemChanges(item) {
+    async saveItemChanges(item, contentType = 'lore') {
         console.log(chalk.cyan('💾 Saving changes...'));
-        
+
         try {
+            // Display what's being saved
+            console.log(chalk.yellow(`\n📋 Changes Summary for ${contentType.toUpperCase()}:`));
+            console.log(chalk.gray('─'.repeat(50)));
+
+            // Show character-specific CTA fields if present
+            if (contentType === 'character') {
+                if (item.title) console.log(chalk.white(`  Title: ${item.title}`));
+                if (item.tagline) console.log(chalk.white(`  🎭 Tagline: ${item.tagline}`));
+                if (item.stakes) console.log(chalk.white(`  ⚔️ Stakes: ${item.stakes}`));
+                if (item.cta_text) console.log(chalk.white(`  🔗 CTA Text: ${item.cta_text}`));
+            }
+
             // Here we would save to Firebase
             // For now, we'll update the local cache
-            console.log(chalk.green('✅ Changes saved successfully!'));
+            console.log(chalk.green('\n✅ Changes saved successfully!'));
             console.log(chalk.yellow('📝 Note: Full Firebase persistence integration pending'));
-            
+
             // Update local cache (this is a start)
-            console.log(chalk.gray(`Updated item: ${item.title}`));
-            
+            console.log(chalk.gray(`Updated item: ${item.title || item.name}`));
+
         } catch (error) {
             console.log(chalk.red('❌ Failed to save changes:', error.message));
         }
