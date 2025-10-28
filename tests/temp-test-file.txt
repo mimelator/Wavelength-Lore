@@ -1,3 +1,0 @@
-Test file for deletion validation
-Created: 2025-10-24T10:57:43.379Z
-Content: Lorem ipsum dolor sit amet
