@@ -34,7 +34,13 @@
     "test:cli-features": "node wavelength-cli-test-harness.js",
     "demo:cli": "node wavelength-cli-showcase.js",
     "demo:create": "node wavelength-content-creation-demo.js",
-    "showcase:cli": "node wavelength-cli-showcase.js"
+    "showcase:cli": "node wavelength-cli-showcase.js",
+    "wavelength:create-pricing-catalog": "node scripts/pricing-system/wavelength-pricing-catalog-creator.js",
+    "wavelength:create-pricing-catalog-dry-run": "node scripts/pricing-system/wavelength-pricing-catalog-creator.js --dry-run",
+    "wavelength:extract-pricing-data": "node scripts/pricing-system/wavelength-pricing-data-extractor.js",
+    "wavelength:refresh-pricing": "node scripts/pricing-system/wavelength-pricing-data-extractor.js",
+    "wavelength:pricing-health": "node scripts/pricing-system/wavelength-pricing-maintenance.js",
+    "wavelength:add-missing-products": "node scripts/pricing-system/wavelength-pricing-catalog-creator.js"
   },
   "dependencies": {
     "@aws-sdk/client-apprunner": "^3.917.0",
