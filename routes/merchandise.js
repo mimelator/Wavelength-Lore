@@ -126,9 +126,10 @@ function ensureDatabaseReady(res) {
 
 /**
  * GET /merchandise
- * Render the merchandise store page (VIP access required - same as games)
+ * Render the merchandise store page 
+ * 🌟 UPDATED: Available for all users (no authentication required)
  */
-router.get('/', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     res.render('merchandise-store', {
       title: 'Custom Merchandise Store',
@@ -255,53 +256,128 @@ router.get('/enhancement-status', (req, res) => {
 
 /**
  * GET /api/merchandise/gallery-images
- * Get user's gallery images suitable for merchandise (includes both uploaded and bookmarked)
+ * Get gallery images suitable for merchandise
+ * 🌟 UPDATED: For authenticated users - personal gallery + bookmarks
+ *            For anonymous users - curated public gallery selection
  */
-router.get('/gallery-images', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+router.get('/gallery-images', async (req, res) => {
   try {
-    const userId = req.user.uid;
+    const userId = req.user?.uid;
     
-    // Get both S3 uploaded images AND Firebase bookmarks
-    const s3Images = await galleryStorage.listUserGalleryImages(userId);
-    const { getUserBookmarks } = require('../services/firebase/galleryService');
-    const bookmarks = await getUserBookmarks(userId);
+    if (userId) {
+      // Authenticated user: Get both S3 uploaded images AND Firebase bookmarks
+      const s3Images = await galleryStorage.listUserGalleryImages(userId);
+      const { getUserBookmarks } = require('../services/firebase/galleryService');
+      const bookmarks = await getUserBookmarks(userId);
     
-    // Format S3 images for merchandise
-    const merchandiseS3Images = s3Images.map(image => ({
-      id: image.relativePath,
-      url: image.url,
-      thumbnailUrl: image.url,
-      title: image.originalName || image.fileName,
-      size: image.size,
-      dimensions: image.dimensions,
-      uploadedAt: image.uploadedAt || image.lastModified,
-      suitableForPrint: image.size > 1000000, // Basic size check (>1MB likely good quality)
-      type: 'uploaded',
-      relativePath: image.relativePath
-    }));
-    
-    // Format bookmarks for merchandise
-    const merchandiseBookmarks = bookmarks.map(bookmark => ({
-      id: bookmark.bookmarkId,
-      url: bookmark.url,
-      thumbnailUrl: bookmark.url,
-      title: bookmark.title || bookmark.fileName,
-      size: 0, // Bookmarks don't track size
-      dimensions: null, // Unknown for bookmarks
-      uploadedAt: bookmark.savedAt,
-      suitableForPrint: true, // Content images are assumed to be suitable
-      type: 'bookmark',
-      relativePath: null,
-      bookmarkId: bookmark.bookmarkId
-    }));
-    
-    // Combine both types
-    const merchandiseImages = [...merchandiseS3Images, ...merchandiseBookmarks];
-    
-    res.json({
-      success: true,
-      images: merchandiseImages
-    });
+      // Format S3 images for merchandise
+      const merchandiseS3Images = s3Images.map(image => ({
+        id: image.relativePath,
+        url: image.url,
+        thumbnailUrl: image.url,
+        title: image.originalName || image.fileName,
+        size: image.size,
+        dimensions: image.dimensions,
+        uploadedAt: image.uploadedAt || image.lastModified,
+        suitableForPrint: image.size > 1000000, // Basic size check (>1MB likely good quality)
+        type: 'uploaded',
+        relativePath: image.relativePath
+      }));
+      
+      // Format bookmarks for merchandise
+      const merchandiseBookmarks = bookmarks.map(bookmark => ({
+        id: bookmark.bookmarkId,
+        url: bookmark.url,
+        thumbnailUrl: bookmark.url,
+        title: bookmark.title || bookmark.fileName,
+        size: 0, // Bookmarks don't track size
+        dimensions: null, // Unknown for bookmarks
+        uploadedAt: bookmark.savedAt,
+        suitableForPrint: true, // Content images are assumed to be suitable
+        type: 'bookmark',
+        relativePath: null,
+        bookmarkId: bookmark.bookmarkId
+      }));
+      
+      // Combine both types
+      const merchandiseImages = [...merchandiseS3Images, ...merchandiseBookmarks];
+      
+      res.json({
+        success: true,
+        images: merchandiseImages
+      });
+
+    } else {
+      // Anonymous user: Provide curated public gallery selection
+      const publicGalleryImages = [
+        {
+          id: 'wavelength-character-1',
+          url: '/images/characters/wavelength-character-cosmic.webp',
+          thumbnailUrl: '/images/characters/wavelength-character-cosmic.webp',
+          title: 'Wavelength Character - Cosmic',
+          size: 2000000,
+          dimensions: { width: 1024, height: 1024 },
+          uploadedAt: new Date().toISOString(),
+          suitableForPrint: true,
+          type: 'public-gallery',
+          category: 'character'
+        },
+        {
+          id: 'wavelength-character-2',
+          url: '/images/characters/wavelength-character-electric.webp',
+          thumbnailUrl: '/images/characters/wavelength-character-electric.webp',
+          title: 'Wavelength Character - Electric',
+          size: 2000000,
+          dimensions: { width: 1024, height: 1024 },
+          uploadedAt: new Date().toISOString(),
+          suitableForPrint: true,
+          type: 'public-gallery',
+          category: 'character'
+        },
+        {
+          id: 'wavelength-logo-1',
+          url: '/images/logos/wavelength-logo-main.webp',
+          thumbnailUrl: '/images/logos/wavelength-logo-main.webp',
+          title: 'Wavelength Logo - Main',
+          size: 1500000,
+          dimensions: { width: 512, height: 512 },
+          uploadedAt: new Date().toISOString(),
+          suitableForPrint: true,
+          type: 'public-gallery',
+          category: 'logo'
+        },
+        {
+          id: 'wavelength-abstract-1',
+          url: '/images/abstract/wavelength-waves-pattern.webp',
+          thumbnailUrl: '/images/abstract/wavelength-waves-pattern.webp',
+          title: 'Wavelength Waves Pattern',
+          size: 1800000,
+          dimensions: { width: 1024, height: 1024 },
+          uploadedAt: new Date().toISOString(),
+          suitableForPrint: true,
+          type: 'public-gallery',
+          category: 'abstract'
+        },
+        {
+          id: 'wavelength-art-1',
+          url: '/images/art/wavelength-digital-art-1.webp',
+          thumbnailUrl: '/images/art/wavelength-digital-art-1.webp',
+          title: 'Wavelength Digital Art #1',
+          size: 2200000,
+          dimensions: { width: 1024, height: 1024 },
+          uploadedAt: new Date().toISOString(),
+          suitableForPrint: true,
+          type: 'public-gallery',
+          category: 'art'
+        }
+      ];
+
+      res.json({
+        success: true,
+        images: publicGalleryImages,
+        message: 'Showing curated public gallery for anonymous users'
+      });
+    }
     
   } catch (error) {
     console.error('Error fetching gallery images for merchandise:', error);
@@ -394,46 +470,143 @@ router.get('/product-types/:category', async (req, res) => {
 /**
  * POST /api/merchandise/create-guided-product
  * Create a product using guided selection (no user naming required)
+ * 🌟 UPDATED: Available for all users (no authentication required)
  */
-router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+router.post('/create-guided-product', async (req, res) => {
   try {
+    console.log('\n' + '🔥'.repeat(80));
+    console.log('🔥 DIAGNOSTIC: CREATE GUIDED PRODUCT API CALLED');
+    console.log('🔥'.repeat(80));
+    
     // Ensure database is ready
     if (!ensureDatabaseReady(res)) {
       return; // Error response already sent
     }
-    
-    const userId = req.user.uid;
-    const { imageId, imageUrl, imageTitle, productType, imageContext = {} } = req.body;
-    
+
+    const userId = req.user?.uid || 'anonymous-user';
+    const { imageId, imageUrl, imageTitle, productType, blueprintId, printProviderId, imageContext = {} } = req.body;
+
+    console.log('📋 DIAGNOSTIC: API Request payload validation');
+    console.log('   userId:', userId);
+    console.log('   imageId:', imageId);
+    console.log('   imageUrl:', imageUrl ? imageUrl.substring(0, 100) + '...' : 'undefined');
+    console.log('   imageTitle:', imageTitle);
+    console.log('   productType:', productType);
+    console.log('   blueprintId:', blueprintId);
+    console.log('   printProviderId:', printProviderId);
+    console.log('   imageContext keys:', Object.keys(imageContext));
+
+    // 🚨 STRICT VALIDATION - NO FALLBACKS
     if (!imageId || !imageUrl || !productType) {
+      const error = 'Image ID, URL, and product type are required';
+      console.error('❌ FATAL ERROR: Missing required parameters');
+      console.error('   imageId present:', !!imageId);
+      console.error('   imageUrl present:', !!imageUrl);
+      console.error('   productType present:', !!productType);
       return res.status(400).json({
         success: false,
-        error: 'Image ID, URL, and product type are required'
+        error: error
       });
     }
+
+    // Find the product configuration with comprehensive diagnostics
+    console.log('🔍 DIAGNOSTIC: Looking up product configuration');
+    console.log('   Searching for productType:', productType);
+    console.log('   Expected format: validated-XXX');
     
-    // Find the product configuration
     const productConfig = findProductById(productType);
+    
     if (!productConfig) {
+      const error = `Invalid product type: ${productType}`;
+      console.error('❌ FATAL ERROR: Product configuration not found');
+      console.error('   productType searched:', productType);
+      console.error('   findProductById returned:', productConfig);
+      console.error('   🎯 This indicates either:');
+      console.error('      1. Frontend sent invalid productType ID');
+      console.error('      2. findProductById function is broken');
+      console.error('      3. Product not in validated catalog');
+      
+      // Debug: Show available product types
+      try {
+        const { getAllProducts } = require('../config/product-types');
+        const allProducts = getAllProducts();
+        console.error('   📊 Available product types (first 5):');
+        allProducts.slice(0, 5).forEach(p => {
+          console.error(`      ${p.id} (${p.name})`);
+        });
+        console.error(`   📊 Total available products: ${allProducts.length}`);
+      } catch (debugError) {
+        console.error('   ❌ Could not load product catalog for debugging:', debugError.message);
+      }
+      
       return res.status(400).json({
         success: false,
-        error: 'Invalid product type'
+        error: error
       });
     }
-    
+
+    console.log('✅ DIAGNOSTIC: Product configuration found');
+    console.log('   productConfig.id:', productConfig.id);
+    console.log('   productConfig.name:', productConfig.name);
+    console.log('   productConfig.blueprintId:', productConfig.blueprintId);
+    console.log('   productConfig.printProviderId:', productConfig.printProviderId);
+    console.log('   productConfig.category:', productConfig.category);
+    console.log('   productConfig.provider:', productConfig.provider);
+
+    // � STRICT PARAMETER VALIDATION - NO FALLBACKS
+    console.log('🔍 DIAGNOSTIC: Blueprint/Provider ID validation');
+    console.log('   blueprintId from request:', blueprintId);
+    console.log('   printProviderId from request:', printProviderId);
+    console.log('   blueprintId from config:', productConfig.blueprintId);
+    console.log('   printProviderId from config:', productConfig.printProviderId);
+
+    // Validate that request parameters match product configuration
+    if (blueprintId && blueprintId !== productConfig.blueprintId) {
+      const error = `Blueprint ID mismatch: request=${blueprintId}, config=${productConfig.blueprintId}`;
+      console.error('❌ FATAL ERROR: Blueprint ID validation failed');
+      console.error('   Request blueprintId:', blueprintId);
+      console.error('   Config blueprintId:', productConfig.blueprintId);
+      console.error('   🎯 This indicates frontend/backend parameter mismatch');
+      return res.status(400).json({
+        success: false,
+        error: error
+      });
+    }
+
+    if (printProviderId && printProviderId !== productConfig.printProviderId) {
+      const error = `Provider ID mismatch: request=${printProviderId}, config=${productConfig.printProviderId}`;
+      console.error('❌ FATAL ERROR: Provider ID validation failed');
+      console.error('   Request printProviderId:', printProviderId);
+      console.error('   Config printProviderId:', productConfig.printProviderId);
+      console.error('   🎯 This indicates frontend/backend parameter mismatch');
+      return res.status(400).json({
+        success: false,
+        error: error
+      });
+    }
+
+    // Use validated IDs from product configuration (trust the validated catalog)
+    const actualBlueprintId = productConfig.blueprintId;
+    const actualPrintProviderId = productConfig.printProviderId;
+
+    console.log('✅ DIAGNOSTIC: Using validated blueprint/provider IDs');
+    console.log('   actualBlueprintId:', actualBlueprintId);
+    console.log('   actualPrintProviderId:', actualPrintProviderId);
+    console.log('   Source: Validated product configuration (NO fallbacks)');
+
     // Generate product details automatically
     const productName = generateProductName(productType, {
       ...imageContext,
       imageTitle: imageTitle || imageId
     });
-    
+
     const productDescription = generateProductDescription(productType, {
       ...imageContext,
       imageTitle: imageTitle || imageId
     });
-    
+
     const productTags = generateProductTags(productType, imageContext);
-    
+
     // Download image from URL for processing with auto-enhancement
     const imageBuffer = await downloadImageFromS3(imageUrl);
     if (!imageBuffer) {
@@ -442,9 +615,15 @@ router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireActi
         error: 'Failed to process image'
       });
     }
-    
-    console.log('🎯 Creating guided product with auto-enhancement:', productType);
-    
+
+    console.log('✅ Product configuration found:', productConfig.name);
+    console.log('✅ Generated Name:', productName);
+    console.log('✅ Image cached successfully, size:', (imageBuffer.length / 1024).toFixed(2), 'KB');
+    console.log('\n🖨️ [PRINTIFY API] Creating product with auto-enhancement...');
+    console.log('   Product Type:', productType);
+    console.log('   Blueprint ID (actual):', actualBlueprintId);
+    console.log('   Print Provider (actual):', actualPrintProviderId);
+
     // Create product with auto-enhancement
     const productResult = await printifyService.createCustomProductWithBlueprintAndAutoEnhancement(
       imageBuffer,
@@ -453,8 +632,8 @@ router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireActi
         title: productName,
         description: productDescription,
         tags: productTags,
-        blueprintId: productConfig.blueprintId,
-        printProviderId: productConfig.printProviderId,
+        blueprintId: actualBlueprintId, // Use actual blueprint ID from request or config
+        printProviderId: actualPrintProviderId, // Use actual provider ID from request or config
         basePrice: productConfig.basePrice,
         userId: userId,
         originalImageId: imageId
@@ -462,13 +641,26 @@ router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireActi
     );
     
     if (!productResult.success) {
+      console.error('❌ [PRINTIFY API] Failed to create product:', productResult.error);
       return res.status(400).json({
         success: false,
         error: productResult.error
       });
     }
-    
+
+    console.log('\n✅ [PRINTIFY API] PRODUCT CREATED SUCCESSFULLY!');
+    console.log('   Product ID:', productResult.productId);
+    console.log('   Variants created:', productResult.variants?.length || 0);
+    console.log('   Images uploaded:', productResult.images?.length || 0);
+    if (productResult.imageEnhancement?.autoEnhanced) {
+      console.log('   🔄 Image Auto-Enhanced: YES');
+      console.log('      Enhancement Source:', productResult.imageEnhancement.enhancementSource);
+    } else {
+      console.log('   🔄 Image Auto-Enhanced: NO');
+    }
+
     // Store product association with user INCLUDING variants and images
+    console.log('\n💾 Storing product in Firebase database...');
     await merchandiseDB.storeUserProduct(userId, {
       productId: productResult.productId,
       imageId: sanitizeFirebaseKey(imageId),
@@ -493,13 +685,20 @@ router.post('/create-guided-product', ensureAuthenticated, groupAuth.requireActi
       },
       generatedAt: new Date().toISOString()
     });
+    console.log('✅ Product stored in database');
     
     // Prepare response message with enhancement info
     let successMessage = `${productConfig.name} created successfully!`;
     if (productResult.imageEnhancement?.autoEnhanced) {
       successMessage += ` Image was automatically enhanced for better print quality.`;
     }
-    
+
+    console.log('\n📤 Sending response to client...');
+    console.log('   Product ID:', productResult.productId);
+    console.log('   Message:', successMessage);
+    console.log('═'.repeat(80));
+    console.log('✅ [OPERATION COMPLETE] Product successfully created and stored\n');
+
     res.json({
       success: true,
       product: {
@@ -1685,7 +1884,17 @@ async function executeWebhookActions(eventResult) {
  */
 async function downloadImageFromS3(imageUrl) {
   try {
-    const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+    // Handle relative URLs (e.g., /upscaled-images/...)
+    // Convert to absolute URL using CDN_URL environment variable
+    let fullUrl = imageUrl;
+    if (imageUrl.startsWith('/')) {
+      const cdnUrl = process.env.CDN_URL || 'http://localhost:3001';
+      fullUrl = `${cdnUrl}${imageUrl}`;
+    }
+
+    console.log('📥 Downloading image from:', fullUrl);
+    const response = await axios.get(fullUrl, { responseType: 'arraybuffer' });
+    console.log('✅ Image downloaded successfully, size:', response.data.length, 'bytes');
     return Buffer.from(response.data);
   } catch (error) {
     console.error('Error downloading image from S3:', error);

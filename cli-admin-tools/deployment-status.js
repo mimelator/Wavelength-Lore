@@ -207,14 +207,25 @@ class WavelengthDeploymentStatus {
         console.log('');
         
         // ECR Status
-        console.log(chalk.cyan('🐳 ECR STATUS:'));
+        console.log(chalk.cyan('🐳 ECR CONFIGURATION:'));
         if (status.ecr.status === 'Active') {
             console.log(chalk.white(`   Repository: ${status.ecr.repository}`));
+            console.log(chalk.white(`   URI: ${status.ecr.uri}`));
             console.log(chalk.white(`   Images: ${status.ecr.imageCount} total`));
             console.log(chalk.white(`   Recent Images:`));
-            status.ecr.recentImages.forEach(img => {
-                console.log(chalk.gray(`     • ${img.tag} (${img.size}) - ${new Date(img.pushedAt).toLocaleString()}`));
+            status.ecr.recentImages.forEach((img, index) => {
+                const isLatest = img.tag === 'latest';
+                const tagDisplay = isLatest ? chalk.yellow(img.tag) : chalk.green(img.tag);
+                const timeAgo = this.getTimeAgo(img.pushedAt);
+                console.log(chalk.gray(`     ${index === 0 ? '→' : '•'} ${tagDisplay} (${img.size}) - ${timeAgo}`));
+                if (index === 0) {
+                    console.log(chalk.gray(`       Latest push: ${new Date(img.pushedAt).toLocaleString()}`));
+                }
             });
+            
+            // Show ECR connection info
+            console.log(chalk.white(`   Region: us-east-1`));
+            console.log(chalk.white(`   Registry: ${status.ecr.uri.split('/')[0]}`));
         } else {
             console.log(chalk.red(`   Status: ${status.ecr.status}`));
             console.log(chalk.red(`   Message: ${status.ecr.message}`));
@@ -223,8 +234,31 @@ class WavelengthDeploymentStatus {
         
         // App Runner Status
         console.log(chalk.cyan('🏃 APP RUNNER STATUS:'));
-        console.log(chalk.white(`   Service: ${status.appRunner.serviceName}`));
+        console.log(chalk.white(`   Service: ${status.appRunner.serviceName || 'wavelength-lore-service'}`));
         console.log(chalk.white(`   Status: ${status.appRunner.status}`));
+        if (status.appRunner.serviceUrl) {
+            console.log(chalk.white(`   URL: https://${status.appRunner.serviceUrl}`));
+        }
+        if (status.appRunner.source && status.appRunner.source !== 'Not available') {
+            console.log(chalk.white(`   Current Image: ${status.appRunner.source}`));
+            
+            // Parse ECR image details from source
+            const imageMatch = status.appRunner.source.match(/wavelength-lore:(.+)$/);
+            if (imageMatch) {
+                const imageTag = imageMatch[1];
+                console.log(chalk.gray(`   Image Tag: ${imageTag}`));
+                
+                // Check if it's using latest (rollback indicator)
+                if (imageTag === 'latest') {
+                    console.log(chalk.red('   ⚠️  WARNING: Using :latest tag (possible rollback)'));
+                } else {
+                    console.log(chalk.green('   ✅ Using specific version tag'));
+                }
+            }
+        }
+        if (status.appRunner.updatedAt) {
+            console.log(chalk.gray(`   Last Updated: ${new Date(status.appRunner.updatedAt).toLocaleString()}`));
+        }
         if (status.appRunner.message) {
             console.log(chalk.gray(`   Message: ${status.appRunner.message}`));
         }
@@ -234,17 +268,67 @@ class WavelengthDeploymentStatus {
         const localHealthy = status.local.dockerfileExists && status.local.nodeModulesExists;
         const ecrHealthy = status.ecr.status !== 'Error';
         const appRunnerHealthy = status.appRunner.status === 'RUNNING';
+        
+        // Check deployment synchronization
+        let deploymentSync = 'Unknown';
+        if (status.local.commit && status.appRunner.source) {
+            const imageMatch = status.appRunner.source.match(/wavelength-lore:(.+)$/);
+            if (imageMatch) {
+                const imageTag = imageMatch[1];
+                // Check if App Runner is using latest commit or version
+                if (imageTag.includes(status.local.commit) || imageTag.startsWith('v')) {
+                    deploymentSync = 'Synchronized';
+                } else if (imageTag === 'latest') {
+                    deploymentSync = 'Rollback detected';
+                } else {
+                    deploymentSync = 'Out of sync';
+                }
+            }
+        }
+        
         const isHealthy = localHealthy && ecrHealthy && appRunnerHealthy;
         
-        console.log(chalk.cyan('🌊 OVERALL HEALTH:'));
-        if (isHealthy) {
-            console.log(chalk.green('   ✅ HEALTHY - All systems operational'));
+        console.log(chalk.cyan('🌊 DEPLOYMENT STATUS SUMMARY:'));
+        console.log(chalk.white(`   Local Environment: ${localHealthy ? '✅' : '❌'}`));
+        console.log(chalk.white(`   ECR Repository: ${ecrHealthy ? '✅' : '❌'}`));
+        console.log(chalk.white(`   App Runner Service: ${appRunnerHealthy ? '✅' : '❌'}`));
+        console.log(chalk.white(`   Deployment Sync: ${deploymentSync === 'Synchronized' ? '✅' : 
+                                                      deploymentSync === 'Rollback detected' ? '🔄' : 
+                                                      deploymentSync === 'Out of sync' ? '⚠️' : '❓'} ${deploymentSync}`));
+        console.log('');
+        
+        if (isHealthy && deploymentSync === 'Synchronized') {
+            console.log(chalk.green('   🚀 OPTIMAL - All systems operational and synchronized'));
+        } else if (isHealthy) {
+            console.log(chalk.yellow('   ⚠️ HEALTHY - Systems running but may need sync'));
         } else {
-            console.log(chalk.yellow('   ⚠️ ATTENTION NEEDED - Check issues above'));
+            console.log(chalk.red('   🔧 ATTENTION NEEDED - Critical issues detected'));
             if (!localHealthy) console.log(chalk.red('      • Local environment issues detected'));
             if (!ecrHealthy) console.log(chalk.red('      • ECR repository issues detected'));  
             if (!appRunnerHealthy) console.log(chalk.red('      • App Runner service not running'));
         }
+        
+        if (deploymentSync === 'Rollback detected') {
+            console.log(chalk.yellow('   💡 TIP: App Runner may have rolled back due to health check failures'));
+        } else if (deploymentSync === 'Out of sync') {
+            console.log(chalk.yellow('   💡 TIP: Consider deploying latest changes to synchronize'));
+        }
+    }
+
+    /**
+     * ⏰ Get human-readable time ago
+     */
+    getTimeAgo(date) {
+        const now = new Date();
+        const diffMs = now - new Date(date);
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+        
+        if (diffDays > 0) return `${diffDays}d ago`;
+        if (diffHours > 0) return `${diffHours}h ago`;
+        if (diffMins > 0) return `${diffMins}m ago`;
+        return 'just now';
     }
 
     /**

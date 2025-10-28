@@ -36,7 +36,7 @@ router.get('/category/:categoryId', (req, res) => {
     
     // Category names for breadcrumbs
     const categoryNames = {
-        'general': 'General Discussion',
+        'general': 'THE SHIRE\'S MESSENGER POST: General Discussion',
         'lore': 'Lore & Theories',
         'episodes': 'Episode Discussions',
         'fanart': 'Fan Creations'
@@ -360,11 +360,11 @@ router.get('/api/categories', async (req, res) => {
             success: true,
             categories: {
                 general: {
-                    id: 'general',
-                    title: 'The Wavelength Band',
-                    description: 'Dive into the heroes! Discuss Alexandria\'s vocal sorcery, Andrew\'s noble quest, and the rest of the team\'s role in the fight for the Shire.',
+                    id: 'general', 
+                    title: 'THE SHIRE\'S MESSENGER POST: General Discussion',
+                    description: 'Anything and everything Wavelength! This is the Shire\'s Town Square. Introduce yourself, chat about the latest news, or discuss any topic that doesn\'t fit into the deeper lore threads. New here? Say hello!',
                     color: '#4a47a3',
-                    icon: '🎵',
+                    icon: '📮',
                     iconSvg: '/icons/hero-icon.svg'
                 },
                 lore: {

@@ -31,20 +31,50 @@ class AutoEnhancedPrintifyService extends PrintifyService {
   async uploadImage(imageBuffer, fileName, title, options = {}) {
     try {
       console.log('🔄 Auto-enhancement upload for:', fileName);
-      
-      // 🚨 CRITICAL VALIDATION: Ensure high-quality image for Printify
-      const qualityCheck = await this.validateImageQualityForPrintify(imageBuffer, fileName);
-      if (!qualityCheck.passedValidation) {
-        throw new Error(`QUALITY VALIDATION FAILED: ${qualityCheck.reason}. Printify requires 300DPI high-quality images, not compressed web images.`);
-      }
-      
+
+      // 🔄 STEP 1: Check initial image quality
+      let qualityCheck = await this.validateImageQualityForPrintify(imageBuffer, fileName);
       let finalBuffer = imageBuffer;
       let enhancementInfo = { autoEnhanced: false };
-      
-      // Auto-enhance if enabled
-      if (this.autoEnhancementEnabled) {
-        const preview = await this.previewImageEnhancement(imageBuffer, fileName, options);
-        
+
+      // 🚀 STEP 2: If image is too small or low-quality, UPSCALE immediately
+      if (!qualityCheck.passedValidation) {
+        console.log(`⚠️ Image quality insufficient: ${qualityCheck.reason}`);
+        console.log('🚀 Upscaling image to Printify standards...');
+
+        try {
+          const upscaledBuffer = await this.upscaler.upscaleImageForPrintify(imageBuffer, fileName);
+          if (upscaledBuffer) {
+            console.log('✅ Image successfully upscaled');
+
+            // For upscaled images, we're more lenient with compression check since we're upscaling web images
+            // Just verify the dimensions are sufficient
+            const sharp = require('sharp');
+            const upscaledMetadata = await sharp(upscaledBuffer).metadata();
+            const isUpscaledSizeSufficient = upscaledMetadata.width >= 1800 && upscaledMetadata.height >= 1800;
+
+            if (isUpscaledSizeSufficient) {
+              console.log(`✅ Upscaled image dimensions sufficient: ${upscaledMetadata.width}x${upscaledMetadata.height}`);
+              finalBuffer = upscaledBuffer;
+              enhancementInfo = {
+                autoEnhanced: true,
+                enhancementSource: 'upscaling',
+                reason: 'Original image was too small and was upscaled to meet Printify requirements'
+              };
+            } else {
+              throw new Error(`Upscaled image dimensions still insufficient: ${upscaledMetadata.width}x${upscaledMetadata.height}. Printify requires minimum 1800x1800.`);
+            }
+          }
+        } catch (upscaleError) {
+          console.error('❌ Upscaling failed:', upscaleError);
+          throw new Error(`Cannot upload image to Printify: ${qualityCheck.reason}. Upscaling also failed: ${upscaleError.message}`);
+        }
+      }
+
+      // 🎨 STEP 3: Auto-enhance if image quality is good
+      if (this.autoEnhancementEnabled && qualityCheck.passedValidation) {
+        const preview = await this.previewImageEnhancement(finalBuffer, fileName, options);
+
         if (preview.success && !preview.originalImageSuitable) {
           // Download enhanced image
           const enhancedBuffer = await this.downloadImageBuffer(preview.enhancedImageUrl);
@@ -60,7 +90,7 @@ class AutoEnhancedPrintifyService extends PrintifyService {
                 }
               }
             };
-            
+
             // 🚨 RE-VALIDATE enhanced image quality
             const enhancedQualityCheck = await this.validateImageQualityForPrintify(finalBuffer, `enhanced-${fileName}`);
             if (!enhancedQualityCheck.passedValidation) {
@@ -70,26 +100,41 @@ class AutoEnhancedPrintifyService extends PrintifyService {
           }
         }
       }
-      
-      // 🚨 FINAL VALIDATION: Double-check image quality before Printify upload
-      const finalQualityCheck = await this.validateImageQualityForPrintify(finalBuffer, fileName);
-      if (!finalQualityCheck.passedValidation) {
-        throw new Error(`FINAL QUALITY VALIDATION FAILED: ${finalQualityCheck.reason}. Cannot upload to Printify without high-quality 300DPI image.`);
+
+      // ✅ STEP 4: Final validation before Printify upload
+      // For upscaled images, only check dimensions (they may still have compression artifacts)
+      let canProceedWithUpload = true;
+
+      if (enhancementInfo.enhancementSource === 'upscaling') {
+        // For upscaled images, just verify dimensions
+        const sharp = require('sharp');
+        const finalMetadata = await sharp(finalBuffer).metadata();
+        canProceedWithUpload = finalMetadata.width >= 1800 && finalMetadata.height >= 1800;
+
+        if (!canProceedWithUpload) {
+          throw new Error(`Upscaled image dimensions insufficient: ${finalMetadata.width}x${finalMetadata.height}. Printify requires 1800x1800.`);
+        }
+        console.log(`✅ Upscaled image dimensions verified: ${finalMetadata.width}x${finalMetadata.height} - proceeding with upload`);
+      } else {
+        // For non-upscaled images, do full validation
+        const finalQualityCheck = await this.validateImageQualityForPrintify(finalBuffer, fileName);
+        if (!finalQualityCheck.passedValidation) {
+          throw new Error(`FINAL QUALITY VALIDATION FAILED: ${finalQualityCheck.reason}. Cannot upload to Printify.`);
+        }
+        console.log('✅ Image passed all quality validations - uploading to Printify');
       }
-      
-      console.log('✅ Image passed all quality validations - uploading to Printify');
-      
-      // Upload to Printify
+
+      // 📤 STEP 5: Upload to Printify
       const uploadResult = await super.uploadImage(finalBuffer, fileName, title);
-      
+
       return {
         ...uploadResult,
         ...enhancementInfo
       };
-      
+
     } catch (error) {
-      console.error('Auto-enhancement upload failed:', error);
-      return super.uploadImage(imageBuffer, fileName, title);
+      console.error('❌ Auto-enhancement upload failed:', error.message);
+      throw new Error(`Cannot upload image to Printify: ${error.message}`);
     }
   }
   

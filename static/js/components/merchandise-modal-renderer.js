@@ -214,8 +214,16 @@ class MerchandiseModalRenderer {
     try {
       const modalId = `customize-modal-${product.id}`;
 
+      // CRITICAL: Determine product type explicitly - no inline OR operators in templates
+      const productType = product.type || product.productType || product.category || 't-shirt';
+      console.log('📝 renderCustomizationModal - Product Type Determination:');
+      console.log('   product.type:', product.type);
+      console.log('   product.productType:', product.productType);
+      console.log('   product.category:', product.category);
+      console.log('   Final productType:', productType);
+
       return `
-        <div class="modal-overlay fullscreen-overlay" data-modal-id="${modalId}" data-product-id="${product.id}" data-product-title="${product.title}" data-product-image="${product.previewImage || product.image || ''}">
+        <div class="modal-overlay fullscreen-overlay" data-modal-id="${modalId}" data-product-id="${product.id}" data-product-title="${product.title}" data-product-type="${productType}" data-product-image="${product.previewImage || product.image || ''}" data-blueprint-id="${product.blueprintId || ''}" data-print-provider-id="${product.printProviderId || ''}">
           <div class="modal-dialog customization-modal fullscreen-customization" role="dialog" aria-labelledby="${modalId}-title">
             <!-- Header -->
             <div class="customization-header">
@@ -2354,10 +2362,10 @@ class MerchandiseModalRenderer {
    * @param {HTMLElement} modal - Customization modal element
    */
   async handlePreviewFinishedProduct(productId, modal) {
-    console.log('🎬 handlePreviewFinishedProduct called with productId:', productId);
+    console.log('🎬 🔥 UPDATED: handlePreviewFinishedProduct - Creating REAL product via Printify API!');
 
     if (this.debugMode) {
-      this.debugLog(`Preview finished product: ${productId}`, 'info');
+      this.debugLog(`Create finished product: ${productId}`, 'info');
     }
 
     try {
@@ -2387,26 +2395,36 @@ class MerchandiseModalRenderer {
       };
       console.log('✅ Customization object built:', customization);
 
-      if (this.debugMode) {
-        this.debugLog(`Customization for finished product preview`, 'info', customization);
-      }
-
       console.log('📊 Step 3: Getting product data from modal');
       // Get product data from modal attributes
       const customizationOverlay = modal.closest('.modal-overlay');
       const customizationModalId = customizationOverlay?.dataset.modalId;
       const productTitle = customizationOverlay?.dataset.productTitle || 'Product';
+      const productType = customizationOverlay?.dataset.productType; // CRITICAL: Must be present
       const productImage = customizationOverlay?.dataset.productImage || '/images/previews/generic-product-preview.svg';
-      console.log('✅ Product data retrieved:', { productTitle, productImage, customizationModalId });
+      // 🔥 CRITICAL: Extract blueprintId and printProviderId from modal
+      const blueprintId = customizationOverlay?.dataset.blueprintId ? parseInt(customizationOverlay.dataset.blueprintId, 10) : null;
+      const printProviderId = customizationOverlay?.dataset.printProviderId ? parseInt(customizationOverlay.dataset.printProviderId, 10) : null;
 
-      // Create a minimal product object from available data
+      console.log('✅ Product data retrieved:', { productTitle, productType, productImage, blueprintId, printProviderId, customizationModalId });
+
+      // CRITICAL VALIDATION: Product type must be explicitly set
+      if (!productType || productType === '') {
+        console.error('❌ CRITICAL ERROR: productType is empty or missing from modal data');
+        throw new Error('Product type is missing. The product object must have type, productType, or category field. Got: "' + productType + '"');
+      }
+
+      // Create product object for Printify API
       const product = {
         id: productId,
         title: productTitle,
-        previewImage: productImage,
-        mockupImage: productImage // Use same image as mockup for now
+        type: productType,
+        productType: productType,
+        blueprintId: blueprintId,
+        printProviderId: printProviderId,
+        previewImage: productImage
       };
-      console.log('✅ Product object created:', product);
+      console.log('✅ Product object created for API:', product);
 
       if (!product.id) {
         console.error(`Product ID not found`);
@@ -2414,62 +2432,69 @@ class MerchandiseModalRenderer {
         return;
       }
 
-      // Store customization in modal for later use
-      modal.dataset.finalCustomization = JSON.stringify(customization);
+      console.log('📊 Step 4: 🚀 CALLING PRINTIFY API TO CREATE REAL PRODUCT!');
+      
+      // Show loading while API call happens
+      this.showLoadingOverlay('Creating your amazing product...');
 
-      console.log('📊 Step 4: Rendering finished product preview');
-      // Render and show finished product preview
-      const previewHTML = this.renderFinishedProductPreview(product, customization);
-      console.log('✅ Preview HTML rendered, length:', previewHTML.length);
-
-      const previewContainer = document.createElement('div');
-      previewContainer.innerHTML = previewHTML;
-      const previewModal = previewContainer.firstElementChild;
-      const previewModalId = previewModal.dataset.modalId;
-      console.log('✅ Preview modal created:', previewModal, 'ID:', previewModalId);
-
-      console.log('📊 Step 5: Managing modal stack');
-      // Hide the customization modal (don't remove, so back button can restore it)
-      if (customizationOverlay) {
-        customizationOverlay.style.display = 'none';
-        customizationOverlay.classList.add('hidden-by-preview');
-        console.log('✅ Customization modal hidden');
+      // 🔥 CALL THE MERCHANDISE STORE'S generatePrintifyMockup METHOD
+      console.log('🔍 Checking for merchandise store instance...');
+      const merchandiseStore = window.merchandiseStore; // Get reference to the main store
+      console.log('📊 merchandiseStore found:', !!merchandiseStore);
+      console.log('📊 generatePrintifyMockup method available:', !!(merchandiseStore && typeof merchandiseStore.generatePrintifyMockup === 'function'));
+      
+      if (!merchandiseStore) {
+        console.error('❌ window.merchandiseStore is not available');
+        console.error('📊 Available on window:', Object.keys(window).filter(k => k.toLowerCase().includes('merch')));
+        throw new Error('Merchandise store not available. Please refresh the page.');
       }
 
-      // Append preview modal to body
-      document.body.appendChild(previewModal);
-      console.log('✅ Preview modal appended to body');
+      if (typeof merchandiseStore.generatePrintifyMockup !== 'function') {
+        console.error('❌ generatePrintifyMockup method not found on store');
+        console.error('📊 Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(merchandiseStore)).filter(name => typeof merchandiseStore[name] === 'function'));
+        throw new Error('Printify API method not available. Please refresh the page.');
+      }
 
-      // Register preview modal in active modals tracking
-      this.activeModals.add(previewModalId);
-      console.log('✅ Preview modal registered in activeModals:', previewModalId);
+      console.log('✅ All checks passed, calling Printify API...');
+      
+      // Call the actual Printify API via the merchandise store
+      await merchandiseStore.generatePrintifyMockup(product, customization);
 
-      // Add show class for animation
-      requestAnimationFrame(() => {
-        previewModal.classList.add('show');
-        console.log('✅ Show class added for animation');
-      });
+      console.log('✅ PRINTIFY API CALL COMPLETED!');
 
-      // Prevent body scroll
-      document.body.classList.add('modal-open');
+      // Hide loading
+      this.hideLoadingOverlay();
 
-      console.log('📊 Step 6: Setting up standard modal handlers');
-      // Setup standard modal event listeners (close button, escape key, etc.)
-      const previewDialog = previewModal.querySelector('.modal-dialog') || previewModal;
-      this.setupModalEventListeners(previewDialog);
-      console.log('✅ Standard modal handlers set up');
+      console.log('📊 Step 5: Close customization modal and show success');
+      
+      // Close the customization modal completely (reuse existing variables)
+      if (customizationOverlay && customizationModalId) {
+        console.log('🔄 Attempting to close modal:', customizationModalId);
+        this.hideModal(customizationModalId);
+        console.log('✅ Customization modal closed');
+      } else {
+        console.warn('⚠️ Could not find customization modal to close');
+        // Fallback: remove the modal overlay directly
+        if (customizationOverlay) {
+          customizationOverlay.remove();
+          console.log('✅ Customization modal removed directly');
+        }
+      }
 
-      console.log('📊 Step 7: Setting up custom preview handlers');
-      // Setup custom handlers for preview modal
-      this.setupFinishedProductPreviewHandlers(previewModal, productId, customization, customizationModalId);
-      console.log('✅ Custom preview handlers set up');
+      // Show success message to user
+      if (merchandiseStore && typeof merchandiseStore.showSuccess === 'function') {
+        merchandiseStore.showSuccess('🎉 Your custom product has been created! Check it out below.');
+        console.log('✅ Success message shown');
+      }
 
-      // Update customization summary in preview
-      this.updateFinishedProductCustomizationSummary(previewModal, customization);
-      console.log('✅ Customization summary updated');
+      // Trigger page re-render to show the new product
+      if (merchandiseStore && typeof merchandiseStore.render === 'function') {
+        merchandiseStore.render();
+        console.log('✅ Merchandise store re-rendered with new product');
+      }
 
       if (this.debugMode) {
-        this.debugLog(`Finished product preview displayed`, 'success');
+        this.debugLog(`Real product created via Printify API!`, 'success');
       }
 
     } catch (error) {
@@ -2748,6 +2773,49 @@ class MerchandiseModalRenderer {
     // This would be implemented to update the summary section
     // based on current selections
     console.log('Updating customization summary...');
+  }
+
+  /**
+   * Show loading overlay during API calls
+   */
+  showLoadingOverlay(message = 'Loading...') {
+    // Remove existing overlay if any
+    this.hideLoadingOverlay();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'printify-loading-overlay';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      color: white;
+      font-size: 18px;
+      text-align: center;
+    `;
+    overlay.innerHTML = `
+      <div style="text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 20px;">⏳</div>
+        <div>${message}</div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  }
+
+  /**
+   * Hide loading overlay
+   */
+  hideLoadingOverlay() {
+    const overlay = document.getElementById('printify-loading-overlay');
+    if (overlay) {
+      overlay.remove();
+    }
   }
 }
 

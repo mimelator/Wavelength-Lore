@@ -179,8 +179,9 @@ class MerchandiseStore {
       this.handleDialogCancelled(data.modalId);
     });
 
-    this.eventBus.on('product.goToProductOptions', (data) => {
-      this.handleGoToProductOptions(data.productId, data.customization);
+    this.eventBus.on('product.goToProductOptions', async (data) => {
+      // 🔥 CRITICAL: Pass blueprintId and printProviderId from event data
+      await this.handleGoToProductOptions(data.productId, data.productType, data.customization, data.blueprintId, data.printProviderId);
     });
   }
   
@@ -1907,29 +1908,85 @@ class MerchandiseStore {
         container.addEventListener('click', (e) => {
           if (e.target.classList.contains('select-simple-product')) {
             const productType = e.target.dataset.product;
-            const blueprintId = e.target.dataset.blueprint;
-            const providerId = e.target.dataset.provider;
+            const blueprintId = parseInt(e.target.dataset.blueprint, 10);
+            const providerId = parseInt(e.target.dataset.provider, 10);
             const blueprintName = e.target.dataset.name;
-            console.log('🎯 Product selected:', productType, blueprintId, providerId);
+            
+            console.log('🔥 DIAGNOSTIC: Product selection event triggered');
+            console.log('   📊 Raw data from UI element:');
+            console.log('      productType:', productType);
+            console.log('      blueprintId:', blueprintId);
+            console.log('      providerId:', providerId);
+            console.log('      blueprintName:', blueprintName);
+            console.log('   📊 availableProducts array status:');
+            console.log('      exists:', !!this.availableProducts);
+            console.log('      length:', this.availableProducts?.length || 0);
+            if (this.availableProducts?.length > 0) {
+              console.log('      first product sample:', this.availableProducts[0]);
+            }
 
-            // Create product config from blueprint data
-            const productConfig = {
-              id: `${blueprintId}-${providerId}`,
-              name: blueprintName || productType,
-              blueprintId: blueprintId,
-              printProviderId: providerId,
-              basePrice: 1999,
-              popularSizes: ['S', 'M', 'L', 'XL'],
-              availableColors: ['Black', 'White', 'Navy', 'Gray']
-            };
+            // 🚨 NO FALLBACK LOGIC - STRICT VALIDATION ONLY
+            if (!this.availableProducts || this.availableProducts.length === 0) {
+              const error = '❌ FATAL ERROR: availableProducts array is empty or undefined. Cannot proceed with product selection.';
+              console.error(error);
+              console.error('   🔍 Debug info:');
+              console.error('      this.availableProducts:', this.availableProducts);
+              console.error('      typeof availableProducts:', typeof this.availableProducts);
+              console.error('   🎯 This indicates loadProductTypes() failed or was never called');
+              throw new Error(error);
+            }
+
+            // Find the exact product config - NO CONSTRUCTION, NO FALLBACKS
+            const productConfig = this.availableProducts.find(p =>
+              parseInt(p.blueprintId, 10) === blueprintId &&
+              parseInt(p.printProviderId, 10) === providerId
+            );
+
+            if (!productConfig) {
+              const error = `❌ FATAL ERROR: Product not found in validated catalog. Blueprint: ${blueprintId}, Provider: ${providerId}`;
+              console.error(error);
+              console.error('   🔍 Available product blueprints/providers:');
+              this.availableProducts.forEach((p, i) => {
+                console.error(`      ${i}: ${p.id} (blueprint: ${p.blueprintId}, provider: ${p.printProviderId})`);
+              });
+              console.error('   🎯 This indicates either:');
+              console.error('      1. UI is generating invalid blueprint/provider combinations');
+              console.error('      2. availableProducts is not properly loaded from product-types.js');
+              console.error('      3. Data attributes on button are wrong');
+              throw new Error(error);
+            }
+
+            console.log('✅ DIAGNOSTIC: Valid product config found');
+            console.log('   📊 Product config details:');
+            console.log('      id:', productConfig.id);
+            console.log('      name:', productConfig.name);
+            console.log('      blueprintId:', productConfig.blueprintId);
+            console.log('      printProviderId:', productConfig.printProviderId);
+            console.log('      category:', productConfig.category);
+            console.log('      provider:', productConfig.provider);
+
+            // Validate that this is a properly formatted product type ID
+            if (!productConfig.id.startsWith('validated-')) {
+              const error = `❌ FATAL ERROR: Product ID '${productConfig.id}' is not a validated product type. Must start with 'validated-'`;
+              console.error(error);
+              console.error('   🎯 This indicates the product was not loaded from the validated catalog');
+              throw new Error(error);
+            }
 
             // Emit event to open customization modal
-            console.log('📱 Emitting product.customize event with productConfig:', productConfig);
+            console.log('📱 DIAGNOSTIC: Emitting product.customize event');
+            console.log('   📊 Event payload:');
+            console.log('      productConfig.id:', productConfig.id);
+            console.log('      blueprintId:', blueprintId);
+            console.log('      providerId:', providerId);
+            
             this.eventBus.emit('product.customize', {
               productConfig: productConfig,
               blueprintId: blueprintId,
               providerId: providerId
             });
+            
+            console.log('✅ DIAGNOSTIC: Product selection event completed successfully');
           } else if (e.target.classList.contains('category-card') || e.target.closest('.category-card')) {
             const card = e.target.closest('.category-card') || e.target;
             const categoryKey = card.dataset.category;
@@ -3044,6 +3101,9 @@ class MerchandiseStore {
     const product = {
       id: productConfig.id,
       productId: productConfig.id,
+      productType: productConfig.id, // CRITICAL: Must be set for API calls
+      type: productConfig.id, // Also set as type for fallback matching
+      category: productConfig.category, // Set category from config
       title: productConfig.name,
       name: productConfig.name,
       blueprintId: blueprintId,
@@ -3181,36 +3241,137 @@ class MerchandiseStore {
    * @param {Object} customization - Customization data with customizedImageUrl
    */
   async generatePrintifyMockup(product, customization) {
-    console.log('🖨️ Generating Printify mockup for product:', product.id);
-    console.log('🎨 Customization data:', customization);
+    console.log('\n' + '�'.repeat(60));
+    console.log('🔥 DIAGNOSTIC: generatePrintifyMockup called');
+    console.log('🔥'.repeat(60));
 
     try {
-      // Show loading state
-      console.log('⏳ Generating your product mockup...');
+      // Comprehensive product object validation
+      console.log('🔍 DIAGNOSTIC: Product object validation');
+      console.log('   product exists:', !!product);
+      console.log('   product type:', typeof product);
+      if (product) {
+        console.log('   product keys:', Object.keys(product));
+        console.log('   product.id:', product.id);
+        console.log('   product.productType:', product.productType);
+        console.log('   product.type:', product.type);
+        console.log('   product.title:', product.title);
+        console.log('   product.blueprintId:', product.blueprintId);
+        console.log('   product.printProviderId:', product.printProviderId);
+        console.log('   product.category:', product.category);
+      }
 
-      // Call the API to create the guided product
+      // Comprehensive customization validation
+      console.log('🔍 DIAGNOSTIC: Customization object validation');
+      console.log('   customization exists:', !!customization);
+      console.log('   customization type:', typeof customization);
+      if (customization) {
+        console.log('   customization keys:', Object.keys(customization));
+        console.log('   customizedImageUrl:', customization.customizedImageUrl);
+        console.log('   effects:', customization.effects);
+        console.log('   borderEnabled:', customization.borderEnabled);
+        console.log('   borderColor:', customization.borderColor);
+      }
+
+      // 🚨 STRICT VALIDATION - NO FALLBACKS
+      if (!product) {
+        const error = '❌ FATAL ERROR: product parameter is null/undefined';
+        console.error(error);
+        throw new Error(error);
+      }
+
+      if (!product.productType) {
+        const error = `❌ FATAL ERROR: product.productType is missing. Product object: ${JSON.stringify(product, null, 2)}`;
+        console.error(error);
+        console.error('   🎯 This indicates modal handler did not set productType correctly');
+        throw new Error(error);
+      }
+
+      // Validate productType format
+      if (!product.productType.startsWith('validated-')) {
+        const error = `❌ FATAL ERROR: product.productType '${product.productType}' is not from validated catalog`;
+        console.error(error);
+        console.error('   🎯 productType must start with "validated-" to be from validated catalog');
+        throw new Error(error);
+      }
+
+      if (!customization) {
+        const error = '❌ FATAL ERROR: customization parameter is null/undefined';
+        console.error(error);
+        throw new Error(error);
+      }
+
+      if (!customization.customizedImageUrl) {
+        const error = '❌ FATAL ERROR: customization.customizedImageUrl is missing';
+        console.error(error);
+        console.error('   🎯 This indicates image effects processing failed');
+        throw new Error(error);
+      }
+
+      if (!product.blueprintId || !product.printProviderId) {
+        const error = `❌ FATAL ERROR: Missing blueprint/provider IDs. blueprintId: ${product.blueprintId}, printProviderId: ${product.printProviderId}`;
+        console.error(error);
+        console.error('   🎯 This indicates product object was not properly constructed from validated catalog');
+        throw new Error(error);
+      }
+
+      console.log('✅ DIAGNOSTIC: All validations passed');
+
+      // Prepare API payload with comprehensive validation
+      console.log('🔍 DIAGNOSTIC: Preparing API request payload');
+      
+      const requestPayload = {
+        imageId: product.id || 'custom-product',
+        imageUrl: customization.customizedImageUrl,
+        imageTitle: product.title,
+        productType: product.productType, // Must be validated product type ID
+        blueprintId: product.blueprintId, // Must match productType config
+        printProviderId: product.printProviderId, // Must match productType config
+        imageContext: {
+          effects: customization.effects,
+          borderEnabled: customization.borderEnabled,
+          borderColor: customization.borderColor
+        }
+      };
+
+      console.log('� DIAGNOSTIC: API payload details');
+      console.log('   imageId:', requestPayload.imageId);
+      console.log('   imageUrl (first 100 chars):', requestPayload.imageUrl.substring(0, 100) + '...');
+      console.log('   imageTitle:', requestPayload.imageTitle);
+      console.log('   productType:', requestPayload.productType);
+      console.log('   blueprintId:', requestPayload.blueprintId);
+      console.log('   printProviderId:', requestPayload.printProviderId);
+      console.log('   imageContext:', requestPayload.imageContext);
+
+      // Final validation of payload
+      if (!requestPayload.productType.startsWith('validated-')) {
+        const error = `❌ FATAL ERROR: About to send invalid productType '${requestPayload.productType}' to API`;
+        console.error(error);
+        throw new Error(error);
+      }
+
+      console.log('📤 DIAGNOSTIC: Sending API request to /api/merchandise/create-guided-product');
+
       const response = await fetch('/api/merchandise/create-guided-product', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          imageId: product.id || 'custom-product',
-          imageUrl: customization.customizedImageUrl,
-          imageTitle: product.title,
-          productType: product.id, // Use product ID as product type
-          imageContext: {
-            effects: customization.effects,
-            borderEnabled: customization.borderEnabled,
-            borderColor: customization.borderColor
-          }
-        })
+        body: JSON.stringify(requestPayload)
       });
 
-      console.log('✅ Printify API response:', response.status);
+      console.log('✅ Printify API response status:', response.status);
 
       if (!response.ok) {
-        throw new Error(`Printify API error: ${response.statusText}`);
+        // Capture error response body for debugging
+        let errorBody = '';
+        try {
+          errorBody = await response.text();
+          console.error('❌ Printify API Error Response Body:', errorBody);
+        } catch (e) {
+          console.error('❌ Could not read error response body:', e.message);
+        }
+        throw new Error(`Printify API error: ${response.statusText} (${response.status}). Response: ${errorBody}`);
       }
 
       const result = await response.json();
@@ -3253,11 +3414,20 @@ class MerchandiseStore {
    * Handle transition to product options page after preview
    * Closes customization modals and shows product options for size/quantity/variants
    * @param {string} productId - Product ID (may be blueprint product ID)
+   * @param {string} productType - Product type (t-shirt, hoodie, etc.) - REQUIRED
    * @param {Object} customization - Customization data with effects, borders, and customizedImageUrl
    */
-  handleGoToProductOptions(productId, customization) {
+  async handleGoToProductOptions(productId, productType, customization, blueprintId, printProviderId) {
     console.log('🎯 Going to product options:', productId);
+    console.log('🎯 Product Type:', productType);
+    console.log('🎯 Blueprint ID:', blueprintId);
+    console.log('🎯 Print Provider ID:', printProviderId);
     console.log('🎨 Customization:', customization);
+
+    // CRITICAL VALIDATION: productType must be present
+    if (!productType) {
+      throw new Error('❌ CRITICAL: productType is required to proceed with Printify integration. Got: ' + productType);
+    }
 
     // Try to find the product in the products array
     // If it's a blueprint product (format: categoryId-blueprintId), it won't be in the array
@@ -3272,6 +3442,9 @@ class MerchandiseStore {
       product = {
         id: productId,
         productId: productId,
+        productType: productType, // CRITICAL: Include product type
+        blueprintId: blueprintId, // 🔥 CRITICAL: Include actual blueprint ID
+        printProviderId: printProviderId, // 🔥 CRITICAL: Include actual provider ID
         title: `Custom Product ${productId}`,
         previewImage: customization.customizedImageUrl || '/images/previews/generic-product-preview.svg',
         isCustomized: true,
@@ -3295,8 +3468,8 @@ class MerchandiseStore {
     // This allows us to display it without modifying the main products array
     this.currentCustomizedProduct = product;
 
-    // Generate Printify mockup image with customization
-    this.generatePrintifyMockup(product, customization);
+    // Generate Printify mockup image with customization (await for completion)
+    await this.generatePrintifyMockup(product, customization);
 
     // Re-render to show product with customization data
     this.render();

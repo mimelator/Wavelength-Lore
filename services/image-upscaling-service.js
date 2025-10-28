@@ -104,13 +104,82 @@ class ImageUpscalingService {
       }
       
       return analysis;
-      
+
     } catch (error) {
       console.error('Error analyzing image quality:', error);
       throw new Error('Failed to analyze image quality');
     }
   }
-  
+
+  /**
+   * 🔥 CRITICAL: Upscale image specifically for Printify requirements
+   * Ensures image meets Printify's minimum quality standards:
+   * - Minimum 1800x1800 pixels
+   * - Minimum 200 DPI (prefer 300 DPI)
+   * - High-quality format (PNG or TIFF, not WebP)
+   * @param {Buffer} imageBuffer - Original image buffer
+   * @param {string} fileName - Filename for logging
+   * @returns {Buffer} Upscaled image buffer meeting Printify requirements
+   */
+  async upscaleImageForPrintify(imageBuffer, fileName = 'image') {
+    console.log(`🚀 UPSCALING FOR PRINTIFY: ${fileName}`);
+
+    try {
+      // Step 1: Analyze current image quality
+      const analysis = await this.analyzeImageQuality(imageBuffer);
+      console.log(`📊 Current image: ${analysis.originalWidth}x${analysis.originalHeight}, DPI: ${analysis.estimatedDPI}`);
+
+      // Step 2: Determine scale factor to meet Printify minimum (1800x1800)
+      const PRINTIFY_MIN_WIDTH = 1800;
+      const PRINTIFY_MIN_HEIGHT = 1800;
+
+      const scaleFactorWidth = PRINTIFY_MIN_WIDTH / analysis.originalWidth;
+      const scaleFactorHeight = PRINTIFY_MIN_HEIGHT / analysis.originalHeight;
+      const scaleFactor = Math.max(scaleFactorWidth, scaleFactorHeight, 1);
+
+      console.log(`📐 Scale factor needed: ${scaleFactor.toFixed(2)}x to reach minimum ${PRINTIFY_MIN_WIDTH}x${PRINTIFY_MIN_HEIGHT}`);
+
+      // Step 3: Use upscaleImage with Printify-specific options
+      const upscaleResult = await this.upscaleImage(imageBuffer, {
+        method: 'auto', // Let it choose best method
+        scaleFactor: scaleFactor,
+        enhanceDetails: true, // Sharpen details for print quality
+        contentType: 'illustration', // Use illustration for artwork
+        originalImageId: fileName,
+        fileName: fileName
+      });
+
+      if (!upscaleResult) {
+        throw new Error('Upscaling did not return a result');
+      }
+
+      // CRITICAL FIX: upscaleImage returns different buffer properties depending on method
+      // It can be: upscaledBuffer, printOptimized, or buffer
+      const resultBuffer = upscaleResult.upscaledBuffer || upscaleResult.printOptimized || upscaleResult.buffer;
+
+      if (!resultBuffer) {
+        console.error('❌ Upscale result structure:', Object.keys(upscaleResult));
+        throw new Error('Upscaling did not produce a valid image buffer');
+      }
+
+      console.log(`✅ Upscaling produced buffer: ${resultBuffer.length} bytes`);
+
+      // Step 4: Verify upscaled image meets Printify requirements
+      const upscaledMetadata = await sharp(resultBuffer).metadata();
+      console.log(`✅ Upscaled image: ${upscaledMetadata.width}x${upscaledMetadata.height}, Format: ${upscaledMetadata.format}`);
+
+      if (upscaledMetadata.width < PRINTIFY_MIN_WIDTH || upscaledMetadata.height < PRINTIFY_MIN_HEIGHT) {
+        throw new Error(`Upscaled image still too small: ${upscaledMetadata.width}x${upscaledMetadata.height}. Printify requires minimum ${PRINTIFY_MIN_WIDTH}x${PRINTIFY_MIN_HEIGHT}`);
+      }
+
+      return resultBuffer;
+
+    } catch (error) {
+      console.error(`❌ Failed to upscale image for Printify: ${error.message}`);
+      throw error;
+    }
+  }
+
   /**
    * Upscale image using AI service with Global Cache integration
    * @param {Buffer} imageBuffer - Original image buffer

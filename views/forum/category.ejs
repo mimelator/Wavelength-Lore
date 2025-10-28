@@ -9,8 +9,8 @@
     </div>
     
     <div class="category-actions">
-        <button class="btn btn-primary" onclick="showCreatePostModal('<%= categoryId %>')" id="create-post-btn" style="display: none;">
-            ✏️ Create New Post
+        <button class="btn btn-primary enhanced-cta" onclick="showCreatePostModal('<%= categoryId %>')" id="create-post-btn" style="display: none;">
+            📝 Start a New Conversation!
         </button>
         <div class="category-tools">
             <button class="btn btn-secondary" onclick="toggleCategoryFilters()">
@@ -102,8 +102,8 @@
         <div class="empty-icon">📝</div>
         <h3>No posts yet</h3>
         <p>Be the first to start a discussion in this category!</p>
-        <button class="btn btn-primary" onclick="showCreatePostModal('<%= categoryId %>')">
-            Create First Post
+        <button class="btn btn-primary enhanced-cta" onclick="showCreatePostModal('<%= categoryId %>')">
+            🌟 Create Your First Messenger Post!
         </button>
     </div>
 </div>
@@ -171,6 +171,9 @@ function updateCategoryDisplay(category) {
 
 async function loadCategoryPosts() {
     try {
+        // Create sticky posts if needed (Issue #58)
+        await createStickyPostsIfNeeded();
+        
         const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
         const categoryQuery = window.firebaseUtils.query(
             postsRef,
@@ -209,26 +212,34 @@ function displayPosts(posts) {
     if (posts.length === 0) {
         container.style.display = 'none';
         emptyState.style.display = 'block';
+        createStickyPostsIfNeeded();
         return;
     }
     
     container.style.display = 'block';
     emptyState.style.display = 'none';
     
-    // Apply sorting
-    const sortedPosts = sortPosts(posts, categoryData.currentSort);
+    // Separate sticky and regular posts for Issue #58
+    const stickyPosts = posts.filter(post => post.isPinned || post.isSticky);
+    const regularPosts = posts.filter(post => !post.isPinned && !post.isSticky);
+    
+    // Apply sorting only to regular posts (sticky posts always stay at top)
+    const sortedRegularPosts = sortPosts(regularPosts, categoryData.currentSort);
+    
+    // Combine sticky posts (at top) with sorted regular posts
+    const allSortedPosts = [...stickyPosts, ...sortedRegularPosts];
     
     // Apply pagination
     const startIndex = (categoryData.currentPage - 1) * categoryData.postsPerPage;
     const endIndex = startIndex + categoryData.postsPerPage;
-    const paginatedPosts = sortedPosts.slice(startIndex, endIndex);
+    const paginatedPosts = allSortedPosts.slice(startIndex, endIndex);
     
     container.innerHTML = paginatedPosts.map(post => `
-        <div class="post-item ${post.isPinned ? 'pinned' : ''}" onclick="location.href='/forum/post/${post.id}'">
+        <div class="post-item ${post.isPinned || post.isSticky ? 'pinned' : ''}" onclick="location.href='/forum/post/${post.id}'">
             <div class="post-main">
                 <div class="post-header">
                     <div class="post-title-section">
-                        ${post.isPinned ? '<span class="pin-indicator">📌</span>' : ''}
+                        ${post.isPinned || post.isSticky ? '<span class="pin-indicator">📌 MESSENGER POST</span>' : ''}
                         <h4 class="post-title">${escapeHtml(post.title)}</h4>
                         ${post.tags && post.tags.length > 0 ? 
                             `<div class="post-tags">
@@ -400,6 +411,110 @@ function getCurrentUserId() {
     return window.forumState.currentUser ? window.forumState.currentUser.uid : null;
 }
 
+// Auto-create sticky posts for General Discussion category (Issue #58)
+async function createStickyPostsIfNeeded() {
+    if (categoryData.id !== 'general-discussion') return;
+    
+    try {
+        const stickyPosts = [
+            {
+                id: 'intro-sticky',
+                title: '🌟 Introduce Yourself to the Circle!',
+                content: `Welcome to THE SHIRE'S MESSENGER POST! 
+
+This is your space to introduce yourself to the Wavelength community. Tell us:
+• What drew you to THE SHIRE BATTLEGAMES: Crystal Harvest?
+• Your favorite Wavelength song or moment
+• What you're hoping to find in our community
+• Any other bands or music you love
+
+We're excited to meet you and welcome you to the circle! 🎵✨`,
+                isSticky: true,
+                isPinned: true,
+                authorName: 'The Shire Herald',
+                authorId: 'system',
+                forumId: 'general-discussion',
+                createdAt: Date.now() - 86400000, // 1 day ago
+                likes: 0,
+                replyCount: 0,
+                tags: ['welcome', 'introductions']
+            },
+            {
+                id: 'favorites-sticky',
+                title: '🎵 Your Top 3 Favorite Wavelength Songs/Moments',
+                content: `Share your favorite Wavelength experiences with the community!
+
+Tell us about:
+• Your top 3 favorite songs and why they resonate with you
+• Memorable live show moments or recordings
+• How these songs connect to your life or experiences
+• What makes Wavelength special to you
+
+This is a great way to discover new favorites and connect with fellow fans! 💫`,
+                isSticky: true,
+                isPinned: true,
+                authorName: 'The Shire Herald',
+                authorId: 'system',
+                forumId: 'general-discussion',
+                createdAt: Date.now() - 86400000 + 3600000, // Slightly newer
+                likes: 0,
+                replyCount: 0,
+                tags: ['music', 'favorites', 'discussion']
+            },
+            {
+                id: 'news-sticky',
+                title: '📺 Wavelength Media Watch: News & Announcements',
+                content: `Stay updated with all things Wavelength!
+
+This is your hub for:
+• Official band announcements and news
+• Upcoming show dates and ticket information  
+• New song releases and album updates
+• Behind-the-scenes content and interviews
+• Community events and meetups
+
+Keep an eye on this thread for the latest updates, and feel free to share any Wavelength news you discover! 🌊`,
+                isSticky: true,
+                isPinned: true,
+                authorName: 'The Shire Herald',
+                authorId: 'system',
+                forumId: 'general-discussion',
+                createdAt: Date.now() - 86400000 + 7200000, // Newest of the three
+                likes: 0,
+                replyCount: 0,
+                tags: ['news', 'announcements', 'official']
+            }
+        ];
+
+        // Check if sticky posts already exist
+        const postsRef = window.firebaseUtils.ref(window.firebaseDB, 'forum/posts');
+        const snapshot = await window.firebaseUtils.get(postsRef);
+        const existingPosts = snapshot.val() || {};
+        
+        // Create sticky posts that don't exist
+        for (const stickyPost of stickyPosts) {
+            if (!existingPosts[stickyPost.id]) {
+                const postRef = window.firebaseUtils.ref(window.firebaseDB, `forum/posts/${stickyPost.id}`);
+                await window.firebaseUtils.set(postRef, stickyPost);
+                console.log(`Created sticky post: ${stickyPost.title}`);
+            }
+        }
+        
+        // Update category post count
+        const categoryRef = window.firebaseUtils.ref(window.firebaseDB, `forum/categories/${categoryData.id}`);
+        const categorySnapshot = await window.firebaseUtils.get(categoryRef);
+        const category = categorySnapshot.val();
+        if (category) {
+            const allPosts = Object.values(existingPosts).filter(post => post.forumId === categoryData.id);
+            const totalPosts = allPosts.length + stickyPosts.filter(sp => !existingPosts[sp.id]).length;
+            await window.firebaseUtils.update(categoryRef, { postCount: totalPosts });
+        }
+        
+    } catch (error) {
+        console.error('Error creating sticky posts:', error);
+    }
+}
+
 // Utility functions
 function formatTimeAgo(timestamp) {
     const now = Date.now();
@@ -569,7 +684,32 @@ function escapeHtml(text) {
 
 .post-item.pinned {
     border-left: 4px solid #6a4c93;
-    background: rgba(106, 76, 147, 0.1);
+    background: linear-gradient(135deg, rgba(106, 76, 147, 0.15), rgba(74, 71, 163, 0.1));
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.post-item.pinned::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #6a4c93, #4a47a3, #6a4c93);
+    border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.post-item.pinned .pin-indicator {
+    background: linear-gradient(135deg, #6a4c93, #4a47a3);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    display: inline-block;
+    margin-bottom: 0.5rem;
 }
 
 .post-header {
@@ -584,10 +724,7 @@ function escapeHtml(text) {
     flex: 1;
 }
 
-.pin-indicator {
-    color: #6a4c93;
-    margin-right: 0.5rem;
-}
+/* Pin indicator styles moved to .post-item.pinned .pin-indicator above */
 
 .post-title {
     margin: 0 0 0.5rem 0;
@@ -751,6 +888,44 @@ function escapeHtml(text) {
     transition: all 0.3s ease;
     text-decoration: none;
     display: inline-block;
+}
+
+/* Enhanced CTA Button for Issue #58 */
+.btn.enhanced-cta {
+    background: linear-gradient(135deg, #6a4c93, #4a47a3);
+    color: white;
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(106, 76, 147, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn.enhanced-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn.enhanced-cta:hover {
+    background: linear-gradient(135deg, #7a5ca3, #5a57b3);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(106, 76, 147, 0.6);
+}
+
+.btn.enhanced-cta:hover::before {
+    left: 100%;
+}
+
+.btn.enhanced-cta:active {
+    transform: translateY(-1px);
 }
 
 .btn-primary {
