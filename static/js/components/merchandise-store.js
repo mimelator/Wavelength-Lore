@@ -245,9 +245,30 @@ class MerchandiseStore {
   }
   
   /**
-   * Infer appropriate icon from product type
+   * Get icon from blueprint metadata API (eliminates all hardcoded patterns)
    */
-  inferIconFromProductType(productType) {
+  async getIconFromBlueprintId(blueprintId) {
+    if (!blueprintId) return '📦';
+    
+    try {
+      const response = await fetch(`/api/merchandise/blueprint-preview/${blueprintId}`);
+      const data = await response.json();
+      
+      if (data.success && data.icon) {
+        console.log(`✅ Got icon from blueprint API: ${blueprintId} → ${data.icon}`);
+        return data.icon;
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to get icon from blueprint API:', error);
+    }
+    
+    return '📦'; // Default fallback
+  }
+  
+  /**
+   * Infer appropriate icon using blueprint API first
+   */
+  async inferIconFromProductType(productType, blueprintId = null) {
     if (!productType) return '📦';
     
     const type = productType.toLowerCase();
@@ -318,31 +339,44 @@ class MerchandiseStore {
   }
   
   /**
-   * Estimate price based on product type patterns
+   * Estimate price using blueprint metadata API
    */
-  estimatePriceByPattern(category) {
-    if (!category) return '$19.95';
+  async estimatePriceByBlueprint(blueprintId) {
+    if (!blueprintId) return '$19.95';
     
-    const type = category.toLowerCase();
-    
-    // Base prices by category patterns
-    if (type.includes('sticker')) return '$4.95';
-    if (type.includes('mug') || type.includes('cup')) return '$14.95';
-    if (type.includes('travel') && type.includes('mug')) return '$21.95';
-    if (type.includes('shirt') || type.includes('tee') || type.includes('tank')) return '$18.95';
-    if (type.includes('premium')) return '$22.95';
-    if (type.includes('hoodie') || type.includes('zip')) return '$34.95';
-    if (type.includes('sweatshirt')) return '$28.95';
-    if (type.includes('bag') || type.includes('tote')) return '$15.95';
-    if (type.includes('backpack')) return '$34.95';
-    if (type.includes('pillow')) return '$18.95';
-    if (type.includes('blanket')) return '$49.95';
-    if (type.includes('canvas') || type.includes('art')) return '$29.95';
-    if (type.includes('phone')) return '$19.95';
-    if (type.includes('laptop')) return '$24.95';
-    if (type.includes('notebook') || type.includes('journal')) return '$16.95';
-    if (type.includes('hat') || type.includes('cap')) return '$19.95';
-    if (type.includes('specialty') || type.includes('special')) return '$24.95';
+    try {
+      const response = await fetch(`/api/merchandise/blueprint-preview/${blueprintId}`);
+      const data = await response.json();
+      
+      if (data.success && data.category) {
+        // Basic price estimation based on category (can be enhanced with actual Printify pricing)
+        const basePrices = {
+          'sticker': '$4.95',
+          'coffee-mug': '$14.95',
+          'travel-mug': '$21.95',
+          't-shirt': '$18.95',
+          'heavy-cotton-tee': '$19.95',
+          'premium-tshirt': '$22.95',
+          'hoodie': '$34.95',
+          'sweatshirt': '$28.95',
+          'tote-bag': '$15.95',
+          'backpack': '$34.95',
+          'pillow': '$18.95',
+          'blanket': '$49.95',
+          'canvas': '$29.95',
+          'phone-case': '$19.95',
+          'laptop-sleeve': '$24.95',
+          'notebook': '$16.95',
+          'hat': '$19.95'
+        };
+        
+        const price = basePrices[data.category] || '$19.95';
+        console.log(`✅ Got price from blueprint API: ${blueprintId} → ${data.category} → ${price}`);
+        return price;
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to get price from blueprint API:', error);
+    }
     
     return '$19.95'; // Default fallback
   }

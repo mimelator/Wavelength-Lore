@@ -1,8 +1,11 @@
 /**
- * Blueprint Preview Image API
+ * Comprehensive Blueprint Metadata API
  * 
- * Provides endpoints for getting generic product preview images
- * based on blueprintId and provider data from Printify catalog
+ * Consolidated API providing complete blueprint information including:
+ * - Preview images from Printify API
+ * - Category mappings and icons
+ * - Product type information
+ * - Display names and pricing patterns
  */
 
 // Ensure environment variables are loaded before requiring PrintifyService
@@ -17,9 +20,84 @@ const PrintifyService = require('../services/printify-service');
 // Initialize Printify service
 const printifyService = new PrintifyService();
 
-// Cache for blueprint images to avoid repeated API calls
-const blueprintImageCache = new Map();
+// Cache for blueprint metadata to avoid repeated API calls
+const blueprintMetadataCache = new Map();
 const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+
+// Comprehensive Blueprint Metadata Mappings
+const BLUEPRINT_CATEGORIES = {
+  // Common blueprint IDs and their categories (from Printify)
+  5: 't-shirt',        // Unisex Cotton Crew Tee
+  6: 'heavy-cotton-tee', // Unisex Heavy Cotton Tee
+  9: 't-shirt',        // Women's Favorite Tee
+  10: 'tank-top',      // Women's Flowy Racerback Tank
+  12: 't-shirt',       // Unisex Jersey Short Sleeve Tee
+  49: 'sweatshirt',    // Unisex Heavy Blend™ Crewneck Sweatshirt
+  66: 'hoodie',        // Unisex Heavy Blend™ Full Zip Hooded Sweatshirt
+  68: 'coffee-mug',    // Mug 11oz
+  70: 'travel-mug',    // Stainless Steel Travel Mug
+  77: 'hoodie',        // Unisex Heavy Blend™ Hooded Sweatshirt
+  175: 'hoodie',       // Unisex Sponge Fleece Pullover Hoodie
+  413: 'backpack',     // Backpack
+  238: 'blanket',      // Sherpa Fleece Blanket
+  220: 'pillow',       // Spun Polyester Square Pillow
+  268: 'phone-case',   // Slim Phone Cases
+  269: 'phone-case',   // Tough Phone Cases
+  277: 'canvas',       // Wall Clock
+  1313: 'tote-bag',    // Cotton Canvas Tote Bag
+};
+
+const CATEGORY_ICONS = {
+  't-shirt': '👕',
+  'heavy-cotton-tee': '👕',
+  'premium-tshirt': '👔',
+  'women-tee': '👚',
+  'tank-top': '🎽',
+  'hoodie': '🧥',
+  'zip-hoodie': '🧥',
+  'sweatshirt': '👔',
+  'coffee-mug': '☕',
+  'travel-mug': '🥤',
+  'pillow': '🛏️',
+  'blanket': '🛋️',
+  'canvas': '🖼️',
+  'tote-bag': '👜',
+  'backpack': '🎒',
+  'phone-case': '📱',
+  'laptop-sleeve': '💻',
+  'notebook': '📓',
+  'sticker': '🏷️',
+  'hat': '🧢',
+  'fanny-pack': '👝',
+  'infant-wear': '👶',
+  'specialty-item': '✨'
+};
+
+const CATEGORY_DISPLAY_NAMES = {
+  't-shirt': 'T-Shirt',
+  'heavy-cotton-tee': 'Heavy Cotton T-Shirt', 
+  'tank-top': 'Tank Top',
+  'hoodie': 'Hoodie',
+  'sweatshirt': 'Sweatshirt',
+  'zip-hoodie': 'Zip Hoodie',
+  'coffee-mug': 'Coffee Mug',
+  'travel-mug': 'Travel Mug',
+  'tote-bag': 'Tote Bag',
+  'backpack': 'Backpack',
+  'phone-case': 'Phone Case',
+  'laptop-sleeve': 'Laptop Sleeve',
+  'pillow': 'Pillow',
+  'blanket': 'Blanket',
+  'canvas': 'Canvas Print',
+  'notebook': 'Notebook',
+  'sticker': 'Sticker',
+  'premium-tshirt': 'Premium T-Shirt',
+  'women-tee': 'Women\'s T-Shirt',
+  'infant-wear': 'Infant Wear',
+  'hat': 'Hat',
+  'fanny-pack': 'Fanny Pack',
+  'specialty-item': 'Specialty Item'
+};
 
 /**
  * Get preview image for a specific blueprint
@@ -54,11 +132,19 @@ router.get('/blueprint-preview/:blueprintId', async (req, res) => {
             });
         }
         
-        // Extract preview image information
+        // Get category and metadata for this blueprint
+        const category = BLUEPRINT_CATEGORIES[parseInt(blueprintId)] || 'unknown';
+        const icon = CATEGORY_ICONS[category] || '📦';
+        const displayName = CATEGORY_DISPLAY_NAMES[category] || blueprint.title;
+        
+        // Extract comprehensive metadata
         const result = {
             success: true,
             blueprintId: parseInt(blueprintId),
             name: blueprint.title,
+            displayName: displayName,
+            category: category,
+            icon: icon,
             description: blueprint.description || '',
             brand: blueprint.brand,
             model: blueprint.model,
@@ -78,6 +164,8 @@ router.get('/blueprint-preview/:blueprintId', async (req, res) => {
             result.previewImage = result.fallbackImage;
             console.log(`⚠️ No official image for blueprint ${blueprintId}, using fallback`);
         }
+        
+        console.log(`📊 Blueprint ${blueprintId} metadata: ${category} → ${icon} → ${displayName}`);
         
         // Cache the result
         blueprintImageCache.set(cacheKey, {
@@ -136,10 +224,18 @@ router.post('/blueprint-previews', async (req, res) => {
                 const blueprint = blueprints.blueprints.find(bp => bp.id == blueprintId);
                 
                 if (blueprint) {
+                    // Get category and metadata for this blueprint
+                    const category = BLUEPRINT_CATEGORIES[parseInt(blueprintId)] || 'unknown';
+                    const icon = CATEGORY_ICONS[category] || '📦';
+                    const displayName = CATEGORY_DISPLAY_NAMES[category] || blueprint.title;
+                    
                     result = {
                         success: true,
                         blueprintId: parseInt(blueprintId),
                         name: blueprint.title,
+                        displayName: displayName,
+                        category: category,
+                        icon: icon,
                         description: blueprint.description || '',
                         brand: blueprint.brand,
                         model: blueprint.model,
@@ -190,16 +286,89 @@ router.post('/blueprint-previews', async (req, res) => {
 });
 
 /**
- * Clear blueprint preview cache
+ * Get blueprint metadata by category
+ * GET /api/merchandise/blueprint-category/:category
+ */
+router.get('/blueprint-category/:category', (req, res) => {
+    try {
+        const { category } = req.params;
+        
+        // Find all blueprints for this category
+        const blueprintsForCategory = Object.entries(BLUEPRINT_CATEGORIES)
+            .filter(([blueprintId, cat]) => cat === category)
+            .map(([blueprintId, cat]) => ({
+                blueprintId: parseInt(blueprintId),
+                category: cat,
+                icon: CATEGORY_ICONS[cat] || '📦',
+                displayName: CATEGORY_DISPLAY_NAMES[cat] || 'Product'
+            }));
+        
+        res.json({
+            success: true,
+            category: category,
+            icon: CATEGORY_ICONS[category] || '📦',
+            displayName: CATEGORY_DISPLAY_NAMES[category] || 'Product',
+            blueprints: blueprintsForCategory
+        });
+        
+    } catch (error) {
+        console.error('❌ Error getting blueprint category:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+/**
+ * Get all blueprint categories and metadata
+ * GET /api/merchandise/blueprint-categories
+ */
+router.get('/blueprint-categories', (req, res) => {
+    try {
+        const categories = {};
+        
+        // Build comprehensive category mapping
+        Object.entries(BLUEPRINT_CATEGORIES).forEach(([blueprintId, category]) => {
+            if (!categories[category]) {
+                categories[category] = {
+                    category: category,
+                    icon: CATEGORY_ICONS[category] || '📦',
+                    displayName: CATEGORY_DISPLAY_NAMES[category] || 'Product',
+                    blueprints: []
+                };
+            }
+            
+            categories[category].blueprints.push(parseInt(blueprintId));
+        });
+        
+        res.json({
+            success: true,
+            categories: categories,
+            totalCategories: Object.keys(categories).length,
+            totalBlueprints: Object.keys(BLUEPRINT_CATEGORIES).length
+        });
+        
+    } catch (error) {
+        console.error('❌ Error getting blueprint categories:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+/**
+ * Clear blueprint metadata cache
  * POST /api/merchandise/clear-blueprint-cache
  */
 router.post('/clear-blueprint-cache', (req, res) => {
-    blueprintImageCache.clear();
-    console.log('🧹 Blueprint preview cache cleared');
+    blueprintMetadataCache.clear();
+    console.log('🧹 Blueprint metadata cache cleared');
     
     res.json({
         success: true,
-        message: 'Blueprint preview cache cleared'
+        message: 'Blueprint metadata cache cleared'
     });
 });
 
