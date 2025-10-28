@@ -284,35 +284,67 @@ class MerchandiseStore {
   }
 
   /**
-   * Get estimated price for display (same as admin approach)
+   * Get estimated price using dynamic product catalog lookup
    */
   getEstimatedPrice(category) {
-    const priceMap = {
-      't-shirt': '$18.95',
-      'premium-tshirt': '$22.95',
-      'heavy-cotton-tee': '$19.95',
-      'women-tee': '$18.95',
-      'tank-top': '$16.95',
-      'hoodie': '$34.95',
-      'zip-hoodie': '$36.95',
-      'sweatshirt': '$28.95',
-      'coffee-mug': '$14.95',
-      'travel-mug': '$21.95',
-      'pillow': '$18.95',
-      'blanket': '$49.95',
-      'canvas': '$29.95',
-      'tote-bag': '$15.95',
-      'backpack': '$34.95',
-      'phone-case': '$19.95',
-      'laptop-sleeve': '$24.95',
-      'notebook': '$16.95',
-      'sticker': '$4.95',
-      'hat': '$19.95',
-      'fanny-pack': '$21.95',
-      'infant-wear': '$15.95',
-      'specialty-item': '$24.95'
-    };
-    return priceMap[category] || '$19.95';
+    console.log('🔍 getEstimatedPrice called with category:', category);
+    
+    // Try to find matching product in catalog for actual pricing
+    if (this.availableProducts && Array.isArray(this.availableProducts)) {
+      const matchingProduct = this.availableProducts.find(product => {
+        const productType = this.extractProductTypeFromProduct(product);
+        return productType === category || 
+               productType?.toLowerCase() === category?.toLowerCase() ||
+               product.title?.toLowerCase().includes(category?.toLowerCase());
+      });
+      
+      if (matchingProduct && matchingProduct.variants && matchingProduct.variants.length > 0) {
+        // Get the lowest price from actual variants
+        const prices = matchingProduct.variants.map(variant => {
+          const price = variant.price || 0;
+          return typeof price === 'number' ? price / 100 : parseFloat(price) || 0;
+        }).filter(price => price > 0);
+        
+        if (prices.length > 0) {
+          const minPrice = Math.min(...prices);
+          console.log('✅ Found actual price from catalog:', `$${minPrice.toFixed(2)}`);
+          return `$${minPrice.toFixed(2)}`;
+        }
+      }
+    }
+    
+    // Dynamic price estimation based on product type patterns
+    return this.estimatePriceByPattern(category);
+  }
+  
+  /**
+   * Estimate price based on product type patterns
+   */
+  estimatePriceByPattern(category) {
+    if (!category) return '$19.95';
+    
+    const type = category.toLowerCase();
+    
+    // Base prices by category patterns
+    if (type.includes('sticker')) return '$4.95';
+    if (type.includes('mug') || type.includes('cup')) return '$14.95';
+    if (type.includes('travel') && type.includes('mug')) return '$21.95';
+    if (type.includes('shirt') || type.includes('tee') || type.includes('tank')) return '$18.95';
+    if (type.includes('premium')) return '$22.95';
+    if (type.includes('hoodie') || type.includes('zip')) return '$34.95';
+    if (type.includes('sweatshirt')) return '$28.95';
+    if (type.includes('bag') || type.includes('tote')) return '$15.95';
+    if (type.includes('backpack')) return '$34.95';
+    if (type.includes('pillow')) return '$18.95';
+    if (type.includes('blanket')) return '$49.95';
+    if (type.includes('canvas') || type.includes('art')) return '$29.95';
+    if (type.includes('phone')) return '$19.95';
+    if (type.includes('laptop')) return '$24.95';
+    if (type.includes('notebook') || type.includes('journal')) return '$16.95';
+    if (type.includes('hat') || type.includes('cap')) return '$19.95';
+    if (type.includes('specialty') || type.includes('special')) return '$24.95';
+    
+    return '$19.95'; // Default fallback
   }
   
   /**
