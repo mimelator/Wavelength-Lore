@@ -1004,10 +1004,48 @@ class MerchandiseStore {
       return;
     }
     
+    // Ensure gallery images are loaded
+    if (!this.galleryImages || this.galleryImages.length === 0) {
+      this.showError('Gallery images not loaded. Please refresh the page and try again.');
+      return;
+    }
+    
     // Find the original image and product type
-    const imageData = this.galleryImages.find(img => img.id === product.sourceImage?.id || img.url === product.sourceImage?.url);
+    // Try multiple ways to find the image data based on different product structures
+    let imageData = null;
+    
+    // Method 1: Check sourceImage (older format)
+    if (product.sourceImage?.id || product.sourceImage?.url) {
+      imageData = this.galleryImages.find(img => 
+        img.id === product.sourceImage?.id || 
+        img.url === product.sourceImage?.url
+      );
+    }
+    
+    // Method 2: Check imageId (newer format)
+    if (!imageData && product.imageId) {
+      imageData = this.galleryImages.find(img => img.id === product.imageId);
+    }
+    
+    // Method 3: Check if imageId is in the images array
+    if (!imageData && product.images && product.images.length > 0) {
+      const firstImageId = product.images[0]?.id || product.images[0];
+      imageData = this.galleryImages.find(img => img.id === firstImageId);
+    }
+    
     if (!imageData) {
-      this.showError('Original image not found');
+      console.warn('Edit Product Debug:', {
+        productId,
+        product,
+        galleryImagesCount: this.galleryImages.length,
+        searchedFor: {
+          sourceImageId: product.sourceImage?.id,
+          sourceImageUrl: product.sourceImage?.url,
+          imageId: product.imageId,
+          firstImage: product.images?.[0]
+        }
+      });
+      this.showError('Original image not found. Please ensure the source image is still in your gallery.');
       return;
     }
     
