@@ -30,6 +30,10 @@ class MerchandiseStore {
     // Debug mode - set to false to reduce console noise
     this.debugMode = false;
     
+    // Event listener management
+    this._eventListenersInitialized = false;
+    this._addToCartLastCall = {};
+    
     // PHASE 2 REFACTOR: Initialize UI renderers for modular UI components
     this.productCardRenderer = new MerchandiseProductCardRenderer({
       validationService: this.validationService,
@@ -1490,21 +1494,9 @@ class MerchandiseStore {
       
       console.log('✅ Merchandise store rendered successfully');
       
-      // Initialize product card event listeners for new variant selectors
+      // Initialize event listeners (prevent duplicates with flag)
       setTimeout(() => {
-        const productsGrid = document.querySelector('.products-grid');
-        if (productsGrid && this.productCardRenderer) {
-          this.productCardRenderer.setupEventListeners(productsGrid);
-          console.log('✅ Product card event listeners initialized');
-        }
-        
-        // Setup cart event listeners after DOM update
-        const cartContainer = document.querySelector('.cart-container');
-        if (cartContainer && this.cartRenderer) {
-          cartContainer._cartRendererInstance = this.cartRenderer;
-          this.cartRenderer.setupEventListeners(cartContainer);
-          console.log('✅ Cart event listeners initialized');
-        }
+        this.initializeEventListeners();
       }, 100); // Brief delay to ensure DOM is updated
       
     } catch (error) {
@@ -2059,6 +2051,56 @@ class MerchandiseStore {
   }
   
   /**
+   * Initialize event listeners with duplicate prevention
+   */
+  initializeEventListeners() {
+    // Prevent duplicate initialization
+    if (this._eventListenersInitialized) {
+      if (this.debugMode) {
+        console.log('⚠️ Event listeners already initialized, skipping duplicate setup');
+      }
+      return;
+    }
+    
+    // Initialize product card event listeners
+    const productsGrid = document.querySelector('.products-grid');
+    if (productsGrid && this.productCardRenderer) {
+      // Clear any existing listeners on the grid
+      this.productCardRenderer.setupEventListeners(productsGrid);
+      if (this.debugMode) {
+        console.log('✅ Product card event listeners initialized');
+      }
+    }
+    
+    // Setup cart event listeners
+    const cartContainer = document.querySelector('.cart-container');
+    if (cartContainer && this.cartRenderer) {
+      cartContainer._cartRendererInstance = this.cartRenderer;
+      this.cartRenderer.setupEventListeners(cartContainer);
+      if (this.debugMode) {
+        console.log('✅ Cart event listeners initialized');
+      }
+    }
+    
+    // Mark as initialized
+    this._eventListenersInitialized = true;
+    
+    if (this.debugMode) {
+      console.log('🎯 All event listeners initialized (duplicates prevented)');
+    }
+  }
+  
+  /**
+   * Reset event listener initialization flag (call when DOM structure changes significantly)
+   */
+  resetEventListeners() {
+    this._eventListenersInitialized = false;
+    if (this.debugMode) {
+      console.log('🔄 Event listener initialization flag reset');
+    }
+  }
+  
+  /**
    * Helper methods for service-based architecture
    */
   
@@ -2078,11 +2120,16 @@ class MerchandiseStore {
       // Update cart HTML
       cartContainer.innerHTML = this.cartRenderer.renderCart();
       
-      // Re-setup event listeners for the new content
-      this.cartRenderer.setupEventListeners(cartContainer);
+      // Only setup event listeners if not already initialized globally
+      if (!this._eventListenersInitialized) {
+        this.cartRenderer.setupEventListeners(cartContainer);
+        if (this.debugMode) {
+          console.log('✅ Cart event listeners setup during updateCartUI');
+        }
+      }
       
       if (this.debugMode) {
-        console.log('✅ Cart UI updated with event listeners');
+        console.log('✅ Cart UI updated (event listeners preserved)');
       }
     }
   }
@@ -4355,6 +4402,22 @@ class MerchandiseStore {
    * @param {number} quantity - Quantity to add (default 1)
    */
   handleAddToCart(productId, customization = null, quantity = 1, variantId = null) {
+    // 🚫 DUPLICATE PREVENTION: Check if we just processed this exact request
+    const requestKey = `${productId}-${variantId}-${quantity}`;
+    const now = Date.now();
+    
+    if (!this._addToCartLastCall) {
+      this._addToCartLastCall = {};
+    }
+    
+    // If same request within 1 second, ignore (debounce)
+    if (this._addToCartLastCall[requestKey] && (now - this._addToCartLastCall[requestKey]) < 1000) {
+      console.warn('🚫 Duplicate add-to-cart request ignored (debounced):', requestKey);
+      return;
+    }
+    
+    this._addToCartLastCall[requestKey] = now;
+    
     console.log('🛒 Add to cart:', productId);
     console.log('📦 Variant ID:', variantId);
     console.log('🎨 Customization:', customization);

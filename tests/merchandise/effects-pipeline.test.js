@@ -617,7 +617,7 @@ async function runEffectsPipelineTest() {
     // PHASE 10 (NEW): PRODUCT CREATION VALIDATION
     // ========================================================================================
     const phase10_new = results.addSection('PHASE 10: Product Creation Validation');
-    console.log('\n📦 PHASE 10: Verifying new product was created with effects...');
+    console.log('\n📦 PHASE 10: Checking if product was created with effects...');
 
     // Check if product was actually created and has effects
     let newProductCreated = false;
@@ -625,8 +625,9 @@ async function runEffectsPipelineTest() {
     let newProductData = null;
 
     try {
+      // We already clicked the preview button in Phase 5, so just wait and check if product appeared
       // Wait a moment for product to be added to DOM
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(1000);
 
       // Check if new product appears in the store
       const productCount = await page.evaluate(() => {
