@@ -1107,12 +1107,6 @@ class MerchandiseStore {
         const productId = btn.dataset.productId;
         this.retryProductSetup(productId);
       }
-      
-      if (e.target.closest('.view-variants-btn')) {
-        const btn = e.target.closest('.view-variants-btn');
-        const productId = btn.dataset.productId;
-        this.showVariantsModal(productId);
-      }
     });
   }
   
@@ -2235,6 +2229,10 @@ class MerchandiseStore {
   
   extractProductTypeFromProduct(product) {
     console.log('🔍 Extracting product type from:', product);
+    console.log('🔍 Product fields available:', Object.keys(product));
+    console.log('🔍 Product blueprintId:', product.blueprintId);
+    console.log('🔍 Product categoryId:', product.categoryId);
+    console.log('🔍 Product productType:', product.productType);
     
     // First check if product has stored productType metadata
     if (product.productType) {
@@ -2262,7 +2260,7 @@ class MerchandiseStore {
       if (variantTitle.includes('poster') || variantTitle.includes('print')) {
         return 'poster';
       }
-      if (variantTitle.includes('mug') || variantTitle.includes('cup')) {
+      if (variantTitle.includes('mug') || variantTitle.includes('cup') || variantTitle.includes('oz')) {
         return 'mug';
       }
       if (variantTitle.includes('tote') || variantTitle.includes('bag')) {
