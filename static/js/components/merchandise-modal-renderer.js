@@ -1837,6 +1837,19 @@ class MerchandiseModalRenderer {
           console.warn('⚠️  WARNING: Preview is showing CUSTOMIZED image URL, not original!');
           console.warn('  - Customized URL:', previousCustomization.customizedImageUrl?.substring(0, 100));
           console.warn('  - This may cause border stacking if effects are reapplied');
+
+          // 🔥 CRITICAL FIX: Reset preview to original image to prevent border stacking
+          // When editing a product with existing customization, we must reset the preview
+          // to the original gallery image. Otherwise, "Update Preview" applies effects
+          // on top of the previously customized image, causing nested/stacked borders.
+          const originalImageUrl = previewImage.dataset.originalImageUrl;
+          if (originalImageUrl) {
+            console.log('🔄 RESETTING preview image to original to prevent nested borders:');
+            console.log('  - From (customized):', previewImage.src?.substring(0, 80));
+            console.log('  - To (original):', originalImageUrl?.substring(0, 80));
+            previewImage.src = originalImageUrl;
+            console.log('✅ Preview image reset - nested borders will now be prevented');
+          }
         }
       }
     }
