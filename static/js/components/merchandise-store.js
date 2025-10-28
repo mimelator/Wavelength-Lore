@@ -2351,47 +2351,33 @@ class MerchandiseStore {
   }
   
   /**
-   * Map blueprint title/ID to our internal product type
+   * Map blueprint title/ID to our internal product type using dynamic product data
    */
   mapBlueprintToProductType(blueprintTitle, blueprintId) {
-    const title = blueprintTitle.toLowerCase();
+    console.log('🔍 Mapping blueprint to product type:', { blueprintTitle, blueprintId });
     
-    // Map by blueprint ID first (most reliable)
-    const blueprintMap = {
-      // T-Shirts & Tops
-      '5': 'premium-tshirt',
-      '6': 'premium-tshirt', 
-      '9': 'premium-tshirt',
-      '11': 'premium-tshirt',
-      '12': 'premium-tshirt',
-      '14': 'premium-tshirt',
-      '15': 'premium-tshirt',
-      '26': 'premium-tshirt',
+    // First, try to find the blueprint in our loaded product data
+    if (this.availableProducts && this.availableProducts.length > 0) {
+      const matchingProduct = this.availableProducts.find(product => 
+        product.blueprintId === parseInt(blueprintId) || 
+        product.blueprintId === blueprintId ||
+        String(product.blueprintId) === String(blueprintId)
+      );
       
-      // Hoodies
-      '146': 'hoodie',
-      
-      // Tank Tops
-      '17': 'tank-top',
-      
-      // Mugs & Drinkware  
-      '68': 'mug',
-      
-      // Pillows & Bedding
-      '220': 'pillow',
-      '223': 'pillow', 
-      '229': 'pillow',
-      '232': 'pillow',
-      
-      // Posters & Wall Art
-      '19': 'poster'
-    };
-    
-    if (blueprintMap[blueprintId]) {
-      return blueprintMap[blueprintId];
+      if (matchingProduct) {
+        console.log('✅ Found matching product in available data:', matchingProduct);
+        // Use the product's category or id as the product type
+        const productType = matchingProduct.category || matchingProduct.id;
+        console.log('✅ Mapped to product type:', productType);
+        return productType;
+      }
     }
     
-    // Fallback to title matching
+    console.log('⚠️ No matching product found in available data, using title analysis');
+    
+    // Fallback: analyze the title for product type hints
+    const title = blueprintTitle.toLowerCase();
+    
     if (title.includes('hoodie') || title.includes('pullover')) {
       return 'hoodie';
     }
@@ -2405,11 +2391,18 @@ class MerchandiseStore {
       return 'poster';
     }
     if (title.includes('mug') || title.includes('cup')) {
-      return 'mug';
+      return 'coffee-mug'; // Use consistent naming
+    }
+    if (title.includes('tote') || title.includes('bag')) {
+      return 'tote-bag';
+    }
+    if (title.includes('phone') || title.includes('case')) {
+      return 'phone-case';
     }
     
-    // Default to t-shirt
-    return 'premium-tshirt';
+    // Default to t-shirt category
+    console.log('🔄 Using default product type: t-shirt');
+    return 't-shirt';
   }
   
   findProductConfig(productTypeId) {
