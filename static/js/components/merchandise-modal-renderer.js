@@ -1743,7 +1743,20 @@ class MerchandiseModalRenderer {
       modal.dataset.borderEnabled = previousCustomization.borderEnabled ? 'true' : 'false';
       modal.dataset.customizedImageUrl = previousCustomization.customizedImageUrl || '';
 
+      // 🔍 DIAGNOSTIC: Deep inspection of restored customization
       console.log('✅ Restored customization state from product.customization');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('📊 CUSTOMIZATION DATA DIAGNOSTIC:');
+      console.log('  Product ID:', productId);
+      console.log('  Full customization object:', JSON.stringify(previousCustomization, null, 2));
+      console.log('  - borderEnabled:', previousCustomization.borderEnabled);
+      console.log('  - borderWidth:', previousCustomization.borderWidth);
+      console.log('  - borderWidthPixels:', previousCustomization.borderWidthPixels);
+      console.log('  - borderColor:', previousCustomization.borderColor);
+      console.log('  - effects object:', JSON.stringify(previousCustomization.effects || {}, null, 2));
+      console.log('  - customizedImageUrl length:', previousCustomization.customizedImageUrl?.length || 0);
+      console.log('  - customizedImageUrl first 100 chars:', previousCustomization.customizedImageUrl?.substring(0, 100) || 'none');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     } else {
       // Initialize with defaults
       modal.dataset.selectedEffects = JSON.stringify({});
@@ -1808,6 +1821,24 @@ class MerchandiseModalRenderer {
       }
 
       console.log('✅ UI state restored from previous customization');
+
+      // 🔍 DIAGNOSTIC: Check the preview image that was restored
+      const previewImage = modal.querySelector('.preview-image');
+      if (previewImage) {
+        console.log('🖼️  PREVIEW IMAGE DIAGNOSTIC:');
+        console.log('  - src attribute:', previewImage.src?.substring(0, 100) || 'none');
+        console.log('  - data-original-image-url:', previewImage.dataset.originalImageUrl?.substring(0, 100) || 'none');
+        console.log('  - Image complete:', previewImage.complete);
+        console.log('  - Natural width/height:', previewImage.naturalWidth, 'x', previewImage.naturalHeight);
+        console.log('  - Current width/height:', previewImage.width, 'x', previewImage.height);
+
+        // Check if this is a customized image with nested borders
+        if (previousCustomization.customizedImageUrl && previewImage.src.includes(previousCustomization.customizedImageUrl)) {
+          console.warn('⚠️  WARNING: Preview is showing CUSTOMIZED image URL, not original!');
+          console.warn('  - Customized URL:', previousCustomization.customizedImageUrl?.substring(0, 100));
+          console.warn('  - This may cause border stacking if effects are reapplied');
+        }
+      }
     }
 
     // Click event delegation
