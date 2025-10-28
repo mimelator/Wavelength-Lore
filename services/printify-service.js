@@ -91,7 +91,100 @@ class PrintifyService {
     
     console.log('✅ PrintifyService configuration validated successfully');
   }
-  
+
+  /**
+   * Enrich variants with image data from Printify's images array
+   * Maps images to variants using variant_ids array in image objects
+   * @param {Array} variants - Variant objects from Printify
+   * @param {Array} images - Image objects from Printify
+   * @returns {Array} Variants with attached image data
+   */
+  enrichVariantsWithImages(variants, images) {
+    if (!variants || !images || images.length === 0) {
+      console.log('⚠️ [ENRICH] No images to map - returning variants as-is');
+      return variants;
+    }
+
+    console.log(`🔗 [ENRICH] Mapping ${images.length} images to ${variants.length} variants`);
+
+    // Build a Map: variantId → image
+    // Each image has a variant_ids array that maps it to multiple variants
+    const variantIdToImage = new Map();
+
+    images.forEach((image, imageIndex) => {
+      if (!image.variant_ids || !Array.isArray(image.variant_ids)) {
+        console.log(`   ⚠️ Image ${imageIndex} has no variant_ids array, skipping`);
+        return;
+      }
+
+      // For each variant ID in this image's variant_ids array
+      image.variant_ids.forEach(variantId => {
+        // Only set if we haven't already mapped this variant to an image
+        if (!variantIdToImage.has(variantId)) {
+          variantIdToImage.set(variantId, image);
+        }
+      });
+    });
+
+    console.log(`   📊 Built variantId→image map with ${variantIdToImage.size} variant mappings`);
+
+    // DEBUG: Log sample of what we're about to use
+    if (variantIdToImage.size > 0) {
+      const firstMappedImage = Array.from(variantIdToImage.values())[0];
+      console.log(`   🔍 Sample mapped image check:`);
+      console.log(`      Has src? ${firstMappedImage.src ? '✅' : '❌'}`);
+      console.log(`      src value: ${firstMappedImage.src ? firstMappedImage.src.substring(0, 50) + '...' : 'NULL/UNDEFINED'}`);
+      console.log(`      position: ${firstMappedImage.position || 'undefined'}`);
+    }
+
+    // Enrich each variant with its matched image
+    const enrichedVariants = variants.map((variant, variantIndex) => {
+      // Look up this variant's image in the map
+      const matchedImage = variantIdToImage.get(variant.id);
+
+      if (matchedImage) {
+        // Variant has a matching image
+        if (variantIndex < 3) {
+          console.log(`   📌 Variant ${variant.id}: matchedImage keys = ${Object.keys(matchedImage).join(', ')}, src = ${matchedImage.src ? '✅' : '❌'}`);
+        }
+
+        if (matchedImage.src) {
+          // Variant has a matching image with src property
+          return {
+            ...variant,
+            image: {
+              url: matchedImage.src,  // Use src, not url
+              position: matchedImage.position || 'front'
+              // Note: Do NOT use matchedImage.id - image objects don't have an id field
+            }
+          };
+        }
+      }
+
+      // No matching image found for this variant
+      if (variantIndex < 5) {
+        // Only log first 5 misses to avoid spam
+        console.log(`   ⚠️ Variant ${variant.id} (${variant.title}) - no image found`);
+      } else if (variantIndex === 5) {
+        console.log(`   ⚠️ ... and ${variants.length - 5} more variants without images`);
+      }
+
+      return variant;
+    });
+
+    const enrichedCount = enrichedVariants.filter(v => v.image).length;
+    console.log(`✅ [ENRICH] Complete - ${enrichedCount}/${enrichedVariants.length} variants have images`);
+
+    // DEBUG: Log structure of enriched variant
+    if (enrichedVariants.length > 0 && enrichedVariants[0].image) {
+      console.log(`   🔍 First enriched variant image object:  ${JSON.stringify(enrichedVariants[0].image)}`);
+      console.log(`   🔍 First enriched variant image.id: ${enrichedVariants[0].image.id || 'NOT DEFINED'}`);
+      console.log(`   🔍 First enriched variant image.url: ${enrichedVariants[0].image.url || 'NOT DEFINED'}`);
+    }
+
+    return enrichedVariants;
+  }
+
   /**
    * Upload image to Printify for use in products
    * @param {Buffer} imageBuffer - Image file buffer
@@ -297,12 +390,24 @@ class PrintifyService {
         console.log(`   - All keys: ${Object.keys(firstVariant).join(', ')}`);
       }
 
+      // ENRICH VARIANTS WITH IMAGES
+      const enrichedVariants = this.enrichVariantsWithImages(response.data.variants, response.data.images);
+
+      // Log results of enrichment
+      const enrichedCount = enrichedVariants.filter(v => v.image).length;
+      console.log(`\n✅ [ENRICH RESULT] ${enrichedCount}/${enrichedVariants.length} variants now have images`);
+      if (enrichedVariants.length > 0 && enrichedVariants[0].image) {
+        console.log(`   Sample enriched variant:`);
+        console.log(`   - Title: ${enrichedVariants[0].title}`);
+        console.log(`   - Image URL: ${enrichedVariants[0].image.url}`);
+      }
+
       return {
         success: true,
         productId: response.data.id,
         title: response.data.title,
         description: response.data.description,
-        variants: response.data.variants,
+        variants: enrichedVariants,
         images: response.data.images,
         tags: response.data.tags
       };
@@ -417,12 +522,24 @@ class PrintifyService {
         console.log(`   - All keys: ${Object.keys(firstImage).join(', ')}`);
       }
 
+      // ENRICH VARIANTS WITH IMAGES
+      const enrichedVariants = this.enrichVariantsWithImages(response.data.variants, response.data.images);
+
+      // Log results of enrichment
+      const enrichedCount = enrichedVariants.filter(v => v.image).length;
+      console.log(`\n✅ [ENRICH RESULT] ${enrichedCount}/${enrichedVariants.length} variants now have images`);
+      if (enrichedVariants.length > 0 && enrichedVariants[0].image) {
+        console.log(`   Sample enriched variant:`);
+        console.log(`   - Title: ${enrichedVariants[0].title}`);
+        console.log(`   - Image URL: ${enrichedVariants[0].image.url}`);
+      }
+
       return {
         success: true,
         productId: response.data.id,
         title: response.data.title,
         description: response.data.description,
-        variants: response.data.variants,
+        variants: enrichedVariants,
         images: response.data.images,
         tags: response.data.tags
       };
