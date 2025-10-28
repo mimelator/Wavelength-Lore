@@ -4033,6 +4033,20 @@
   display: none;
 }
 
+/* 🔥 CRITICAL FIX: Style the custom checkbox when checked */
+/* This makes the visual checkmark appear when user clicks "Add Border" */
+.border-enable-label input[type="checkbox"]:checked + .checkbox-custom {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+.border-enable-label input[type="checkbox"]:checked + .checkbox-custom::after {
+  content: '✓';
+  color: white;
+  font-weight: bold;
+  font-size: 0.75rem;
+}
+
 #border-enable-checkbox:checked ~ #border-options-container {
   display: block !important;
 }
