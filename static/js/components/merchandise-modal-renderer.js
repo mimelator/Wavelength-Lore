@@ -250,6 +250,7 @@ class MerchandiseModalRenderer {
                   <img
                     id="customization-preview-image-${product.id}"
                     src="${product.previewImage || product.image || '/images/previews/generic-product-preview.svg'}"
+                    data-original-image-url="${product.previewImage || product.image || '/images/previews/generic-product-preview.svg'}"
                     alt="${product.title}"
                     class="preview-image"
                   />
@@ -2392,8 +2393,10 @@ class MerchandiseModalRenderer {
     }
 
     try {
-      // Get the image URL from the preview image element
-      const imageUrl = previewImage?.src || '/images/previews/generic-product-preview.svg';
+      // 🔥 CRITICAL FIX: Always use the ORIGINAL image URL, not the current preview src
+      // The current preview.src may contain a previously customized image (with old borders/effects)
+      // We need to always start from the original gallery image and apply fresh effects each time
+      const imageUrl = previewImage?.dataset?.originalImageUrl || previewImage?.src || '/images/previews/generic-product-preview.svg';
 
       // Call effects API
       console.log('🌐 Making API call to /api/merchandise/openai-upscaler/apply-effects');
