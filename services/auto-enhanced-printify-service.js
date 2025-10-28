@@ -57,6 +57,17 @@ class AutoEnhancedPrintifyService extends PrintifyService {
             if (isUpscaledSizeSufficient) {
               console.log(`✅ Upscaled image dimensions sufficient: ${upscaledMetadata.width}x${upscaledMetadata.height}`);
               finalBuffer = upscaledBuffer;
+
+              // 🔧 BUG FIX: Update fileName to match upscaled image format
+              // The upscaler converts WebP to PNG internally, but doesn't update the filename
+              // This causes a mismatch when sending to Printify (PNG buffer + .webp filename)
+              // which leads to double-conversion and corrupted data (400 error)
+              if (fileName && fileName.toLowerCase().endsWith('.webp')) {
+                console.log('🔧 Updating fileName: .webp → .png (upscaler converted format)');
+                fileName = fileName.replace(/\.webp$/i, '.png');
+                console.log(`   New fileName: ${fileName}`);
+              }
+
               enhancementInfo = {
                 autoEnhanced: true,
                 enhancementSource: 'upscaling',
