@@ -137,9 +137,17 @@ class ImageUpscalingService {
       if (metadata.format === 'webp') {
         console.log('🔄 Converting WebP to PNG for upscaler compatibility...');
         // PROACTIVE: Mark that we're converting the format
-        console.log(`📝 PROACTIVE FORMAT TRACKING: Converting fileName from .webp to .png`);
-        finalFileName = fileName.replace(/\.webp$/i, '.png');
-        console.log(`   Tracked: ${fileName} → ${finalFileName}`);
+        console.log(`📝 PROACTIVE FORMAT TRACKING: Converting WebP buffer to PNG format`);
+        
+        // Handle both cases: fileName with .webp extension AND fileName with no extension
+        if (fileName && fileName.toLowerCase().endsWith('.webp')) {
+          finalFileName = fileName.replace(/\.webp$/i, '.png');
+          console.log(`   Tracked: ${fileName} → ${finalFileName} (replaced .webp extension)`);
+        } else {
+          // PROACTIVE ENHANCEMENT: Add .png extension when no extension exists
+          finalFileName = fileName + '.png';
+          console.log(`   Tracked: ${fileName} → ${finalFileName} (added .png extension)`);
+        }
 
         // Start with reasonable compression to avoid huge files
         processedBuffer = await sharp(imageBuffer)

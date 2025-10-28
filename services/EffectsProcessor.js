@@ -45,11 +45,13 @@ class EffectsProcessor {
       pipeline = await this.applyLightingEffects(pipeline, finalParams, imageMetadata);
       pipeline = await this.applySpecialEffects(pipeline, finalParams, imageMetadata);
 
-      // Convert to WebP for preview
+      // PROACTIVE FORMAT TRACKING: Use PNG for Printify compatibility instead of WebP
+      // This maintains the format expected by Printify API
+      console.log('📝 PROACTIVE FORMAT TRACKING: Effects processor maintaining PNG format for Printify compatibility');
       const processed = await pipeline
-        .webp({
-          quality: effectsConfig.processing.webpQuality,
-          alphaQuality: effectsConfig.processing.webpAlphaQuality
+        .png({
+          quality: 90,  // High quality PNG for print
+          compressionLevel: 6  // Balanced compression
         })
         .toBuffer();
 

@@ -90,6 +90,11 @@ class AutoEnhancedPrintifyService extends PrintifyService {
                     finalBuffer = effectsModifiedBuffer;
                     effectsAppliedAfterUpscaling = true;
                     console.log('   ✅ finalBuffer updated with effects-modified version');
+                    
+                    // 🔥 PROACTIVE FORMAT TRACKING: Effects processor maintains PNG format
+                    // No format change needed - effects processor keeps PNG for Printify compatibility
+                    console.log('📝 PROACTIVE FORMAT TRACKING: Effects processor maintained PNG format for Printify compatibility');
+                    console.log(`   FileName remains: ${fileName} (PNG format preserved through effects pipeline)`);
                   } else {
                     console.warn('⚠️ Effects processing returned empty buffer, keeping upscaled version');
                   }
