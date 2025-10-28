@@ -1042,11 +1042,47 @@ class MerchandiseStore {
           sourceImageId: product.sourceImage?.id,
           sourceImageUrl: product.sourceImage?.url,
           imageId: product.imageId,
-          firstImage: product.images?.[0]
-        }
+          firstImage: product.images?.[0],
+          productType: product.productType,
+          blueprintIdFromProductType: product.productType && product.productType.startsWith('validated-') 
+            ? product.productType.replace('validated-', '') : null
+        },
+        galleryImageIds: this.galleryImages.map(img => img.id),
+        galleryImageSample: this.galleryImages.slice(0, 3)
       });
-      this.showError('Original image not found. Please ensure the source image is still in your gallery.');
-      return;
+      
+      // Let's also try a more flexible search
+      console.warn('Attempting flexible image search...');
+      
+      // For validated products, try to use blueprint ID from productType
+      let blueprintSearchId = null;
+      if (product.productType && product.productType.startsWith('validated-')) {
+        blueprintSearchId = product.productType.replace('validated-', '');
+        console.warn('Extracted blueprint ID for image search:', blueprintSearchId);
+      }
+      
+      const flexibleSearch = this.galleryImages.find(img => {
+        return img.id === product.imageId ||
+               img.id === product.sourceImage?.id ||
+               img.url === product.sourceImage?.url ||
+               (product.images && product.images.includes(img.id)) ||
+               (typeof product.images?.[0] === 'string' && img.id === product.images[0]) ||
+               (typeof product.images?.[0] === 'object' && img.id === product.images[0]?.id) ||
+               // Try blueprint ID search for validated products
+               (blueprintSearchId && (
+                 img.id === blueprintSearchId ||
+                 String(img.id) === String(blueprintSearchId) ||
+                 parseInt(img.id) === parseInt(blueprintSearchId)
+               ));
+      });
+      
+      if (flexibleSearch) {
+        console.warn('Found image with flexible search:', flexibleSearch);
+        imageData = flexibleSearch;
+      } else {
+        this.showError('Original image not found. Please ensure the source image is still in your gallery.');
+        return;
+      }
     }
     
     // Extract product type from existing product
