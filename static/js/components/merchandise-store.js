@@ -2066,6 +2066,15 @@ class MerchandiseStore {
     // Update cart display using cart service data
     const cartContainer = document.querySelector('.cart-container');
     if (cartContainer && this.cartRenderer) {
+      // Check if cart is empty to add proper classes
+      const cartSummary = this.cartService.getSummary();
+      
+      // Update cart classes based on state
+      cartContainer.className = 'cart-container';
+      if (cartSummary.isEmpty) {
+        cartContainer.classList.add('empty-cart');
+      }
+      
       // Update cart HTML
       cartContainer.innerHTML = this.cartRenderer.renderCart();
       

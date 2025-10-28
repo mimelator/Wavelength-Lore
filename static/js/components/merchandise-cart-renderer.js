@@ -62,7 +62,6 @@ class MerchandiseCartRenderer {
       }
       
       const cartHTML = `
-        <div class="cart-container">
           <div class="cart-header">
             <h3>
               <span class="cart-icon">🛒</span>
@@ -82,7 +81,6 @@ class MerchandiseCartRenderer {
             ${this.renderCartSummary(cartSummary)}
             ${this.renderCheckoutSection(cartSummary)}
           </div>
-        </div>
       `;
       
       if (this.debugMode) {
@@ -253,7 +251,6 @@ class MerchandiseCartRenderer {
    */
   renderEmptyCart() {
     return `
-      <div class="cart-container empty-cart">
         <div class="empty-cart-content">
           <div class="empty-cart-icon">🛒</div>
           <h3>Your Cart is Empty</h3>
@@ -262,7 +259,6 @@ class MerchandiseCartRenderer {
             <span>🎨</span> Design Your First Product
           </button>
         </div>
-      </div>
     `;
   }
   
@@ -272,7 +268,6 @@ class MerchandiseCartRenderer {
    */
   renderCartError() {
     return `
-      <div class="cart-container cart-error">
         <div class="cart-error-content">
           <div class="cart-error-icon">⚠️</div>
           <h3>Error Loading Cart</h3>
@@ -281,7 +276,6 @@ class MerchandiseCartRenderer {
             <span>🔄</span> Retry
           </button>
         </div>
-      </div>
     `;
   }
   

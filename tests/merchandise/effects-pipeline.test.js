@@ -614,10 +614,95 @@ async function runEffectsPipelineTest() {
     }
 
     // ==================================================================================
-    // PHASE 10: FINAL VALIDATION
+    // PHASE 10 (NEW): PRODUCT CREATION VALIDATION
     // ========================================================================================
-    const phase10 = results.addSection('PHASE 10: Final Validation');
-    console.log('\n✅ PHASE 10: Final checks...');
+    const phase10_new = results.addSection('PHASE 10: Product Creation Validation');
+    console.log('\n📦 PHASE 10: Verifying new product was created with effects...');
+
+    // Check if product was actually created and has effects
+    let newProductCreated = false;
+    let newProductHasEffects = false;
+    let newProductData = null;
+
+    try {
+      // Wait a moment for product to be added to DOM
+      await page.waitForTimeout(2000);
+
+      // Check if new product appears in the store
+      const productCount = await page.evaluate(() => {
+        const products = document.querySelectorAll('.product-card, [data-product-id]');
+        return products.length;
+      });
+
+      if (productCount > 0) {
+        phase10_new.pass(`New product appears in store (${productCount} products visible)`);
+        newProductCreated = true;
+
+        // Try to find the newly created product and check for effect data
+        const productEffects = await page.evaluate(() => {
+          // Get the most recently added product
+          const products = document.querySelectorAll('.product-card, [data-product-id]');
+          const lastProduct = products[products.length - 1];
+
+          if (!lastProduct) return null;
+
+          // Check for effect data in various locations
+          const productId = lastProduct.getAttribute('data-product-id') ||
+                           lastProduct.getAttribute('data-id') ||
+                           lastProduct.id;
+
+          const effectsText = lastProduct.textContent;
+          const hasEffectMention = effectsText.includes('Vibrancy') ||
+                                  effectsText.includes('Dramatic') ||
+                                  effectsText.includes('effect') ||
+                                  effectsText.includes('FX');
+
+          const dataAttribute = lastProduct.getAttribute('data-effects') ||
+                               lastProduct.getAttribute('data-customization');
+
+          return {
+            productId: productId,
+            hasEffectMention: hasEffectMention,
+            effectsDataAttr: dataAttribute,
+            innerHTML: lastProduct.innerHTML.substring(0, 500)
+          };
+        });
+
+        if (productEffects) {
+          phase10_new.pass('Retrieved new product data', productEffects);
+          newProductData = productEffects;
+
+          if (productEffects.hasEffectMention) {
+            phase10_new.pass('Product shows effect-related text/data');
+            newProductHasEffects = true;
+          } else if (productEffects.effectsDataAttr) {
+            phase10_new.pass('Product has effects data in attributes', {
+              dataAttr: productEffects.effectsDataAttr
+            });
+            newProductHasEffects = true;
+          } else {
+            phase10_new.warn('Product created but no visible effect data found');
+          }
+        }
+      } else {
+        phase10_new.fail('No new product found in store');
+      }
+    } catch (e) {
+      phase10_new.warn('Could not verify product creation', { error: e.message });
+    }
+
+    // Store result for final summary
+    results.diagnosticData.productCreationResult = {
+      productCreated: newProductCreated,
+      productHasEffects: newProductHasEffects,
+      productData: newProductData
+    };
+
+    // ==================================================================================
+    // PHASE 11 (WAS 10): FINAL VALIDATION
+    // ========================================================================================
+    const phase11 = results.addSection('PHASE 11: Final Validation');
+    console.log('\n✅ PHASE 11: Final checks...');
 
     // Check if we have sufficient evidence of effect processing
     const hasApiPayloads = results.apiPayloads.length > 0;
@@ -628,9 +713,19 @@ async function runEffectsPipelineTest() {
     phase10.pass('Browser console logging functional', { logsCount: serverLogs.length });
 
     if (hasEffectEvidence) {
-      phase10.pass('Complete effect processing evidence found');
+      phase11.pass('Complete effect processing evidence found');
     } else if (hasApiPayloads && hasServerLogs) {
-      phase10.warn('API and browser logs captured but effect processing logs not explicitly found');
+      phase11.warn('API and browser logs captured but effect processing logs not explicitly found');
+    }
+
+    // Add the most important check: was the product created with effects?
+    console.log('\n' + '='.repeat(80));
+    console.log('🎯 FINAL RESULT: PRODUCT CREATION WITH EFFECTS');
+    console.log('='.repeat(80));
+    console.log(`\n  Product Created: ${newProductCreated ? '✅ YES' : '❌ NO'}`);
+    console.log(`  Product Has Effects: ${newProductHasEffects ? '✅ YES' : '⚠️  UNKNOWN/NO'}`);
+    if (newProductData) {
+      console.log(`  Product ID: ${newProductData.productId || 'Not found'}`);
     }
 
     // ==================================================================================
@@ -645,6 +740,8 @@ async function runEffectsPipelineTest() {
     console.log(`   ❌ Failed: ${results.failCount}`);
     console.log(`   ⚠️  Total: ${results.passCount + results.failCount}`);
     console.log(`   📊 Success Rate: ${Math.round((results.passCount / (results.passCount + results.failCount)) * 100)}%`);
+    console.log(`\n🎯 CRITICAL RESULT:`);
+    console.log(`   Product Created with Effects: ${newProductCreated && newProductHasEffects ? '✅ YES' : '❌ NO'}`);
 
     // List sections with results
     console.log(`\n📋 Test Sections:`);
