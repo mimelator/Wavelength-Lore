@@ -377,30 +377,79 @@ class MerchandiseStore {
       const data = await response.json();
       
       if (data.success && data.category) {
-        // Basic price estimation based on category (can be enhanced with actual Printify pricing)
-        const basePrices = {
-          'sticker': '$4.95',
+        console.log('🔍 Searching for blueprint pricing in dynamic catalog...');
+        
+        // First try to find the exact product with this blueprintId in our catalog
+        const matchingProduct = this.availableProducts?.find(product => 
+          product.blueprintId === parseInt(blueprintId) || 
+          String(product.blueprintId) === String(blueprintId)
+        );
+        
+        if (matchingProduct) {
+          console.log(`✅ Found product for blueprint ${blueprintId}:`, matchingProduct.name);
+          
+          // Use actual pricing from product variants if available
+          if (matchingProduct.variants && matchingProduct.variants.length > 0) {
+            const prices = matchingProduct.variants.map(variant => {
+              const price = variant.price || 0;
+              return typeof price === 'number' ? price / 100 : parseFloat(price) || 0;
+            }).filter(price => price > 0);
+            
+            if (prices.length > 0) {
+              const minPrice = Math.min(...prices);
+              console.log(`✅ DYNAMIC PRICING: Blueprint ${blueprintId} → $${minPrice.toFixed(2)} from real variants`);
+              return `$${minPrice.toFixed(2)}`;
+            }
+          }
+          
+          // Fallback to product's base price if variants unavailable
+          if (matchingProduct.basePrice) {
+            const price = matchingProduct.basePrice / 100;
+            console.log(`✅ DYNAMIC BASE PRICE: Blueprint ${blueprintId} → $${price.toFixed(2)}`);
+            return `$${price.toFixed(2)}`;
+          }
+        }
+        
+        // Secondary fallback: use category-based lookup in our catalog
+        const categoryProducts = this.availableProducts?.filter(product => 
+          product.category === data.category
+        );
+        
+        if (categoryProducts && categoryProducts.length > 0) {
+          // Get average price for this category from real products
+          const categoryPrices = [];
+          categoryProducts.forEach(product => {
+            if (product.variants && product.variants.length > 0) {
+              const productPrices = product.variants.map(v => {
+                const price = v.price || 0;
+                return typeof price === 'number' ? price / 100 : parseFloat(price) || 0;
+              }).filter(p => p > 0);
+              
+              if (productPrices.length > 0) {
+                categoryPrices.push(Math.min(...productPrices));
+              }
+            }
+          });
+          
+          if (categoryPrices.length > 0) {
+            const avgPrice = categoryPrices.reduce((sum, price) => sum + price, 0) / categoryPrices.length;
+            console.log(`✅ CATEGORY PRICING: ${data.category} → $${avgPrice.toFixed(2)} (average from ${categoryPrices.length} products)`);
+            return `$${avgPrice.toFixed(2)}`;
+          }
+        }
+        
+        console.log(`⚠️ No dynamic pricing found for blueprint ${blueprintId}, category ${data.category}`);
+        
+        // Minimal hardcoded fallback (only if absolutely necessary)
+        const essentialFallbacks = {
           'coffee-mug': '$14.95',
-          'travel-mug': '$21.95',
-          't-shirt': '$18.95',
-          'heavy-cotton-tee': '$19.95',
-          'premium-tshirt': '$22.95',
-          'hoodie': '$34.95',
-          'sweatshirt': '$28.95',
-          'tote-bag': '$15.95',
-          'backpack': '$34.95',
-          'pillow': '$18.95',
-          'blanket': '$49.95',
-          'canvas': '$29.95',
-          'phone-case': '$19.95',
-          'laptop-sleeve': '$24.95',
-          'notebook': '$16.95',
-          'hat': '$19.95'
+          't-shirt': '$18.95', 
+          'hoodie': '$34.95'
         };
         
-        const price = basePrices[data.category] || '$19.95';
-        console.log(`✅ Got price from blueprint API: ${blueprintId} → ${data.category} → ${price}`);
-        return price;
+        const fallbackPrice = essentialFallbacks[data.category] || '$19.95';
+        console.log(`🔄 Using minimal fallback: ${data.category} → ${fallbackPrice}`);
+        return fallbackPrice;
       }
     } catch (error) {
       console.warn('⚠️ Failed to get price from blueprint API:', error);
