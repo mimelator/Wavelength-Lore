@@ -27,6 +27,9 @@ class MerchandiseStore {
     this.eventBus = new WavelengthEventBus();
     this.stripeCheckoutService = new StripeCheckoutService();
     
+    // Debug mode - set to false to reduce console noise
+    this.debugMode = false;
+    
     // PHASE 2 REFACTOR: Initialize UI renderers for modular UI components
     this.productCardRenderer = new MerchandiseProductCardRenderer({
       validationService: this.validationService,
@@ -37,7 +40,8 @@ class MerchandiseStore {
     this.cartRenderer = new MerchandiseCartRenderer({
       cartService: this.cartService,
       eventBus: this.eventBus,
-      merchandiseStore: this
+      merchandiseStore: this,
+      debugMode: this.debugMode
     });
     
     this.categoryGridRenderer = new MerchandiseCategoryGridRenderer({
@@ -2765,26 +2769,34 @@ class MerchandiseStore {
   }
   
   extractProductTypeFromProduct(product) {
-    console.log('🔍 Extracting product type from:', product);
-    console.log('🔍 Product fields available:', Object.keys(product));
-    console.log('🔍 Product blueprintId:', product.blueprintId);
-    console.log('🔍 Product categoryId:', product.categoryId);
-    console.log('🔍 Product productType:', product.productType);
+    if (this.debugMode) {
+      console.log('🔍 Extracting product type from:', product);
+      console.log('🔍 Product fields available:', Object.keys(product));
+      console.log('🔍 Product blueprintId:', product.blueprintId);
+      console.log('🔍 Product categoryId:', product.categoryId);
+      console.log('🔍 Product productType:', product.productType);
+    }
 
     // First check if product has stored productType metadata
     if (product.productType) {
-      console.log('🔍 Found stored productType:', product.productType);
+      if (this.debugMode) {
+        console.log('🔍 Found stored productType:', product.productType);
+      }
 
       // Handle validated-XX format - keep it as-is for most accurate lookup
       if (product.productType.startsWith('validated-')) {
         const blueprintId = product.productType.replace('validated-', '');
-        console.log('🔍 Extracted blueprint ID from productType:', blueprintId);
+        if (this.debugMode) {
+          console.log('🔍 Extracted blueprint ID from productType:', blueprintId);
+        }
 
         // Try to find the product in availableProducts by blueprint ID to verify it exists
         if (this.availableProducts && this.availableProducts.length > 0) {
           const matchingProduct = this.availableProducts.find(p => p.blueprintId === parseInt(blueprintId));
           if (matchingProduct) {
-            console.log('✅ Verified product exists for blueprint', blueprintId, ':', matchingProduct.name);
+            if (this.debugMode) {
+              console.log('✅ Verified product exists for blueprint', blueprintId, ':', matchingProduct.name);
+            }
             // Return the validated-XX ID directly for most accurate config lookup
             return product.productType;
           }
@@ -2916,7 +2928,9 @@ class MerchandiseStore {
         const blueprintId = parseInt(productType.replace('validated-', ''));
         const matchingProduct = this.availableProducts.find(p => p.blueprintId === blueprintId);
         if (matchingProduct && matchingProduct.name) {
-          console.log('🎯 Found dynamic product name:', matchingProduct.name, 'for blueprint', blueprintId);
+          if (this.debugMode) {
+            console.log('🎯 Found dynamic product name:', matchingProduct.name, 'for blueprint', blueprintId);
+          }
           return matchingProduct.name;
         }
       }
@@ -2924,7 +2938,9 @@ class MerchandiseStore {
       // Look for direct productType match
       const matchingProduct = this.availableProducts.find(p => p.productType === productType || p.category === productType);
       if (matchingProduct && matchingProduct.name) {
-        console.log('🎯 Found dynamic product name:', matchingProduct.name, 'for type', productType);
+        if (this.debugMode) {
+          console.log('🎯 Found dynamic product name:', matchingProduct.name, 'for type', productType);
+        }
         return matchingProduct.name;
       }
     }
@@ -3613,6 +3629,31 @@ class MerchandiseStore {
       completeOrderBtn.innerHTML = `<span>💳</span> Complete Order ($${cartSummary.total.toFixed(2)})`;
       completeOrderBtn.disabled = false;
     }
+  }
+
+  /**
+   * Toggle debug mode for all components
+   * Usage in console: window.merchandiseStore.toggleDebug()
+   */
+  toggleDebug(enabled) {
+    const newDebugMode = enabled !== undefined ? enabled : !this.debugMode;
+    
+    console.log(`🔧 Setting debug mode: ${newDebugMode ? 'ON' : 'OFF'}`);
+    
+    // Update store debug mode
+    this.debugMode = newDebugMode;
+    
+    // Update service debug modes
+    if (this.cartService) {
+      this.cartService.debugMode = newDebugMode;
+    }
+    
+    if (this.cartRenderer) {
+      this.cartRenderer.debugMode = newDebugMode;
+    }
+    
+    console.log(`✅ Debug mode ${newDebugMode ? 'enabled' : 'disabled'} for all components`);
+    return newDebugMode;
   }
 
   /**

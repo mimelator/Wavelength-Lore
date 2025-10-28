@@ -12,7 +12,7 @@ class MerchandiseCartService {
   constructor() {
     this.items = [];
     this.eventBus = null; // Will be injected
-    this.debugMode = true; // Enable detailed diagnostics
+    this.debugMode = false; // Quiet by default - set to true for debugging
     
     console.log('🛒 CART DIAGNOSTICS: MerchandiseCartService initializing...');
     this.loadFromStorage();

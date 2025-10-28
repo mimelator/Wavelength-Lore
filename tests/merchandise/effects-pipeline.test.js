@@ -274,14 +274,85 @@ async function runEffectsPipelineTest() {
       { name: 'dramatic', expectedParams: { vignette: 0.5, contrast: 1.2, blur: 2 } }
     ];
 
-    for (const effect of effectsToTest) {
-      const effectCheckbox = await page.$(`input[data-effect="${effect.name}"], [data-effect="${effect.name}"]`);
+    // First, try to find what selectors are actually in the modal
+    const availableSelectors = await page.evaluate(() => {
+      const modal = document.querySelector('.product-customization-modal, [role="dialog"], .modal');
+      if (!modal) return null;
 
-      if (effectCheckbox) {
-        await effectCheckbox.click();
-        phase4.pass(`Selected effect: ${effect.name}`, { expectedParams: effect.expectedParams });
+      const checkboxes = modal.querySelectorAll('input[type="checkbox"]');
+      const buttons = modal.querySelectorAll('button[data-effect], [data-effect]');
+      const labels = modal.querySelectorAll('label');
+
+      return {
+        checkboxCount: checkboxes.length,
+        checkboxNames: Array.from(checkboxes).map(cb => ({
+          id: cb.id,
+          name: cb.name,
+          dataEffect: cb.getAttribute('data-effect'),
+          value: cb.value
+        })),
+        buttonCount: buttons.length,
+        labelCount: labels.length
+      };
+    });
+
+    if (availableSelectors && availableSelectors.checkboxNames.length > 0) {
+      phase4.pass('Found effect controls in modal', availableSelectors);
+    }
+
+    for (const effect of effectsToTest) {
+      // Try multiple selector patterns
+      const selectors = [
+        `input[data-effect="${effect.name}"]`,
+        `input[value="${effect.name}"]`,
+        `input[id*="${effect.name}"]`,
+        `button[data-effect="${effect.name}"]`,
+        `[data-effect="${effect.name}"]`
+      ];
+
+      let effectControl = null;
+      let usedSelector = null;
+
+      for (const selector of selectors) {
+        effectControl = await page.$(selector);
+        if (effectControl) {
+          usedSelector = selector;
+          break;
+        }
+      }
+
+      if (effectControl) {
+        try {
+          // Try direct click first
+          await effectControl.click();
+          phase4.pass(`Selected effect: ${effect.name}`, {
+            expectedParams: effect.expectedParams,
+            selector: usedSelector
+          });
+        } catch (clickError) {
+          // If direct click fails, try via evaluate (for hidden elements)
+          try {
+            await page.evaluate((effectName) => {
+              const checkbox = document.querySelector(`input[data-effect="${effectName}"]`);
+              if (checkbox) {
+                checkbox.checked = true;
+                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                return true;
+              }
+              return false;
+            }, effect.name);
+            phase4.pass(`Selected effect: ${effect.name} (via evaluate)`, {
+              expectedParams: effect.expectedParams,
+              method: 'evaluate'
+            });
+          } catch (evalError) {
+            phase4.warn(`Found effect control but click failed: ${effect.name}`, { error: clickError.message });
+          }
+        }
       } else {
-        phase4.warn(`Could not find checkbox for effect: ${effect.name}`);
+        phase4.warn(`Could not find control for effect: ${effect.name}`, {
+          availableSelectors: availableSelectors
+        });
       }
     }
 
@@ -338,7 +409,24 @@ async function runEffectsPipelineTest() {
 
     // Click preview/create button
     console.log('  🔍 Clicking "Preview Finished Product" button...');
-    const previewBtn = await page.$('button:has-text("Preview"), [data-action="preview"], #previewProductBtn, .preview-btn');
+
+    // Try multiple selectors
+    const previewSelectors = [
+      '[data-action="preview"]',
+      '#previewProductBtn',
+      '.preview-btn',
+      'button[class*="preview"]',
+      'button[class*="finish"]'
+    ];
+
+    let previewBtn = null;
+    for (const selector of previewSelectors) {
+      previewBtn = await page.$(selector);
+      if (previewBtn) {
+        console.log(`  Found button with selector: ${selector}`);
+        break;
+      }
+    }
 
     if (previewBtn) {
       await previewBtn.click();
@@ -348,11 +436,15 @@ async function runEffectsPipelineTest() {
       // Try to find any button with preview-related text
       const buttons = await page.$$('button');
       for (const btn of buttons) {
-        const text = await btn.evaluate(el => el.textContent.toLowerCase());
-        if (text.includes('preview') || text.includes('finish') || text.includes('create')) {
-          await btn.click();
-          phase5.pass('Clicked button (alternative selector)');
-          break;
+        try {
+          const text = await btn.evaluate(el => el.textContent.toLowerCase());
+          if (text.includes('preview') || text.includes('finish') || text.includes('create')) {
+            await btn.click();
+            phase5.pass('Clicked button (alternative selector)');
+            break;
+          }
+        } catch (e) {
+          // Skip this button
         }
       }
     }

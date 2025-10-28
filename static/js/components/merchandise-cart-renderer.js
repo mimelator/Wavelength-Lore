@@ -14,14 +14,16 @@ class MerchandiseCartRenderer {
     this.cartService = options.cartService;
     this.eventBus = options.eventBus;
     this.merchandiseStore = options.merchandiseStore; // For accessing helper methods
-    this.debugMode = true; // Enable detailed diagnostics
+    this.debugMode = options.debugMode !== undefined ? options.debugMode : false; // Quiet by default
     
-    console.log('🛒 CART UI DIAGNOSTICS: MerchandiseCartRenderer initializing...');
-    console.log('🛒 Services connected:', {
-      cartService: !!this.cartService,
-      eventBus: !!this.eventBus,
-      merchandiseStore: !!this.merchandiseStore
-    });
+    if (this.debugMode) {
+      console.log('🛒 CART UI DIAGNOSTICS: MerchandiseCartRenderer initializing...');
+      console.log('🛒 Services connected:', {
+        cartService: !!this.cartService,
+        eventBus: !!this.eventBus,
+        merchandiseStore: !!this.merchandiseStore
+      });
+    }
     
     // 🔍 DIAGNOSTIC: Store instance reference for debugging access
     setTimeout(() => {
