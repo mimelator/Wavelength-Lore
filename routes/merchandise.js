@@ -1622,7 +1622,14 @@ router.post('/confirm-payment', ensureAuthenticated, async (req, res) => {
 router.get('/payment-health', async (req, res) => {
   try {
     const healthCheck = await stripePaymentService.healthCheck();
-    res.json(healthCheck);
+    
+    // Add Stripe public key for frontend initialization
+    const response = {
+      ...healthCheck,
+      stripePublicKey: process.env.STRIPE_PUBLISHABLE_KEY
+    };
+    
+    res.json(response);
   } catch (error) {
     res.status(500).json({
       success: false,
