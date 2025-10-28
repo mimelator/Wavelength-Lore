@@ -356,17 +356,34 @@ class MerchandiseProductCardRenderer {
       return this.merchandiseStore.getProductIcon(productType);
     }
     
-    // Fallback icon mapping
-    const iconMap = {
-      'apparel': '👕',
-      'accessories': '🎒',
-      'home-decor': '🏠',
-      'stickers': '📌',
-      'mugs': '☕',
-      'default': '🛍️'
-    };
+    // Dynamic icon inference
+    return this.inferIconFromProductType(productType) || '🛍️';
+  }
+  
+  /**
+   * Infer icon from product type (same logic as store)
+   */
+  inferIconFromProductType(productType) {
+    if (!productType) return '🛍️';
     
-    return iconMap[productType] || iconMap.default;
+    const type = productType.toLowerCase();
+    
+    // Apparel patterns
+    if (type.includes('shirt') || type.includes('tee') || type === 'apparel') return '👕';
+    if (type.includes('hoodie') || type.includes('sweatshirt')) return '🧥';
+    if (type.includes('tank')) return '�';
+    if (type.includes('women')) return '👚';
+    
+    // Accessories patterns
+    if (type.includes('mug') || type.includes('cup') || type === 'mugs') return '☕';
+    if (type.includes('bag') || type.includes('tote') || type === 'accessories') return '🎒';
+    if (type.includes('phone')) return '📱';
+    if (type.includes('sticker') || type === 'stickers') return '📌';
+    
+    // Home decor patterns
+    if (type.includes('pillow') || type.includes('canvas') || type === 'home-decor') return '🏠';
+    
+    return '🛍️'; // Default fallback
   }
   
   /**
@@ -379,28 +396,32 @@ class MerchandiseProductCardRenderer {
       return this.merchandiseStore.getProductTypeName(productType);
     }
     
-    // Enhanced product type mapping
-    const typeMapping = {
-      'mug': 'Coffee Mug',
-      'mug-11oz': '11oz Mug',
-      'mug-15oz': '15oz Mug',
-      't-shirt': 'T-Shirt',
-      'tshirt': 'T-Shirt',
-      'hoodie': 'Hoodie',
-      'sweatshirt': 'Sweatshirt',
-      'tank-top': 'Tank Top',
-      'poster': 'Poster',
-      'canvas': 'Canvas Print',
-      'sticker': 'Sticker',
-      'phone-case': 'Phone Case',
-      'tote-bag': 'Tote Bag',
-      'pillow': 'Throw Pillow',
-      'mousepad': 'Mouse Pad'
-    };
+    // Try to find matching product in merchandise store catalog for dynamic typing
+    if (this.merchandiseStore && this.merchandiseStore.availableProducts) {
+      const matchingProduct = this.merchandiseStore.availableProducts.find(product => {
+        const catalogProductType = this.merchandiseStore.extractProductTypeFromProduct(product);
+        return catalogProductType === productType || 
+               catalogProductType?.toLowerCase() === productType?.toLowerCase() ||
+               product.title?.toLowerCase().includes(productType?.toLowerCase());
+      });
+      
+      if (matchingProduct) {
+        console.log('✅ Found product type in catalog:', matchingProduct.title);
+        // Use the actual product title or derive a clean name
+        const cleanTitle = matchingProduct.title
+          .replace(/^(Wavelength\s+)?Lore\s*/i, '')
+          .replace(/\s*-\s*.*$/, '') // Remove everything after dash
+          .trim();
+        if (cleanTitle && cleanTitle !== matchingProduct.title) {
+          return cleanTitle;
+        }
+      }
+    }
     
-    // Try direct mapping first
-    if (typeMapping[productType?.toLowerCase()]) {
-      return typeMapping[productType.toLowerCase()];
+    // Dynamic type name generation based on patterns
+    const dynamicTypeName = this.generateDynamicTypeName(productType);
+    if (dynamicTypeName) {
+      return dynamicTypeName;
     }
     
     // Fallback to formatted version
@@ -408,7 +429,35 @@ class MerchandiseProductCardRenderer {
       return productType.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
     
-    return 'Custom Product';
+    return 'Product';
+  }
+  
+  /**
+   * Generate dynamic type name based on product type patterns
+   */
+  generateDynamicTypeName(productType) {
+    if (!productType) return null;
+    
+    const type = productType.toLowerCase();
+    
+    // Handle size variants
+    if (type.includes('11oz')) return '11oz Mug';
+    if (type.includes('15oz')) return '15oz Mug';
+    if (type.includes('20oz')) return '20oz Mug';
+    
+    // Handle specific product patterns
+    if (type === 'mug' || type.includes('coffee-mug')) return 'Coffee Mug';
+    if (type === 'tshirt' || type === 't-shirt') return 'T-Shirt';
+    if (type.includes('tank')) return 'Tank Top';
+    if (type.includes('phone')) return 'Phone Case';
+    if (type.includes('tote')) return 'Tote Bag';
+    if (type.includes('throw') && type.includes('pillow')) return 'Throw Pillow';
+    if (type === 'pillow') return 'Throw Pillow';
+    if (type.includes('canvas')) return 'Canvas Print';
+    if (type.includes('mouse')) return 'Mouse Pad';
+    
+    // Default: clean up the raw type
+    return productType.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   }
   
   /**

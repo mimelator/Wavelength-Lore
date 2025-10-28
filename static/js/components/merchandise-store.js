@@ -219,35 +219,68 @@ class MerchandiseStore {
   }
 
   /**
-   * Get category icon (same as admin catalog approach)
+   * Get category icon using dynamic product catalog data
    */
   getCategoryIcon(category) {
-    const iconMap = {
-      't-shirt': '👕',
-      'premium-tshirt': '👔', 
-      'heavy-cotton-tee': '👕',
-      'women-tee': '👚',
-      'tank-top': '🎽',
-      'hoodie': '🧥',
-      'zip-hoodie': '🧥',
-      'sweatshirt': '👔',
-      'coffee-mug': '☕',
-      'travel-mug': '🥤',
-      'pillow': '🛏️',
-      'blanket': '🛋️',
-      'canvas': '🖼️',
-      'tote-bag': '👜',
-      'backpack': '🎒',
-      'phone-case': '📱',
-      'laptop-sleeve': '💻',
-      'notebook': '📓',
-      'sticker': '🏷️',
-      'hat': '🧢',
-      'fanny-pack': '👝',
-      'infant-wear': '👶',
-      'specialty-item': '✨'
-    };
-    return iconMap[category] || '📦';
+    console.log('🔍 getCategoryIcon called with category:', category);
+    
+    // Try to find matching product in catalog
+    if (this.availableProducts && Array.isArray(this.availableProducts)) {
+      const matchingProduct = this.availableProducts.find(product => {
+        const productType = this.extractProductTypeFromProduct(product);
+        return productType === category || 
+               productType?.toLowerCase() === category?.toLowerCase() ||
+               product.title?.toLowerCase().includes(category?.toLowerCase());
+      });
+      
+      if (matchingProduct) {
+        console.log('✅ Found matching product for icon:', matchingProduct.title);
+        // Return icon based on product category or infer from type
+        return this.inferIconFromProductType(this.extractProductTypeFromProduct(matchingProduct));
+      }
+    }
+    
+    // Dynamic fallback based on category name patterns
+    return this.inferIconFromProductType(category);
+  }
+  
+  /**
+   * Infer appropriate icon from product type
+   */
+  inferIconFromProductType(productType) {
+    if (!productType) return '📦';
+    
+    const type = productType.toLowerCase();
+    
+    // Apparel patterns
+    if (type.includes('shirt') || type.includes('tee')) return '�';
+    if (type.includes('hoodie') || type.includes('sweatshirt')) return '🧥';
+    if (type.includes('tank')) return '🎽';
+    if (type.includes('women')) return '�';
+    if (type.includes('premium')) return '�';
+    
+    // Accessories patterns
+    if (type.includes('mug') || type.includes('cup')) return '☕';
+    if (type.includes('travel') && type.includes('mug')) return '🥤';
+    if (type.includes('bag') || type.includes('tote')) return '👜';
+    if (type.includes('backpack')) return '🎒';
+    if (type.includes('hat') || type.includes('cap')) return '🧢';
+    if (type.includes('phone')) return '📱';
+    if (type.includes('laptop')) return '💻';
+    if (type.includes('fanny')) return '�';
+    
+    // Home decor patterns
+    if (type.includes('pillow')) return '🛏️';
+    if (type.includes('blanket')) return '�️';
+    if (type.includes('canvas') || type.includes('art')) return '🖼️';
+    
+    // Other patterns
+    if (type.includes('sticker')) return '🏷️';
+    if (type.includes('notebook') || type.includes('journal')) return '�';
+    if (type.includes('infant') || type.includes('baby')) return '👶';
+    if (type.includes('special')) return '✨';
+    
+    return '📦'; // Default fallback
   }
 
   /**
@@ -2019,7 +2052,124 @@ class MerchandiseStore {
     tryInitialize();
   }
   
-  extractImageContext(imageData) {
+  /**
+   * Get character names from API with caching
+   */
+  async getCharacterNames() {
+    if (this.cachedCharacters && this.cachedCharacters.length > 0) {
+      return this.cachedCharacters;
+    }
+    
+    try {
+      const response = await fetch('/api/characters');
+      const data = await response.json();
+      if (data.success && data.data) {
+        // Extract character names from the API response
+        this.cachedCharacters = Object.values(data.data).map(char => ({
+          name: char.name || char.character_name || char.id,
+          id: char.id
+        }));
+        console.log('✅ Loaded characters from API:', this.cachedCharacters.length);
+        return this.cachedCharacters;
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to load characters from API, using fallback:', error);
+    }
+    
+    // Fallback to basic character list
+    this.cachedCharacters = [
+      { name: 'daphne', id: 'daphne' },
+      { name: 'lucky', id: 'lucky' },
+      { name: 'felix', id: 'felix' },
+      { name: 'goblin-king', id: 'goblin-king' }
+    ];
+    return this.cachedCharacters;
+  }
+  
+  /**
+   * Get season names from API with caching
+   */
+  async getSeasonNames() {
+    if (this.cachedSeasons && this.cachedSeasons.length > 0) {
+      return this.cachedSeasons;
+    }
+    
+    try {
+      const response = await fetch('/api/seasons');
+      const data = await response.json();
+      if (data.success && data.data) {
+        // Extract season names from the API response
+        this.cachedSeasons = Object.keys(data.data).map(seasonKey => ({
+          name: seasonKey,
+          id: seasonKey
+        }));
+        console.log('✅ Loaded seasons from API:', this.cachedSeasons.length);
+        return this.cachedSeasons;
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to load seasons from API, using fallback:', error);
+    }
+    
+    // Fallback to basic season list
+    this.cachedSeasons = [
+      { name: 'spring', id: 'spring' },
+      { name: 'summer', id: 'summer' },
+      { name: 'autumn', id: 'autumn' },
+      { name: 'fall', id: 'fall' },
+      { name: 'winter', id: 'winter' }
+    ];
+    return this.cachedSeasons;
+  }
+  
+  /**
+   * Get location names from lore API with caching
+   */
+  async getLocationNames() {
+    if (this.cachedLocations && this.cachedLocations.length > 0) {
+      return this.cachedLocations;
+    }
+    
+    try {
+      const response = await fetch('/api/lore');
+      const data = await response.json();
+      if (data.success && data.data) {
+        // Extract locations from lore data (filter by type or keywords)
+        this.cachedLocations = Object.values(data.data)
+          .filter(lore => {
+            // Look for location-type lore items
+            const title = (lore.title || '').toLowerCase();
+            const description = (lore.description || '').toLowerCase();
+            return title.includes('location') || 
+                   title.includes('place') ||
+                   description.includes('location') ||
+                   lore.type === 'location';
+          })
+          .map(lore => ({
+            name: lore.title || lore.name || lore.id,
+            id: lore.id
+          }));
+        
+        console.log('✅ Loaded locations from lore API:', this.cachedLocations.length);
+        return this.cachedLocations;
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to load locations from API, using fallback:', error);
+    }
+    
+    // Fallback to basic location list
+    this.cachedLocations = [
+      { name: 'forest', id: 'forest' },
+      { name: 'castle', id: 'castle' },
+      { name: 'garden', id: 'garden' },
+      { name: 'mountain', id: 'mountain' },
+      { name: 'cave', id: 'cave' },
+      { name: 'town', id: 'town' },
+      { name: 'village', id: 'village' }
+    ];
+    return this.cachedLocations;
+  }
+
+  async extractImageContext(imageData) {
     if (!imageData || !imageData.title) {
       return {};
     }
@@ -2027,11 +2177,13 @@ class MerchandiseStore {
     const title = imageData.title.toLowerCase();
     const context = {};
     
-    // Try to extract character names
-    const characters = ['daphne', 'lucky', 'felix', 'goblin-king'];
+    // Try to extract character names using API data
+    const characters = await this.getCharacterNames();
     for (const character of characters) {
-      if (title.includes(character.replace('-', ' ')) || title.includes(character)) {
-        context.characterName = character.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const charName = character.name || character;
+      const charKey = typeof charName === 'string' ? charName.toLowerCase() : '';
+      if (title.includes(charKey.replace('-', ' ')) || title.includes(charKey)) {
+        context.characterName = charKey.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
         break;
       }
     }
@@ -2042,20 +2194,24 @@ class MerchandiseStore {
       context.episodeNumber = episodeMatch[1];
     }
     
-    // Try to extract seasonal context
-    const seasons = ['spring', 'summer', 'autumn', 'fall', 'winter'];
+    // Try to extract seasonal context using API data
+    const seasons = await this.getSeasonNames();
     for (const season of seasons) {
-      if (title.includes(season)) {
-        context.seasonName = season.charAt(0).toUpperCase() + season.slice(1);
+      const seasonName = season.name || season;
+      const seasonKey = typeof seasonName === 'string' ? seasonName.toLowerCase() : '';
+      if (title.includes(seasonKey)) {
+        context.seasonName = seasonKey.charAt(0).toUpperCase() + seasonKey.slice(1);
         break;
       }
     }
     
-    // Try to extract location
-    const locations = ['forest', 'castle', 'garden', 'mountain', 'cave', 'town', 'village'];
+    // Try to extract location using lore API data
+    const locations = await this.getLocationNames();
     for (const location of locations) {
-      if (title.includes(location)) {
-        context.locationName = location.charAt(0).toUpperCase() + location.slice(1);
+      const locationName = location.name || location;
+      const locationKey = typeof locationName === 'string' ? locationName.toLowerCase() : '';
+      if (title.includes(locationKey)) {
+        context.locationName = locationKey.charAt(0).toUpperCase() + locationKey.slice(1);
         break;
       }
     }
