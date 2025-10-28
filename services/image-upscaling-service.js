@@ -168,15 +168,29 @@ class ImageUpscalingService {
 
       console.log(`📐 Scale factor needed: ${scaleFactor.toFixed(2)}x to reach minimum ${PRINTIFY_MIN_WIDTH}x${PRINTIFY_MIN_HEIGHT}`);
 
-      // Step 3: Use upscaleImage with Printify-specific options
-      const upscaleResult = await this.upscaleImage(processedBuffer, {
-        method: 'auto', // Let it choose best method
-        scaleFactor: scaleFactor,
-        enhanceDetails: true, // Sharpen details for print quality
-        contentType: 'illustration', // Use illustration for artwork
-        originalImageId: fileName,
-        fileName: fileName
-      });
+      // Step 3: Try upscaling, but fall back to original if it fails
+      let upscaleResult;
+      try {
+        upscaleResult = await this.upscaleImage(processedBuffer, {
+          method: 'auto', // Let it choose best method
+          scaleFactor: scaleFactor,
+          enhanceDetails: true, // Sharpen details for print quality
+          contentType: 'illustration', // Use illustration for artwork
+          originalImageId: fileName,
+          fileName: fileName
+        });
+      } catch (upscaleError) {
+        console.log(`⚠️ Upscaling failed: ${upscaleError.message}`);
+        
+        // Check if original image meets minimum requirements
+        if (analysis.originalWidth >= PRINTIFY_MIN_WIDTH && analysis.originalHeight >= PRINTIFY_MIN_HEIGHT) {
+          console.log(`✅ Original image (${analysis.originalWidth}x${analysis.originalHeight}) meets Printify minimum. Using original.`);
+          return processedBuffer; // Return the original processed buffer
+        } else {
+          console.log(`❌ Original image too small (${analysis.originalWidth}x${analysis.originalHeight}) and upscaling failed.`);
+          throw new Error(`Cannot upload image to Printify: Image too small: ${analysis.originalWidth}x${analysis.originalHeight}. Printify needs minimum ${PRINTIFY_MIN_WIDTH}x${PRINTIFY_MIN_HEIGHT} for quality printing. Upscaling also failed: ${upscaleError.message}`);
+        }
+      }
 
       if (!upscaleResult) {
         throw new Error('Upscaling did not return a result');
@@ -601,7 +615,28 @@ class ImageUpscalingService {
         console.log(`🗜️  Maximum compression applied. Final size: ${fileSizeMB.toFixed(2)} MB`);
         
         if (fileSizeMB > 4) {
-          throw new Error(`Image too large after compression: ${fileSizeMB.toFixed(2)}MB. OpenAI requires images under 4MB.`);
+          console.log(`⚠️ Even maximum compression yields ${fileSizeMB.toFixed(2)}MB. Trying smaller dimensions...`);
+          
+          // Try smaller dimensions as last resort
+          processedBuffer = await sharp(imageBuffer)
+            .resize(1400, 1400, { fit: 'cover' }) // Much smaller target
+            .ensureAlpha()
+            .toColorspace('srgb')
+            .png({ 
+              quality: 50, 
+              compressionLevel: 9,
+              palette: false,
+              colors: 128 // Limit color palette for extreme compression
+            })
+            .toBuffer();
+          
+          fileSizeMB = processedBuffer.length / (1024 * 1024);
+          console.log(`📐 Reduced to 1400x1400 with extreme compression: ${fileSizeMB.toFixed(2)} MB`);
+          
+          if (fileSizeMB > 4) {
+            console.log(`❌ Image still too large: ${fileSizeMB.toFixed(2)}MB. OpenAI upscaling not possible.`);
+            throw new Error(`Image too complex for OpenAI upscaling. Even at 1400x1400 with extreme compression: ${fileSizeMB.toFixed(2)}MB exceeds 4MB limit.`);
+          }
         }
       }
 
