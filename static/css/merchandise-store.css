@@ -89,6 +89,50 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 🔥 Right-side decorative overlay: Goblin treasure tree */
+.merch-right-overlay {
+  position: fixed;
+  right: -100px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.7;
+  animation: floatRight 6s ease-in-out infinite;
+}
+
+@keyframes floatRight {
+  0%, 100% {
+    transform: translateY(-50%) translateX(0);
+  }
+  50% {
+    transform: translateY(-50%) translateX(-20px);
+  }
+}
+
+.goblin-tree-image {
+  max-width: 600px;
+  height: auto;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+  transform: scaleX(-1);
+}
+
+/* Responsive: Hide on smaller screens */
+@media (max-width: 1200px) {
+  .merch-right-overlay {
+    opacity: 0.4;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .merch-right-overlay {
+    display: none;
+  }
 }
 
 .store-header {
