@@ -1114,11 +1114,14 @@ class MerchandiseStore {
   }
   
   editProduct(productId) {
-    const product = this.products.find(p => (p.id || p.productId) === productId);
+    let product = this.products.find(p => (p.id || p.productId) === productId);
     if (!product) {
       this.showError('Product not found');
       return;
     }
+
+    // Normalize the product to ensure consistent id field
+    product = this.normalizeProduct(product);
     
     // Note: We use the product's existing image data, not gallery lookup
     
@@ -3635,9 +3638,27 @@ class MerchandiseStore {
   /**
    * Show customization modal using ModalRenderer
    */
+  /**
+   * Normalize product object to ensure consistent id field
+   * API may return products with productId instead of id
+   */
+  normalizeProduct(product) {
+    if (!product) return product;
+    return {
+      ...product,
+      // Ensure id is always set
+      id: product.id || product.productId || product.localId
+    };
+  }
+
   showCustomizationModal(productId) {
     console.log('🎨 Show customization modal:', productId);
-    const product = this.products.find(p => (p.id || p.productId) === productId);
+    let product = this.products.find(p => (p.id || p.productId) === productId);
+
+    // Normalize the product to ensure consistent id field
+    if (product) {
+      product = this.normalizeProduct(product);
+    }
 
     console.log('🔍 Found product object:', {
       found: !!product,
