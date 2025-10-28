@@ -225,6 +225,15 @@ class MerchandiseModalRenderer {
       console.log('   product.category:', product.category);
       console.log('   Final productType:', productType);
 
+      // 🔍 DIAGNOSTIC: Check what image URLs we're using in the modal
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('🔍 MODAL INITIALIZATION IMAGE DIAGNOSTIC:');
+      console.log('  product.previewImage:', product.previewImage?.substring(0, 80));
+      console.log('  product.image:', product.image?.substring(0, 80));
+      console.log('  product.sourceImage?.url:', product.sourceImage?.url?.substring(0, 80));
+      console.log('  Final src being rendered:', (product.previewImage || product.image || '/images/previews/generic-product-preview.svg').substring(0, 80));
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
       return `
         <div class="modal-overlay fullscreen-overlay" data-modal-id="${modalId}" data-product-id="${product.id}" data-product-title="${product.title}" data-product-type="${productType}" data-product-image="${product.previewImage || product.image || ''}" data-blueprint-id="${product.blueprintId || ''}" data-print-provider-id="${product.printProviderId || ''}">
           <div class="modal-dialog customization-modal fullscreen-customization" role="dialog" aria-labelledby="${modalId}-title">
