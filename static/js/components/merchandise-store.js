@@ -3719,6 +3719,16 @@ class MerchandiseStore {
       // Effects and borders work much better with the original image than the manufactured mockup
       const originalImageUrl = product.sourceImage?.url || product.sourceImage?.thumbnailUrl || '/images/previews/generic-product-preview.svg';
 
+      // 🔍 DIAGNOSTIC: Check what sourceImage we're getting
+      console.log('🔍 SOURCE IMAGE DIAGNOSTIC:');
+      console.log('  product.sourceImage exists:', !!product.sourceImage);
+      if (product.sourceImage) {
+        console.log('    - sourceImage.url:', product.sourceImage.url?.substring(0, 80));
+        console.log('    - sourceImage.thumbnailUrl:', product.sourceImage.thumbnailUrl?.substring(0, 80));
+        console.log('    - Full sourceImage:', JSON.stringify(product.sourceImage, null, 2));
+      }
+      console.log('  Final originalImageUrl:', originalImageUrl?.substring(0, 80));
+
       const preparedProduct = {
         ...product,
         // Ensure id is set (prefer id, fallback to productId)
