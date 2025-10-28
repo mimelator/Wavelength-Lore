@@ -106,3 +106,81 @@
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
+
+/* 🛒 Cart Modal Image Styling - Optimized for compact display */
+.cart-modal-item-image {
+  width: 80px !important;
+  height: 80px !important;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+  flex-shrink: 0; /* Prevent image from shrinking in flex layout */
+}
+
+.cart-modal-item-image:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transform: scale(1.05);
+}
+
+/* Cart modal item layout */
+.cart-modal-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.cart-modal-item:last-child {
+  border-bottom: none;
+}
+
+.cart-modal-item-details {
+  flex: 1;
+  min-width: 0; /* Allow text to truncate if needed */
+}
+
+.cart-modal-item-details h5 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  line-height: 1.3;
+}
+
+.cart-modal-item-details .item-variant {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  color: #718096;
+}
+
+.cart-modal-item-details .item-price {
+  margin: 0;
+  font-size: 13px;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.cart-modal-item-total {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  min-width: 60px;
+  text-align: right;
+}
+
+.remove-from-cart-modal-btn {
+  background: none;
+  border: none;
+  color: #e53e3e;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.remove-from-cart-modal-btn:hover {
+  background-color: #fed7d7;
+}

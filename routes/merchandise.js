@@ -1,8 +1,9 @@
 /**
- * Merchandise Store Routes
- * 
+ * The Liberation Vault - Merchandise Routes
+ *
  * API routes for custom merchandise creation and ordering
  * integrating user gallery images with Printify print-on-demand
+ * 🔓 Where liberated minds create symbols of their freedom
  * 🔥 ENHANCED: Real Stripe payment processing integration
  */
 
@@ -131,9 +132,9 @@ function ensureDatabaseReady(res) {
 router.get('/', ensureAuthenticated, async (req, res) => {
   try {
     res.render('merchandise-store', {
-      title: 'Custom Merchandise Store',
-      pageTitle: 'Custom Merchandise - Create Your Own Products',
-      pageDescription: 'Create custom merchandise from your gallery images using our print-on-demand service.',
+      title: 'The Liberation Vault',
+      pageTitle: 'The Liberation Vault - Symbols of Your Freedom',
+      pageDescription: 'The Liberation Vault: Where liberated minds create and share symbols of their freedom through custom merchandise.',
       user: req.user,
       cdnUrl: process.env.CDN_URL,
       version: `v${Date.now()}`

@@ -67,7 +67,7 @@ class MerchandiseStore {
     // Set up event listeners for cross-component communication
     this.setupServiceEventListeners();
     
-    console.log('🛍️ MerchandiseStore constructor called with refactored services');
+    console.log('🔓 Liberation Vault - MerchandiseStore constructor called with refactored services');
     
     // Add a simple health check
     this.healthCheck();
@@ -228,7 +228,7 @@ class MerchandiseStore {
       container.innerHTML = `
         <div class="merchandise-store">
           <div class="store-header">
-            <h1>🛍️ Custom Merchandise Store</h1>
+            <h1>🔓 The Liberation Vault</h1>
             <p>Initializing store...</p>
           </div>
         </div>
@@ -570,7 +570,7 @@ class MerchandiseStore {
   }
   
   async init() {
-    console.log('🛍️ Initializing Merchandise Store');
+    console.log('🔓 Initializing The Liberation Vault');
     
     try {
       // Check for pre-selected image from URL parameters
@@ -645,7 +645,7 @@ class MerchandiseStore {
         }, 500);
       }
       
-      console.log('🎉 Merchandise Store initialization complete!');
+      console.log('🎉 The Liberation Vault is now open!');
       this.isInitializing = false;
       this.isInitialized = true;
       
@@ -666,7 +666,7 @@ class MerchandiseStore {
         container.innerHTML = `
           <div class="merchandise-store">
             <div class="store-header">
-              <h1>🛍️ Merchandise Store</h1>
+              <h1>🔓 The Liberation Vault</h1>
               <p style="color: #ff6b6b;">There was an error loading the store. Please refresh the page.</p>
               <p style="color: #ff6b6b; font-size: 0.9rem;">Error: ${error.message}</p>
             </div>
@@ -1456,7 +1456,7 @@ class MerchandiseStore {
       container.innerHTML = `
         <div class="merchandise-store">
           <div class="store-header">
-            <h1>🛍️ Create Custom Merchandise</h1>
+            <h1>🔓 Unlock Your Freedom - Create Merchandise</h1>
             <p>Turn your favorite Wavelength moments into premium merchandise</p>
           </div>
 
@@ -1510,7 +1510,7 @@ class MerchandiseStore {
       container.innerHTML = `
         <div class="merchandise-store">
           <div class="store-header">
-            <h1>🛍️ Merchandise Store</h1>
+            <h1>🔓 The Liberation Vault</h1>
             <p style="color: #ff6b6b;">There was an error loading the store. Please refresh the page.</p>
           </div>
         </div>
@@ -1619,7 +1619,7 @@ class MerchandiseStore {
     container.innerHTML = `
       <div class="category-cards-view">
         <div class="catalog-header">
-          <h2>🛍️ Choose Your Product Category</h2>
+          <h2>🔓 Explore Your Vault - Choose a Product Category</h2>
           <p>Explore ${Object.keys(this.productCategories).length} categories with ${this.availableProducts.length} total products</p>
         </div>
         <div class="category-cards-grid">
@@ -4375,7 +4375,7 @@ class MerchandiseStore {
       const saved = localStorage.getItem('merchandise-cart');
       if (saved) {
         this.cart = JSON.parse(saved);
-        console.log(`🛍️ Loaded ${this.cart.length} items from cart storage`);
+        console.log(`🔓 Loaded ${this.cart.length} sacred items from your vault`);
       } else {
         this.cart = [];
       }

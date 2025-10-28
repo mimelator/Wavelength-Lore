@@ -794,9 +794,9 @@ class MerchandiseModalRenderer {
           <div class="modal-dialog cart-modal" role="dialog" aria-labelledby="${modalId}-title">
             <div class="modal-header">
               <h3 id="${modalId}-title">
-                <span class="modal-icon">🛒</span>
-                Shopping Cart
-                <span class="cart-count-badge">${cartSummary.totalQuantity}</span>
+                <span class="modal-icon">🌊</span>
+                Wavelength Cart
+                <span class="cart-count-badge">${cartSummary.totalQuantity} item${cartSummary.totalQuantity !== 1 ? 's' : ''}</span>
               </h3>
               <button class="modal-close-btn" data-modal-id="${modalId}" aria-label="Close modal">
                 <span>✕</span>

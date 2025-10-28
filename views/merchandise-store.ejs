@@ -6,18 +6,18 @@
     <link rel="stylesheet" href="/css/enhanced-product-ui.css">
     <link rel="stylesheet" href="/css/gorgeous-mockups.css">
 
-    <title>Custom Merchandise Store | Wavelength Lore</title>
-    <meta name="description" content="Create custom merchandise from your favorite Wavelength Lore moments. Turn gallery images into premium t-shirts and more.">
+    <title>The Liberation Vault | Wavelength Lore</title>
+    <meta name="description" content="The Liberation Vault - A sanctuary where liberated minds create and share symbols of their freedom. Transform your gallery images into premium merchandise.">
 </head>
 <body>
     <%- include('partials/header') %>
 
     <main class="merchandise-main">
         <div id="merchandise-store">
-            <!-- Merchandise store interface will be rendered here by JavaScript -->
+            <!-- The Liberation Vault interface will be rendered here by JavaScript -->
             <div class="loading-container">
                 <div class="loading-spinner"></div>
-                <p>Loading Merchandise Store...</p>
+                <p>Opening The Liberation Vault...</p>
             </div>
         </div>
     </main>
@@ -77,8 +77,8 @@
                     container.innerHTML = `
                         <div class="merchandise-store">
                             <div class="store-header">
-                                <h1>🛍️ Merchandise Store</h1>
-                                <p style="color: #ff6b6b;">Failed to load store services: ${missingServices.join(', ')}</p>
+                                <h1>🔓 The Liberation Vault</h1>
+                                <p style="color: #ff6b6b;">Failed to open the vault services: ${missingServices.join(', ')}</p>
                                 <p style="color: #ff6b6b; font-size: 0.9rem;">Please refresh the page.</p>
                             </div>
                         </div>
@@ -94,8 +94,8 @@
                     container.innerHTML = `
                         <div class="merchandise-store">
                             <div class="store-header">
-                                <h1>🛍️ Merchandise Store</h1>
-                                <p style="color: #ff6b6b;">Failed to load store components. Please refresh the page.</p>
+                                <h1>🔓 The Liberation Vault</h1>
+                                <p style="color: #ff6b6b;">Failed to unlock the vault. Please refresh the page.</p>
                             </div>
                         </div>
                     `;
