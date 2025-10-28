@@ -1004,103 +1004,48 @@ class MerchandiseStore {
       return;
     }
     
-    // Ensure gallery images are loaded
-    if (!this.galleryImages || this.galleryImages.length === 0) {
-      this.showError('Gallery images not loaded. Please refresh the page and try again.');
-      return;
-    }
+    // Note: We use the product's existing image data, not gallery lookup
     
     // Find the original image and product type
     // Try multiple ways to find the image data based on different product structures
     let imageData = null;
     
-    // Method 1: Check sourceImage (older format) - PRIORITY for validated products
-    if (product.sourceImage?.id || product.sourceImage?.url) {
-      imageData = this.galleryImages.find(img => 
-        img.id === product.sourceImage?.id || 
-        img.url === product.sourceImage?.url
-      );
-      console.warn('Method 1 (sourceImage) result:', imageData ? 'FOUND' : 'NOT FOUND');
-    }
+    // SIMPLIFIED APPROACH: Use the same image logic as the product card display
+    // The product already has the image data needed for display, so use that directly
     
-    // Method 2: Check images array for Firebase IDs
-    if (!imageData && product.images && product.images.length > 0) {
-      const firstImageId = product.images[0]?.id || product.images[0];
-      imageData = this.galleryImages.find(img => img.id === firstImageId);
-      console.warn('Method 2 (images array) searching for:', firstImageId, 'Result:', imageData ? 'FOUND' : 'NOT FOUND');
-    }
-    
-    // Method 3: Check imageId (newer format) - but skip if it's validated-XX format
-    if (!imageData && product.imageId && !product.imageId.startsWith('validated-')) {
-      imageData = this.galleryImages.find(img => img.id === product.imageId);
-      console.warn('Method 3 (imageId) result:', imageData ? 'FOUND' : 'NOT FOUND');
-    } else if (product.imageId && product.imageId.startsWith('validated-')) {
-      console.warn('Method 3 (imageId) SKIPPED - validated format detected:', product.imageId);
+    if (product.images && product.images.length > 0) {
+      // Use the first image from the images array (same as product card display)
+      const productImage = product.images[0];
+      imageData = {
+        id: productImage.id || productImage,
+        url: productImage.src || productImage.url || productImage,
+        thumbnailUrl: productImage.thumbnailUrl || productImage.src || productImage.url || productImage,
+        title: product.title || 'Product Image'
+      };
+      console.warn('✅ Using product.images[0]:', imageData);
+    } else if (product.sourceImage) {
+      // Fall back to sourceImage (same as product card display)
+      imageData = {
+        id: product.sourceImage.id,
+        url: product.sourceImage.url,
+        thumbnailUrl: product.sourceImage.thumbnailUrl || product.sourceImage.url,
+        title: product.title || 'Product Image'
+      };
+      console.warn('✅ Using product.sourceImage:', imageData);
     }
     
     if (!imageData) {
-      console.warn('Edit Product Debug:', {
+      console.error('❌ No image data found in product:', {
         productId,
-        product,
-        galleryImagesCount: this.galleryImages.length,
-        searchedFor: {
-          sourceImageId: product.sourceImage?.id,
-          sourceImageUrl: product.sourceImage?.url,
-          imageId: product.imageId,
-          firstImage: product.images?.[0],
-          productType: product.productType,
-          blueprintIdFromProductType: product.productType && product.productType.startsWith('validated-') 
-            ? product.productType.replace('validated-', '') : null,
-          // Additional debugging
-          sourceImageFull: product.sourceImage,
-          imagesArray: product.images,
-          printifyImageId: product.printifyImageId
-        },
-        galleryImageIds: this.galleryImages.map(img => img.id),
-        galleryImageSample: this.galleryImages.slice(0, 3)
+        hasImages: !!(product.images && product.images.length > 0),
+        hasSourceImage: !!product.sourceImage,
+        imageData: {
+          images: product.images,
+          sourceImage: product.sourceImage
+        }
       });
-      
-      // Let's also try a more flexible search
-      console.warn('Attempting flexible image search...');
-      
-      // For validated products, try to use blueprint ID from productType
-      let blueprintSearchId = null;
-      if (product.productType && product.productType.startsWith('validated-')) {
-        blueprintSearchId = product.productType.replace('validated-', '');
-        console.warn('Extracted blueprint ID for image search:', blueprintSearchId);
-      }
-      
-      const flexibleSearch = this.galleryImages.find(img => {
-        return img.id === product.imageId ||
-               img.id === product.sourceImage?.id ||
-               img.url === product.sourceImage?.url ||
-               (product.images && product.images.includes(img.id)) ||
-               (typeof product.images?.[0] === 'string' && img.id === product.images[0]) ||
-               (typeof product.images?.[0] === 'object' && img.id === product.images[0]?.id) ||
-               // Try blueprint ID search for validated products
-               (blueprintSearchId && (
-                 img.id === blueprintSearchId ||
-                 String(img.id) === String(blueprintSearchId) ||
-                 parseInt(img.id) === parseInt(blueprintSearchId)
-               ));
-      });
-      
-      if (flexibleSearch) {
-        console.warn('Found image with flexible search:', flexibleSearch);
-        imageData = flexibleSearch;
-      } else {
-        console.error('❌ DETAILED SEARCH FAILURE:');
-        console.error('   Blueprint ID extracted:', blueprintSearchId);
-        console.error('   Available gallery image IDs:', this.galleryImages.map(img => img.id));
-        console.error('   Gallery image ID types:', this.galleryImages.map(img => typeof img.id));
-        console.error('   Searching for ID variations of:', blueprintSearchId);
-        console.error('   Direct match test:', this.galleryImages.some(img => img.id === blueprintSearchId));
-        console.error('   String match test:', this.galleryImages.some(img => String(img.id) === String(blueprintSearchId)));
-        console.error('   Numeric match test:', this.galleryImages.some(img => parseInt(img.id) === parseInt(blueprintSearchId)));
-        
-        this.showError('Original image not found. Please ensure the source image is still in your gallery.');
-        return;
-      }
+      this.showError('Product image data not available. Please try refreshing.');
+      return;
     }
     
     // Extract product type from existing product
