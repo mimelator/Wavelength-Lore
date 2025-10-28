@@ -2642,6 +2642,21 @@ class MerchandiseModalRenderer {
 
       console.log('✅ PRINTIFY API CALL COMPLETED!');
 
+      // 🔥 CRITICAL FIX: Save customization back to the product in the store
+      // This is essential so that when users click Edit again, their previous
+      // customizations (effects, borders, colors) are restored
+      console.log('📊 Step 4.5: Saving customization to product in store');
+      if (merchandiseStore && merchandiseStore.products) {
+        const productInStore = merchandiseStore.products.find(p => (p.id || p.productId) === productId);
+        if (productInStore) {
+          productInStore.customization = customization;
+          console.log('✅ Customization saved to product:', productInStore.id || productInStore.productId);
+          console.log('  Saved customization:', customization);
+        } else {
+          console.warn('⚠️ Product not found in store to save customization');
+        }
+      }
+
       // Hide loading
       this.hideLoadingOverlay();
 
