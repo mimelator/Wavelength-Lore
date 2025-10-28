@@ -74,7 +74,7 @@ class MerchandiseProductCardRenderer {
    */
   renderCompleteProductCard(product) {
     const productId = product.id || product.productId;
-    const productTitle = product.title || 'Untitled Product';
+    const productTitle = this.generateEnhancedProductTitle(product);
     const productImage = this.getProductImage(product);
     const productType = this.getProductType(product);
     const productIcon = this.getProductIcon(productType);
@@ -118,11 +118,8 @@ class MerchandiseProductCardRenderer {
             <div class="variant-summary">
               <span class="variant-count">${variantInfo.count} variants available</span>
               <span class="price-range">${variantInfo.priceRange}</span>
-              <button class="view-variants-btn btn-secondary" 
-                      data-product-id="${productId}">
-                View Options
-              </button>
             </div>
+            ${this.renderInlineVariants(product)}
           </div>
         </div>
       </div>
@@ -382,8 +379,36 @@ class MerchandiseProductCardRenderer {
       return this.merchandiseStore.getProductTypeName(productType);
     }
     
-    // Fallback name mapping
-    return productType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    // Enhanced product type mapping
+    const typeMapping = {
+      'mug': 'Coffee Mug',
+      'mug-11oz': '11oz Mug',
+      'mug-15oz': '15oz Mug',
+      't-shirt': 'T-Shirt',
+      'tshirt': 'T-Shirt',
+      'hoodie': 'Hoodie',
+      'sweatshirt': 'Sweatshirt',
+      'tank-top': 'Tank Top',
+      'poster': 'Poster',
+      'canvas': 'Canvas Print',
+      'sticker': 'Sticker',
+      'phone-case': 'Phone Case',
+      'tote-bag': 'Tote Bag',
+      'pillow': 'Throw Pillow',
+      'mousepad': 'Mouse Pad'
+    };
+    
+    // Try direct mapping first
+    if (typeMapping[productType?.toLowerCase()]) {
+      return typeMapping[productType.toLowerCase()];
+    }
+    
+    // Fallback to formatted version
+    if (productType) {
+      return productType.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+    
+    return 'Custom Product';
   }
   
   /**
@@ -396,10 +421,100 @@ class MerchandiseProductCardRenderer {
       return this.merchandiseStore.getProductDetails(product);
     }
     
-    // Fallback details
-    return product.description || 'Custom merchandise product';
+    // Generate enhanced product details
+    const details = [];
+    
+    // Add variant information
+    if (product.variants && product.variants.length > 0) {
+      const variant = product.variants[0]; // Use first variant as reference
+      if (variant.title) {
+        details.push(`<span class="detail-item"><strong>Size:</strong> ${variant.title}</span>`);
+      }
+    }
+    
+    // Add product type context
+    const productType = this.getProductType(product);
+    if (productType && productType.includes('mug')) {
+      details.push(`<span class="detail-item"><strong>Material:</strong> Ceramic</span>`);
+      details.push(`<span class="detail-item"><strong>Style:</strong> Classic</span>`);
+    } else if (productType && productType.includes('shirt')) {
+      details.push(`<span class="detail-item"><strong>Material:</strong> Premium Cotton</span>`);
+      details.push(`<span class="detail-item"><strong>Fit:</strong> Regular</span>`);
+    }
+    
+    // Add price as a detail if available
+    if (product.variants && product.variants.length > 0) {
+      const prices = product.variants.map(v => parseFloat(v.price) / 100);
+      const minPrice = Math.min(...prices);
+      details.push(`<span class="detail-item"><strong>Price:</strong> $${minPrice.toFixed(2)}</span>`);
+    }
+    
+    return details.length > 0 ? details.join('') : 'Premium custom merchandise';
   }
   
+  /**
+   * Generate enhanced product title with character/episode/lore context
+   * @param {Object} product - Product object
+   * @returns {string} Enhanced product title
+   */
+  generateEnhancedProductTitle(product) {
+    // Try to get context from the original image or product data
+    const sourceImage = product.sourceImage || {};
+    const imageName = sourceImage.name || sourceImage.filename || product.title || '';
+    
+    // Extract character/episode information from image name
+    let characterName = '';
+    let episodeName = '';
+    let productType = this.getProductTypeName(this.getProductType(product));
+    
+    // Parse common patterns in image names
+    if (imageName) {
+      // Look for character names (common patterns)
+      const characterPatterns = [
+        /alice/i, /bob/i, /charlie/i, /diana/i, /eve/i, 
+        /frank/i, /grace/i, /henry/i, /iris/i, /jack/i,
+        /kate/i, /liam/i, /maya/i, /noah/i, /olivia/i,
+        /parker/i, /quinn/i, /ruby/i, /sam/i, /tara/i
+      ];
+      
+      for (const pattern of characterPatterns) {
+        if (pattern.test(imageName)) {
+          characterName = imageName.match(pattern)[0];
+          characterName = characterName.charAt(0).toUpperCase() + characterName.slice(1);
+          break;
+        }
+      }
+      
+      // Look for episode patterns
+      const episodeMatch = imageName.match(/episode[\s-_]*(\d+)/i) || 
+                          imageName.match(/ep[\s-_]*(\d+)/i) ||
+                          imageName.match(/chapter[\s-_]*(\d+)/i);
+      if (episodeMatch) {
+        episodeName = `Episode ${episodeMatch[1]}`;
+      }
+    }
+    
+    // Build enhanced title
+    let title = '';
+    if (characterName && episodeName) {
+      title = `${characterName} ${episodeName} ${productType}`;
+    } else if (characterName) {
+      title = `${characterName} ${productType}`;
+    } else if (episodeName) {
+      title = `${episodeName} ${productType}`;
+    } else {
+      // Fallback to wavelength-themed names
+      const wavelengthThemes = [
+        'Quantum', 'Ethereal', 'Cosmic', 'Dimensional', 'Mystical', 
+        'Celestial', 'Infinite', 'Radiant', 'Luminous', 'Transcendent'
+      ];
+      const randomTheme = wavelengthThemes[Math.floor(Math.random() * wavelengthThemes.length)];
+      title = `${randomTheme} ${productType}`;
+    }
+    
+    return title;
+  }
+
   /**
    * Helper method to get variant information
    * @param {Object} product - Product object
@@ -411,7 +526,8 @@ class MerchandiseProductCardRenderer {
     
     let priceRange = 'Price varies';
     if (variants.length > 0) {
-      const prices = variants.map(v => parseFloat(v.price) || 0).filter(p => p > 0);
+      // Convert prices from cents to dollars (divide by 100)
+      const prices = variants.map(v => (parseFloat(v.price) || 0) / 100).filter(p => p > 0);
       if (prices.length > 0) {
         const min = Math.min(...prices);
         const max = Math.max(...prices);
@@ -422,6 +538,47 @@ class MerchandiseProductCardRenderer {
     return { count, priceRange };
   }
   
+  /**
+   * Render inline variants display within product card
+   * @param {Object} product - Product object
+   * @returns {string} HTML string for inline variants
+   */
+  renderInlineVariants(product) {
+    const variants = product.variants || [];
+    if (variants.length === 0) {
+      return '<p class="no-variants">No variants available</p>';
+    }
+    
+    // Show up to 3 variants inline, collapse the rest
+    const displayVariants = variants.slice(0, 3);
+    const hasMore = variants.length > 3;
+    
+    return `
+      <div class="inline-variants">
+        <h5>Available Options:</h5>
+        <div class="variant-chips">
+          ${displayVariants.map(variant => `
+            <div class="variant-chip" data-variant-id="${variant.id}">
+              <span class="variant-name">${variant.title}</span>
+              <span class="variant-price">$${(variant.price / 100).toFixed(2)}</span>
+              <button class="add-to-cart-btn" 
+                      data-product-id="${product.id || product.productId}" 
+                      data-variant-id="${variant.id}"
+                      title="Add to cart">
+                🛒
+              </button>
+            </div>
+          `).join('')}
+          ${hasMore ? `
+            <div class="variant-chip more-variants">
+              <span class="more-text">+${variants.length - 3} more</span>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
   /**
    * Set up event listeners for product card interactions
    * @param {HTMLElement} container - Container element with product cards
@@ -441,8 +598,9 @@ class MerchandiseProductCardRenderer {
         this.handleEditProduct(productId);
       } else if (e.target.closest('.delete-product-btn')) {
         this.handleDeleteProduct(productId);
-      } else if (e.target.closest('.view-variants-btn')) {
-        this.handleViewVariants(productId);
+      } else if (e.target.closest('.add-to-cart-btn')) {
+        const variantId = e.target.closest('[data-variant-id]')?.dataset.variantId;
+        this.handleAddToCart(productId, variantId);
       } else if (e.target.closest('.refresh-status-btn')) {
         this.handleRefreshStatus(productId);
       } else if (e.target.closest('.retry-setup-btn')) {
@@ -520,6 +678,17 @@ class MerchandiseProductCardRenderer {
   handleRepairProduct(productId) {
     if (this.eventBus) {
       this.eventBus.emit('product.repair', { productId });
+    }
+  }
+
+  /**
+   * Handle add to cart action
+   * @param {string} productId - Product ID
+   * @param {string} variantId - Variant ID
+   */
+  handleAddToCart(productId, variantId) {
+    if (this.eventBus) {
+      this.eventBus.emit('cart.addItem', { productId, variantId });
     }
   }
 }
