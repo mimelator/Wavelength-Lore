@@ -3682,6 +3682,32 @@ class MerchandiseStore {
         previewImage: product.previewImage
       });
 
+      // CRITICAL DEBUGGING: Log actual image object structure
+      if (product.images && product.images.length > 0) {
+        const firstImage = product.images[0];
+        console.log('🖼️  FIRST IMAGE OBJECT PROPERTIES:');
+        console.log('   Type:', typeof firstImage);
+        console.log('   Is String?:', typeof firstImage === 'string');
+        console.log('   Is Object?:', typeof firstImage === 'object');
+        console.log('   Keys:', Object.keys(firstImage || {}));
+
+        // Try multiple property names
+        console.log('   Testing property names:');
+        console.log('     .url:', firstImage?.url);
+        console.log('     .src:', firstImage?.src);
+        console.log('     .image:', firstImage?.image);
+        console.log('     .imageUrl:', firstImage?.imageUrl);
+        console.log('     .thumbnail:', firstImage?.thumbnail);
+        console.log('     Direct toString():', firstImage?.toString?.());
+
+        // If it's a string, use it directly
+        if (typeof firstImage === 'string') {
+          console.log('   ⚠️  Image is a STRING, not an object:', firstImage);
+        } else {
+          console.log('   Full Object:', JSON.stringify(firstImage, null, 2));
+        }
+      }
+
       // Prepare product data with proper image fields for modal renderer
       const preparedProduct = {
         ...product,
