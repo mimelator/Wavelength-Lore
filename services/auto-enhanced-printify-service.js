@@ -25,7 +25,7 @@ class AutoEnhancedPrintifyService extends PrintifyService {
    * @param {Buffer} imageBuffer - Image buffer
    * @param {string} fileName - Filename
    * @param {string} title - Display title
-   * @param {Object} options - Upload options
+   * @param {Object} options - Upload options including effectParams
    * @returns {Object} Upload result
    */
   async uploadImage(imageBuffer, fileName, title, options = {}) {
@@ -36,6 +36,7 @@ class AutoEnhancedPrintifyService extends PrintifyService {
       let qualityCheck = await this.validateImageQualityForPrintify(imageBuffer, fileName);
       let finalBuffer = imageBuffer;
       let enhancementInfo = { autoEnhanced: false };
+      let effectsAppliedAfterUpscaling = false;
 
       // 🚀 STEP 2: If image is too small or low-quality, UPSCALE immediately
       if (!qualityCheck.passedValidation) {
@@ -61,6 +62,33 @@ class AutoEnhancedPrintifyService extends PrintifyService {
                 enhancementSource: 'upscaling',
                 reason: 'Original image was too small and was upscaled to meet Printify requirements'
               };
+
+              // 🔥 FIX FOR GITHUB ISSUE #96: Apply effects AFTER upscaling (not before)
+              // This ensures effects are applied to the final quality image, not lost during upscaling
+              if (options.effectParams && Object.keys(options.effectParams).length > 0) {
+                console.log('\n🔥 APPLYING EFFECTS AFTER UPSCALING (Issue #96 Fix)');
+                console.log('   Effects to apply:', options.effectParams);
+
+                try {
+                  const EffectsProcessor = require('./EffectsProcessor');
+                  const effectsProcessor = new EffectsProcessor();
+
+                  const effectsModifiedBuffer = await effectsProcessor.processImage(finalBuffer, options.effectParams);
+                  if (effectsModifiedBuffer && effectsModifiedBuffer.length > 0) {
+                    console.log('✅ Effects applied to upscaled image');
+                    console.log('   Upscaled buffer size:', (finalBuffer.length / 1024).toFixed(2), 'KB');
+                    console.log('   Effects-modified size:', (effectsModifiedBuffer.length / 1024).toFixed(2), 'KB');
+                    finalBuffer = effectsModifiedBuffer;
+                    effectsAppliedAfterUpscaling = true;
+                    console.log('   ✅ finalBuffer updated with effects-modified version');
+                  } else {
+                    console.warn('⚠️ Effects processing returned empty buffer, keeping upscaled version');
+                  }
+                } catch (effectsError) {
+                  console.error('❌ Failed to apply effects after upscaling:', effectsError.message);
+                  console.warn('⚠️ Continuing with upscaled image (effects not applied)');
+                }
+              }
             } else {
               throw new Error(`Upscaled image dimensions still insufficient: ${upscaledMetadata.width}x${upscaledMetadata.height}. Printify requires minimum 1800x1800.`);
             }
@@ -129,7 +157,8 @@ class AutoEnhancedPrintifyService extends PrintifyService {
 
       return {
         ...uploadResult,
-        ...enhancementInfo
+        ...enhancementInfo,
+        effectsAppliedAfterUpscaling: effectsAppliedAfterUpscaling
       };
 
     } catch (error) {
@@ -204,29 +233,30 @@ class AutoEnhancedPrintifyService extends PrintifyService {
    */
   async createCustomProductWithBlueprintAndAutoEnhancement(imageBuffer, fileName, productOptions = {}) {
     try {
-      const { 
-        title, 
-        description, 
-        tags = [], 
-        blueprintId, 
+      const {
+        title,
+        description,
+        tags = [],
+        blueprintId,
         printProviderId,
         basePrice = 2099,
         userId,
-        originalImageId
+        originalImageId,
+        effectParams  // 🔥 GITHUB ISSUE #96: Pass effect parameters to apply AFTER upscaling
       } = productOptions;
-      
+
       if (!blueprintId || !printProviderId) {
         throw new Error('Blueprint ID and Print Provider ID are required');
       }
-      
+
       console.log('🎯 Creating custom product with blueprint and auto-enhancement...');
-      
+
       // Upload image with auto-enhancement
       const imageUploadResult = await this.uploadImage(
-        imageBuffer, 
-        fileName, 
+        imageBuffer,
+        fileName,
         title || 'Custom Merchandise Image',
-        { userId, originalImageId }
+        { userId, originalImageId, effectParams }  // 🔥 Pass effectParams for post-upscaling application
       );
       
       if (!imageUploadResult.success) {

@@ -548,17 +548,19 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
     console.log('   Buffer size:', (imageBuffer.length / 1024).toFixed(2), 'KB');
     console.log('   Buffer type:', Buffer.isBuffer(imageBuffer) ? 'Buffer' : typeof imageBuffer);
 
+    // 🔥 GITHUB ISSUE #96 FIX: Store effect params to pass to Printify service
+    // Effects will be applied AFTER upscaling to ensure they're preserved on quality image
+    let effectParams = null;
+
     if (imageContext && (imageContext.effects || imageContext.borderEnabled)) {
-      console.log('\n🎨 Applying user customizations before upscaling...');
+      console.log('\n🔥 GITHUB ISSUE #96 FIX: Preparing effects to apply AFTER upscaling...');
       console.log('   imageContext.effects:', imageContext.effects);
       console.log('   imageContext.borderEnabled:', imageContext.borderEnabled);
 
-      const EffectsProcessor = require('../services/EffectsProcessor');
       const effectsConfig = require('../config/effectsConfig');
-      const effectsProcessor = new EffectsProcessor();
 
       // 🔥 CRITICAL FIX: Convert boolean effect selections to numeric parameters using presets
-      let effectsToApply = {
+      effectParams = {
         saturation: 1.0,
         colorTemperature: 5500,
         bloom: 0,
@@ -586,10 +588,10 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
               if (typeof paramValue === 'number') {
                 // For multiplicative values (saturation, brightness, contrast), multiply
                 if (['saturation', 'brightness', 'contrast'].includes(paramName)) {
-                  effectsToApply[paramName] = (effectsToApply[paramName] || 1.0) * paramValue;
+                  effectParams[paramName] = (effectParams[paramName] || 1.0) * paramValue;
                 } else {
                   // For additive values (bloom, vignette, blur, lightning), add
-                  effectsToApply[paramName] = (effectsToApply[paramName] || 0) + paramValue;
+                  effectParams[paramName] = (effectParams[paramName] || 0) + paramValue;
                 }
               }
             });
@@ -597,24 +599,9 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
         });
       }
 
-      console.log('\n✅ Final effect parameters to apply:');
-      console.log('   ', effectsToApply);
-
-      try {
-        const customizedBuffer = await effectsProcessor.processImage(imageBuffer, effectsToApply);
-        if (customizedBuffer && customizedBuffer.length > 0) {
-          console.log('\n✅ Effects processing returned buffer');
-          console.log('   Original buffer size:', (imageBuffer.length / 1024).toFixed(2), 'KB');
-          console.log('   Customized buffer size:', (customizedBuffer.length / 1024).toFixed(2), 'KB');
-          imageBuffer = customizedBuffer;
-          console.log('   ✅ imageBuffer updated with customized version');
-        } else {
-          console.warn('⚠️ Effects processing returned empty buffer, using original');
-        }
-      } catch (effectsError) {
-        console.error('❌ Effects processing failed:', effectsError.message);
-        console.warn('⚠️ Continuing with original image (no effects applied)');
-      }
+      console.log('\n✅ Effect parameters prepared for post-upscaling application:');
+      console.log('   ', effectParams);
+      console.log('   ℹ️ These will be applied to the image AFTER upscaling to preserve quality');
     } else {
       console.log('\nℹ️ No user customizations to apply (no effects or borders)');
     }
@@ -641,7 +628,8 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
         printProviderId: actualPrintProviderId, // Use actual provider ID from request or config
         basePrice: productConfig.basePrice,
         userId: userId,
-        originalImageId: imageId
+        originalImageId: imageId,
+        effectParams: effectParams // 🔥 Pass effect parameters for post-upscaling application (Issue #96)
       }
     );
     

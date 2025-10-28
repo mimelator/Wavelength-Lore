@@ -1100,6 +1100,138 @@
   scroll-margin-top: 80px; /* Account for any fixed headers */
 }
 
+/* 
+   CART ITEM CONTROLS LAYOUT FIX
+   Fixes vertical stacking of quantity, price, and trash controls
+*/
+
+/* Main cart item controls container - horizontal layout */
+.cart-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: flex-end;
+  min-width: 280px; /* Ensure enough space for all controls */
+}
+
+/* Quantity controls - keep horizontal layout */
+.cart-item-controls .quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px; /* Fixed width for consistent alignment */
+}
+
+.cart-item-controls .quantity-controls button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.cart-item-controls .quantity-controls button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.cart-item-controls .quantity-input {
+  width: 50px;
+  height: 32px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.cart-item-controls .quantity-input:focus {
+  outline: none;
+  border-color: #2196F3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+/* Item total price - centered and prominent */
+.cart-item-total {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #4CAF50;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* Remove button - styled consistently */
+.remove-item-btn {
+  background: rgba(244, 67, 54, 0.15);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  color: #f44336;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+}
+
+.remove-item-btn:hover {
+  background: rgba(244, 67, 54, 0.25);
+  border-color: #f44336;
+  transform: scale(1.05);
+}
+
+.remove-item-btn span {
+  font-size: 1.1rem;
+}
+
+/* Responsive adjustments for cart controls */
+@media (max-width: 768px) {
+  .cart-item-controls {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    min-width: auto;
+  }
+  
+  .cart-item-controls .quantity-controls {
+    justify-content: center;
+    min-width: auto;
+  }
+  
+  .cart-item-total {
+    text-align: center;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .cart-item-controls {
+    gap: 8px;
+  }
+  
+  .cart-item-controls .quantity-controls button {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+  
+  .cart-item-controls .quantity-input {
+    width: 45px;
+    height: 28px;
+  }
+}
+
 /* Smooth scroll behavior for the entire page */
 html {
   scroll-behavior: smooth;
