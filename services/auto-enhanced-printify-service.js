@@ -44,13 +44,16 @@ class AutoEnhancedPrintifyService extends PrintifyService {
         console.log('🚀 Upscaling image to Printify standards...');
 
         try {
-          const upscaledBuffer = await this.upscaler.upscaleImageForPrintify(imageBuffer, fileName);
-          if (upscaledBuffer) {
+          const upscaledResult = await this.upscaler.upscaleImageForPrintify(imageBuffer, fileName);
+
+          // PROACTIVE FORMAT TRACKING: Extract buffer and fileName from result
+          if (upscaledResult && upscaledResult.buffer) {
             console.log('✅ Image successfully upscaled');
 
             // For upscaled images, we're more lenient with compression check since we're upscaling web images
             // Just verify the dimensions are sufficient
             const sharp = require('sharp');
+            const upscaledBuffer = upscaledResult.buffer;
             const upscaledMetadata = await sharp(upscaledBuffer).metadata();
             const isUpscaledSizeSufficient = upscaledMetadata.width >= 1800 && upscaledMetadata.height >= 1800;
 
@@ -58,15 +61,10 @@ class AutoEnhancedPrintifyService extends PrintifyService {
               console.log(`✅ Upscaled image dimensions sufficient: ${upscaledMetadata.width}x${upscaledMetadata.height}`);
               finalBuffer = upscaledBuffer;
 
-              // 🔧 BUG FIX: Update fileName to match upscaled image format
-              // The upscaler converts WebP to PNG internally, but doesn't update the filename
-              // This causes a mismatch when sending to Printify (PNG buffer + .webp filename)
-              // which leads to double-conversion and corrupted data (400 error)
-              if (fileName && fileName.toLowerCase().endsWith('.webp')) {
-                console.log('🔧 Updating fileName: .webp → .png (upscaler converted format)');
-                fileName = fileName.replace(/\.webp$/i, '.png');
-                console.log(`   New fileName: ${fileName}`);
-              }
+              // PROACTIVE FORMAT TRACKING: Use the fileName already updated by upscaler
+              // No need to guess - we KNOW what format we have because upscaler told us!
+              fileName = upscaledResult.fileName;
+              console.log(`✅ PROACTIVE: Using fileName from upscaler: ${fileName}`);
 
               enhancementInfo = {
                 autoEnhanced: true,
@@ -119,6 +117,14 @@ class AutoEnhancedPrintifyService extends PrintifyService {
           const enhancedBuffer = await this.downloadImageBuffer(preview.enhancedImageUrl);
           if (enhancedBuffer) {
             finalBuffer = enhancedBuffer;
+
+            // PROACTIVE FORMAT TRACKING: Enhancement API ALWAYS stores images as PNG
+            // So we KNOW the format - no need to guess or detect!
+            console.log(`📝 PROACTIVE FORMAT TRACKING: Enhancement API always stores as PNG`);
+            const enhancementFileName = fileName.replace(/\.(webp|png|jpg|jpeg|gif)$/i, '.png');
+            fileName = enhancementFileName;
+            console.log(`   Tracked: Enhancement returns PNG → ${fileName}`);
+
             enhancementInfo = {
               autoEnhanced: true,
               enhancementSource: 'generated',
@@ -164,31 +170,14 @@ class AutoEnhancedPrintifyService extends PrintifyService {
       }
 
       // 📤 STEP 5: Upload to Printify
-      // 🔧 BUG FIX: Ensure fileName matches buffer format before upload
-      // This handles BOTH upscaled images AND images that passed quality validation
-      // If buffer is PNG but fileName is .webp, update the filename
-      if (fileName && fileName.toLowerCase().endsWith('.webp')) {
-        try {
-          const sharp = require('sharp');
-          const bufferMetadata = await sharp(finalBuffer).metadata();
-          const actualFormat = bufferMetadata.format ? bufferMetadata.format.toLowerCase() : 'unknown';
-
-          console.log(`🔍 Buffer format check: fileName=".webp", actualFormat="${actualFormat}"`);
-
-          if (actualFormat === 'png') {
-            console.log('🔧 PRE-UPLOAD FIX: Buffer is PNG but fileName is .webp, updating...');
-            fileName = fileName.replace(/\.webp$/i, '.png');
-            console.log(`   Updated fileName: ${fileName}`);
-          } else if (actualFormat === 'webp') {
-            console.log('✅ Buffer format matches fileName: WebP + .webp (correct)');
-          } else {
-            console.warn(`⚠️ Unexpected buffer format: ${actualFormat}. Keeping original fileName: ${fileName}`);
-          }
-        } catch (metadataErr) {
-          console.error('❌ Failed to verify buffer format:', metadataErr.message);
-          console.warn('⚠️ Could not verify buffer format, proceeding with original fileName:', fileName);
-        }
-      }
+      // ✅ PROACTIVE DESIGN: fileName now matches buffer format
+      // We know the format because:
+      // 1. If upscaled: upscaler.upscaleImageForPrintify() returns { buffer, fileName } with updated fileName
+      // 2. If enhanced: Enhancement API stores as PNG, so we proactively set .png extension
+      // 3. If passed validation (no enhancement): Original WebP/PNG format is preserved
+      // NO GUESSING - we track the format at the source of transformation!
+      console.log(`✅ PROACTIVE UPLOAD: fileName matches buffer format (no reactive detection needed)`);
+      console.log(`   FileName: ${fileName}`);
 
       const uploadResult = await super.uploadImage(finalBuffer, fileName, title);
 

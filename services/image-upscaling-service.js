@@ -117,29 +117,39 @@ class ImageUpscalingService {
    * - Minimum 1800x1800 pixels
    * - Minimum 200 DPI (prefer 300 DPI)
    * - High-quality format (PNG or TIFF, not WebP)
+   *
+   * PROACTIVE FORMAT TRACKING: Returns object with both buffer AND updated fileName
+   * This eliminates the need for reactive format detection in the caller
    * @param {Buffer} imageBuffer - Original image buffer
    * @param {string} fileName - Filename for logging
-   * @returns {Buffer} Upscaled image buffer meeting Printify requirements
+   * @returns {Object} { buffer: Buffer, fileName: string } - Upscaled image buffer and updated filename
    */
   async upscaleImageForPrintify(imageBuffer, fileName = 'image') {
     console.log(`🚀 UPSCALING FOR PRINTIFY: ${fileName}`);
 
     try {
       // Step 0: Convert WebP to PNG if necessary (upscaler requires PNG)
+      // PROACTIVE FORMAT TRACKING: Track if we converted the format
       let processedBuffer = imageBuffer;
+      let finalFileName = fileName; // Track the final filename
       const metadata = await sharp(imageBuffer).metadata();
-      
+
       if (metadata.format === 'webp') {
         console.log('🔄 Converting WebP to PNG for upscaler compatibility...');
+        // PROACTIVE: Mark that we're converting the format
+        console.log(`📝 PROACTIVE FORMAT TRACKING: Converting fileName from .webp to .png`);
+        finalFileName = fileName.replace(/\.webp$/i, '.png');
+        console.log(`   Tracked: ${fileName} → ${finalFileName}`);
+
         // Start with reasonable compression to avoid huge files
         processedBuffer = await sharp(imageBuffer)
           .png({ quality: 70, compressionLevel: 9 }) // UPDATED: More aggressive initial compression
           .toBuffer();
-        
+
         // Check file size after conversion (upscaler has 4MB limit)
         let fileSizeMB = processedBuffer.length / (1024 * 1024);
         console.log(`✅ Converted ${metadata.format} → PNG (${fileSizeMB.toFixed(2)}MB)`);
-        
+
         if (fileSizeMB > 4) {
           console.log(`⚠️ PNG file size ${fileSizeMB.toFixed(2)}MB exceeds 4MB limit, applying maximum compression...`);
           processedBuffer = await sharp(imageBuffer)
@@ -147,7 +157,7 @@ class ImageUpscalingService {
             .toBuffer();
           fileSizeMB = processedBuffer.length / (1024 * 1024);
           console.log(`✅ Maximum compression applied: ${fileSizeMB.toFixed(2)}MB`);
-          
+
           if (fileSizeMB > 4) {
             throw new Error(`Image too large after compression: ${fileSizeMB.toFixed(2)}MB. Upscaler requires images under 4MB.`);
           }
@@ -185,7 +195,14 @@ class ImageUpscalingService {
         // Check if original image meets minimum requirements
         if (analysis.originalWidth >= PRINTIFY_MIN_WIDTH && analysis.originalHeight >= PRINTIFY_MIN_HEIGHT) {
           console.log(`✅ Original image (${analysis.originalWidth}x${analysis.originalHeight}) meets Printify minimum. Using original.`);
-          return processedBuffer; // Return the original processed buffer
+          console.log(`✅ FALLBACK COMPLETE - Returning proactive format information:`);
+          console.log(`   Buffer: ${processedBuffer.length} bytes`);
+          console.log(`   FileName: ${finalFileName}`);
+          // PROACTIVE FORMAT TRACKING: Return object with updated filename
+          return {
+            buffer: processedBuffer,
+            fileName: finalFileName
+          };
         } else {
           console.log(`❌ Original image too small (${analysis.originalWidth}x${analysis.originalHeight}) and upscaling failed.`);
           throw new Error(`Cannot upload image to Printify: Image too small: ${analysis.originalWidth}x${analysis.originalHeight}. Printify needs minimum ${PRINTIFY_MIN_WIDTH}x${PRINTIFY_MIN_HEIGHT} for quality printing. Upscaling also failed: ${upscaleError.message}`);
@@ -215,7 +232,16 @@ class ImageUpscalingService {
         throw new Error(`Upscaled image still too small: ${upscaledMetadata.width}x${upscaledMetadata.height}. Printify requires minimum ${PRINTIFY_MIN_WIDTH}x${PRINTIFY_MIN_HEIGHT}`);
       }
 
-      return resultBuffer;
+      // PROACTIVE FORMAT TRACKING: Return both buffer AND the updated filename
+      // The caller now knows exactly what format they're getting (no guessing!)
+      console.log(`✅ UPSCALING COMPLETE - Returning proactive format information:`);
+      console.log(`   Buffer: ${resultBuffer.length} bytes (${upscaledMetadata.format?.toUpperCase() || 'UNKNOWN'})`);
+      console.log(`   FileName: ${finalFileName}`);
+
+      return {
+        buffer: resultBuffer,
+        fileName: finalFileName
+      };
 
     } catch (error) {
       console.error(`❌ Failed to upscale image for Printify: ${error.message}`);

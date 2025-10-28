@@ -2657,6 +2657,12 @@ class MerchandiseModalRenderer {
       this.debugLog(`Update preview for product: ${productId}`, 'info');
     }
 
+    // Safety check for modal parameter
+    if (!modal || !modal.dataset) {
+      console.error('❌ handleUpdatePreview: Invalid modal parameter', { productId, modal });
+      throw new Error('Modal element is required and must have dataset property');
+    }
+
     // Gather all selected effects from modal state
     const selectedEffects = JSON.parse(modal.dataset.selectedEffects || '{}');
     console.log('📋 Selected effects from modal:', selectedEffects);
@@ -2863,8 +2869,8 @@ class MerchandiseModalRenderer {
       // CRITICAL FIX: Automatically update preview if not done yet
       if (!customizedImageUrl) {
         console.log('⚙️ Preview not updated yet - automatically triggering update...');
-        // Automatically trigger the update preview action
-        await this.handleUpdatePreview(modal);
+        // Automatically trigger the update preview action with correct parameters
+        await this.handleUpdatePreview(productId, modal);
 
         // Get the newly generated customized image URL
         customizedImageUrl = modal.dataset.customizedImageUrl;
