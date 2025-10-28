@@ -102,24 +102,26 @@ async function validateMerchandiseEdit() {
     log('\n📋 TEST 3: Image Extraction Logic Test', 'blue');
     totalTests++;
 
-    // Simulate product object structure based on logs
+    // Simulate product object structure based on ACTUAL Printify API response
     const mockProduct = {
       id: '6900301af0f77a08d90aa0d2',
       productId: '6900301af0f77a08d90aa0d2',
       title: 'Mug 11oz - Mug 11oz',
       images: [
         {
-          // Simulate actual Printify image structure
-          id: { someField: 'value' },
-          url: 'https://images-api.printify.com/mockup/6900301af0f.../mug-11oz.jpg',
-          thumbnailUrl: 'https://images-api.printify.com/mockup/6900301af0f.../mug-11oz.jpg',
-          title: 'Mug 11oz - Mug 11oz'
+          // ACTUAL Printify image structure - uses .src, not .url
+          is_default: true,
+          is_selected_for_publishing: true,
+          position: 'front',
+          src: 'https://images-api.printify.com/mockup/6900301af0f77a08d90aa0d2/33719/6400/mug-11oz-mug-11oz.jpg?camera_label=front',
+          variant_ids: [33719]
         },
         {
-          id: { someField: 'value' },
-          url: 'https://images-api.printify.com/mockup/6900301af0f.../angle-view.jpg',
-          thumbnailUrl: 'https://images-api.printify.com/mockup/6900301af0f.../angle-view.jpg',
-          title: 'Angle View'
+          is_default: false,
+          is_selected_for_publishing: false,
+          position: 'back',
+          src: 'https://images-api.printify.com/mockup/6900301af0f77a08d90aa0d2/33719/6400/mug-11oz-back.jpg?camera_label=back',
+          variant_ids: [33719]
         }
       ],
       sourceImage: {
@@ -132,22 +134,22 @@ async function validateMerchandiseEdit() {
 
     log('   Testing image extraction from product.images[0]:', 'gray');
     const firstImage = mockProduct.images?.[0];
-    const hasImageUrl = firstImage && firstImage.url;
+    const hasImageSrc = firstImage && firstImage.src;
 
-    if (check(hasImageUrl, 'product.images[0] has url property', `URL: ${firstImage?.url?.substring(0, 60)}...`)) {
+    if (check(hasImageSrc, 'product.images[0] has .src property (Printify format)', `URL: ${firstImage?.src?.substring(0, 60)}...`)) {
       passCount++;
     } else {
       log(`   🔍 First image structure: ${JSON.stringify(firstImage, null, 2)}`, 'gray');
     }
 
-    // TEST 4: Test the actual extraction logic
-    log('\n📋 TEST 4: Extraction Logic Simulation', 'blue');
+    // TEST 4: Test the actual extraction logic (FIXED to use .src for Printify)
+    log('\n📋 TEST 4: Extraction Logic Simulation (Updated for .src property)', 'blue');
     totalTests++;
 
-    // This is what the code does:
-    const image = mockProduct.image || (mockProduct.images?.[0]?.url) || (mockProduct.previewImage) || '/images/previews/generic-product-preview.svg';
+    // This is what the FIXED code does:
+    const image = mockProduct.image || (mockProduct.images?.[0]?.src) || (mockProduct.images?.[0]?.url) || (mockProduct.previewImage) || '/images/previews/generic-product-preview.svg';
     const isUsingFallback = image === '/images/previews/generic-product-preview.svg';
-    const isUsingCorrectImage = image === mockProduct.images[0].url;
+    const isUsingCorrectImage = image === mockProduct.images[0].src;
 
     if (check(!isUsingFallback && isUsingCorrectImage, 'Image extraction uses actual URL (not fallback)', `URL: ${image.substring(0, 60)}...`)) {
       passCount++;
@@ -185,15 +187,16 @@ async function validateMerchandiseEdit() {
     const preparedProduct = {
       ...mockProductWithType,
       id: mockProductWithType.id || mockProductWithType.productId,
-      image: mockProductWithType.image || (mockProductWithType.images?.[0]?.url) || (mockProductWithType.previewImage) || '/images/previews/generic-product-preview.svg',
-      previewImage: mockProductWithType.previewImage || (mockProductWithType.images?.[0]?.url) || (mockProductWithType.image) || '/images/previews/generic-product-preview.svg'
+      // FIXED: Use .src (Printify format) first, then .url as fallback
+      image: mockProductWithType.image || (mockProductWithType.images?.[0]?.src) || (mockProductWithType.images?.[0]?.url) || (mockProductWithType.previewImage) || '/images/previews/generic-product-preview.svg',
+      previewImage: mockProductWithType.previewImage || (mockProductWithType.images?.[0]?.src) || (mockProductWithType.images?.[0]?.url) || (mockProductWithType.image) || '/images/previews/generic-product-preview.svg'
     };
 
     const allFieldsPresent =
       preparedProduct.id === '6900301af0f77a08d90aa0d2' &&
       preparedProduct.title === 'Mug 11oz - Mug 11oz' &&
-      preparedProduct.image.startsWith('https://') &&
-      preparedProduct.previewImage.startsWith('https://') &&
+      preparedProduct.image.startsWith('https://images-api.printify.com') &&
+      preparedProduct.previewImage.startsWith('https://images-api.printify.com') &&
       preparedProduct.productType === 'validated-68';
 
     if (check(allFieldsPresent, 'Prepared product has all required fields',
