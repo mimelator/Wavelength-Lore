@@ -135,6 +135,21 @@ class ImageUpscalingService {
           .png({ quality: 100, compressionLevel: 0 }) // Uncompressed PNG for best quality
           .toBuffer();
         console.log(`✅ Converted ${metadata.format} → PNG for upscaling`);
+        
+        // Check file size after conversion (upscaler has 4MB limit)
+        const fileSizeMB = processedBuffer.length / (1024 * 1024);
+        if (fileSizeMB > 4) {
+          console.log(`⚠️ PNG file size ${fileSizeMB.toFixed(2)}MB exceeds 4MB limit, applying compression...`);
+          processedBuffer = await sharp(imageBuffer)
+            .png({ quality: 90, compressionLevel: 6 }) // Balanced quality/size
+            .toBuffer();
+          const compressedSizeMB = processedBuffer.length / (1024 * 1024);
+          console.log(`✅ Compressed PNG to ${compressedSizeMB.toFixed(2)}MB`);
+          
+          if (compressedSizeMB > 4) {
+            throw new Error(`Image too large: ${compressedSizeMB.toFixed(2)}MB. Upscaler requires images under 4MB.`);
+          }
+        }
       }
 
       // Step 1: Analyze current image quality
