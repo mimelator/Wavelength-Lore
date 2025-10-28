@@ -1145,9 +1145,9 @@ class MerchandiseModalRenderer {
    * @returns {string} HTML string for border customization options
    */
   renderBorderCustomizationOptions(product) {
-    // Border width options
+    // 🔥 CRITICAL FIX: Remove "None" from width options (consistent with renderCompactBorderSection)
+    // Border width options - no "None" since border is controlled by the enable checkbox
     const widths = [
-      { value: 0, label: 'None', pixels: 0 },
       { value: 1, label: 'Thin', pixels: 10 },
       { value: 2, label: 'Medium', pixels: 20 },
       { value: 3, label: 'Thick', pixels: 30 },
