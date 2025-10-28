@@ -1600,7 +1600,7 @@ class MerchandiseModalRenderer {
 
     // Setup event listeners on the modal dialog (not the overlay)
     this.setupModalEventListeners(modal);
-    
+
     // Focus management
     if (focus) {
       const firstFocusable = modal.querySelector('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
@@ -1608,15 +1608,32 @@ class MerchandiseModalRenderer {
         firstFocusable.focus();
       }
     }
-    
+
     // Add show class for animation
     requestAnimationFrame(() => {
       modal.classList.add('show');
     });
-    
+
     // Prevent body scroll
     document.body.classList.add('modal-open');
-    
+
+    // 🔥 FEATURE: Push browser history so back button closes modal instead of navigating away
+    // This allows users to press browser back button to dismiss the modal and stay on /merch
+    const historyState = { modalOpen: true, modalId: modalId };
+    window.history.pushState(historyState, '', window.location.href);
+    console.log('📜 Browser history pushed for modal:', modalId);
+
+    // Handle back button to close this modal
+    const backHandler = (event) => {
+      if (event.state && event.state.modalOpen && event.state.modalId === modalId) {
+        // This is our modal history state, close the modal
+        this.hideModal(modalId);
+        // Remove this specific handler
+        window.removeEventListener('popstate', backHandler);
+      }
+    };
+    window.addEventListener('popstate', backHandler);
+
     return modal;
   }
   
