@@ -132,6 +132,22 @@ class PrintifyService {
         contents: base64Image
       };
 
+      // 🔍 PRE-UPLOAD DIAGNOSTICS
+      console.log('📤 PRINTIFY UPLOAD ATTEMPT:');
+      console.log('   📁 fileName:', uploadFileName);
+      console.log('   📊 Buffer size:', (uploadBuffer.length / 1024).toFixed(2), 'KB');
+      console.log('   🔤 Base64 size:', (base64Image.length / 1024).toFixed(2), 'KB');
+      console.log('   📏 Payload keys:', Object.keys(payload));
+      
+      // Validate base64 is not corrupted
+      if (!base64Image || base64Image.length === 0) {
+        throw new Error('Base64 conversion failed - empty result');
+      }
+      
+      // Check if base64 looks valid (should start with valid data URL patterns)
+      const base64Start = base64Image.substring(0, 50);
+      console.log('   🔤 Base64 preview:', base64Start + '...');
+
       // Send the request with JSON content type
       const response = await this.api.post('/uploads/images.json', payload);
       
@@ -150,9 +166,30 @@ class PrintifyService {
     } catch (error) {
       console.error('Error uploading image to Printify:', error);
       
+      // 🔍 ENHANCED ERROR DIAGNOSTICS
+      console.error('🚨 PRINTIFY UPLOAD FAILURE DETAILS:');
+      console.error('   📁 Original fileName:', fileName);
+      console.error('   📁 Upload fileName:', uploadFileName);
+      console.error('   📊 Original buffer size:', (imageBuffer.length / 1024).toFixed(2), 'KB');
+      console.error('   📊 Upload buffer size:', (uploadBuffer.length / 1024).toFixed(2), 'KB');
+      console.error('   🔤 Base64 length:', base64Image ? (base64Image.length / 1024).toFixed(2) + 'KB' : 'undefined');
+      
       // Log detailed error information
       if (error.response?.data) {
-        console.error('Printify API Error Details:', JSON.stringify(error.response.data, null, 2));
+        console.error('🚨 Printify API Error Details:', JSON.stringify(error.response.data, null, 2));
+        console.error('📡 Response Status:', error.response.status);
+        console.error('📡 Response Headers:', error.response.headers);
+      }
+      
+      if (error.response?.status === 400) {
+        console.error('🔍 400 BAD REQUEST - Possible causes:');
+        console.error('   1. Invalid image format or corrupted data');
+        console.error('   2. File too large (current:', (uploadBuffer.length / 1024).toFixed(2), 'KB)');
+        console.error('   3. Invalid base64 encoding');
+        console.error('   4. Missing required fields in payload');
+        console.error('   📋 Payload structure sent:');
+        console.error('      file_name:', uploadFileName);
+        console.error('      contents: [base64 data -', base64Image ? (base64Image.length / 1024).toFixed(2) + 'KB]' : 'undefined');
       }
       
       return {

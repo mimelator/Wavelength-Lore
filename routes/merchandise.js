@@ -1892,14 +1892,63 @@ async function downloadImageFromS3(imageUrl) {
       fullUrl = `${cdnUrl}${imageUrl}`;
     }
 
-    console.log('📥 Downloading image from:', fullUrl);
-    const response = await axios.get(fullUrl, { responseType: 'arraybuffer' });
-    console.log('✅ Image downloaded successfully, size:', response.data.length, 'bytes');
-    return Buffer.from(response.data);
+    console.log('📥 DOWNLOAD DIAGNOSTICS:');
+    console.log('   Original imageUrl:', imageUrl);
+    console.log('   Full URL:', fullUrl);
+    console.log('   CDN_URL env:', process.env.CDN_URL || 'not set');
+    
+    const response = await axios.get(fullUrl, { 
+      responseType: 'arraybuffer',
+      timeout: 30000, // 30 second timeout
+      maxContentLength: 10 * 1024 * 1024 // 10MB max
+    });
+    
+    console.log('✅ DOWNLOAD SUCCESS:');
+    console.log('   Response status:', response.status);
+    console.log('   Content-Type:', response.headers['content-type']);
+    console.log('   Content-Length:', response.headers['content-length']);
+    console.log('   Data size:', response.data.length, 'bytes');
+    
+    const buffer = Buffer.from(response.data);
+    console.log('   Buffer created:', Buffer.isBuffer(buffer), 'size:', buffer.length);
+    
+    // Validate the buffer contains valid image data
+    if (buffer.length === 0) {
+      throw new Error('Downloaded image is empty (0 bytes)');
+    }
+    
+    // Quick image format check
+    const imageType = getImageType(buffer);
+    console.log('   Detected image type:', imageType);
+    
+    return buffer;
   } catch (error) {
-    console.error('Error downloading image from S3:', error);
+    console.error('❌ DOWNLOAD ERROR:', error.message);
+    console.error('   Error type:', error.constructor.name);
+    if (error.response) {
+      console.error('   Response status:', error.response.status);
+      console.error('   Response headers:', error.response.headers);
+    }
+    if (error.code) {
+      console.error('   Error code:', error.code);
+    }
     return null;
   }
+}
+
+/**
+ * Quick image type detection from buffer header
+ */
+function getImageType(buffer) {
+  if (!buffer || buffer.length < 12) return 'unknown';
+  
+  // Check magic bytes
+  if (buffer[0] === 0xFF && buffer[1] === 0xD8) return 'JPEG';
+  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47) return 'PNG';
+  if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46) return 'GIF';
+  if (buffer.slice(8, 12).toString() === 'WEBP') return 'WebP';
+  
+  return 'unknown';
 }
 
 /**

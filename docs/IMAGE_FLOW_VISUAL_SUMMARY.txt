@@ -1,0 +1,466 @@
+╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║              WAVELENGTH GALLERY TO PRINTIFY PRODUCT - COMPLETE VISUAL FLOW MAP                      ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+OVERALL FLOW ARCHITECTURE:
+═════════════════════════
+
+  Browser (Frontend)          Network        Node.js Server        Services & APIs          Printify
+  ─────────────────────────────────────────────────────────────────────────────────────────────────
+  
+  [Gallery UI]
+      │
+      ├─→ selectImage()
+      │   └─ 🖼️ Log: "Image selected"
+      │
+      └─→ Choose Product Type
+          └─ Emit product.customize event
+              │
+              └─→ Show customization modal
+                  (effects, borders, etc.)
+
+
+  [Customization UI]
+      │
+      ├─→ Build request payload
+      │   ├─ imageId
+      │   ├─ imageUrl  
+      │   ├─ productType
+      │   ├─ blueprintId
+      │   ├─ printProviderId
+      │   └─ imageContext (effects, borders)
+      │
+      └─→ POST /api/merchandise/create-guided-product
+          │
+          ├─ 📤 Log: "Sending API request"
+          │
+          │
+          └──→ [SERVER]
+              │
+              ├─ VALIDATE REQUEST
+              │  ├─ 🔥 Log: "CREATE GUIDED PRODUCT API CALLED"
+              │  ├─ ✅ Check database ready
+              │  ├─ ✅ Check all parameters present
+              │  ├─ 📋 Log: "API Request payload validation"
+              │  ├─ ✅ Find product configuration
+              │  ├─ ✅ Validate blueprint/provider IDs
+              │  └─ 🔍 Log: "Blueprint/Provider ID validation"
+              │
+              ├─ DOWNLOAD IMAGE FROM S3
+              │  ├─ 📥 Log: "Downloading image from: {url}"
+              │  ├─ downloadImageFromS3(imageUrl)
+              │  └─ ✅ Log: "Image downloaded successfully, size: {bytes}"
+              │
+              ├─ PREPARE EFFECTS (if applicable)
+              │  ├─ 🔍 Log: "IMAGE BUFFER DIAGNOSTIC BEFORE EFFECTS"
+              │  ├─ Build effect parameters from imageContext
+              │  ├─ 🔥 Log: "GITHUB ISSUE #96 FIX: Preparing effects"
+              │  ├─ Merge effect presets (saturation, brightness, etc.)
+              │  └─ ✅ Log: "Effect parameters prepared"
+              │
+              └─→ CALL AUTO-ENHANCED PRINTIFY SERVICE
+                 │
+                 │  AutoEnhancedPrintifyService.uploadImage()
+                 │  ┌─────────────────────────────────────────────────────────┐
+                 │  │ AUTO-ENHANCEMENT PIPELINE                               │
+                 │  ├─────────────────────────────────────────────────────────┤
+                 │  │                                                         │
+                 │  ├─ 🔄 Log: "Auto-enhancement upload for: {fileName}"      │
+                 │  │                                                         │
+                 │  ├─ STEP 1: QUALITY CHECK                                 │
+                 │  │  └─ validateImageQualityForPrintify(imageBuffer)       │
+                 │  │     ├─ Check dimensions >= 1800x1800                  │
+                 │  │     ├─ Check DPI quality                              │
+                 │  │     └─ Passes validation?                             │
+                 │  │         │                                             │
+                 │  │         ├─ YES → Jump to STEP 4 (Validation)          │
+                 │  │         └─ NO  → Continue to STEP 2                   │
+                 │  │                                                         │
+                 │  ├─ STEP 2: UPSCALING (if needed)                         │
+                 │  │  ├─ ⚠️ Log: "Image quality insufficient: {reason}"     │
+                 │  │  ├─ 🚀 Log: "Upscaling image to Printify standards"    │
+                 │  │  │                                                     │
+                 │  │  └─→ ImageUpscalingService.upscaleImageForPrintify()  │
+                 │  │      ┌─────────────────────────────────────────────┐  │
+                 │  │      │ UPSCALING SUB-PIPELINE                      │  │
+                 │  │      │                                             │  │
+                 │  │      ├─ 🚀 Log: "UPSCALING FOR PRINTIFY: {file}"   │  │
+                 │  │      │                                             │  │
+                 │  │      ├─ WebP Format Detection                      │  │
+                 │  │      │  ├─ 🔄 Log: "Converting WebP to PNG..."    │  │
+                 │  │      │  ├─ 📝 Log: "PROACTIVE FORMAT TRACKING"    │  │
+                 │  │      │  ├─ Convert WebP → PNG                    │  │
+                 │  │      │  ├─ Check file size < 4MB                 │  │
+                 │  │      │  └─ ✅ Log: "Converted {format} → PNG"     │  │
+                 │  │      │                                             │  │
+                 │  │      ├─ Analyze Image Quality                     │  │
+                 │  │      │  ├─ Get dimensions                         │  │
+                 │  │      │  ├─ Estimate DPI                           │  │
+                 │  │      │  └─ 📊 Log: "Current image: {w}x{h}"       │  │
+                 │  │      │                                             │  │
+                 │  │      ├─ Calculate Scale Factor                    │  │
+                 │  │      │  └─ 📐 Log: "Scale factor needed: {factor}" │  │
+                 │  │      │                                             │  │
+                 │  │      ├─ Execute Upscaling                         │  │
+                 │  │      │  ├─ Call upscaleImage() with parameters    │  │
+                 │  │      │  └─ ✅ Log: "Image successfully upscaled"   │  │
+                 │  │      │                                             │  │
+                 │  │      └─ Return Proactive Result                   │  │
+                 │  │         ├─ ✅ Log: "PROACTIVE: Using fileName..."  │  │
+                 │  │         └─ { buffer, fileName: updated }          │  │
+                 │  │      │                                             │  │
+                 │  │      └─────────────────────────────────────────────┘  │
+                 │  │                                                         │
+                 │  ├─ STEP 3: EFFECTS APPLICATION (if provided)            │
+                 │  │  ├─ 🔥 Log: "APPLYING EFFECTS AFTER UPSCALING"        │
+                 │  │  │                                                     │
+                 │  │  └─→ EffectsProcessor.processImage()                  │
+                 │  │      ┌─────────────────────────────────────────────┐  │
+                 │  │      │ EFFECTS SUB-PIPELINE                        │  │
+                 │  │      │                                             │  │
+                 │  │      ├─ 🎨 Log: "Processing image with effects"   │  │
+                 │  │      │                                             │  │
+                 │  │      ├─ Get Image Metadata                        │  │
+                 │  │      │  └─ 📐 Log: "Image dimensions: {w}x{h}"    │  │
+                 │  │      │                                             │  │
+                 │  │      ├─ Apply Color Grading                       │  │
+                 │  │      │  ├─ Saturation adjustment                 │  │
+                 │  │      │  ├─ Color temperature shift                │  │
+                 │  │      │  ├─ Brightness & contrast                 │  │
+                 │  │      │  └─ (Using Sharp modulate)                │  │
+                 │  │      │                                             │  │
+                 │  │      ├─ Apply Lighting Effects                    │  │
+                 │  │      │  ├─ Vignette (darken edges)               │  │
+                 │  │      │  ├─ Bloom (glow effect)                   │  │
+                 │  │      │  └─ Edge blur                             │  │
+                 │  │      │                                             │  │
+                 │  │      ├─ Apply Special Effects                     │  │
+                 │  │      │  └─ Lightning effect                       │  │
+                 │  │      │                                             │  │
+                 │  │      ├─ Apply Border (if enabled)                 │  │
+                 │  │      │  ├─ 🖼️ Log: "Applying border: {w}px"       │  │
+                 │  │      │  └─ ✅ Log: "Border applied successfully"   │  │
+                 │  │      │                                             │  │
+                 │  │      ├─ Convert to WebP                           │  │
+                 │  │      │                                             │  │
+                 │  │      ├─ ✅ Log: "Effects applied successfully"     │  │
+                 │  │      └─ Return WebP buffer with effects           │  │
+                 │  │      └─────────────────────────────────────────────┘  │
+                 │  │                                                         │
+                 │  ├─ STEP 4: FINAL VALIDATION                             │
+                 │  │  ├─ Re-validate image quality                         │
+                 │  │  ├─ Check dimensions still sufficient                 │
+                 │  │  └─ ✅ Log: "Upscaled image dimensions verified"      │
+                 │  │                                                         │
+                 │  └─ STEP 5: UPLOAD TO PRINTIFY                          │
+                 │     ├─ ✅ Log: "PROACTIVE UPLOAD: fileName matches"      │
+                 │     │                                                     │
+                 │     └─→ PrintifyService.uploadImage()                   │
+                 │         ┌─────────────────────────────────────────────┐  │
+                 │         │ PRINTIFY UPLOAD                             │  │
+                 │         │                                             │  │
+                 │         ├─ Convert WebP → PNG (if needed)             │  │
+                 │         ├─ Create FormData with image buffer          │  │
+                 │         ├─ POST /v1/shops/{id}/uploads                │  │
+                 │         └─ Return: { id, url, width, height }         │  │
+                 │         └─────────────────────────────────────────────┘  │
+                 │                                                         │
+                 └─────────────────────────────────────────────────────────┘
+                    │
+                    └─→ Return Enhancement Result
+                        {
+                          buffer: finalBuffer,
+                          autoEnhanced: true|false,
+                          enhancementSource: 'upscaling'|'generated'|'none',
+                          uploadedImage: { id, url, ... }
+                        }
+              │
+              ├─ CREATE PRINTIFY PRODUCT
+              │  │
+              │  ├─ 🖨️ Log: "[PRINTIFY API] Creating product..."
+              │  │
+              │  └─→ AutoEnhancedPrintifyService.createCustomProductWithBlueprintAndAutoEnhancement()
+              │      │
+              │      ├─ uploadImage() completed above
+              │      │
+              │      └─→ PrintifyService.createProduct()
+              │          ┌─────────────────────────────────────────────┐
+              │          │ PRINTIFY PRODUCT CREATION                   │
+              │          │                                             │
+              │          ├─ POST /v1/shops/{id}/products               │
+              │          │  Payload:                                  │
+              │          │  ├─ title, description, tags               │
+              │          │  ├─ type: 'standard'                       │
+              │          │  ├─ images: [uploadedImageUrl]             │
+              │          │  ├─ variants: [{ price, sku, ... }]        │
+              │          │  └─ print_providers: [{ id, blueprint_id }]│
+              │          │                                             │
+              │          └─ Response:                                 │
+              │             {                                         │
+              │               id: productId,                          │
+              │               title, description,                     │
+              │               variants: [...],                        │
+              │               images: [...]                           │
+              │             }                                         │
+              │          └─────────────────────────────────────────────┘
+              │      │
+              │      └─→ ✅ Log: "[PRINTIFY API] PRODUCT CREATED SUCCESSFULLY!"
+              │
+              ├─ STORE IN FIREBASE
+              │  │
+              │  ├─ 💾 Log: "Storing product in Firebase database..."
+              │  │
+              │  └─→ MerchandiseDatabase.storeUserProduct()
+              │      ├─ Store at: /users/{userId}/products/{productId}
+              │      ├─ Save variants & images
+              │      ├─ Save enhancement metadata
+              │      └─ ✅ Log: "Product stored in database"
+              │
+              └─→ SEND RESPONSE TO CLIENT
+                 │
+                 ├─ 📤 Log: "Sending response to client..."
+                 ├─ ✅ Log: "[OPERATION COMPLETE]"
+                 │
+                 └─→ res.json({
+                     success: true,
+                     product: {
+                       id, title, description,
+                       images, variants,
+                       enhancement: { autoEnhanced, enhancementSource }
+                     },
+                     message: successMessage
+                   })
+
+
+  [Client Response Handler]
+      │
+      ├─→ Success toast notification
+      ├─→ Update product list UI
+      └─→ Redirect to product details
+
+
+PHASE BREAKDOWN SUMMARY:
+═══════════════════════
+
+Phase 1: GALLERY SELECTION
+  ├─ Location: merchandise-store.js, line 2503
+  ├─ Entry point: selectImage()
+  ├─ Logs: 🖼️ Image selected
+  └─ Output: selectedImage stored in memory
+
+Phase 2: PRODUCT TYPE SELECTION  
+  ├─ Location: merchandise-store.js, line 2555-2634
+  ├─ Event: click on product category
+  ├─ Logs: 🔥 DIAGNOSTIC: Product selection event triggered
+  └─ Output: productConfig validated & product.customize event emitted
+
+Phase 3: API REQUEST
+  ├─ Location: merchandise-store.js (frontend)
+  ├─ Action: POST /api/merchandise/create-guided-product
+  ├─ Logs: 📤 DIAGNOSTIC: Sending API request
+  └─ Payload: imageId, imageUrl, productType, blueprintId, printProviderId, imageContext
+
+Phase 4: BACKEND VALIDATION
+  ├─ Location: merchandise.js, line 398-620
+  ├─ Steps:
+  │  ├─ Database ready check
+  │  ├─ Parameter validation
+  │  ├─ Product config lookup
+  │  ├─ Blueprint/provider ID validation
+  │  └─ Image download from S3
+  ├─ Logs: 🔥 CREATE GUIDED PRODUCT API CALLED, 📋 API Request payload validation, etc.
+  └─ Output: imageBuffer, effectParams prepared
+
+Phase 5: AUTO-ENHANCEMENT
+  ├─ Location: auto-enhanced-printify-service.js, line 30-194
+  ├─ Main steps:
+  │  ├─ Quality check
+  │  ├─ Upscaling (if needed)
+  │  ├─ Effects application (if provided)
+  │  ├─ Final validation
+  │  └─ Printify upload
+  ├─ Logs: 🔄 Auto-enhancement, 🚀 Upscaling, 🎨 Effects, ✅ PROACTIVE UPLOAD
+  └─ Output: Printify image URL, enhancement metadata
+
+Phase 6: PRINTIFY PRODUCT CREATION
+  ├─ Location: printify-service.js
+  ├─ Action: POST /v1/shops/{id}/products
+  ├─ Logs: 🖨️ [PRINTIFY API] Creating product, ✅ [PRINTIFY API] PRODUCT CREATED
+  └─ Output: productId, variants, images
+
+Phase 7: DATABASE STORAGE
+  ├─ Location: merchandise.js, line 656
+  ├─ Action: Store product in Firebase
+  ├─ Logs: 💾 Storing product, ✅ Product stored
+  └─ Output: Product persisted at /users/{userId}/products/{productId}
+
+Phase 8: RESPONSE TO CLIENT
+  ├─ Location: merchandise.js, line 689-710
+  ├─ Action: Send JSON response with product details
+  ├─ Logs: 📤 Sending response, ✅ [OPERATION COMPLETE]
+  └─ Output: success=true, product data with enhancement info
+
+
+BUFFER TRANSFORMATION JOURNEY:
+════════════════════════════
+
+  [Original S3 Image]
+  WebP, 1-2 MB, 800x600 pixels
+         │
+         └─ downloadImageFromS3()
+              │
+              ↓
+  [Image Buffer]
+  Bytes in memory, WebP format
+         │
+         └─ Format validation
+              │
+              ├─ WebP → PNG conversion (if needed)
+              │
+              ↓
+  [Processed Buffer]
+  Bytes in memory, PNG format, <4MB
+         │
+         └─ Quality check
+              │
+              ├─ If 1800x1800+: Skip upscaling
+              │
+              └─ If <1800x1800: Upscale
+                 │
+                 └─ upscaleImage() in image-upscaling-service.js
+                      │
+                      ↓
+  [Upscaled Buffer]
+  Bytes in memory, PNG format, 1800x1800+
+         │
+         └─ Apply effects (if provided)
+              │
+              └─ EffectsProcessor.processImage()
+                   │
+                   ↓
+  [Effects-Enhanced Buffer]
+  Bytes in memory, WebP format with effects applied
+         │
+         └─ Final validation
+              │
+              ├─ Dimensions >= 1800x1800 ✓
+              ├─ Quality sufficient ✓
+              │
+              ↓
+  [Final Buffer Ready for Upload]
+         │
+         └─ uploadImage() to Printify
+              │
+              └─ POST /v1/shops/{id}/uploads
+                   │
+                   ↓
+  [Printify CDN]
+  PNG/WebP stored on Printify servers
+  Accessible via public URL
+         │
+         └─ createProduct() uses image URL
+              │
+              ↓
+  [Printify Product]
+  Complete product with:
+  ├─ Product ID
+  ├─ Variants
+  ├─ Images
+  └─ Print provider configuration
+         │
+         └─ storeUserProduct() in Firebase
+              │
+              ↓
+  [Firebase Database Entry]
+  JSON metadata stored at:
+  /users/{userId}/products/{productId}
+
+
+CRITICAL PATHS & CHECKPOINTS:
+═════════════════════════════
+
+✓ Checkpoint 1: Request Parameters
+  Location: merchandise.js, line 423
+  Must have: imageId, imageUrl, productType
+  Log marker: 📋 DIAGNOSTIC: API Request payload validation
+
+✓ Checkpoint 2: Product Configuration
+  Location: merchandise.js, line 440
+  Must find: Product config by type
+  Log marker: 🔍 DIAGNOSTIC: Looking up product configuration
+
+✓ Checkpoint 3: Blueprint/Provider Validation
+  Location: merchandise.js, line 487
+  Must match: IDs from request vs config
+  Log marker: 🔍 DIAGNOSTIC: Blueprint/Provider ID validation
+
+✓ Checkpoint 4: Image Download
+  Location: merchandise.js, line 1885
+  Must succeed: downloadImageFromS3()
+  Log marker: 📥 Downloading image from
+
+✓ Checkpoint 5: Quality Check
+  Location: auto-enhanced-printify-service.js, line 36
+  Must pass: Dimensions >= 1800x1800
+  Log marker: 🔄 Auto-enhancement upload for
+
+✓ Checkpoint 6: Upscaling (if needed)
+  Location: image-upscaling-service.js, line 127
+  Must produce: 1800x1800+ PNG
+  Log marker: 🚀 UPSCALING FOR PRINTIFY
+
+✓ Checkpoint 7: Effects Application (if applicable)
+  Location: EffectsProcessor.js, line 20
+  Must apply: All selected effects cleanly
+  Log marker: 🎨 Processing image with effects
+
+✓ Checkpoint 8: Printify Upload
+  Location: printify-service.js
+  Must return: Valid upload ID & URL
+  Log marker: ✅ PROACTIVE UPLOAD
+
+✓ Checkpoint 9: Product Creation
+  Location: printify-service.js
+  Must return: Product ID with variants
+  Log marker: ✅ [PRINTIFY API] PRODUCT CREATED
+
+✓ Checkpoint 10: Database Storage
+  Location: merchandise-database.js
+  Must persist: Complete product metadata
+  Log marker: ✅ Product stored in database
+
+
+KEY TECHNICAL FEATURES:
+══════════════════════
+
+1. PROACTIVE FORMAT TRACKING
+   ├─ Track format changes at source (not reactive detection)
+   ├─ Example: Upscaler returns { buffer, fileName: 'image.png' }
+   ├─ No guessing about format after transformation
+   └─ Log marker: 📝 PROACTIVE FORMAT TRACKING
+
+2. EFFECTS AFTER UPSCALING (Issue #96 Fix)
+   ├─ Apply effects AFTER upscaling, not before
+   ├─ Preserves quality and ensures effects aren't lost
+   ├─ Effects applied to final 1800x1800+ image
+   └─ Log marker: 🔥 APPLYING EFFECTS AFTER UPSCALING
+
+3. STRICT VALIDATION (NO FALLBACKS)
+   ├─ Fail fast on invalid inputs
+   ├─ No default values or guessing
+   ├─ All parameters must be explicitly provided
+   └─ Log markers: ❌ FATAL ERROR
+
+4. AUTO-ENHANCEMENT
+   ├─ Automatically detects images needing upscaling
+   ├─ Uses AI upscaling service for quality
+   ├─ Validates result meets Printify standards
+   └─ Returns enhancement metadata
+
+5. DATABASE PERSISTENCE
+   ├─ Stores enhancement metadata with product
+   ├─ Tracks: autoEnhanced, enhancementSource, originalSuitable
+   ├─ Enables future enhancement reuse
+   └─ Firebase structure: /users/{userId}/products/{productId}
+
+
