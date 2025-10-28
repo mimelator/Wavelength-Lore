@@ -2497,17 +2497,39 @@ class MerchandiseStore {
     console.log('🔍 Looking for product config:', productTypeId);
     console.log('🔍 Available products count:', this.availableProducts?.length || 0);
     console.log('🔍 Available categories:', Object.keys(this.productCategories || {}));
-    
-    // First, try direct search in availableProducts array
+
+    // First, try direct search in availableProducts array by ID (handles both "validated-XX" and direct IDs)
     if (this.availableProducts && this.availableProducts.length > 0) {
       const product = this.availableProducts.find(p => p.id === productTypeId);
       if (product) {
-        console.log('✅ Found product config in availableProducts:', product);
+        console.log('✅ Found product config in availableProducts by ID:', product);
         return product;
       }
     }
-    
-    // Fallback: Search through product categories
+
+    // Second, try searching by category if productTypeId looks like a category name (e.g., "coffee-mug")
+    // This handles the case where a category name is passed instead of validated-XX
+    if (this.availableProducts && this.availableProducts.length > 0) {
+      const categoryProduct = this.availableProducts.find(p => p.category === productTypeId);
+      if (categoryProduct) {
+        console.log('✅ Found product config by category match:', categoryProduct);
+        return categoryProduct;
+      }
+    }
+
+    // Third, try searching by blueprint ID if productTypeId is a number
+    if (this.availableProducts && this.availableProducts.length > 0) {
+      const blueprintId = parseInt(productTypeId);
+      if (!isNaN(blueprintId)) {
+        const product = this.availableProducts.find(p => p.blueprintId === blueprintId);
+        if (product) {
+          console.log('✅ Found product config by blueprint ID:', product);
+          return product;
+        }
+      }
+    }
+
+    // Fourth fallback: Search through product categories structure
     if (this.productCategories) {
       for (const [categoryKey, category] of Object.entries(this.productCategories)) {
         console.log(`🔍 Checking category ${categoryKey}:`, category.products?.map(p => p.id));
@@ -2518,7 +2540,7 @@ class MerchandiseStore {
         }
       }
     }
-    
+
     console.log('❌ Product config not found for:', productTypeId);
     return null;
   }
@@ -2613,41 +2635,31 @@ class MerchandiseStore {
     console.log('🔍 Product blueprintId:', product.blueprintId);
     console.log('🔍 Product categoryId:', product.categoryId);
     console.log('🔍 Product productType:', product.productType);
-    
+
     // First check if product has stored productType metadata
     if (product.productType) {
       console.log('🔍 Found stored productType:', product.productType);
-      
-      // Handle validated-XX format - extract the blueprint ID
+
+      // Handle validated-XX format - keep it as-is for most accurate lookup
       if (product.productType.startsWith('validated-')) {
         const blueprintId = product.productType.replace('validated-', '');
         console.log('🔍 Extracted blueprint ID from productType:', blueprintId);
-        
-        // Try to find the product type dynamically from loaded product data
+
+        // Try to find the product in availableProducts by blueprint ID to verify it exists
         if (this.availableProducts && this.availableProducts.length > 0) {
           const matchingProduct = this.availableProducts.find(p => p.blueprintId === parseInt(blueprintId));
           if (matchingProduct) {
-            console.log('🔍 Found dynamic product for blueprint', blueprintId, ':', matchingProduct.name);
-            // Return the productType or category from the dynamic data
-            return matchingProduct.productType || matchingProduct.category || 'custom-product';
+            console.log('✅ Verified product exists for blueprint', blueprintId, ':', matchingProduct.name);
+            // Return the validated-XX ID directly for most accurate config lookup
+            return product.productType;
           }
         }
-        
-        console.log('⚠️ No dynamic product found for blueprint', blueprintId, '- using fallback');
-        // Fallback for common blueprint IDs if dynamic lookup fails
-        const fallbackMap = {
-          '68': 'coffee-mug',
-          '5': 't-shirt',
-          '77': 'hoodie',
-          '220': 'pillow'
-        };
-        
-        if (fallbackMap[blueprintId]) {
-          console.log('� Using fallback mapping for blueprint', blueprintId);
-          return fallbackMap[blueprintId];
-        }
+
+        console.log('⚠️ No dynamic product found for blueprint', blueprintId, '- using productType as-is');
+        // Return the validated-XX format as stored
+        return product.productType;
       }
-      
+
       // Return as-is if not in validated-XX format
       return product.productType;
     }
