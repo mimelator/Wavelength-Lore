@@ -544,16 +544,70 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
     console.log('✅ Image cached successfully, size:', (imageBuffer.length / 1024).toFixed(2), 'KB');
 
     // 🎨 CRITICAL: Apply user customizations (effects, borders) BEFORE upscaling
+    console.log('\n🔍 IMAGE BUFFER DIAGNOSTIC BEFORE EFFECTS:');
+    console.log('   Buffer size:', (imageBuffer.length / 1024).toFixed(2), 'KB');
+    console.log('   Buffer type:', Buffer.isBuffer(imageBuffer) ? 'Buffer' : typeof imageBuffer);
+
     if (imageContext && (imageContext.effects || imageContext.borderEnabled)) {
-      console.log('🎨 Applying user customizations before upscaling...');
+      console.log('\n🎨 Applying user customizations before upscaling...');
+      console.log('   imageContext.effects:', imageContext.effects);
+      console.log('   imageContext.borderEnabled:', imageContext.borderEnabled);
+
       const EffectsProcessor = require('../services/EffectsProcessor');
+      const effectsConfig = require('../config/effectsConfig');
       const effectsProcessor = new EffectsProcessor();
 
+      // 🔥 CRITICAL FIX: Convert boolean effect selections to numeric parameters using presets
+      let effectsToApply = {
+        saturation: 1.0,
+        colorTemperature: 5500,
+        bloom: 0,
+        vignette: 0,
+        blur: 0,
+        brightness: 1.0,
+        contrast: 1.0,
+        lightning: 0,
+        borderEnabled: imageContext.borderEnabled || false,
+        borderColor: imageContext.borderColor || '#000000',
+        borderWidth: imageContext.borderWidth || 0,
+        borderWidthPixels: imageContext.borderWidthPixels || 0
+      };
+
+      console.log('\n🔍 Converting effect selections to numeric parameters:');
+      if (imageContext.effects && Object.keys(imageContext.effects).length > 0) {
+        // Merge all selected effect presets
+        Object.entries(imageContext.effects).forEach(([effectName, isEnabled]) => {
+          if (isEnabled && effectsConfig.effectTypes && effectsConfig.effectTypes[effectName]) {
+            const effectPreset = effectsConfig.effectTypes[effectName].preset;
+            console.log(`   ✅ ${effectName} selected - merging preset:`, effectPreset);
+
+            // Merge preset values (higher values win for multiplicative params)
+            Object.entries(effectPreset).forEach(([paramName, paramValue]) => {
+              if (typeof paramValue === 'number') {
+                // For multiplicative values (saturation, brightness, contrast), multiply
+                if (['saturation', 'brightness', 'contrast'].includes(paramName)) {
+                  effectsToApply[paramName] = (effectsToApply[paramName] || 1.0) * paramValue;
+                } else {
+                  // For additive values (bloom, vignette, blur, lightning), add
+                  effectsToApply[paramName] = (effectsToApply[paramName] || 0) + paramValue;
+                }
+              }
+            });
+          }
+        });
+      }
+
+      console.log('\n✅ Final effect parameters to apply:');
+      console.log('   ', effectsToApply);
+
       try {
-        const customizedBuffer = await effectsProcessor.processImage(imageBuffer, imageContext);
+        const customizedBuffer = await effectsProcessor.processImage(imageBuffer, effectsToApply);
         if (customizedBuffer && customizedBuffer.length > 0) {
+          console.log('\n✅ Effects processing returned buffer');
+          console.log('   Original buffer size:', (imageBuffer.length / 1024).toFixed(2), 'KB');
+          console.log('   Customized buffer size:', (customizedBuffer.length / 1024).toFixed(2), 'KB');
           imageBuffer = customizedBuffer;
-          console.log('✅ User customizations applied, new size:', (imageBuffer.length / 1024).toFixed(2), 'KB');
+          console.log('   ✅ imageBuffer updated with customized version');
         } else {
           console.warn('⚠️ Effects processing returned empty buffer, using original');
         }
@@ -562,13 +616,18 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
         console.warn('⚠️ Continuing with original image (no effects applied)');
       }
     } else {
-      console.log('ℹ️ No user customizations to apply');
+      console.log('\nℹ️ No user customizations to apply (no effects or borders)');
     }
+
+    console.log('\n🔍 IMAGE BUFFER DIAGNOSTIC BEFORE PRINTIFY:');
+    console.log('   Buffer size being sent to Printify:', (imageBuffer.length / 1024).toFixed(2), 'KB');
+    console.log('   This is the buffer that will be uploaded to Printify');
 
     console.log('\n🖨️ [PRINTIFY API] Creating product with auto-enhancement...');
     console.log('   Product Type:', productType);
     console.log('   Blueprint ID (actual):', actualBlueprintId);
     console.log('   Print Provider (actual):', actualPrintProviderId);
+    console.log('   Image buffer size:', (imageBuffer.length / 1024).toFixed(2), 'KB');
 
     // Create product with auto-enhancement
     const productResult = await printifyService.createCustomProductWithBlueprintAndAutoEnhancement(
