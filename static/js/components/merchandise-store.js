@@ -2243,31 +2243,28 @@ class MerchandiseStore {
         const blueprintId = product.productType.replace('validated-', '');
         console.log('🔍 Extracted blueprint ID from productType:', blueprintId);
         
-        // Map blueprint IDs to product types (comprehensive list from backend)
-        const blueprintMap = {
-          '5': 't-shirt',
-          '6': 'heavy-cotton-tee',
-          '9': 't-shirt',
-          '10': 'tank-top',
-          '12': 't-shirt',
-          '49': 'sweatshirt',
-          '66': 'hoodie',
+        // Try to find the product type dynamically from loaded product data
+        if (this.availableProducts && this.availableProducts.length > 0) {
+          const matchingProduct = this.availableProducts.find(p => p.blueprintId === parseInt(blueprintId));
+          if (matchingProduct) {
+            console.log('🔍 Found dynamic product for blueprint', blueprintId, ':', matchingProduct.name);
+            // Return the productType or category from the dynamic data
+            return matchingProduct.productType || matchingProduct.category || 'custom-product';
+          }
+        }
+        
+        console.log('⚠️ No dynamic product found for blueprint', blueprintId, '- using fallback');
+        // Fallback for common blueprint IDs if dynamic lookup fails
+        const fallbackMap = {
           '68': 'coffee-mug',
-          '70': 'travel-mug',
+          '5': 't-shirt',
           '77': 'hoodie',
-          '175': 'hoodie',
-          '413': 'backpack',
-          '238': 'blanket',
-          '220': 'pillow',
-          '268': 'phone-case',
-          '269': 'phone-case',
-          '277': 'canvas',
-          '1313': 'tote-bag'
+          '220': 'pillow'
         };
         
-        if (blueprintMap[blueprintId]) {
-          console.log('🔍 Mapped validated productType to:', blueprintMap[blueprintId]);
-          return blueprintMap[blueprintId];
+        if (fallbackMap[blueprintId]) {
+          console.log('� Using fallback mapping for blueprint', blueprintId);
+          return fallbackMap[blueprintId];
         }
       }
       
@@ -2385,30 +2382,43 @@ class MerchandiseStore {
   }
   
   getProductTypeName(productType) {
-    const names = {
-      't-shirt': 'T-Shirt',
-      'heavy-cotton-tee': 'Heavy Cotton Tee',
-      'tank-top': 'Tank Top',
-      'sweatshirt': 'Sweatshirt',
-      'hoodie': 'Pullover Hoodie',
+    // Try to find the product type in our dynamically loaded product data
+    if (this.availableProducts && this.availableProducts.length > 0) {
+      // Look for a product with matching blueprint ID from validated-XX format
+      if (productType.startsWith && productType.startsWith('validated-')) {
+        const blueprintId = parseInt(productType.replace('validated-', ''));
+        const matchingProduct = this.availableProducts.find(p => p.blueprintId === blueprintId);
+        if (matchingProduct && matchingProduct.name) {
+          console.log('🎯 Found dynamic product name:', matchingProduct.name, 'for blueprint', blueprintId);
+          return matchingProduct.name;
+        }
+      }
+      
+      // Look for direct productType match
+      const matchingProduct = this.availableProducts.find(p => p.productType === productType || p.category === productType);
+      if (matchingProduct && matchingProduct.name) {
+        console.log('🎯 Found dynamic product name:', matchingProduct.name, 'for type', productType);
+        return matchingProduct.name;
+      }
+    }
+    
+    // Fallback to minimal hardcoded mapping for common cases
+    const fallbackNames = {
       'coffee-mug': 'Coffee Mug',
-      'travel-mug': 'Travel Mug',
-      'backpack': 'Backpack',
-      'blanket': 'Fleece Blanket',
-      'pillow': 'Square Pillow',
-      'phone-case': 'Phone Case',
-      'canvas': 'Canvas Print',
-      'tote-bag': 'Tote Bag',
-      'premium-tshirt': 'Premium T-Shirt',
-      'poster': 'Premium Poster',
-      'mug': 'Coffee Mug',
-      'sticker': 'Vinyl Sticker',
-      'womens-tee': "Women's Tee",
-      'infant-tee': 'Infant Tee',
-      'ultra-cotton-tee': 'Ultra Cotton Tee',
-      'ultra-cotton-alt': 'Ultra Cotton Tee'
+      't-shirt': 'T-Shirt',
+      'hoodie': 'Hoodie',
+      'mug': 'Mug'
     };
-    return names[productType] || 'Custom Product';
+    
+    const fallbackName = fallbackNames[productType];
+    if (fallbackName) {
+      console.log('🔄 Using fallback name:', fallbackName, 'for type', productType);
+      return fallbackName;
+    }
+    
+    console.log('⚠️ No name found for product type:', productType, '- using formatted version');
+    // Last resort: format the productType string nicely
+    return productType ? productType.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Custom Product';
   }
   
   getProductDetails(product) {
