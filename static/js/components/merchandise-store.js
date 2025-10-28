@@ -1843,6 +1843,40 @@ class MerchandiseStore {
       this.renderCategoryProducts(container);
       // Load blueprint preview images after rendering
       this.loadBlueprintPreviews();
+      
+      // 🎯 SCROLL TO ENSURE PRODUCT TYPES ARE VISIBLE
+      // Add a brief delay to ensure rendering is complete
+      setTimeout(() => {
+        // First try to scroll to the product types container
+        const productTypesContainer = container.querySelector('.category-products-view') || 
+                                     container.querySelector('.products-grid') ||
+                                     container;
+        
+        if (productTypesContainer) {
+          productTypesContainer.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start',
+            inline: 'nearest' 
+          });
+          
+          if (this.debugMode) {
+            console.log('🎯 Scrolled to product types for category:', categoryKey);
+          }
+        } else {
+          // Fallback: scroll to the choose-product-section
+          const chooseProductSection = document.getElementById('choose-product-section');
+          if (chooseProductSection) {
+            chooseProductSection.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'start' 
+            });
+            
+            if (this.debugMode) {
+              console.log('🎯 Fallback scroll to choose-product-section');
+            }
+          }
+        }
+      }, 300); // Brief delay to ensure DOM updates complete
     }
   }
 
@@ -1863,6 +1897,40 @@ class MerchandiseStore {
     const container = document.getElementById('category-navigation-container');
     if (container) {
       this.renderCategoryCards(container);
+      
+      // 🎯 SCROLL TO CATEGORY SELECTION FOR BETTER UX
+      // Add a brief delay to ensure rendering is complete
+      setTimeout(() => {
+        // Try to scroll to the category cards container
+        const categoryCardsContainer = container.querySelector('.category-cards-view') ||
+                                      container.querySelector('.category-cards-grid') ||
+                                      container;
+        
+        if (categoryCardsContainer) {
+          categoryCardsContainer.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start',
+            inline: 'nearest' 
+          });
+          
+          if (this.debugMode) {
+            console.log('🎯 Scrolled back to category selection');
+          }
+        } else {
+          // Fallback: scroll to the choose-product-section
+          const chooseProductSection = document.getElementById('choose-product-section');
+          if (chooseProductSection) {
+            chooseProductSection.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'start' 
+            });
+            
+            if (this.debugMode) {
+              console.log('🎯 Fallback scroll to choose-product-section (back to categories)');
+            }
+          }
+        }
+      }, 300); // Brief delay to ensure DOM updates complete
     }
   }
 
@@ -4550,6 +4618,43 @@ class MerchandiseStore {
     // Render and show the customization modal
     const modalHtml = this.modalRenderer.renderCustomizationModal(product);
     this.modalRenderer.showModal(modalHtml);
+    
+    // 🎯 ENSURE MODAL IS PROPERLY VISIBLE
+    // Add a brief delay to ensure modal is rendered and visible
+    setTimeout(() => {
+      // First, try to find the modal element
+      const modal = document.querySelector('.merchandise-customization-modal') || 
+                   document.querySelector('.modal') ||
+                   document.querySelector('[role="dialog"]') ||
+                   document.querySelector('.modal-overlay');
+      
+      if (modal) {
+        // Scroll the modal into view
+        modal.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center',
+          inline: 'center' 
+        });
+        
+        if (this.debugMode) {
+          console.log('🎯 Scrolled customization modal into view');
+        }
+      } else {
+        // Fallback: scroll to ensure the page is positioned well for modal viewing
+        // Usually modals appear centered, so scroll to the top-middle area
+        const chooseProductSection = document.getElementById('choose-product-section');
+        if (chooseProductSection) {
+          chooseProductSection.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+          
+          if (this.debugMode) {
+            console.log('🎯 Positioned page for modal visibility (fallback)');
+          }
+        }
+      }
+    }, 400); // Delay to ensure modal rendering completes
   }
 
   /**
