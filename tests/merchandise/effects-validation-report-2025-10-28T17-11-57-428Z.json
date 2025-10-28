@@ -1,0 +1,37 @@
+{
+  "timestamp": "2025-10-28T17:11:57.148Z",
+  "testName": "Effects Validation - GitHub Issue #96",
+  "steps": [
+    {
+      "name": "Server connectivity",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:11:57.239Z",
+      "details": "Server is responding"
+    },
+    {
+      "name": "Test product prepared",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:11:57.239Z",
+      "details": {
+        "selectedEffects": [
+          "vibrancy",
+          "dramatic"
+        ],
+        "productType": "validated-413"
+      }
+    },
+    {
+      "name": "API request",
+      "status": "FAIL",
+      "timestamp": "2025-10-28T17:11:57.427Z",
+      "details": "Status 400: Failed to process image"
+    },
+    {
+      "name": "Full error response",
+      "status": "FAIL",
+      "timestamp": "2025-10-28T17:11:57.427Z",
+      "details": "{\n  \"success\": false,\n  \"error\": \"Failed to process image\"\n}"
+    }
+  ],
+  "conclusion": "ERROR - Request failed with status code 400"
+}

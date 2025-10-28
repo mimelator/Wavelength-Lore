@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-10-28T17:11:11.060Z",
+  "testName": "Effects Validation - GitHub Issue #96",
+  "steps": [
+    {
+      "name": "Server connectivity",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:11:11.153Z",
+      "details": "Server is responding"
+    },
+    {
+      "name": "Test product prepared",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:11:11.153Z",
+      "details": {
+        "selectedEffects": [
+          "vibrancy",
+          "dramatic"
+        ],
+        "productType": "validated-premium-tshirt"
+      }
+    },
+    {
+      "name": "API request",
+      "status": "FAIL",
+      "timestamp": "2025-10-28T17:11:11.233Z",
+      "details": "Status 400: Invalid product type: validated-premium-tshirt"
+    }
+  ],
+  "conclusion": "ERROR - Request failed with status code 400"
+}

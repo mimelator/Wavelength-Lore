@@ -1,0 +1,82 @@
+{
+  "timestamp": "2025-10-28T17:12:28.893Z",
+  "testName": "Effect Conversion Logic Test - Issue #96",
+  "steps": [
+    {
+      "name": "effectsConfig loaded",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:12:28.897Z",
+      "details": "Found 6 effect types"
+    },
+    {
+      "name": "vibrancy preset found",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:12:28.897Z",
+      "details": {
+        "saturation": 1.4,
+        "colorTemperature": 3800,
+        "brightness": 1.08,
+        "contrast": 1.15
+      }
+    },
+    {
+      "name": "vibrancy has numeric parameters",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:12:28.897Z",
+      "details": "saturation, colorTemperature, brightness, contrast"
+    },
+    {
+      "name": "dramatic preset found",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:12:28.897Z",
+      "details": {
+        "vignette": 0.5,
+        "contrast": 1.2,
+        "blur": 2
+      }
+    },
+    {
+      "name": "dramatic has numeric parameters",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:12:28.897Z",
+      "details": "vignette, contrast, blur"
+    },
+    {
+      "name": "User selected effects",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:12:28.897Z",
+      "details": {
+        "vibrancy": true,
+        "dramatic": true
+      }
+    },
+    {
+      "name": "Effect conversion complete",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:12:28.897Z",
+      "details": {
+        "saturation": 1.4,
+        "colorTemperature": 9300,
+        "bloom": 0,
+        "vignette": 0.5,
+        "blur": 2,
+        "brightness": 1.08,
+        "contrast": 1.38,
+        "lightning": 0
+      }
+    },
+    {
+      "name": "All parameters are numeric",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:12:28.897Z",
+      "details": "Ready to send to EffectsProcessor"
+    },
+    {
+      "name": "Boolean→Numeric conversion WORKS",
+      "status": "PASS",
+      "timestamp": "2025-10-28T17:12:28.897Z",
+      "details": "Input: {vibrancy: true} → Output: {saturation: 1.4, contrast: 1.38, vignette: 0.5}"
+    }
+  ],
+  "conclusion": "PASS - Effect conversion logic is CORRECT"
+}

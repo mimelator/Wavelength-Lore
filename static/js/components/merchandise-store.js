@@ -1485,7 +1485,6 @@ class MerchandiseStore {
             </div>
             
             <div class="store-section">
-              <h2>🛒 Shopping Cart</h2>
               <div class="cart-container">
                 ${this.renderCart()}
               </div>

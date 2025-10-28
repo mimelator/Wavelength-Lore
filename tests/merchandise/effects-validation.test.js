@@ -93,30 +93,24 @@ async function runEffectsValidationTest() {
     console.log('\nSTEP 2: Simulating product creation with effects...\n');
 
     // Test data: Simulate what would be sent when user selects effects
+    // Using a real product type from product-types.js and a localhost image
     const testProduct = {
       imageId: `test-product-${Date.now()}`,
-      imageUrl: 'https://via.placeholder.com/800x600',
+      imageUrl: `${BASE_URL}/test-image.jpg`, // Local test image
       imageTitle: 'Test Product with Effects',
-      productType: 'premium-tshirt',
-      customization: {
-        effects: {
-          vibrancy: true,
-          dramatic: true
-        },
-        borderEnabled: false
-      },
+      productType: 'validated-413', // Backpack - real product from product-types.js
+      blueprintId: 413,
+      printProviderId: null,
       imageContext: {
         effects: {
           vibrancy: true,
           dramatic: true
-        },
-        imageBuffer: Buffer.alloc(0), // placeholder
-        imageUrl: 'https://via.placeholder.com/800x600'
+        }
       }
     };
 
     logStep('Test product prepared', 'PASS', {
-      selectedEffects: Object.keys(testProduct.customization.effects),
+      selectedEffects: Object.keys(testProduct.imageContext.effects),
       productType: testProduct.productType
     });
 
@@ -127,14 +121,18 @@ async function runEffectsValidationTest() {
 
     let previewResponse = null;
     try {
-      previewResponse = await axios.post(`${BASE_URL}/api/merchandise/preview-finished-product`, testProduct, {
+      previewResponse = await axios.post(`${BASE_URL}/api/merchandise/create-guided-product`, testProduct, {
         timeout: 30000,
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer dev-bypass' // Allow test to run without auth
+        }
       });
       logStep('API request sent successfully', 'PASS', `Status: ${previewResponse.status}`);
     } catch (e) {
       if (e.response) {
         logStep('API request', 'FAIL', `Status ${e.response.status}: ${e.response.data?.error || e.message}`);
+        logStep('Full error response', 'FAIL', JSON.stringify(e.response.data, null, 2).substring(0, 500));
       } else {
         logStep('API request', 'FAIL', e.message);
       }
