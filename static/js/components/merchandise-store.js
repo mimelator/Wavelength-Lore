@@ -219,7 +219,7 @@ class MerchandiseStore {
   }
 
   /**
-   * Get category icon using dynamic product catalog data
+   * Get category icon synchronously for immediate UI rendering
    */
   getCategoryIcon(category) {
     console.log('🔍 getCategoryIcon called with category:', category);
@@ -235,13 +235,41 @@ class MerchandiseStore {
       
       if (matchingProduct) {
         console.log('✅ Found matching product for icon:', matchingProduct.title);
-        // Return icon based on product category or infer from type
-        return this.inferIconFromProductType(this.extractProductTypeFromProduct(matchingProduct));
+        // Use cached blueprint data if available, otherwise default
+        return this.getCachedIconForBlueprint(matchingProduct.blueprintId) || this.getBasicIconForCategory(category);
       }
     }
     
-    // Dynamic fallback based on category name patterns
-    return this.inferIconFromProductType(category);
+    // Basic fallback icon
+    return this.getBasicIconForCategory(category);
+  }
+  
+  /**
+   * Get cached icon from blueprint if available
+   */
+  getCachedIconForBlueprint(blueprintId) {
+    // This would check if we have cached blueprint data
+    // For now, return null to use fallback
+    return null;
+  }
+  
+  /**
+   * Get basic icon for category (minimal hardcoded fallbacks)
+   */
+  getBasicIconForCategory(category) {
+    if (!category) return '📦';
+    
+    const type = category.toLowerCase();
+    
+    // Basic essential mappings only
+    if (type.includes('mug')) return '☕';
+    if (type.includes('travel') && type.includes('mug')) return '🥤';
+    if (type.includes('shirt') || type.includes('tee')) return '👕';
+    if (type.includes('hoodie')) return '🧥';
+    if (type.includes('bag')) return '👜';
+    if (type.includes('sticker')) return '🏷️';
+    
+    return '📦';
   }
   
   /**
@@ -334,8 +362,8 @@ class MerchandiseStore {
       }
     }
     
-    // Dynamic price estimation based on product type patterns
-    return this.estimatePriceByPattern(category);
+    // Fallback to basic default pricing
+    return '$19.95';
   }
   
   /**
