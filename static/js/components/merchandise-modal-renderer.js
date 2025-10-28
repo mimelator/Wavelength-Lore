@@ -2708,11 +2708,25 @@ class MerchandiseModalRenderer {
       customizationModal.parentElement.remove();
     }
 
+    // 🔥 CRITICAL: Extract product data from the customization modal's parent overlay
+    const customizationOverlay = customizationModal?.closest('.modal-overlay');
+    const productType = customizationOverlay?.dataset.productType;
+    const blueprintId = customizationOverlay?.dataset.blueprintId ? parseInt(customizationOverlay.dataset.blueprintId, 10) : null;
+    const printProviderId = customizationOverlay?.dataset.printProviderId ? parseInt(customizationOverlay.dataset.printProviderId, 10) : null;
+
+    console.log('🎯 handleAddToCartFromFinishedProduct - Extracted data:');
+    console.log('   productType:', productType);
+    console.log('   blueprintId:', blueprintId);
+    console.log('   printProviderId:', printProviderId);
+
     // Emit event with customization data
     // The merchandise store should handle navigating to product options
     if (this.eventBus) {
       this.eventBus.emit('product.goToProductOptions', {
         productId: productId,
+        productType: productType,
+        blueprintId: blueprintId,
+        printProviderId: printProviderId,
         customization: customization
       });
     }

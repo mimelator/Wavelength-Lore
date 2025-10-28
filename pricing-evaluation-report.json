@@ -1,0 +1,89 @@
+{
+  "timestamp": "2025-10-28T11:41:02.758Z",
+  "summary": {
+    "total": 5,
+    "successful": 0,
+    "failed": 5,
+    "successRate": 0,
+    "avgResponseTime": 47,
+    "totalVariants": 0
+  },
+  "detailed": {
+    "total": 5,
+    "successful": 0,
+    "failed": 5,
+    "apiErrors": 0,
+    "noPricing": 5,
+    "totalVariants": 0,
+    "totalResponseTime": 237,
+    "priceRange": {
+      "min": null,
+      "max": 0
+    },
+    "byCategory": {},
+    "byProvider": {},
+    "failedProducts": [
+      {
+        "success": false,
+        "productKey": "validated-413",
+        "name": "Backpack",
+        "blueprintId": 413,
+        "printProviderId": 10,
+        "provider": "MWW On Demand",
+        "category": "backpack",
+        "error": "No valid pricing data",
+        "responseTime": 77,
+        "variantCount": 1
+      },
+      {
+        "success": false,
+        "productKey": "validated-238",
+        "name": "Sherpa Fleece Blanket",
+        "blueprintId": 238,
+        "printProviderId": 99,
+        "provider": "MWW On Demand",
+        "category": "blanket",
+        "error": "No valid pricing data",
+        "responseTime": 28,
+        "variantCount": 2
+      },
+      {
+        "success": false,
+        "productKey": "validated-1091",
+        "name": "Crushed Velvet Blanket",
+        "blueprintId": 1091,
+        "printProviderId": 10,
+        "provider": "MWW On Demand",
+        "category": "blanket",
+        "error": "No valid pricing data",
+        "responseTime": 31,
+        "variantCount": 1
+      },
+      {
+        "success": false,
+        "productKey": "validated-1385",
+        "name": "Fleece Sherpa Blanket",
+        "blueprintId": 1385,
+        "printProviderId": 1,
+        "provider": "Printful",
+        "category": "blanket",
+        "error": "No valid pricing data",
+        "responseTime": 59,
+        "variantCount": 4
+      },
+      {
+        "success": false,
+        "productKey": "validated-1573",
+        "name": "Quilted Throw",
+        "blueprintId": 1573,
+        "printProviderId": 10,
+        "provider": "MWW On Demand",
+        "category": "blanket",
+        "error": "No valid pricing data",
+        "responseTime": 42,
+        "variantCount": 1
+      }
+    ],
+    "successfulProducts": []
+  }
+}
