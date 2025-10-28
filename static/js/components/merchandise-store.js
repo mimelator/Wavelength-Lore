@@ -3714,14 +3714,22 @@ class MerchandiseStore {
 
       // Prepare product data with proper image fields for modal renderer
       // NOTE: product.images contains Printify image objects with .src property, not .url
+      // 🔥 CRITICAL FIX: Use original gallery image for customization preview, not the manufactured product image
+      // The sourceImage is the original user-selected image from their gallery
+      // Effects and borders work much better with the original image than the manufactured mockup
+      const originalImageUrl = product.sourceImage?.url || product.sourceImage?.thumbnailUrl || '/images/previews/generic-product-preview.svg';
+
       const preparedProduct = {
         ...product,
         // Ensure id is set (prefer id, fallback to productId)
         id: product.id || product.productId,
-        // Ensure image fields are set for modal renderer
-        // Try .src (Printify format) first, then .url, then fallback
-        image: product.image || (product.images?.[0]?.src) || (product.images?.[0]?.url) || (product.previewImage) || '/images/previews/generic-product-preview.svg',
-        previewImage: product.previewImage || (product.images?.[0]?.src) || (product.images?.[0]?.url) || (product.image) || '/images/previews/generic-product-preview.svg',
+        // CRITICAL: Use original gallery image for preview in customization modal
+        // This allows effects and borders to be applied correctly to the original artwork
+        // (Printify images are manufactured product mockups, not suitable for effects processing)
+        image: originalImageUrl,
+        previewImage: originalImageUrl,
+        // Keep Printify images as fallback for product display elsewhere
+        printifyImage: product.images?.[0]?.src || product.images?.[0]?.url,
         // CRITICAL: Add blueprintId and printProviderId from product config
         blueprintId: product.blueprintId || productConfig?.blueprintId,
         printProviderId: product.printProviderId || productConfig?.printProviderId
