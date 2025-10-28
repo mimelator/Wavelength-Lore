@@ -410,14 +410,24 @@ jobs:
 
           # Commit the version changes
           git add package.json version.json
-          git commit -m "🔖 Auto-increment version to v$NEW_VERSION after successful deployment [skip version]"
-          
-          # Create and push tag
-          git tag "v$NEW_VERSION"
-          git push origin main
-          git push origin "v$NEW_VERSION"
-          
-          echo "::notice::✅ Version v$NEW_VERSION committed and tagged"
+          git commit -m "🔖 Auto-increment version to v$NEW_VERSION after successful deployment [skip version]" || echo "::notice::No changes to commit"
+
+          # Ensure we have remote tags locally for existence check
+          git fetch --tags origin || echo "::warning::Failed to fetch tags from origin (continuing)"
+
+          # Create and push tag only if it doesn't already exist (idempotent)
+          if git rev-parse -q --verify "refs/tags/v$NEW_VERSION" >/dev/null; then
+            echo "::notice::Tag v$NEW_VERSION already exists on this repository; skipping tag creation"
+          else
+            git tag "v$NEW_VERSION"
+            git push origin "v$NEW_VERSION"
+            echo "::notice::✅ Tag v$NEW_VERSION created and pushed"
+          fi
+
+          # Push the commit to main (always) -- do this after tag to keep history consistent
+          git push origin main || echo "::warning::Failed to push commit to origin/main"
+
+          echo "::notice::✅ Version commit/push step completed for v$NEW_VERSION"
 
       - name: Deployment Summary
         if: success()
