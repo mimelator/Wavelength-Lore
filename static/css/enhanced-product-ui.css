@@ -1281,6 +1281,184 @@
   gap: 8px;
 }
 
+/* 
+   CART FOOTER SPACING FIX
+   Fixes cramped text and button spacing in cart summary and checkout sections
+*/
+
+/* Cart footer container - add proper spacing */
+.cart-footer {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Cart summary section - improve line spacing */
+.cart-summary {
+  margin-bottom: 25px; /* Add space before checkout section */
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px; /* Add breathing room between rows */
+  padding: 0 4px; /* Subtle padding for better alignment */
+}
+
+.summary-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Total row - make it stand out more */
+.summary-row.total-row {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.summary-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+}
+
+.summary-value {
+  color: #fff;
+  font-weight: 500;
+}
+
+.total-value {
+  color: #4CAF50;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* Savings info section - proper spacing */
+.savings-info {
+  margin-top: 15px;
+  margin-bottom: 20px;
+}
+
+.savings-message {
+  background: rgba(76, 175, 80, 0.15);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  color: #4CAF50;
+  padding: 10px 15px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.savings-message span {
+  font-size: 1.1rem;
+}
+
+/* Checkout section - proper spacing and layout */
+.checkout-section {
+  margin-top: 25px; /* Crucial spacing above checkout button */
+}
+
+.checkout-btn {
+  width: 100%;
+  margin-bottom: 15px; /* Space between button and info text */
+  padding: 16px 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'AnimeAce', Arial, sans-serif;
+}
+
+.checkout-btn:hover {
+  background: linear-gradient(135deg, #45a049 0%, #3e8e41 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.checkout-icon {
+  font-size: 1.2rem;
+}
+
+.checkout-total {
+  font-weight: 700;
+  margin-left: auto;
+}
+
+/* Checkout info text - better spacing */
+.checkout-info {
+  margin-bottom: 20px; /* Space before continue shopping */
+}
+
+.checkout-info p {
+  margin: 8px 0; /* Proper line spacing */
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+
+.secure-checkout {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.shipping-info {
+  color: #4CAF50;
+}
+
+/* Continue shopping section */
+.continue-shopping {
+  text-align: center;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive adjustments for cart footer */
+@media (max-width: 768px) {
+  .cart-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+  }
+  
+  .checkout-section {
+    margin-top: 20px;
+  }
+  
+  .checkout-btn {
+    padding: 14px 16px;
+    font-size: 1rem;
+  }
+  
+  .summary-row {
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-btn {
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 12px;
+  }
+  
+  .checkout-total {
+    margin-left: 0;
+  }
+}
+
 /* Smooth scroll behavior for the entire page */
 html {
   scroll-behavior: smooth;
