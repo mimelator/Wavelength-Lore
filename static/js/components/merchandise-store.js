@@ -3421,6 +3421,201 @@ class MerchandiseStore {
   }
 
   /**
+   * Initialize Stripe Elements in checkout modal
+   */
+  async initializeStripeCheckout() {
+    try {
+      console.log('🔐 Initializing Stripe elements in checkout modal...');
+
+      // Validate cart is not empty
+      const cartSummary = this.cartService.getSummary();
+      if (cartSummary.isEmpty) {
+        this.showError('Cart is empty');
+        return;
+      }
+
+      // Wait for modal to be fully rendered
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Check if stripe card element exists
+      const cardElement = document.getElementById('stripe-card-element');
+      if (!cardElement) {
+        console.error('❌ Stripe card element not found in DOM');
+        return;
+      }
+
+      // Initialize Stripe with our public key (test mode)
+      if (!window.Stripe) {
+        console.error('❌ Stripe.js not loaded');
+        return;
+      }
+
+      const stripe = window.Stripe('pk_test_51QHlxnCLvLU3kDX3cKNOjvfJtqGk9KGxKwLMlD4oOqXlhBSfBKFqxCdWnwfcJ8xJWuUjdCBIjdm2Kp9Nh5J2J5Qr00O1J5Q1J5');
+      const elements = stripe.elements();
+
+      // Create card element
+      const card = elements.create('card', {
+        style: {
+          base: {
+            fontSize: '16px',
+            color: '#424770',
+            '::placeholder': {
+              color: '#aab7c4',
+            },
+          },
+          invalid: {
+            color: '#9e2146',
+          },
+        },
+      });
+
+      // Mount card element
+      card.mount('#stripe-card-element');
+
+      // Handle real-time validation errors from the card Element
+      card.on('change', ({error}) => {
+        const displayError = document.getElementById('stripe-card-errors');
+        if (error) {
+          displayError.textContent = error.message;
+        } else {
+          displayError.textContent = '';
+        }
+      });
+
+      // Store stripe and card instances for form submission
+      this.stripe = stripe;
+      this.cardElement = card;
+
+      // Attach form submission handler
+      this.attachCheckoutModalFormHandler();
+
+      console.log('✅ Stripe elements initialized successfully in checkout modal');
+    } catch (error) {
+      console.error('❌ Error initializing Stripe checkout:', error);
+      this.showError(`Error initializing payment form: ${error.message}`);
+    }
+  }
+
+  /**
+   * Attach form submission handler to checkout modal form
+   */
+  attachCheckoutModalFormHandler() {
+    const form = document.getElementById('checkout-form');
+    const completeOrderBtn = document.querySelector('.complete-order-btn');
+    
+    if (!form || !completeOrderBtn) {
+      console.error('❌ Checkout form or complete order button not found');
+      return;
+    }
+
+    completeOrderBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      await this.handleCheckoutModalSubmit();
+    });
+  }
+
+  /**
+   * Handle checkout modal form submission
+   */
+  async handleCheckoutModalSubmit() {
+    try {
+      console.log('💳 Processing checkout...');
+      
+      // Show loading state
+      const completeOrderBtn = document.querySelector('.complete-order-btn');
+      const originalText = completeOrderBtn.innerHTML;
+      completeOrderBtn.innerHTML = '<span>⏳</span> Processing...';
+      completeOrderBtn.disabled = true;
+
+      // Validate form
+      const form = document.getElementById('checkout-form');
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        throw new Error('Please fill in all required fields');
+      }
+
+      // Get form data
+      const formData = new FormData(form);
+      const customerData = {
+        email: formData.get('email'),
+        firstName: formData.get('firstName'),
+        lastName: formData.get('lastName'),
+        address: formData.get('address'),
+        city: formData.get('city'),
+        state: formData.get('state'),
+        zip: formData.get('zip'),
+        country: formData.get('country')
+      };
+
+      // Get cart summary
+      const cartSummary = this.cartService.getSummary();
+
+      // Create payment intent on server
+      const paymentIntentResponse = await fetch('/api/merchandise/create-payment-intent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          items: cartSummary.items,
+          shippingAddress: customerData,
+          shippingCost: 0 // Free shipping for now
+        })
+      });
+
+      const paymentIntentResult = await paymentIntentResponse.json();
+      if (!paymentIntentResult.success) {
+        throw new Error(paymentIntentResult.error || 'Failed to create payment intent');
+      }
+
+      // Confirm payment with Stripe
+      const result = await this.stripe.confirmCardPayment(paymentIntentResult.clientSecret, {
+        payment_method: {
+          card: this.cardElement,
+          billing_details: {
+            name: `${customerData.firstName} ${customerData.lastName}`,
+            email: customerData.email,
+            address: {
+              line1: customerData.address,
+              city: customerData.city,
+              state: customerData.state,
+              postal_code: customerData.zip,
+              country: customerData.country.toLowerCase()
+            }
+          }
+        }
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message);
+      }
+
+      // Payment successful
+      console.log('✅ Payment successful:', result.paymentIntent);
+      
+      // Clear cart
+      this.cartService.clear();
+      
+      // Show success message and close modal
+      this.showSuccess('Order completed successfully! You will receive a confirmation email shortly.');
+      this.modalRenderer.hideModal('checkout-modal');
+      
+      // Optionally redirect to order confirmation page
+      // window.location.href = `/order-confirmation/${result.paymentIntent.id}`;
+
+    } catch (error) {
+      console.error('❌ Checkout error:', error);
+      this.showError(`Checkout failed: ${error.message}`);
+      
+      // Reset button state
+      const completeOrderBtn = document.querySelector('.complete-order-btn');
+      const cartSummary = this.cartService.getSummary();
+      completeOrderBtn.innerHTML = `<span>💳</span> Complete Order ($${cartSummary.total.toFixed(2)})`;
+      completeOrderBtn.disabled = false;
+    }
+  }
+
+  /**
    * Attach form submission handler to checkout form
    */
   attachCheckoutFormHandler() {
@@ -4188,6 +4383,23 @@ class MerchandiseStore {
     if (!cartSummary.isEmpty) {
       const modalHtml = this.modalRenderer.renderCartModal(cartSummary);
       this.modalRenderer.showModal(modalHtml);
+    }
+  }
+
+  /**
+   * Handle checkout initiation from cart modal
+   */
+  handleCheckoutInitiate() {
+    console.log('🚀 Checkout initiated - showing checkout form');
+    const cartSummary = this.cartService.getSummary();
+    if (!cartSummary.isEmpty) {
+      const checkoutModalHtml = this.modalRenderer.renderCheckoutModal(cartSummary);
+      this.modalRenderer.showModal(checkoutModalHtml);
+      
+      // Initialize Stripe Elements after modal is shown
+      setTimeout(() => {
+        this.initializeStripeCheckout();
+      }, 100);
     }
   }
   

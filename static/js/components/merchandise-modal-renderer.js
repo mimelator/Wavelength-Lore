@@ -1020,6 +1020,26 @@ class MerchandiseModalRenderer {
   }
 
   /**
+   * Get item image for display
+   * @param {Object} item - Cart item
+   * @returns {string} Image URL
+   */
+  getItemImage(item) {
+    return item.image || '/images/previews/generic-product-preview.svg';
+  }
+  
+  /**
+   * Get variant description for display
+   * @param {Object} item - Cart item
+   * @returns {string} Variant description
+   */
+  getVariantDescription(item) {
+    // This would typically show size, color, etc.
+    // For now, return a placeholder
+    return item.variantId ? `Variant: ${item.variantId}` : 'Standard';
+  }
+
+  /**
    * Render confirmation dialog
    * @param {Object} options - Confirmation options
    * @returns {string} HTML string for confirmation dialog
@@ -1840,21 +1860,36 @@ class MerchandiseModalRenderer {
    * @param {string} modalId - Modal ID to hide
    */
   hideModal(modalId) {
+    console.log('🔍 hideModal called with modalId:', modalId);
     const modal = document.querySelector(`[data-modal-id="${modalId}"]`);
-    if (!modal) return;
-    
+    console.log('🔍 Found modal element:', !!modal);
+    if (!modal) {
+      console.warn('⚠️ Modal element not found for modalId:', modalId);
+      return;
+    }
+
+    console.log('🔍 Modal element details:');
+    console.log('   Tag:', modal.tagName);
+    console.log('   Classes:', modal.className);
+    console.log('   data-modal-id:', modal.dataset.modalId);
+
     // Remove from active modals
     this.activeModals.delete(modalId);
-    
+    console.log('🔍 Removed from activeModals, remaining:', this.activeModals.size);
+
     // Hide with animation
     modal.classList.add('hiding');
-    
+    console.log('🔍 Added "hiding" class, will remove after 300ms');
+
     setTimeout(() => {
+      console.log('🔍 Removing modal from DOM');
       modal.remove();
-      
+      console.log('✅ Modal removed from DOM');
+
       // Re-enable body scroll if no more modals
       if (this.activeModals.size === 0) {
         document.body.classList.remove('modal-open');
+        console.log('✅ Removed modal-open class from body');
       }
     }, 300); // Match CSS transition duration
   }
@@ -1910,6 +1945,9 @@ class MerchandiseModalRenderer {
     } else if (modal.classList.contains('cart-modal')) {
       console.log('🛒 Detected cart-modal');
       this.setupCartModalHandlers(modal);
+    } else if (modal.classList.contains('checkout-modal')) {
+      console.log('💳 Detected checkout-modal');
+      this.setupCheckoutModalHandlers(modal);
     } else if (modal.classList.contains('confirmation-dialog')) {
       console.log('⚠️ Detected confirmation-dialog');
       this.setupConfirmationDialogHandlers(modal);
@@ -3390,6 +3428,30 @@ class MerchandiseModalRenderer {
         console.log('🛍️ Continue shopping from cart modal');
         this.hideModal('cart-modal'); // Close cart modal
       }
+    });
+  }
+
+  /**
+   * Setup checkout modal handlers
+   * @param {HTMLElement} modal - Checkout modal element
+   */
+  setupCheckoutModalHandlers(modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target.classList.contains('back-to-cart-btn')) {
+        // Handle back to cart from checkout modal
+        console.log('🔙 Back to cart from checkout modal');
+        this.hideModal('checkout-modal'); // Close checkout modal
+        
+        // Show cart modal again
+        setTimeout(() => {
+          if (this.eventBus) {
+            this.eventBus.emit('cart.checkout'); // This will show cart modal
+          }
+        }, 100);
+        
+      }
+      // Note: complete-order-btn handler is attached separately in merchandise store
+      // because it needs access to Stripe and payment processing logic
     });
   }
   
