@@ -380,7 +380,6 @@ class EnhancedMerchandiseStore {
           ${category.products.map(productType => `
             <div class="product-type-card ${this.selectedProductTypes.includes(productType) ? 'selected' : ''}" 
                  onclick="enhancedMerchandiseStore.toggleProductType('${productType}')">
-              <div class="product-icon">${this.getProductIcon(productType)}</div>
               <div class="product-name">${this.getProductName(productType)}</div>
               <div class="product-price">$${this.getProductPrice(productType)}</div>
               <div class="selection-indicator">
@@ -675,21 +674,6 @@ class EnhancedMerchandiseStore {
   }
   
   // Utility methods
-  getProductIcon(productType) {
-    const icons = {
-      't-shirt': '👕',
-      'hoodie': '🅿️',
-      'tank-top': '🎽',
-      'mug': '☕',
-      'poster': '🖼️',
-      'canvas': '🎨',
-      'tote-bag': '🛍️',
-      'phone-case': '📱',
-      'sticker': '🏷️'
-    };
-    return icons[productType] || '📦';
-  }
-  
   getProductName(productType) {
     return productType.split('-').map(word => 
       word.charAt(0).toUpperCase() + word.slice(1)

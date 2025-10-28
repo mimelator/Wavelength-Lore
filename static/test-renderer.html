@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MerchandiseProductCardRenderer Test</title>
+</head>
+<body>
+    <h1>Testing MerchandiseProductCardRenderer Loading</h1>
+    <div id="results"></div>
+    
+    <script src="/js/components/merchandise-product-card-renderer.js"></script>
+    <script>
+        const results = document.getElementById('results');
+        
+        function addResult(message, isError = false) {
+            const div = document.createElement('div');
+            div.style.color = isError ? 'red' : 'green';
+            div.style.margin = '10px 0';
+            div.textContent = message;
+            results.appendChild(div);
+        }
+        
+        // Test 1: Check if class is available
+        if (typeof MerchandiseProductCardRenderer !== 'undefined') {
+            addResult('✅ MerchandiseProductCardRenderer class is available');
+            
+            // Test 2: Try to instantiate
+            try {
+                const mockServices = {
+                    validationService: { getProductStatus: () => ({ message: 'test' }) },
+                    eventBus: { emit: () => {}, on: () => {} },
+                    merchandiseStore: { getProductTypeName: () => 'Test Product' }
+                };
+                
+                const instance = new MerchandiseProductCardRenderer(mockServices);
+                addResult('✅ Class instantiation successful');
+                
+                // Test 3: Check methods
+                const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(instance)).filter(name => name !== 'constructor');
+                addResult(`✅ Available methods: ${methods.length} found`);
+                addResult(`Methods: ${methods.slice(0, 5).join(', ')}...`);
+                
+            } catch (error) {
+                addResult(`❌ Instantiation failed: ${error.message}`, true);
+            }
+        } else {
+            addResult('❌ MerchandiseProductCardRenderer class NOT available', true);
+            addResult(`Available window properties: ${Object.keys(window).filter(k => k.includes('Merchandise')).join(', ')}`, true);
+        }
+    </script>
+</body>
+</html>

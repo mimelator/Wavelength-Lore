@@ -106,15 +106,32 @@ class PrintifyService {
       if (!validation.valid) {
         throw new Error(validation.error);
       }
-      
+
+      // Convert WebP to PNG - Printify API doesn't actually support WebP despite config
+      let uploadBuffer = imageBuffer;
+      let uploadFileName = fileName;
+
+      if (fileName && fileName.toLowerCase().endsWith('.webp')) {
+        console.log('🎨 Converting WebP image to PNG for Printify compatibility...');
+        try {
+          const sharp = require('sharp');
+          uploadBuffer = await sharp(imageBuffer).png().toBuffer();
+          uploadFileName = fileName.replace(/\.webp$/i, '.png');
+          console.log(`✅ WebP conversion successful: ${fileName} → ${uploadFileName}`);
+        } catch (conversionError) {
+          console.warn('⚠️ WebP conversion failed, attempting original upload:', conversionError.message);
+          // Fall through to attempt original upload
+        }
+      }
+
       // Create JSON payload for image upload according to Printify API spec
-      const base64Image = imageBuffer.toString('base64');
-      
+      const base64Image = uploadBuffer.toString('base64');
+
       const payload = {
-        file_name: fileName,
+        file_name: uploadFileName,
         contents: base64Image
       };
-      
+
       // Send the request with JSON content type
       const response = await this.api.post('/uploads/images.json', payload);
       

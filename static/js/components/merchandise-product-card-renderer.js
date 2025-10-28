@@ -1,5 +1,5 @@
 /**
- * WAVELENGTH Product Card Renderer
+ * WAVELENGTH Product Card Renderer (FIXED - No Icons)
  * 
  * Handles rendering of product cards in different states:
  * - Complete products with full functionality
@@ -77,14 +77,12 @@ class MerchandiseProductCardRenderer {
     const productTitle = this.generateEnhancedProductTitle(product);
     const productImage = this.getProductImage(product);
     const productType = this.getProductType(product);
-    const productIcon = this.getProductIcon(productType);
     const productDetails = this.getProductDetails(product);
     const variantInfo = this.getVariantInfo(product);
     
     return `
       <div class="product-card complete-product" data-product-id="${productId}">
         <div class="product-type-header">
-          <span class="product-type-icon">${productIcon}</span>
           <span class="product-type-name">${this.getProductTypeName(productType)}</span>
         </div>
         
@@ -146,13 +144,11 @@ class MerchandiseProductCardRenderer {
     const productTitle = product.title || 'Processing Product';
     const productImage = this.getProductImage(product);
     const productType = this.getProductType(product);
-    const productIcon = this.getProductIcon(productType);
     const status = this.validationService.getProductStatus(product);
     
     return `
       <div class="product-card incomplete-product" data-product-id="${productId}">
         <div class="product-type-header">
-          <span class="product-type-icon">${productIcon}</span>
           <span class="product-type-name">${this.getProductTypeName(productType)}</span>
           <span class="product-status processing">${status.message}</span>
         </div>
@@ -221,13 +217,11 @@ class MerchandiseProductCardRenderer {
     const productTitle = product.title || 'Broken Product';
     const productImage = this.getProductImage(product);
     const productType = this.getProductType(product);
-    const productIcon = this.getProductIcon(productType);
     const status = this.validationService.getProductStatus(product);
     
     return `
       <div class="product-card broken-product" data-product-id="${productId}">
         <div class="product-type-header">
-          <span class="product-type-icon">${productIcon}</span>
           <span class="product-type-name">${this.getProductTypeName(productType)}</span>
           <span class="product-status broken">Needs Repair</span>
         </div>
@@ -335,46 +329,6 @@ class MerchandiseProductCardRenderer {
     
     // Fallback extraction logic
     return product.productType || product.type || 'custom-product';
-  }
-  
-  /**
-   * Helper method to get product icon
-   * @param {string} productType - Product type
-   * @returns {string} Product icon
-   */
-  getProductIcon(productType) {
-    if (this.merchandiseStore && typeof this.merchandiseStore.getProductIcon === 'function') {
-      return this.merchandiseStore.getProductIcon(productType);
-    }
-    
-    // Dynamic icon inference
-    return this.inferIconFromProductType(productType) || '🛍️';
-  }
-  
-  /**
-   * Infer icon from product type (same logic as store)
-   */
-  inferIconFromProductType(productType) {
-    if (!productType) return '🛍️';
-    
-    const type = productType.toLowerCase();
-    
-    // Apparel patterns
-    if (type.includes('shirt') || type.includes('tee') || type === 'apparel') return '👕';
-    if (type.includes('hoodie') || type.includes('sweatshirt')) return '🧥';
-    if (type.includes('tank')) return '�';
-    if (type.includes('women')) return '👚';
-    
-    // Accessories patterns
-    if (type.includes('mug') || type.includes('cup') || type === 'mugs') return '☕';
-    if (type.includes('bag') || type.includes('tote') || type === 'accessories') return '🎒';
-    if (type.includes('phone')) return '📱';
-    if (type.includes('sticker') || type === 'stickers') return '📌';
-    
-    // Home decor patterns
-    if (type.includes('pillow') || type.includes('canvas') || type === 'home-decor') return '🏠';
-    
-    return '🛍️'; // Default fallback
   }
   
   /**
@@ -875,4 +829,5 @@ if (typeof module !== 'undefined' && module.exports) {
 // Make available in browser global scope
 if (typeof window !== 'undefined') {
   window.MerchandiseProductCardRenderer = MerchandiseProductCardRenderer;
+  console.log('✅ MerchandiseProductCardRenderer exported to window object');
 }

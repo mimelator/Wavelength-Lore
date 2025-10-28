@@ -2283,13 +2283,11 @@ class MerchandiseStore {
     const productTitle = product.title || 'Untitled Product';
     const productImage = product.sourceImage?.url || '';
     const productType = this.extractProductTypeFromProduct(product);
-    const productIcon = this.getProductIcon(productType);
     const status = this.getProductStatus(product);
     
     return `
       <div class="product-card incomplete-product">
         <div class="product-type-header">
-          <span class="product-type-icon">${productIcon}</span>
           <span class="product-type-name">${this.getProductTypeName(productType)}</span>
           <span class="product-status ${status.class}">${status.text}</span>
         </div>
@@ -3095,25 +3093,6 @@ class MerchandiseStore {
       selectedColor: 'Black', // Default since we don't store this currently
       borderStyle: 'solid-medium' // Default since we don't store this currently
     };
-  }
-  
-  getProductIcon(productType) {
-    const icons = {
-      'premium-tshirt': '👕',
-      'hoodie': '🧥',
-      'tank-top': '🎽',
-      'pillow': '🛏️',
-      'poster': '🖼️',
-      'mug': '☕',
-      'tote-bag': '🛍️',
-      'sticker': '🏷️',
-      'womens-tee': '👚',
-      'heavy-cotton-tee': '👕',
-      'infant-tee': '👶',
-      'ultra-cotton-tee': '👕',
-      'ultra-cotton-alt': '👕'
-    };
-    return icons[productType] || '👕';
   }
   
   getProductTypeName(productType) {
