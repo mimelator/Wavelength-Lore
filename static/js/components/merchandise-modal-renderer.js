@@ -378,8 +378,11 @@ class MerchandiseModalRenderer {
    * @returns {string} HTML for compact border section
    */
   renderCompactBorderSection(product) {
+    // 🔥 CRITICAL FIX: Remove "None" from width options
+    // When a border is enabled, users must select an actual width (Thin, Medium, Thick, Extra Thick)
+    // There's no "border with None width" - either you have a border or you don't
+    // The "Add Border" checkbox controls whether borders are enabled
     const widths = [
-      { value: 0, label: 'None', pixels: 0 },
       { value: 1, label: 'Thin', pixels: 10 },
       { value: 2, label: 'Medium', pixels: 20 },
       { value: 3, label: 'Thick', pixels: 30 },
@@ -455,7 +458,7 @@ class MerchandiseModalRenderer {
             <div class="border-width-section">
               <label class="section-label">Width:</label>
               <div class="width-buttons-grid radio-grid">
-                ${widths.map(width => `
+                ${widths.map((width, index) => `
                   <label class="width-radio-label">
                     <input
                       type="radio"
@@ -464,7 +467,7 @@ class MerchandiseModalRenderer {
                       data-border-width="${width.value}"
                       data-border-pixels="${width.pixels}"
                       value="${width.value}"
-                      ${width.value === 0 ? 'checked' : ''}
+                      ${index === 0 ? 'checked' : ''}
                     />
                     <span class="radio-custom"></span>
                     <span class="radio-label">${width.label}</span>
@@ -1744,15 +1747,35 @@ class MerchandiseModalRenderer {
       if (e.target.classList.contains('border-enable-toggle')) {
         const isChecked = e.target.checked;
         const optionsContainer = modal.querySelector('#border-options-container');
+
+        // 🔥 CRITICAL FIX: Explicitly set the checkbox's checked state on the DOM
+        // This ensures the visual state (checkmark) matches the internal state
+        e.target.checked = isChecked;
+
         if (optionsContainer) {
           optionsContainer.style.display = isChecked ? 'block' : 'none';
         }
 
         modal.dataset.borderEnabled = isChecked;
-        if (!isChecked) {
-          modal.dataset.selectedBorderWidth = '0';
-          modal.dataset.selectedBorderPixels = '0';
-          modal.dataset.selectedBorderColor = '#000000';
+
+        if (isChecked) {
+          // When border is enabled, set default width to "Thin" (value 1, 10 pixels)
+          modal.dataset.selectedBorderWidth = '1';
+          modal.dataset.selectedBorderPixels = '10';
+          // Set the default width radio button to checked
+          const defaultWidthRadio = modal.querySelector('input[name="border-width"][value="1"]');
+          if (defaultWidthRadio) {
+            modal.querySelectorAll('input[name="border-width"]').forEach(radio => {
+              radio.checked = false;
+            });
+            defaultWidthRadio.checked = true;
+          }
+          modal.querySelector('#border-selection-display').textContent = 'Thin, Black';
+        } else {
+          // When border is disabled, clear the border settings
+          modal.dataset.selectedBorderWidth = '';
+          modal.dataset.selectedBorderPixels = '';
+          modal.dataset.selectedBorderColor = '';
           modal.querySelector('#border-selection-display').textContent = 'None';
         }
 

@@ -12,9 +12,9 @@ require('dotenv').config();
 const ProductTypesModule = require('./config/product-types.js');
 const ProductTypes = ProductTypesModule.ProductTypes;
 
-const PRINTIFY_API_URL = "https://api.printify.com/v1";
+const PRINTIFY_API_URL = process.env.PRINTIFY_API_URL || "https://api.printify.com/v1";
 const API_TOKEN = process.env.PRINTIFY_API_TOKEN;
-const SHOP_ID = "5776226"; // From the discovery
+const SHOP_ID = process.env.PRINTIFY_SHOP_ID; // Use our actual shop ID
 
 console.log('🌊 WAVELENGTH SHOP-BASED PRICING SYSTEM');
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
