@@ -3805,15 +3805,36 @@ class MerchandiseStore {
       // Payment successful
       console.log('✅ Payment successful:', result.paymentIntent);
       
+      // Store order data for confirmation page
+      const orderData = {
+        orderId: result.paymentIntent.id,
+        customerData: customerData,
+        items: cartSummary.items,
+        subtotal: cartSummary.total,
+        tax: 0, // Calculate tax if needed
+        total: cartSummary.total,
+        paymentIntentId: result.paymentIntent.id,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Store in localStorage for confirmation page
+      localStorage.setItem('wavelength-recent-order', JSON.stringify(orderData));
+      
+      // Send confirmation email (async, don't wait for completion)
+      this.sendOrderConfirmationEmail(orderData).catch(error => {
+        console.warn('⚠️  Order confirmation email failed:', error.message);
+      });
+      
       // Clear cart
       this.cartService.clear();
       
-      // Show success message and close modal
-      this.showSuccess('Order completed successfully! You will receive a confirmation email shortly.');
+      // Close modal and redirect to confirmation page
       this.modalRenderer.hideModal('checkout-modal');
       
-      // Optionally redirect to order confirmation page
-      // window.location.href = `/order-confirmation/${result.paymentIntent.id}`;
+      // Small delay to ensure modal closes smoothly
+      setTimeout(() => {
+        window.location.href = `/static/order-confirmation.html?order=${result.paymentIntent.id}`;
+      }, 500);
 
     } catch (error) {
       console.error('❌ Checkout error:', error);
@@ -3824,6 +3845,35 @@ class MerchandiseStore {
       const cartSummary = this.cartService.getSummary();
       completeOrderBtn.innerHTML = `<span>💳</span> Complete Order ($${cartSummary.total.toFixed(2)})`;
       completeOrderBtn.disabled = false;
+    }
+  }
+
+  /**
+   * Send order confirmation email
+   * @param {Object} orderData - Order data to send in email
+   */
+  async sendOrderConfirmationEmail(orderData) {
+    try {
+      const response = await fetch('/api/merchandise/send-confirmation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('✅ Order confirmation email sent successfully');
+      } else {
+        console.warn('⚠️  Order confirmation email failed:', result.error);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to send order confirmation email:', error);
+      throw error;
     }
   }
 
