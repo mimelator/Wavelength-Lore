@@ -18,6 +18,7 @@
     "admin:env-sync": "node scripts/unified/apprunner-env-sync.js",
     "test:cli": "node wavelength-cli-test-harness.js",
     "test:cli-features": "node wavelength-cli-test-harness.js",
+    "test:effects": "node tests/merchandise/effects-pipeline.test.js",
     "wavelength:create-pricing-catalog": "node scripts/pricing-system/wavelength-pricing-catalog-creator.js",
     "wavelength:create-pricing-catalog-dry-run": "node scripts/pricing-system/wavelength-pricing-catalog-creator.js --dry-run",
     "wavelength:extract-pricing-data": "node scripts/pricing-system/wavelength-pricing-data-extractor.js",
