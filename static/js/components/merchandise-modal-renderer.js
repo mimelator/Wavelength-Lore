@@ -3303,37 +3303,6 @@ class MerchandiseModalRenderer {
       });
     }
 
-    // 🔥 FEATURE: Variant/Size selection
-    // Handle variant option button clicks
-    const variantBtns = modal.querySelectorAll('.variant-option-btn');
-    variantBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const variantId = btn.dataset.variantId;
-        const variantTitle = btn.dataset.variantTitle;
-
-        console.log('📦 Variant selected:', { variantId, variantTitle });
-
-        // Update button styling to show selected state
-        variantBtns.forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-
-        // Store selected variant in modal dataset for later use
-        modal.dataset.selectedVariantId = variantId;
-        modal.dataset.selectedVariantTitle = variantTitle;
-
-        // Enable add to cart button now that size is selected
-        const addToCartBtn = modal.querySelector('.add-to-cart-from-finished-btn');
-        if (addToCartBtn) {
-          addToCartBtn.disabled = false;
-          addToCartBtn.style.opacity = '1';
-          addToCartBtn.style.cursor = 'pointer';
-        }
-
-        if (this.debugMode) {
-          this.debugLog(`Size selected: ${variantTitle}`, 'info');
-        }
-      });
-    });
 
     // 🔥 FEATURE: Quantity controls in finished product modal
     const quantityInput = modal.querySelector('[id^="finished-quantity-"]');
@@ -3818,18 +3787,17 @@ class MerchandiseModalRenderer {
 
   /**
    * Render variant/size options for finished product modal
-   * Maps Printify variants to user-friendly size labels
+   * Uses a dropdown select for all variant counts (unified UX)
    * @param {Object} product - Product object with variants array
-   * @returns {string} HTML for variant selection buttons
+   * @returns {string} HTML for variant selection dropdown
    */
   renderVariantOptions(product) {
     if (!product.variants || product.variants.length === 0) {
       return '<p class="text-muted">No size options available</p>';
     }
 
-    // Map variant properties to user-friendly labels
-    // Variants have: id, title, options (which include size), price, etc.
-    return product.variants.map(variant => {
+    // Build dropdown options from variants
+    const options = product.variants.map((variant, index) => {
       // Extract size from variant title or options
       let sizeLabel = 'Size';
       if (variant.title) {
@@ -3844,13 +3812,28 @@ class MerchandiseModalRenderer {
         }
       }
 
-      // Use variant ID as the value (for adding to cart)
+      // Extract image URL from variant
+      const imageUrl = variant.image?.url || variant.image;
+      const hasImage = !!imageUrl;
+
       return `
-        <button class="variant-option-btn" data-variant-id="${variant.id}" data-variant-title="${variant.title || sizeLabel}">
+        <option value="${variant.id}"
+                data-image-url="${imageUrl || ''}"
+                data-has-image="${hasImage}"
+                data-variant-title="${variant.title || sizeLabel}"
+                data-variant-index="${index}">
           ${sizeLabel}
-        </button>
+        </option>
       `;
     }).join('');
+
+    // Return a single dropdown for all variants
+    return `
+      <select class="variant-selector form-control" id="variant-selector-${product.id}">
+        <option value="">Select a size...</option>
+        ${options}
+      </select>
+    `;
   }
 }
 

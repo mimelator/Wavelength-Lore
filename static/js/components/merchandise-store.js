@@ -163,8 +163,8 @@ class MerchandiseStore {
     
     // Cart Renderer Events
     this.eventBus.on('cart.addItem', (data) => {
-      // Fix parameter order: productId, customization, quantity, variantId
-      this.handleAddToCart(data.productId, null, data.quantity || 1, data.variantId);
+      // Fix parameter order: productId, customization, quantity, variantId, variantImageUrl
+      this.handleAddToCart(data.productId, null, data.quantity || 1, data.variantId, data.variantImageUrl);
     });
     
     this.eventBus.on('cart.quantityChanged', (data) => {
@@ -3635,6 +3635,13 @@ class MerchandiseStore {
     try {
       console.log('🔐 Initializing Stripe checkout...');
 
+      // Wait for Stripe to be ready
+      const stripeReady = await this.stripeCheckoutService.waitForReady();
+      if (!stripeReady) {
+        this.showError('Failed to initialize payment system');
+        return;
+      }
+
       // Validate cart is not empty
       const cartSummary = this.cartService.getSummary();
       if (cartSummary.isEmpty) {
@@ -3642,8 +3649,8 @@ class MerchandiseStore {
         return;
       }
 
-      // Create payment intent on server
-      const shippingAddress = this.stripeCheckoutService.getShippingAddressFromForm();
+      // Create payment intent on server FIRST
+      const shippingAddress = {}; // Empty for now, will be filled by form
       const result = await this.stripeCheckoutService.createPaymentIntent(
         cartSummary.items,
         shippingAddress,
@@ -3655,7 +3662,9 @@ class MerchandiseStore {
         return;
       }
 
-      // Create Stripe Elements with client secret
+      console.log('✅ Payment intent created, now creating Stripe Elements...');
+
+      // Create Stripe Elements with client secret (NOW we have it)
       const elementsCreated = this.stripeCheckoutService.createElements();
       if (!elementsCreated) {
         this.showError('Failed to initialize payment form');
@@ -4663,34 +4672,35 @@ class MerchandiseStore {
    * @param {Object} customization - Optional customization data (effects, borders, size, etc.)
    * @param {number} quantity - Quantity to add (default 1)
    */
-  handleAddToCart(productId, customization = null, quantity = 1, variantId = null) {
+  handleAddToCart(productId, customization = null, quantity = 1, variantId = null, variantImageUrl = null) {
     // 🚫 DUPLICATE PREVENTION: Check if we just processed this exact request
     const requestKey = `${productId}-${variantId}-${quantity}`;
     const now = Date.now();
-    
+
     if (!this._addToCartLastCall) {
       this._addToCartLastCall = {};
     }
-    
+
     // If same request within 1 second, ignore (debounce)
     if (this._addToCartLastCall[requestKey] && (now - this._addToCartLastCall[requestKey]) < 1000) {
       console.warn('🚫 Duplicate add-to-cart request ignored (debounced):', requestKey);
       return;
     }
-    
+
     this._addToCartLastCall[requestKey] = now;
-    
+
     console.log('🛒 Add to cart:', productId);
     console.log('📦 Variant ID:', variantId);
     console.log('🎨 Customization:', customization);
     console.log('📦 Quantity:', quantity);
+    console.log('🖼️  Variant Image URL:', variantImageUrl ? '✅ ' + variantImageUrl.substring(0, 60) + '...' : '❌ Not provided');
 
     const product = this.products.find(p => (p.id || p.productId) === productId);
     if (!product) {
       this.showError('Product not found');
       return;
     }
-    
+
     if (!this.validationService.isProductComplete(product)) {
       this.showError('Product needs to be completed before adding to cart');
       return;
@@ -4708,7 +4718,8 @@ class MerchandiseStore {
       sourceImage: product.sourceImage,
       previewImage: product.previewImage,
       blueprintId: product.blueprintId,
-      printProviderId: product.printProviderId
+      printProviderId: product.printProviderId,
+      selectedVariantImageUrl: variantImageUrl  // ← Pass variant image URL
     };
 
     // Determine the actual variant ID to use

@@ -86,8 +86,15 @@ class MerchandiseProductCardRenderer {
           <span class="product-type-name">${this.getProductTypeName(productType)}</span>
         </div>
         
-        <div class="product-image">
-          <img src="${productImage}" alt="${productTitle}" loading="lazy" />
+        <div class="product-image gorgeous-mockup-container">
+          <img src="${productImage}" 
+               alt="${productTitle}" 
+               loading="lazy" 
+               class="gorgeous-mockup-image"
+               style="width: 100%; height: 300px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+          <div class="mockup-quality-badge">
+            🌟 High Quality Preview
+          </div>
           <div class="product-actions">
             <button class="action-btn edit-product-btn" 
                     data-product-id="${productId}" 
@@ -301,19 +308,32 @@ class MerchandiseProductCardRenderer {
   }
   
   /**
-   * Helper method to get product image with fallbacks
+   * Helper method to get product image URL with fallbacks
+   * PRIORITIZES gorgeous Printify mockup images from enriched variants
    * @param {Object} product - Product object
    * @returns {string} Image URL
    */
   getProductImage(product) {
+    // 🎨 PRIORITY 1: Beautiful Printify mockup from enriched variants
+    if (product.variants && product.variants.length > 0) {
+      const variantWithImage = product.variants.find(v => v.image && v.image.url);
+      if (variantWithImage) {
+        console.log(`🌟 [GORGEOUS MOCKUP] Using beautiful Printify mockup: ${variantWithImage.image.url.substring(0, 80)}...`);
+        return variantWithImage.image.url;
+      }
+    }
+    
+    // PRIORITY 2: Basic Printify images array (fallback)
     if (product.images && product.images.length > 0) {
       return product.images[0].src || product.images[0].url;
     }
     
+    // PRIORITY 3: Source image (original uploaded image)
     if (product.sourceImage && product.sourceImage.url) {
       return product.sourceImage.url;
     }
     
+    // PRIORITY 4: Generic placeholder
     return '/images/previews/generic-product-preview.svg';
   }
   
@@ -655,50 +675,7 @@ class MerchandiseProductCardRenderer {
       `;
     }
     
-    // FEW VARIANTS (2-5): Individual chips with buttons
-    if (variants.length <= 5) {
-      const prices = variants.map(v => v.price / 100);
-      const minPrice = Math.min(...prices);
-      const maxPrice = Math.max(...prices);
-      const priceRange = minPrice === maxPrice ? `$${minPrice.toFixed(2)}` : `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
-      
-      // 🔍 LOG: Rendering variant chips (2-5 variants)
-      const chipVariants = variants.map(variant => {
-        const imageUrl = variant.image?.url || product.images?.[0]?.url || '';
-        console.log(`🖼️ [CHIP] Variant: ${variant.title} | ID: ${variant.id} | Image: ${imageUrl ? '✅ Present' : '❌ Missing'}`);
-        return `
-          <div class="variant-chip"
-               data-variant-id="${variant.id}"
-               data-image-url="${imageUrl}">
-            <span class="variant-name">${variant.title}</span>
-            <span class="variant-price">$${(variant.price / 100).toFixed(2)}</span>
-            <button class="add-to-cart-btn"
-                    data-product-id="${productId}"
-                    data-variant-id="${variant.id}"
-                    title="Add ${variant.title} to cart">
-              🛒
-            </button>
-          </div>
-        `;
-      }).join('');
-
-      console.log(`🎯 [CHIPS] Product ${productId}: ${variants.length} variants - Chips rendered with image URLs`);
-
-      return `
-        <div class="variant-summary">
-          <span class="variant-count">${variants.length} variants available</span>
-          <span class="price-range">${priceRange}</span>
-        </div>
-        <div class="inline-variants few-variants">
-          <h5>🎯 Available Options (${variants.length}):</h5>
-          <div class="variant-chips">
-            ${chipVariants}
-          </div>
-        </div>
-      `;
-    }
-    
-    // MANY VARIANTS (6+): Dropdown selector + single cart button
+    // ALL VARIANTS (2+): Use unified dropdown for all products
     const prices = variants.map(v => v.price / 100);
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
@@ -764,14 +741,23 @@ class MerchandiseProductCardRenderer {
       const productId = e.target.closest('[data-product-id]')?.dataset.productId;
       if (!productId) return;
       
+      // 🌟 Handle variant chip selection (switch gorgeous mockup image)
+      if (e.target.closest('.variant-chip')) {
+        const variantChip = e.target.closest('.variant-chip');
+        const imageUrl = variantChip.dataset.imageUrl;
+        this.handleVariantChipSelection(e.target, variantChip, imageUrl);
+      }
+      
       // Handle different button clicks
       if (e.target.closest('.edit-product-btn')) {
         this.handleEditProduct(productId);
       } else if (e.target.closest('.delete-product-btn')) {
         this.handleDeleteProduct(productId);
       } else if (e.target.closest('.add-to-cart-btn')) {
-        const variantId = e.target.closest('[data-variant-id]')?.dataset.variantId;
-        this.handleAddToCart(productId, variantId);
+        const button = e.target.closest('.add-to-cart-btn');
+        const variantId = button?.dataset.variantId || e.target.closest('[data-variant-id]')?.dataset.variantId;
+        const variantImageUrl = button?.dataset.selectedVariantImage || '';  // Get image URL from button
+        this.handleAddToCart(productId, variantId, variantImageUrl);
       } else if (e.target.closest('.refresh-status-btn')) {
         this.handleRefreshStatus(productId);
       } else if (e.target.closest('.retry-setup-btn')) {
@@ -790,6 +776,43 @@ class MerchandiseProductCardRenderer {
   }
   
   /**
+   * Handle variant chip selection (update gorgeous mockup image)
+   * @param {HTMLElement} clickedElement - The clicked element
+   * @param {HTMLElement} variantChip - The variant chip container
+   * @param {string} imageUrl - The variant's mockup image URL
+   */
+  handleVariantChipSelection(clickedElement, variantChip, imageUrl) {
+    // Don't interfere if they clicked the cart button specifically
+    if (clickedElement.classList.contains('add-to-cart-btn')) {
+      return;
+    }
+    
+    const productCard = variantChip.closest('.product-card');
+    const productImage = productCard.querySelector('.gorgeous-mockup-image');
+    
+    // 🌟 UPDATE GORGEOUS MOCKUP IMAGE when variant chip is selected
+    if (imageUrl && productImage) {
+      console.log(`🎨 [GORGEOUS MOCKUP CHIP] Switching to variant image: ${imageUrl.substring(0, 80)}...`);
+      productImage.src = imageUrl;
+      
+      // Add visual feedback - smooth transition
+      productImage.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      productImage.style.opacity = '0.8';
+      productImage.style.transform = 'scale(0.98)';
+      
+      setTimeout(() => {
+        productImage.style.opacity = '1';
+        productImage.style.transform = 'scale(1)';
+      }, 150);
+    }
+    
+    // Highlight selected variant chip
+    const allChips = productCard.querySelectorAll('.variant-chip');
+    allChips.forEach(chip => chip.classList.remove('selected'));
+    variantChip.classList.add('selected');
+  }
+
+  /**
    * Handle variant selection from dropdown
    * @param {HTMLSelectElement} selectElement - The variant selector element
    */
@@ -798,20 +821,61 @@ class MerchandiseProductCardRenderer {
     const productId = selectElement.dataset.productId;
     const variantId = selectedOption.value;
     const price = selectedOption.dataset.price;
-    
+    const imageUrl = selectedOption.dataset.imageUrl;
+
+    console.log(`\n🔄 [VARIANT-CHANGE] Product ${productId} variant selector changed`);
+    console.log(`   ├─ Variant ID: ${variantId}`);
+    console.log(`   ├─ Price: $${price || 'N/A'}`);
+    console.log(`   └─ Image URL: ${imageUrl ? '✅ ' + imageUrl.substring(0, 60) + '...' : '❌ Missing'}`);
+
     // Find related elements in the same product card
     const productCard = selectElement.closest('.product-card');
     const cartButton = productCard.querySelector('.unified-cart-btn');
     const priceDisplay = productCard.querySelector('.selected-variant-price');
     const priceValue = productCard.querySelector('.price-value');
+    const productImage = productCard.querySelector('.gorgeous-mockup-image');
+
+    console.log(`   Elements found:`);
+    console.log(`   ├─ Cart button: ${cartButton ? '✅' : '❌'}`);
+    console.log(`   ├─ Price display: ${priceDisplay ? '✅' : '❌'}`);
+    console.log(`   ├─ Product image: ${productImage ? '✅' : '❌'}`);
+
+    // 🌟 UPDATE GORGEOUS MOCKUP IMAGE when variant changes
+    if (imageUrl && productImage) {
+      console.log(`   🎨 Updating mockup image...`);
+      console.log(`      Current src: ${productImage.src.substring(0, 60)}...`);
+      productImage.src = imageUrl;
+      console.log(`      New src: ${imageUrl.substring(0, 60)}...`);
+
+      // Add a subtle animation effect
+      productImage.style.transition = 'opacity 0.3s ease';
+      productImage.style.opacity = '0.7';
+      setTimeout(() => {
+        productImage.style.opacity = '1';
+        console.log(`      ✅ Fade animation complete`);
+      }, 150);
+    } else {
+      console.log(`   ⚠️ Cannot update image:`);
+      if (!imageUrl) console.log(`      - No image URL provided`);
+      if (!productImage) console.log(`      - Product image element not found`);
+    }
     
     if (variantId && cartButton) {
-      // Enable cart button and update variant ID
+      // Enable cart button and update variant ID + IMAGE URL
       cartButton.disabled = false;
       cartButton.dataset.variantId = variantId;
+      cartButton.dataset.variantImageUrl = imageUrl || '';  // ← Store the variant's image URL
       cartButton.title = `Add ${selectedOption.textContent.split(' - ')[0]} to cart`;
       cartButton.textContent = '🛒 Add Selected to Cart';
-      
+
+      // Store variant image on cart button for cart service to retrieve
+      cartButton.dataset.selectedVariantImage = imageUrl || '';
+
+      console.log(`   ✅ Cart button updated:`);
+      console.log(`      ├─ variantId: ${variantId}`);
+      console.log(`      ├─ imageUrl: ${imageUrl ? '✅' : '❌'}`);
+      console.log(`      └─ data-selectedVariantImage set for cart service`);
+
       // Show and update price display
       if (priceDisplay && priceValue && price) {
         priceDisplay.style.display = 'block';
@@ -822,10 +886,12 @@ class MerchandiseProductCardRenderer {
       if (cartButton) {
         cartButton.disabled = true;
         cartButton.dataset.variantId = '';
+        cartButton.dataset.variantImageUrl = '';  // Clear image URL
+        cartButton.dataset.selectedVariantImage = '';  // Clear variant image
         cartButton.title = 'Select a variant first';
         cartButton.textContent = '🛒 Add Selected to Cart';
       }
-      
+
       // Hide price display
       if (priceDisplay) {
         priceDisplay.style.display = 'none';
@@ -905,10 +971,11 @@ class MerchandiseProductCardRenderer {
    * Handle add to cart action
    * @param {string} productId - Product ID
    * @param {string} variantId - Variant ID
+   * @param {string} variantImageUrl - Optional variant image URL for cart display
    */
-  handleAddToCart(productId, variantId) {
+  handleAddToCart(productId, variantId, variantImageUrl = '') {
     if (this.eventBus) {
-      this.eventBus.emit('cart.addItem', { productId, variantId });
+      this.eventBus.emit('cart.addItem', { productId, variantId, variantImageUrl });
     }
   }
 }

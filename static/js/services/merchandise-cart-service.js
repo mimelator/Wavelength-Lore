@@ -356,6 +356,13 @@ class MerchandiseCartService {
     try {
       console.log(`📸 [EXTRACT-IMAGE] Product: ${product.title || product.id} | VariantId: ${variantId || 'None'}`);
 
+      // 🖼️ PRIORITY 0: Pre-selected variant image URL (from dropdown/button selection)
+      if (product.selectedVariantImageUrl) {
+        console.log(`   ├─ PRIORITY 0: Using pre-selected variant image from product card selection`);
+        console.log(`   │  └─ Found variant image: ✅ ${product.selectedVariantImageUrl.substring(0, 80)}...`);
+        return product.selectedVariantImageUrl;
+      }
+
       // 🖼️ PRIORITY 1: Variant-specific image
       if (variantId && product.variants && Array.isArray(product.variants)) {
         console.log(`   ├─ PRIORITY 1: Looking for variant image (variantId: ${variantId})`);

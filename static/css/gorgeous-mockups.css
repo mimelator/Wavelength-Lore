@@ -1,0 +1,108 @@
+/* 🌟 WAVELENGTH Gorgeous Mockup Styles */
+
+/* Enhanced product cards with beautiful mockup images */
+.gorgeous-mockup-container {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.gorgeous-mockup-image {
+  transition: all 0.3s ease !important;
+  border: 2px solid #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+.gorgeous-mockup-image:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2) !important;
+}
+
+/* Quality badge for mockup images */
+.mockup-quality-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: bold;
+  opacity: 0.9;
+  z-index: 5;
+}
+
+/* Enhanced variant chips with selection feedback */
+.variant-chip {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.variant-chip:hover {
+  background-color: #f8f9ff;
+  border-color: #667eea;
+  transform: translateY(-1px);
+}
+
+.variant-chip.selected {
+  background-color: #667eea;
+  color: white;
+  border-color: #5a67d8;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.variant-chip.selected .variant-name,
+.variant-chip.selected .variant-price {
+  color: white;
+}
+
+/* Enhanced product cards with better spacing */
+.product-card.complete-product {
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.product-card.complete-product:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* Better product actions positioning */
+.product-actions {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gorgeous-mockup-container:hover .product-actions {
+  opacity: 1;
+}
+
+.action-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.action-btn:hover {
+  background: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}

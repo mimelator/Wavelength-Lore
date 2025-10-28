@@ -10,6 +10,7 @@ class StripeCheckoutService {
     this.clientSecret = null;
     this.paymentIntentId = null;
     this.isProcessing = false;
+    this.isReady = false;
 
     console.log('💳 StripeCheckoutService initializing...');
     this.initializeStripe();
@@ -39,6 +40,7 @@ class StripeCheckoutService {
 
       if (data.stripePublicKey) {
         this.stripe = window.Stripe(data.stripePublicKey);
+        this.isReady = true;
         console.log('✅ Stripe initialized with public key');
       } else {
         console.error('❌ Stripe public key not available from server');
@@ -46,6 +48,22 @@ class StripeCheckoutService {
     } catch (error) {
       console.error('❌ Failed to load Stripe config:', error);
     }
+  }
+
+  /**
+   * Wait for Stripe to be ready
+   */
+  async waitForReady() {
+    if (this.isReady) return true;
+    
+    // Poll until ready or timeout
+    for (let i = 0; i < 50; i++) {
+      if (this.isReady) return true;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    console.error('❌ Stripe initialization timeout');
+    return false;
   }
 
   /**
@@ -57,23 +75,28 @@ class StripeCheckoutService {
       return false;
     }
 
+    if (!this.clientSecret) {
+      console.error('❌ Client secret not available - call createPaymentIntent first');
+      return false;
+    }
+
     if (!this.elements) {
       this.elements = this.stripe.elements({
         clientSecret: this.clientSecret,
         appearance: {
           theme: 'flat',
           variables: {
-            colorPrimary: '#007bff',
+            colorPrimary: '#667eea',
             colorBackground: '#ffffff',
             colorText: '#333333',
             colorDanger: '#dc3545',
             fontFamily: 'system-ui, -apple-system, sans-serif',
             spacingUnit: '4px',
-            borderRadius: '4px'
+            borderRadius: '8px'
           }
         }
       });
-      console.log('✅ Stripe Elements created');
+      console.log('✅ Stripe Elements created with client secret');
     }
 
     return true;
