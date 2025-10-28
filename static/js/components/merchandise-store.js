@@ -1498,11 +1498,12 @@ class MerchandiseStore {
           console.log('✅ Product card event listeners initialized');
         }
         
-        // 🔍 DIAGNOSTIC: Store cart renderer instance reference after render
+        // Setup cart event listeners after DOM update
         const cartContainer = document.querySelector('.cart-container');
         if (cartContainer && this.cartRenderer) {
           cartContainer._cartRendererInstance = this.cartRenderer;
-          console.log('🔍 DIAGNOSTIC: Cart renderer instance stored on container');
+          this.cartRenderer.setupEventListeners(cartContainer);
+          console.log('✅ Cart event listeners initialized');
         }
       }, 100); // Brief delay to ensure DOM is updated
       
@@ -2063,7 +2064,18 @@ class MerchandiseStore {
   
   updateCartUI() {
     // Update cart display using cart service data
-    this.renderCart();
+    const cartContainer = document.querySelector('.cart-container');
+    if (cartContainer && this.cartRenderer) {
+      // Update cart HTML
+      cartContainer.innerHTML = this.cartRenderer.renderCart();
+      
+      // Re-setup event listeners for the new content
+      this.cartRenderer.setupEventListeners(cartContainer);
+      
+      if (this.debugMode) {
+        console.log('✅ Cart UI updated with event listeners');
+      }
+    }
   }
   
   async refreshProducts() {
