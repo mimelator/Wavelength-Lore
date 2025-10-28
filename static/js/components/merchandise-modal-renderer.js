@@ -3015,7 +3015,7 @@ class MerchandiseModalRenderer {
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.85);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -3023,14 +3023,109 @@ class MerchandiseModalRenderer {
       color: white;
       font-size: 18px;
       text-align: center;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     `;
+
+    // 🔥 ENHANCED: Multi-step progress overlay with better visual feedback
     overlay.innerHTML = `
-      <div style="text-align: center;">
-        <div style="font-size: 48px; margin-bottom: 20px;">⏳</div>
-        <div>${message}</div>
+      <div style="
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 24px;
+        padding: 60px 80px;
+        max-width: 600px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+      ">
+        <!-- Animated Spinner -->
+        <div style="
+          font-size: 64px;
+          margin-bottom: 40px;
+          animation: spin 2s linear infinite;
+          display: inline-block;
+        ">✨</div>
+
+        <!-- Main Message -->
+        <div style="
+          font-size: 24px;
+          font-weight: 600;
+          margin-bottom: 30px;
+          color: #ffffff;
+          letter-spacing: 0.5px;
+        ">${message}</div>
+
+        <!-- Progress Steps -->
+        <div style="
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          align-items: flex-start;
+          margin-top: 40px;
+          text-align: left;
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.8);
+        ">
+          <div class="progress-step" data-step="upscale" style="opacity: 0.7; transition: opacity 0.3s ease;">
+            <span style="display: inline-block; width: 24px; height: 24px; line-height: 24px; text-align: center; margin-right: 12px;">📸</span>
+            Auto-upscaling your artwork for crisp, beautiful output
+          </div>
+          <div class="progress-step" data-step="customize" style="opacity: 0.7; transition: opacity 0.3s ease;">
+            <span style="display: inline-block; width: 24px; height: 24px; line-height: 24px; text-align: center; margin-right: 12px;">🎨</span>
+            Applying your custom effects and borders
+          </div>
+          <div class="progress-step" data-step="create" style="opacity: 0.7; transition: opacity 0.3s ease;">
+            <span style="display: inline-block; width: 24px; height: 24px; line-height: 24px; text-align: center; margin-right: 12px;">🛍️</span>
+            Creating your bespoke product with precision
+          </div>
+        </div>
+
+        <!-- Encouraging Message -->
+        <div style="
+          margin-top: 40px;
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.6);
+          font-style: italic;
+        ">
+          This usually takes 10-15 seconds... crafting something special just for you ✨
+        </div>
       </div>
+
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg) scale(1); }
+          50% { transform: rotate(180deg) scale(1.1); }
+          100% { transform: rotate(360deg) scale(1); }
+        }
+
+        @keyframes pulse {
+          0% { opacity: 0.6; }
+          50% { opacity: 1; }
+          100% { opacity: 0.6; }
+        }
+
+        .progress-step {
+          animation: pulse 2s ease-in-out infinite;
+        }
+      </style>
     `;
     document.body.appendChild(overlay);
+
+    // Animate progress steps sequentially
+    setTimeout(() => {
+      const upscaleStep = overlay.querySelector('[data-step="upscale"]');
+      if (upscaleStep) upscaleStep.style.opacity = '1';
+    }, 500);
+
+    setTimeout(() => {
+      const customizeStep = overlay.querySelector('[data-step="customize"]');
+      if (customizeStep) customizeStep.style.opacity = '1';
+    }, 3000);
+
+    setTimeout(() => {
+      const createStep = overlay.querySelector('[data-step="create"]');
+      if (createStep) createStep.style.opacity = '1';
+    }, 6000);
   }
 
   /**
