@@ -428,20 +428,24 @@ class MerchandiseCartRenderer {
     
     // Delegate event handling to container
     container.addEventListener('click', (e) => {
+      // Find the actual button element (in case click was on child element like span)
+      const target = e.target;
+      const button = target.closest('button');
+      
       // Quantity controls
-      if (e.target.classList.contains('quantity-decrease')) {
-        this.handleQuantityDecrease(e.target);
-      } else if (e.target.classList.contains('quantity-increase')) {
-        this.handleQuantityIncrease(e.target);
-      } else if (e.target.classList.contains('remove-item-btn')) {
-        this.handleRemoveItem(e.target);
-      } else if (e.target.classList.contains('clear-cart-btn')) {
+      if (target.classList.contains('quantity-decrease') || button?.classList.contains('quantity-decrease')) {
+        this.handleQuantityDecrease(button || target);
+      } else if (target.classList.contains('quantity-increase') || button?.classList.contains('quantity-increase')) {
+        this.handleQuantityIncrease(button || target);
+      } else if (target.classList.contains('remove-item-btn') || button?.classList.contains('remove-item-btn')) {
+        this.handleRemoveItem(button || target);
+      } else if (target.classList.contains('clear-cart-btn') || button?.classList.contains('clear-cart-btn')) {
         this.handleClearCart();
-      } else if (e.target.classList.contains('checkout-btn')) {
+      } else if (target.classList.contains('checkout-btn') || button?.classList.contains('checkout-btn')) {
         this.handleCheckout();
-      } else if (e.target.classList.contains('continue-shopping-btn')) {
+      } else if (target.classList.contains('continue-shopping-btn') || button?.classList.contains('continue-shopping-btn')) {
         this.handleContinueShopping();
-      } else if (e.target.classList.contains('browse-products-btn')) {
+      } else if (target.classList.contains('browse-products-btn') || button?.classList.contains('browse-products-btn')) {
         this.handleBrowseProducts();
       }
     });

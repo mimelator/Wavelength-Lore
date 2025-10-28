@@ -3240,18 +3240,9 @@ class MerchandiseModalRenderer {
       });
     }
 
-    // Close button (handled by setupModalEventListeners, but ensure proper modal ID is passed)
-    // This provides extra safeguard
-    const closeBtn = modal.querySelector('.modal-close-btn');
-    if (closeBtn && !closeBtn.__addedListener) {
-      closeBtn.__addedListener = true; // Prevent duplicate listeners
-      closeBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('❌ Close button clicked');
-        this.hideModal(previewModalId);
-      });
-    }
+    // Close button is already handled by setupModalEventListeners
+    // No need to add duplicate listeners here
+    console.log('🔍 Close button handling already set up in setupModalEventListeners');
   }
 
   /**
