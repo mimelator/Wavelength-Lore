@@ -4060,6 +4060,13 @@ class MerchandiseStore {
 
         console.log('✅ Customized product stored:', this.currentCustomizedProduct);
 
+        // 🔥 CRITICAL FIX: Add the product to the products array so it appears in the UI immediately
+        // Without this, users had to refresh the page to see their newly created product
+        if (!this.products.find(p => (p.id || p.productId) === (result.product.id || result.product.productId))) {
+          this.products.push(this.currentCustomizedProduct);
+          console.log('✅ Product added to products array for immediate display');
+        }
+
         // Show success message
         this.showSuccess(`✨ Product mockup generated! Check it out below.`);
       } else {
