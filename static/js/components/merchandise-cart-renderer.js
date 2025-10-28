@@ -65,8 +65,8 @@ class MerchandiseCartRenderer {
           <div class="cart-header">
             <h3>
               <span class="cart-icon">🛒</span>
-              Your Cart
-              <span class="cart-badge">${cartSummary.totalQuantity} item${cartSummary.totalQuantity !== 1 ? 's' : ''}</span>
+              Your Cart:
+              <span class="cart-badge">${cartSummary.totalQuantity} Item${cartSummary.totalQuantity !== 1 ? 's' : ''}</span>
             </h3>
             <button class="clear-cart-btn" title="Clear Cart">
               <span>🗑️</span> Clear All
