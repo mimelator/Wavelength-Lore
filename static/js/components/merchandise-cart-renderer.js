@@ -83,6 +83,13 @@ class MerchandiseCartRenderer {
         </div>
       `;
       
+      if (this.debugMode) {
+        console.log('🛒 Cart HTML generated successfully');
+        console.groupEnd();
+      }
+      
+      return cartHTML;
+      
     } catch (error) {
       console.error('Error rendering cart:', error);
       return this.renderCartError();
