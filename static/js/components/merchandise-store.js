@@ -1080,6 +1080,15 @@ class MerchandiseStore {
         console.warn('Found image with flexible search:', flexibleSearch);
         imageData = flexibleSearch;
       } else {
+        console.error('❌ DETAILED SEARCH FAILURE:');
+        console.error('   Blueprint ID extracted:', blueprintSearchId);
+        console.error('   Available gallery image IDs:', this.galleryImages.map(img => img.id));
+        console.error('   Gallery image ID types:', this.galleryImages.map(img => typeof img.id));
+        console.error('   Searching for ID variations of:', blueprintSearchId);
+        console.error('   Direct match test:', this.galleryImages.some(img => img.id === blueprintSearchId));
+        console.error('   String match test:', this.galleryImages.some(img => String(img.id) === String(blueprintSearchId)));
+        console.error('   Numeric match test:', this.galleryImages.some(img => parseInt(img.id) === parseInt(blueprintSearchId)));
+        
         this.showError('Original image not found. Please ensure the source image is still in your gallery.');
         return;
       }
