@@ -3580,7 +3580,23 @@ class MerchandiseStore {
     console.log('🎨 Show customization modal:', productId);
     const product = this.products.find(p => (p.id || p.productId) === productId);
     if (product) {
-      const modalHtml = this.modalRenderer.renderCustomizationModal(product);
+      // Prepare product data with proper image fields for modal renderer
+      const preparedProduct = {
+        ...product,
+        // Ensure image fields are set for modal renderer
+        image: product.image || (product.images?.[0]?.url) || (product.previewImage) || '/images/previews/generic-product-preview.svg',
+        previewImage: product.previewImage || (product.images?.[0]?.url) || (product.image) || '/images/previews/generic-product-preview.svg'
+      };
+
+      console.log('🎨 Prepared product for modal:', {
+        id: preparedProduct.id,
+        title: preparedProduct.title,
+        image: preparedProduct.image,
+        previewImage: preparedProduct.previewImage,
+        productType: preparedProduct.productType
+      });
+
+      const modalHtml = this.modalRenderer.renderCustomizationModal(preparedProduct);
       this.modalRenderer.showModal(modalHtml);
     }
   }
