@@ -96,13 +96,15 @@
 /* 🔥 Right-side decorative overlay: Goblin treasure tree */
 .merch-right-overlay {
   position: fixed;
-  right: -100px;
+  right: -150px;
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
   z-index: 1;
-  opacity: 0.7;
   animation: floatRight 6s ease-in-out infinite;
+  /* Blend modes to integrate with purple gradient background */
+  mix-blend-mode: screen;
+  filter: hue-rotate(30deg) saturate(0.9);
 }
 
 @keyframes floatRight {
@@ -110,22 +112,41 @@
     transform: translateY(-50%) translateX(0);
   }
   50% {
-    transform: translateY(-50%) translateX(-20px);
+    transform: translateY(-50%) translateX(-30px);
   }
 }
 
 .goblin-tree-image {
-  max-width: 600px;
+  max-width: 650px;
   height: auto;
-  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+  display: block;
+  /* Filters to blend with purple gradient better */
+  filter: brightness(0.95) contrast(1.1) drop-shadow(8px 12px 20px rgba(0, 0, 0, 0.5));
   transform: scaleX(-1);
+  /* Proper opacity for blending */
+  opacity: 0.88;
 }
 
-/* Responsive: Hide on smaller screens */
+/* Responsive: Adjust for different screen sizes */
+@media (max-width: 1400px) {
+  .merch-right-overlay {
+    right: -200px;
+  }
+
+  .goblin-tree-image {
+    max-width: 550px;
+  }
+}
+
 @media (max-width: 1200px) {
   .merch-right-overlay {
-    opacity: 0.4;
-    max-width: 400px;
+    right: -250px;
+    filter: hue-rotate(30deg) saturate(0.8);
+  }
+
+  .goblin-tree-image {
+    max-width: 450px;
+    opacity: 0.8;
   }
 }
 
