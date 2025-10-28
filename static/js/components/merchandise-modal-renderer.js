@@ -1806,14 +1806,19 @@ class MerchandiseModalRenderer {
     // Try to find modal-dialog inside the overlay, otherwise use overlay itself
     let modal = overlay.querySelector('.modal-dialog') || overlay;
 
+    // Track active modal using the overlay's modal ID
+    const modalId = overlay.dataset.modalId;
+
+    // Check if a modal with this ID already exists and remove it
+    // This prevents duplicate modals when showModal is called multiple times
+    const existingModal = document.querySelector(`[data-modal-id="${modalId}"]`);
+    if (existingModal) {
+      existingModal.remove();
+    }
+
     // Add overlay to DOM (contains the modal-dialog)
     appendTo.appendChild(overlay);
 
-    console.log('📦 showModal: overlay classes:', overlay.className);
-    console.log('📦 showModal: modal classes:', modal.className);
-
-    // Track active modal using the overlay's modal ID
-    const modalId = overlay.dataset.modalId;
     this.activeModals.add(modalId);
 
     // Setup event listeners on the modal dialog (not the overlay)
@@ -1860,36 +1865,27 @@ class MerchandiseModalRenderer {
    * @param {string} modalId - Modal ID to hide
    */
   hideModal(modalId) {
-    console.log('🔍 hideModal called with modalId:', modalId);
     const modal = document.querySelector(`[data-modal-id="${modalId}"]`);
-    console.log('🔍 Found modal element:', !!modal);
     if (!modal) {
-      console.warn('⚠️ Modal element not found for modalId:', modalId);
       return;
     }
 
-    console.log('🔍 Modal element details:');
-    console.log('   Tag:', modal.tagName);
-    console.log('   Classes:', modal.className);
-    console.log('   data-modal-id:', modal.dataset.modalId);
-
     // Remove from active modals
     this.activeModals.delete(modalId);
-    console.log('🔍 Removed from activeModals, remaining:', this.activeModals.size);
 
     // Hide with animation
     modal.classList.add('hiding');
-    console.log('🔍 Added "hiding" class, will remove after 300ms');
 
+    // Remove after animation completes
     setTimeout(() => {
-      console.log('🔍 Removing modal from DOM');
-      modal.remove();
-      console.log('✅ Modal removed from DOM');
+      const stillExists = document.querySelector(`[data-modal-id="${modalId}"]`);
+      if (stillExists) {
+        stillExists.remove();
+      }
 
       // Re-enable body scroll if no more modals
       if (this.activeModals.size === 0) {
         document.body.classList.remove('modal-open');
-        console.log('✅ Removed modal-open class from body');
       }
     }, 300); // Match CSS transition duration
   }

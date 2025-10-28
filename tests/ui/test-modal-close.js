@@ -32,6 +32,14 @@ async function testModalCloseSingleClick() {
     page = await browser.newPage();
     page.setDefaultTimeout(TEST_TIMEOUT);
 
+    // Capture browser console logs
+    page.on('console', msg => {
+      const text = msg.text();
+      if (text.includes('🔍') || text.includes('✅') || text.includes('⚠️')) {
+        console.log('   [BROWSER]:', text);
+      }
+    });
+
     // Set viewport
     await page.setViewport({ width: 1280, height: 720 });
 
