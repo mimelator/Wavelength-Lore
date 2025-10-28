@@ -3709,13 +3709,15 @@ class MerchandiseStore {
       }
 
       // Prepare product data with proper image fields for modal renderer
+      // NOTE: product.images contains Printify image objects with .src property, not .url
       const preparedProduct = {
         ...product,
         // Ensure id is set (prefer id, fallback to productId)
         id: product.id || product.productId,
         // Ensure image fields are set for modal renderer
-        image: product.image || (product.images?.[0]?.url) || (product.previewImage) || '/images/previews/generic-product-preview.svg',
-        previewImage: product.previewImage || (product.images?.[0]?.url) || (product.image) || '/images/previews/generic-product-preview.svg'
+        // Try .src (Printify format) first, then .url, then fallback
+        image: product.image || (product.images?.[0]?.src) || (product.images?.[0]?.url) || (product.previewImage) || '/images/previews/generic-product-preview.svg',
+        previewImage: product.previewImage || (product.images?.[0]?.src) || (product.images?.[0]?.url) || (product.image) || '/images/previews/generic-product-preview.svg'
       };
 
       console.log('🎨 Prepared product for modal:', {
