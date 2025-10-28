@@ -2237,6 +2237,29 @@ class MerchandiseStore {
     // First check if product has stored productType metadata
     if (product.productType) {
       console.log('🔍 Found stored productType:', product.productType);
+      
+      // Handle validated-XX format - extract the blueprint ID
+      if (product.productType.startsWith('validated-')) {
+        const blueprintId = product.productType.replace('validated-', '');
+        console.log('🔍 Extracted blueprint ID from productType:', blueprintId);
+        
+        // Map common blueprint IDs to product types
+        const blueprintMap = {
+          '5': 'premium-tshirt',
+          '146': 'hoodie', 
+          '17': 'tank-top',
+          '68': 'mug',
+          '19': 'poster',
+          '71': 'pillow'
+        };
+        
+        if (blueprintMap[blueprintId]) {
+          console.log('🔍 Mapped validated productType to:', blueprintMap[blueprintId]);
+          return blueprintMap[blueprintId];
+        }
+      }
+      
+      // Return as-is if not in validated-XX format
       return product.productType;
     }
     
