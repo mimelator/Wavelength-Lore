@@ -1014,23 +1014,28 @@ class MerchandiseStore {
     // Try multiple ways to find the image data based on different product structures
     let imageData = null;
     
-    // Method 1: Check sourceImage (older format)
+    // Method 1: Check sourceImage (older format) - PRIORITY for validated products
     if (product.sourceImage?.id || product.sourceImage?.url) {
       imageData = this.galleryImages.find(img => 
         img.id === product.sourceImage?.id || 
         img.url === product.sourceImage?.url
       );
+      console.warn('Method 1 (sourceImage) result:', imageData ? 'FOUND' : 'NOT FOUND');
     }
     
-    // Method 2: Check imageId (newer format)
-    if (!imageData && product.imageId) {
-      imageData = this.galleryImages.find(img => img.id === product.imageId);
-    }
-    
-    // Method 3: Check if imageId is in the images array
+    // Method 2: Check images array for Firebase IDs
     if (!imageData && product.images && product.images.length > 0) {
       const firstImageId = product.images[0]?.id || product.images[0];
       imageData = this.galleryImages.find(img => img.id === firstImageId);
+      console.warn('Method 2 (images array) searching for:', firstImageId, 'Result:', imageData ? 'FOUND' : 'NOT FOUND');
+    }
+    
+    // Method 3: Check imageId (newer format) - but skip if it's validated-XX format
+    if (!imageData && product.imageId && !product.imageId.startsWith('validated-')) {
+      imageData = this.galleryImages.find(img => img.id === product.imageId);
+      console.warn('Method 3 (imageId) result:', imageData ? 'FOUND' : 'NOT FOUND');
+    } else if (product.imageId && product.imageId.startsWith('validated-')) {
+      console.warn('Method 3 (imageId) SKIPPED - validated format detected:', product.imageId);
     }
     
     if (!imageData) {
@@ -1045,7 +1050,11 @@ class MerchandiseStore {
           firstImage: product.images?.[0],
           productType: product.productType,
           blueprintIdFromProductType: product.productType && product.productType.startsWith('validated-') 
-            ? product.productType.replace('validated-', '') : null
+            ? product.productType.replace('validated-', '') : null,
+          // Additional debugging
+          sourceImageFull: product.sourceImage,
+          imagesArray: product.images,
+          printifyImageId: product.printifyImageId
         },
         galleryImageIds: this.galleryImages.map(img => img.id),
         galleryImageSample: this.galleryImages.slice(0, 3)
