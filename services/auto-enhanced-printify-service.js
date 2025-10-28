@@ -164,6 +164,23 @@ class AutoEnhancedPrintifyService extends PrintifyService {
       }
 
       // 📤 STEP 5: Upload to Printify
+      // 🔧 BUG FIX: Ensure fileName matches buffer format before upload
+      // This handles BOTH upscaled images AND images that passed quality validation
+      // If buffer is PNG but fileName is .webp, update the filename
+      if (fileName && fileName.toLowerCase().endsWith('.webp')) {
+        try {
+          const sharp = require('sharp');
+          const bufferMetadata = await sharp(finalBuffer).metadata();
+          if (bufferMetadata.format === 'png') {
+            console.log('🔧 PRE-UPLOAD FIX: Buffer is PNG but fileName is .webp, updating...');
+            fileName = fileName.replace(/\.webp$/i, '.png');
+            console.log(`   Updated fileName: ${fileName}`);
+          }
+        } catch (metadataErr) {
+          console.warn('⚠️ Could not verify buffer format, proceeding with original fileName');
+        }
+      }
+
       const uploadResult = await super.uploadImage(finalBuffer, fileName, title);
 
       return {
