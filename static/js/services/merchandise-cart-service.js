@@ -81,8 +81,8 @@ class MerchandiseCartService {
       } else {
         // Add new item
         const extractedPrice = this.extractPrice(product, variantId);
-        const extractedImage = this.extractImage(product);
-        
+        const extractedImage = this.extractImage(product, variantId);
+
         const cartItem = {
           id: productId,
           productId: productId,
@@ -347,27 +347,76 @@ class MerchandiseCartService {
   }
   
   /**
-   * Extract image from product
+   * Extract image from product (prioritizing variant-specific image)
    * @param {Object} product - Product object
+   * @param {string} variantId - Optional variant ID to get variant-specific image
    * @returns {string} Image URL
    */
-  extractImage(product) {
+  extractImage(product, variantId = null) {
     try {
-      // Try product images first
+      console.log(`📸 [EXTRACT-IMAGE] Product: ${product.title || product.id} | VariantId: ${variantId || 'None'}`);
+
+      // 🖼️ PRIORITY 1: Variant-specific image
+      if (variantId && product.variants && Array.isArray(product.variants)) {
+        console.log(`   ├─ PRIORITY 1: Looking for variant image (variantId: ${variantId})`);
+        const variant = product.variants.find(v => v.id === variantId);
+        if (variant) {
+          console.log(`   │  ├─ Found variant: ${variant.title}`);
+          if (variant.image && variant.image.url) {
+            console.log(`   │  ├─ Found variant image: ✅ ${variant.image.url}`);
+            if (this.debugMode) {
+              console.log(`🖼️ Using variant image for ${variantId}:`, variant.image.url);
+            }
+            return variant.image.url;
+          } else {
+            console.log(`   │  └─ NO variant image found (variant.image: ${variant.image ? '?exists' : 'missing'})`);
+          }
+        } else {
+          console.log(`   │  └─ Variant not found in product.variants`);
+        }
+      } else {
+        console.log(`   ├─ PRIORITY 1: Skipped (variantId: ${variantId ? 'present' : 'MISSING'}, variants: ${product.variants ? '✅' : '❌'})`);
+      }
+
+      // PRIORITY 2: Product images
+      console.log(`   ├─ PRIORITY 2: Looking for product image`);
       if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-        return product.images[0].src || product.images[0].url || '';
+        const imageUrl = product.images[0].src || product.images[0].url || '';
+        if (imageUrl) {
+          console.log(`   │  └─ Found product image: ✅ ${imageUrl}`);
+          if (this.debugMode) {
+            console.log('🖼️ Using product image:', imageUrl);
+          }
+          return imageUrl;
+        } else {
+          console.log(`   │  └─ Product image exists but URL empty`);
+        }
+      } else {
+        console.log(`   │  └─ No product.images array`);
       }
-      
-      // Try source image
+
+      // PRIORITY 3: Source image (gallery image)
+      console.log(`   ├─ PRIORITY 3: Looking for source/gallery image`);
       if (product.sourceImage && product.sourceImage.url) {
+        console.log(`   │  └─ Found source image: ✅ ${product.sourceImage.url}`);
+        if (this.debugMode) {
+          console.log('🖼️ Using source image:', product.sourceImage.url);
+        }
         return product.sourceImage.url;
+      } else {
+        console.log(`   │  └─ No sourceImage.url`);
       }
-      
-      // Default fallback
-      return '/images/previews/generic-product-preview.svg';
-      
+
+      // PRIORITY 4: Default fallback
+      const fallback = '/images/previews/generic-product-preview.svg';
+      console.log(`   └─ PRIORITY 4: Using generic fallback: ${fallback}`);
+      if (this.debugMode) {
+        console.log('🖼️ Using generic fallback image');
+      }
+      return fallback;
+
     } catch (error) {
-      console.error('Error extracting image:', error);
+      console.error(`❌ [EXTRACT-IMAGE] Error extracting image:`, error);
       return '/images/previews/generic-product-preview.svg';
     }
   }

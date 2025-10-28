@@ -2115,6 +2115,21 @@ class MerchandiseModalRenderer {
     // Click event delegation
     modal.addEventListener('click', (e) => {
       console.log('🖱️ Modal click detected on:', e.target.className, e.target.tagName);
+
+      // 🖼️ VARIANT CHIP: Update preview when chip is clicked
+      if (e.target.closest('.variant-chip')) {
+        const chip = e.target.closest('.variant-chip');
+        const variantId = chip.dataset.variantId;
+        const variantImageUrl = chip.dataset.imageUrl;
+        console.log(`🔵 [CHIP-CLICK] Variant ID: ${variantId} | Image URL: ${variantImageUrl ? '✅ Found' : '❌ Missing'}`);
+        if (variantImageUrl) {
+          console.log(`🔄 [CHIP-CLICK] Updating preview with: ${variantImageUrl}`);
+          this.updatePreviewImage(modal, variantImageUrl);
+        } else {
+          console.warn(`⚠️ [CHIP-CLICK] No image URL found for variant ${variantId}`);
+        }
+      }
+
       // Section toggle (collapse/expand)
       if (e.target.closest('.section-header')) {
         const section = e.target.closest('.compact-section');
@@ -2260,6 +2275,15 @@ class MerchandiseModalRenderer {
 
     // Change event delegation (for selects and inputs)
     modal.addEventListener('change', (e) => {
+      // 🖼️ VARIANT SELECTOR: Update preview image when variant changes
+      if (e.target.classList.contains('variant-selector')) {
+        const selectedOption = e.target.options[e.target.selectedIndex];
+        const variantId = selectedOption.value;
+        const imageUrl = selectedOption.dataset.imageUrl;
+        console.log(`🔴 [DROPDOWN-CHANGE] Variant ID: ${variantId} | Image URL: ${imageUrl ? '✅ Found' : '❌ Missing'}`);
+        this.handleVariantSelection(e.target, modal);
+      }
+
       // Border width radio inputs
       if (e.target.classList.contains('width-radio-input')) {
         this.handleBorderWidthSelection(e.target, modal);
@@ -2292,7 +2316,124 @@ class MerchandiseModalRenderer {
       }
     });
   }
-  
+
+  /**
+   * 🖼️ Handle variant selector dropdown change - Update preview image
+   * @param {HTMLElement} selector - Variant selector element
+   * @param {HTMLElement} modal - Modal element
+   */
+  handleVariantSelection(selector, modal) {
+    const selectedOption = selector.options[selector.selectedIndex];
+    const variantImageUrl = selectedOption.dataset.imageUrl;
+    const variantId = selectedOption.value;
+    const variantTitle = selectedOption.textContent;
+
+    console.log(`📦 [HANDLE-VARIANT] Selected: "${variantTitle}" (ID: ${variantId})`);
+    console.log(`   ├─ Image URL: ${variantImageUrl ? `✅ Present` : '❌ Missing'} ${variantImageUrl || ''}`);
+    console.log(`   └─ Price: ${selectedOption.dataset.price || 'N/A'}`);
+
+    if (this.debugMode) {
+      this.debugLog(`Variant selected: ${variantTitle} (ID: ${variantId})`, 'info', {
+        imageUrl: variantImageUrl
+      });
+    }
+
+    // Store selected variant in modal data
+    modal.dataset.selectedVariantId = variantId;
+    modal.dataset.selectedVariantTitle = variantTitle;
+    console.log(`   ✅ Variant data stored in modal.dataset`);
+
+    // Update preview image if variant has an image
+    if (variantImageUrl) {
+      console.log(`   🖼️ Updating preview image: ${variantImageUrl}`);
+      this.updatePreviewImage(modal, variantImageUrl);
+    } else {
+      console.warn(`   ⚠️ [WARN] No image URL found - preview WILL NOT UPDATE`);
+    }
+
+    // Update price display if present
+    const priceValue = selectedOption.dataset.price;
+    if (priceValue) {
+      const priceDisplay = modal.querySelector('.selected-variant-price');
+      const priceElement = priceDisplay?.querySelector('.price-value');
+      if (priceElement) {
+        priceElement.textContent = `$${priceValue}`;
+        if (priceDisplay) {
+          priceDisplay.style.display = 'block';
+          console.log(`   💵 Price updated to: $${priceValue}`);
+        }
+      } else {
+        console.warn(`   ⚠️ [WARN] Price element not found in DOM`);
+      }
+    } else {
+      console.warn(`   ⚠️ [WARN] No price data available`);
+    }
+
+    // Enable the add to cart button
+    const addBtn = modal.querySelector('.unified-cart-btn');
+    if (addBtn) {
+      addBtn.dataset.variantId = variantId;
+      addBtn.disabled = false;
+      addBtn.title = `Add ${variantTitle} to cart`;
+      console.log(`   🛒 Add button enabled with variantId: ${variantId}`);
+    } else {
+      console.warn(`   ⚠️ [WARN] Add to cart button not found`);
+    }
+
+    this.updateCustomizationSummary(modal);
+    console.log(`✅ [HANDLE-VARIANT] Complete\n`);
+  }
+
+  /**
+   * 🖼️ Update preview image with smooth fade transition
+   * @param {HTMLElement} modal - Modal element
+   * @param {string} imageUrl - Image URL to display
+   */
+  updatePreviewImage(modal, imageUrl) {
+    console.log(`🖼️ [UPDATE-PREVIEW] Called with imageUrl: ${imageUrl ? '✅ Present' : '❌ Missing'}`);
+
+    if (!imageUrl) {
+      console.warn(`❌ [UPDATE-PREVIEW] No imageUrl provided - ABORTING`);
+      return;
+    }
+
+    const previewImg = modal.querySelector('.preview-image');
+    if (!previewImg) {
+      console.warn(`❌ [UPDATE-PREVIEW] .preview-image element NOT FOUND in DOM - ABORTING`);
+      return;
+    }
+
+    console.log(`✅ [UPDATE-PREVIEW] Found preview image element`);
+    console.log(`   ├─ Current src: ${previewImg.src}`);
+    console.log(`   └─ Will change to: ${imageUrl}`);
+
+    // Store the selected variant image
+    modal.dataset.selectedVariantImage = imageUrl;
+
+    // Fade out
+    previewImg.style.transition = 'opacity 0.2s ease-in-out';
+    previewImg.style.opacity = '0.5';
+    console.log(`   ⏳ Starting fade-out (0.2s to opacity 0.5)`);
+
+    // Update image source
+    setTimeout(() => {
+      console.log(`   🔄 (150ms later) Updating image src to: ${imageUrl}`);
+      previewImg.src = imageUrl;
+
+      // Fade back in
+      setTimeout(() => {
+        previewImg.style.opacity = '1';
+        console.log(`   ✅ Fade-in complete (back to opacity 1.0)`);
+      }, 50);
+    }, 150);
+
+    console.log(`🖼️ [UPDATE-PREVIEW] Transition complete (total ~550ms)\n`);
+
+    if (this.debugMode) {
+      this.debugLog(`Preview image updated: ${imageUrl}`, 'info');
+    }
+  }
+
   /**
    * Handle border width selection
    * @param {HTMLElement} button - Width button element

@@ -662,6 +662,28 @@ class MerchandiseProductCardRenderer {
       const maxPrice = Math.max(...prices);
       const priceRange = minPrice === maxPrice ? `$${minPrice.toFixed(2)}` : `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
       
+      // 🔍 LOG: Rendering variant chips (2-5 variants)
+      const chipVariants = variants.map(variant => {
+        const imageUrl = variant.image?.url || product.images?.[0]?.url || '';
+        console.log(`🖼️ [CHIP] Variant: ${variant.title} | ID: ${variant.id} | Image: ${imageUrl ? '✅ Present' : '❌ Missing'}`);
+        return `
+          <div class="variant-chip"
+               data-variant-id="${variant.id}"
+               data-image-url="${imageUrl}">
+            <span class="variant-name">${variant.title}</span>
+            <span class="variant-price">$${(variant.price / 100).toFixed(2)}</span>
+            <button class="add-to-cart-btn"
+                    data-product-id="${productId}"
+                    data-variant-id="${variant.id}"
+                    title="Add ${variant.title} to cart">
+              🛒
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      console.log(`🎯 [CHIPS] Product ${productId}: ${variants.length} variants - Chips rendered with image URLs`);
+
       return `
         <div class="variant-summary">
           <span class="variant-count">${variants.length} variants available</span>
@@ -670,18 +692,7 @@ class MerchandiseProductCardRenderer {
         <div class="inline-variants few-variants">
           <h5>🎯 Available Options (${variants.length}):</h5>
           <div class="variant-chips">
-            ${variants.map(variant => `
-              <div class="variant-chip" data-variant-id="${variant.id}">
-                <span class="variant-name">${variant.title}</span>
-                <span class="variant-price">$${(variant.price / 100).toFixed(2)}</span>
-                <button class="add-to-cart-btn" 
-                        data-product-id="${productId}" 
-                        data-variant-id="${variant.id}"
-                        title="Add ${variant.title} to cart">
-                  🛒
-                </button>
-              </div>
-            `).join('')}
+            ${chipVariants}
           </div>
         </div>
       `;
@@ -692,7 +703,22 @@ class MerchandiseProductCardRenderer {
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     const priceRange = minPrice === maxPrice ? `$${minPrice.toFixed(2)}` : `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
-    
+
+    // 🔍 LOG: Rendering dropdown (6+ variants)
+    const dropdownOptions = variants.map(variant => {
+      const imageUrl = variant.image?.url || product.images?.[0]?.url || '';
+      console.log(`🖼️ [DROPDOWN] Variant: ${variant.title} | ID: ${variant.id} | Image: ${imageUrl ? '✅ Present' : '❌ Missing'}`);
+      return `
+        <option value="${variant.id}"
+                data-price="${(variant.price / 100).toFixed(2)}"
+                data-image-url="${imageUrl}">
+          ${variant.title} - $${(variant.price / 100).toFixed(2)}
+        </option>
+      `;
+    }).join('');
+
+    console.log(`🎯 [DROPDOWN] Product ${productId}: ${variants.length} variants - Dropdown rendered with image URLs`);
+
     return `
       <div class="variant-summary">
         <span class="variant-count">${variants.length} variants available</span>
@@ -704,11 +730,7 @@ class MerchandiseProductCardRenderer {
           <div class="variant-selector-group">
             <select class="variant-selector" data-product-id="${productId}">
               <option value="">Select size & color...</option>
-              ${variants.map(variant => `
-                <option value="${variant.id}" data-price="${(variant.price / 100).toFixed(2)}">
-                  ${variant.title} - $${(variant.price / 100).toFixed(2)}
-                </option>
-              `).join('')}
+              ${dropdownOptions}
             </select>
             <div class="selected-variant-price" style="display: none;">
               <span class="price-label">Price:</span>

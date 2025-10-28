@@ -100,6 +100,11 @@ class PrintifyService {
    * @returns {Object} Upload result with image ID and URL
    */
   async uploadImage(imageBuffer, fileName, title) {
+    // Declare variables outside try block for error logging access
+    let uploadBuffer = imageBuffer;
+    let uploadFileName = fileName;
+    let base64Image;
+    
     try {
       // Validate image before upload
       const validation = this.validateImage(imageBuffer, fileName);
@@ -107,25 +112,53 @@ class PrintifyService {
         throw new Error(validation.error);
       }
 
-      // Convert WebP to PNG - Printify API doesn't actually support WebP despite config
-      let uploadBuffer = imageBuffer;
-      let uploadFileName = fileName;
-
-      if (fileName && fileName.toLowerCase().endsWith('.webp')) {
-        console.log('🎨 Converting WebP image to PNG for Printify compatibility...');
+      // Detect actual image format from buffer and convert WebP to PNG
+      // Printify API doesn't support WebP despite what their docs might say
+      let actualFormat = 'unknown';
+      
+      // Detect format from buffer header
+      if (imageBuffer.length >= 12) {
+        const header = imageBuffer.toString('hex', 0, 12);
+        if (header.startsWith('89504e47')) {
+          actualFormat = 'png';
+        } else if (header.startsWith('ffd8ff')) {
+          actualFormat = 'jpeg';
+        } else if (header.startsWith('474946383761') || header.startsWith('474946383961')) {
+          actualFormat = 'gif';
+        } else if (header.startsWith('52494646') && imageBuffer.toString('ascii', 8, 12) === 'WEBP') {
+          actualFormat = 'webp';
+        }
+      }
+      
+      console.log(`🔍 Detected image format: ${actualFormat} (from buffer analysis)`);
+      
+      // Convert WebP to PNG regardless of filename
+      if (actualFormat === 'webp') {
+        console.log('🎨 Converting WebP buffer to PNG for Printify compatibility...');
         try {
           const sharp = require('sharp');
           uploadBuffer = await sharp(imageBuffer).png().toBuffer();
-          uploadFileName = fileName.replace(/\.webp$/i, '.png');
-          console.log(`✅ WebP conversion successful: ${fileName} → ${uploadFileName}`);
+          
+          // Ensure filename has proper extension
+          if (uploadFileName && !uploadFileName.toLowerCase().endsWith('.png')) {
+            if (uploadFileName.toLowerCase().endsWith('.webp')) {
+              uploadFileName = uploadFileName.replace(/\.webp$/i, '.png');
+            } else {
+              uploadFileName = uploadFileName + '.png';
+            }
+          }
+          
+          console.log(`✅ WebP buffer conversion successful: ${fileName} → ${uploadFileName}`);
+          console.log(`   Original buffer: ${(imageBuffer.length / 1024).toFixed(2)} KB (WebP)`);
+          console.log(`   Converted buffer: ${(uploadBuffer.length / 1024).toFixed(2)} KB (PNG)`);
         } catch (conversionError) {
-          console.warn('⚠️ WebP conversion failed, attempting original upload:', conversionError.message);
+          console.warn('⚠️ WebP buffer conversion failed, attempting original upload:', conversionError.message);
           // Fall through to attempt original upload
         }
       }
 
       // Create JSON payload for image upload according to Printify API spec
-      const base64Image = uploadBuffer.toString('base64');
+      base64Image = uploadBuffer.toString('base64');
 
       const payload = {
         file_name: uploadFileName,
@@ -209,11 +242,11 @@ class PrintifyService {
   async createCustomProduct(imageId, productOptions = {}) {
     try {
       const { title, description, tags = [] } = productOptions;
-      
+
       // Use working blueprint/provider combination from testing
       const blueprintId = 5; // Unisex Cotton Crew Tee
       const printProviderId = 61; // Dimona Tee
-      
+
       // Create product payload
       const productData = {
         title: title || 'Custom Wavelength Merchandise',
@@ -222,7 +255,7 @@ class PrintifyService {
         print_provider_id: printProviderId,
         variants: [
           { id: 17391, price: 2099, is_enabled: true }, // Heather Grey / S
-          { id: 17392, price: 2099, is_enabled: true }, // Heather Grey / M  
+          { id: 17392, price: 2099, is_enabled: true }, // Heather Grey / M
           { id: 17393, price: 2099, is_enabled: true }, // Heather Grey / L
           { id: 17394, price: 2099, is_enabled: true }  // Heather Grey / XL
         ],
@@ -247,9 +280,23 @@ class PrintifyService {
         ],
         tags: ['wavelength', 'custom', 'merchandise', ...tags]
       };
-      
+
       const response = await this.api.post(`/shops/${this.shopId}/products.json`, productData);
-      
+
+      // LOG VARIANT STRUCTURE FOR DEBUGGING
+      console.log('🔍 [PRINTIFY] createCustomProduct - variant structure:');
+      if (response.data.variants && response.data.variants.length > 0) {
+        const firstVariant = response.data.variants[0];
+        console.log(`   Sample variant (first of ${response.data.variants.length}):`);
+        console.log(`   - ID: ${firstVariant.id}`);
+        console.log(`   - Title: ${firstVariant.title}`);
+        console.log(`   - Has image field: ${firstVariant.image ? 'YES' : 'NO'}`);
+        if (firstVariant.image) {
+          console.log(`   - Image URL: ${firstVariant.image.url || 'NO URL'}`);
+        }
+        console.log(`   - All keys: ${Object.keys(firstVariant).join(', ')}`);
+      }
+
       return {
         success: true,
         productId: response.data.id,
@@ -343,7 +390,33 @@ class PrintifyService {
       };
       
       const response = await this.api.post(`/shops/${this.shopId}/products.json`, productData);
-      
+
+      // LOG VARIANT STRUCTURE FOR DEBUGGING
+      console.log('🔍 [PRINTIFY] createCustomProductWithBlueprint - variant structure:');
+      if (response.data.variants && response.data.variants.length > 0) {
+        const firstVariant = response.data.variants[0];
+        console.log(`   Sample variant (first of ${response.data.variants.length}):`);
+        console.log(`   - ID: ${firstVariant.id}`);
+        console.log(`   - Title: ${firstVariant.title}`);
+        console.log(`   - Has image field: ${firstVariant.image ? 'YES' : 'NO'}`);
+        if (firstVariant.image) {
+          console.log(`   - Image URL: ${firstVariant.image.url || 'NO URL'}`);
+        }
+        console.log(`   - Options: ${JSON.stringify(firstVariant.options || [])}`);
+        console.log(`   - All keys: ${Object.keys(firstVariant).join(', ')}`);
+      }
+
+      // LOG IMAGES STRUCTURE
+      console.log(`\n🖼️  [PRINTIFY] Images array (${response.data.images?.length || 0} images):`);
+      if (response.data.images && response.data.images.length > 0) {
+        const firstImage = response.data.images[0];
+        console.log(`   Sample image (first of ${response.data.images.length}):`);
+        console.log(`   - ID: ${firstImage.id}`);
+        console.log(`   - URL: ${firstImage.url}`);
+        console.log(`   - Options: ${JSON.stringify(firstImage.options || {})}`);
+        console.log(`   - All keys: ${Object.keys(firstImage).join(', ')}`);
+      }
+
       return {
         success: true,
         productId: response.data.id,
@@ -353,7 +426,7 @@ class PrintifyService {
         images: response.data.images,
         tags: response.data.tags
       };
-      
+
     } catch (error) {
       console.error('Error creating custom product with blueprint:', error);
       
