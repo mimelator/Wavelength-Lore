@@ -151,7 +151,8 @@ class MerchandiseStore {
     
     // Cart Renderer Events
     this.eventBus.on('cart.addItem', (data) => {
-      this.handleAddToCart(data.productId, data.variantId, data.quantity || 1);
+      // Fix parameter order: productId, customization, quantity, variantId
+      this.handleAddToCart(data.productId, null, data.quantity || 1, data.variantId);
     });
     
     this.eventBus.on('cart.quantityChanged', (data) => {
@@ -1061,14 +1062,19 @@ class MerchandiseStore {
         throw new Error('Product not found');
       }
       
-      // REFACTOR: Use cart service instead of direct cart manipulation
+      // Ensure product has the required id property
+      if (!product.id && !product.productId) {
+        throw new Error('Invalid product - missing product ID');
+      }
+      
+      // REFACTOR: Use cart service with proper error handling
       const result = this.cartService.addItem(product, variantId, quantity);
       
-      if (result.success) {
+      if (result && result.success) {
         this.showSuccess('Added to cart!');
         // Cart UI will be updated via event bus
       } else {
-        throw new Error(result.message);
+        throw new Error(result ? result.message : 'Unknown cart error');
       }
       
     } catch (error) {
@@ -1357,14 +1363,14 @@ class MerchandiseStore {
       }
     });
     
-    // Add to cart
-    document.addEventListener('click', (e) => {
-      if (e.target.classList.contains('add-to-cart-btn')) {
-        const productId = e.target.dataset.productId;
-        const variantId = e.target.dataset.variantId;
-        this.addToCart(productId, variantId);
-      }
-    });
+    // Add to cart - DISABLED: Now handled by ProductCardRenderer
+    // document.addEventListener('click', (e) => {
+    //   if (e.target.classList.contains('add-to-cart-btn')) {
+    //     const productId = e.target.dataset.productId;
+    //     const variantId = e.target.dataset.variantId;
+    //     this.addToCart(productId, variantId);
+    //   }
+    // });
     
     // Cart management
     document.addEventListener('click', (e) => {
@@ -4094,74 +4100,47 @@ class MerchandiseStore {
     console.log('📦 Quantity:', quantity);
 
     const product = this.products.find(p => (p.id || p.productId) === productId);
-    if (product && this.validationService.isProductComplete(product)) {
-      // Use customized image if available, otherwise use default preview
-      const imageUrl = customization?.customizedImageUrl || product.previewImage;
-
-      // 🔥 FEATURE: Use actual variant ID, not hardcoded 'default'
-      const actualVariantId = variantId || 'default';
-
-      // 🔥 FEATURE: Build cart item with variant and customization metadata
-      // CRITICAL FIX: Look up pricing from dynamic catalog using blueprint/provider IDs
-      let cartPrice = product.price || product.variants?.find(v => v.id === variantId)?.price || 19.95;
-
-      // Try to get pricing from the pricing service
-      if (product.blueprintId && product.printProviderId) {
-        const pricingData = this.pricingService.lookupProductPricing(
-          product.blueprintId,
-          product.printProviderId
-        );
-
-        if (pricingData && pricingData.success && pricingData.variants && pricingData.variants.length > 0) {
-          // Use pricing from dynamic catalog
-          const priceString = pricingData.variants[0]?.price || cartPrice;
-          // Parse price string (e.g., "$29.99" -> 29.99)
-          if (typeof priceString === 'string' && priceString.includes('$')) {
-            cartPrice = parseFloat(priceString.replace(/[^\d.-]/g, ''));
-          } else {
-            cartPrice = parseFloat(priceString) || cartPrice;
-          }
-          console.log(`💰 Using pricing from dynamic catalog: $${cartPrice}`);
-        }
-      }
-
-      const cartItem = {
-        productId: productId,
-        variantId: actualVariantId,
-        title: product.title,
-        price: cartPrice,
-        image: imageUrl,
-        quantity: quantity || 1
-      };
-
-      // Add customization data to cart item if provided
-      if (customization) {
-        cartItem.customization = {
-          effects: customization.effects || {},
-          borderEnabled: customization.borderEnabled || false,
-          borderWidth: customization.borderWidth || 0,
-          borderWidthPixels: customization.borderWidthPixels || 0,
-          borderColor: customization.borderColor || '#000000',
-          size: customization.size,
-          customizedImageUrl: customization.customizedImageUrl,
-          timestamp: customization.timestamp
-        };
-        console.log('💾 Saving customization with cart item:', cartItem.customization);
-      }
-
-      // 🔥 FEATURE: Add variant metadata for order fulfillment
-      cartItem.metadata = {
-        variantId: actualVariantId,
-        quantity: quantity,
-        customizationApplied: !!customization
-      };
-
-      console.log('🛍️ Cart item being added:', cartItem);
-
-      this.cartService.addItem(cartItem);
-      this.showSuccess(`Product added to cart! (Qty: ${quantity})`);
-    } else {
+    if (!product) {
+      this.showError('Product not found');
+      return;
+    }
+    
+    if (!this.validationService.isProductComplete(product)) {
       this.showError('Product needs to be completed before adding to cart');
+      return;
+    }
+
+    // 🔥 CRITICAL FIX: Pass the full product object to cart service
+    // The cart service expects a product object with an id property
+    const productForCart = {
+      id: product.id || product.productId,
+      productId: product.id || product.productId,
+      title: product.title,
+      variants: product.variants,
+      price: product.price,
+      images: product.images,
+      sourceImage: product.sourceImage,
+      previewImage: product.previewImage,
+      blueprintId: product.blueprintId,
+      printProviderId: product.printProviderId
+    };
+
+    // Determine the actual variant ID to use
+    const actualVariantId = variantId || (product.variants && product.variants[0]?.id) || 'default';
+    
+    console.log('�️ Calling cart service with:', {
+      product: productForCart,
+      variantId: actualVariantId,
+      quantity: quantity || 1
+    });
+
+    // 🔥 CRITICAL FIX: Call cart service with proper parameters
+    try {
+      this.cartService.addItem(productForCart, actualVariantId, quantity || 1);
+      this.showSuccess(`Product added to cart! (Qty: ${quantity || 1})`);
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      this.showError('Failed to add to cart: ' + error.message);
     }
   }
   
