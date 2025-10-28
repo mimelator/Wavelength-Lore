@@ -2513,8 +2513,16 @@ class MerchandiseStore {
           </div>
           
           <div class="variant-selector">
+            <div class="product-actions-bar">
+              <button class="btn-secondary edit-product-btn" 
+                      data-product-id="${product.id || product.productId}"
+                      onclick="this.closest('.modal').remove(); merchandiseStore.startNewDesign();">
+                <span>🎨</span> Edit Design
+              </button>
+            </div>
+
             ${hasVariants ? `
-              <h3>Choose Your Style</h3>
+              <h3>Choose Your Style & Size</h3>
               <div class="variants-grid">
                 ${product.variants.map((variant, variantIndex) => {
                   const variantImage = getVariantImage(variant, variantIndex);
