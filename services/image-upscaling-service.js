@@ -572,7 +572,12 @@ class ImageUpscalingService {
       let processedBuffer = await sharp(imageBuffer)
         .resize(1800, 1800, { fit: 'cover' }) // Crop to be square for Printify minimum
         .ensureAlpha() // CRITICAL: Ensure image has alpha channel (RGBA) for OpenAI
-        .png({ quality: 90, compressionLevel: 6 }) // Apply compression to keep under 4MB
+        .toColorspace('srgb') // Ensure correct colorspace
+        .png({ 
+          quality: 90, 
+          compressionLevel: 6,
+          palette: false // Force RGBA instead of palette-based PNG
+        })
         .toBuffer();
 
       let fileSizeMB = processedBuffer.length / (1024 * 1024);
@@ -584,7 +589,12 @@ class ImageUpscalingService {
         processedBuffer = await sharp(imageBuffer)
           .resize(1800, 1800, { fit: 'cover' })
           .ensureAlpha()
-          .png({ quality: 70, compressionLevel: 9 }) // Maximum compression
+          .toColorspace('srgb')
+          .png({ 
+            quality: 70, 
+            compressionLevel: 9,
+            palette: false // Force RGBA instead of palette-based PNG
+          })
           .toBuffer();
         
         fileSizeMB = processedBuffer.length / (1024 * 1024);
