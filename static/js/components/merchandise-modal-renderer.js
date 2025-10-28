@@ -1702,13 +1702,98 @@ class MerchandiseModalRenderer {
    */
   setupCustomizationModalHandlers(modal) {
     console.log('🎯 setupCustomizationModalHandlers called');
-    // Initialize modal state for tracking selections
-    modal.dataset.selectedEffects = JSON.stringify({});
-    modal.dataset.selectedBorderWidth = '0';
-    modal.dataset.selectedBorderPixels = '0';
-    modal.dataset.selectedBorderColor = '#000000';
+
+    // 🔥 CRITICAL FIX: Restore previous customization preferences if they exist
+    // Get the overlay to access product customization data
+    const overlay = modal.closest('.modal-overlay');
+    const productId = overlay?.dataset.productId;
+
+    // Try to get the product from the store to restore customization
+    let previousCustomization = null;
+    if (window.merchandiseStore) {
+      const product = window.merchandiseStore.products.find(p => (p.id || p.productId) === productId);
+      if (product && product.customization) {
+        previousCustomization = product.customization;
+        console.log('✅ Found previous customization for product:', productId, previousCustomization);
+      }
+    }
+
+    // Initialize modal state - either from previous customization or with defaults
+    if (previousCustomization) {
+      // Restore previous state
+      modal.dataset.selectedEffects = JSON.stringify(previousCustomization.effects || {});
+      modal.dataset.selectedBorderWidth = String(previousCustomization.borderWidth || '0');
+      modal.dataset.selectedBorderPixels = String(previousCustomization.borderWidthPixels || '0');
+      modal.dataset.selectedBorderColor = previousCustomization.borderColor || '#000000';
+      modal.dataset.borderEnabled = previousCustomization.borderEnabled ? 'true' : 'false';
+      modal.dataset.customizedImageUrl = previousCustomization.customizedImageUrl || '';
+
+      console.log('✅ Restored customization state from product.customization');
+    } else {
+      // Initialize with defaults
+      modal.dataset.selectedEffects = JSON.stringify({});
+      modal.dataset.selectedBorderWidth = '0';
+      modal.dataset.selectedBorderPixels = '0';
+      modal.dataset.selectedBorderColor = '#000000';
+      modal.dataset.borderEnabled = 'false';
+
+      console.log('✅ Initialized with default customization state');
+    }
+
     modal.dataset.selectedSize = '';
     modal.dataset.selectedQuantity = '1';
+
+    // 🔥 CRITICAL FIX: Restore UI state from saved customization
+    // Check/uncheck effect checkboxes and border checkbox based on previousCustomization
+    if (previousCustomization) {
+      // Restore effect checkboxes
+      const savedEffects = previousCustomization.effects || {};
+      Object.entries(savedEffects).forEach(([effectKey, isEnabled]) => {
+        const checkbox = modal.querySelector(`.effect-toggle[data-effect="${effectKey}"]`);
+        if (checkbox) {
+          checkbox.checked = isEnabled;
+          console.log(`  ✅ Effect "${effectKey}" restored to ${isEnabled}`);
+        }
+      });
+
+      // Restore border enable checkbox and settings
+      if (previousCustomization.borderEnabled) {
+        const borderCheckbox = modal.querySelector('#border-enable-checkbox');
+        if (borderCheckbox) {
+          borderCheckbox.checked = true;
+          console.log('  ✅ Border enabled checkbox restored');
+
+          // Show border options
+          const optionsContainer = modal.querySelector('#border-options-container');
+          if (optionsContainer) {
+            optionsContainer.style.display = 'block';
+          }
+
+          // Restore border width
+          const borderWidth = previousCustomization.borderWidth || 1;
+          const widthRadio = modal.querySelector(`input[name="border-width"][value="${borderWidth}"]`);
+          if (widthRadio) {
+            modal.querySelectorAll('input[name="border-width"]').forEach(r => r.checked = false);
+            widthRadio.checked = true;
+            console.log(`  ✅ Border width restored to ${borderWidth}`);
+          }
+
+          // Restore border color
+          const borderColor = previousCustomization.borderColor || '#000000';
+          const colorSelect = modal.querySelector('#border-color-select');
+          if (colorSelect) {
+            colorSelect.value = borderColor;
+            const colorSwatch = modal.querySelector('#border-color-swatch');
+            if (colorSwatch) {
+              colorSwatch.style.backgroundColor = borderColor;
+            }
+            console.log(`  ✅ Border color restored to ${borderColor}`);
+          }
+        }
+      }
+
+      console.log('✅ UI state restored from previous customization');
+    }
 
     // Click event delegation
     modal.addEventListener('click', (e) => {
