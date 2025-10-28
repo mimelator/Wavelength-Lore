@@ -171,13 +171,22 @@ class AutoEnhancedPrintifyService extends PrintifyService {
         try {
           const sharp = require('sharp');
           const bufferMetadata = await sharp(finalBuffer).metadata();
-          if (bufferMetadata.format === 'png') {
+          const actualFormat = bufferMetadata.format ? bufferMetadata.format.toLowerCase() : 'unknown';
+
+          console.log(`🔍 Buffer format check: fileName=".webp", actualFormat="${actualFormat}"`);
+
+          if (actualFormat === 'png') {
             console.log('🔧 PRE-UPLOAD FIX: Buffer is PNG but fileName is .webp, updating...');
             fileName = fileName.replace(/\.webp$/i, '.png');
             console.log(`   Updated fileName: ${fileName}`);
+          } else if (actualFormat === 'webp') {
+            console.log('✅ Buffer format matches fileName: WebP + .webp (correct)');
+          } else {
+            console.warn(`⚠️ Unexpected buffer format: ${actualFormat}. Keeping original fileName: ${fileName}`);
           }
         } catch (metadataErr) {
-          console.warn('⚠️ Could not verify buffer format, proceeding with original fileName');
+          console.error('❌ Failed to verify buffer format:', metadataErr.message);
+          console.warn('⚠️ Could not verify buffer format, proceeding with original fileName:', fileName);
         }
       }
 
