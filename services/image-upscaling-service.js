@@ -125,8 +125,20 @@ class ImageUpscalingService {
     console.log(`🚀 UPSCALING FOR PRINTIFY: ${fileName}`);
 
     try {
+      // Step 0: Convert WebP to PNG if necessary (upscaler requires PNG)
+      let processedBuffer = imageBuffer;
+      const metadata = await sharp(imageBuffer).metadata();
+      
+      if (metadata.format === 'webp') {
+        console.log('🔄 Converting WebP to PNG for upscaler compatibility...');
+        processedBuffer = await sharp(imageBuffer)
+          .png({ quality: 100, compressionLevel: 0 }) // Uncompressed PNG for best quality
+          .toBuffer();
+        console.log(`✅ Converted ${metadata.format} → PNG for upscaling`);
+      }
+
       // Step 1: Analyze current image quality
-      const analysis = await this.analyzeImageQuality(imageBuffer);
+      const analysis = await this.analyzeImageQuality(processedBuffer);
       console.log(`📊 Current image: ${analysis.originalWidth}x${analysis.originalHeight}, DPI: ${analysis.estimatedDPI}`);
 
       // Step 2: Determine scale factor to meet Printify minimum (1800x1800)
@@ -140,7 +152,7 @@ class ImageUpscalingService {
       console.log(`📐 Scale factor needed: ${scaleFactor.toFixed(2)}x to reach minimum ${PRINTIFY_MIN_WIDTH}x${PRINTIFY_MIN_HEIGHT}`);
 
       // Step 3: Use upscaleImage with Printify-specific options
-      const upscaleResult = await this.upscaleImage(imageBuffer, {
+      const upscaleResult = await this.upscaleImage(processedBuffer, {
         method: 'auto', // Let it choose best method
         scaleFactor: scaleFactor,
         enhanceDetails: true, // Sharpen details for print quality
