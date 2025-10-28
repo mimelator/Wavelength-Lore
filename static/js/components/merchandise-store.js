@@ -21,7 +21,9 @@ class MerchandiseStore {
     this.apiService = new MerchandiseApiService();
     this.cartService = new MerchandiseCartService();
     this.validationService = new MerchandiseProductValidationService();
+    this.pricingService = new WavelengthPricingService();
     this.eventBus = new WavelengthEventBus();
+    this.stripeCheckoutService = new StripeCheckoutService();
     
     // PHASE 2 REFACTOR: Initialize UI renderers for modular UI components
     this.productCardRenderer = new MerchandiseProductCardRenderer({
@@ -695,12 +697,23 @@ class MerchandiseStore {
       console.log('📋 Product types API response:', data);
       
       if (data.success && data.allProducts) {
-        // Use the same approach as admin catalog - simple allProducts array
-        this.availableProducts = data.allProducts;
+        // CRITICAL FIX: Enrich products with pricing metadata for dynamic pricing lookup
+        // Extract blueprint ID from productType (e.g., "validated-68" -> 68)
+        this.availableProducts = data.allProducts.map(product => {
+          if (!product.blueprintId && product.productType) {
+            const blueprintMatch = product.productType.match(/(\d+)$/);
+            if (blueprintMatch) {
+              product.blueprintId = parseInt(blueprintMatch[1]);
+              // Default print provider to 1 (Printful)
+              product.printProviderId = product.printProviderId || 1;
+            }
+          }
+          return product;
+        });
         
         // Group products by category for display (same as admin catalog approach)
         this.productCategories = {};
-        data.allProducts.forEach(product => {
+        this.availableProducts.forEach(product => {
           const category = product.category || 'specialty';
           if (!this.productCategories[category]) {
             this.productCategories[category] = {
@@ -1529,7 +1542,15 @@ class MerchandiseStore {
     const categoryCardsHTML = sortedCategories.map(([categoryKey, categoryData]) => {
       const stats = this.getCategoryStats(categoryData.products);
       const description = this.getCategoryDescription(categoryKey);
-      
+
+      // Only include pricing section if we have pricing data
+      const priceRangeHTML = stats ? `
+        <div class="stat-item">
+          <span class="stat-price">${stats.priceRange}</span>
+          <span class="stat-label">Price Range</span>
+        </div>
+      ` : '';
+
       return `
         <div class="category-card" data-category="${categoryKey}">
           <div class="category-card-header">
@@ -1544,10 +1565,7 @@ class MerchandiseStore {
               <span class="stat-number">${categoryData.products.length}</span>
               <span class="stat-label">Products</span>
             </div>
-            <div class="stat-item">
-              <span class="stat-price">${stats.priceRange}</span>
-              <span class="stat-label">Price Range</span>
-            </div>
+            ${priceRangeHTML}
           </div>
           <div class="category-card-footer">
             <button class="browse-category-btn">
@@ -1587,12 +1605,18 @@ class MerchandiseStore {
     }
 
     const productsHTML = categoryData.products.map(product => {
-      let priceDisplay;
-      try {
-        priceDisplay = this.getEstimatedPrice(product.category);
-      } catch (error) {
-        console.error(`❌ Product ${product.name} hidden due to pricing failure:`, error.message);
-        return ''; // Hide product if pricing fails
+      // Try to get pricing from the service
+      let priceDisplay = 'Pricing Coming Soon';
+
+      if (product.blueprintId && product.printProviderId) {
+        try {
+          const pricingData = this.pricingService.lookupProductPricing(product.blueprintId, product.printProviderId);
+          if (pricingData && pricingData.success && pricingData.variants && pricingData.variants[0]) {
+            priceDisplay = pricingData.variants[0].price;
+          }
+        } catch (error) {
+          // Silently continue - pricing just won't be shown
+        }
       }
       
       return `
@@ -1645,27 +1669,33 @@ class MerchandiseStore {
 
   getCategoryStats(products) {
     const providers = new Set(products.map(p => p.provider));
-    // Parse price strings to numbers (remove $ and convert to float)
-    const prices = products.map(p => {
-      try {
-        const priceStr = this.getEstimatedPrice(p.category);
-        return parseFloat(priceStr.replace('$', ''));
-      } catch (error) {
-        console.error(`❌ Product ${p.name} excluded from stats due to pricing failure:`, error.message);
-        return null; // Exclude this product from pricing stats
-      }
-    }).filter(price => price !== null);
-    
+
+    // Use pricing service to get accurate prices for products WITH pricing
+    const prices = products
+      .filter(p => p.blueprintId && p.printProviderId) // Only products with pricing metadata
+      .map(p => {
+        try {
+          const pricingData = this.pricingService.lookupProductPricing(p.blueprintId, p.printProviderId);
+          if (pricingData && pricingData.success && pricingData.variants && pricingData.variants[0]) {
+            const priceStr = pricingData.variants[0].price;
+            const price = parseFloat(priceStr.replace('$', ''));
+            return price > 0 ? price : null;
+          }
+        } catch (error) {
+          // Silently skip products without pricing
+        }
+        return null;
+      })
+      .filter(price => price !== null);
+
     if (prices.length === 0) {
-      return {
-        providerCount: providers.size,
-        priceRange: 'Pricing unavailable'
-      };
+      // Don't show pricing section if no products have pricing
+      return null;
     }
-    
+
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
-    
+
     return {
       providerCount: providers.size,
       priceRange: minPrice === maxPrice ? `$${minPrice.toFixed(2)}` : `$${minPrice.toFixed(2)}-${maxPrice.toFixed(2)}`
@@ -1843,12 +1873,18 @@ class MerchandiseStore {
     const newProducts = categoryData.products.slice(fromIndex, toIndex);
     
     newProducts.forEach((product, index) => {
-      let priceDisplay;
-      try {
-        priceDisplay = this.getEstimatedPrice(product.category);
-      } catch (error) {
-        console.error(`❌ Product ${product.name} hidden due to pricing failure:`, error.message);
-        return; // Skip this product if pricing fails
+      // Try to get pricing from the service
+      let priceDisplay = 'Pricing Coming Soon';
+
+      if (product.blueprintId && product.printProviderId) {
+        try {
+          const pricingData = this.pricingService.lookupProductPricing(product.blueprintId, product.printProviderId);
+          if (pricingData && pricingData.success && pricingData.variants && pricingData.variants[0]) {
+            priceDisplay = pricingData.variants[0].price;
+          }
+        } catch (error) {
+          // Silently continue - pricing just won't be shown
+        }
       }
       
       const productElement = document.createElement('div');
@@ -3167,14 +3203,34 @@ class MerchandiseStore {
     modal.querySelector('.cancel-btn').onclick = () => modal.style.display = 'none';
   }
   
-  showCheckoutModal() {
+  async showCheckoutModal() {
     const modal = document.getElementById('checkout-modal');
     const content = document.getElementById('checkout-content');
-    
+
+    const cartSummary = this.cartService.getSummary();
+
     content.innerHTML = `
       <div class="checkout-form">
-        <h3>Shipping Information</h3>
+        <h2>Complete Your Order</h2>
+
+        <!-- Order Summary -->
+        <div class="order-summary">
+          <h3>Order Summary</h3>
+          <div class="summary-items">
+            ${cartSummary.items.map(item => `
+              <div class="summary-item">
+                <span>${item.title}</span>
+                <span>$${item.price.toFixed(2)}</span>
+              </div>
+            `).join('')}
+          </div>
+          <div class="summary-total">
+            <strong>Total: $${cartSummary.total.toFixed(2)}</strong>
+          </div>
+        </div>
+
         <form id="checkout-form">
+          <h3>Shipping Information</h3>
           <div class="form-row">
             <div class="form-group">
               <label for="first-name">First Name</label>
@@ -3216,28 +3272,182 @@ class MerchandiseStore {
             <select id="country" required>
               <option value="US">United States</option>
               <option value="CA">Canada</option>
-              <!-- Add more countries as needed -->
             </select>
           </div>
-          
+
           <h3>Payment Information</h3>
           <div id="payment-element">
             <!-- Stripe payment element will be mounted here -->
           </div>
-          
+
           <div class="form-actions">
-            <button type="submit" class="btn-primary">Place Order</button>
+            <button type="submit" id="checkout-submit-btn" class="btn-primary">
+              <span id="submit-text">Place Order</span>
+              <span id="submit-spinner" class="spinner" style="display: none;"></span>
+            </button>
             <button type="button" class="btn-secondary cancel-btn">Cancel</button>
           </div>
+          <div id="checkout-error-message" style="color: #dc3545; margin-top: 10px; display: none;"></div>
         </form>
       </div>
     `;
-    
+
     modal.style.display = 'block';
-    
+
     // Setup close handlers
     modal.querySelector('.close').onclick = () => modal.style.display = 'none';
     modal.querySelector('.cancel-btn').onclick = () => modal.style.display = 'none';
+
+    // Initialize Stripe Payment Element
+    await this.initializeCheckout();
+  }
+
+  /**
+   * Initialize Stripe checkout on form display
+   */
+  async initializeCheckout() {
+    try {
+      console.log('🔐 Initializing Stripe checkout...');
+
+      // Validate cart is not empty
+      const cartSummary = this.cartService.getSummary();
+      if (cartSummary.isEmpty) {
+        this.showError('Cart is empty');
+        return;
+      }
+
+      // Create payment intent on server
+      const shippingAddress = this.stripeCheckoutService.getShippingAddressFromForm();
+      const result = await this.stripeCheckoutService.createPaymentIntent(
+        cartSummary.items,
+        shippingAddress,
+        0 // TODO: Calculate shipping cost
+      );
+
+      if (!result.success) {
+        this.showError(`Failed to initialize checkout: ${result.error}`);
+        return;
+      }
+
+      // Create Stripe Elements with client secret
+      const elementsCreated = this.stripeCheckoutService.createElements();
+      if (!elementsCreated) {
+        this.showError('Failed to initialize payment form');
+        return;
+      }
+
+      // Mount payment element
+      const mounted = this.stripeCheckoutService.mountPaymentElement('payment-element');
+      if (!mounted) {
+        this.showError('Failed to load payment form');
+        return;
+      }
+
+      // Attach form submission handler
+      this.attachCheckoutFormHandler();
+
+      console.log('✅ Stripe checkout initialized successfully');
+    } catch (error) {
+      console.error('❌ Error initializing checkout:', error);
+      this.showError(`Error initializing checkout: ${error.message}`);
+    }
+  }
+
+  /**
+   * Attach form submission handler to checkout form
+   */
+  attachCheckoutFormHandler() {
+    const form = document.getElementById('checkout-form');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await this.handleCheckoutSubmit();
+    });
+  }
+
+  /**
+   * Handle checkout form submission
+   */
+  async handleCheckoutSubmit() {
+    try {
+      // Validate shipping form
+      const validation = this.stripeCheckoutService.validateShippingForm();
+      if (!validation.valid) {
+        const errorDiv = document.getElementById('checkout-error-message');
+        if (errorDiv) {
+          errorDiv.textContent = validation.errors.join(', ');
+          errorDiv.style.display = 'block';
+        }
+        return;
+      }
+
+      // Show loading state
+      const submitBtn = document.getElementById('checkout-submit-btn');
+      const submitText = document.getElementById('submit-text');
+      const submitSpinner = document.getElementById('submit-spinner');
+
+      submitBtn.disabled = true;
+      submitText.style.display = 'none';
+      submitSpinner.style.display = 'inline-block';
+
+      console.log('💳 Processing payment...');
+
+      // Get shipping address
+      const shippingAddress = this.stripeCheckoutService.getShippingAddressFromForm();
+
+      // Confirm payment with Stripe and backend
+      const result = await this.stripeCheckoutService.confirmPayment(shippingAddress);
+
+      if (!result.success) {
+        const errorDiv = document.getElementById('checkout-error-message');
+        if (errorDiv) {
+          errorDiv.textContent = result.error || 'Payment failed. Please try again.';
+          errorDiv.style.display = 'block';
+        }
+
+        // Reset button
+        submitBtn.disabled = false;
+        submitText.style.display = 'inline';
+        submitSpinner.style.display = 'none';
+        return;
+      }
+
+      // Payment successful!
+      console.log('✅ Payment successful:', result);
+      this.showSuccess(`Order placed successfully! Order ID: ${result.orderId}`);
+
+      // Clear cart
+      this.cartService.clearCart();
+
+      // Close modal
+      const modal = document.getElementById('checkout-modal');
+      modal.style.display = 'none';
+
+      // Reset Stripe service
+      this.stripeCheckoutService.reset();
+
+      // Redirect to order confirmation page
+      setTimeout(() => {
+        window.location.href = `/merchandise?order_confirmation=${result.orderId}`;
+      }, 1500);
+
+    } catch (error) {
+      console.error('❌ Error during checkout:', error);
+      const errorDiv = document.getElementById('checkout-error-message');
+      if (errorDiv) {
+        errorDiv.textContent = error.message || 'An error occurred. Please try again.';
+        errorDiv.style.display = 'block';
+      }
+
+      // Reset button
+      const submitBtn = document.getElementById('checkout-submit-btn');
+      const submitText = document.getElementById('submit-text');
+      const submitSpinner = document.getElementById('submit-spinner');
+      submitBtn.disabled = false;
+      submitText.style.display = 'inline';
+      submitSpinner.style.display = 'none';
+    }
   }
   
   /**
@@ -3835,13 +4045,34 @@ class MerchandiseStore {
       const actualVariantId = variantId || 'default';
 
       // 🔥 FEATURE: Build cart item with variant and customization metadata
+      // CRITICAL FIX: Look up pricing from dynamic catalog using blueprint/provider IDs
+      let cartPrice = product.price || product.variants?.find(v => v.id === variantId)?.price || 19.95;
+
+      // Try to get pricing from the pricing service
+      if (product.blueprintId && product.printProviderId) {
+        const pricingData = this.pricingService.lookupProductPricing(
+          product.blueprintId,
+          product.printProviderId
+        );
+
+        if (pricingData && pricingData.success && pricingData.variants && pricingData.variants.length > 0) {
+          // Use pricing from dynamic catalog
+          const priceString = pricingData.variants[0]?.price || cartPrice;
+          // Parse price string (e.g., "$29.99" -> 29.99)
+          if (typeof priceString === 'string' && priceString.includes('$')) {
+            cartPrice = parseFloat(priceString.replace(/[^\d.-]/g, ''));
+          } else {
+            cartPrice = parseFloat(priceString) || cartPrice;
+          }
+          console.log(`💰 Using pricing from dynamic catalog: $${cartPrice}`);
+        }
+      }
+
       const cartItem = {
         productId: productId,
         variantId: actualVariantId,
         title: product.title,
-        // 🔥 PLACEHOLDER: Price will be filled from pricing source (TBD)
-        // For now, use fallback. When pricing system is ready, update this.
-        price: product.price || product.variants?.find(v => v.id === variantId)?.price || 19.95,
+        price: cartPrice,
         image: imageUrl,
         quantity: quantity || 1
       };
@@ -4019,10 +4250,25 @@ class MerchandiseStore {
 
       // Prepare API payload with comprehensive validation
       console.log('🔍 DIAGNOSTIC: Preparing API request payload');
-      
+
+      // CRITICAL FIX: Use the ORIGINAL gallery image, not the customized/effects version
+      // The customization.customizedImageUrl is the effects-processed image for preview only
+      // For Printify API, we need the original unmodified gallery image
+      // This should be in product.previewImage or product.image
+      const originalImageUrl = product.previewImage || product.image || product.sourceImage?.url;
+      if (!originalImageUrl) {
+        const error = `❌ FATAL ERROR: Cannot find original image URL. previewImage: ${product.previewImage}, image: ${product.image}, sourceImage: ${product.sourceImage?.url}`;
+        console.error(error);
+        throw new Error(error);
+      }
+
+      console.log('🖼️  Using original image for Printify API:');
+      console.log('   Original URL:', originalImageUrl?.substring(0, 100) + '...');
+      console.log('   Customized URL (effects only):', customization.customizedImageUrl?.substring(0, 100) + '...');
+
       const requestPayload = {
         imageId: product.id || 'custom-product',
-        imageUrl: customization.customizedImageUrl,
+        imageUrl: originalImageUrl,
         imageTitle: product.title,
         productType: product.productType, // Must be validated product type ID
         blueprintId: product.blueprintId, // Must match productType config

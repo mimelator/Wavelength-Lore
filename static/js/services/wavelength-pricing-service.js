@@ -1,7 +1,7 @@
 
 /**
  * WAVELENGTH PRICING LOOKUP API
- * Generated: 2025-10-28T12:49:31.948Z
+ * Generated: 2025-10-28T12:57:51.270Z
  * 
  * Usage in merchandise store:
  * const pricing = await this.lookupProductPricing(blueprintId, printProviderId);
@@ -14661,7 +14661,11 @@ class WavelengthPricingService {
     }
 }
 
-// Export for use in merchandise store
+// Export for browser and Node.js
+if (typeof window !== 'undefined') {
+    window.WavelengthPricingService = WavelengthPricingService;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = WavelengthPricingService;
 }

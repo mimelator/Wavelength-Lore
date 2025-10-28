@@ -6,6 +6,9 @@
 const express = require('express');
 const path = require('path');
 
+// Track application start time for uptime calculation
+const APPLICATION_START_TIME = new Date();
+
 // Import configuration modules
 const { configureApp } = require('./config/server');
 const { initializeDatabase, initializeAllCaches } = require('./config/database');
@@ -77,14 +80,86 @@ async function createApp() {
   // Configure API routes
   configureAPIRoutes(app, adminRateLimit, adminAuthStrict);
 
+  // Helper function to calculate application uptime
+  // IMPORTANT: This function should never throw errors
+  const getApplicationUptime = () => {
+    try {
+      const now = new Date();
+      const uptimeMs = now - APPLICATION_START_TIME;
+      
+      // Validate that we have a positive uptime
+      if (uptimeMs < 0 || !isFinite(uptimeMs)) {
+        return {
+          display: 'invalid',
+          error: 'negative or invalid uptime',
+          startTime: APPLICATION_START_TIME.toISOString()
+        };
+      }
+
+      const seconds = Math.floor(uptimeMs / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      
+      let uptimeDisplay;
+      if (days > 0) {
+        uptimeDisplay = `${days}d ${hours % 24}h ${minutes % 60}m`;
+      } else if (hours > 0) {
+        uptimeDisplay = `${hours}h ${minutes % 60}m`;
+      } else if (minutes > 0) {
+        uptimeDisplay = `${minutes}m ${seconds % 60}s`;
+      } else {
+        uptimeDisplay = `${seconds}s`;
+      }
+      
+      return {
+        milliseconds: uptimeMs,
+        seconds: seconds,
+        minutes: minutes,
+        hours: hours,
+        days: days,
+        display: uptimeDisplay,
+        startTime: APPLICATION_START_TIME.toISOString()
+      };
+    } catch (error) {
+      // Return safe fallback if any calculation fails
+      return {
+        display: 'calculation-error',
+        error: error.message,
+        startTime: APPLICATION_START_TIME ? APPLICATION_START_TIME.toISOString() : 'unknown'
+      };
+    }
+  };
+
   // Add Wavelength data API routes (TEMPORARY - should be in middleware)
   app.get('/api/health', (req, res) => {
-    res.status(200).json({
-      success: true,
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      service: 'Wavelength API'
-    });
+    try {
+      const basicResponse = {
+        success: true,
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        service: 'Wavelength API'
+      };
+
+      // Try to add detailed uptime info, but don't fail if it doesn't work
+      try {
+        const uptime = getApplicationUptime();
+        basicResponse.applicationUptime = uptime;
+      } catch (uptimeError) {
+        basicResponse.applicationUptime = { display: 'unavailable', error: 'calculation failed' };
+      }
+
+      res.status(200).json(basicResponse);
+    } catch (error) {
+      // Fallback response if everything fails
+      res.status(200).json({
+        success: true,
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        service: 'Wavelength API',
+        note: 'minimal health check'
+      });
+    }
   });
 
   app.get('/api/seasons', (req, res) => {
@@ -105,12 +180,34 @@ async function createApp() {
   });
 
   // Add simple health check endpoint for App Runner (no authentication required)
+  // CRITICAL: This endpoint must NEVER fail or App Runner will take the service down
   app.get('/health', (_req, res) => {
-    res.status(200).json({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime()
-    });
+    try {
+      const basicHealth = {
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime() // Node.js process uptime in seconds
+      };
+
+      // Try to add application uptime, but don't fail if it doesn't work
+      try {
+        const uptime = getApplicationUptime();
+        basicHealth.applicationUptime = uptime.display;
+        basicHealth.startTime = uptime.startTime;
+      } catch (uptimeError) {
+        // Silently ignore uptime calculation errors
+        basicHealth.applicationUptime = 'unavailable';
+      }
+
+      res.status(200).json(basicHealth);
+    } catch (error) {
+      // Even if everything fails, return a basic healthy response
+      res.status(200).json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: 0
+      });
+    }
   });
 
   // Mount authentication routes (public access)

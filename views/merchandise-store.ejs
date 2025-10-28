@@ -23,14 +23,19 @@
     <%- include('partials/footer') %>
 
     <!-- REFACTOR: Load all services in dependency order -->
-    
+
+    <!-- Stripe.js Library (external) -->
+    <script src="https://js.stripe.com/v3/"></script>
+
     <!-- Event Bus (foundation) -->
     <script src="/js/services/wavelength-event-bus.js?v=<%= version %>" onerror="console.error('❌ Failed to load wavelength-event-bus.js')"></script>
-    
+
     <!-- Core Services -->
     <script src="/js/services/MerchandiseApiService.js?v=<%= version %>" onerror="console.error('❌ Failed to load MerchandiseApiService.js')"></script>
     <script src="/js/services/merchandise-cart-service.js?v=<%= version %>" onerror="console.error('❌ Failed to load merchandise-cart-service.js')"></script>
     <script src="/js/services/merchandise-product-validation-service.js?v=<%= version %>" onerror="console.error('❌ Failed to load merchandise-product-validation-service.js')"></script>
+    <script src="/js/services/wavelength-pricing-service.js?v=<%= version %>" onerror="console.error('❌ Failed to load wavelength-pricing-service.js')"></script>
+    <script src="/js/services/stripe-checkout-service.js?v=<%= version %>" onerror="console.error('❌ Failed to load stripe-checkout-service.js')"></script>
     
     <!-- PHASE 2: UI Renderer Components (depend on services) -->
     <script src="/js/components/merchandise-product-card-renderer.js?v=<%= version %>" onerror="console.error('❌ Failed to load merchandise-product-card-renderer.js')"></script>
@@ -49,9 +54,11 @@
             // REFACTOR: Check if all required services and UI renderers are available
             const requiredServices = [
                 'WavelengthEventBus',
-                'MerchandiseApiService', 
+                'MerchandiseApiService',
                 'MerchandiseCartService',
                 'MerchandiseProductValidationService',
+                'WavelengthPricingService',
+                'StripeCheckoutService',
                 'MerchandiseProductCardRenderer',
                 'MerchandiseCartRenderer',
                 'MerchandiseCategoryGridRenderer',

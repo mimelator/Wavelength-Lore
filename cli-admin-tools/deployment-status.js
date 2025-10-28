@@ -81,6 +81,70 @@ class WavelengthDeploymentStatus {
             const result = await this.appRunner.send(command);
             const service = result.Service;
             
+            // Calculate uptime if service is running
+            let uptime = null;
+            let uptimeDisplay = 'Unknown';
+            if (service.Status === 'RUNNING' && service.UpdatedAt) {
+                const now = new Date();
+                const serviceStart = new Date(service.UpdatedAt);
+                const uptimeMs = now - serviceStart;
+                uptime = {
+                    milliseconds: uptimeMs,
+                    seconds: Math.floor(uptimeMs / 1000),
+                    minutes: Math.floor(uptimeMs / (1000 * 60)),
+                    hours: Math.floor(uptimeMs / (1000 * 60 * 60)),
+                    days: Math.floor(uptimeMs / (1000 * 60 * 60 * 24))
+                };
+                
+                // Format uptime display
+                if (uptime.days > 0) {
+                    uptimeDisplay = `${uptime.days}d ${uptime.hours % 24}h ${uptime.minutes % 60}m`;
+                } else if (uptime.hours > 0) {
+                    uptimeDisplay = `${uptime.hours}h ${uptime.minutes % 60}m`;
+                } else if (uptime.minutes > 0) {
+                    uptimeDisplay = `${uptime.minutes}m ${uptime.seconds % 60}s`;
+                } else {
+                    uptimeDisplay = `${uptime.seconds}s`;
+                }
+            }
+
+            // Try to get application uptime from health endpoint
+            let applicationUptime = null;
+            let applicationStatus = 'Unknown';
+            if (service.Status === 'RUNNING' && service.ServiceUrl) {
+                try {
+                    const https = require('https');
+                    const healthUrl = `https://${service.ServiceUrl}/health`;
+                    
+                    const healthResponse = await new Promise((resolve, reject) => {
+                        const req = https.get(healthUrl, { timeout: 5000 }, (res) => {
+                            let data = '';
+                            res.on('data', chunk => data += chunk);
+                            res.on('end', () => {
+                                try {
+                                    resolve(JSON.parse(data));
+                                } catch (e) {
+                                    reject(new Error('Invalid JSON response'));
+                                }
+                            });
+                        });
+                        req.on('error', reject);
+                        req.on('timeout', () => {
+                            req.destroy();
+                            reject(new Error('Health check timeout'));
+                        });
+                    });
+                    
+                    if (healthResponse.status === 'healthy') {
+                        applicationStatus = 'Healthy';
+                        applicationUptime = healthResponse.applicationUptime || 'Unknown';
+                    }
+                } catch (error) {
+                    console.log(chalk.gray(`   Note: Could not fetch application health (${error.message})`));
+                    applicationStatus = 'Health check failed';
+                }
+            }
+
             return {
                 status: service.Status,
                 message: `Service is ${service.Status.toLowerCase()}`,
@@ -88,6 +152,10 @@ class WavelengthDeploymentStatus {
                 serviceUrl: service.ServiceUrl,
                 createdAt: service.CreatedAt,
                 updatedAt: service.UpdatedAt,
+                uptime: uptime,
+                uptimeDisplay: uptimeDisplay,
+                applicationUptime: applicationUptime,
+                applicationStatus: applicationStatus,
                 source: service.SourceConfiguration?.ImageRepository?.ImageIdentifier || 'Not available'
             };
             
@@ -239,6 +307,37 @@ class WavelengthDeploymentStatus {
         if (status.appRunner.serviceUrl) {
             console.log(chalk.white(`   URL: https://${status.appRunner.serviceUrl}`));
         }
+        
+        // Display service uptime if available
+        if (status.appRunner.status === 'RUNNING' && status.appRunner.uptimeDisplay !== 'Unknown') {
+            console.log(chalk.green(`   ⏰ Service Uptime: ${status.appRunner.uptimeDisplay}`));
+            if (status.appRunner.uptime.days >= 7) {
+                console.log(chalk.blue(`   🎯 Excellent service stability - Running for over a week!`));
+            } else if (status.appRunner.uptime.days >= 1) {
+                console.log(chalk.green(`   ✅ Good service stability - Running for ${status.appRunner.uptime.days} day(s)`));
+            } else if (status.appRunner.uptime.hours >= 1) {
+                console.log(chalk.yellow(`   📊 Recent service deployment - Running for ${status.appRunner.uptime.hours} hour(s)`));
+            } else {
+                console.log(chalk.cyan(`   🚀 Fresh service deployment - Just started`));
+            }
+        } else if (status.appRunner.status !== 'RUNNING') {
+            console.log(chalk.red(`   ⏰ Service Uptime: Service not running`));
+        }
+
+        // Display application uptime if available
+        if (status.appRunner.applicationUptime && 
+            status.appRunner.applicationUptime !== 'Unknown' && 
+            status.appRunner.applicationUptime !== 'unavailable') {
+            console.log(chalk.cyan(`   🚀 Application Uptime: ${status.appRunner.applicationUptime}`));
+            console.log(chalk.green(`   ✅ Application Status: ${status.appRunner.applicationStatus}`));
+        } else if (status.appRunner.status === 'RUNNING') {
+            const statusMsg = status.appRunner.applicationStatus || 'Could not determine';
+            if (statusMsg === 'Health check failed') {
+                console.log(chalk.yellow(`   🚀 Application Uptime: Health endpoint not accessible`));
+            } else {
+                console.log(chalk.gray(`   🚀 Application Uptime: ${statusMsg}`));
+            }
+        }
         if (status.appRunner.source && status.appRunner.source !== 'Not available') {
             console.log(chalk.white(`   Current Image: ${status.appRunner.source}`));
             
@@ -292,6 +391,17 @@ class WavelengthDeploymentStatus {
         console.log(chalk.white(`   Local Environment: ${localHealthy ? '✅' : '❌'}`));
         console.log(chalk.white(`   ECR Repository: ${ecrHealthy ? '✅' : '❌'}`));
         console.log(chalk.white(`   App Runner Service: ${appRunnerHealthy ? '✅' : '❌'}`));
+        
+        // Add uptime to summary if service is running
+        if (appRunnerHealthy && status.appRunner.uptimeDisplay !== 'Unknown') {
+            console.log(chalk.white(`   Service Uptime: ⏰ ${status.appRunner.uptimeDisplay}`));
+        }
+        if (status.appRunner.applicationUptime && 
+            status.appRunner.applicationUptime !== 'Unknown' && 
+            status.appRunner.applicationUptime !== 'unavailable') {
+            console.log(chalk.white(`   App Uptime: 🚀 ${status.appRunner.applicationUptime}`));
+        }
+        
         console.log(chalk.white(`   Deployment Sync: ${deploymentSync === 'Synchronized' ? '✅' : 
                                                       deploymentSync === 'Rollback detected' ? '🔄' : 
                                                       deploymentSync === 'Out of sync' ? '⚠️' : '❓'} ${deploymentSync}`));

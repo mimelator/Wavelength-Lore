@@ -2639,13 +2639,23 @@ class MerchandiseModalRenderer {
       // Gather all customization data
       const selectedEffects = JSON.parse(modal.dataset.selectedEffects || '{}');
       const borderCustomization = this.gatherBorderCustomization(modal);
-      const customizedImageUrl = modal.dataset.customizedImageUrl;
+      let customizedImageUrl = modal.dataset.customizedImageUrl;
       console.log('✅ Customization data gathered:', { customizedImageUrl, borderCustomization });
 
-      // Validate that we have a customized image
+      // CRITICAL FIX: Automatically update preview if not done yet
       if (!customizedImageUrl) {
-        alert('Please click "Update Preview" first to generate your customized artwork.');
-        return;
+        console.log('⚙️ Preview not updated yet - automatically triggering update...');
+        // Automatically trigger the update preview action
+        await this.handleUpdatePreview(modal);
+
+        // Get the newly generated customized image URL
+        customizedImageUrl = modal.dataset.customizedImageUrl;
+        if (customizedImageUrl) {
+          console.log('✅ Auto-generated preview image:', customizedImageUrl);
+        } else {
+          alert('Unable to generate preview. Please try clicking "Update Preview" manually.');
+          return;
+        }
       }
 
       console.log('📊 Step 2: Building customization object');
@@ -2700,8 +2710,17 @@ class MerchandiseModalRenderer {
 
       console.log('📊 Step 4: 🚀 CALLING PRINTIFY API TO CREATE REAL PRODUCT!');
       
-      // Show loading while API call happens
-      this.showLoadingOverlay('Creating your amazing product...');
+      // Show loading with product details while API call happens
+      const productName = product.title || 'Custom Product';
+      const provider = product.provider || 'Printify';
+      const category = product.category || 'merchandise';
+      this.showLoadingOverlay(`Creating your amazing ${productName}...`, {
+        productName,
+        provider,
+        category,
+        blueprintId: product.blueprintId,
+        printProviderId: product.printProviderId
+      });
 
       // 🔥 CALL THE MERCHANDISE STORE'S generatePrintifyMockup METHOD
       console.log('🔍 Checking for merchandise store instance...');
@@ -3216,7 +3235,7 @@ class MerchandiseModalRenderer {
   /**
    * Show loading overlay during API calls
    */
-  showLoadingOverlay(message = 'Loading...') {
+  showLoadingOverlay(message = 'Loading...', productDetails = null) {
     // Remove existing overlay if any
     this.hideLoadingOverlay();
 
@@ -3240,13 +3259,40 @@ class MerchandiseModalRenderer {
       -webkit-backdrop-filter: blur(4px);
     `;
 
-    // 🔥 ENHANCED: Multi-step progress overlay with better visual feedback
+    // Build product details section if available
+    const productDetailsHTML = productDetails ? `
+      <div style="
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 30px;
+        border-left: 4px solid rgba(100, 200, 255, 0.6);
+      ">
+        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.9); font-weight: 500;">
+          📦 ${productDetails.productName || 'Product'}
+        </div>
+        <div style="
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.7);
+          margin-top: 8px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          text-align: left;
+        ">
+          <div>🏢 Provider: <strong>${productDetails.provider || 'N/A'}</strong></div>
+          <div>📂 Category: <strong>${productDetails.category || 'N/A'}</strong></div>
+        </div>
+      </div>
+    ` : '';
+
+    // 🔥 ENHANCED: Multi-step progress overlay with product details and better visual feedback
     overlay.innerHTML = `
       <div style="
         background: rgba(0, 0, 0, 0.5);
         border-radius: 24px;
         padding: 60px 80px;
-        max-width: 600px;
+        max-width: 700px;
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border: 2px solid rgba(255, 255, 255, 0.1);
@@ -3267,6 +3313,9 @@ class MerchandiseModalRenderer {
           color: #ffffff;
           letter-spacing: 0.5px;
         ">${message}</div>
+
+        <!-- Product Details -->
+        ${productDetailsHTML}
 
         <!-- Progress Steps -->
         <div style="
