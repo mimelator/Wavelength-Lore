@@ -2531,13 +2531,9 @@ class MerchandiseModalRenderer {
         }
       }
 
-      // Show preview modal with finished product
-      console.log('📊 Step 6: Show finished product preview modal');
-      this.showFinishedProductPreview(product, customization, customizationModalId);
-
-      // Show success message to user
+      // Show success message to user (no useless preview modal)
       if (merchandiseStore && typeof merchandiseStore.showSuccess === 'function') {
-        merchandiseStore.showSuccess('🎉 Your custom product has been created! Check it out below.');
+        merchandiseStore.showSuccess('✅ Your custom product has been created successfully!');
         console.log('✅ Success message shown');
       }
 
@@ -2843,44 +2839,7 @@ class MerchandiseModalRenderer {
    * @param {Object} customization - Customization object  
    * @param {string} customizationModalId - ID of customization modal to restore
    */
-  showFinishedProductPreview(product, customization, customizationModalId) {
-    const previewModalId = `preview-finished-${product.id}-${Date.now()}`;
-    
-    const previewHTML = `
-      <div class="modal-overlay fullscreen-overlay" data-modal-id="${previewModalId}">
-        <div class="modal-dialog preview-modal">
-          <div class="modal-header">
-            <h3>🎉 Your Custom Product Preview</h3>
-            <button class="modal-close" data-close-modal="${previewModalId}">×</button>
-          </div>
-          <div class="modal-body">
-            <div class="preview-content">
-              <div class="product-preview">
-                <img src="${customization.customizedImageUrl || product.previewImage}" 
-                     alt="${product.title}" class="preview-image">
-                <h4>${product.title}</h4>
-                <p class="customization-summary">
-                  ${customization.effects ? 'Effects applied' : 'No effects'} • 
-                  ${customization.borderEnabled ? 'Border added' : 'No border'}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn-secondary back-to-customize-btn" data-back-to="${customizationModalId}">
-              ← Back to Customize
-            </button>
-            <button class="btn-primary add-to-cart-btn" data-product-id="${product.id}">
-              Add to Cart
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', previewHTML);
-    console.log('✅ Finished product preview modal shown');
-  }
+  // REMOVED: showFinishedProductPreview - useless modal that just shows the same image user already customized
 
   /**
    * Show loading overlay during API calls
