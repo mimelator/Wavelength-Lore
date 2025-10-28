@@ -838,7 +838,187 @@ class MerchandiseModalRenderer {
       return this.renderModalError('cart');
     }
   }
-  
+
+  /**
+   * Render checkout modal with payment form
+   * @param {Object} cartSummary - Cart summary object
+   * @returns {string} HTML string for checkout modal
+   */
+  renderCheckoutModal(cartSummary) {
+    try {
+      const modalId = 'checkout-modal';
+      
+      return `
+        <div class="modal-overlay" data-modal-id="${modalId}">
+          <div class="modal-dialog checkout-modal" role="dialog" aria-labelledby="${modalId}-title">
+            <div class="modal-header">
+              <h3 id="${modalId}-title">
+                <span class="modal-icon">💳</span>
+                Secure Checkout
+              </h3>
+              <button class="modal-close-btn" data-modal-id="${modalId}" aria-label="Close modal">
+                <span>✕</span>
+              </button>
+            </div>
+            
+            <div class="modal-body">
+              <div class="checkout-container">
+                <!-- Order Summary Section -->
+                <div class="checkout-order-summary">
+                  <h4>Order Summary</h4>
+                  <div class="checkout-items">
+                    ${cartSummary.items.map(item => this.renderCheckoutItem(item)).join('')}
+                  </div>
+                  <div class="checkout-totals">
+                    <div class="total-row">
+                      <span>Subtotal:</span>
+                      <span>$${cartSummary.total.toFixed(2)}</span>
+                    </div>
+                    <div class="total-row">
+                      <span>Shipping:</span>
+                      <span>FREE</span>
+                    </div>
+                    <div class="total-row total">
+                      <span>Total:</span>
+                      <span>$${cartSummary.total.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Customer Details & Payment Section -->
+                <div class="checkout-payment-section">
+                  <form id="checkout-form" class="checkout-form">
+                    <!-- Customer Information -->
+                    <div class="form-section">
+                      <h4>Contact Information</h4>
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label for="customer-email">Email Address *</label>
+                          <input type="email" id="customer-email" name="email" required placeholder="your@email.com">
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Shipping Address -->
+                    <div class="form-section">
+                      <h4>Shipping Address</h4>
+                      <div class="form-row">
+                        <div class="form-group half">
+                          <label for="shipping-first-name">First Name *</label>
+                          <input type="text" id="shipping-first-name" name="firstName" required>
+                        </div>
+                        <div class="form-group half">
+                          <label for="shipping-last-name">Last Name *</label>
+                          <input type="text" id="shipping-last-name" name="lastName" required>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label for="shipping-address">Address *</label>
+                          <input type="text" id="shipping-address" name="address" required>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group half">
+                          <label for="shipping-city">City *</label>
+                          <input type="text" id="shipping-city" name="city" required>
+                        </div>
+                        <div class="form-group quarter">
+                          <label for="shipping-state">State *</label>
+                          <input type="text" id="shipping-state" name="state" required>
+                        </div>
+                        <div class="form-group quarter">
+                          <label for="shipping-zip">ZIP Code *</label>
+                          <input type="text" id="shipping-zip" name="zip" required>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label for="shipping-country">Country *</label>
+                          <select id="shipping-country" name="country" required>
+                            <option value="US">United States</option>
+                            <option value="CA">Canada</option>
+                            <option value="UK">United Kingdom</option>
+                            <option value="AU">Australia</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Payment Information -->
+                    <div class="form-section">
+                      <h4>Payment Information</h4>
+                      <div class="payment-security-notice">
+                        <span>🔒</span> Your payment information is secure and encrypted
+                      </div>
+                      
+                      <!-- Stripe Elements will be inserted here -->
+                      <div id="stripe-card-element" class="stripe-element">
+                        <!-- Stripe card element placeholder -->
+                      </div>
+                      <div id="stripe-card-errors" class="stripe-errors" role="alert"></div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="form-section">
+                      <div class="checkbox-group">
+                        <input type="checkbox" id="terms-agreement" name="terms" required>
+                        <label for="terms-agreement">
+                          I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
+                        </label>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            
+            <div class="modal-footer">
+              <div class="modal-actions">
+                <button class="btn-secondary back-to-cart-btn" data-modal-id="${modalId}">
+                  ← Back to Cart
+                </button>
+                <button class="btn-primary complete-order-btn" form="checkout-form">
+                  <span>💳</span> Complete Order ($${cartSummary.total.toFixed(2)})
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+    } catch (error) {
+      console.error('Error rendering checkout modal:', error);
+      return this.renderModalError('checkout');
+    }
+  }
+
+  /**
+   * Render individual checkout item
+   * @param {Object} item - Cart item
+   * @returns {string} HTML string for checkout item
+   */
+  renderCheckoutItem(item) {
+    const itemTotal = (item.price || 0) * (item.quantity || 1);
+    const itemImage = this.getItemImage(item);
+    
+    return `
+      <div class="checkout-item">
+        <div class="checkout-item-image">
+          <img src="${itemImage}" alt="${item.title}" loading="lazy">
+        </div>
+        <div class="checkout-item-details">
+          <h5>${item.title}</h5>
+          <p class="checkout-item-variant">${this.getVariantDescription(item)}</p>
+          <p class="checkout-item-quantity">Qty: ${item.quantity}</p>
+        </div>
+        <div class="checkout-item-price">
+          $${itemTotal.toFixed(2)}
+        </div>
+      </div>
+    `;
+  }
+
   /**
    * Render confirmation dialog
    * @param {Object} options - Confirmation options
@@ -2233,10 +2413,14 @@ class MerchandiseModalRenderer {
       this.debugLog(`Save customization for product: ${productId}`, 'info');
     }
 
+    // Gather all selected effects from modal state
+    const selectedEffects = JSON.parse(modal.dataset.selectedEffects || '{}');
+
     // Gather customization data including border options
     const borderCustomization = this.gatherBorderCustomization(modal);
 
     const customization = {
+      effects: selectedEffects,
       borderEnabled: borderCustomization.borderEnabled,
       borderWidth: borderCustomization.borderWidth,
       borderWidthPixels: borderCustomization.borderWidthPixels,
@@ -2672,8 +2856,16 @@ class MerchandiseModalRenderer {
       console.log('✅ Customization object built:', customization);
 
       console.log('📊 Step 3: Getting product data from modal');
+      console.log('   modal element:', modal);
+      console.log('   modal className:', modal?.className);
+      console.log('   modal tag:', modal?.tagName);
       // Get product data from modal attributes
       const customizationOverlay = modal.closest('.modal-overlay');
+      console.log('   customizationOverlay found:', !!customizationOverlay);
+      if (customizationOverlay) {
+        console.log('   customizationOverlay className:', customizationOverlay.className);
+        console.log('   customizationOverlay data-modal-id:', customizationOverlay.dataset.modalId);
+      }
       const customizationModalId = customizationOverlay?.dataset.modalId;
       const productTitle = customizationOverlay?.dataset.productTitle || 'Product';
       const productType = customizationOverlay?.dataset.productType; // CRITICAL: Must be present
@@ -2784,16 +2976,22 @@ class MerchandiseModalRenderer {
       this.hideLoadingOverlay();
 
       console.log('📊 Step 5: Close customization modal and show success');
-      
+      console.log('   customizationOverlay available:', !!customizationOverlay);
+      console.log('   customizationModalId available:', !!customizationModalId);
+      console.log('   customizationModalId value:', customizationModalId);
+
       // Close the customization modal completely (reuse existing variables)
       if (customizationOverlay && customizationModalId) {
         console.log('🔄 Attempting to close modal:', customizationModalId);
         this.hideModal(customizationModalId);
-        console.log('✅ Customization modal closed');
+        console.log('✅ Customization modal closed (hideModal called)');
       } else {
         console.warn('⚠️ Could not find customization modal to close');
+        console.warn('   customizationOverlay:', customizationOverlay);
+        console.warn('   customizationModalId:', customizationModalId);
         // Fallback: remove the modal overlay directly
         if (customizationOverlay) {
+          console.log('🔄 Using fallback: removing overlay directly');
           customizationOverlay.remove();
           console.log('✅ Customization modal removed directly');
         }
@@ -3169,6 +3367,17 @@ class MerchandiseModalRenderer {
         if (this.eventBus) {
           this.eventBus.emit('cart.removeItem', { productId, variantId });
         }
+      } else if (e.target.classList.contains('checkout-modal-btn')) {
+        // Handle checkout from cart modal
+        console.log('💳 Checkout button clicked from cart modal');
+        if (this.eventBus) {
+          this.eventBus.emit('checkout.initiate');
+        }
+        this.hideModal('cart-modal'); // Close cart modal
+      } else if (e.target.classList.contains('continue-shopping-modal-btn')) {
+        // Handle continue shopping from cart modal
+        console.log('🛍️ Continue shopping from cart modal');
+        this.hideModal('cart-modal'); // Close cart modal
       }
     });
   }

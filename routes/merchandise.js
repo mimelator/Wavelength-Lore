@@ -548,9 +548,9 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
       console.log('🎨 Applying user customizations before upscaling...');
       const EffectsProcessor = require('../services/EffectsProcessor');
       const effectsProcessor = new EffectsProcessor();
-      
+
       try {
-        const customizedBuffer = await effectsProcessor.applyEffects(imageBuffer, imageContext);
+        const customizedBuffer = await effectsProcessor.processImage(imageBuffer, imageContext);
         if (customizedBuffer && customizedBuffer.length > 0) {
           imageBuffer = customizedBuffer;
           console.log('✅ User customizations applied, new size:', (imageBuffer.length / 1024).toFixed(2), 'KB');
