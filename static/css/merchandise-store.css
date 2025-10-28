@@ -3813,17 +3813,22 @@
   display: block;
 }
 
+/* 🔥 CRITICAL FIX: Preview overlay positioning
+   The overlay should be a small label on top of the image, not filling the entire container
+   It was covering the entire image area with a semi-transparent dark overlay */
 .preview-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 12px;
+  left: 12px;
+  right: auto;
+  bottom: auto;
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 12px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   pointer-events: none;
+  z-index: 10;
+  background: transparent;
 }
 
 .preview-info {
