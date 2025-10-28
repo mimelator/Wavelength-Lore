@@ -1322,7 +1322,10 @@ class MerchandiseStore {
   
   async checkout() {
     try {
-      if (this.cart.length === 0) {
+      // Get cart items from cart service instead of this.cart
+      const cartItems = this.cartService.getItems();
+      
+      if (!cartItems || cartItems.length === 0) {
         this.showError('Your cart is empty');
         return;
       }
