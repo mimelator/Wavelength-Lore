@@ -1880,6 +1880,14 @@ class MerchandiseModalRenderer {
     // Get the label text for debugging
     const label = input.closest('.width-radio-label')?.querySelector('.radio-label')?.textContent || borderWidth;
 
+    // CRITICAL: Update the checked state of all width radio buttons
+    // Remove checked from all width radios
+    modal.querySelectorAll('input[name="border-width"]').forEach(radio => {
+      radio.checked = false;
+    });
+    // Set checked on the selected one
+    input.checked = true;
+
     // Store in modal state
     modal.dataset.selectedBorderWidth = borderWidth;
     modal.dataset.selectedBorderPixels = borderPixels;
