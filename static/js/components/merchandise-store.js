@@ -2428,38 +2428,87 @@ class MerchandiseStore {
       return;
     }
     
+    // Generate better title using our function
+    const enhancedTitle = this.generateProductTitle(product, this.selectedImage);
+    
     const hasVariants = product.variants && product.variants.length > 0;
+    const hasImages = product.images && product.images.length > 0;
+    const previewImage = (hasImages && product.images.length > 0) 
+      ? product.images[0].src 
+      : (product.sourceImage?.url || '');
     
     const modal = document.createElement('div');
     modal.className = 'modal variants-modal';
     modal.innerHTML = `
-      <div class="modal-content">
+      <div class="modal-content preview-modal-content">
         <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
-        <h2>🎽 ${product.title} - Choose Your Style</h2>
+        <h2>� ${enhancedTitle}</h2>
         
-        ${hasVariants ? `
-          <div class="compact-variants-grid">
-            ${product.variants.map(variant => `
-              <div class="compact-variant-card">
-                <div class="variant-info">
-                  <h4>${variant.title}</h4>
-                  <span class="variant-price">$${(variant.price / 100).toFixed(2)}</span>
-                </div>
-                <button class="add-to-cart-btn compact" 
-                        data-product-id="${productId}" 
-                        data-variant-id="${variant.id}"
-                        onclick="merchandiseStore.addToCart('${productId}', '${variant.id}'); this.closest('.modal').remove();">
-                  Add to Cart
+        <div class="preview-layout">
+          <div class="preview-gallery">
+            <div class="main-preview">
+              <img id="mainPreviewImage" src="${previewImage}" alt="${enhancedTitle}" />
+            </div>
+            ${hasImages ? `
+              <div class="preview-thumbnails">
+                ${product.images.map((img, index) => `
+                  <img class="preview-thumb ${index === 0 ? 'active' : ''}" 
+                       src="${img.src}" 
+                       onclick="this.closest('.modal').querySelector('#mainPreviewImage').src = this.src; 
+                                this.closest('.preview-thumbnails').querySelectorAll('.preview-thumb').forEach(t => t.classList.remove('active')); 
+                                this.classList.add('active');" />
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+          
+          <div class="variant-selector">
+            <div class="product-actions-bar">
+              <button class="btn-secondary edit-product-btn" 
+                      data-product-id="${productId}"
+                      onclick="this.closest('.modal').remove(); merchandiseStore.startNewDesign();">
+                <span>🎨</span> Edit Design
+              </button>
+            </div>
+
+            ${hasVariants ? `
+              <h3>Choose Your Style & Size</h3>
+              <div class="variants-grid">
+                ${product.variants.map((variant, variantIndex) => {
+                  return `
+                    <div class="variant-card" data-variant-id="${variant.id}">
+                      <div class="variant-preview">
+                        <img src="${previewImage}" alt="${variant.title}" 
+                             onclick="document.getElementById('mainPreviewImage').src = this.src" 
+                             style="cursor: pointer;" 
+                             title="Click to view larger" />
+                      </div>
+                      <div class="variant-info">
+                        <h4>${variant.title}</h4>
+                        <p class="variant-price">$${(variant.price / 100).toFixed(2)}</p>
+                        <button class="select-variant-btn" 
+                                data-product-id="${productId}" 
+                                data-variant-id="${variant.id}"
+                                onclick="merchandiseStore.addToCart('${productId}', '${variant.id}'); this.closest('.modal').remove();">
+                          Add to Cart
+                        </button>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            ` : `
+              <div class="no-variants-message">
+                <h3>🚧 Product Setup In Progress</h3>
+                <p>This product is still being processed. Variants and detailed previews will be available soon!</p>
+                <p class="product-info">You can still edit this product to make changes to the design.</p>
+                <button class="btn-secondary" onclick="this.closest('.modal').remove()">
+                  Close Preview
                 </button>
               </div>
-            `).join('')}
+            `}
           </div>
-        ` : `
-          <div class="no-variants-message">
-            <p>🚧 This product is still being processed. Variants will be available soon!</p>
-            <button class="btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
-          </div>
-        `}
+        </div>
       </div>
     `;
     
