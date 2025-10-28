@@ -444,8 +444,8 @@ class MerchandiseStore {
       // Load product types first
       console.log('🔍 Loading product types...');
       await this.loadProductTypes();
-      console.log('✅ Product types loaded:', Object.keys(this.productTypes || {}).length, 'categories');
-      console.log('🔍 Product types data:', this.productTypes);
+      console.log('✅ Product types loaded:', this.availableProducts?.length || 0, 'products in', Object.keys(this.productCategories || {}).length, 'categories');
+      console.log('🔍 Available products sample:', this.availableProducts?.slice(0, 3)?.map(p => p.id));
       
       // Load user's gallery images
       console.log('🔍 Loading gallery images...');
@@ -2414,15 +2414,27 @@ class MerchandiseStore {
   
   findProductConfig(productTypeId) {
     console.log('🔍 Looking for product config:', productTypeId);
-    console.log('🔍 Available product types:', Object.keys(this.productTypes));
+    console.log('🔍 Available products count:', this.availableProducts?.length || 0);
+    console.log('🔍 Available categories:', Object.keys(this.productCategories || {}));
     
-    // Search through all product type categories
-    for (const [categoryKey, category] of Object.entries(this.productTypes)) {
-      console.log(`🔍 Checking category ${categoryKey}:`, category.products?.map(p => p.id));
-      const product = category.products?.find(p => p.id === productTypeId);
+    // First, try direct search in availableProducts array
+    if (this.availableProducts && this.availableProducts.length > 0) {
+      const product = this.availableProducts.find(p => p.id === productTypeId);
       if (product) {
-        console.log('✅ Found product config:', product);
+        console.log('✅ Found product config in availableProducts:', product);
         return product;
+      }
+    }
+    
+    // Fallback: Search through product categories
+    if (this.productCategories) {
+      for (const [categoryKey, category] of Object.entries(this.productCategories)) {
+        console.log(`🔍 Checking category ${categoryKey}:`, category.products?.map(p => p.id));
+        const product = category.products?.find(p => p.id === productTypeId);
+        if (product) {
+          console.log('✅ Found product config in category:', product);
+          return product;
+        }
       }
     }
     
