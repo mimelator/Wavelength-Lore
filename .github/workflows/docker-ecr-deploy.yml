@@ -32,6 +32,11 @@ jobs:
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+          
+          # Verify git remote configuration
+          echo "::notice::Git remote origin: $(git remote get-url origin)"
+          echo "::notice::Current branch: $(git branch --show-current)"
+          echo "::notice::Git user: $(git config user.name) <$(git config user.email)>"
 
       - name: Check if Version Increment Needed
         id: check-version
@@ -385,6 +390,7 @@ jobs:
 
       - name: Commit Version Changes
         if: steps.deploy-apprunner.outcome == 'success' && steps.check-version.outputs.skip == 'false'
+        continue-on-error: true
         env:
           NEW_VERSION: ${{ steps.set-version.outputs.version }}
         run: |
@@ -408,9 +414,18 @@ jobs:
           }
           EOF
 
+          # Check if there are any changes to commit
+          if git diff --staged --quiet && git diff --quiet package.json version.json; then
+            echo "::notice::No version changes to commit"
+            exit 0
+          fi
+
           # Commit the version changes
           git add package.json version.json
-          git commit -m "🔖 Auto-increment version to v$NEW_VERSION after successful deployment [skip version]" || echo "::notice::No changes to commit"
+          git commit -m "🔖 Auto-increment version to v$NEW_VERSION after successful deployment [skip version]" || {
+            echo "::notice::No changes to commit or commit failed"
+            exit 0
+          }
 
           # Ensure we have remote tags locally for existence check
           git fetch --tags origin || echo "::warning::Failed to fetch tags from origin (continuing)"
@@ -419,18 +434,34 @@ jobs:
           if git rev-parse -q --verify "refs/tags/v$NEW_VERSION" >/dev/null; then
             echo "::notice::Tag v$NEW_VERSION already exists on this repository; skipping tag creation"
           else
-            git tag "v$NEW_VERSION"
-            git push origin "v$NEW_VERSION"
-            echo "::notice::✅ Tag v$NEW_VERSION created and pushed"
+            git tag "v$NEW_VERSION" || {
+              echo "::warning::Failed to create tag v$NEW_VERSION"
+              exit 0
+            }
+            
+            # Push tag with explicit error handling
+            if git push origin "v$NEW_VERSION"; then
+              echo "::notice::✅ Tag v$NEW_VERSION created and pushed"
+            else
+              echo "::warning::Failed to push tag v$NEW_VERSION - may already exist remotely"
+            fi
           fi
 
-          # Push the commit to main (always) -- do this after tag to keep history consistent
-          git push origin main || echo "::warning::Failed to push commit to origin/main"
+          # Push the commit to main with better error handling
+          if git push origin HEAD:main; then
+            echo "::notice::✅ Version commit pushed successfully"
+          else
+            echo "::error::Failed to push version commit to main branch"
+            echo "::error::This may be due to branch protection rules or concurrent pushes"
+            echo "::notice::Deployment was successful, only version commit failed"
+            # Don't fail the entire workflow for version commit issues
+            exit 0
+          fi
 
           echo "::notice::✅ Version commit/push step completed for v$NEW_VERSION"
 
       - name: Deployment Summary
-        if: success()
+        if: always() && steps.deploy-apprunner.outcome == 'success'
         env:
           SHORT_SHA: ${{ steps.deploy-apprunner.outputs.short_sha }}
           VERSION_TAG: ${{ steps.deploy-apprunner.outputs.version_tag }}
@@ -446,3 +477,9 @@ jobs:
             echo "::notice::Version incremented and committed: v${{ steps.set-version.outputs.version }}"
           fi
           echo "::notice::========================================="
+          
+          # Show overall workflow status
+          if [ "${{ job.status }}" != "success" ]; then
+            echo "::warning::⚠️  Note: Deployment succeeded but some post-deployment steps may have failed"
+            echo "::warning::This is typically the version commit step and does not affect the live deployment"
+          fi
