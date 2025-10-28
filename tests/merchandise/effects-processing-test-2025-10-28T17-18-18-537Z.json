@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-10-28T17:18:18.281Z",
+  "testName": "Effects Processing Validation",
+  "steps": [],
+  "serverLogsCapture": null,
+  "evidenceFound": {
+    "conversionStarted": false,
+    "vibrancyMerged": false,
+    "dramaticMerged": false,
+    "finalParametersShown": false,
+    "saturationFound": false,
+    "numericParameters": []
+  },
+  "apiResponse": null,
+  "apiError": {
+    "status": 400,
+    "message": "Failed to process image"
+  }
+}
