@@ -131,23 +131,25 @@ class ImageUpscalingService {
       
       if (metadata.format === 'webp') {
         console.log('🔄 Converting WebP to PNG for upscaler compatibility...');
+        // Start with reasonable compression to avoid huge files
         processedBuffer = await sharp(imageBuffer)
-          .png({ quality: 100, compressionLevel: 0 }) // Uncompressed PNG for best quality
+          .png({ quality: 90, compressionLevel: 6 }) // Start with balanced quality/size
           .toBuffer();
-        console.log(`✅ Converted ${metadata.format} → PNG for upscaling`);
         
         // Check file size after conversion (upscaler has 4MB limit)
-        const fileSizeMB = processedBuffer.length / (1024 * 1024);
+        let fileSizeMB = processedBuffer.length / (1024 * 1024);
+        console.log(`✅ Converted ${metadata.format} → PNG (${fileSizeMB.toFixed(2)}MB)`);
+        
         if (fileSizeMB > 4) {
-          console.log(`⚠️ PNG file size ${fileSizeMB.toFixed(2)}MB exceeds 4MB limit, applying compression...`);
+          console.log(`⚠️ PNG file size ${fileSizeMB.toFixed(2)}MB exceeds 4MB limit, applying maximum compression...`);
           processedBuffer = await sharp(imageBuffer)
-            .png({ quality: 90, compressionLevel: 6 }) // Balanced quality/size
+            .png({ quality: 70, compressionLevel: 9 }) // Maximum compression
             .toBuffer();
-          const compressedSizeMB = processedBuffer.length / (1024 * 1024);
-          console.log(`✅ Compressed PNG to ${compressedSizeMB.toFixed(2)}MB`);
+          fileSizeMB = processedBuffer.length / (1024 * 1024);
+          console.log(`✅ Maximum compression applied: ${fileSizeMB.toFixed(2)}MB`);
           
-          if (compressedSizeMB > 4) {
-            throw new Error(`Image too large: ${compressedSizeMB.toFixed(2)}MB. Upscaler requires images under 4MB.`);
+          if (fileSizeMB > 4) {
+            throw new Error(`Image too large after compression: ${fileSizeMB.toFixed(2)}MB. Upscaler requires images under 4MB.`);
           }
         }
       }
@@ -567,13 +569,31 @@ class ImageUpscalingService {
 
       // 2. Process the image to meet OpenAI requirements (square PNG, <4MB).
       // The 'edit' endpoint also requires a square PNG.
-      const processedBuffer = await sharp(imageBuffer)
+      let processedBuffer = await sharp(imageBuffer)
         .resize(1800, 1800, { fit: 'cover' }) // Crop to be square for Printify minimum
         .ensureAlpha() // Ensure image has an alpha channel (RGBA) for OpenAI
-        .png() // Convert to PNG
+        .png({ quality: 90, compressionLevel: 6 }) // Apply compression to keep under 4MB
         .toBuffer();
 
-      console.log(`🖼️  Image processed for OpenAI. Buffer size: ${(processedBuffer.length / 1024 / 1024).toFixed(2)} MB`);
+      let fileSizeMB = processedBuffer.length / (1024 * 1024);
+      console.log(`🖼️  Image processed for OpenAI. Buffer size: ${fileSizeMB.toFixed(2)} MB`);
+
+      // Check if still too large after compression
+      if (fileSizeMB > 4) {
+        console.log(`⚠️ Image still too large (${fileSizeMB.toFixed(2)}MB), applying maximum compression...`);
+        processedBuffer = await sharp(imageBuffer)
+          .resize(1800, 1800, { fit: 'cover' })
+          .ensureAlpha()
+          .png({ quality: 70, compressionLevel: 9 }) // Maximum compression
+          .toBuffer();
+        
+        fileSizeMB = processedBuffer.length / (1024 * 1024);
+        console.log(`🗜️  Maximum compression applied. Final size: ${fileSizeMB.toFixed(2)} MB`);
+        
+        if (fileSizeMB > 4) {
+          throw new Error(`Image too large after compression: ${fileSizeMB.toFixed(2)}MB. OpenAI requires images under 4MB.`);
+        }
+      }
 
       // Add a timeout to the API call to prevent hangs
       const controller = new AbortController();
