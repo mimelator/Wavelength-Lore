@@ -3708,6 +3708,10 @@ class MerchandiseStore {
         }
       }
 
+      // Get product config to find blueprintId and printProviderId
+      const productType = this.extractProductTypeFromProduct(product);
+      const productConfig = this.findProductConfig(productType);
+
       // Prepare product data with proper image fields for modal renderer
       // NOTE: product.images contains Printify image objects with .src property, not .url
       const preparedProduct = {
@@ -3717,16 +3721,21 @@ class MerchandiseStore {
         // Ensure image fields are set for modal renderer
         // Try .src (Printify format) first, then .url, then fallback
         image: product.image || (product.images?.[0]?.src) || (product.images?.[0]?.url) || (product.previewImage) || '/images/previews/generic-product-preview.svg',
-        previewImage: product.previewImage || (product.images?.[0]?.src) || (product.images?.[0]?.url) || (product.image) || '/images/previews/generic-product-preview.svg'
+        previewImage: product.previewImage || (product.images?.[0]?.src) || (product.images?.[0]?.url) || (product.image) || '/images/previews/generic-product-preview.svg',
+        // CRITICAL: Add blueprintId and printProviderId from product config
+        blueprintId: product.blueprintId || productConfig?.blueprintId,
+        printProviderId: product.printProviderId || productConfig?.printProviderId
       };
 
       console.log('🎨 Prepared product for modal:', {
         id: preparedProduct.id,
         productId: preparedProduct.productId,
         title: preparedProduct.title,
-        image: preparedProduct.image,
-        previewImage: preparedProduct.previewImage,
+        image: preparedProduct.image ? preparedProduct.image.substring(0, 60) + '...' : 'none',
+        previewImage: preparedProduct.previewImage ? preparedProduct.previewImage.substring(0, 60) + '...' : 'none',
         productType: preparedProduct.productType,
+        blueprintId: preparedProduct.blueprintId,
+        printProviderId: preparedProduct.printProviderId,
         hasImages: preparedProduct.images ? `[${preparedProduct.images.length}]` : 'none'
       });
 
