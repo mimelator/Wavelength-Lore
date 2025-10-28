@@ -109,7 +109,7 @@ router.get('/blueprint-preview/:blueprintId', async (req, res) => {
         const cacheKey = `blueprint_${blueprintId}`;
         
         // Check cache first
-        const cached = blueprintImageCache.get(cacheKey);
+        const cached = blueprintMetadataCache.get(cacheKey);
         if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
             console.log(`🎯 Returning cached preview for blueprint ${blueprintId}`);
             return res.json(cached.data);
@@ -168,7 +168,7 @@ router.get('/blueprint-preview/:blueprintId', async (req, res) => {
         console.log(`📊 Blueprint ${blueprintId} metadata: ${category} → ${icon} → ${displayName}`);
         
         // Cache the result
-        blueprintImageCache.set(cacheKey, {
+        blueprintMetadataCache.set(cacheKey, {
             data: result,
             timestamp: Date.now()
         });
@@ -216,7 +216,7 @@ router.post('/blueprint-previews', async (req, res) => {
             
             // Check cache first
             let result;
-            const cached = blueprintImageCache.get(cacheKey);
+            const cached = blueprintMetadataCache.get(cacheKey);
             if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
                 result = cached.data;
             } else {
@@ -254,7 +254,7 @@ router.post('/blueprint-previews', async (req, res) => {
                     }
                     
                     // Cache it
-                    blueprintImageCache.set(cacheKey, {
+                    blueprintMetadataCache.set(cacheKey, {
                         data: result,
                         timestamp: Date.now()
                     });
