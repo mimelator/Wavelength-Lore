@@ -126,10 +126,9 @@ function ensureDatabaseReady(res) {
 
 /**
  * GET /merchandise
- * Render the merchandise store page 
- * 🌟 UPDATED: Available for all users (no authentication required)
+ * Render the merchandise store page (any authenticated user)
  */
-router.get('/', async (req, res) => {
+router.get('/', ensureAuthenticated, async (req, res) => {
   try {
     res.render('merchandise-store', {
       title: 'Custom Merchandise Store',
@@ -256,16 +255,13 @@ router.get('/enhancement-status', (req, res) => {
 
 /**
  * GET /api/merchandise/gallery-images
- * Get gallery images suitable for merchandise
- * 🌟 UPDATED: For authenticated users - personal gallery + bookmarks
- *            For anonymous users - curated public gallery selection
+ * Get user's gallery images suitable for merchandise (includes both uploaded and bookmarked)
  */
-router.get('/gallery-images', async (req, res) => {
+router.get('/gallery-images', ensureAuthenticated, async (req, res) => {
   try {
-    const userId = req.user?.uid;
+    const userId = req.user.uid;
     
-    if (userId) {
-      // Authenticated user: Get both S3 uploaded images AND Firebase bookmarks
+    // Get both S3 uploaded images AND Firebase bookmarks
       const s3Images = await galleryStorage.listUserGalleryImages(userId);
       const { getUserBookmarks } = require('../services/firebase/galleryService');
       const bookmarks = await getUserBookmarks(userId);
@@ -302,82 +298,10 @@ router.get('/gallery-images', async (req, res) => {
       // Combine both types
       const merchandiseImages = [...merchandiseS3Images, ...merchandiseBookmarks];
       
-      res.json({
-        success: true,
-        images: merchandiseImages
-      });
-
-    } else {
-      // Anonymous user: Provide curated public gallery selection
-      const publicGalleryImages = [
-        {
-          id: 'wavelength-character-1',
-          url: '/images/characters/wavelength-character-cosmic.webp',
-          thumbnailUrl: '/images/characters/wavelength-character-cosmic.webp',
-          title: 'Wavelength Character - Cosmic',
-          size: 2000000,
-          dimensions: { width: 1024, height: 1024 },
-          uploadedAt: new Date().toISOString(),
-          suitableForPrint: true,
-          type: 'public-gallery',
-          category: 'character'
-        },
-        {
-          id: 'wavelength-character-2',
-          url: '/images/characters/wavelength-character-electric.webp',
-          thumbnailUrl: '/images/characters/wavelength-character-electric.webp',
-          title: 'Wavelength Character - Electric',
-          size: 2000000,
-          dimensions: { width: 1024, height: 1024 },
-          uploadedAt: new Date().toISOString(),
-          suitableForPrint: true,
-          type: 'public-gallery',
-          category: 'character'
-        },
-        {
-          id: 'wavelength-logo-1',
-          url: '/images/logos/wavelength-logo-main.webp',
-          thumbnailUrl: '/images/logos/wavelength-logo-main.webp',
-          title: 'Wavelength Logo - Main',
-          size: 1500000,
-          dimensions: { width: 512, height: 512 },
-          uploadedAt: new Date().toISOString(),
-          suitableForPrint: true,
-          type: 'public-gallery',
-          category: 'logo'
-        },
-        {
-          id: 'wavelength-abstract-1',
-          url: '/images/abstract/wavelength-waves-pattern.webp',
-          thumbnailUrl: '/images/abstract/wavelength-waves-pattern.webp',
-          title: 'Wavelength Waves Pattern',
-          size: 1800000,
-          dimensions: { width: 1024, height: 1024 },
-          uploadedAt: new Date().toISOString(),
-          suitableForPrint: true,
-          type: 'public-gallery',
-          category: 'abstract'
-        },
-        {
-          id: 'wavelength-art-1',
-          url: '/images/art/wavelength-digital-art-1.webp',
-          thumbnailUrl: '/images/art/wavelength-digital-art-1.webp',
-          title: 'Wavelength Digital Art #1',
-          size: 2200000,
-          dimensions: { width: 1024, height: 1024 },
-          uploadedAt: new Date().toISOString(),
-          suitableForPrint: true,
-          type: 'public-gallery',
-          category: 'art'
-        }
-      ];
-
-      res.json({
-        success: true,
-        images: publicGalleryImages,
-        message: 'Showing curated public gallery for anonymous users'
-      });
-    }
+    res.json({
+      success: true,
+      images: merchandiseImages
+    });
     
   } catch (error) {
     console.error('Error fetching gallery images for merchandise:', error);
@@ -469,10 +393,9 @@ router.get('/product-types/:category', async (req, res) => {
 
 /**
  * POST /api/merchandise/create-guided-product
- * Create a product using guided selection (no user naming required)
- * 🌟 UPDATED: Available for all users (no authentication required)
+ * Create a product using guided selection (any authenticated user)
  */
-router.post('/create-guided-product', async (req, res) => {
+router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
   try {
     console.log('\n' + '🔥'.repeat(80));
     console.log('🔥 DIAGNOSTIC: CREATE GUIDED PRODUCT API CALLED');
@@ -483,7 +406,7 @@ router.post('/create-guided-product', async (req, res) => {
       return; // Error response already sent
     }
 
-    const userId = req.user?.uid || 'anonymous-user';
+    const userId = req.user.uid;
     const { imageId, imageUrl, imageTitle, productType, blueprintId, printProviderId, imageContext = {} } = req.body;
 
     console.log('📋 DIAGNOSTIC: API Request payload validation');
