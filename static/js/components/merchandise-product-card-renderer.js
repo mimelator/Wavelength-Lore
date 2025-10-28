@@ -91,11 +91,6 @@ class MerchandiseProductCardRenderer {
         <div class="product-image">
           <img src="${productImage}" alt="${productTitle}" loading="lazy" />
           <div class="product-actions">
-            <button class="action-btn view-product-btn" 
-                    data-product-id="${productId}" 
-                    title="View Product Details">
-              <span>👁️</span>
-            </button>
             <button class="action-btn edit-product-btn" 
                     data-product-id="${productId}" 
                     title="Edit Product">
@@ -641,9 +636,7 @@ class MerchandiseProductCardRenderer {
       if (!productId) return;
       
       // Handle different button clicks
-      if (e.target.closest('.view-product-btn')) {
-        this.handleViewProduct(productId);
-      } else if (e.target.closest('.edit-product-btn')) {
+      if (e.target.closest('.edit-product-btn')) {
         this.handleEditProduct(productId);
       } else if (e.target.closest('.delete-product-btn')) {
         this.handleDeleteProduct(productId);
@@ -661,22 +654,20 @@ class MerchandiseProductCardRenderer {
   }
   
   /**
-   * Handle view product action
-   * @param {string} productId - Product ID
-   */
-  handleViewProduct(productId) {
-    if (this.eventBus) {
-      this.eventBus.emit('product.view', { productId });
-    }
-  }
-  
-  /**
    * Handle edit product action
    * @param {string} productId - Product ID
    */
   handleEditProduct(productId) {
-    if (this.eventBus) {
+    // First try to find the MerchandiseStore instance
+    if (window.merchandiseStore && window.merchandiseStore.editProduct) {
+      window.merchandiseStore.editProduct(productId);
+    } else if (this.eventBus) {
+      // Fallback to event bus if store not available
       this.eventBus.emit('product.edit', { productId });
+    } else {
+      // Final fallback - emit a custom customize event
+      this.eventBus?.emit('product.customize', { productId });
+      console.warn('Edit product functionality not fully connected:', productId);
     }
   }
   
