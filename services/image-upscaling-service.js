@@ -567,11 +567,11 @@ class ImageUpscalingService {
 
       console.log('Generated prompt for OpenAI:', prompt);
 
-      // 2. Process the image to meet OpenAI requirements (square PNG, <4MB).
-      // The 'edit' endpoint also requires a square PNG.
+      // 2. Process the image to meet OpenAI requirements (square PNG with alpha channel, <4MB).
+      // The 'edit' endpoint requires a square PNG with RGBA format.
       let processedBuffer = await sharp(imageBuffer)
         .resize(1800, 1800, { fit: 'cover' }) // Crop to be square for Printify minimum
-        .ensureAlpha() // Ensure image has an alpha channel (RGBA) for OpenAI
+        .ensureAlpha() // CRITICAL: Ensure image has alpha channel (RGBA) for OpenAI
         .png({ quality: 90, compressionLevel: 6 }) // Apply compression to keep under 4MB
         .toBuffer();
 
