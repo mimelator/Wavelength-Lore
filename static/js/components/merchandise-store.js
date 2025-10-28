@@ -362,15 +362,23 @@ class MerchandiseStore {
       }
     }
     
-    // Fallback to basic default pricing
-    return '$19.95';
+    // NO FALLBACKS - If we can't get real pricing, don't show the product
+    const errorMsg = `❌ PRICING FAILURE: Category '${category}' has no valid pricing data in catalog`;
+    console.error(errorMsg);
+    console.error(`❌ No products found in catalog for category: ${category}`);
+    console.error(`❌ Product will be hidden from customers until pricing is available`);
+    throw new Error(errorMsg);
   }
   
   /**
    * Estimate price using blueprint metadata API
    */
   async estimatePriceByBlueprint(blueprintId) {
-    if (!blueprintId) return '$19.95';
+    if (!blueprintId) {
+      const errorMsg = `❌ PRICING FAILURE: No blueprint ID provided`;
+      console.error(errorMsg);
+      throw new Error(errorMsg);
+    }
     
     try {
       const response = await fetch(`/api/merchandise/blueprint-preview/${blueprintId}`);
@@ -440,22 +448,22 @@ class MerchandiseStore {
         
         console.log(`⚠️ No dynamic pricing found for blueprint ${blueprintId}, category ${data.category}`);
         
-        // Minimal hardcoded fallback (only if absolutely necessary)
-        const essentialFallbacks = {
-          'coffee-mug': '$14.95',
-          't-shirt': '$18.95', 
-          'hoodie': '$34.95'
-        };
-        
-        const fallbackPrice = essentialFallbacks[data.category] || '$19.95';
-        console.log(`🔄 Using minimal fallback: ${data.category} → ${fallbackPrice}`);
-        return fallbackPrice;
+        // NO FALLBACKS - If we can't get real pricing, don't show the product
+        const errorMsg = `❌ PRICING FAILURE: Blueprint ${blueprintId} (category: ${data.category}) has no valid pricing data`;
+        console.error(errorMsg);
+        console.error(`❌ Printify API failed to provide pricing for this product`);
+        console.error(`❌ Product will be hidden from customers until pricing is available`);
+        throw new Error(errorMsg);
       }
     } catch (error) {
-      console.warn('⚠️ Failed to get price from blueprint API:', error);
+      const errorMsg = `❌ PRICING API ERROR: Blueprint ${blueprintId} API call failed - ${error.message}`;
+      console.error(errorMsg);
+      console.error(`❌ Product will be hidden from customers until pricing API is working`);
+      throw new Error(errorMsg);
     }
     
-    return '$19.95'; // Default fallback
+    // This should never be reached due to error throwing above
+    throw new Error(`❌ CRITICAL: Pricing system reached unreachable code for blueprint ${blueprintId}`);
   }
   
   /**
@@ -1516,7 +1524,16 @@ class MerchandiseStore {
       return;
     }
 
-    const productsHTML = categoryData.products.map(product => `
+    const productsHTML = categoryData.products.map(product => {
+      let priceDisplay;
+      try {
+        priceDisplay = this.getEstimatedPrice(product.category);
+      } catch (error) {
+        console.error(`❌ Product ${product.name} hidden due to pricing failure:`, error.message);
+        return ''; // Hide product if pricing fails
+      }
+      
+      return `
       <div class="product-item">
         <div class="product-preview">
           <div class="product-preview-image" data-blueprint-id="${product.blueprintId}">
@@ -1532,7 +1549,7 @@ class MerchandiseStore {
           <h4 class="product-name">${product.name}</h4>
           <p class="product-description">${product.description || 'Custom merchandise item'}</p>
           <div class="product-details">
-            <span class="product-price">${this.getEstimatedPrice(product.category)}</span>
+            <span class="product-price">${priceDisplay}</span>
           </div>
         </div>
         <button class="select-simple-product product-select-btn" 
@@ -1542,7 +1559,8 @@ class MerchandiseStore {
           Select This Product
         </button>
       </div>
-    `).join('');
+      `;
+    }).filter(html => html !== '').join('');
 
     container.innerHTML = `
       <div class="category-products-view">
@@ -1567,9 +1585,22 @@ class MerchandiseStore {
     const providers = new Set(products.map(p => p.provider));
     // Parse price strings to numbers (remove $ and convert to float)
     const prices = products.map(p => {
-      const priceStr = this.getEstimatedPrice(p.category);
-      return parseFloat(priceStr.replace('$', ''));
-    });
+      try {
+        const priceStr = this.getEstimatedPrice(p.category);
+        return parseFloat(priceStr.replace('$', ''));
+      } catch (error) {
+        console.error(`❌ Product ${p.name} excluded from stats due to pricing failure:`, error.message);
+        return null; // Exclude this product from pricing stats
+      }
+    }).filter(price => price !== null);
+    
+    if (prices.length === 0) {
+      return {
+        providerCount: providers.size,
+        priceRange: 'Pricing unavailable'
+      };
+    }
+    
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     
@@ -1750,6 +1781,14 @@ class MerchandiseStore {
     const newProducts = categoryData.products.slice(fromIndex, toIndex);
     
     newProducts.forEach((product, index) => {
+      let priceDisplay;
+      try {
+        priceDisplay = this.getEstimatedPrice(product.category);
+      } catch (error) {
+        console.error(`❌ Product ${product.name} hidden due to pricing failure:`, error.message);
+        return; // Skip this product if pricing fails
+      }
+      
       const productElement = document.createElement('div');
       productElement.className = 'simple-category progressive-item progressive-new';
       productElement.dataset.type = product.id;
@@ -1759,7 +1798,7 @@ class MerchandiseStore {
         <div class="category-icon">${this.getCategoryIcon(product.category)}</div>
         <h5>${product.name}</h5>
         <p class="product-desc">${product.description || 'Custom merchandise item'}</p>
-        <div class="product-price">$${this.getEstimatedPrice(product.category)}</div>
+        <div class="product-price">${priceDisplay}</div>
         <button class="select-simple-product" 
                 data-product="${product.id}" 
                 data-blueprint="${product.blueprintId}" 
