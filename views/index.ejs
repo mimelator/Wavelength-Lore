@@ -7,8 +7,8 @@
     <%- include('partials/header') %>
 
     <div class="hero-section">
-        <h1>Enter a world where mystery meets music</h1>
-        <p class="hero-subtitle">Start your journey into the unknown</p>
+        <h1>Where Music is Magic: Survive the Battle for the Shire</h1>
+        <p class="hero-subtitle">Enter the immersive fantasy universe of Wavelength Lore</p>
     </div>
 
     <style>
@@ -93,14 +93,13 @@
     </style>
     
     <section class="summary">
-        <h2>Introduction</h2>
-        <p>Wavelength is a multimedia project that explores the intersection of music, storytelling, and visual art. 
-            Through a series of animated episodes, Wavelength invites viewers to embark on a journey through a rich and immersive universe filled with 
-            unique characters, captivating narratives, great visuals and engaging music.</p>
+        <h2>About This Original Animated Fantasy Web Series</h2>
+        <p><strong>Wavelength Lore</strong> is an original animated fantasy web series that reimagines the relationship between music and magic. This lore-rich storytelling universe presents an immersive animated experience where music is not just entertainment—it's the key to survival. Through a series of animated episodes, Wavelength Lore invites viewers to embark on a transformative journey through a richly detailed fantasy world filled with
+            compelling characters, intricate narratives, stunning visuals, and an evocative original soundtrack.</p>
 
             <p>
-                Each Season delves into different themes and story arcs, allowing for a diverse exploration of the Wavelength universe.
-                Wavelength will continue to expand and evolve, as the modern world around us changes.
+                Each season explores unique themes and story arcs within the larger fantasy narrative, allowing for a comprehensive exploration of the Wavelength universe. Central to the mythology is the <strong>Battle for the Shire</strong> and the legendary <strong>Goblin King</strong>—key story elements that drive the conflict and mystery throughout the series.
+                The Wavelength Lore universe continues to expand and evolve, creating an increasingly complex and captivating storytelling experience for fans of original fantasy animation.
 
             </p>
     </section>
@@ -110,7 +109,7 @@
         <div class="season-title">
             <h2><%= videos[season].title %></h2>
             <p class="season-description"><%= videos[season].description %></p>
-            <a href="<%= videos[season].seasonLink %>" target="_blank" class="center-link">Watch Full Season</a>
+            <a href="<%= videos[season].seasonLink %>" target="_blank" class="center-link">Watch Complete <%= videos[season].title %> on YouTube</a>
         </div>
         <br /><br />
         <div class="carousel" id="carousel-<%= season %>">
@@ -135,15 +134,15 @@
                         </div>
                     <% } %>
                     <h3 class="episode-title">
-                        <a href="/season/<%= season.replace('season', '') %>/episode/<%= episode.replace('episode', '') %>">
+                        <a href="/season/<%= season.replace('season', '') %>/episode/<%= episode.replace('episode', '') %>" title="Read the full lore and story of <%= episodeData.title %>">
                             <%= episodeData.title %>
                         </a>
                     </h3>
-                    <a href="/season/<%= season.replace('season', '') %>/episode/<%= episode.replace('episode', '') %>">
-                        <img src="<%= cdnUrl %><%= episodeData.image %>" alt="<%= episodeData.title %>">
+                    <a href="/season/<%= season.replace('season', '') %>/episode/<%= episode.replace('episode', '') %>" title="Explore <%= episodeData.title %> in Wavelength Lore">
+                        <img src="<%= cdnUrl %><%= episodeData.image %>" alt="<%= episodeData.title %> - from Wavelength Lore animated series" loading="lazy">
                     </a>
                     <p><%= episodeData.description %></p>
-                    <a href="<%= episodeData.youtubeLink %>" target="_blank" class="youtube-link">Watch on YouTube</a>
+                    <a href="<%= episodeData.youtubeLink %>" target="_blank" class="youtube-link" title="Watch <%= episodeData.title %> episode on YouTube">Watch <%= episodeData.title %> on YouTube</a>
                 </div>
             <% }); %>
         </div>

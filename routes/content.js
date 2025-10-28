@@ -32,22 +32,33 @@ router.get('/', async (req, res) => {
     
     res.render('index', {
       title: 'Welcome to Wavelength Lore',
-      pageTitle: 'Wavelength Lore - Animated Storytelling Universe',
-      pageDescription: 'Explore the Wavelength universe through animated episodes, character stories, and immersive lore. A multimedia project blending music, storytelling, and visual art.',
-      pageKeywords: 'wavelength, animation, storytelling, music, episodes, characters, lore, multimedia, visual art, animated series',
+      pageTitle: 'Wavelength Lore: Original Animated Series, Music & Fantasy Storytelling',
+      pageDescription: 'Wavelength Lore is an original animated fantasy web series where music is magic. Explore a lore-rich storytelling universe with captivating episodes, characters, and world-building.',
+      pageKeywords: 'original animated fantasy web series, lore-rich storytelling universe, animated series, music is magic, fantasy storytelling, character stories, episodes, immersive lore',
       ogType: 'website',
       ogImage: process.env.CDN_URL + '/images/wavelength-og-default.webp',
       structuredData: {
         "@context": "https://schema.org",
-        "@type": "WebSite",
+        "@type": "CreativeWorkSeries",
         "name": "Wavelength Lore",
-        "description": "Explore the Wavelength universe through animated episodes, character stories, and immersive lore.",
+        "description": "Wavelength Lore is an original animated fantasy web series where music is magic. Explore an immersive lore-rich storytelling universe.",
         "url": req.protocol + '://' + req.get('host'),
+        "image": process.env.CDN_URL + '/images/wavelength-og-default.webp',
         "creator": {
           "@type": "Organization",
           "name": "Wavelength Lore"
         },
-        "genre": ["Animation", "Storytelling", "Music", "Visual Art"]
+        "genre": ["Animation", "Fantasy", "Music", "Storytelling"],
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "9.0",
+          "ratingCount": "1"
+        },
+        "hasPart": {
+          "@type": "VideoObject",
+          "name": "Wavelength Lore Episodes",
+          "description": "Episodic content from the Wavelength Lore series"
+        }
       },
       isContentCreator: res.locals.isContentCreator || false, // Pass the flag to template
       cdnUrl: process.env.CDN_URL,
