@@ -170,6 +170,10 @@ class MerchandiseStore {
     this.eventBus.on('cart.checkout', () => {
       this.handleCheckout();
     });
+
+    this.eventBus.on('checkout.initiate', () => {
+      this.handleCheckoutInitiate();
+    });
     
     // Modal Renderer Events
     this.eventBus.on('modal.customizationSaved', (data) => {

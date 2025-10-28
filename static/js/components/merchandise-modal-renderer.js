@@ -2901,7 +2901,7 @@ class MerchandiseModalRenderer {
       }
 
       console.log('📊 Step 4: 🚀 CALLING PRINTIFY API TO CREATE REAL PRODUCT!');
-      
+
       // Show loading with product details while API call happens
       const productName = product.title || 'Custom Product';
       const provider = product.provider || 'Printify';
@@ -2919,27 +2919,33 @@ class MerchandiseModalRenderer {
       console.log('📊 Available on window:', Object.keys(window).filter(k => k.toLowerCase().includes('merch')));
       console.log('📊 window.merchandiseStore:', window.merchandiseStore);
       console.log('📊 window.MerchandiseStore:', window.MerchandiseStore);
-      
+
       const merchandiseStore = window.merchandiseStore; // Get reference to the main store
       console.log('📊 merchandiseStore found:', !!merchandiseStore);
       console.log('📊 generatePrintifyMockup method available:', !!(merchandiseStore && typeof merchandiseStore.generatePrintifyMockup === 'function'));
-      
+
       if (!merchandiseStore) {
         console.error('❌ window.merchandiseStore is not available');
         console.error('📊 Trying window.store...');
         console.log('📊 window.store:', window.store);
-        
+
         // Try to use window.store as fallback
         const fallbackStore = window.store;
         if (fallbackStore && typeof fallbackStore.generatePrintifyMockup === 'function') {
           console.log('✅ Using fallback store');
           // Use fallback instead of throwing error immediately
-          await fallbackStore.generatePrintifyMockup(product, customization);
-          console.log('✅ PRINTIFY API CALL COMPLETED via FALLBACK!');
-          this.hideLoadingOverlay();
-          return; // Early return to skip the rest
+          try {
+            await fallbackStore.generatePrintifyMockup(product, customization);
+            console.log('✅ PRINTIFY API CALL COMPLETED via FALLBACK!');
+            this.hideLoadingOverlay();
+            return; // Early return to skip the rest
+          } catch (fallbackError) {
+            console.error('❌ Fallback store call failed:', fallbackError);
+            this.hideLoadingOverlay();
+            throw fallbackError;
+          }
         }
-        
+
         alert('❌ DEBUG: Merchandise store not available. Check console for details.');
         throw new Error('Merchandise store not available. Please refresh the page.');
       }
@@ -2951,11 +2957,16 @@ class MerchandiseModalRenderer {
       }
 
       console.log('✅ All checks passed, calling Printify API...');
-      
-      // Call the actual Printify API via the merchandise store
-      await merchandiseStore.generatePrintifyMockup(product, customization);
 
-      console.log('✅ PRINTIFY API CALL COMPLETED!');
+      // Call the actual Printify API via the merchandise store
+      try {
+        await merchandiseStore.generatePrintifyMockup(product, customization);
+        console.log('✅ PRINTIFY API CALL COMPLETED!');
+      } catch (apiError) {
+        console.error('❌ Printify API call threw error:', apiError);
+        this.hideLoadingOverlay();
+        throw apiError;
+      }
 
       // 🔥 CRITICAL FIX: Save customization back to the product in the store
       // This is essential so that when users click Edit again, their previous
