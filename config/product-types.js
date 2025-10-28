@@ -17,7 +17,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'backpack',
-    description: 'Validated backpack product with 1 provider options',
+    description: 'Durable backpack perfect for daily adventures and carrying your essentials',
     validProviderCount: 1,
     validationIndex: 105
   },
@@ -31,7 +31,7 @@ const ProductTypes = {
     printProviderId: 99,
     provider: 'MWW On Demand',
     category: 'blanket',
-    description: 'Validated blanket product with 1 provider options',
+    description: 'Cozy blanket ideal for snuggling up at home or outdoor events',
     validProviderCount: 1,
     validationIndex: 90
   },
@@ -43,7 +43,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'blanket',
-    description: 'Validated blanket product with 1 provider options',
+    description: 'Cozy blanket ideal for snuggling up at home or outdoor events',
     validProviderCount: 1,
     validationIndex: 119
   },
@@ -55,7 +55,7 @@ const ProductTypes = {
     printProviderId: 1,
     provider: 'Printful',
     category: 'blanket',
-    description: 'Validated blanket product with 1 provider options',
+    description: 'Cozy blanket ideal for snuggling up at home or outdoor events',
     validProviderCount: 1,
     validationIndex: 123
   },
@@ -67,7 +67,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'blanket',
-    description: 'Validated blanket product with 1 provider options',
+    description: 'Cozy blanket ideal for snuggling up at home or outdoor events',
     validProviderCount: 1,
     validationIndex: 127
   },
@@ -79,7 +79,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'blanket',
-    description: 'Validated blanket product with 1 provider options',
+    description: 'Cozy blanket ideal for snuggling up at home or outdoor events',
     validProviderCount: 1,
     validationIndex: 137
   },
@@ -91,7 +91,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'blanket',
-    description: 'Validated blanket product with 1 provider options',
+    description: 'Cozy blanket ideal for snuggling up at home or outdoor events',
     validProviderCount: 1,
     validationIndex: 140
   },
@@ -105,7 +105,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'canvas',
-    description: 'Validated canvas product with 1 provider options',
+    description: 'Beautiful canvas print that transforms any wall into a gallery of your personality',
     validProviderCount: 1,
     validationIndex: 89
   },
@@ -117,7 +117,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'canvas',
-    description: 'Validated canvas product with 1 provider options',
+    description: 'Beautiful canvas print that transforms any wall into a gallery of your personality',
     validProviderCount: 1,
     validationIndex: 103
   },
@@ -129,7 +129,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'canvas',
-    description: 'Validated canvas product with 1 provider options',
+    description: 'Beautiful canvas print that transforms any wall into a gallery of your personality',
     validProviderCount: 1,
     validationIndex: 104
   },
@@ -141,7 +141,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'canvas',
-    description: 'Validated canvas product with 1 provider options',
+    description: 'Beautiful canvas print that transforms any wall into a gallery of your personality',
     validProviderCount: 1,
     validationIndex: 110
   },
@@ -153,7 +153,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'canvas',
-    description: 'Validated canvas product with 1 provider options',
+    description: 'Beautiful canvas print that transforms any wall into a gallery of your personality',
     validProviderCount: 1,
     validationIndex: 111
   },
@@ -165,7 +165,7 @@ const ProductTypes = {
     printProviderId: 1,
     provider: 'Printful',
     category: 'canvas',
-    description: 'Validated canvas product with 1 provider options',
+    description: 'Beautiful canvas print that transforms any wall into a gallery of your personality',
     validProviderCount: 1,
     validationIndex: 112
   },
@@ -177,7 +177,7 @@ const ProductTypes = {
     printProviderId: 1,
     provider: 'Printful',
     category: 'canvas',
-    description: 'Validated canvas product with 1 provider options',
+    description: 'Beautiful canvas print that transforms any wall into a gallery of your personality',
     validProviderCount: 1,
     validationIndex: 114
   },
@@ -189,7 +189,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'canvas',
-    description: 'Validated canvas product with 1 provider options',
+    description: 'Beautiful canvas print that transforms any wall into a gallery of your personality',
     validProviderCount: 1,
     validationIndex: 115
   },
@@ -201,7 +201,7 @@ const ProductTypes = {
     printProviderId: 1,
     provider: 'Printful',
     category: 'canvas',
-    description: 'Validated canvas product with 1 provider options',
+    description: 'Beautiful canvas print that transforms any wall into a gallery of your personality',
     validProviderCount: 1,
     validationIndex: 122
   },
@@ -213,7 +213,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'canvas',
-    description: 'Validated canvas product with 1 provider options',
+    description: 'Beautiful canvas print that transforms any wall into a gallery of your personality',
     validProviderCount: 1,
     validationIndex: 130
   },
@@ -225,7 +225,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'canvas',
-    description: 'Validated canvas product with 1 provider options',
+    description: 'Beautiful canvas print that transforms any wall into a gallery of your personality',
     validProviderCount: 1,
     validationIndex: 138
   },
@@ -291,7 +291,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'hat',
-    description: 'Validated hat product with 1 provider options',
+    description: 'Stylish hat to complete your look and protect you from the elements',
     validProviderCount: 1,
     validationIndex: 116
   },
@@ -303,7 +303,7 @@ const ProductTypes = {
     printProviderId: 29,
     provider: 'TBD',
     category: 'hat',
-    description: 'Validated hat product with 1 provider options',
+    description: 'Stylish hat to complete your look and protect you from the elements',
     validProviderCount: 1,
     validationIndex: 141
   },
@@ -427,7 +427,7 @@ const ProductTypes = {
     printProviderId: 3,
     provider: 'OTTO Print',
     category: 'hoodie',
-    description: 'Validated hoodie product with 1 provider options',
+    description: 'Comfortable hoodie for casual wear and staying cozy',
     validProviderCount: 1,
     validationIndex: 31
   },
@@ -439,7 +439,7 @@ const ProductTypes = {
     printProviderId: 29,
     provider: 'TBD',
     category: 'hoodie',
-    description: 'Validated hoodie product with 1 provider options',
+    description: 'Comfortable hoodie for casual wear and staying cozy',
     validProviderCount: 1,
     validationIndex: 44
   },
@@ -481,7 +481,7 @@ const ProductTypes = {
     printProviderId: 1,
     provider: 'Printful',
     category: 'notebook',
-    description: 'Validated notebook product with 1 provider options',
+    description: 'Premium notebook for capturing your thoughts, ideas, and memories',
     validProviderCount: 1,
     validationIndex: 86
   },
@@ -493,7 +493,7 @@ const ProductTypes = {
     printProviderId: 1,
     provider: 'Printful',
     category: 'notebook',
-    description: 'Validated notebook product with 1 provider options',
+    description: 'Premium notebook for capturing your thoughts, ideas, and memories',
     validProviderCount: 1,
     validationIndex: 87
   },
@@ -505,7 +505,7 @@ const ProductTypes = {
     printProviderId: 1,
     provider: 'Printful',
     category: 'notebook',
-    description: 'Validated notebook product with 1 provider options',
+    description: 'Premium notebook for capturing your thoughts, ideas, and memories',
     validProviderCount: 1,
     validationIndex: 88
   },
@@ -557,7 +557,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'pillow',
-    description: 'Validated pillow product with 1 provider options',
+    description: 'Comfortable pillow that adds both comfort and style to any space',
     validProviderCount: 1,
     validationIndex: 55
   },
@@ -569,7 +569,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'pillow',
-    description: 'Validated pillow product with 1 provider options',
+    description: 'Comfortable pillow that adds both comfort and style to any space',
     validProviderCount: 1,
     validationIndex: 56
   },
@@ -581,7 +581,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'pillow',
-    description: 'Validated pillow product with 1 provider options',
+    description: 'Comfortable pillow that adds both comfort and style to any space',
     validProviderCount: 1,
     validationIndex: 57
   },
@@ -593,7 +593,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'pillow',
-    description: 'Validated pillow product with 1 provider options',
+    description: 'Comfortable pillow that adds both comfort and style to any space',
     validProviderCount: 1,
     validationIndex: 58
   },
@@ -605,7 +605,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'pillow',
-    description: 'Validated pillow product with 1 provider options',
+    description: 'Comfortable pillow that adds both comfort and style to any space',
     validProviderCount: 1,
     validationIndex: 62
   },
@@ -617,7 +617,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'pillow',
-    description: 'Validated pillow product with 1 provider options',
+    description: 'Comfortable pillow that adds both comfort and style to any space',
     validProviderCount: 1,
     validationIndex: 63
   },
@@ -629,7 +629,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'pillow',
-    description: 'Validated pillow product with 1 provider options',
+    description: 'Comfortable pillow that adds both comfort and style to any space',
     validProviderCount: 1,
     validationIndex: 64
   },
@@ -641,7 +641,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'pillow',
-    description: 'Validated pillow product with 1 provider options',
+    description: 'Comfortable pillow that adds both comfort and style to any space',
     validProviderCount: 1,
     validationIndex: 65
   },
@@ -653,7 +653,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'pillow',
-    description: 'Validated pillow product with 1 provider options',
+    description: 'Comfortable pillow that adds both comfort and style to any space',
     validProviderCount: 1,
     validationIndex: 66
   },
@@ -665,7 +665,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'pillow',
-    description: 'Validated pillow product with 1 provider options',
+    description: 'Comfortable pillow that adds both comfort and style to any space',
     validProviderCount: 1,
     validationIndex: 68
   },
@@ -677,7 +677,7 @@ const ProductTypes = {
     printProviderId: 10,
     provider: 'MWW On Demand',
     category: 'pillow',
-    description: 'Validated pillow product with 1 provider options',
+    description: 'Comfortable pillow that adds both comfort and style to any space',
     validProviderCount: 1,
     validationIndex: 69
   },
@@ -827,7 +827,7 @@ const ProductTypes = {
     printProviderId: 1,
     provider: 'Printful',
     category: 'sticker',
-    description: 'Validated sticker product with 1 provider options',
+    description: 'Fun sticker to personalize your belongings and show your personality',
     validProviderCount: 1,
     validationIndex: 76
   },
@@ -839,7 +839,7 @@ const ProductTypes = {
     printProviderId: 1,
     provider: 'Printful',
     category: 'sticker',
-    description: 'Validated sticker product with 1 provider options',
+    description: 'Fun sticker to personalize your belongings and show your personality',
     validProviderCount: 1,
     validationIndex: 77
   },
@@ -853,7 +853,7 @@ const ProductTypes = {
     printProviderId: 51,
     provider: 'OTTO Print',
     category: 'sweatshirt',
-    description: 'Validated sweatshirt product with 2 provider options',
+    description: 'Comfortable sweatshirt perfect for casual wear and staying warm',
     validProviderCount: 2,
     validationIndex: 18
   },
@@ -865,7 +865,7 @@ const ProductTypes = {
     printProviderId: 3,
     provider: 'OTTO Print',
     category: 'sweatshirt',
-    description: 'Validated sweatshirt product with 2 provider options',
+    description: 'Comfortable sweatshirt perfect for casual wear and staying warm',
     validProviderCount: 2,
     validationIndex: 35
   },
@@ -877,7 +877,7 @@ const ProductTypes = {
     printProviderId: 29,
     provider: 'TBD',
     category: 'sweatshirt',
-    description: 'Validated sweatshirt product with 1 provider options',
+    description: 'Comfortable sweatshirt perfect for casual wear and staying warm',
     validProviderCount: 1,
     validationIndex: 142
   },

@@ -1646,7 +1646,7 @@ class MerchandiseStore {
 
     const productsHTML = categoryData.products.map(product => {
       // Try to get pricing from the service
-      let priceDisplay = 'Pricing Coming Soon';
+      let priceDisplay = 'Price Available at Checkout';
 
       if (product.blueprintId && product.printProviderId) {
         try {
@@ -1982,7 +1982,7 @@ class MerchandiseStore {
     
     newProducts.forEach((product, index) => {
       // Try to get pricing from the service
-      let priceDisplay = 'Pricing Coming Soon';
+      let priceDisplay = 'Price Available at Checkout';
 
       if (product.blueprintId && product.printProviderId) {
         try {
