@@ -3175,6 +3175,81 @@ class MerchandiseStore {
   }
 
   /**
+   * Generate Printify mockup for customized product
+   * Calls API to create product with customized image
+   * @param {Object} product - Product object with customization data
+   * @param {Object} customization - Customization data with customizedImageUrl
+   */
+  async generatePrintifyMockup(product, customization) {
+    console.log('🖨️ Generating Printify mockup for product:', product.id);
+    console.log('🎨 Customization data:', customization);
+
+    try {
+      // Show loading state
+      console.log('⏳ Generating your product mockup...');
+
+      // Call the API to create the guided product
+      const response = await fetch('/api/merchandise/create-guided-product', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageId: product.id || 'custom-product',
+          imageUrl: customization.customizedImageUrl,
+          imageTitle: product.title,
+          productType: product.id, // Use product ID as product type
+          imageContext: {
+            effects: customization.effects,
+            borderEnabled: customization.borderEnabled,
+            borderColor: customization.borderColor
+          }
+        })
+      });
+
+      console.log('✅ Printify API response:', response.status);
+
+      if (!response.ok) {
+        throw new Error(`Printify API error: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('🎉 Product created successfully:', result);
+
+      if (result.success && result.product) {
+        // Store the created product
+        if (!this.customizedProducts) {
+          this.customizedProducts = [];
+        }
+        this.customizedProducts.push(result.product);
+
+        // Update current product with Printify details
+        this.currentCustomizedProduct = {
+          ...product,
+          ...result.product,
+          customization: customization,
+          generatedAt: new Date().toISOString()
+        };
+
+        console.log('✅ Customized product stored:', this.currentCustomizedProduct);
+
+        // Show success message
+        this.showSuccess(`✨ Product mockup generated! Check it out below.`);
+      } else {
+        throw new Error(result.error || 'Failed to create product');
+      }
+    } catch (error) {
+      console.error('❌ Error generating Printify mockup:', error);
+      console.error('Error details:', error.message);
+
+      this.showError(`Failed to generate mockup: ${error.message}`);
+
+      // Fallback: Still try to display product with custom image
+      console.log('📌 Fallback: Using customized image preview');
+    }
+  }
+
+  /**
    * Handle transition to product options page after preview
    * Closes customization modals and shows product options for size/quantity/variants
    * @param {string} productId - Product ID (may be blueprint product ID)
@@ -3220,9 +3295,8 @@ class MerchandiseStore {
     // This allows us to display it without modifying the main products array
     this.currentCustomizedProduct = product;
 
-    // TODO: Next phase - Generate Printify mockup image
-    // For now, show success and indicate we're ready for product options
-    this.showSuccess('✨ Perfect! Now select your size and quantity.');
+    // Generate Printify mockup image with customization
+    this.generatePrintifyMockup(product, customization);
 
     // Re-render to show product with customization data
     this.render();
