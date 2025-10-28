@@ -730,9 +730,27 @@ class MerchandiseModalRenderer {
                     </div>
                   </div>
 
+                  <!-- Size/Variant Selection -->
+                  <div class="product-options-section">
+                    <h4>Select Size:</h4>
+                    <div class="variant-options" id="variant-options-${product.id}" data-product-id="${product.id}">
+                      ${(product.variants || []).length > 0 ? this.renderVariantOptions(product) : '<p class="text-muted">Size options loading...</p>'}
+                    </div>
+                  </div>
+
+                  <!-- Quantity Selection -->
+                  <div class="quantity-section">
+                    <label for="finished-quantity-${product.id}">Quantity:</label>
+                    <div class="quantity-controls">
+                      <button class="qty-btn" data-action="decrease">−</button>
+                      <input type="number" id="finished-quantity-${product.id}" class="qty-input" value="1" min="1" max="99" />
+                      <button class="qty-btn" data-action="increase">+</button>
+                    </div>
+                  </div>
+
                   <div class="product-actions-info">
                     <p class="friendly-message">
-                      ✨ Love what you see? Add to cart and choose your size and quantity on the next step!
+                      ✨ Love what you see? Select your size and add to cart!
                     </p>
                     <p class="edit-message">
                       Want to change something? Go back and customize again - we'll save your choices!
@@ -747,7 +765,7 @@ class MerchandiseModalRenderer {
                 <button class="btn-secondary back-to-customize-btn" data-product-id="${product.id}">
                   ← Back to Customize
                 </button>
-                <button class="btn-primary add-to-cart-from-finished-btn" data-product-id="${product.id}">
+                <button class="btn-primary add-to-cart-from-finished-btn" data-product-id="${product.id}" disabled>
                   <span>🛒</span> Add to Cart
                 </button>
               </div>
@@ -2876,12 +2894,83 @@ class MerchandiseModalRenderer {
       });
     }
 
+    // 🔥 FEATURE: Variant/Size selection
+    // Handle variant option button clicks
+    const variantBtns = modal.querySelectorAll('.variant-option-btn');
+    variantBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const variantId = btn.dataset.variantId;
+        const variantTitle = btn.dataset.variantTitle;
+
+        console.log('📦 Variant selected:', { variantId, variantTitle });
+
+        // Update button styling to show selected state
+        variantBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+
+        // Store selected variant in modal dataset for later use
+        modal.dataset.selectedVariantId = variantId;
+        modal.dataset.selectedVariantTitle = variantTitle;
+
+        // Enable add to cart button now that size is selected
+        const addToCartBtn = modal.querySelector('.add-to-cart-from-finished-btn');
+        if (addToCartBtn) {
+          addToCartBtn.disabled = false;
+          addToCartBtn.style.opacity = '1';
+          addToCartBtn.style.cursor = 'pointer';
+        }
+
+        if (this.debugMode) {
+          this.debugLog(`Size selected: ${variantTitle}`, 'info');
+        }
+      });
+    });
+
+    // 🔥 FEATURE: Quantity controls in finished product modal
+    const quantityInput = modal.querySelector('[id^="finished-quantity-"]');
+    if (quantityInput) {
+      // Handle +/- buttons
+      const qtyBtns = modal.querySelectorAll('.quantity-controls .qty-btn');
+      qtyBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const action = btn.dataset.action;
+          let currentQty = parseInt(quantityInput.value) || 1;
+
+          if (action === 'increase') {
+            currentQty = Math.min(currentQty + 1, 99);
+          } else if (action === 'decrease') {
+            currentQty = Math.max(currentQty - 1, 1);
+          }
+
+          quantityInput.value = currentQty;
+          modal.dataset.selectedQuantity = currentQty;
+
+          if (this.debugMode) {
+            this.debugLog(`Quantity: ${currentQty}`, 'info');
+          }
+        });
+      });
+
+      // Handle direct input
+      quantityInput.addEventListener('input', () => {
+        let qty = parseInt(quantityInput.value) || 1;
+        qty = Math.min(Math.max(qty, 1), 99);
+        quantityInput.value = qty;
+        modal.dataset.selectedQuantity = qty;
+      });
+    }
+
     // Add to cart from finished product button
     const addToCartBtn = modal.querySelector('.add-to-cart-from-finished-btn');
     if (addToCartBtn) {
       addToCartBtn.addEventListener('click', () => {
         console.log('🛒 Add to cart from finished product');
-        this.handleAddToCartFromFinishedProduct(productId, customization);
+        this.handleAddToCartFromFinishedProduct(
+          productId,
+          customization,
+          modal.dataset.selectedVariantId,
+          parseInt(modal.dataset.selectedQuantity || '1')
+        );
       });
     }
 
@@ -2939,9 +3028,15 @@ class MerchandiseModalRenderer {
    * @param {string} productId - Product ID
    * @param {Object} customization - Customization object
    */
-  handleAddToCartFromFinishedProduct(productId, customization) {
+  handleAddToCartFromFinishedProduct(productId, customization, variantId = null, quantity = 1) {
     if (this.debugMode) {
       this.debugLog(`Add to cart from finished product preview`, 'info');
+    }
+
+    // Validate that variant was selected
+    if (!variantId) {
+      alert('Please select a size before adding to cart.');
+      return;
     }
 
     // Close the preview modal
@@ -2962,24 +3057,32 @@ class MerchandiseModalRenderer {
     const printProviderId = customizationOverlay?.dataset.printProviderId ? parseInt(customizationOverlay.dataset.printProviderId, 10) : null;
 
     console.log('🎯 handleAddToCartFromFinishedProduct - Extracted data:');
+    console.log('   productId:', productId);
+    console.log('   variantId:', variantId);
+    console.log('   quantity:', quantity);
     console.log('   productType:', productType);
     console.log('   blueprintId:', blueprintId);
     console.log('   printProviderId:', printProviderId);
 
-    // Emit event with customization data
-    // The merchandise store should handle navigating to product options
+    // 🔥 FEATURE: Emit product.addToCart event with full cart data
+    // This will be handled by merchandise-store.js handleAddToCart()
     if (this.eventBus) {
-      this.eventBus.emit('product.goToProductOptions', {
+      this.eventBus.emit('product.addToCart', {
         productId: productId,
+        variantId: variantId,
+        customization: customization,
+        quantity: quantity,
+        // Also include product metadata for commerce operations
         productType: productType,
         blueprintId: blueprintId,
-        printProviderId: printProviderId,
-        customization: customization
+        printProviderId: printProviderId
       });
+
+      console.log('✅ Add to cart event emitted');
     }
 
     if (this.debugMode) {
-      this.debugLog(`Transitioning to product options page`, 'success');
+      this.debugLog(`Product added to cart with variant ${variantId} (qty: ${quantity})`, 'success');
     }
   }
 
@@ -3246,6 +3349,43 @@ class MerchandiseModalRenderer {
     if (overlay) {
       overlay.remove();
     }
+  }
+
+  /**
+   * Render variant/size options for finished product modal
+   * Maps Printify variants to user-friendly size labels
+   * @param {Object} product - Product object with variants array
+   * @returns {string} HTML for variant selection buttons
+   */
+  renderVariantOptions(product) {
+    if (!product.variants || product.variants.length === 0) {
+      return '<p class="text-muted">No size options available</p>';
+    }
+
+    // Map variant properties to user-friendly labels
+    // Variants have: id, title, options (which include size), price, etc.
+    return product.variants.map(variant => {
+      // Extract size from variant title or options
+      let sizeLabel = 'Size';
+      if (variant.title) {
+        // Try to extract size from title (e.g., "Mug 11oz" or "T-Shirt - M")
+        const titleParts = variant.title.split(' - ');
+        if (titleParts.length > 1) {
+          sizeLabel = titleParts[1];
+        } else if (variant.title.includes('11oz')) {
+          sizeLabel = '11oz';
+        } else if (variant.title.includes('20oz')) {
+          sizeLabel = '20oz';
+        }
+      }
+
+      // Use variant ID as the value (for adding to cart)
+      return `
+        <button class="variant-option-btn" data-variant-id="${variant.id}" data-variant-title="${variant.title || sizeLabel}">
+          ${sizeLabel}
+        </button>
+      `;
+    }).join('');
   }
 }
 

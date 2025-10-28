@@ -3820,8 +3820,9 @@ class MerchandiseStore {
    * @param {Object} customization - Optional customization data (effects, borders, size, etc.)
    * @param {number} quantity - Quantity to add (default 1)
    */
-  handleAddToCart(productId, customization = null, quantity = 1) {
+  handleAddToCart(productId, customization = null, quantity = 1, variantId = null) {
     console.log('🛒 Add to cart:', productId);
+    console.log('📦 Variant ID:', variantId);
     console.log('🎨 Customization:', customization);
     console.log('📦 Quantity:', quantity);
 
@@ -3830,11 +3831,17 @@ class MerchandiseStore {
       // Use customized image if available, otherwise use default preview
       const imageUrl = customization?.customizedImageUrl || product.previewImage;
 
+      // 🔥 FEATURE: Use actual variant ID, not hardcoded 'default'
+      const actualVariantId = variantId || 'default';
+
+      // 🔥 FEATURE: Build cart item with variant and customization metadata
       const cartItem = {
         productId: productId,
-        variantId: 'default',
+        variantId: actualVariantId,
         title: product.title,
-        price: product.price || 19.95,
+        // 🔥 PLACEHOLDER: Price will be filled from pricing source (TBD)
+        // For now, use fallback. When pricing system is ready, update this.
+        price: product.price || product.variants?.find(v => v.id === variantId)?.price || 19.95,
         image: imageUrl,
         quantity: quantity || 1
       };
@@ -3853,6 +3860,15 @@ class MerchandiseStore {
         };
         console.log('💾 Saving customization with cart item:', cartItem.customization);
       }
+
+      // 🔥 FEATURE: Add variant metadata for order fulfillment
+      cartItem.metadata = {
+        variantId: actualVariantId,
+        quantity: quantity,
+        customizationApplied: !!customization
+      };
+
+      console.log('🛍️ Cart item being added:', cartItem);
 
       this.cartService.addItem(cartItem);
       this.showSuccess(`Product added to cart! (Qty: ${quantity})`);

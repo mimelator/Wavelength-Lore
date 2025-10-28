@@ -1,0 +1,1307 @@
+{
+  "created": "2025-10-28T12:39:09.692Z",
+  "totalProducts": 142,
+  "successfulCreations": 110,
+  "errors": 32,
+  "imageId": "6900b54e19090cc89c3e5a69",
+  "products": [
+    {
+      "product": "Sherpa Fleece Blanket",
+      "blueprintId": 238,
+      "printProviderId": 99,
+      "productId": "6900b7dda37984bb1402fc23",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Crushed Velvet Blanket",
+      "blueprintId": 1091,
+      "printProviderId": 10,
+      "productId": "6900b7dfef37eb2d810b9d7d",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Fleece Sherpa Blanket",
+      "blueprintId": 1385,
+      "printProviderId": 1,
+      "productId": "6900b7e0dfd4c59d8e07ea26",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Quilted Throw",
+      "blueprintId": 1573,
+      "printProviderId": 10,
+      "productId": "6900b7e1f3140dcedc0bb673",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Woven Blanket",
+      "blueprintId": 1626,
+      "printProviderId": 10,
+      "productId": "6900b7e8a37984bb1402fc26",
+      "variants": 6,
+      "status": "created"
+    },
+    {
+      "product": "Pixel Fleece Blanket (AOP)",
+      "blueprintId": 1911,
+      "printProviderId": 10,
+      "productId": "6900b7e9ef37eb2d810b9d83",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Shower Curtains",
+      "blueprintId": 235,
+      "printProviderId": 10,
+      "productId": "6900b7eb59f64e83650035bc",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Christmas Stockings",
+      "blueprintId": 380,
+      "printProviderId": 10,
+      "productId": "6900b7ec91f168712b01a852",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Christmas Tree Skirts",
+      "blueprintId": 381,
+      "printProviderId": 10,
+      "productId": "6900b7efdfd4c59d8e07ea2f",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Pet Feeding Mats",
+      "blueprintId": 623,
+      "printProviderId": 10,
+      "productId": "6900b7f6dfd4c59d8e07ea30",
+      "variants": 3,
+      "status": "created"
+    },
+    {
+      "product": "Window Curtain",
+      "blueprintId": 748,
+      "printProviderId": 10,
+      "productId": "6900b7f759f64e83650035c9",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Rubber Yoga Mat",
+      "blueprintId": 788,
+      "printProviderId": 1,
+      "productId": "6900b7f859f64e83650035cd",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Hand Towel",
+      "blueprintId": 797,
+      "printProviderId": 1,
+      "productId": "6900b7fb60348c0eba0404ae",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Pennant",
+      "blueprintId": 1030,
+      "printProviderId": 10,
+      "productId": "6900b7fda37984bb1402fc2b",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Wrapping Papers",
+      "blueprintId": 1367,
+      "printProviderId": 1,
+      "productId": "6900b807f3140dcedc0bb67d",
+      "variants": 6,
+      "status": "created"
+    },
+    {
+      "product": "Quilted Coverlet",
+      "blueprintId": 1592,
+      "printProviderId": 10,
+      "productId": "6900b80a60348c0eba0404b1",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Poly Twill Napkin",
+      "blueprintId": 1633,
+      "printProviderId": 10,
+      "productId": "6900b80edfd4c59d8e07ea48",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Stainless Steel Travel Mug",
+      "blueprintId": 70,
+      "printProviderId": 1,
+      "productId": "6900b80fef37eb2d810b9d9c",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Mug 11oz",
+      "blueprintId": 68,
+      "printProviderId": 1,
+      "productId": "6900b810dfd4c59d8e07ea4e",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Latte Mug",
+      "blueprintId": 289,
+      "printProviderId": 1,
+      "productId": "6900b817d5e760724d07d4bf",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Women’s Capri Leggings (AOP)",
+      "blueprintId": 1050,
+      "printProviderId": 10,
+      "productId": "6900b818dec460f0580a8a73",
+      "variants": 6,
+      "status": "created"
+    },
+    {
+      "product": "Relaxed Classic Dad Cap",
+      "blueprintId": 1951,
+      "printProviderId": 29,
+      "productId": "6900b81adfd4c59d8e07ea80",
+      "variants": 7,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Heavy Blend™ Full Zip Hooded Sweatshirt",
+      "blueprintId": 66,
+      "printProviderId": 34,
+      "productId": "6900b821ef37eb2d810b9db8",
+      "variants": 8,
+      "status": "created"
+    },
+    {
+      "product": "Beach Towel",
+      "blueprintId": 352,
+      "printProviderId": 1,
+      "productId": "6900b825ef37eb2d810b9dbd",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Face Towel",
+      "blueprintId": 796,
+      "printProviderId": 1,
+      "productId": "6900b82760348c0eba0404ba",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Men's Denim Jacket",
+      "blueprintId": 1437,
+      "printProviderId": 10,
+      "productId": "6900b82d91f168712b01a86d",
+      "variants": 5,
+      "status": "created"
+    },
+    {
+      "product": "Tablecloths",
+      "blueprintId": 1624,
+      "printProviderId": 10,
+      "productId": "6900b82f60348c0eba0404be",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Fabric (Combed Cotton Prima)",
+      "blueprintId": 1740,
+      "printProviderId": 10,
+      "productId": "6900b832ab8aefd2fc028380",
+      "variants": 5,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Sponge Fleece Pullover Hoodie",
+      "blueprintId": 175,
+      "printProviderId": 3,
+      "productId": "6900b834f3140dcedc0bb687",
+      "variants": 25,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Garment-Dyed Hoodie",
+      "blueprintId": 1298,
+      "printProviderId": 29,
+      "productId": "6900b835ab8aefd2fc028381",
+      "variants": 43,
+      "status": "created"
+    },
+    {
+      "product": "Infant Long Sleeve Bodysuit",
+      "blueprintId": 31,
+      "printProviderId": 3,
+      "productId": "6900b83eef37eb2d810b9dd6",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Spiral Notebook - Ruled Line",
+      "blueprintId": 74,
+      "printProviderId": 1,
+      "productId": "6900b83ff3140dcedc0bb689",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Journal - Ruled Line",
+      "blueprintId": 75,
+      "printProviderId": 1,
+      "productId": "6900b841a37984bb1402fc3c",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Journal - Blank",
+      "blueprintId": 76,
+      "printProviderId": 1,
+      "productId": "6900b84491f168712b01a874",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Slim Phone Cases",
+      "blueprintId": 268,
+      "printProviderId": 1,
+      "productId": "6900b84bab8aefd2fc028386",
+      "variants": 26,
+      "status": "created"
+    },
+    {
+      "product": "Tough Phone Cases",
+      "blueprintId": 269,
+      "printProviderId": 1,
+      "productId": "6900b84cf3140dcedc0bb68e",
+      "variants": 32,
+      "status": "created"
+    },
+    {
+      "product": "Wireless Charger",
+      "blueprintId": 601,
+      "printProviderId": 1,
+      "productId": "6900b84ed5e760724d07d556",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Spun Polyester Square Pillow",
+      "blueprintId": 220,
+      "printProviderId": 10,
+      "productId": "6900b84ff3140dcedc0bb690",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Faux Suede Square Pillow",
+      "blueprintId": 223,
+      "printProviderId": 10,
+      "productId": "6900b8509bdcd400590c6062",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Spun Polyester Square Pillowcase",
+      "blueprintId": 229,
+      "printProviderId": 10,
+      "productId": "6900b85791f168712b01a877",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Faux Suede Square Pillowcase",
+      "blueprintId": 232,
+      "printProviderId": 10,
+      "productId": "6900b859d5e760724d07d55b",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Microfiber Pillow Sham",
+      "blueprintId": 295,
+      "printProviderId": 10,
+      "productId": "6900b85bdfd4c59d8e07eb3f",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Spun Polyester Lumbar Pillow",
+      "blueprintId": 538,
+      "printProviderId": 10,
+      "productId": "6900b85d59f64e83650036ab",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Tufted Floor Pillow, Square",
+      "blueprintId": 844,
+      "printProviderId": 10,
+      "productId": "6900b85e91f168712b01a878",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Tufted Floor Pillow, Round",
+      "blueprintId": 870,
+      "printProviderId": 10,
+      "productId": "6900b864f3140dcedc0bb69d",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Outdoor Pillows",
+      "blueprintId": 1007,
+      "printProviderId": 10,
+      "productId": "6900b86659f64e83650036b5",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Throw Pillow",
+      "blueprintId": 1572,
+      "printProviderId": 10,
+      "productId": "6900b868dec460f0580a8a9f",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Microfiber Pillowcase",
+      "blueprintId": 1590,
+      "printProviderId": 10,
+      "productId": "6900b86bf3140dcedc0bb69f",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Wall Clock",
+      "blueprintId": 277,
+      "printProviderId": 1,
+      "productId": "6900b86cdfd4c59d8e07eb46",
+      "variants": 6,
+      "status": "created"
+    },
+    {
+      "product": "Poly Scarf",
+      "blueprintId": 264,
+      "printProviderId": 10,
+      "productId": "6900b8729bdcd400590c6074",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Comforter",
+      "blueprintId": 416,
+      "printProviderId": 10,
+      "productId": "6900b87591f168712b01a88a",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Puzzle (120, 252, 500-Piece)",
+      "blueprintId": 616,
+      "printProviderId": 1,
+      "productId": "6900b87a60348c0eba0404ea",
+      "variants": 3,
+      "status": "created"
+    },
+    {
+      "product": "Fabric (Spun Polyester)",
+      "blueprintId": 1608,
+      "printProviderId": 10,
+      "productId": "6900b881d5e760724d07d568",
+      "variants": 5,
+      "status": "created"
+    },
+    {
+      "product": "Quilted Table Runner",
+      "blueprintId": 1622,
+      "printProviderId": 10,
+      "productId": "6900b882a37984bb1402fc51",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Bath Mat",
+      "blueprintId": 254,
+      "printProviderId": 10,
+      "productId": "6900b885a37984bb1402fc52",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Outdoor Rug",
+      "blueprintId": 1085,
+      "printProviderId": 10,
+      "productId": "6900b88959f64e83650036c7",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Quilted Bed Runner",
+      "blueprintId": 1591,
+      "printProviderId": 10,
+      "productId": "6900b88bf3140dcedc0bb6a8",
+      "variants": 3,
+      "status": "created"
+    },
+    {
+      "product": "Square Stickers",
+      "blueprintId": 384,
+      "printProviderId": 1,
+      "productId": "6900b894ab8aefd2fc0283a0",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Kiss-Cut Stickers",
+      "blueprintId": 400,
+      "printProviderId": 1,
+      "productId": "6900b899dfd4c59d8e07eb57",
+      "variants": 8,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Heavy Blend™ Crewneck Sweatshirt",
+      "blueprintId": 49,
+      "printProviderId": 51,
+      "productId": "6900b89ca37984bb1402fc5e",
+      "variants": 54,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Crewneck Sweatshirt",
+      "blueprintId": 446,
+      "printProviderId": 3,
+      "productId": "6900b89f91f168712b01a89b",
+      "variants": 24,
+      "status": "created"
+    },
+    {
+      "product": "District® V.I.T.™ Unisex Fleece Crew",
+      "blueprintId": 1959,
+      "printProviderId": 29,
+      "productId": "6900b8a7dfd4c59d8e07eb5b",
+      "variants": 60,
+      "status": "created"
+    },
+    {
+      "product": "The Boyfriend Tee for Women",
+      "blueprintId": 14,
+      "printProviderId": 34,
+      "productId": "6900b8b3dec460f0580a8abe",
+      "variants": 14,
+      "status": "created"
+    },
+    {
+      "product": "Men's Very Important Tee",
+      "blueprintId": 15,
+      "printProviderId": 3,
+      "productId": "6900b8b5ef37eb2d810b9e09",
+      "variants": 52,
+      "status": "created"
+    },
+    {
+      "product": "Men's Lightweight Fashion Tee",
+      "blueprintId": 26,
+      "printProviderId": 3,
+      "productId": "6900b8bf9bdcd400590c6097",
+      "variants": 11,
+      "status": "created"
+    },
+    {
+      "product": "Toddler's Fine Jersey Tee",
+      "blueprintId": 32,
+      "printProviderId": 61,
+      "productId": "6900b8c29bdcd400590c6098",
+      "variants": 42,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Jersey Short Sleeve V-Neck Tee",
+      "blueprintId": 48,
+      "printProviderId": 3,
+      "productId": "6900b8cddfd4c59d8e07eb63",
+      "variants": 76,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Ultra Cotton Long Sleeve Tee",
+      "blueprintId": 80,
+      "printProviderId": 61,
+      "productId": "6900b8d0dfd4c59d8e07eb65",
+      "variants": 35,
+      "status": "created"
+    },
+    {
+      "product": "Men's NUBLEND® Hooded Sweatshirt",
+      "blueprintId": 114,
+      "printProviderId": 3,
+      "productId": "6900b8d39bdcd400590c609f",
+      "variants": 39,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Tri-Blend Crew Tee",
+      "blueprintId": 139,
+      "printProviderId": 99,
+      "productId": "6900b8dad5e760724d07d585",
+      "variants": 84,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Tri-Blend 3\u0004 Raglan Tee",
+      "blueprintId": 147,
+      "printProviderId": 29,
+      "productId": "6900b8deab8aefd2fc0283b6",
+      "variants": 12,
+      "status": "created"
+    },
+    {
+      "product": "Velveteen Plush Blanket",
+      "blueprintId": 522,
+      "printProviderId": 47,
+      "productId": "6900b8e79bdcd400590c60a3",
+      "variants": 3,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Drop Shoulder Sweatshirt",
+      "blueprintId": 579,
+      "printProviderId": 51,
+      "productId": "6900b8e960348c0eba040501",
+      "variants": 14,
+      "status": "created"
+    },
+    {
+      "product": "Beefy-T®  Short-Sleeve T-Shirt",
+      "blueprintId": 607,
+      "printProviderId": 29,
+      "productId": "6900b8eb91f168712b01a8af",
+      "variants": 18,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Zone Performance T-shirt",
+      "blueprintId": 1089,
+      "printProviderId": 3,
+      "productId": "6900b8f2ef37eb2d810b9e22",
+      "variants": 29,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Performance Long Sleeve Shirt",
+      "blueprintId": 1102,
+      "printProviderId": 3,
+      "productId": "6900b8f6f3140dcedc0bb6c6",
+      "variants": 26,
+      "status": "created"
+    },
+    {
+      "product": "Women's Performance V-Neck T-Shirt",
+      "blueprintId": 1103,
+      "printProviderId": 3,
+      "productId": "6900b8f8ef37eb2d810b9e24",
+      "variants": 30,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Garment-Dyed Sweatshirt",
+      "blueprintId": 1296,
+      "printProviderId": 61,
+      "productId": "6900b8f9d5e760724d07d58b",
+      "variants": 15,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Lightweight Hooded Sweatshirt",
+      "blueprintId": 1528,
+      "printProviderId": 99,
+      "productId": "6900b902d5e760724d07d591",
+      "variants": 60,
+      "status": "created"
+    },
+    {
+      "product": "Women's Curvy Fine Jersey Tee",
+      "blueprintId": 1751,
+      "printProviderId": 29,
+      "productId": "6900b90dd5e760724d07d593",
+      "variants": 24,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Tie Dye Cotton Tee",
+      "blueprintId": 1950,
+      "printProviderId": 29,
+      "productId": "6900b90f60348c0eba04050a",
+      "variants": 17,
+      "status": "created"
+    },
+    {
+      "product": "Indoor Wall Tapestries",
+      "blueprintId": 241,
+      "printProviderId": 10,
+      "productId": "6900b912f3140dcedc0bb6dc",
+      "variants": 8,
+      "status": "created"
+    },
+    {
+      "product": "Can Holder",
+      "blueprintId": 355,
+      "printProviderId": 1,
+      "productId": "6900b914f3140dcedc0bb6e3",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Flip Flops",
+      "blueprintId": 587,
+      "printProviderId": 1,
+      "productId": "6900b915dec460f0580a8aeb",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Women's Flowy Racerback Tank",
+      "blueprintId": 10,
+      "printProviderId": 61,
+      "productId": "6900b91c91f168712b01a8b8",
+      "variants": 6,
+      "status": "created"
+    },
+    {
+      "product": "Women's Ideal Racerback Tank",
+      "blueprintId": 18,
+      "printProviderId": 3,
+      "productId": "6900b91ddec460f0580a8b04",
+      "variants": 35,
+      "status": "created"
+    },
+    {
+      "product": "Unisex Jersey Tank",
+      "blueprintId": 39,
+      "printProviderId": 3,
+      "productId": "6900b91f9bdcd400590c60c7",
+      "variants": 56,
+      "status": "created"
+    },
+    {
+      "product": "Women's Flowy Scoop Muscle Tank",
+      "blueprintId": 47,
+      "printProviderId": 99,
+      "productId": "6900b922f3140dcedc0bb716",
+      "variants": 12,
+      "status": "created"
+    },
+    {
+      "product": "Women's Tri-Blend Racerback Tank",
+      "blueprintId": 141,
+      "printProviderId": 3,
+      "productId": "6900b92359f64e8365003725",
+      "variants": 30,
+      "status": "created"
+    },
+    {
+      "product": "Women's Sporty Racerback Tank",
+      "blueprintId": 1578,
+      "printProviderId": 10,
+      "productId": "6900b92adfd4c59d8e07eb9c",
+      "variants": 30,
+      "status": "created"
+    },
+    {
+      "product": "Cotton Canvas Tote Bag",
+      "blueprintId": 1313,
+      "printProviderId": 99,
+      "productId": "6900b92ca37984bb1402fc91",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Weekender Bag",
+      "blueprintId": 326,
+      "printProviderId": 10,
+      "productId": "6900b92d91f168712b01a8bd",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Drawstring Bag",
+      "blueprintId": 414,
+      "printProviderId": 10,
+      "productId": "6900b930f3140dcedc0bb73d",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Bean Bag Chair Cover",
+      "blueprintId": 853,
+      "printProviderId": 10,
+      "productId": "6900b937a37984bb1402fc95",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Laundry Bag",
+      "blueprintId": 1034,
+      "printProviderId": 10,
+      "productId": "6900b9389bdcd400590c60ed",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Polyester Lunch Bag",
+      "blueprintId": 1042,
+      "printProviderId": 10,
+      "productId": "6900b93ba37984bb1402fc98",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Adjustable Tote Bag (AOP)",
+      "blueprintId": 1300,
+      "printProviderId": 10,
+      "productId": "6900b93c60348c0eba040545",
+      "variants": 2,
+      "status": "created"
+    },
+    {
+      "product": "Tote Bag (AOP)",
+      "blueprintId": 1389,
+      "printProviderId": 10,
+      "productId": "6900b93e9bdcd400590c60f1",
+      "variants": 15,
+      "status": "created"
+    },
+    {
+      "product": "Tumbler 20oz",
+      "blueprintId": 353,
+      "printProviderId": 1,
+      "productId": "6900b94560348c0eba040546",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Tumbler 10oz",
+      "blueprintId": 354,
+      "printProviderId": 1,
+      "productId": "6900b947d5e760724d07d5a4",
+      "variants": 1,
+      "status": "created"
+    },
+    {
+      "product": "Women's Cut & Sew Casual Leggings (AOP)",
+      "blueprintId": 256,
+      "printProviderId": 10,
+      "productId": "6900b949f3140dcedc0bb754",
+      "variants": 6,
+      "status": "created"
+    },
+    {
+      "product": "Women's Cut & Sew Racerback Dress (AOP)",
+      "blueprintId": 276,
+      "printProviderId": 10,
+      "productId": "6900b94bdfd4c59d8e07ebb2",
+      "variants": 6,
+      "status": "created"
+    },
+    {
+      "product": "Women's Shorts (AOP)",
+      "blueprintId": 1110,
+      "printProviderId": 10,
+      "productId": "6900b953a37984bb1402fc9b",
+      "variants": 6,
+      "status": "created"
+    },
+    {
+      "product": "Women's Biker Shorts (AOP)",
+      "blueprintId": 1132,
+      "printProviderId": 10,
+      "productId": "6900b95560348c0eba040548",
+      "variants": 6,
+      "status": "created"
+    },
+    {
+      "product": "Women's Denim Jacket",
+      "blueprintId": 1396,
+      "printProviderId": 10,
+      "productId": "6900b956ab8aefd2fc0283d6",
+      "variants": 5,
+      "status": "created"
+    },
+    {
+      "product": "Women's Dolman",
+      "blueprintId": 1596,
+      "printProviderId": 10,
+      "productId": "6900b95def37eb2d810b9ea9",
+      "variants": 12,
+      "status": "created"
+    },
+    {
+      "product": "Accessory Pouch",
+      "blueprintId": 356,
+      "printProviderId": 10,
+      "productId": "6900b95f59f64e8365003757",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Accessory Pouch w T-bottom",
+      "blueprintId": 357,
+      "printProviderId": 10,
+      "productId": "6900b962d5e760724d07d5af",
+      "variants": 4,
+      "status": "created"
+    },
+    {
+      "product": "Microfiber Duvet Cover",
+      "blueprintId": 296,
+      "printProviderId": 10,
+      "productId": "6900b964ab8aefd2fc0283de",
+      "variants": 8,
+      "status": "created"
+    },
+    {
+      "product": "Quilted Sham",
+      "blueprintId": 1597,
+      "printProviderId": 10,
+      "productId": "6900b96cdec460f0580a8b5a",
+      "variants": 3,
+      "status": "created"
+    }
+  ],
+  "errorDetails": [
+    {
+      "product": "Backpack",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Basketball Training Shorts (AOP)",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Unisex Heavy Cotton Tee",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Unisex Heavy Blend™ Hooded Sweatshirt",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Kids Heavy Cotton™ Tee",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Too many variants enabled. Maximum allowed: 100\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Too many variants enabled. Maximum allowed: 100",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Infant Fine Jersey Bodysuit",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Too many variants enabled. Maximum allowed: 100\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Too many variants enabled. Maximum allowed: 100",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Sublimation Socks",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Round Rug",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":6002,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Decorator 10 not available for this blueprint 1083\",\"code\":6002}}",
+      "response": {
+        "status": "error",
+        "code": 6002,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Decorator 10 not available for this blueprint 1083",
+          "code": 6002
+        }
+      }
+    },
+    {
+      "product": "Unisex Cotton Crew Tee",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Women's Favorite Tee",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Too many variants enabled. Maximum allowed: 100\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Too many variants enabled. Maximum allowed: 100",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Unisex Jersey Short Sleeve Tee",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Too many variants enabled. Maximum allowed: 100\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Too many variants enabled. Maximum allowed: 100",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Infant Fine Jersey Tee",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Unisex Ultra Cotton Tee",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Unisex Jersey Long Sleeve Tee",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Kids Softstyle Tee",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Women's Softstyle Tee",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Unisex Softstyle T-Shirt",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Unisex Triblend Tee",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Women's Cut & Sew Tee (AOP)",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Unisex Cut & Sew Tee (AOP)",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Crop Tee (AOP)",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Unisex CVC Jersey T-shirt",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Unisex Oversized Boxy Tee",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Men's Hawaiian Camp Shirt (AOP)",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Unisex Polo Shirt (AOP)",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Men's UV Protection Long Sleeve Shirt (AOP)",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Duffel Bag",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Sling Bag",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Women's Pencil Skirt (AOP)",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Women's Skater Skirt (AOP)",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Women's Dolman (Polyester, 6oz)",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    },
+    {
+      "product": "Windbreaker Jacket (AOP)",
+      "error": "Creation failed: 400 - {\"status\":\"error\",\"code\":8251,\"message\":\"Validation failed.\",\"errors\":{\"reason\":\"Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field\",\"code\":8251}}",
+      "response": {
+        "status": "error",
+        "code": 8251,
+        "message": "Validation failed.",
+        "errors": {
+          "reason": "Variants do not match selected blueprint and print provider. Please make sure that all product variants are present in the `print_areas.*.variant_ids` field",
+          "code": 8251
+        }
+      }
+    }
+  ]
+}
