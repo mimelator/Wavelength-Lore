@@ -1708,14 +1708,28 @@ class MerchandiseModalRenderer {
     const overlay = modal.closest('.modal-overlay');
     const productId = overlay?.dataset.productId;
 
+    console.log('🔍 DEBUG: Looking for product customization');
+    console.log('  productId from modal:', productId);
+    console.log('  merchandiseStore available:', !!window.merchandiseStore);
+
     // Try to get the product from the store to restore customization
     let previousCustomization = null;
     if (window.merchandiseStore) {
+      console.log('  🔍 Searching in products array, length:', window.merchandiseStore.products?.length || 0);
       const product = window.merchandiseStore.products.find(p => (p.id || p.productId) === productId);
+      console.log('  ✅ Product found:', !!product);
+      if (product) {
+        console.log('    - Product has customization property:', !!product.customization);
+        console.log('    - Customization data:', product.customization);
+      }
       if (product && product.customization) {
         previousCustomization = product.customization;
         console.log('✅ Found previous customization for product:', productId, previousCustomization);
+      } else if (product) {
+        console.log('⚠️ Product found but no customization data on it');
       }
+    } else {
+      console.log('❌ window.merchandiseStore not available');
     }
 
     // Initialize modal state - either from previous customization or with defaults
