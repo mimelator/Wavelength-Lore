@@ -2686,6 +2686,30 @@ class MerchandiseModalRenderer {
       if (merchandiseStore && typeof merchandiseStore.render === 'function') {
         merchandiseStore.render();
         console.log('✅ Merchandise store re-rendered with new product');
+
+        // 🔥 CRITICAL: Focus on newly created product so user doesn't have to search
+        // After render completes, find and scroll to the most recently created product
+        setTimeout(() => {
+          const productCards = document.querySelectorAll('.product-card');
+          if (productCards.length > 0) {
+            // Get the last product card (most recently created)
+            const newestProductCard = productCards[productCards.length - 1];
+
+            // Scroll into view with smooth animation
+            newestProductCard.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center'
+            });
+
+            // Focus on the card for accessibility
+            newestProductCard.focus();
+
+            // Add a highlight animation to draw attention
+            newestProductCard.style.animation = 'highlight-pulse 2s ease-in-out';
+
+            console.log('✅ Scrolled to newly created product and set focus');
+          }
+        }, 300); // Small delay to ensure DOM is fully updated
       }
 
       if (this.debugMode) {
