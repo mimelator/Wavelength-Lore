@@ -14,6 +14,24 @@ class MerchandiseCartRenderer {
     this.cartService = options.cartService;
     this.eventBus = options.eventBus;
     this.merchandiseStore = options.merchandiseStore; // For accessing helper methods
+    this.debugMode = true; // Enable detailed diagnostics
+    
+    console.log('🛒 CART UI DIAGNOSTICS: MerchandiseCartRenderer initializing...');
+    console.log('🛒 Services connected:', {
+      cartService: !!this.cartService,
+      eventBus: !!this.eventBus,
+      merchandiseStore: !!this.merchandiseStore
+    });
+    
+    // 🔍 DIAGNOSTIC: Store instance reference for debugging access
+    setTimeout(() => {
+      const cartElements = document.querySelectorAll('[data-component="cart"], .cart-container, .cart-summary');
+      cartElements.forEach(element => {
+        if (!element._cartRendererInstance) {
+          element._cartRendererInstance = this;
+        }
+      });
+    }, 100); // Brief delay to ensure DOM elements exist
   }
   
   /**
@@ -21,14 +39,27 @@ class MerchandiseCartRenderer {
    * @returns {string} HTML string for cart display
    */
   renderCart() {
+    if (this.debugMode) {
+      console.group('🛒 CART UI DIAGNOSTICS: Rendering cart interface');
+    }
+    
     try {
       const cartSummary = this.cartService.getSummary();
       
+      if (this.debugMode) {
+        console.log('🛒 Cart summary for rendering:', cartSummary);
+        console.log(`🛒 Cart status: ${cartSummary.isEmpty ? 'Empty' : `${cartSummary.itemCount} items, ${cartSummary.totalQuantity} total qty`}`);
+      }
+      
       if (cartSummary.isEmpty) {
+        if (this.debugMode) {
+          console.log('🛒 Rendering empty cart view');
+          console.groupEnd();
+        }
         return this.renderEmptyCart();
       }
       
-      return `
+      const cartHTML = `
         <div class="cart-container">
           <div class="cart-header">
             <h3>
@@ -535,6 +566,103 @@ class MerchandiseCartRenderer {
     if (this.eventBus) {
       this.eventBus.emit('ui.browseProducts');
     }
+  }
+  
+  /**
+   * 🔍 DIAGNOSTIC: Get comprehensive cart diagnostics
+   * Call this method from console: window.merchandiseStore.cartRenderer.getCartDiagnostics()
+   */
+  getCartDiagnostics() {
+    console.group('🛒 COMPREHENSIVE CART DIAGNOSTICS');
+    
+    console.log('📊 Cart Service Status:');
+    console.log('  - Service connected:', !!this.cartService);
+    console.log('  - Event bus connected:', !!this.eventBus);
+    console.log('  - Store reference:', !!this.merchandiseStore);
+    
+    if (this.cartService) {
+      const summary = this.cartService.getSummary();
+      console.log('📦 Cart Contents:');
+      console.log('  - Item count:', summary.itemCount);
+      console.log('  - Total quantity:', summary.totalQuantity);
+      console.log('  - Is empty:', summary.isEmpty);
+      console.log('  - Items:', summary.items);
+      
+      console.log('💾 Storage Status:');
+      const stored = localStorage.getItem('wavelength_cart');
+      console.log('  - Has localStorage data:', !!stored);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          console.log('  - Stored items count:', parsed.length);
+          console.log('  - Stored data:', parsed);
+        } catch (e) {
+          console.log('  - Storage data corrupted:', e.message);
+        }
+      }
+    }
+    
+    console.log('🎯 UI Elements:');
+    const cartContainer = document.querySelector('.cart-container');
+    const cartModal = document.querySelector('#cart-modal');
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    
+    console.log('  - Cart container exists:', !!cartContainer);
+    console.log('  - Cart modal exists:', !!cartModal);
+    console.log('  - Add to cart buttons found:', addToCartButtons.length);
+    
+    console.log('🔄 Event Listeners:');
+    if (this.eventBus) {
+      console.log('  - Event bus type:', typeof this.eventBus);
+      console.log('  - Has emit method:', typeof this.eventBus.emit === 'function');
+    }
+    
+    console.groupEnd();
+    
+    const summary = this.cartService ? this.cartService.getSummary() : { isEmpty: true, itemCount: 0, totalQuantity: 0, items: [] };
+    const stored = localStorage.getItem('wavelength_cart');
+    
+    const diagnostics = {
+      timestamp: new Date().toISOString(),
+      service: {
+        cartService: !!this.cartService,
+        eventBus: !!this.eventBus,
+        merchandiseStore: !!this.merchandiseStore,
+        eventBusType: this.eventBus ? typeof this.eventBus : 'undefined',
+        hasEmitMethod: !!(this.eventBus && typeof this.eventBus.emit === 'function')
+      },
+      storage: {
+        hasLocalStorageData: !!stored,
+        itemCount: summary.itemCount,
+        totalQuantity: summary.totalQuantity,
+        isEmpty: summary.isEmpty
+      },
+      ui: {
+        cartContainer: !!cartContainer,
+        cartModal: !!cartModal,
+        addToCartButtons: addToCartButtons.length
+      },
+      items: summary.items || [],
+      debug: {
+        recommendations: []
+      }
+    };
+    
+    // Add recommendations based on findings
+    if (!diagnostics.service.cartService) {
+      diagnostics.debug.recommendations.push('Cart service not connected - cart operations will fail');
+    }
+    if (!diagnostics.service.eventBus) {
+      diagnostics.debug.recommendations.push('Event bus not connected - cart events will not work');
+    }
+    if (diagnostics.ui.addToCartButtons === 0) {
+      diagnostics.debug.recommendations.push('No add-to-cart buttons found - users cannot add items');
+    }
+    if (!diagnostics.ui.cartContainer) {
+      diagnostics.debug.recommendations.push('Cart container not found - cart UI will not display');
+    }
+    
+    return diagnostics;
   }
 }
 

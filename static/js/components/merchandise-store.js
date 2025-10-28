@@ -16,6 +16,8 @@ class MerchandiseStore {
     this.galleryImages = [];
     this.enhancementStatus = { available: false };
     this.isInitializing = true;
+    this.isInitialized = false;
+    this.containerId = 'merchandise-store';
     
     // REFACTOR: Initialize services for separated concerns
     this.apiService = new MerchandiseApiService();
@@ -148,6 +150,10 @@ class MerchandiseStore {
     });
     
     // Cart Renderer Events
+    this.eventBus.on('cart.addItem', (data) => {
+      this.handleAddToCart(data.productId, data.variantId, data.quantity || 1);
+    });
+    
     this.eventBus.on('cart.quantityChanged', (data) => {
       this.handleCartQuantityChange(data.productId, data.variantId, data.quantity);
     });
@@ -624,6 +630,10 @@ class MerchandiseStore {
       
       console.log('🎉 Merchandise Store initialization complete!');
       this.isInitializing = false;
+      this.isInitialized = true;
+      
+      // Render the initial UI
+      this.render();
       
     } catch (error) {
       this.isInitializing = false;
@@ -1465,6 +1475,16 @@ class MerchandiseStore {
       `;
       
       console.log('✅ Merchandise store rendered successfully');
+      
+      // 🔍 DIAGNOSTIC: Store cart renderer instance reference after render
+      setTimeout(() => {
+        const cartContainer = document.querySelector('.cart-container');
+        if (cartContainer && this.cartRenderer) {
+          cartContainer._cartRendererInstance = this.cartRenderer;
+          console.log('🔍 DIAGNOSTIC: Cart renderer instance stored on container');
+        }
+      }, 100); // Brief delay to ensure DOM is updated
+      
     } catch (error) {
       console.error('Error rendering merchandise store:', error);
       container.innerHTML = `
@@ -4556,6 +4576,62 @@ class MerchandiseStore {
       return product.title || 'Custom Product';
     }
   }
+
+  /**
+   * 🔍 DIAGNOSTIC: Get comprehensive store diagnostics
+   * Call window.wavelengthStoreDiagnostics() in console for debugging
+   */
+  getStoreDiagnostics() {
+    const diagnostics = {
+      timestamp: new Date().toISOString(),
+      store: {
+        isInitialized: !!this.isInitialized,
+        containerId: this.containerId,
+        currentView: this.currentView,
+        isLoading: this.isLoading,
+        hasContainer: !!document.getElementById(this.containerId)
+      },
+      products: {
+        totalProducts: this.products ? this.products.length : 0,
+        hasProducts: !!(this.products && this.products.length > 0),
+        firstProduct: this.products?.[0] ? {
+          id: this.products[0].id,
+          title: this.products[0].title,
+          hasVariants: !!(this.products[0].variants && this.products[0].variants.length > 0)
+        } : null
+      },
+      cart: {
+        hasCartService: !!this.cartService,
+        cartServiceType: this.cartService?.constructor?.name || 'unknown'
+      },
+      ui: {
+        containerExists: !!document.getElementById(this.containerId),
+        productGridExists: !!document.querySelector('.product-grid'),
+        cartElementExists: !!document.querySelector('.cart-container, .cart-summary, .cart-items'),
+        addToCartButtonsExist: document.querySelectorAll('[data-action="add-to-cart"], .add-to-cart-btn').length > 0
+      },
+      debug: {
+        consoleErrors: 'Check browser console for any JavaScript errors',
+        recommendations: []
+      }
+    };
+
+    // Add recommendations based on findings
+    if (!diagnostics.store.isInitialized) {
+      diagnostics.debug.recommendations.push('Store not initialized - check authentication and container element');
+    }
+    if (!diagnostics.products.hasProducts) {
+      diagnostics.debug.recommendations.push('No products loaded - check API connection and product data');
+    }
+    if (!diagnostics.cart.hasCartService) {
+      diagnostics.debug.recommendations.push('Cart service not available - cart functionality will not work');
+    }
+    if (!diagnostics.ui.addToCartButtonsExist) {
+      diagnostics.debug.recommendations.push('No add-to-cart buttons found - users cannot add items to cart');
+    }
+
+    return diagnostics;
+  }
 }
 
 // Initialize when DOM is ready
@@ -4570,4 +4646,140 @@ if (typeof module !== 'undefined' && module.exports) {
 // Make available in browser global scope
 if (typeof window !== 'undefined') {
   window.MerchandiseStore = MerchandiseStore;
+  
+  // 🔍 GLOBAL DIAGNOSTIC INTERFACE
+  // Use these functions in browser console for debugging
+  window.wavelengthStoreDiagnostics = function() {
+    console.log('🌊 WAVELENGTH STORE DIAGNOSTICS');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    
+    // Find active store instance
+    const storeContainer = document.getElementById('merchandise-store') || 
+                          document.getElementById('merchandise-store-container') ||
+                          document.querySelector('[data-component="merchandise-store"]');
+    
+    if (storeContainer && storeContainer._merchandiseStoreInstance) {
+      const diagnostics = storeContainer._merchandiseStoreInstance.getStoreDiagnostics();
+      console.table(diagnostics.store);
+      console.table(diagnostics.products);
+      console.table(diagnostics.cart);
+      console.table(diagnostics.ui);
+      
+      if (diagnostics.debug.recommendations.length > 0) {
+        console.log('📋 RECOMMENDATIONS:');
+        diagnostics.debug.recommendations.forEach((rec, i) => {
+          console.log(`${i + 1}. ${rec}`);
+        });
+      }
+      
+      return diagnostics;
+    } else if (window.merchandiseStore && window.merchandiseStore.getStoreDiagnostics) {
+      // Fallback: Use global store instance if container reference isn't set
+      console.log('🔍 Using fallback: Global store instance found');
+      const diagnostics = window.merchandiseStore.getStoreDiagnostics();
+      console.table(diagnostics.store);
+      console.table(diagnostics.products);
+      console.table(diagnostics.cart);
+      console.table(diagnostics.ui);
+      
+      if (diagnostics.debug.recommendations.length > 0) {
+        console.log('📋 RECOMMENDATIONS:');
+        diagnostics.debug.recommendations.forEach((rec, i) => {
+          console.log(`${i + 1}. ${rec}`);
+        });
+      }
+      
+      return diagnostics;
+    } else {
+      console.warn('❌ No active merchandise store instance found');
+      console.log('🔍 Debug info:');
+      console.log('- Store container found:', !!storeContainer);
+      console.log('- Container has instance:', !!(storeContainer && storeContainer._merchandiseStoreInstance));
+      console.log('- Global store available:', !!window.merchandiseStore);
+      console.log('- Global store has diagnostics:', !!(window.merchandiseStore && window.merchandiseStore.getStoreDiagnostics));
+      return { error: 'Store not initialized or container not found' };
+    }
+  };
+  
+  window.wavelengthCartDiagnostics = function() {
+    console.log('🛒 WAVELENGTH CART DIAGNOSTICS');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    
+    // Find cart renderer instance
+    const cartElements = document.querySelectorAll('[data-component="cart"], .cart-container, .cart-summary');
+    
+    for (let element of cartElements) {
+      if (element._cartRendererInstance && element._cartRendererInstance.getCartDiagnostics) {
+        const cartDiag = element._cartRendererInstance.getCartDiagnostics();
+        console.table(cartDiag.service);
+        console.table(cartDiag.storage);
+        console.table(cartDiag.ui);
+        console.log('📦 CART ITEMS:', cartDiag.items);
+        
+        if (cartDiag.debug.recommendations.length > 0) {
+          console.log('📋 RECOMMENDATIONS:');
+          cartDiag.debug.recommendations.forEach((rec, i) => {
+            console.log(`${i + 1}. ${rec}`);
+          });
+        }
+        
+        return cartDiag;
+      }
+    }
+    
+    // Fallback: Use global store instance if container reference isn't set
+    if (window.merchandiseStore && window.merchandiseStore.cartRenderer && window.merchandiseStore.cartRenderer.getCartDiagnostics) {
+      console.log('🔍 Using fallback: Global store cart renderer found');
+      const cartDiag = window.merchandiseStore.cartRenderer.getCartDiagnostics();
+      console.table(cartDiag.service);
+      console.table(cartDiag.storage);
+      console.table(cartDiag.ui);
+      console.log('📦 CART ITEMS:', cartDiag.items);
+      
+      if (cartDiag.debug.recommendations.length > 0) {
+        console.log('📋 RECOMMENDATIONS:');
+        cartDiag.debug.recommendations.forEach((rec, i) => {
+          console.log(`${i + 1}. ${rec}`);
+        });
+      }
+      
+      return cartDiag;
+    }
+    
+    console.warn('❌ No active cart renderer instance found');
+    console.log('🔍 Debug info:');
+    console.log('- Cart elements found:', cartElements.length);
+    console.log('- Global store available:', !!window.merchandiseStore);
+    console.log('- Global cart renderer available:', !!(window.merchandiseStore && window.merchandiseStore.cartRenderer));
+    return { error: 'Cart renderer not initialized or container not found' };
+  };
+  
+  window.wavelengthFullDiagnostics = function() {
+    console.log('🌊 WAVELENGTH FULL SYSTEM DIAGNOSTICS');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    
+    const storeDiag = window.wavelengthStoreDiagnostics();
+    console.log(''); // Spacer
+    const cartDiag = window.wavelengthCartDiagnostics();
+    
+    console.log(''); // Spacer
+    console.log('🔍 QUICK UI SCAN:');
+    console.log('- Product elements:', document.querySelectorAll('.product-item, .product-card').length);
+    console.log('- Add to cart buttons:', document.querySelectorAll('[data-action="add-to-cart"], .add-to-cart-btn').length);
+    console.log('- Cart elements:', document.querySelectorAll('.cart-container, .cart-summary, .cart-items').length);
+    console.log('- Variant selectors:', document.querySelectorAll('.variant-selector, .size-selector, .color-selector').length);
+    
+    return {
+      store: storeDiag,
+      cart: cartDiag,
+      timestamp: new Date().toISOString()
+    };
+  };
+  
+  // Add helpful console message
+  console.log('🌊 WAVELENGTH DIAGNOSTICS LOADED');
+  console.log('🔍 Use these functions in console:');
+  console.log('• wavelengthStoreDiagnostics() - Store status');
+  console.log('• wavelengthCartDiagnostics() - Cart status');  
+  console.log('• wavelengthFullDiagnostics() - Complete system scan');
 }

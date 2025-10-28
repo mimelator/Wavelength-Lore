@@ -111,6 +111,15 @@
                 try {
                     if (!window.merchandiseStore) {
                         window.merchandiseStore = new MerchandiseStore();
+                        
+                        // 🔍 DIAGNOSTIC: Store instance reference for debugging
+                        const container = document.getElementById('merchandise-store');
+                        if (container) {
+                            container._merchandiseStoreInstance = window.merchandiseStore;
+                            console.log('🔍 DIAGNOSTIC: Store instance reference stored on container:', container.id);
+                        } else {
+                            console.warn('❌ DIAGNOSTIC: Could not find merchandise-store container for instance reference');
+                        }
                     }
                 } catch (error) {
                     console.error('❌ Failed to initialize MerchandiseStore:', error);
@@ -129,6 +138,15 @@
                                 try {
                                     if (!window.merchandiseStore) {
                                         window.merchandiseStore = new MerchandiseStore();
+                                        
+                                        // 🔍 DIAGNOSTIC: Store instance reference for debugging
+                                        const container = document.getElementById('merchandise-store');
+                                        if (container) {
+                                            container._merchandiseStoreInstance = window.merchandiseStore;
+                                            console.log('🔍 DIAGNOSTIC: Store instance reference stored on container:', container.id);
+                                        } else {
+                                            console.warn('❌ DIAGNOSTIC: Could not find merchandise-store container for instance reference');
+                                        }
                                     }
                                 } catch (error) {
                                     console.error('❌ Failed to initialize MerchandiseStore:', error);

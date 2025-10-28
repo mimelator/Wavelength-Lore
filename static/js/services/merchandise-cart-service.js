@@ -12,7 +12,11 @@ class MerchandiseCartService {
   constructor() {
     this.items = [];
     this.eventBus = null; // Will be injected
+    this.debugMode = true; // Enable detailed diagnostics
+    
+    console.log('🛒 CART DIAGNOSTICS: MerchandiseCartService initializing...');
     this.loadFromStorage();
+    console.log(`🛒 CART DIAGNOSTICS: Initialized with ${this.items.length} items from storage`);
   }
   
   /**
@@ -20,6 +24,9 @@ class MerchandiseCartService {
    */
   setEventBus(eventBus) {
     this.eventBus = eventBus;
+    if (this.debugMode) {
+      console.log('🛒 CART DIAGNOSTICS: Event bus connected', eventBus ? '✅' : '❌');
+    }
   }
   
   /**
@@ -30,9 +37,17 @@ class MerchandiseCartService {
    * @returns {Object} Result with success status and message
    */
   addItem(product, variantId, quantity = 1) {
+    if (this.debugMode) {
+      console.group('🛒 CART DIAGNOSTICS: Adding item to cart');
+      console.log('Product:', product);
+      console.log('Variant ID:', variantId);
+      console.log('Quantity:', quantity);
+      console.log('Current cart items:', this.items.length);
+    }
+    
     try {
       if (!product || !product.id) {
-        throw new Error('Invalid product');
+        throw new Error('Invalid product - missing product or product.id');
       }
       
       if (!variantId) {
@@ -49,39 +64,80 @@ class MerchandiseCartService {
                 item.variantId === variantId
       );
       
+      if (this.debugMode) {
+        console.log(`🔍 Checking for existing item: productId=${productId}, variantId=${variantId}`);
+        console.log(`Found existing item at index: ${existingItemIndex}`);
+      }
+      
       if (existingItemIndex >= 0) {
         // Update existing item quantity
+        const oldQuantity = this.items[existingItemIndex].quantity;
         this.items[existingItemIndex].quantity += quantity;
-        console.log(`🛒 Updated cart item quantity: ${this.items[existingItemIndex].quantity}`);
+        const newQuantity = this.items[existingItemIndex].quantity;
+        
+        if (this.debugMode) {
+          console.log(`✅ Updated existing item quantity: ${oldQuantity} → ${newQuantity}`);
+        }
       } else {
         // Add new item
+        const extractedPrice = this.extractPrice(product, variantId);
+        const extractedImage = this.extractImage(product);
+        
         const cartItem = {
           id: productId,
           productId: productId,
           variantId: variantId,
           quantity: quantity,
           title: product.title || 'Untitled Product',
-          price: this.extractPrice(product, variantId),
-          image: this.extractImage(product),
+          price: extractedPrice,
+          image: extractedImage,
           dateAdded: new Date().toISOString()
         };
         
+        if (this.debugMode) {
+          console.log('📦 Creating new cart item:', cartItem);
+          console.log('💰 Extracted price:', extractedPrice);
+          console.log('🖼️ Extracted image:', extractedImage);
+        }
+        
         this.items.push(cartItem);
-        console.log(`🛒 Added new item to cart: ${cartItem.title}`);
+        
+        if (this.debugMode) {
+          console.log(`✅ Added new item to cart: ${cartItem.title}`);
+        }
       }
       
       this.saveToStorage();
-      this.publishEvent('cart.updated', { items: this.items, action: 'add' });
       
-      return {
+      const eventData = { items: this.items, action: 'add', productId, variantId, quantity };
+      this.publishEvent('cart.updated', eventData);
+      
+      const result = {
         success: true,
         message: 'Item added to cart successfully',
         itemCount: this.items.length,
         totalQuantity: this.getTotalQuantity()
       };
       
+      if (this.debugMode) {
+        console.log('📊 Add item result:', result);
+        console.log(`🛒 Cart now has ${result.itemCount} unique items, ${result.totalQuantity} total quantity`);
+        console.groupEnd();
+      }
+      
+      return result;
+      
     } catch (error) {
-      console.error('Error adding item to cart:', error);
+      console.error('❌ CART ERROR: Failed to add item to cart:', error);
+      if (this.debugMode) {
+        console.error('Error details:', {
+          product: product,
+          variantId: variantId,
+          quantity: quantity,
+          currentItems: this.items
+        });
+        console.groupEnd();
+      }
       return {
         success: false,
         message: error.message,
@@ -320,10 +376,31 @@ class MerchandiseCartService {
    * Save cart to localStorage
    */
   saveToStorage() {
+    if (this.debugMode) {
+      console.log(`💾 CART DIAGNOSTICS: Saving ${this.items.length} items to localStorage`);
+    }
+    
     try {
-      localStorage.setItem('wavelength_cart', JSON.stringify(this.items));
+      const cartData = JSON.stringify(this.items);
+      localStorage.setItem('wavelength_cart', cartData);
+      
+      if (this.debugMode) {
+        console.log('✅ Cart saved to localStorage successfully');
+        console.log(`📦 Saved data size: ${cartData.length} characters`);
+        
+        // Verify save by reading it back
+        const verification = localStorage.getItem('wavelength_cart');
+        if (verification === cartData) {
+          console.log('✅ Storage verification passed');
+        } else {
+          console.warn('⚠️ Storage verification failed - data mismatch');
+        }
+      }
     } catch (error) {
-      console.error('Error saving cart to storage:', error);
+      console.error('❌ CART ERROR: Failed to save cart to storage:', error);
+      if (this.debugMode) {
+        console.error('Cart data that failed to save:', this.items);
+      }
     }
   }
   
@@ -331,15 +408,38 @@ class MerchandiseCartService {
    * Load cart from localStorage
    */
   loadFromStorage() {
+    if (this.debugMode) {
+      console.log('💾 CART DIAGNOSTICS: Loading cart from localStorage...');
+    }
+    
     try {
       const stored = localStorage.getItem('wavelength_cart');
       if (stored) {
-        this.items = JSON.parse(stored) || [];
-        console.log(`🛒 Loaded ${this.items.length} items from storage`);
+        const parsedItems = JSON.parse(stored) || [];
+        this.items = parsedItems;
+        
+        if (this.debugMode) {
+          console.log(`✅ Loaded ${this.items.length} items from storage`);
+          console.log('📦 Cart items loaded:', this.items);
+          
+          // Validate loaded items
+          this.items.forEach((item, index) => {
+            if (!item.productId || !item.variantId) {
+              console.warn(`⚠️ Invalid cart item at index ${index}:`, item);
+            }
+          });
+        }
+      } else {
+        if (this.debugMode) {
+          console.log('📝 No cart data found in localStorage - starting with empty cart');
+        }
       }
     } catch (error) {
-      console.error('Error loading cart from storage:', error);
+      console.error('❌ CART ERROR: Failed to load cart from storage:', error);
       this.items = [];
+      if (this.debugMode) {
+        console.log('🔄 Reset to empty cart due to storage error');
+      }
     }
   }
   
@@ -349,8 +449,22 @@ class MerchandiseCartService {
    * @param {Object} data - Event data
    */
   publishEvent(event, data) {
+    if (this.debugMode) {
+      console.log(`📢 CART EVENT: Publishing '${event}'`, data);
+    }
+    
     if (this.eventBus && typeof this.eventBus.emit === 'function') {
       this.eventBus.emit(event, data);
+      if (this.debugMode) {
+        console.log(`✅ Event '${event}' published successfully`);
+      }
+    } else {
+      if (this.debugMode) {
+        console.warn(`⚠️ Event bus not available for event '${event}'`, {
+          hasEventBus: !!this.eventBus,
+          hasEmitMethod: this.eventBus && typeof this.eventBus.emit === 'function'
+        });
+      }
     }
   }
   
