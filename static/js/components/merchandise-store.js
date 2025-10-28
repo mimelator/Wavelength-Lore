@@ -2487,12 +2487,15 @@ class MerchandiseStore {
       return previewImage;
     };
     
+    // Generate a better title
+    const enhancedTitle = this.generateProductTitle(product, this.selectedImage);
+    
     const modal = document.createElement('div');
     modal.className = 'modal product-preview-modal';
     modal.innerHTML = `
       <div class="modal-content preview-modal-content">
         <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
-        <h2>🎨 ${product.title}</h2>
+        <h2>🎨 ${enhancedTitle}</h2>
         
         <div class="preview-layout">
           <div class="preview-gallery">
@@ -3505,6 +3508,101 @@ class MerchandiseStore {
   handleDialogCancelled(modalId) {
     console.log('❌ Dialog cancelled:', modalId);
     // Handle cancellation actions
+  }
+
+  /**
+   * Start a new design process - return to gallery selection
+   */
+  startNewDesign() {
+    console.log('🎨 Starting new design process...');
+    
+    // Clear current selection
+    this.selectedImage = null;
+    this.selectedCategory = null;
+    this.selectedProduct = null;
+    this.currentCustomizedProduct = null;
+    
+    // Show the merchandise creation interface by refreshing the page to starting state
+    window.location.reload();
+  }
+
+  /**
+   * Generate a meaningful product title based on image and product type
+   * @param {Object} product - Product object
+   * @param {Object} imageData - Image metadata
+   * @returns {string} Enhanced product title
+   */
+  generateProductTitle(product, imageData = null) {
+    try {
+      let characterName = '';
+      let episodeName = '';
+      let loreName = '';
+      let productTypeName = this.getProductTypeName(product.productType || 'unknown');
+
+      // Try to extract character/episode/lore info from image data or title
+      if (imageData && imageData.title) {
+        const title = imageData.title.toLowerCase();
+        
+        // Check for character names
+        if (title.includes('lucky') || title.includes('leprechaun')) {
+          characterName = 'Lucky';
+        } else if (title.includes('yeti')) {
+          characterName = 'Yeti';
+        } else if (title.includes('wavelength') || title.includes('band')) {
+          characterName = 'Wavelength Band';
+        } else if (title.includes('goblin')) {
+          characterName = 'Goblin King';
+        }
+
+        // Check for episode references
+        if (title.includes('lucky charm') || title.includes('episode 1')) {
+          episodeName = 'My Lucky Charm';
+        } else if (title.includes('back to the shire') || title.includes('episode 11')) {
+          episodeName = 'Back to the Shire';
+        } else if (title.includes('concert') || title.includes('encore')) {
+          episodeName = 'Concert Episode';
+        }
+
+        // Check for lore references
+        if (title.includes('shire')) {
+          loreName = 'The Shire';
+        } else if (title.includes('stage') || title.includes('concert venue')) {
+          loreName = 'Concert Stage';
+        }
+      }
+
+      // Also try to extract from product title if it contains metadata
+      if (product.title && product.title !== 'Custom Product') {
+        const title = product.title.toLowerCase();
+        if (title.includes('lucky') && !characterName) characterName = 'Lucky';
+        if (title.includes('yeti') && !characterName) characterName = 'Yeti';
+        if (title.includes('wavelength') && !characterName) characterName = 'Wavelength Band';
+      }
+
+      // Build the title hierarchically
+      let titleParts = [];
+      
+      if (characterName) {
+        titleParts.push(characterName);
+      }
+      
+      if (episodeName) {
+        titleParts.push(episodeName);
+      } else if (loreName) {
+        titleParts.push(loreName);
+      }
+
+      if (titleParts.length > 0) {
+        return `${titleParts.join(' - ')} ${productTypeName}`;
+      } else {
+        // Fallback to a more descriptive title
+        return `Wavelength ${productTypeName}`;
+      }
+
+    } catch (error) {
+      console.error('Error generating product title:', error);
+      return product.title || 'Custom Product';
+    }
   }
 }
 

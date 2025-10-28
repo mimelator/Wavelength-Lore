@@ -1667,6 +1667,38 @@
   transform: translateY(-1px);
 }
 
+/* Product Actions Bar */
+.product-actions-bar {
+  padding: 15px;
+  background: #f0f7ff;
+  border-radius: 8px;
+  border: 1px solid #e3f2fd;
+  margin-bottom: 20px;
+}
+
+.edit-product-btn {
+  width: 100%;
+  padding: 12px 20px;
+  background: #ff6b35;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.edit-product-btn:hover {
+  background: #ff5722;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
 /* Finished Product Preview Modal */
 .modal-dialog.finished-product-preview {
   max-width: 1000px;
