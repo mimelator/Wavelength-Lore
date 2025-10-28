@@ -2243,14 +2243,26 @@ class MerchandiseStore {
         const blueprintId = product.productType.replace('validated-', '');
         console.log('🔍 Extracted blueprint ID from productType:', blueprintId);
         
-        // Map common blueprint IDs to product types
+        // Map blueprint IDs to product types (comprehensive list from backend)
         const blueprintMap = {
-          '5': 'premium-tshirt',
-          '146': 'hoodie', 
-          '17': 'tank-top',
-          '68': 'mug',
-          '19': 'poster',
-          '71': 'pillow'
+          '5': 't-shirt',
+          '6': 'heavy-cotton-tee',
+          '9': 't-shirt',
+          '10': 'tank-top',
+          '12': 't-shirt',
+          '49': 'sweatshirt',
+          '66': 'hoodie',
+          '68': 'coffee-mug',
+          '70': 'travel-mug',
+          '77': 'hoodie',
+          '175': 'hoodie',
+          '413': 'backpack',
+          '238': 'blanket',
+          '220': 'pillow',
+          '268': 'phone-case',
+          '269': 'phone-case',
+          '277': 'canvas',
+          '1313': 'tote-bag'
         };
         
         if (blueprintMap[blueprintId]) {
@@ -2374,16 +2386,24 @@ class MerchandiseStore {
   
   getProductTypeName(productType) {
     const names = {
-      'premium-tshirt': 'Premium T-Shirt',
-      'hoodie': 'Pullover Hoodie',
+      't-shirt': 'T-Shirt',
+      'heavy-cotton-tee': 'Heavy Cotton Tee',
       'tank-top': 'Tank Top',
+      'sweatshirt': 'Sweatshirt',
+      'hoodie': 'Pullover Hoodie',
+      'coffee-mug': 'Coffee Mug',
+      'travel-mug': 'Travel Mug',
+      'backpack': 'Backpack',
+      'blanket': 'Fleece Blanket',
       'pillow': 'Square Pillow',
+      'phone-case': 'Phone Case',
+      'canvas': 'Canvas Print',
+      'tote-bag': 'Tote Bag',
+      'premium-tshirt': 'Premium T-Shirt',
       'poster': 'Premium Poster',
       'mug': 'Coffee Mug',
-      'tote-bag': 'Tote Bag',
       'sticker': 'Vinyl Sticker',
       'womens-tee': "Women's Tee",
-      'heavy-cotton-tee': 'Heavy Cotton Tee',
       'infant-tee': 'Infant Tee',
       'ultra-cotton-tee': 'Ultra Cotton Tee',
       'ultra-cotton-alt': 'Ultra Cotton Tee'
