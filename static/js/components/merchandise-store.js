@@ -1407,11 +1407,6 @@ class MerchandiseStore {
     try {
       container.innerHTML = `
         <div class="merchandise-store">
-          <!-- 🔥 Decorative overlay: Goblin treasure tree on right side -->
-          <div class="merch-right-overlay">
-            <img src="/static/images/exp/goblin-treasure-tree.png" alt="Goblin's Treasure" class="goblin-tree-image" />
-          </div>
-
           <div class="store-header">
             <h1>🛍️ Create Custom Merchandise</h1>
             <p>Turn your favorite Wavelength moments into premium merchandise</p>
