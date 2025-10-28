@@ -1476,8 +1476,15 @@ class MerchandiseStore {
       
       console.log('✅ Merchandise store rendered successfully');
       
-      // 🔍 DIAGNOSTIC: Store cart renderer instance reference after render
+      // Initialize product card event listeners for new variant selectors
       setTimeout(() => {
+        const productsGrid = document.querySelector('.products-grid');
+        if (productsGrid && this.productCardRenderer) {
+          this.productCardRenderer.setupEventListeners(productsGrid);
+          console.log('✅ Product card event listeners initialized');
+        }
+        
+        // 🔍 DIAGNOSTIC: Store cart renderer instance reference after render
         const cartContainer = document.querySelector('.cart-container');
         if (cartContainer && this.cartRenderer) {
           cartContainer._cartRendererInstance = this.cartRenderer;
@@ -2932,25 +2939,55 @@ class MerchandiseStore {
   }
   
   getProductDetails(product) {
+    const variants = product.variants || [];
+    
+    // STREAMLINED: For single variants, don't duplicate size/price info here
+    if (variants.length === 1) {
+      const details = [];
+      
+      // Add product type context (non-variant specific details)
+      const productType = this.extractProductTypeFromProduct(product);
+      if (productType && productType.includes('mug')) {
+        details.push(`<span class="detail-item"><strong>Material:</strong> Ceramic</span>`);
+        details.push(`<span class="detail-item"><strong>Style:</strong> Classic</span>`);
+      } else if (productType && productType.includes('shirt')) {
+        details.push(`<span class="detail-item"><strong>Material:</strong> Premium Cotton</span>`);
+        details.push(`<span class="detail-item"><strong>Fit:</strong> Regular</span>`);
+      } else if (productType && (productType.includes('tree') && productType.includes('skirt')) || productType.includes('Christmas')) {
+        details.push(`<span class="detail-item"><strong>Material:</strong> Premium Fabric</span>`);
+        details.push(`<span class="detail-item"><strong>Style:</strong> Festive</span>`);
+      } else {
+        // Generic product details
+        details.push(`<span class="detail-item"><strong>Material:</strong> Premium Quality</span>`);
+        details.push(`<span class="detail-item"><strong>Style:</strong> Custom Design</span>`);
+      }
+      
+      return details.join('');
+    }
+    
+    // For multiple variants, show general details and price range
     const details = [];
     
-    // Default size (we don't store this currently, so show most common)
-    details.push(`<span class="detail-item"><strong>Size:</strong> M</span>`);
+    // Add product type context
+    const productType = this.extractProductTypeFromProduct(product);
+    if (productType && productType.includes('mug')) {
+      details.push(`<span class="detail-item"><strong>Material:</strong> Ceramic</span>`);
+      details.push(`<span class="detail-item"><strong>Style:</strong> Classic</span>`);
+    } else if (productType && productType.includes('shirt')) {
+      details.push(`<span class="detail-item"><strong>Material:</strong> Premium Cotton</span>`);
+      details.push(`<span class="detail-item"><strong>Fit:</strong> Regular</span>`);
+    } else {
+      details.push(`<span class="detail-item"><strong>Material:</strong> Premium Quality</span>`);
+    }
     
-    // Border style (simplified - we don't store this currently)
-    details.push(`<span class="detail-item"><strong>Border:</strong> Medium Black</span>`);
-    
-    // Price range from variants
-    if (product.variants && product.variants.length > 0) {
-      const prices = product.variants.map(v => v.price / 100);
+    // Add price range for multiple variants
+    if (variants.length > 1) {
+      const prices = variants.map(v => v.price / 100);
       const minPrice = Math.min(...prices);
       const maxPrice = Math.max(...prices);
       
-      if (minPrice === maxPrice) {
-        details.push(`<span class="detail-item"><strong>Price:</strong> $${minPrice.toFixed(2)}</span>`);
-      } else {
-        details.push(`<span class="detail-item"><strong>Price:</strong> $${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}</span>`);
-      }
+      const priceRange = minPrice === maxPrice ? `$${minPrice.toFixed(2)}` : `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
+      details.push(`<span class="detail-item"><strong>Price Range:</strong> ${priceRange}</span>`);
     }
     
     return details.join('');

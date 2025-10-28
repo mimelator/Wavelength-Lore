@@ -1,0 +1,703 @@
+/**
+ * ENHANCED PRODUCT CARD UI - MAJOR IMPROVEMENTS
+ * 
+ * This CSS overrides the existing tiny cart buttons and creates
+ * a much better user experience for product variation selection
+ * and adding items to cart.
+ */
+
+/* =============================================================================
+   ENHANCED PRODUCT CARD LAYOUT
+   ============================================================================= */
+
+.product-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* =============================================================================
+   PROMINENT VARIATION DISPLAY
+   ============================================================================= */
+
+.product-variants {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.variant-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.variant-count {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #4CAF50;
+}
+
+.price-range {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #FFD700;
+}
+
+/* =============================================================================
+   ENHANCED VARIANT CHIPS - RESPONSIVE AND CONTAINED
+   ============================================================================= */
+
+.inline-variants h5 {
+  color: white;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.variant-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.variant-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 12px 15px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  min-height: 50px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.variant-chip:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(76, 175, 80, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
+}
+
+.variant-name {
+  flex: 1;
+  margin-right: 10px;
+  color: white;
+  font-weight: 500;
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0; /* Allow flex item to shrink below content size */
+}
+
+.variant-price {
+  margin-right: 10px;
+  font-weight: 700;
+  color: #4CAF50;
+  font-size: 1rem;
+  background: rgba(76, 175, 80, 0.1);
+  padding: 4px 8px;
+  border-radius: 15px;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  white-space: nowrap;
+  flex-shrink: 0; /* Prevent price from shrinking */
+}
+
+/* =============================================================================
+   RESPONSIVE CART BUTTONS - CONTAINED AND ADAPTIVE
+   ============================================================================= */
+
+.add-to-cart-btn {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 15px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 100px;
+  max-width: 120px;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  flex-shrink: 0; /* Prevent button from shrinking */
+  white-space: nowrap;
+}
+
+.add-to-cart-btn:hover {
+  background: linear-gradient(135deg, #45a049, #388e3c);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.add-to-cart-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.add-to-cart-btn::before {
+  content: "🛒";
+  font-size: 1.2rem;
+}
+
+.add-to-cart-btn::after {
+  content: "Add to Cart";
+  font-weight: 600;
+}
+
+/* =============================================================================
+   EXPANDED VARIANTS DISPLAY - SHOW ALL VARIANTS CLEARLY
+   ============================================================================= */
+
+.variant-chip.more-variants {
+  background: rgba(255, 193, 7, 0.15);
+  border-color: rgba(255, 193, 7, 0.3);
+  cursor: pointer;
+  justify-content: center;
+}
+
+.variant-chip.more-variants:hover {
+  background: rgba(255, 193, 7, 0.25);
+  border-color: rgba(255, 193, 7, 0.5);
+}
+
+.more-text {
+  color: #FFC107;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* =============================================================================
+   PROMINENT VARIATION SELECTION MODAL TRIGGER
+   ============================================================================= */
+
+.view-all-variants-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #2196F3, #1976D2);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 15px 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.view-all-variants-btn:hover {
+  background: linear-gradient(135deg, #1976D2, #1565C0);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
+}
+
+.view-all-variants-btn::before {
+  content: "👁️";
+  font-size: 1.2rem;
+}
+
+/* =============================================================================
+   RESPONSIVE IMPROVEMENTS FOR ALL SCREEN SIZES
+   ============================================================================= */
+
+/* Product cards container */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Ensure product cards don't overflow */
+.product-card {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.product-variants {
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Desktop adjustments for narrow columns */
+@media (min-width: 1200px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
+}
+
+/* Tablet improvements */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .variant-chip {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .add-to-cart-btn {
+    min-width: 90px;
+    max-width: 110px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .single-variant-action .add-to-cart-btn {
+    min-width: 100px;
+    max-width: 120px;
+    padding: 10px 15px;
+  }
+}
+
+/* Mobile improvements */
+@media (max-width: 768px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .variant-chip {
+    min-height: 60px;
+    padding: 15px 18px;
+    font-size: 1rem;
+  }
+  
+  .add-to-cart-btn {
+    min-width: 140px;
+    max-width: none;
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+  
+  .single-variant-action .add-to-cart-btn {
+    min-width: 150px;
+    max-width: none;
+    padding: 15px 25px;
+    font-size: 1.1rem;
+  }
+  
+  .variant-name {
+    font-size: 1.1rem;
+    white-space: normal; /* Allow wrapping on mobile */
+  }
+  
+  .variant-price {
+    font-size: 1.1rem;
+  }
+}
+
+/* =============================================================================
+   VISUAL FEEDBACK AND ANIMATIONS
+   ============================================================================= */
+
+.variant-chip.selected {
+  background: rgba(76, 175, 80, 0.2);
+  border-color: #4CAF50;
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+}
+
+.add-to-cart-btn.adding {
+  background: linear-gradient(135deg, #FF9800, #F57C00);
+  transform: scale(0.95);
+}
+
+.add-to-cart-btn.added {
+  background: linear-gradient(135deg, #4CAF50, #388E3C);
+  transform: scale(1.1);
+}
+
+.add-to-cart-btn.added::after {
+  content: "Added! ✅";
+}
+
+/* =============================================================================
+   IMPROVED PRODUCT INFO LAYOUT
+   ============================================================================= */
+
+.product-info {
+  margin-top: 15px;
+}
+
+.product-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 10px;
+}
+
+.product-details {
+  margin-bottom: 15px;
+  color: rgba(255, 255, 255, 0.8);
+  min-height: 20px; /* Maintain consistent spacing even with fewer details */
+}
+
+.product-details:empty {
+  margin-bottom: 5px; /* Reduce margin if no details */
+}
+
+.detail-item {
+  display: inline-block;
+  margin-right: 15px;
+  margin-bottom: 5px;
+  font-size: 0.95rem;
+}
+
+.detail-item strong {
+  color: #4CAF50;
+}
+
+/* =============================================================================
+   ENHANCED HOVER STATES AND INTERACTIONS
+   ============================================================================= */
+
+.product-card .add-to-cart-btn {
+  transition: all 0.2s ease;
+}
+
+.variant-chip:hover .add-to-cart-btn {
+  background: linear-gradient(135deg, #45a049, #388e3c);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  transform: scale(1.1);
+}
+
+.variant-chip:hover .variant-price {
+  background: rgba(76, 175, 80, 0.2);
+  border-color: rgba(76, 175, 80, 0.5);
+  transform: scale(1.05);
+}
+
+/* =============================================================================
+   STREAMLINED SINGLE VARIANT DISPLAY
+   ============================================================================= */
+
+.single-variant-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 15px 20px;
+  margin-top: 15px;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.single-variant-action:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(76, 175, 80, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.1);
+}
+
+.variant-details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0; /* Allow flex item to shrink */
+}
+
+.variant-specs {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+  min-width: 0; /* Allow flex item to shrink */
+}
+
+.variant-size {
+  color: white;
+  font-weight: 500;
+  font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0; /* Allow text to shrink */
+}
+
+.variant-size strong {
+  color: #4CAF50;
+  margin-right: 5px;
+}
+
+.variant-info {
+  color: white;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.single-variant-action .variant-price {
+  font-weight: 700;
+  color: #4CAF50;
+  font-size: 1.1rem;
+  background: rgba(76, 175, 80, 0.15);
+  padding: 6px 12px;
+  border-radius: 15px;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  white-space: nowrap;
+  flex-shrink: 0; /* Prevent price from shrinking */
+}
+
+.single-variant-action .add-to-cart-btn {
+  min-width: 120px;
+  max-width: 140px;
+  font-size: 1rem;
+  padding: 12px 20px;
+  flex-shrink: 0; /* Prevent button from shrinking */
+}
+
+.single-variant-action .add-to-cart-btn.primary {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+}
+
+.single-variant-action .add-to-cart-btn.primary:hover {
+  background: linear-gradient(135deg, #45a049, #388e3c);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+}
+
+/* =============================================================================
+   MULTI-VARIANT SELECTOR INTERFACE (6+ variants)
+   ============================================================================= */
+
+.inline-variants.many-variants {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.inline-variants.many-variants h5 {
+  color: white;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.variant-selector-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.variant-selector-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.variant-selector {
+  width: 100%;
+  padding: 12px 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.variant-selector:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(76, 175, 80, 0.4);
+}
+
+.variant-selector:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+}
+
+.variant-selector option {
+  background: #1a1a1a;
+  color: white;
+  padding: 10px;
+}
+
+.selected-variant-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(76, 175, 80, 0.15);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 6px;
+  align-self: flex-start;
+}
+
+.selected-variant-price .price-label {
+  color: #4CAF50;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.selected-variant-price .price-value {
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.unified-cart-btn {
+  width: 100%;
+  max-width: none;
+  padding: 15px 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.unified-cart-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #45a049, #388e3c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.unified-cart-btn:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.variant-selector-hint {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.variant-selector-hint .hint-text {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* =============================================================================
+   FEW VARIANTS STYLING (2-5 variants)
+   ============================================================================= */
+
+.inline-variants.few-variants .variant-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.inline-variants.few-variants .variant-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 12px 15px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.inline-variants.few-variants .variant-chip:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+.inline-variants.few-variants .variant-chip .add-to-cart-btn {
+  min-width: 60px;
+  max-width: 80px;
+  padding: 8px 12px;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN FOR VARIANT SELECTORS
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .variant-selector-container {
+    gap: 12px;
+  }
+  
+  .variant-selector {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+  
+  .unified-cart-btn {
+    padding: 12px 16px;
+    font-size: 1rem;
+  }
+  
+  .selected-variant-price {
+    padding: 6px 10px;
+  }
+}
+
+/* =============================================================================
+   ACCESSIBILITY IMPROVEMENTS
+   ============================================================================= */
+
+.add-to-cart-btn:focus {
+  outline: 3px solid rgba(76, 175, 80, 0.5);
+  outline-offset: 2px;
+}
+
+.variant-chip:focus-within {
+  outline: 2px solid rgba(33, 150, 243, 0.5);
+  outline-offset: 2px;
+}
+
+.single-variant-action:focus-within {
+  outline: 2px solid rgba(76, 175, 80, 0.5);
+  outline-offset: 2px;
+}

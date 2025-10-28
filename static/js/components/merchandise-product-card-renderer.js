@@ -110,10 +110,12 @@ class MerchandiseProductCardRenderer {
             ${productDetails}
           </div>
           <div class="product-variants">
-            <div class="variant-summary">
-              <span class="variant-count">${variantInfo.count} variants available</span>
-              <span class="price-range">${variantInfo.priceRange}</span>
-            </div>
+            ${variantInfo.count > 1 ? `
+              <div class="variant-summary">
+                <span class="variant-count">${variantInfo.count} variants available</span>
+                <span class="price-range">${variantInfo.priceRange}</span>
+              </div>
+            ` : ''}
             ${this.renderInlineVariants(product)}
           </div>
         </div>
@@ -456,7 +458,7 @@ class MerchandiseProductCardRenderer {
   }
   
   /**
-   * Helper method to get product details
+   * Helper method to get product details - STREAMLINED FOR SINGLE VARIANTS
    * @param {Object} product - Product object
    * @returns {string} Product details HTML
    */
@@ -465,16 +467,30 @@ class MerchandiseProductCardRenderer {
       return this.merchandiseStore.getProductDetails(product);
     }
     
-    // Generate enhanced product details
-    const details = [];
+    const variants = product.variants || [];
     
-    // Add variant information
-    if (product.variants && product.variants.length > 0) {
-      const variant = product.variants[0]; // Use first variant as reference
-      if (variant.title) {
-        details.push(`<span class="detail-item"><strong>Size:</strong> ${variant.title}</span>`);
+    // For single variants, don't duplicate size/price info here - it goes in the action section
+    if (variants.length === 1) {
+      const details = [];
+      
+      // Add product type context (non-variant specific details)
+      const productType = this.getProductType(product);
+      if (productType && productType.includes('mug')) {
+        details.push(`<span class="detail-item"><strong>Material:</strong> Ceramic</span>`);
+        details.push(`<span class="detail-item"><strong>Style:</strong> Classic</span>`);
+      } else if (productType && productType.includes('shirt')) {
+        details.push(`<span class="detail-item"><strong>Material:</strong> Premium Cotton</span>`);
+        details.push(`<span class="detail-item"><strong>Fit:</strong> Regular</span>`);
+      } else if (productType && productType.includes('tree') && productType.includes('skirt')) {
+        details.push(`<span class="detail-item"><strong>Material:</strong> Premium Fabric</span>`);
+        details.push(`<span class="detail-item"><strong>Style:</strong> Festive</span>`);
       }
+      
+      return details.length > 0 ? details.join('') : 'Premium custom merchandise';
     }
+    
+    // For multiple variants, show general details (not specific variant info)
+    const details = [];
     
     // Add product type context
     const productType = this.getProductType(product);
@@ -486,11 +502,13 @@ class MerchandiseProductCardRenderer {
       details.push(`<span class="detail-item"><strong>Fit:</strong> Regular</span>`);
     }
     
-    // Add price as a detail if available
-    if (product.variants && product.variants.length > 0) {
-      const prices = product.variants.map(v => parseFloat(v.price) / 100);
+    // Add price range for multiple variants
+    if (variants.length > 1) {
+      const prices = variants.map(v => parseFloat(v.price) / 100);
       const minPrice = Math.min(...prices);
-      details.push(`<span class="detail-item"><strong>Price:</strong> $${minPrice.toFixed(2)}</span>`);
+      const maxPrice = Math.max(...prices);
+      const priceRange = minPrice === maxPrice ? `$${minPrice.toFixed(2)}` : `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
+      details.push(`<span class="detail-item"><strong>Price Range:</strong> ${priceRange}</span>`);
     }
     
     return details.length > 0 ? details.join('') : 'Premium custom merchandise';
@@ -583,41 +601,94 @@ class MerchandiseProductCardRenderer {
   }
   
   /**
-   * Render inline variants display within product card
+   * Render inline variants display within product card - OPTIMIZED FOR ALL SCENARIOS
    * @param {Object} product - Product object
    * @returns {string} HTML string for inline variants
    */
   renderInlineVariants(product) {
     const variants = product.variants || [];
+    const productId = product.id || product.productId;
+    
     if (variants.length === 0) {
       return '<p class="no-variants">No variants available</p>';
     }
     
-    // Show up to 3 variants inline, collapse the rest
-    const displayVariants = variants.slice(0, 3);
-    const hasMore = variants.length > 3;
+    // SINGLE VARIANT: Streamlined display
+    if (variants.length === 1) {
+      const variant = variants[0];
+      const sizeInfo = variant.title || 'Standard';
+      const price = (variant.price / 100).toFixed(2);
+      
+      return `
+        <div class="single-variant-action">
+          <div class="variant-details">
+            <div class="variant-specs">
+              <span class="variant-size"><strong>Size:</strong> ${sizeInfo}</span>
+              <span class="variant-price">$${price}</span>
+            </div>
+          </div>
+          <button class="add-to-cart-btn primary" 
+                  data-product-id="${productId}" 
+                  data-variant-id="${variant.id}"
+                  title="Add ${sizeInfo} to cart">
+            🛒 Add to Cart
+          </button>
+        </div>
+      `;
+    }
     
+    // FEW VARIANTS (2-5): Individual chips with buttons
+    if (variants.length <= 5) {
+      return `
+        <div class="inline-variants few-variants">
+          <h5>🎯 Available Options (${variants.length}):</h5>
+          <div class="variant-chips">
+            ${variants.map(variant => `
+              <div class="variant-chip" data-variant-id="${variant.id}">
+                <span class="variant-name">${variant.title}</span>
+                <span class="variant-price">$${(variant.price / 100).toFixed(2)}</span>
+                <button class="add-to-cart-btn" 
+                        data-product-id="${productId}" 
+                        data-variant-id="${variant.id}"
+                        title="Add ${variant.title} to cart">
+                  🛒
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+    
+    // MANY VARIANTS (6+): Dropdown selector + single cart button
     return `
-      <div class="inline-variants">
-        <h5>Available Options:</h5>
-        <div class="variant-chips">
-          ${displayVariants.map(variant => `
-            <div class="variant-chip" data-variant-id="${variant.id}">
-              <span class="variant-name">${variant.title}</span>
-              <span class="variant-price">$${(variant.price / 100).toFixed(2)}</span>
-              <button class="add-to-cart-btn" 
-                      data-product-id="${product.id || product.productId}" 
-                      data-variant-id="${variant.id}"
-                      title="Add to cart">
-                🛒
-              </button>
+      <div class="inline-variants many-variants">
+        <h5>🎯 Choose Your Option (${variants.length} available):</h5>
+        <div class="variant-selector-container">
+          <div class="variant-selector-group">
+            <select class="variant-selector" data-product-id="${productId}">
+              <option value="">Select size & color...</option>
+              ${variants.map(variant => `
+                <option value="${variant.id}" data-price="${(variant.price / 100).toFixed(2)}">
+                  ${variant.title} - $${(variant.price / 100).toFixed(2)}
+                </option>
+              `).join('')}
+            </select>
+            <div class="selected-variant-price" style="display: none;">
+              <span class="price-label">Price:</span>
+              <span class="price-value">$0.00</span>
             </div>
-          `).join('')}
-          ${hasMore ? `
-            <div class="variant-chip more-variants">
-              <span class="more-text">+${variants.length - 3} more</span>
-            </div>
-          ` : ''}
+          </div>
+          <button class="add-to-cart-btn primary unified-cart-btn" 
+                  data-product-id="${productId}" 
+                  data-variant-id=""
+                  disabled
+                  title="Select a variant first">
+            🛒 Add Selected to Cart
+          </button>
+        </div>
+        <div class="variant-selector-hint">
+          <span class="hint-text">💡 Choose your preferred size and color combination above</span>
         </div>
       </div>
     `;
@@ -651,6 +722,57 @@ class MerchandiseProductCardRenderer {
         this.handleRepairProduct(productId);
       }
     });
+    
+    // Handle variant selector changes for multi-variant products
+    container.addEventListener('change', (e) => {
+      if (e.target.classList.contains('variant-selector')) {
+        this.handleVariantSelection(e.target);
+      }
+    });
+  }
+  
+  /**
+   * Handle variant selection from dropdown
+   * @param {HTMLSelectElement} selectElement - The variant selector element
+   */
+  handleVariantSelection(selectElement) {
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const productId = selectElement.dataset.productId;
+    const variantId = selectedOption.value;
+    const price = selectedOption.dataset.price;
+    
+    // Find related elements in the same product card
+    const productCard = selectElement.closest('.product-card');
+    const cartButton = productCard.querySelector('.unified-cart-btn');
+    const priceDisplay = productCard.querySelector('.selected-variant-price');
+    const priceValue = productCard.querySelector('.price-value');
+    
+    if (variantId && cartButton) {
+      // Enable cart button and update variant ID
+      cartButton.disabled = false;
+      cartButton.dataset.variantId = variantId;
+      cartButton.title = `Add ${selectedOption.textContent.split(' - ')[0]} to cart`;
+      cartButton.textContent = '🛒 Add Selected to Cart';
+      
+      // Show and update price display
+      if (priceDisplay && priceValue && price) {
+        priceDisplay.style.display = 'block';
+        priceValue.textContent = `$${price}`;
+      }
+    } else {
+      // Disable cart button when no selection
+      if (cartButton) {
+        cartButton.disabled = true;
+        cartButton.dataset.variantId = '';
+        cartButton.title = 'Select a variant first';
+        cartButton.textContent = '🛒 Add Selected to Cart';
+      }
+      
+      // Hide price display
+      if (priceDisplay) {
+        priceDisplay.style.display = 'none';
+      }
+    }
   }
   
   /**
