@@ -513,16 +513,86 @@ class MerchandiseProductCardRenderer {
     } else if (episodeName) {
       title = `${episodeName} ${productType}`;
     } else {
-      // Fallback to wavelength-themed names
-      const wavelengthThemes = [
-        'Quantum', 'Ethereal', 'Cosmic', 'Dimensional', 'Mystical', 
-        'Celestial', 'Infinite', 'Radiant', 'Luminous', 'Transcendent'
-      ];
-      const randomTheme = wavelengthThemes[Math.floor(Math.random() * wavelengthThemes.length)];
-      title = `${randomTheme} ${productType}`;
+      // Use actual Wavelength lore instead of generic fantasy words
+      const wavelengthLore = this.selectWavelengthLore(product);
+      title = `${wavelengthLore} ${productType}`;
     }
     
     return title;
+  }
+
+  /**
+   * Select appropriate Wavelength lore element based on product context
+   * @param {Object} product - Product object
+   * @returns {string} Lore-based prefix for product title
+   */
+  selectWavelengthLore(product) {
+    // Wavelength universe content - actual lore, not generic fantasy words
+    const wavelengthLore = {
+      characters: [
+        { name: 'Lucky', location: 'Shire Sanctuary', keywords: ['lucky', 'leprechaun', 'charm', 'shire'] },
+        { name: 'Yeti', location: 'Ice Fortress', keywords: ['yeti', 'ice', 'snow', 'cold', 'fortress'] },
+        { name: 'Goblin King', location: 'Goblin Realm', keywords: ['goblin', 'king', 'realm', 'crown'] },
+        { name: 'Wavelength Band', location: 'Concert Stage', keywords: ['band', 'concert', 'music', 'stage', 'wavelength'] }
+      ],
+      episodes: [
+        { name: 'My Lucky Charm', keywords: ['my-lucky-charm', 'lucky-charm', 'charm', 'episode-1', 'episode 1'] },
+        { name: 'Back to the Shire', keywords: ['back-to-the-shire', 'back-to-shire', 'shire', 'episode-11', 'episode 11'] },
+        { name: 'Concert Encore', keywords: ['concert-encore', 'encore', 'concert', 'music', 'stage'] }
+      ]
+    };
+
+    // Try to match product context to actual Wavelength content
+    const sourceImage = product.sourceImage || {};
+    const imageName = (sourceImage.name || sourceImage.filename || product.title || '').toLowerCase();
+    
+    // Look for episode matches first (more specific)
+    for (const episode of wavelengthLore.episodes) {
+      for (const keyword of episode.keywords) {
+        if (imageName.includes(keyword)) {
+          return episode.name;
+        }
+      }
+    }
+    
+    // Look for character matches in image name/context
+    for (const character of wavelengthLore.characters) {
+      for (const keyword of character.keywords) {
+        if (imageName.includes(keyword)) {
+          return `${character.name}'s ${character.location}`;
+        }
+      }
+    }
+    
+    // Intelligent fallback - rotate through characters instead of random fantasy
+    // This ensures every product gets actual Wavelength lore, not meaningless words
+    const productHash = this.generateProductHash(product);
+    const characterIndex = productHash % wavelengthLore.characters.length;
+    const selectedCharacter = wavelengthLore.characters[characterIndex];
+    
+    return `${selectedCharacter.name}'s ${selectedCharacter.location}`;
+  }
+
+  /**
+   * Generate a consistent hash for a product to ensure stable character assignment
+   * @param {Object} product - Product object
+   * @returns {number} Hash value for consistent selection
+   */
+  generateProductHash(product) {
+    const productString = JSON.stringify({
+      id: product.id,
+      title: product.title,
+      productType: product.productType
+    });
+    
+    // Simple hash function for consistent character selection
+    let hash = 0;
+    for (let i = 0; i < productString.length; i++) {
+      const char = productString.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash);
   }
 
   /**
