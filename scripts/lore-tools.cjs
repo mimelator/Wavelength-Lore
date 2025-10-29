@@ -16,8 +16,9 @@ class LoreToolsManager {
       output: process.stdout
     });
     
-    this.mcpServerPath = path.join(__dirname, '../mcp/enhanced-wavelength-server.js');
-    this.chatbotPath = path.resolve(__dirname, '../../Wavelength-Chatbot');
+    // Update paths to match workspace structure
+    this.loreDir = path.resolve(__dirname, '..');
+    this.chatbotDir = '/Volumes/5bits/current/wavelength-dev/Wavelength-Chatbot';
   }
 
   async askQuestion(question) {
@@ -28,56 +29,82 @@ class LoreToolsManager {
     });
   }
 
-  async callMCPTool(toolName, args) {
+  async callDirectScript(operation, args = {}) {
     try {
-      const mcpCall = {
-        jsonrpc: "2.0",
-        id: Date.now(),
-        method: "tools/call",
-        params: {
-          name: toolName,
-          arguments: args
-        }
-      };
-
-      // Create a temporary input for the MCP server instead of using shell pipes
       const fs = require('fs');
-      const os = require('os');
-      const tempInputFile = path.join(os.tmpdir(), `mcp-input-${Date.now()}.json`);
       
-      try {
-        // Write the MCP call to a temporary file
-        fs.writeFileSync(tempInputFile, JSON.stringify(mcpCall), 'utf8');
-        
-        // Use input redirection instead of piping to avoid shell issues
-        const result = execSync(`node "${this.mcpServerPath}" < "${tempInputFile}"`, { 
-          encoding: 'utf8', 
-          cwd: path.dirname(this.mcpServerPath),
-          shell: true
-        });
-        
-        // Parse the JSON response
-        const lines = result.split('\n').filter(line => line.trim());
-        const jsonLine = lines.find(line => line.startsWith('{"result"'));
-        
-        if (jsonLine) {
-          const parsed = JSON.parse(jsonLine);
-          return parsed.result.content[0].text;
-        }
-        
-        return result;
-      } finally {
-        // Clean up temporary file
-        try {
-          if (fs.existsSync(tempInputFile)) {
-            fs.unlinkSync(tempInputFile);
+      // Map operations to direct script calls
+      switch (operation) {
+        case 'sync-docs':
+          console.log('🔄 Running Google Docs sync...');
+          const syncResult = execSync(`cd "${this.chatbotDir}" && node scripts/sync-google-docs.js`, { 
+            encoding: 'utf8', stdio: 'pipe' 
+          });
+          return syncResult;
+          
+        case 'sync-lore':
+          console.log('🔄 Syncing lore content...');
+          const targetDir = path.join(this.chatbotDir, 'content/wavelength-lore');
+          const sourceDir = path.join(this.loreDir, 'content');
+          
+          // Copy content files (simplified implementation)
+          if (fs.existsSync(sourceDir)) {
+            execSync(`cp -r "${sourceDir}"/* "${targetDir}"/ 2>/dev/null || true`, { encoding: 'utf8' });
+            return `✅ Lore content synced to ${targetDir}`;
+          } else {
+            return `❌ Source directory not found: ${sourceDir}`;
           }
-        } catch (cleanupError) {
-          // Ignore cleanup errors
-        }
+          
+        case 'ingest':
+          console.log('🔄 Running lore ingestion...');
+          execSync(`cd "${this.chatbotDir}" && node scripts/ingest-lore.js`, { 
+            encoding: 'utf8', 
+            stdio: 'inherit',
+            timeout: 60000 
+          });
+          return '✅ Lore ingestion completed';
+          
+        case 'full-sync':
+          console.log('🔄 Running full synchronization...');
+          await this.callDirectScript('sync-lore');
+          await this.callDirectScript('sync-docs');
+          await this.callDirectScript('ingest');
+          return '✅ Full synchronization completed';
+          
+        case 'status':
+          console.log('📊 Checking system status...');
+          let status = '📊 SYSTEM STATUS:\n';
+          status += `📁 Chatbot path: ${this.chatbotDir}\n`;
+          status += `📁 Content exists: ${fs.existsSync(path.join(__dirname, '../content')) ? 'Yes' : 'No'}\n`;
+          status += `📁 Chatbot content dir: ${fs.existsSync(path.join(this.chatbotDir, 'content')) ? 'Yes' : 'No'}\n`;
+          return status;
+          
+        case 'list':
+          console.log('📚 Listing documents...');
+          const configPath = path.join(this.chatbotDir, 'config/google-docs-config.js');
+          if (fs.existsSync(configPath)) {
+            try {
+              delete require.cache[require.resolve(configPath)]; // Clear cache
+              const config = require(configPath);
+              const docs = config.DOCUMENTS_CONFIG || [];
+              let result = `📚 CONFIGURED DOCUMENTS (${docs.length}):\n`;
+              docs.forEach((doc, i) => {
+                result += `${i + 1}. ${doc.name} (${doc.category})\n`;
+              });
+              return result;
+            } catch (error) {
+              return '❌ Error reading document configuration';
+            }
+          } else {
+            return '❌ Document configuration not found';
+          }
+          
+        default:
+          return `❌ Unknown operation: ${operation}`;
       }
+      
     } catch (error) {
-      return `❌ Error calling MCP tool: ${error.message}`;
+      return `❌ Error executing operation: ${error.message}`;
     }
   }
 
@@ -98,6 +125,8 @@ class LoreToolsManager {
   async registerDocument() {
     console.log('\n📄 REGISTER NEW GOOGLE DOCUMENT');
     console.log('===============================');
+    console.log('⚠️  Document registration requires manual configuration');
+    console.log('📋 Please add the document to the Google Docs config file manually:');
     
     const url = await this.askQuestion('🔗 Google Docs URL or Document ID: ');
     const name = await this.askQuestion('📝 Document name: ');
@@ -117,16 +146,22 @@ class LoreToolsManager {
     const category = categoryMap[categoryChoice] || categoryChoice.toLowerCase();
     
     const description = await this.askQuestion('📄 Brief description (optional): ');
-    const customTags = await this.askQuestion('🏷️  Custom tags (comma-separated, optional): ');
     
-    const tags = customTags ? customTags.split(',').map(t => t.trim()) : [category, 'lore'];
+    console.log('\n📋 CONFIGURATION TO ADD:');
+    console.log('========================');
+    console.log('Add this to your Wavelength-Chatbot/config/google-docs-config.js:');
+    console.log('');
+    console.log('{');
+    console.log(`  id: "${url.includes('docs.google.com') ? url.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] || url : url}",`);
+    console.log(`  name: "${name}",`);
+    console.log(`  category: "${category}",`);
+    console.log(`  description: "${description || ''}"`);
+    console.log('}');
+    console.log('');
+    console.log('💡 After adding the configuration, run option 2 (Document Ingestion) to sync the document.');
     
-    console.log('\n🔄 Registering document via MCP...');
-    const result = await this.callMCPTool('register_shared_document', {
-      url, name, category, description, tags
-    });
-    
-    console.log(result);
+    const configPath = path.join(this.chatbotDir, 'config', 'google-docs-config.js');
+    console.log(`📁 Config file location: ${configPath}`);
   }
 
   async manageIngestion() {
@@ -139,7 +174,7 @@ class LoreToolsManager {
     
     const choice = await this.askQuestion('\n📋 Choose action (1-4): ');
     const actionMap = {
-      '1': 'list', '2': 'sync', '3': 'ingest', '4': 'sync-and-ingest'
+      '1': 'list', '2': 'sync-docs', '3': 'ingest', '4': 'full-sync'
     };
     
     const action = actionMap[choice];
@@ -149,7 +184,7 @@ class LoreToolsManager {
     }
     
     console.log('\n🔄 Processing...');
-    const result = await this.callMCPTool('lore_ingestion_status', { action });
+    const result = await this.callDirectScript(action);
     console.log(result);
   }
 
@@ -179,7 +214,7 @@ class LoreToolsManager {
     }
     
     console.log('\n🔄 Processing...');
-    const result = await this.callMCPTool('content_sync_manager', { operation, force });
+    const result = await this.callDirectScript(operation, { force });
     console.log(result);
   }
 
@@ -202,8 +237,45 @@ class LoreToolsManager {
     const type = typeMap[typeChoice] || typeChoice.toLowerCase();
     
     console.log('\n🔍 Searching...');
-    const result = await this.callMCPTool('wavelength_lore_search', { query, type });
-    console.log(result);
+    
+    // Use grep-based search since direct script search is not available
+    const { spawn } = require('child_process');
+    const chatbotPath = path.join(this.chatbotDir, 'content');
+    
+    let searchPaths = [chatbotPath];
+    if (type === 'characters') {
+      searchPaths = [path.join(chatbotPath, 'characters')];
+    } else if (type === 'episodes') {
+      searchPaths = [path.join(chatbotPath, 'episodes')];
+    } else if (type === 'lore') {
+      searchPaths = [path.join(chatbotPath, 'lore')];
+    }
+    
+    console.log(`📊 SEARCH RESULTS for "${query}" in ${type}:`);
+    console.log('=' + '='.repeat(40));
+    
+    for (const searchPath of searchPaths) {
+      const grep = spawn('grep', ['-r', '-i', '--include=*.md', '--include=*.txt', '-n', query, searchPath]);
+      
+      grep.stdout.on('data', (data) => {
+        console.log(data.toString().trim());
+      });
+      
+      grep.stderr.on('data', (data) => {
+        // Ignore "No such file or directory" errors for missing content directories
+        if (!data.toString().includes('No such file or directory')) {
+          console.error('Search warning:', data.toString().trim());
+        }
+      });
+      
+      grep.on('close', (code) => {
+        if (code === 1) {
+          console.log(`📝 No matches found in ${path.basename(searchPath)}`);
+        } else if (code !== 0) {
+          console.log(`❌ Search failed in ${path.basename(searchPath)}`);
+        }
+      });
+    }
   }
 
   async characterRelationships() {
@@ -212,9 +284,45 @@ class LoreToolsManager {
     
     const character = await this.askQuestion('👤 Character name: ');
     
-    console.log('\n🔄 Generating relationship map...');
-    const result = await this.callMCPTool('character_relationship_map', { character });
-    console.log(result);
+    console.log('\n🔄 Searching for character relationships...');
+    
+    // Use grep to find character mentions across content
+    const { spawn } = require('child_process');
+    const chatbotPath = path.join(this.chatbotDir, 'content');
+    
+    console.log(`📊 CHARACTER RELATIONSHIP ANALYSIS for "${character}":`);
+    console.log('=' + '='.repeat(50));
+    
+    // Search for character mentions
+    const grep = spawn('grep', ['-r', '-i', '--include=*.md', '--include=*.txt', '-n', character, chatbotPath]);
+    
+    let foundResults = false;
+    
+    grep.stdout.on('data', (data) => {
+      foundResults = true;
+      const lines = data.toString().split('\n').filter(line => line.trim());
+      lines.forEach(line => {
+        if (line.includes(':')) {
+          const [file, ...content] = line.split(':');
+          console.log(`📄 ${path.relative(chatbotPath, file)}: ${content.join(':').trim()}`);
+        }
+      });
+    });
+    
+    grep.stderr.on('data', (data) => {
+      if (!data.toString().includes('No such file or directory')) {
+        console.error('Search warning:', data.toString().trim());
+      }
+    });
+    
+    grep.on('close', (code) => {
+      if (!foundResults) {
+        console.log(`📝 No relationships found for character "${character}"`);
+        console.log('💡 Try checking character name spelling or search for partial matches');
+      } else {
+        console.log('\n✅ Character relationship search completed');
+      }
+    });
   }
 
   async systemStatus() {
@@ -222,19 +330,36 @@ class LoreToolsManager {
     console.log('================');
     
     console.log('🔄 Checking content sync status...');
-    const syncStatus = await this.callMCPTool('content_sync_manager', { operation: 'status' });
-    console.log(syncStatus);
+    const syncResult = await this.callDirectScript('status');
+    console.log(syncResult);
     
     console.log('\n📚 Checking document configuration...');
-    const docStatus = await this.callMCPTool('lore_ingestion_status', { action: 'list' });
-    console.log(docStatus);
+    const listResult = await this.callDirectScript('list');
+    console.log(listResult);
+    
+    console.log('\n📁 Checking file system status...');
+    const fs = require('fs');
+    
+    // Check main directories
+    const dirs = [
+      { name: 'Wavelength-Lore', path: this.loreDir },
+      { name: 'Wavelength-Chatbot', path: this.chatbotDir },
+      { name: 'Chatbot Content', path: path.join(this.chatbotDir, 'content') },
+      { name: 'Google Docs Config', path: path.join(this.chatbotDir, 'config', 'google-docs-config.js') }
+    ];
+    
+    dirs.forEach(dir => {
+      const exists = fs.existsSync(dir.path);
+      const icon = exists ? '✅' : '❌';
+      console.log(`${icon} ${dir.name}: ${exists ? 'Found' : 'Missing'} (${dir.path})`);
+    });
   }
 
   async documentationNavigator() {
     console.log('\n📚 DOCUMENTATION NAVIGATOR');
     console.log('=========================');
     
-    const query = await this.askQuestion('🔍 What are you looking for? (e.g., "deployment guide", "MCP tools", "getting started"): ');
+    const query = await this.askQuestion('🔍 What are you looking for? (e.g., "deployment guide", "getting started"): ');
     
     console.log('\n📋 Documentation types:');
     console.log('1. search      - General search (default)');
@@ -250,11 +375,48 @@ class LoreToolsManager {
     };
     const type = typeMap[typeChoice] || 'search';
     
-    const context = await this.askQuestion('🎯 Current task context (optional): ');
-    
     console.log('\n🔍 Searching documentation...');
-    const result = await this.callMCPTool('documentation_navigator', { query, type, context });
-    console.log(result);
+    
+    // Search documentation files using grep
+    const fs = require('fs');
+    const { spawn } = require('child_process');
+    
+    const searchPaths = [
+      this.loreDir,
+      path.join(this.chatbotDir, 'docs'),
+      path.join(this.chatbotDir, 'README.md'),
+      path.join(this.chatbotDir, 'QUICKSTART.md')
+    ];
+    
+    console.log(`📊 DOCUMENTATION SEARCH RESULTS for "${query}":`);
+    console.log('=' + '='.repeat(50));
+    
+    let foundResults = false;
+    
+    for (const searchPath of searchPaths) {
+      if (fs.existsSync(searchPath)) {
+        const grep = spawn('grep', ['-r', '-i', '--include=*.md', '--include=*.txt', '-n', query, searchPath]);
+        
+        grep.stdout.on('data', (data) => {
+          foundResults = true;
+          const lines = data.toString().split('\n').filter(line => line.trim());
+          lines.forEach(line => {
+            if (line.includes(':')) {
+              const [file, ...content] = line.split(':');
+              const relativePath = path.relative(process.cwd(), file);
+              console.log(`📄 ${relativePath}: ${content.join(':').trim()}`);
+            }
+          });
+        });
+        
+        grep.on('close', () => {
+          if (!foundResults) {
+            console.log(`📝 No documentation found for "${query}"`);
+            console.log('💡 Try searching for broader terms or check available documentation files');
+          }
+        });
+      }
+    }
   }
 
   async directChatbotTools() {
@@ -271,22 +433,22 @@ class LoreToolsManager {
       switch (choice) {
         case '1':
           console.log('\n🚀 Launching Google Docs manager...');
-          execSync(`cd "${this.chatbotPath}" && node scripts/manage-google-docs.js`, { stdio: 'inherit' });
+          execSync(`cd "${this.chatbotDir}" && node scripts/manage-google-docs.js`, { stdio: 'inherit' });
           break;
           
         case '2':
           console.log('\n🚀 Running lore ingestion...');
-          execSync(`cd "${this.chatbotPath}" && node scripts/ingest-lore.js`, { stdio: 'inherit' });
+          execSync(`cd "${this.chatbotDir}" && node scripts/ingest-lore.js`, { stdio: 'inherit' });
           break;
           
         case '3':
           console.log('\n🚀 Testing chatbot...');
-          execSync(`cd "${this.chatbotPath}" && npm test`, { stdio: 'inherit' });
+          execSync(`cd "${this.chatbotDir}" && npm test`, { stdio: 'inherit' });
           break;
           
         case '4':
           console.log('\n📋 Chatbot configuration:');
-          const configPath = path.join(this.chatbotPath, 'config/google-docs-config.js');
+          const configPath = path.join(this.chatbotDir, 'config/google-docs-config.js');
           try {
             const config = require(configPath);
             console.log(`📄 Documents configured: ${config.DOCUMENTS_CONFIG?.length || 0}`);
