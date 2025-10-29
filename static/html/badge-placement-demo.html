@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badge Placement UI Demo</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Badge Placement UI CSS -->
+    <link rel="stylesheet" href="/css/badge-placement-ui.css">
+    
+    <style>
+        body {
+            background: #f8f9fa;
+            padding: 20px 0;
+        }
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .demo-header {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .demo-content {
+            padding: 30px;
+        }
+        .status-panel {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .config-output {
+            background: #2c3e50;
+            color: #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- Header -->
+        <div class="demo-header">
+            <h1>🏆 Badge Placement UI Demo</h1>
+            <p class="mb-0">Interactive badge placement system for merchandise customization</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="demo-content">
+            <!-- Status Panel -->
+            <div class="status-panel">
+                <h4>🔧 Demo Status</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Component Status:</strong> <span id="component-status">Loading...</span></p>
+                        <p><strong>Available Badges:</strong> <span id="badge-count">0</span></p>
+                        <p><strong>Placed Badges:</strong> <span id="placed-count">0</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Test Image:</strong> <span id="image-status">Loading...</span></p>
+                        <p><strong>Last Update:</strong> <span id="last-update">-</span></p>
+                        <button class="btn btn-sm btn-primary" onclick="loadTestImage()">🖼️ Load Test Image</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Configuration Output -->
+            <div class="status-panel">
+                <h4>📄 Live Configuration</h4>
+                <div class="config-output" id="config-output">
+{
+  "badges": [],
+  "message": "No badges placed yet"
+}
+                </div>
+            </div>
+            
+            <!-- Badge Placement Interface -->
+            <div id="badge-placement-container">
+                <!-- BadgePlacementUI will render here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Badge Placement UI -->
+    <script src="/js/components/badge-placement-ui.js"></script>
+    
+    <script>
+        // Demo initialization
+        let badgePlacementUI = null;
+        let testImageUrl = null;
+        
+        // Mock badge data for testing
+        const mockBadges = [
+            {
+                id: 'harmony-student',
+                name: 'Harmony Student',
+                description: 'Learned the basics of harmony',
+                image: '/images/badges/alexandria-harmony-student.webp'
+            },
+            {
+                id: 'wisdom-seeker',
+                name: 'Wisdom Seeker',
+                description: 'Explored ancient knowledge',
+                image: '/images/badges/wisdom-seeker.webp'
+            },
+            {
+                id: 'cultural-explorer',
+                name: 'Cultural Explorer',
+                description: 'Discovered new cultures',
+                image: '/images/badges/cultural-explorer.webp'
+            }
+        ];
+        
+        // Initialize demo
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🏆 Badge Placement UI Demo - Initializing...');
+            
+            try {
+                updateStatus('component-status', 'Initializing...');
+                
+                // Create badge placement UI instance
+                badgePlacementUI = new BadgePlacementUI({
+                    containerId: 'badge-placement-container',
+                    imageUrl: null, // Will load test image
+                    availableBadges: mockBadges,
+                    onConfigChange: handleConfigChange
+                });
+                
+                // Initialize the UI
+                await badgePlacementUI.init();
+                
+                updateStatus('component-status', '✅ Ready');
+                updateStatus('badge-count', mockBadges.length);
+                updateStatus('image-status', 'No image loaded');
+                
+                console.log('✅ Badge Placement UI Demo initialized successfully');
+                
+            } catch (error) {
+                console.error('❌ Demo initialization failed:', error);
+                updateStatus('component-status', '❌ Failed to initialize');
+                
+                // Show error in container
+                document.getElementById('badge-placement-container').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h4>❌ Initialization Failed</h4>
+                        <p>Error: ${error.message}</p>
+                        <button class="btn btn-primary" onclick="location.reload()">🔄 Reload Page</button>
+                    </div>
+                `;
+            }
+        });
+        
+        // Handle configuration changes
+        function handleConfigChange(config, isFinal = false) {
+            console.log('🏆 Badge configuration changed:', config, 'Final:', isFinal);
+            
+            // Update display
+            updateStatus('placed-count', config.badges ? config.badges.length : 0);
+            updateStatus('last-update', new Date().toLocaleTimeString());
+            
+            // Update configuration output
+            const output = document.getElementById('config-output');
+            if (output) {
+                output.textContent = JSON.stringify(config, null, 2);
+            }
+            
+            // If final, simulate sending to server
+            if (isFinal) {
+                simulateServerSubmission(config);
+            }
+        }
+        
+        // Load test image
+        function loadTestImage() {
+            // Use a placeholder image service for testing
+            testImageUrl = 'https://picsum.photos/800/600?random=' + Date.now();
+            
+            updateStatus('image-status', 'Loading...');
+            
+            if (badgePlacementUI) {
+                badgePlacementUI.updateImage(testImageUrl)
+                    .then(() => {
+                        updateStatus('image-status', '✅ Test image loaded');
+                    })
+                    .catch(error => {
+                        console.error('Failed to load test image:', error);
+                        updateStatus('image-status', '❌ Failed to load');
+                    });
+            }
+        }
+        
+        // Simulate server submission
+        function simulateServerSubmission(config) {
+            console.log('🚀 Simulating server submission...');
+            
+            // Show loading toast
+            showToast('🚀 Submitting badge configuration...', 'info');
+            
+            setTimeout(() => {
+                // Simulate success
+                showToast('✅ Badge configuration applied successfully!', 'success');
+                console.log('✅ Server submission simulated successfully');
+            }, 2000);
+        }
+        
+        // Utility functions
+        function updateStatus(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+        
+        function showToast(message, type = 'info') {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show`;
+            toast.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 5000);
+        }
+        
+        // Global debug functions
+        window.debugBadgeUI = function() {
+            console.log('🏆 Badge UI Debug Info:');
+            console.log('- Component:', badgePlacementUI);
+            console.log('- Initialized:', badgePlacementUI?.isInitialized);
+            console.log('- Selected Badges:', badgePlacementUI?.selectedBadges);
+            console.log('- Available Badges:', badgePlacementUI?.availableBadges);
+        };
+        
+        window.addTestBadge = function() {
+            if (badgePlacementUI && badgePlacementUI.availableBadges.length > 0) {
+                const badge = badgePlacementUI.availableBadges[0];
+                badgePlacementUI.addBadge(badge, { x: 0.1, y: 0.1 }, 'medium');
+                console.log('🏆 Added test badge');
+            }
+        };
+        
+        console.log('🏆 Badge Placement UI Demo - Script loaded');
+        console.log('🔧 Debug functions available: debugBadgeUI(), addTestBadge()');
+    </script>
+</body>
+</html>

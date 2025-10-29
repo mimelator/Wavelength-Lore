@@ -1,0 +1,608 @@
+/**
+ * Badge Placement UI Styles
+ * 
+ * Professional styling for the interactive badge placement interface
+ * Includes drag & drop visuals, canvas styling, and responsive layout
+ */
+
+.badge-placement-interface {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Header */
+.badge-placement-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.badge-placement-header h3 {
+  color: #2c3e50;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.badge-placement-header p {
+  color: #6c757d;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Main Content Layout */
+.badge-placement-content {
+  display: grid;
+  grid-template-columns: 280px 1fr 250px;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 1200px) {
+  .badge-placement-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* Left Panel: Badge Library */
+.badge-library-panel {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  height: fit-content;
+}
+
+.badge-library-panel h4 {
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 8px;
+}
+
+/* Available Badges Grid */
+.available-badges-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 25px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.available-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: grab;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.available-badge:hover {
+  border-color: #3498db;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+}
+
+.available-badge:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+.available-badge.dragging {
+  opacity: 0.5;
+}
+
+.badge-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.badge-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.badge-name {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.badge-description {
+  font-size: 12px;
+  color: #6c757d;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* No Badges Available */
+.no-badges-available,
+.badge-error,
+.loading-badges {
+  text-align: center;
+  padding: 30px 15px;
+  color: #6c757d;
+}
+
+.no-badges-available p:first-child,
+.badge-error p:first-child {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.help-text {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+/* Badge Controls */
+.badge-controls {
+  margin-bottom: 25px;
+}
+
+.size-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.size-controls label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 0;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.size-controls label:hover {
+  color: #3498db;
+}
+
+.size-controls input[type="radio"] {
+  margin: 0;
+  transform: scale(1.1);
+}
+
+/* Preset Positions */
+.preset-positions h4 {
+  color: #2c3e50;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 6px;
+}
+
+.position-presets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.preset-btn {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 8px 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.preset-btn:hover {
+  background: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.preset-btn:active {
+  transform: scale(0.95);
+}
+
+/* Center Panel: Canvas Preview */
+.canvas-preview-panel {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  text-align: center;
+}
+
+.canvas-preview-panel h4 {
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.canvas-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#badge-preview-canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  cursor: crosshair;
+  background: #f8f9fa;
+}
+
+.canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.canvas-instructions {
+  color: white;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.canvas-instructions p {
+  margin: 8px 0;
+}
+
+/* Canvas Controls */
+.canvas-controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Right Panel: Placed Badges */
+.placed-badges-panel {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  height: fit-content;
+}
+
+.placed-badges-panel h4 {
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #e74c3c;
+  padding-bottom: 8px;
+}
+
+/* Placed Badges List */
+.placed-badges-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.placed-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.placed-badge-item:hover {
+  border-color: #e74c3c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2);
+}
+
+.placed-badge-item.selected {
+  border-color: #3498db;
+  background: #f8f9ff;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.badge-thumbnail {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.badge-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.badge-details .badge-name {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 13px;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.badge-position,
+.badge-size {
+  font-size: 11px;
+  color: #6c757d;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.remove-badge-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+
+.placed-badge-item:hover .remove-badge-btn {
+  opacity: 1;
+}
+
+.remove-badge-btn:hover {
+  background: #c0392b;
+  transform: scale(1.1);
+}
+
+/* No Badges Placed */
+.no-badges-placed {
+  text-align: center;
+  padding: 40px 15px;
+  color: #6c757d;
+}
+
+.no-badges-placed p:first-child {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+/* Footer */
+.badge-placement-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-top: 2px solid #e9ecef;
+  margin-top: 20px;
+}
+
+.placement-summary {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+/* Button Styles */
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  background: #3498db;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2980b9;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
+
+.btn-success {
+  background: #27ae60;
+  color: white;
+}
+
+.btn-success:hover {
+  background: #219a52;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* Drag and Drop States */
+.canvas-drag-over {
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3) !important;
+}
+
+.available-badge.dragging {
+  opacity: 0.5;
+  transform: scale(0.9);
+}
+
+/* Loading States */
+.loading-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.loading-badges::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e9ecef;
+  border-top-color: #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .badge-placement-interface {
+    padding: 15px;
+  }
+  
+  .badge-placement-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .badge-placement-footer {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .action-buttons {
+    justify-content: center;
+  }
+  
+  .canvas-controls {
+    flex-wrap: wrap;
+  }
+  
+  .position-presets {
+    grid-template-columns: 1fr;
+  }
+  
+  .preset-btn {
+    font-size: 11px;
+    padding: 6px 4px;
+  }
+}
+
+/* Accessibility */
+.badge-placement-interface *:focus {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+}
+
+.badge-placement-interface button:focus,
+.badge-placement-interface input:focus {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+}
+
+/* High DPI Support */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  #badge-preview-canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Dark Mode Support (optional) */
+@media (prefers-color-scheme: dark) {
+  .badge-placement-interface {
+    color: #e9ecef;
+  }
+  
+  .badge-library-panel,
+  .placed-badges-panel {
+    background: #2c3e50;
+    border-color: #34495e;
+  }
+  
+  .canvas-preview-panel {
+    background: #2c3e50;
+    border-color: #34495e;
+  }
+  
+  .available-badge,
+  .placed-badge-item {
+    background: #34495e;
+    border-color: #495057;
+    color: #e9ecef;
+  }
+  
+  .preset-btn {
+    background: #34495e;
+    border-color: #495057;
+    color: #e9ecef;
+  }
+}
