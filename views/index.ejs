@@ -91,6 +91,67 @@
         .carousel .hidden-episode:hover {
             opacity: 1;
         }
+
+        /* Season divider with NPC character */
+        .season-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            padding: 1rem 0;
+            position: relative;
+        }
+
+        .season-divider::before,
+        .season-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(100, 100, 100, 0.3), transparent);
+        }
+
+        .season-divider .npc-break {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .season-divider .npc-image {
+            max-height: 120px;
+            width: auto;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+            transition: transform 0.3s ease;
+        }
+
+        .season-divider .npc-image:hover {
+            transform: scale(1.1) translateY(-5px);
+        }
+
+        .season-divider .npc-label {
+            font-size: 0.85rem;
+            color: #666;
+            text-align: center;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .season-divider {
+                gap: 1rem;
+                margin: 1rem 0;
+            }
+
+            .season-divider .npc-image {
+                max-height: 80px;
+            }
+
+            .season-divider .npc-label {
+                font-size: 0.75rem;
+            }
+        }
     </style>
     
     <section class="summary">
@@ -147,8 +208,14 @@
                 </div>
             <% }); %>
         </div>
-        <br /><br />
-        <br /><hr /><br />
+
+        <!-- Season Divider with NPC Character -->
+        <div class="season-divider">
+            <div class="npc-break">
+                <img src="/assets/npc-characters/sneaky-goblin.png" alt="Sneaky Goblin - Wavelength Lore NPC" class="npc-image">
+                <span class="npc-label">🍄 The Sneaky Goblin 🍄</span>
+            </div>
+        </div>
     <% } %>
 
     <%- include('partials/footer') %>
