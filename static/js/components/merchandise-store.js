@@ -3616,10 +3616,16 @@ class MerchandiseStore {
       }
 
       // Create payment intent on server FIRST
-      const shippingAddress = {}; // Empty for now, will be filled by form
+      // Use a default shipping address for tax calculation - will be updated on submission
+      const defaultShippingAddress = {
+        country: 'US',
+        state: 'CA', // Default to CA for tax calculation
+        city: 'Default',
+        address: 'TBD'
+      };
       const result = await this.stripeCheckoutService.createPaymentIntent(
         cartSummary.items,
-        shippingAddress,
+        defaultShippingAddress,
         0 // TODO: Calculate shipping cost
       );
 
@@ -3891,32 +3897,7 @@ class MerchandiseStore {
       // Get shipping address
       const shippingAddress = this.stripeCheckoutService.getShippingAddressFromForm();
 
-      // First create payment intent with cart items
-      const cartItems = this.cartService.getItems();
-      console.log('🛒 Cart items for payment:', cartItems);
-      
-      const paymentIntentResult = await this.stripeCheckoutService.createPaymentIntent(
-        cartItems, 
-        shippingAddress, 
-        0 // shipping cost - calculate if needed
-      );
-
-      if (!paymentIntentResult.success) {
-        const errorDiv = document.getElementById('checkout-error-message');
-        if (errorDiv) {
-          errorDiv.textContent = paymentIntentResult.error || 'Failed to create payment. Please try again.';
-          errorDiv.style.display = 'block';
-        }
-
-        // Reset button
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '<span>💳</span> Complete Order';
-        }
-        return;
-      }
-
-      // Confirm payment with Stripe and backend
+      // Confirm payment with Stripe and backend (payment intent already created in initializeCheckout)
       const result = await this.stripeCheckoutService.confirmPayment(shippingAddress);
 
       if (!result.success) {
