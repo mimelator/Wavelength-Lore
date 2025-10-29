@@ -142,6 +142,16 @@ class EmailService {
                 <td style="padding: 8px 0; font-weight: bold;">Order Date:</td>
                 <td style="padding: 8px 0;">${orderDate}</td>
             </tr>
+            ${orderData.subtotal ? `
+            <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Subtotal:</td>
+                <td style="padding: 8px 0;">$${orderData.subtotal.toFixed(2)}</td>
+            </tr>` : ''}
+            ${orderData.tax ? `
+            <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Tax:</td>
+                <td style="padding: 8px 0;">$${orderData.tax.toFixed(2)}</td>
+            </tr>` : ''}
             <tr>
                 <td style="padding: 8px 0; font-weight: bold;">Total Amount:</td>
                 <td style="padding: 8px 0; color: #059669; font-weight: bold;">$${(orderData.total || orderData.amount || 0).toFixed(2)}</td>
@@ -202,6 +212,9 @@ class EmailService {
         <p style="margin: 5px 0;">
             <a href="https://wavelengthlore.com" style="color: #667eea; text-decoration: none;">wavelengthlore.com</a> | 
             <a href="https://wavelengthlore.com/support" style="color: #667eea; text-decoration: none;">Support</a>
+        </p>
+        <p style="margin: 10px 0 0 0; font-size: 0.8rem;">
+            © ${new Date().getFullYear()} Wavelength Lore. All rights reserved.
         </p>
     </div>
 </body>
@@ -294,6 +307,10 @@ class EmailService {
            style="display: inline-block; background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 5px;">
             Reply to Customer
         </a>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 0.9rem;">
+        <p style="margin: 0;">© ${new Date().getFullYear()} Wavelength Lore. All rights reserved.</p>
     </div>
 </body>
 </html>
