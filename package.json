@@ -38,6 +38,7 @@
     "wavelength:add-missing-products": "node scripts/pricing-system/wavelength-pricing-catalog-creator.js",
     "wavelength:configure-email": "node wavelength-tools/wavelength-email-configurator.js",
     "wavelength:test-email": "node wavelength-tools/wavelength-email-test-suite.js",
+    "wavelength:npc-test": "node wavelength-npc-integration-test.js",
     "wavelength:test-order-flow": "node wavelength-tools/wavelength-order-flow-test.js",
     "wavelength:debug-email": "node wavelength-tools/wavelength-email-debug.js",
     "wavelength:ses-setup": "node wavelength-tools/wavelength-ses-setup-assistant.js",

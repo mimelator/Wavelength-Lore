@@ -1,0 +1,33 @@
+# Wavelength NPC Gallery Extraction - Background Characters
+# Focus: Goblins, Sprites, Pixies, Woodland Creatures
+# Format: imagePath,description,characterId,outputName,crop
+
+# ICE BLUE GREED - Goblin & Creature Audience
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-01.png,goblin audience member left side,ibg-goblin-1,ibg_goblin_audience_1.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-01.png,small goblin in crowd upper left,ibg-goblin-2,ibg_goblin_crowd_1.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-01.png,goblin far right background,ibg-goblin-3,ibg_goblin_right.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-05.png,goblin audience member,ibg-goblin-4,ibg_goblin_audience_2.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-05.png,sprite or pixie flying,ibg-sprite-1,ibg_sprite_flying.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-09.png,background goblin,ibg-goblin-5,ibg_goblin_bg_1.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-15.png,goblin in forest scene,ibg-goblin-6,ibg_goblin_forest.png,true
+
+# GOBLINS RULE - Goblin Variants
+/Volumes/5bits/current/Battle of the Shire Assets/GoblinsRule/GoblinsRule-01.png,goblin audience member left,gr-goblin-1,gr_goblin_1.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/GoblinsRule/GoblinsRule-01.png,goblin audience member right side,gr-goblin-2,gr_goblin_2.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/GoblinsRule/GoblinsRule-01.png,small goblin in crowd,gr-goblin-3,gr_goblin_crowd.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/GoblinsRule/GoblinsRule-02.png,goblin character,gr-goblin-4,gr_goblin_4.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/GoblinsRule/GoblinsRule-03.png,goblin in scene,gr-goblin-5,gr_goblin_5.png,true
+
+# BATTLE OF THE SHIRE - Diverse Creatures
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-05.png,woodland creature background,bots-creature-1,bots_creature_1.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-10.png,forest animal character,bots-creature-2,bots_creature_2.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-15.png,goblin or sprite,bots-creature-3,bots_creature_3.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-20.png,background character,bots-creature-4,bots_creature_4.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-25.png,woodland npc,bots-creature-5,bots_creature_5.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-30.png,background creature,bots-creature-6,bots_creature_6.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-35.png,fantasy creature,bots-creature-7,bots_creature_7.png,true
+
+# ICE FORTRESS - Winter Creatures & Sprites
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Fortress Concert Assets/IceFC-05.png,arctic creature,ifc-creature-1,ifc_arctic_creature_1.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Fortress Concert Assets/IceFC-10.png,snow spirit or pixie,ifc-sprite-1,ifc_snow_sprite.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Fortress Concert Assets/IceFC-15.png,ice realm creature,ifc-creature-2,ifc_ice_creature.png,true
