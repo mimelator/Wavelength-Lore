@@ -1,176 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <%- include('../partials/head', {
-        title: title + ' - Wavelength Community Forum',
-        pageDescription: 'Connect with fellow Wavelength fans in our community forum'
-    }) %>
-    
-    <!-- Forum-specific CSS -->
-    <link rel="stylesheet" href="<%= cdnUrl %>/css/forum.css">
-    
-    <!-- Firebase SDK - Direct imports for better compatibility -->
-    <script type="module">
-      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-      import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-      import { getDatabase, ref, push, set, onValue, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
-      
-      // Initialize Firebase with environment config
-      const firebaseConfig = {
-        apiKey: "<%= process.env.API_KEY %>",
-        authDomain: "<%= process.env.AUTH_DOMAIN %>",
-        databaseURL: "<%= process.env.DATABASE_URL %>",
-        projectId: "<%= process.env.PROJECT_ID %>",
-        storageBucket: "<%= process.env.STORAGE_BUCKET %>",
-        messagingSenderId: "<%= process.env.MESSAGING_SENDER_ID %>",
-        appId: "<%= process.env.APP_ID %>"
-      };
-      
-      console.log('🔥 Initializing Firebase for forum home...');
-      
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const database = getDatabase(app);
-      
-      // Configure Firebase Auth persistence for 2-week sessions
-      setPersistence(auth, browserLocalPersistence).then(() => {
-        console.log('✅ Firebase Auth persistence set to LOCAL for extended sessions');
-        
-        // Initialize session manager if not already present
-        if (!window.sessionManager) {
-          window.sessionManager = {
-            SESSION_DURATION: 14 * 24 * 60 * 60 * 1000,
-            isSessionValid: function() {
-              const lastActivity = localStorage.getItem('wavelength_last_activity');
-              if (!lastActivity) return false;
-              const now = Date.now();
-              const timeSinceActivity = now - parseInt(lastActivity);
-              return timeSinceActivity < this.SESSION_DURATION;
-            },
-            updateActivity: function() {
-              console.log('📝 Session activity updated');
-              localStorage.setItem('wavelength_last_activity', Date.now().toString());
-            },
-            clearExpiredSession: function() {
-              const lastActivity = localStorage.getItem('wavelength_last_activity');
-              if (!lastActivity) {
-                console.log('📝 No previous session found');
-                return false;
-              }
-              
-              if (!this.isSessionValid()) {
-                console.log('📝 Session expired, clearing...');
-                localStorage.removeItem('wavelength_last_activity');
-                // Don't automatically sign out here - let the auth state listener handle it
-                return true;
-              }
-              
-              console.log('📝 Session is still valid');
-              return false;
-            }
-          };
-        }
-        
-        // Check session validity but don't aggressively clear active users
-        console.log('📝 Checking session on page load...');
-        window.sessionManager.clearExpiredSession();
-      }).catch((error) => {
-        console.error('❌ Failed to set Firebase persistence:', error);
-      });
-      
-      // Make Firebase available globally for forum components
-      window.firebaseAuth = auth;
-      window.firebaseDB = database;
-      window.firebaseUtils = { 
-        signInWithPopup, 
-        signInWithRedirect,
-        getRedirectResult,
-        GoogleAuthProvider, 
-        signOut, 
-        onAuthStateChanged, 
-        setPersistence, 
-        browserLocalPersistence, 
-        ref, 
-        push, 
-        set, 
-        onValue, 
-        query, 
-        orderByChild 
-      };
-      
-      console.log('✅ Firebase initialized successfully for forum home');
-    </script>
-    
-    <!-- Forum JavaScript -->
-    <script src="/js/forum.js" defer></script>
-    <script src="/js/forum-activity.js" defer></script>
-</head>
-<body>
-    <%- include('../partials/header') %>
-    
-    <div class="forum-container">
-        <!-- Consolidated Forum Header -->
-        <div class="forum-page-header">
-            <div class="forum-header-content">
-                <div class="forum-title-section">
-                    <h1 class="forum-page-title">💬 Community Forum</h1>
-                    <p class="forum-subtitle">Connect with fellow Wavelength fans</p>
-                </div>
-                
-                <div class="forum-header-actions">
-                    <!-- Authentication Status -->
-                    <div id="forum-auth-container" class="auth-status">
-                        <div class="guest-message">Sign in to participate</div>
-                        <div class="auth-actions">
-                            <button class="btn btn-primary btn-small" onclick="window.forumJS.signInWithGoogle()">Sign in</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Quick Navigation -->
-                    <div class="forum-quick-nav">
-                        <a href="/forum" class="quick-nav-btn <%= currentPage === 'home' ? 'active' : '' %>" title="Forum Home">🏠</a>
-                        <a href="/forum/recent" class="quick-nav-btn <%= currentPage === 'recent' ? 'active' : '' %>" title="Recent Posts">🕒</a>
-                        <a href="/forum/popular" class="quick-nav-btn <%= currentPage === 'popular' ? 'active' : '' %>" title="Popular">🔥</a>
-                        <a href="/forum/search" class="quick-nav-btn <%= currentPage === 'search' ? 'active' : '' %>" title="Search">🔍</a>
-                        <a href="/" class="quick-nav-btn" title="Back to Main Site">←</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Forum Content -->
-        <%- include('home') %>
+#!/usr/bin/env node
 
-        <!-- Games Leaderboard -->
-        <%- include('../partials/leaderboard') %>
-    </div>
+const fs = require('fs');
+const path = require('path');
 
-    <!-- Forum Footer -->
-    <footer class="forum-footer">
-        <div class="container">
-            <div class="forum-footer-content">
-                <div class="forum-stats">
-                    <span>Wavelength Community Forum</span>
-                </div>
-                <div class="forum-links">
-                    <a href="/">Return to Wavelength Lore</a>
-                    <a href="/forum/guidelines">Community Guidelines</a>
-                    <a href="/forum/help">Help & Support</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+// List of forum files that need to be updated
+const forumFiles = [
+    'views/forum/category-page.ejs',
+    'views/forum/popular.ejs',
+    'views/forum/admin.ejs',
+    'views/forum/help.ejs',
+    'views/forum/create-post-page.ejs',
+    'views/forum/search.ejs',
+    'views/forum/home-page.ejs',
+    'views/forum/recent.ejs',
+    'views/forum/post-page.ejs',
+    'views/forum/guidelines.ejs'
+];
 
-    <%- include('../partials/footer') %>
-    
-    <!-- Forum Modals -->
-    <div id="forum-modals"></div>
-    
-    <!-- Disambiguation Scripts -->
-    <%- simpleDisambiguationScript %>
-    <%- simpleDisambiguationStyles %>
-    
-    <!-- Unified Radio System Widget -->
+// Old include line to replace
+const oldInclude = `    <%- include('../partials/radio-player-widget') %>`;
+
+// New unified radio system widget
+const newRadioWidget = `    <!-- Unified Radio System Widget -->
     <div class="wavelength-radio-widget" data-wavelength-radio-widget="true">
       <div class="radio-widget-toggle" id="radioWidgetToggle" title="Show/Hide Radio Player">
         <span class="toggle-icon">📻</span>
@@ -431,6 +282,54 @@
           left: 20px;
         }
       }
-    </style>
-</body>
-</html>
+    </style>`;
+
+console.log('🎵 WAVELENGTH FORUM RADIO WIDGET UNIFICATION');
+console.log('═══════════════════════════════════════════════');
+
+let successCount = 0;
+let errorCount = 0;
+
+for (const filePath of forumFiles) {
+    try {
+        const fullPath = path.join(__dirname, filePath);
+        console.log(`\n🔄 Processing: ${filePath}`);
+        
+        if (!fs.existsSync(fullPath)) {
+            console.log(`⚠️  File not found: ${filePath}`);
+            errorCount++;
+            continue;
+        }
+
+        let content = fs.readFileSync(fullPath, 'utf8');
+        
+        if (!content.includes(oldInclude)) {
+            console.log(`ℹ️  Already updated or no radio widget found in: ${filePath}`);
+            continue;
+        }
+
+        // Replace the old include with the new unified system
+        const updatedContent = content.replace(oldInclude, newRadioWidget);
+        
+        if (updatedContent === content) {
+            console.log(`⚠️  No changes made to: ${filePath}`);
+            continue;
+        }
+
+        // Write the updated content back to the file
+        fs.writeFileSync(fullPath, updatedContent, 'utf8');
+        console.log(`✅ Updated: ${filePath}`);
+        successCount++;
+
+    } catch (error) {
+        console.error(`❌ Error processing ${filePath}:`, error.message);
+        errorCount++;
+    }
+}
+
+console.log('\n═══════════════════════════════════════════════');
+console.log(`🎯 SUMMARY:`);
+console.log(`   ✅ Successfully updated: ${successCount} files`);
+console.log(`   ❌ Errors encountered: ${errorCount} files`);
+console.log(`   🎵 All forum pages now use unified radio system!`);
+console.log('═══════════════════════════════════════════════');
