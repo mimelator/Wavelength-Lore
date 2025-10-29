@@ -327,10 +327,19 @@
   border-color: rgba(255,255,255,0.4);
 }
 
+/* Main container for merchandise store page */
+.merchandise-main {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
 .merchandise-store {
   max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   color: white;
