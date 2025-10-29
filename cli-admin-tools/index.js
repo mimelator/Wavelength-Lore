@@ -15,10 +15,10 @@ class WavelengthAdminToolkit {
         this.toolsDir = __dirname;
         this.tools = {
             'sync': {
-                name: 'Sync Assets',
-                description: 'Sync static assets and images',
-                script: 'sync-assets.js',
-                icon: '📄'
+                name: 'S3 Sync (Upload to CDN)',
+                description: 'Upload static assets and images to S3/CloudFront',
+                script: 's3-sync.js',
+                icon: '📤'
             },
             'cache': {
                 name: 'Cache Bust',
@@ -113,9 +113,12 @@ class WavelengthAdminToolkit {
                 if (toolKey === 'sync') {
                     if (args.includes('--status')) {
                         const status = toolInstance.getStatus();
-                        console.log(chalk.cyan('📄 SYNC ASSETS STATUS:'));
+                        console.log(chalk.cyan('📤 S3 SYNC STATUS:'));
                         console.log(chalk.white(`Status: ${status.status}`));
                         console.log(chalk.white(`Last Sync: ${status.lastSync}`));
+                        console.log(chalk.white(`Method: ${status.method || 'S3 Upload'}`));
+                    } else if (args.includes('--check') || args.includes('--check-aws')) {
+                        await toolInstance.checkAWS();
                     } else {
                         await toolInstance.sync();
                     }
