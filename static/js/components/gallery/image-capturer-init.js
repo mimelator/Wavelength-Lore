@@ -97,14 +97,18 @@ document.addEventListener('DOMContentLoaded', () => {
       // Exclude these selectors from getting Save to Gallery buttons
       excludeSelectors: [
         // Banner images
-        '.banner img', 
+        '.banner img',
         '.site-banner img',
         '.header-banner img',
         '.page-banner img',
         '[class*="banner"] img',
-        
+
+        // Season divider NPC images - don't add save buttons to these
+        '.season-divider img',
+        '.npc-image',
+
         // Navigation elements and cards/badges on main entry pages
-        'nav img', 
+        'nav img',
         '.navigation img',
         '.nav-item img',
         '.navbar img',
@@ -117,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '.character-card img',
         '.lore-card img',
         '.episode-card img',
-        
+
         // Main navigation and index page elements
         '.main-nav img',
         '.page-nav img',
@@ -125,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '.content-card img',
         '.grid-item img',
         '.index-card img',
-        
+
         // UI elements that shouldn't have save buttons
         '.icon img',
         '.logo img',
@@ -133,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '.button img',
         '.thumbnail img',
         '.profile-picture img',
-        
+
         // Additional selectors
         '[role="button"] img',
         '[role="navigation"] img'
