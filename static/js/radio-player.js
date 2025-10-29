@@ -447,39 +447,59 @@ class WavelengthRadio {
     // Control bindings
     bindControls() {
         // Play/Pause
-        document.getElementById('playPauseBtn').addEventListener('click', () => this.togglePlay());
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        if (playPauseBtn) {
+            playPauseBtn.addEventListener('click', () => this.togglePlay());
+        }
 
         // Previous/Next
-        document.getElementById('prevBtn').addEventListener('click', () => this.previous());
-        document.getElementById('nextBtn').addEventListener('click', () => this.next());
+        const prevBtn = document.getElementById('prevBtn');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => this.previous());
+        }
+
+        const nextBtn = document.getElementById('nextBtn');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => this.next());
+        }
 
         // Shuffle
-        document.getElementById('shuffleBtn').addEventListener('click', () => this.toggleShuffle());
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        if (shuffleBtn) {
+            shuffleBtn.addEventListener('click', () => this.toggleShuffle());
+        }
 
         // Repeat
-        document.getElementById('repeatBtn').addEventListener('click', () => this.cycleRepeat());
+        const repeatBtn = document.getElementById('repeatBtn');
+        if (repeatBtn) {
+            repeatBtn.addEventListener('click', () => this.cycleRepeat());
+        }
 
         // Volume
         const volumeSlider = document.getElementById('volumeSlider');
-        volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
-        this.setVolume(volumeSlider.value);
+        if (volumeSlider) {
+            volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
+            this.setVolume(volumeSlider.value);
+        }
 
         // Progress bar
         const progressBar = document.querySelector('.progress-bar');
         const progressHandle = document.getElementById('progressHandle');
 
-        let isDragging = false;
+        if (progressBar && progressHandle) {
+            let isDragging = false;
 
-        progressHandle.addEventListener('mousedown', () => isDragging = true);
-        document.addEventListener('mouseup', () => isDragging = false);
+            progressHandle.addEventListener('mousedown', () => isDragging = true);
+            document.addEventListener('mouseup', () => isDragging = false);
 
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                this.seek(e, progressBar);
-            }
-        });
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    this.seek(e, progressBar);
+                }
+            });
 
-        progressBar.addEventListener('click', (e) => this.seek(e, progressBar));
+            progressBar.addEventListener('click', (e) => this.seek(e, progressBar));
+        }
 
         // Playlist mode buttons
         document.querySelectorAll('.mode-btn').forEach(btn => {
