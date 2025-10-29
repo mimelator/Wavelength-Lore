@@ -386,9 +386,9 @@ function getSimpleDisambiguationScript(cdnUrlParam = '') {
           // 🔥 FIX: Use proper client-side JSON unescaping
           // Client-side unescaping - matches server-side escaping order
           const conflictsData = element.dataset.conflicts
-            .replace(/\\\\/g, '\\')     // Unescape backslashes first
+            .replace(/\\\\\\\\/g, '\\\\\\\\')     // Unescape backslashes first
             .replace(/&#x27;/g, "'")    // Unescape single quotes
-            .replace(/&quot;/g, '"')    // Unescape quotes  
+            .replace(/&quot;/g, '"')    // Unescape quotes
             .replace(/&gt;/g, '>')      // Unescape greater than
             .replace(/&lt;/g, '<')      // Unescape less than
             .replace(/&amp;/g, '&');    // Unescape ampersands last
