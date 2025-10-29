@@ -234,47 +234,8 @@
     <!-- Forum Modals -->
     <div id="forum-modals"></div>
     
-    <!-- Unified Radio System Widget for Forum Pages -->
-    <div class="wavelength-radio-widget" data-wavelength-radio-widget="true">
-      <div class="radio-widget-toggle" id="radioWidgetToggle" title="Show/Hide Radio Player">
-        <span class="toggle-icon">📻</span>
-        <span class="toggle-text">Radio Player</span>
-      </div>
-
-      <div class="radio-widget-content" id="radioWidgetContent">
-        <div class="radio-widget-header">
-          <h3>✨ Wavelength Radio ✨</h3>
-          <button class="radio-widget-close" id="radioWidgetClose" title="Close">✕</button>
-        </div>
-
-        <div class="radio-widget-info">
-          <div class="radio-widget-track" id="radioWidgetTrack">Select a track</div>
-          <div class="radio-widget-progress" id="radioWidgetProgress">0:00 / 0:00</div>
-        </div>
-
-        <div class="radio-widget-controls">
-          <button class="radio-widget-btn" id="radioWidgetPrev" title="Previous">⏮</button>
-          <button class="radio-widget-btn radio-widget-play" id="radioWidgetPlay" title="Play">▶</button>
-          <button class="radio-widget-btn" id="radioWidgetNext" title="Next">⏭</button>
-        </div>
-
-        <div class="radio-widget-volume">
-          <span class="volume-icon">🔊</span>
-          <input type="range" id="radioWidgetVolume" min="0" max="100" value="80" class="radio-widget-volume-slider">
-          <span id="radioWidgetVolumeValue">80%</span>
-        </div>
-
-        <div class="radio-widget-footer">
-          <a href="/radio" class="radio-widget-link">🎵 Full Player</a>
-        </div>
-      </div>
-
-      <!-- Hidden audio element -->
-      <audio id="radioWidgetAudio" preload="metadata"></audio>
-    </div>
-
-    <!-- Load Unified Radio System -->
-    <script src="<%= cdnUrl %>/js/radio-player.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+    <!-- Include proper footer with radio widget -->
+    <%- include('../partials/footer') %>
     
     <!-- Unified Radio Widget Styles -->
     <style>

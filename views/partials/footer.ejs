@@ -32,8 +32,8 @@
 </script>
 <% } %>
 
-<!-- Wavelength Radio Widget (appears on all pages except /forum/* and /radio) -->
-<% if (typeof currentPage !== 'undefined' && !currentPage.startsWith('/forum') && currentPage !== '/radio') { %>
+<!-- Wavelength Radio Widget (appears on all pages except /radio) -->
+<% if (typeof currentPage !== 'undefined' && currentPage !== '/radio') { %>
 
 <!-- Full-page collectible overlay -->
 <div id="globalGameCanvas" class="global-game-canvas"></div>

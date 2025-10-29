@@ -260,6 +260,7 @@ router.get('/profile', (req, res) => {
         userId: null, // Will be determined by client-side authentication
         isOwnProfile: true, // This is always the user's own profile
         title: 'My Profile',
+        currentPage: '/forum/profile',
         breadcrumbs: [
             { name: 'User Profile', url: null }
         ],
@@ -278,6 +279,7 @@ router.get('/user/:userId', (req, res) => {
         userId: userId,
         isOwnProfile: false, // This is viewing someone else's profile
         title: 'User Profile',
+        currentPage: '/forum/user/' + userId,
         cdnUrl: process.env.CDN_URL || '',
         version: process.env.VERSION || Date.now()
     });
