@@ -3880,13 +3880,11 @@ class MerchandiseStore {
       }
 
       // Show loading state
-      const submitBtn = document.getElementById('checkout-submit-btn');
-      const submitText = document.getElementById('submit-text');
-      const submitSpinner = document.getElementById('submit-spinner');
-
-      submitBtn.disabled = true;
-      submitText.style.display = 'none';
-      submitSpinner.style.display = 'inline-block';
+      const submitBtn = document.querySelector('.complete-order-btn');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>⏳</span> Processing...';
+      }
 
       console.log('💳 Processing payment...');
 
@@ -3937,13 +3935,13 @@ class MerchandiseStore {
         errorDiv.style.display = 'block';
       }
 
-      // Reset button
-      const submitBtn = document.getElementById('checkout-submit-btn');
-      const submitText = document.getElementById('submit-text');
-      const submitSpinner = document.getElementById('submit-spinner');
-      submitBtn.disabled = false;
-      submitText.style.display = 'inline';
-      submitSpinner.style.display = 'none';
+      // Reset button (use class selector since modal uses class, not ID)
+      const submitBtn = document.querySelector('.complete-order-btn');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        // The button text is simple, so just reset it
+        submitBtn.innerHTML = '<span>💳</span> Complete Order';
+      }
     }
   }
   

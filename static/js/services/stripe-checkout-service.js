@@ -278,15 +278,15 @@ class StripeCheckoutService {
    */
   getShippingAddressFromForm() {
     return {
-      firstName: document.getElementById('first-name')?.value || '',
-      lastName: document.getElementById('last-name')?.value || '',
-      email: document.getElementById('email')?.value || '',
-      address1: document.getElementById('address1')?.value || '',
-      address2: document.getElementById('address2')?.value || '',
-      city: document.getElementById('city')?.value || '',
-      state: document.getElementById('state')?.value || '',
-      zip: document.getElementById('zip')?.value || '',
-      country: document.getElementById('country')?.value || 'US'
+      firstName: document.getElementById('shipping-first-name')?.value || '',
+      lastName: document.getElementById('shipping-last-name')?.value || '',
+      email: document.getElementById('customer-email')?.value || '',
+      address1: document.getElementById('shipping-address')?.value || '',
+      address2: document.getElementById('shipping-address2')?.value || '',
+      city: document.getElementById('shipping-city')?.value || '',
+      state: document.getElementById('shipping-state')?.value || '',
+      zip: document.getElementById('shipping-zip')?.value || '',
+      country: document.getElementById('shipping-country')?.value || 'US'
     };
   }
 
@@ -297,18 +297,18 @@ class StripeCheckoutService {
   validateShippingForm() {
     const errors = [];
 
-    const firstName = document.getElementById('first-name')?.value?.trim();
-    const lastName = document.getElementById('last-name')?.value?.trim();
-    const email = document.getElementById('email')?.value?.trim();
-    const address1 = document.getElementById('address1')?.value?.trim();
-    const city = document.getElementById('city')?.value?.trim();
-    const state = document.getElementById('state')?.value?.trim();
-    const zip = document.getElementById('zip')?.value?.trim();
+    const firstName = document.getElementById('shipping-first-name')?.value?.trim();
+    const lastName = document.getElementById('shipping-last-name')?.value?.trim();
+    const email = document.getElementById('customer-email')?.value?.trim();
+    const address1 = document.getElementById('shipping-address')?.value?.trim();
+    const city = document.getElementById('shipping-city')?.value?.trim();
+    const state = document.getElementById('shipping-state')?.value?.trim();
+    const zip = document.getElementById('shipping-zip')?.value?.trim();
 
     if (!firstName) errors.push('First name is required');
     if (!lastName) errors.push('Last name is required');
     if (!email) errors.push('Email is required');
-    if (!email.includes('@')) errors.push('Valid email is required');
+    if (email && !email.includes('@')) errors.push('Valid email is required');
     if (!address1) errors.push('Address is required');
     if (!city) errors.push('City is required');
     if (!state) errors.push('State is required');
