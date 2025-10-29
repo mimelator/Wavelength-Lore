@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌊 Wavelength Lore Content Audit Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .section-icon {
+            font-size: 2em;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .items-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .item-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .item-header {
+            background: #3498db;
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .item-content {
+            padding: 20px;
+        }
+
+        .field-group {
+            margin-bottom: 20px;
+        }
+
+        .field-group-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .field-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .field-header {
+            background: #ecf0f1;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            font-weight: 500;
+            color: #2c3e50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .field-type {
+            font-size: 0.8em;
+            padding: 2px 8px;
+            border-radius: 12px;
+            color: white;
+            font-weight: normal;
+        }
+
+        .field-type.cta {
+            background: #e74c3c;
+        }
+
+        .field-type.text {
+            background: #95a5a6;
+        }
+
+        .field-content {
+            padding: 15px;
+        }
+
+        .field-value {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: #2c3e50;
+            border-left: 4px solid #3498db;
+            margin-bottom: 15px;
+            min-height: 60px;
+            width: 100%;
+            border: 1px solid #ddd;
+            resize: vertical;
+        }
+
+        .field-value:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .command-section {
+            background: #2c3e50;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .command-section.collapsed .command-code {
+            display: none;
+        }
+
+        .toggle-btn {
+            background: #34495e;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-right: 10px;
+            transition: background 0.2s ease;
+        }
+
+        .toggle-btn:hover {
+            background: #2c3e50;
+        }
+
+        .command-header {
+            background: #34495e;
+            padding: 10px 15px;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .command-code {
+            background: #2c3e50;
+            padding: 15px;
+            color: #ecf0f1;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85em;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-all;
+            position: relative;
+        }
+
+        .copy-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: background 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: #219a52;
+        }
+
+        .copy-btn.copied {
+            background: #e74c3c;
+        }
+
+        .filter-controls {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-controls label {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .filter-controls input, .filter-controls select {
+            padding: 8px 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .cta-highlight {
+            background: linear-gradient(90deg, #ff9a9e 0%, #fecfef 100%) !important;
+        }
+
+        .instructions {
+            background: #e8f6f3;
+            border: 1px solid #1abc9c;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .instructions h3 {
+            color: #16a085;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .command-code {
+                font-size: 0.75em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌊 Wavelength Lore Content Audit</h1>
+            <div class="subtitle">Interactive Content Management Dashboard</div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalObjects">19</div>
+                <div class="stat-label">Total Objects</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalFields">122</div>
+                <div class="stat-label">Total Fields</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="ctaFields">8</div>
+                <div class="stat-label">CTA Fields</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="textFields">114</div>
+                <div class="stat-label">Text Fields</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="instructions">
+                <h3>🚀 How to Use This Interactive Content Editor</h3>
+                <ul>
+                    <li><strong>✏️ Edit Directly:</strong> Click in any text field to edit content inline - no truncation!</li>
+                    <li><strong>📝 Live Updates:</strong> Firebase commands update automatically as you type</li>
+                    <li><strong>👁️ Show/Hide Commands:</strong> Click "Show" to expand Firebase commands (collapsed by default)</li>
+                    <li><strong>📋 Copy & Run:</strong> Click "Copy" to get the updated command, then paste in your terminal</li>
+                    <li><strong>🔍 Filter Content:</strong> Use search and filter controls to find specific items</li>
+                    <li><strong>🎯 CTA Focus:</strong> CTA fields are highlighted in pink for easy identification</li>
+                    <li><strong>💾 Workflow:</strong> Edit text → Show command → Copy → Paste in terminal → Run!</li>
+                </ul>
+            </div>
+
+            <div class="filter-controls">
+                <label for="searchInput">🔍 Search:</label>
+                <input type="text" id="searchInput" placeholder="Search characters, lore, or fields...">
+                
+                <label for="typeFilter">📂 Type:</label>
+                <select id="typeFilter">
+                    <option value="">All Types</option>
+                    <option value="characters">Characters</option>
+                    <option value="lore">Lore Items</option>
+                </select>
+                
+                <label for="fieldFilter">🎯 Fields:</label>
+                <select id="fieldFilter">
+                    <option value="">All Fields</option>
+                    <option value="cta">CTA Fields Only</option>
+                    <option value="text">Text Fields Only</option>
+                </select>
+            </div>
+
+            <!-- Characters Section -->
+            <div class="section" id="charactersSection">
+                <div class="section-header">
+                    <div class="section-icon">🎭</div>
+                    <h2 class="section-title">Characters (8)</h2>
+                </div>
+                <div class="items-grid" id="charactersGrid"></div>
+            </div>
+
+            <!-- Lore Section -->
+            <div class="section" id="loreSection">
+                <div class="section-header">
+                    <div class="section-icon">🌟</div>
+                    <h2 class="section-title">Lore Items (11)</h2>
+                </div>
+                <div class="items-grid" id="loreGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Content data from the audit
+        const auditData = {
+            characters: {
+                alex: {
+                    title: "Alexandria",
+                    description: "The Precocious Free-Spirited Violinist of Wavelength and Daughter of Prince Andrew and Jewel, Alexandria is a quarter elf and musically gifted like her mother. She loves to teach others how to play and compose music... Especially young children.",
+                    id: "alex",
+                    image: "/images/characters/wavelength/alexandria-1.webp",
+                    stakes: "In Wavelength Lore, Alexandria faces the challenge of reconciling her past as an orphan with her desire to forge her own identity and future, especially as she navigates her relationships with her ...",
+                    tagline: "Whispers of Harmony, Secrets in the Strings.",
+                    cta_text: "Discover Alex's Journey!"
+                },
+                andrew: {
+                    title: "Prince Andrew",
+                    description: "The lead singer and lutist of Wavelength, husband of Jewel, and father of Alexandria and Eloquence",
+                    id: "andrew",
+                    image: "/images/characters/wavelength/andrew-4.webp",
+                    stakes: "Andrew, once banished by King David and forced into slavery, now faces the challenge of reconciling his past while navigating the complexities of his newfound life with Wavelength. As the leader of...",
+                    tagline: "Melodies of a Prince, Shadows of Betrayal.",
+                    cta_text: "Discover Andrew's Journey!"
+                },
+                daphne: {
+                    title: "Daphne",
+                    description: "The prodigy daughter of the Shire's Choir Master, Daphne is a gifted drummer who joins Wavelength after the Battle of the Shire when she and her brother are orphaned and Wavelength loses their Drummer Maurice.",
+                    id: "daphne",
+                    image: "/images/characters/wavelength/daphne-6.webp",
+                    stakes: "Daphne faces the immense challenge of overcoming her anger and bitterness after losing her father and becoming the caretaker of her younger brother, while also proving herself as a worthy drummer i...",
+                    tagline: "Drummer of Destiny, Heart of the Shire.",
+                    cta_text: "Discover Daphne's Journey!"
+                },
+                eloquence: {
+                    title: "Eloquence",
+                    description: "The Bass player of Wavelength Son of Prince Andrew and Jewel, Eloquence is a quarter elf and passionate about the Bass Guitar as well as Rhythm Theory. He was best friends with Magical Maurice the Percussion Wizard of Wavelength until Maurice died at the Battle of the Shire.",
+                    id: "eloquence",
+                    image: "/images/characters/wavelength/eloquence-5.webp",
+                    stakes: "Eloquence faces the challenge of navigating his identity and self-worth in the shadow of his brother's fame and the powerful King David, which puts him at risk of being overshadowed or losing his p...",
+                    tagline: "Rhythms of Fate, Secrets in Sound.",
+                    cta_text: "Discover Eloquence's Journey!"
+                },
+                jewel: {
+                    title: "Jewel",
+                    description: "The harpist of Wavelength and Wife of Prince Andrew and mother of Alexandria and Eloquence. Being half elf, she obtained a superior musical education and has innate gifted musical talents, but being a half elf her community shunner her. She met her husband at a Summer Music Workshop and after years of marriage and raising two children they formed the band Wavelength.",
+                    id: "jewel",
+                    image: "/images/characters/wavelength/jewel-5.webp",
+                    stakes: "In Wavelength Lore, Jewel faces the challenge of overcoming her past as an angry orphaned musical prodigy while navigating her complicated relationship with her distant younger brother. As she jour...",
+                    tagline: "Half-Elf Harpist: Secrets Strung in Melody.",
+                    cta_text: "Discover Jewel's Journey!"
+                },
+                lucky: {
+                    title: "Lucky",
+                    description: "Lucky is the Leprechaun who has an endless supply of Golden Advice. His wisdom has earned him a role as the a beloved token of luck to the Shire. But after the Battle of the Shire, Lucky decides to travel with Wavelength for awhile even though he isn't a musician per-se. He is a fantastic singer though. Mostly, he wants to fish and everywhere the Wavelength travels, seems to include a convenient fishing opporunity for Lucky.",
+                    id: "lucky",
+                    image: "/images/characters/wavelength/lucky_closeup.webp",
+                    stakes: "As the wise leprechaun whose Golden Advice and strategic cunning helped defeat the Goblin King, Lucky now faces the challenge of guiding Wavelength through new adventures while pursuing his passion for fishing in every waters they encounter.",
+                    tagline: "Whispers of Luck, Secrets Beneath the Waves.",
+                    cta_text: "Discover Lucky's Magic!"
+                },
+                maurice: {
+                    title: "Maurice",
+                    description: "Wavelength has been blessed with the Percussion Wizard, Maurice. Maurice is a Dwarf who is short in stature but big in heart. He is a master of rhythm and percussion, and his drumming skills are unmatched in all the land. Maurice's beats can shake the very earth and inspire courage in the hearts of his allies. He is a loyal companion to Wavelength and will stop at nothing to protect his friends and their music. He is also very much a big brother figure to Eloquence. Sadly, he died at the Battle of the Shire, defending the Shire from the Goblin King and his Misery of Goblins.",
+                    id: "maurice",
+                    image: "/images/characters/wavelength/maurice-4.webp",
+                    stakes: "In Wavelength Lore, Maurice, the Percussion Wizard, faces the critical challenge of defending the Shire from the Goblin King and his Misery of Goblins during the Battle of the Shire. His unwavering...",
+                    tagline: "Rhythms of Courage, Echoes of a Fallen Hero.",
+                    cta_text: "Discover Maurice's Rhythm!"
+                },
+                yeti: {
+                    title: "Yeti",
+                    description: "Wavelength first met Yeti up in the far, frozen North at the Ice Castle. Yeti, while ferocious looking is actually a Nurse in practice. Although very clumsy, which is how he got the name: Yeti. He keeps falling down, 'Yeti' gets back up again.",
+                    id: "yeti",
+                    image: "/images/characters/wavelength/yeti-5.webp",
+                    stakes: "With the threat of the Goblin King and his Misery of Goblins defeated, Yeti continues his dual role as both fierce protector and gentle healer at the Ice Fortress.",
+                    tagline: "Clumsy guardian, fierce healer of the frost.",
+                    cta_text: "Uncover Yeti Secrets!"
+                }
+            },
+            lore: {
+                "daphne-flower": {
+                    title: "🌸 Daphne 🌸",
+                    description: "The Daphne flower is renowned for its incredibly fragrant blossoms, which are often described as having a sweet, heady, and sometimes spicy scent. The intensity and specific nuances can vary slightly between species and even individual plants, but generally, you can expect a truly delightful aroma. Some people say that it has peculiar properties that can captivate people like an enchantment spell.",
+                    enhanced_title: "\"Daphne: The Enchantress of Fragrance\" TAGLINE: \"Beware the allure of the Daphne flower; its scent is a seductive veil hiding a perilous truth.\" DESCRIPTION: The Daphne flower, with its intoxicating aroma that dances between sweetness and spice, is not merely a botanical marvel—it is a potent instrument of enchantment...",
+                    id: "daphne-flower",
+                    image: "https://df5sj8f594cdx.cloudfront.net/images/lores/daphne-flower/ai-generated-1760986251316-43b560650f46c03e.png",
+                    type: "nature"
+                },
+                goblin: {
+                    title: "Goblins",
+                    description: "A Goblin can be nearly anyone in disguise. They often hate others without reason, and are only vaguely happy when they are spreading fear and hatred. They live to rule, and their lust for power is insatiable. Goblins can be thought of as a person who has been consumed by a Virus of Hatred, Fear and Greed. Since Misery loves Company, Goblins often travel in groups called: Misery of Goblins, and they do their best to spread Misery wherever they go.",
+                    enhanced_title: "\"Goblins: Agents of Chaos and Misery\" TAGLINE: \"Born from darkness, these creatures thrive on fear, spreading chaos wherever they roam.\" DESCRIPTION: Goblins are not merely creatures; they are the embodiment of malevolence...",
+                    id: "goblin",
+                    image: "/images/seasons/season3/episodes/episode3/images/Sneak_Attack-16.webp",
+                    type: "villain"
+                },
+                "goblin-king": {
+                    title: "Goblin King",
+                    description: "The Goblin King is a Psychopath that leads a Misery of Goblins to invade the Shire and begin the Battle of the Shire. He lives by one Rule: Goblin's Rule, which means that the only rule you ever need to know about when dealing with the Goblin King, is that he will Rule all over you. He is tricked by Lucky and the fact that Goblin's Greed is insatiable, into leaving his lair to pursue an Ice Blue Diamond, which Lucky uses to lure him out of hiding during the Battle for the Shire. Maurice was killed by the Goblin King during this battle while defending the Shire.",
+                    enhanced_title: "\"The Goblin King: Harbinger of Desolation\" TAGLINE: \"A tyrant whose insatiable greed threatens to plunge the Shire into eternal darkness.\" DESCRIPTION: The Goblin King reigns supreme over his Misery of Goblins...",
+                    id: "goblin-king",
+                    image: "/images/seasons/season4/episodes/episode3/images/GoblinsRule-17.webp",
+                    type: "villain"
+                },
+                "ice-blue-diamond": {
+                    title: "Ice Blue Diamond",
+                    description: "Ice Blue Diamonds are rare and precious gemstones found only in the lairs of Ice Dragons. These diamonds are known for their stunning blue color and are highly sought after by collectors and adventurers alike. The process of mining these diamonds is extremely dangerous, as it involves navigating the treacherous ice caves guarded by the dragons. Lucky used one of these diamonds to lure the Goblin King out of hiding during the Battle for the Shire.",
+                    enhanced_title: "The Relic of Infinite Greed TAGLINE: The jewel that awakens the darkest desires of the heart. DESCRIPTION: The Ice Blue Diamond, known as the Relic of Infinite Greed...",
+                    id: "ice-blue-diamond",
+                    image: "/images/seasons/season4/episodes/episode4/images/IceBlueGreed-27.webp",
+                    type: "thing"
+                },
+                "ice-dragons": {
+                    title: "Ice Dragons",
+                    description: "Ice Dragons are majestic and powerful creatures that inhabit the frozen landscapes of the far North. With their shimmering scales and icy breath, they are both feared and revered by the inhabitants of the Ice Fortress. These dragons are known to be fiercely protective of their territory and will not hesitate to defend it against intruders. Their lair is the only place where the rare and precious Ice Blue Diamonds can be found.",
+                    enhanced_title: "\"Ice Dragons: Guardians of Frozen Fury\" TAGLINE: \"These titanic beasts wield the fury of winter, their icy breath a harbinger of doom for those who dare intrude.\"...",
+                    id: "ice-dragons",
+                    image: "/images/seasons/season3/episodes/episode7/images/PrepareForBattle-14.webp",
+                    type: "thing"
+                },
+                "ice-fortress": {
+                    title: "Ice Fortress",
+                    description: "A majestic fortress made of ice, standing tall against the backdrop of a frozen landscape. The Ice Fortress is home to the Frostborne, a community of denizens who welcome all strangers, no matter wealth or looks or race. Here, the beauty of winter is celebrated, and the power of ice magic is harnessed to protect the realm from external threats.",
+                    enhanced_title: "\"The Ice Fortress: Bastion of Frozen Resolve\" TAGLINE: \"Within these glacial walls lies the power to either shield the innocent or unleash unspeakable terror.\"...",
+                    id: "ice-fortress",
+                    image: "/images/seasons/season3/episodes/episode6/images/icefortress-fiery-3.webp",
+                    type: "place"
+                },
+                "ice-whales": {
+                    title: "Ice Whales",
+                    description: "Ice Whales are the most dangerous evil creatures known to the deep oceans in the far, frozen North and are very different from more normally known types of whales found in the Oceans. These ferocious creatures will rip you to shreds just for spite. Some of the Shire Folk join the Denizens of the Ice Fortress to participate in the Ice Whale Hunt.",
+                    enhanced_title: "\"The Ice Whales: Harbingers of Frozen Terror\" TAGLINE: \"These malevolent leviathans unleash chaos upon the seas, feeding on despair and destruction.\"...",
+                    id: "ice-whales",
+                    image: "/images/seasons/season3/episodes/episode2/images/Ice_Whale-17.webp",
+                    type: "thing"
+                },
+                misery: {
+                    title: "Misery of Goblins",
+                    description: "A Misery of Goblins is a goblin horde that is enthralled by the Goblin King to do his bidding. They are driven by one thing: Greed. Goblins are insatiably greedy and will do anything to get their hands on treasure, especially if it is shiny. This makes them easy to manipulate, as Lucky discovered when he used an Ice Blue Diamond to lure the Goblin King out of hiding during the Battle for the Shire.",
+                    enhanced_title: "\"The Misery of Goblins: The Corrupted Horde of Greed\" TAGLINE: \"A relentless swarm, fueled by insatiable greed, bent on spreading darkness and despair across the Shire.\"...",
+                    id: "misery",
+                    image: "/images/seasons/season2/episodes/episode1/images/FallOfTheShire_take1-06.webp",
+                    type: "villain"
+                },
+                "shire-sanctuary": {
+                    title: "Shire Sanctuary",
+                    description: "A serene and peaceful sanctuary located in the heart of the Shire. The Shire Sanctuary is a place of healing and tranquility, where the weary can find rest and solace. Surrounded by lush greenery and vibrant flowers, it is tended by the kind-hearted Shire Folk who call this place home. Occasionally Wavelength will perform impromptu concerts here to lift the spirits of the Shire Folk, as was the case after the Battle for the Shire.",
+                    enhanced_title: "\"The Shire Sanctuary: Bastion of Hope Amidst Shadows\" TAGLINE: \"A sacred refuge, yet a target for darkness, where the line between healing and despair blurs.\"...",
+                    id: "shire-sanctuary",
+                    image: "/images/seasons/season4/episodes/episode8/images/shire-sanctuary-05.webp",
+                    type: "place"
+                },
+                "the-shire": {
+                    title: "The Shire",
+                    description: "A quiet realm where peace is abundant, and nature thrives alongside the residents of the Shire who are known as The Shire Folk. The Shire is known for its rolling green hills, crystal-clear streams, and the famous Shire Sanctuary where Wavelength first performed their legendary concerts. The Shire Folk are deeply connected to nature, their fellow Shire Folk community and artisian crafts. Often times, you will find Lucky, their resident Wise Elder, fishing in local streams.",
+                    enhanced_title: "\"The Shire: Heart of Tranquility, Battleground of Shadows\" TAGLINE: \"A peaceful realm now teetering on the brink of darkness, threatened by the sinister forces of greed and despair.\"...",
+                    id: "the-shire",
+                    image: "/images/seasons/season3/episodes/episode5/images/RebuildTheShire-08.webp",
+                    type: "place"
+                },
+                wavelength: {
+                    title: "Wavelength",
+                    description: "Wavelength is a mostly family band of musicians who use music to help them explore the natural world and culture. Wavelength gained their fame due to the Battle of the Shire that they personally experienced and retell in their music. They are known for their love of music, adventure, and storytelling through song.",
+                    enhanced_title: "\"Wavelength: The Harmonious Guardians of the Shire\" TAGLINE: \"In a world torn asunder by the Goblin King, their music is the last beacon of hope against darkness.\"...",
+                    id: "wavelength",
+                    image: "/images/seasons/season4/episodes/episode8/images/shire-sanctuary-04.webp",
+                    type: "band"
+                }
+            }
+        };
+
+        // Utility functions
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function truncateText(text, maxLength = 200) {
+            // No truncation - show full text
+            return text;
+        }
+
+        function generateFirebaseCommand(collection, docId, fieldPath, currentValue) {
+            const escapedValue = currentValue.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+            return `firebase database:update /${collection}/${docId}/${fieldPath} --data '"${escapedValue}"'`;
+        }
+
+        function isCTAField(fieldName) {
+            const ctaPatterns = [
+                'cta_text',
+                'cta_primary', 
+                'cta_secondary',
+                'investigation_cta',
+                'action_cta',
+                'call_to_action',
+                'button_text'
+            ];
+            return ctaPatterns.some(pattern => 
+                fieldName.toLowerCase().includes(pattern.toLowerCase())
+            );
+        }
+
+        function copyToClipboard(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function toggleCommand(button) {
+            const commandSection = button.closest('.command-section');
+            const isCollapsed = commandSection.classList.contains('collapsed');
+            
+            if (isCollapsed) {
+                commandSection.classList.remove('collapsed');
+                button.textContent = 'Hide';
+            } else {
+                commandSection.classList.add('collapsed');
+                button.textContent = 'Show';
+            }
+        }
+
+        function updateCommand(textarea, collection, docId, fieldName) {
+            const newValue = textarea.value;
+            const command = generateFirebaseCommand(collection, docId, fieldName, newValue);
+            const commandCode = textarea.closest('.field-item').querySelector('.command-code');
+            commandCode.textContent = command;
+            
+            // Update the copy button to use the new command
+            const copyBtn = textarea.closest('.field-item').querySelector('.copy-btn');
+            copyBtn.onclick = () => copyToClipboard(command, copyBtn);
+        }
+
+        function createFieldItem(fieldName, fieldValue, collection, docId) {
+            const isCTA = isCTAField(fieldName);
+            const fieldType = isCTA ? 'cta' : 'text';
+            const command = generateFirebaseCommand(collection, docId, fieldName, fieldValue);
+            const escapedValue = escapeHtml(fieldValue);
+            const fieldId = `field_${collection}_${docId}_${fieldName}`;
+            
+            return `
+                <div class="field-item ${isCTA ? 'cta-highlight' : ''}" data-collection="${collection}" data-doc-id="${docId}" data-field-name="${fieldName}">
+                    <div class="field-header">
+                        <span>${fieldName}</span>
+                        <span class="field-type ${fieldType}">${fieldType.toUpperCase()}</span>
+                    </div>
+                    <div class="field-content">
+                        <textarea 
+                            class="field-value" 
+                            id="${fieldId}"
+                            placeholder="Edit ${fieldName} content here..."
+                            oninput="updateCommand(this, '${collection}', '${docId}', '${fieldName}')"
+                        >${escapedValue}</textarea>
+                        <div class="command-section collapsed">
+                            <div class="command-header">
+                                <button class="toggle-btn" onclick="toggleCommand(this)">Show</button>
+                                <span>🔧 Firebase Update Command (Live Updated)</span>
+                                <button class="copy-btn" onclick="copyToClipboard(this.closest('.field-item').querySelector('.command-code').textContent, this)">Copy</button>
+                            </div>
+                            <div class="command-code">${escapeHtml(command)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createItemCard(itemId, itemData, collection) {
+            const textFields = [];
+            const ctaFields = [];
+            
+            Object.entries(itemData).forEach(([fieldName, fieldValue]) => {
+                if (typeof fieldValue === 'string' && fieldValue.trim()) {
+                    if (isCTAField(fieldName)) {
+                        ctaFields.push(createFieldItem(fieldName, fieldValue, collection, itemId));
+                    } else {
+                        textFields.push(createFieldItem(fieldName, fieldValue, collection, itemId));
+                    }
+                }
+            });
+
+            return `
+                <div class="item-card" data-type="${collection}" data-id="${itemId}">
+                    <div class="item-header">
+                        ${itemData.title || itemId} (${itemId})
+                    </div>
+                    <div class="item-content">
+                        ${ctaFields.length > 0 ? `
+                            <div class="field-group">
+                                <div class="field-group-title">🎯 CTA Fields (${ctaFields.length})</div>
+                                ${ctaFields.join('')}
+                            </div>
+                        ` : ''}
+                        ${textFields.length > 0 ? `
+                            <div class="field-group">
+                                <div class="field-group-title">📄 Text Fields (${textFields.length})</div>
+                                ${textFields.join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderContent() {
+            const charactersGrid = document.getElementById('charactersGrid');
+            const loreGrid = document.getElementById('loreGrid');
+
+            // Render Characters
+            charactersGrid.innerHTML = Object.entries(auditData.characters)
+                .map(([id, data]) => createItemCard(id, data, 'characters'))
+                .join('');
+
+            // Render Lore
+            loreGrid.innerHTML = Object.entries(auditData.lore)
+                .map(([id, data]) => createItemCard(id, data, 'lore'))
+                .join('');
+        }
+
+        function filterContent() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            const fieldFilter = document.getElementById('fieldFilter').value;
+
+            const itemCards = document.querySelectorAll('.item-card');
+            
+            itemCards.forEach(card => {
+                const cardType = card.dataset.type;
+                const cardId = card.dataset.id;
+                const cardText = card.textContent.toLowerCase();
+                
+                // Type filter
+                if (typeFilter && cardType !== typeFilter) {
+                    card.style.display = 'none';
+                    return;
+                }
+                
+                // Search filter
+                if (searchTerm && !cardText.includes(searchTerm)) {
+                    card.style.display = 'none';
+                    return;
+                }
+                
+                // Field filter
+                if (fieldFilter === 'cta') {
+                    const hasCTA = card.querySelector('.cta-highlight');
+                    if (!hasCTA) {
+                        card.style.display = 'none';
+                        return;
+                    }
+                } else if (fieldFilter === 'text') {
+                    const hasCTA = card.querySelector('.cta-highlight');
+                    if (hasCTA) {
+                        card.style.display = 'none';
+                        return;
+                    }
+                }
+                
+                card.style.display = 'block';
+            });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            renderContent();
+            
+            // Add event listeners for filters
+            document.getElementById('searchInput').addEventListener('input', filterContent);
+            document.getElementById('typeFilter').addEventListener('change', filterContent);
+            document.getElementById('fieldFilter').addEventListener('change', filterContent);
+        });
+    </script>
+</body>
+</html>
