@@ -21,14 +21,20 @@
         <a href="/radio" class="radio-nav-link">🎵 Experience Music</a>
       </li>
 
-      <!-- Enhanced Community Dropdown -->
+      <!-- Gallery - Direct Link (Prominent Access) -->
+      <li id="gallery-nav-item" style="display: none;">
+        <a href="/my-gallery" class="gallery-nav-link" title="View your saved images">🖼️ Collection</a>
+      </li>
+
+      <!-- Enhanced Community Dropdown - Reorganized -->
       <li class="has-dropdown">
         <a href="#" onclick="return false;">✨ Join Community</a>
         <ul class="dropdown">
-          <li><a href="/forum">💭 Share Theories</a></li>
-          <li id="leaderboard-dropdown-item" style="display: none;"><a href="/leaderboard">🏆 Compete & Win</a></li>
+          <!-- User Profile Section (top of dropdown) -->
           <li id="profile-dropdown-item" style="display: none;"><a href="/forum/profile">👤 Your Journey</a></li>
-          <li id="gallery-dropdown-item" style="display: none;"><a href="/my-gallery">🖼️ Your Collection</a></li>
+          <li id="leaderboard-dropdown-item" style="display: none;"><a href="/leaderboard">🏆 Compete & Win</a></li>
+          <!-- Community Discussion Section (below profile) -->
+          <li class="dropdown-divider"><a href="/forum">💭 Share Theories</a></li>
         </ul>
       </li>
 
@@ -103,15 +109,16 @@
                   if (leaderboardDropdownItem) {
                     leaderboardDropdownItem.style.display = 'block';
                   }
-                  
+
                   const profileDropdownItem = document.getElementById('profile-dropdown-item');
                   if (profileDropdownItem) {
                     profileDropdownItem.style.display = 'block';
                   }
-                  
-                  const galleryDropdownItem = document.getElementById('gallery-dropdown-item');
-                  if (galleryDropdownItem) {
-                    galleryDropdownItem.style.display = 'block';
+
+                  // Show gallery as a direct nav item (prominent access)
+                  const galleryNavItem = document.getElementById('gallery-nav-item');
+                  if (galleryNavItem) {
+                    galleryNavItem.style.display = 'block';
                   }
 
                   // Show admin link if user is admin
@@ -338,6 +345,18 @@
     color: var(--primary-color, #ffd700);
     padding-left: 1.5rem;
   }
+
+  /* Dropdown divider for section separation */
+  header nav ul.dropdown li.dropdown-divider {
+    border-top: 1px solid rgba(255, 215, 0, 0.3) !important;
+    margin-top: 8px !important;
+    padding-top: 8px !important;
+    border-bottom: none !important;
+  }
+
+  header nav ul.dropdown li.dropdown-divider a {
+    padding-top: 0.75rem !important;
+  }
   /* Don't apply styles to dropdown links - handled by nav-dropdown.css */
   header > nav > ul > li > a {
     color: #fff;
@@ -439,6 +458,43 @@
     background: linear-gradient(135deg, #a78bfa, #818cf8) !important;
     transform: translateY(-2px) !important;
     box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important;
+    border-color: rgba(255, 215, 0, 0.6) !important;
+  }
+
+  /* Gallery Navigation Link Styling */
+  .gallery-nav-link {
+    background: linear-gradient(135deg, #06b6d4, #0891b2) !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    color: #ffd700 !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+    border: 2px solid rgba(255, 215, 0, 0.3) !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .gallery-nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .gallery-nav-link:hover::before {
+    left: 100%;
+  }
+
+  .gallery-nav-link:hover {
+    background: linear-gradient(135deg, #0891b2, #06b6d4) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4) !important;
     border-color: rgba(255, 215, 0, 0.6) !important;
   }
 
