@@ -1422,12 +1422,12 @@ class MerchandiseStore {
     }, 500);
   }
   
-  startGuidedTour() {
+  startGuidedTour(forceStart = false) {
     console.log('🎭 Starting Liberation Vault guided tour...');
     
-    // Check if user has completed tour before
-    const tourCompleted = localStorage.getItem('wavelength_vault_tour_completed') === 'true';
-    console.log('🔍 Tour completed check:', tourCompleted);
+    // Check if user has completed tour before (unless forcing start)
+    const tourCompleted = !forceStart && localStorage.getItem('wavelength_vault_tour_completed') === 'true';
+    console.log('🔍 Tour completed check:', tourCompleted, '| Force start:', forceStart);
     
     if (tourCompleted) {
       console.log('🔄 Tour already completed, showing replay option');
@@ -1704,8 +1704,10 @@ class MerchandiseStore {
   replayTour() {
     // Remove any existing notifications
     document.querySelectorAll('.tour-replay-notification').forEach(el => el.remove());
-    // Start the guided tour from beginning (this will initialize tour steps)
-    this.startGuidedTour();
+    
+    // Start the guided tour from beginning with force flag (bypasses completion check)
+    console.log('🔄 Starting tour replay (forced)');
+    this.startGuidedTour(true);
   }
 
   /**
@@ -1845,33 +1847,43 @@ class MerchandiseStore {
   renderProductPreview() {
     return `
       <div class="tour-preview-content">
-        <div class="preview-products">
-          <div class="preview-product-card">
-            <div class="preview-image">🖼️</div>
-            <div class="preview-details">
-              <h4>Custom T-Shirt</h4>
-              <p>Your Image • Unisex • Size M</p>
-              <div class="preview-price">$24.99</div>
-              <div class="preview-actions">
-                <button class="preview-btn">Preview</button>
-                <button class="preview-btn primary">Add to Cart</button>
+        <div class="preview-empty-state">
+          <div class="empty-state-icon">📦</div>
+          <h3>Your Custom Products Will Appear Here</h3>
+          <p>After you select gallery images and create custom merchandise, you'll see beautiful product cards like these:</p>
+          
+          <div class="preview-product-examples">
+            <div class="example-card">
+              <div class="example-image">👕</div>
+              <div class="example-text">
+                <strong>Custom T-Shirts</strong><br>
+                <small>Your designs on premium apparel</small>
+              </div>
+            </div>
+            <div class="example-card">
+              <div class="example-image">☕</div>
+              <div class="example-text">
+                <strong>Mugs & Accessories</strong><br>
+                <small>Perfect for daily use</small>
+              </div>
+            </div>
+            <div class="example-card">
+              <div class="example-image">🖼️</div>
+              <div class="example-text">
+                <strong>Art Prints</strong><br>
+                <small>Gallery-quality reproductions</small>
               </div>
             </div>
           </div>
-          <div class="preview-product-card">
-            <div class="preview-image">☕</div>
-            <div class="preview-details">
-              <h4>Liberation Mug</h4>
-              <p>Your Image • Ceramic • 11oz</p>
-              <div class="preview-price">$16.99</div>
-              <div class="preview-actions">
-                <button class="preview-btn">Preview</button>
-                <button class="preview-btn primary">Add to Cart</button>
-              </div>
-            </div>
+          
+          <div class="preview-note">
+            <strong>✨ The Process:</strong><br>
+            1. Save images from episodes to your gallery<br>
+            2. Select an image and choose a product type<br>
+            3. Customize and add to cart<br>
+            4. Your creations appear in this section!
           </div>
         </div>
-        <p class="preview-note">💡 Your custom products will appear here after creation</p>
       </div>
     `;
   }
