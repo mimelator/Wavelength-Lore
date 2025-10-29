@@ -52,7 +52,9 @@
     "wavelength:extract-character-help": "node wavelength-tools/character-extractor/cli.js --help",
     "wavelength:extract-character-examples": "node wavelength-tools/character-extractor/cli.js --help-example",
     "wavelength:extract-batch": "node wavelength-tools/character-extractor/batch-cli.js",
-    "wavelength:extract-batch-sample": "node wavelength-tools/character-extractor/batch-cli.js --sample-config"
+    "wavelength:extract-batch-sample": "node wavelength-tools/character-extractor/batch-cli.js --sample-config",
+    "wavelength:content-audit": "node wavelength-content-audit.js",
+    "wavelength:content-audit-html": "python3 -m http.server 8080 && open http://localhost:8080/wavelength-content-audit-report.html"
   },
   "dependencies": {
     "@aws-sdk/client-apprunner": "^3.917.0",

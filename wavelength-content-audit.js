@@ -109,7 +109,7 @@ class ContentAuditor {
     // Create the database path
     const dbPath = `${collection}/${docId}/${fieldPath}`;
     
-    return `firebase database:update /${dbPath} --data '"${escapedValue}"'`;
+    return `firebase database:set /${dbPath} --data '"${escapedValue}"'`;
   }
 
   /**

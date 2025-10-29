@@ -602,11 +602,14 @@
         }
 
         function generateFirebaseCommand(collection, docId, fieldPath, currentValue) {
+            // Escape quotes and special characters for JSON
             const escapedValue = currentValue.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-            return `firebase database:update /${collection}/${docId}/${fieldPath} --data '"${escapedValue}"'`;
-        }
-
-        function isCTAField(fieldName) {
+            
+            // Create the database path
+            const dbPath = `${collection}/${docId}/${fieldPath}`;
+            
+            return `firebase database:set /${dbPath} --data '"${escapedValue}"'`;
+        }        function isCTAField(fieldName) {
             const ctaPatterns = [
                 'cta_text',
                 'cta_primary', 
