@@ -1,0 +1,7 @@
+# Wavelength Character Extraction Test Config
+# Format: imagePath,description,characterId,outputName,crop
+
+# Test extractions
+public/upscaled-images/upscaled-4fdbYxJHjEP4xksk9sgFE3lgYUs2-1761592747982.jpg,elf character singing,test-elf-1,test_elf_1.png,false
+IceBlueGreed-19.png,goblin peeking from tree right side,test-goblin-1,test_goblin_1.png,true
+public/upscaled-images/upscaled-4fdbYxJHjEP4xksk9sgFE3lgYUs2-1761593535934.jpg,elf with guitar,test-elf-2,test_elf_2.png,false

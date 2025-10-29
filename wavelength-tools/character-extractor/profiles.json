@@ -1,0 +1,33 @@
+{
+  "profiles": {
+    "focal-elf": {
+      "description": "Main elf character singing with guitar",
+      "crop": false,
+      "outputName": "focal_elf.png",
+      "notes": "Use for focal elf portraits"
+    },
+    "sneaky-goblin": {
+      "description": "Goblin peeking from tree right side",
+      "crop": true,
+      "outputName": "sneaky_goblin.png",
+      "notes": "Background goblin from IceBlueGreed-19.png"
+    },
+    "bg-wizard": {
+      "description": "Wizard in the distance",
+      "crop": true,
+      "outputName": "wizard_bg.png",
+      "notes": "Use --crop for background wizards"
+    },
+    "side-character": {
+      "description": "Character on the side of scene",
+      "crop": true,
+      "outputName": "side_char.png",
+      "notes": "Always use crop for side/background characters"
+    }
+  },
+  "quick-commands": {
+    "extract-goblin": "npm run wavelength:extract-character -- --image=IceBlueGreed-19.png --description='goblin peeking from tree right side' --crop --character-id=sneaky-goblin",
+    "extract-focal": "npm run wavelength:extract-character -- --image=public/upscaled-images/upscaled-4fdbYxJHjEP4xksk9sgFE3lgYUs2-1761592747982.jpg --description='elf character singing' --character-id=focal-elf",
+    "batch-test": "npm run wavelength:extract-batch -- --config=character-extractions-test.csv"
+  }
+}
