@@ -6,6 +6,16 @@
  * Wraps the working bash script for use in CLI admin mode
  */
 
+require('dotenv').config();
+
+// Map dev credentials to AWS CLI standard variables
+if (process.env.aws_wavelength_dev_access_key_id) {
+    process.env.AWS_ACCESS_KEY_ID = process.env.aws_wavelength_dev_access_key_id;
+}
+if (process.env.aws_wavelength_dev_secret_access_key) {
+    process.env.AWS_SECRET_ACCESS_KEY = process.env.aws_wavelength_dev_secret_access_key;
+}
+
 const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
