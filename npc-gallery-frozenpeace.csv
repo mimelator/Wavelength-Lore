@@ -1,0 +1,27 @@
+# Wavelength NPC Gallery Extraction - Frozen Peace Episode
+# Rich source: FrozenPeace-01.png has Ice Dragons, elves, woodland creatures, sprites
+# Format: imagePath,description,characterId,outputName,crop
+
+# FROZEN PEACE EPISODE - Mix of backgrounds and magical creatures
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-01.png,ice dragon flying in sky blue magical creature,fp-ice-dragon-1,fp_ice_dragon_1.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-01.png,elf character in brown outfit,fp-elf-1,fp_elf_1.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-01.png,elf in green outfit,fp-elf-2,fp_elf_2.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-01.png,snow rabbit or arctic creature,fp-rabbit-1,fp_snow_rabbit_1.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-01.png,arctic fox creature,fp-fox-1,fp_arctic_fox_1.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-01.png,elf character red outfit,fp-elf-3,fp_elf_3.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-01.png,winter sprite or pixie,fp-sprite-1,fp_winter_sprite_1.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-01.png,woodland creature in forest,fp-creature-1,fp_creature_1.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-01.png,reindeer or arctic deer,fp-deer-1,fp_arctic_deer.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-01.png,background elf character,fp-elf-4,fp_elf_4.png,true
+
+# Additional Frozen Peace images for more NPCs
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-02.png,ice dragon or magical creature,fp-ice-dragon-2,fp_ice_dragon_2.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-02.png,elf character,fp-elf-5,fp_elf_5.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-02.png,woodland creature,fp-creature-2,fp_creature_2.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-03.png,ice dragon or sprite,fp-ice-dragon-3,fp_ice_dragon_3.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-03.png,arctic animal,fp-arctic-animal-1,fp_arctic_animal_1.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-04.png,elf character background,fp-elf-6,fp_elf_6.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-04.png,winter creature,fp-creature-3,fp_creature_3.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-05.png,magical sprite,fp-sprite-2,fp_sprite_2.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-05.png,woodland npc,fp-woodland-1,fp_woodland_1.png,true
+/Volumes/5bits/current/Ice Fortress Concert Assets/Frozen Peace/FrozenPeace-06.png,ice creature,fp-creature-4,fp_creature_4.png,true

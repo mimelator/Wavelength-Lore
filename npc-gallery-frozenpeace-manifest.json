@@ -1,0 +1,130 @@
+{
+  "timestamp": "2025-10-29T09:18:56.685Z",
+  "summary": {
+    "total": 20,
+    "successful": 19,
+    "failed": 1,
+    "successRate": "95.0%"
+  },
+  "characters": [
+    {
+      "characterId": "fp-ice-dragon-1",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_ice_dragon_1.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-elf-1",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_elf_1.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-elf-2",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_elf_2.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-rabbit-1",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_snow_rabbit_1.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-fox-1",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_arctic_fox_1.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-elf-3",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_elf_3.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-sprite-1",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_winter_sprite_1.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-creature-1",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_creature_1.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-deer-1",
+      "success": false,
+      "error": "Character detection failed: Character not detected: reindeer or arctic deer"
+    },
+    {
+      "characterId": "fp-elf-4",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_elf_4.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-ice-dragon-2",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_ice_dragon_2.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-elf-5",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_elf_5.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-creature-2",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_creature_2.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-ice-dragon-3",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_ice_dragon_3.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-arctic-animal-1",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_arctic_animal_1.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-elf-6",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_elf_6.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-creature-3",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_creature_3.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-sprite-2",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_sprite_2.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-woodland-1",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_woodland_1.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "fp-creature-4",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/fp_creature_4.png",
+      "confidence": "high"
+    }
+  ]
+}
