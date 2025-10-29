@@ -1,0 +1,121 @@
+{
+  "testDate": "2025-10-29T15:58:45.231Z",
+  "emailProvider": "console",
+  "testEmail": "mimel@imelshire.com",
+  "summary": {
+    "total": 18,
+    "passed": 14,
+    "failed": 4,
+    "successRate": 78
+  },
+  "results": [
+    {
+      "testName": "Standard Order Confirmation",
+      "passed": true,
+      "error": null,
+      "timestamp": "2025-10-29T15:58:45.228Z"
+    },
+    {
+      "testName": "Multiple Items Order",
+      "passed": true,
+      "error": null,
+      "timestamp": "2025-10-29T15:58:45.228Z"
+    },
+    {
+      "testName": "Order with Tax",
+      "passed": false,
+      "error": "Tax not properly displayed",
+      "timestamp": "2025-10-29T15:58:45.228Z"
+    },
+    {
+      "testName": "International Order",
+      "passed": true,
+      "error": null,
+      "timestamp": "2025-10-29T15:58:45.228Z"
+    },
+    {
+      "testName": "Support Ticket Notification",
+      "passed": false,
+      "error": "Support notification content missing",
+      "timestamp": "2025-10-29T15:58:45.229Z"
+    },
+    {
+      "testName": "Support Acknowledgment",
+      "passed": false,
+      "error": "Support acknowledgment content missing",
+      "timestamp": "2025-10-29T15:58:45.229Z"
+    },
+    {
+      "testName": "HTML Template Validation",
+      "passed": false,
+      "error": "Missing BODY section",
+      "timestamp": "2025-10-29T15:58:45.229Z"
+    },
+    {
+      "testName": "Image Links Validation",
+      "passed": true,
+      "error": null,
+      "timestamp": "2025-10-29T15:58:45.229Z"
+    },
+    {
+      "testName": "Action Buttons Validation",
+      "passed": true,
+      "error": null,
+      "timestamp": "2025-10-29T15:58:45.230Z"
+    },
+    {
+      "testName": "Email Provider Configuration",
+      "passed": true,
+      "error": null,
+      "timestamp": "2025-10-29T15:58:45.230Z"
+    },
+    {
+      "testName": "Email Delivery Success",
+      "passed": true,
+      "error": "Skipped - console mode",
+      "timestamp": "2025-10-29T15:58:45.230Z"
+    },
+    {
+      "testName": "Invalid Email Handling",
+      "passed": true,
+      "error": null,
+      "timestamp": "2025-10-29T15:58:45.230Z"
+    },
+    {
+      "testName": "Missing Order Data Handling",
+      "passed": true,
+      "error": null,
+      "timestamp": "2025-10-29T15:58:45.230Z"
+    },
+    {
+      "testName": "Mobile Viewport Configuration",
+      "passed": true,
+      "error": null,
+      "timestamp": "2025-10-29T15:58:45.230Z"
+    },
+    {
+      "testName": "Responsive Styles Validation",
+      "passed": true,
+      "error": null,
+      "timestamp": "2025-10-29T15:58:45.231Z"
+    },
+    {
+      "testName": "Brand Consistency",
+      "passed": true,
+      "error": null,
+      "timestamp": "2025-10-29T15:58:45.231Z"
+    },
+    {
+      "testName": "Contact Information",
+      "passed": true,
+      "error": null,
+      "timestamp": "2025-10-29T15:58:45.231Z"
+    },
+    {
+      "testName": "Legal Compliance",
+      "passed": true,
+      "error": null,
+      "timestamp": "2025-10-29T15:58:45.231Z"
+    }
+  ]
+}

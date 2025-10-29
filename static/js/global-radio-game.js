@@ -242,6 +242,12 @@ class GlobalRadioGame {
 
     restorePlaybackState() {
         try {
+            // Check if WavelengthRadio is taking control
+            if (window.wavelengthRadioActive || this.disabled) {
+                console.log('🔄 Global radio game disabled - WavelengthRadio in control');
+                return;
+            }
+
             const savedState = localStorage.getItem('global_radio_playback_state');
             if (!savedState) return;
 

@@ -2,9 +2,21 @@
 
 class WavelengthRadio {
     constructor() {
-        // Audio elements
-        this.audio = document.getElementById('audioPlayer');
-        this.playlist = window.WAVELENGTH_PLAYLIST || [];
+        // Detect player type and set appropriate audio element
+        const fullPlayerAudio = document.getElementById('audioPlayer');
+        const miniPlayerAudio = document.getElementById('globalRadioAudio');
+        
+        this.audio = fullPlayerAudio || miniPlayerAudio;
+        this.isMiniPlayer = !fullPlayerAudio; // true if using global mini player
+        
+        console.log(`🔍 Radio player detection: fullPlayer=${!!fullPlayerAudio}, miniPlayer=${!!miniPlayerAudio}, isMiniPlayer=${this.isMiniPlayer}`);
+        
+        if (!this.audio) {
+            throw new Error('No compatible audio element found (audioPlayer or globalRadioAudio)');
+        }
+        
+        // Enhanced playlist loading with fallback
+        this.loadPlaylist();
         this.cdnUrl = window.CDN_URL || '';
 
         // Player state
@@ -45,25 +57,101 @@ class WavelengthRadio {
         this.init();
     }
 
+    // Enhanced playlist loading with multiple fallback strategies
+    loadPlaylist() {
+        try {
+            // Strategy 1: Use window.WAVELENGTH_PLAYLIST if available
+            if (window.WAVELENGTH_PLAYLIST && window.WAVELENGTH_PLAYLIST.length > 0) {
+                this.playlist = window.WAVELENGTH_PLAYLIST;
+                console.log(`🎵 Loaded playlist from window.WAVELENGTH_PLAYLIST: ${this.playlist.length} tracks`);
+                return;
+            }
+
+            // Strategy 2: Use window.globalRadioPlaylist if available (used by global radio game)
+            if (window.globalRadioPlaylist && window.globalRadioPlaylist.length > 0) {
+                this.playlist = window.globalRadioPlaylist;
+                console.log(`🎵 Loaded playlist from window.globalRadioPlaylist: ${this.playlist.length} tracks`);
+                return;
+            }
+
+            // Strategy 3: Try to load from global radio game instance
+            if (window.globalRadioGame && window.globalRadioGame.playlist && window.globalRadioGame.playlist.length > 0) {
+                this.playlist = [...window.globalRadioGame.playlist]; // Create copy to avoid reference issues
+                console.log(`🎵 Loaded playlist from globalRadioGame instance: ${this.playlist.length} tracks`);
+                return;
+            }
+
+            // Strategy 4: Load playlist directly via API call
+            this.loadPlaylistFromAPI();
+
+            // Strategy 5: Fallback to empty playlist
+            console.warn('⚠️ No playlist found, using empty playlist. Will retry during state restoration.');
+            this.playlist = [];
+
+        } catch (error) {
+            console.error('Error loading playlist:', error);
+            this.playlist = [];
+        }
+    }
+
+    // Load playlist directly from API
+    async loadPlaylistFromAPI() {
+        try {
+            console.log('🌐 Loading playlist from API...');
+            const response = await fetch('/api/radio/playlist');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            if (data && data.length > 0) {
+                this.playlist = data;
+                console.log(`🎵 Loaded playlist from API: ${this.playlist.length} tracks`);
+                
+                // If we have state waiting to be restored, try again now
+                if (this.pendingStateRestore && this.pendingState) {
+                    console.log('🔄 Playlist loaded, attempting delayed state restoration...');
+                    this.restoreStateOnInit(this.pendingState);
+                    this.pendingStateRestore = false;
+                    this.pendingState = null;
+                }
+            }
+        } catch (error) {
+            console.warn('⚠️ Failed to load playlist from API:', error);
+        }
+    }
+
     init() {
         // Pause and cleanup global radio player if it exists (shouldn't exist, but safeguard)
         this.pauseGlobalPlayer();
 
         this.bindControls();
-        this.bindPlaylist();
         this.bindAudioEvents();
-        this.recalculateTotalPoints(); // Ensure total points are accurate
-        this.updateStats();
-        this.startMysticalSpawner();
-        this.loadFavorites();
-        this.initFirebaseSync();
-        this.initSoundSystem();
-        this.bindSoundToggle();
-        this.initWeatherEffects();
+        
+        if (this.isMiniPlayer) {
+            // Mini player: core functionality for state synchronization
+            console.log('🎵 Initializing mini radio player with state sync');
+            this.bindPlaylist(); // Need playlist for track switching and state restoration
+            this.loadFavorites();
+            this.initSoundSystem();
+            this.initStateSync(); // Enhanced state synchronization for mini player
+        } else {
+            // Full player: complete initialization
+            console.log('🎵 Initializing full radio player');
+            this.bindPlaylist();
+            this.recalculateTotalPoints(); // Ensure total points are accurate
+            this.updateStats();
+            this.startMysticalSpawner();
+            this.loadFavorites();
+            this.initFirebaseSync();
+            this.initSoundSystem();
+            this.bindSoundToggle();
+            this.initWeatherEffects();
+            this.initStateSync(); // Enhanced state synchronization for full player
 
-        // Initialize screensaver module (if available)
-        if (typeof RadioScreenSaver !== 'undefined') {
-            this.screensaver = new RadioScreenSaver(this);
+            // Initialize screensaver module (if available)
+            if (typeof RadioScreenSaver !== 'undefined') {
+                this.screensaver = new RadioScreenSaver(this);
+            }
         }
 
         // Restore saved player settings
@@ -203,6 +291,189 @@ class WavelengthRadio {
             }
         } catch (error) {
             console.error('Error restoring global player state:', error);
+        }
+    }
+
+
+
+    // Enhanced state synchronization for seamless mini/full player experience
+    initStateSync() {
+        console.log(`🔄 Initializing enhanced state sync for ${this.isMiniPlayer ? 'mini' : 'full'} player`);
+
+        // Disable the global radio game since WavelengthRadio is taking control
+        this.disableGlobalRadioGame();
+
+        // Create cross-tab state synchronization
+        if (typeof window !== 'undefined') {
+            // Listen for storage changes from other tabs/players
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'global_radio_playback_state' && e.newValue) {
+                    this.handleRemoteStateChange(JSON.parse(e.newValue));
+                }
+            });
+
+            // Enhanced periodic state sync for same-tab experience
+            this.stateSyncInterval = setInterval(() => {
+                this.syncState();
+            }, 1000); // Sync every second
+        }
+
+        // Initial state restoration with enhanced logic
+        this.restoreStateOnInit();
+    }
+
+    // Disable global radio game to prevent conflicts
+    disableGlobalRadioGame() {
+        try {
+            // Signal to global radio game that WavelengthRadio is in control
+            if (typeof window !== 'undefined') {
+                window.wavelengthRadioActive = true;
+                
+                // If global radio game is already running, pause it
+                if (window.globalRadioGame) {
+                    console.log('🔄 Disabling global radio game - WavelengthRadio taking control');
+                    if (window.globalRadioGame.audio) {
+                        window.globalRadioGame.audio.pause();
+                    }
+                    // Disable its auto-resume
+                    window.globalRadioGame.disabled = true;
+                }
+            }
+        } catch (error) {
+            console.warn('Error disabling global radio game:', error);
+        }
+    }
+
+    // Handle state changes from other tabs/players
+    handleRemoteStateChange(newState) {
+        // Only sync if this isn't the active player (avoid feedback loops)
+        if (!this.isPlaying && newState.isPlaying) {
+            console.log('📻 Remote player started - syncing state');
+            this.syncToRemoteState(newState);
+        }
+    }
+
+    // Sync to remote state from another player instance
+    syncToRemoteState(state) {
+        if (state.trackIndex >= 0 && state.trackIndex < this.playlist.length) {
+            this.currentTrackIndex = state.trackIndex;
+            
+            // Update UI to show current track (but don't auto-play)
+            if (this.playlist[state.trackIndex]) {
+                this.updateNowPlaying(this.playlist[state.trackIndex]);
+            }
+            
+            // Sync volume
+            if (state.volume !== undefined && Math.abs(this.audio.volume - state.volume) > 0.01) {
+                this.audio.volume = state.volume;
+                const volumeSlider = document.getElementById('volumeSlider') || document.getElementById('globalVolumeSlider');
+                if (volumeSlider) {
+                    volumeSlider.value = state.volume * 100;
+                }
+            }
+        }
+    }
+
+    // Enhanced state restoration on initialization
+    restoreStateOnInit() {
+        try {
+            const savedState = localStorage.getItem('global_radio_playback_state');
+            if (!savedState) return;
+
+            const state = JSON.parse(savedState);
+            console.log('🔄 Restoring shared playback state:', state);
+
+            // Check if we need to wait for playlist to load
+            if ((!this.playlist || this.playlist.length === 0) && state.trackIndex >= 0) {
+                console.warn('⚠️ Playlist not ready, setting flag to retry when API loads...');
+                this.pendingStateRestore = true;
+                this.pendingState = state;
+                return;
+            }
+
+            // Always restore track and volume info for continuity
+            if (state.trackIndex >= 0 && state.trackIndex < this.playlist.length) {
+                this.currentTrackIndex = state.trackIndex;
+                this.updateNowPlaying(this.playlist[state.trackIndex]);
+                
+                // Restore volume immediately
+                if (state.volume !== undefined) {
+                    this.audio.volume = state.volume;
+                    const volumeSlider = document.getElementById('volumeSlider') || document.getElementById('globalVolumeSlider');
+                    if (volumeSlider) {
+                        volumeSlider.value = state.volume * 100;
+                    }
+                }
+                
+                // For mini player, restore full playback state including resuming if it was playing
+                if (this.isMiniPlayer) {
+                    console.log(`🔍 Mini player restore: playlist length=${this.playlist.length}, trackIndex=${state.trackIndex}`);
+                    
+                    const track = this.playlist[state.trackIndex];
+                    if (!track) {
+                        console.warn(`⚠️ Mini player: Track ${state.trackIndex} not found in playlist`);
+                        return;
+                    }
+                    
+                    console.log(`🎵 Mini player loading track: "${track.title}" (S${track.season}E${track.episode})`);
+                    const audioPath = `${this.cdnUrl}/images/seasons/season${track.season}/episodes/episode${track.episode}/${track.file}`;
+                    this.audio.src = audioPath;
+                    this.audio.load();
+                    
+                    // Set current time and resume playback if it was playing
+                    this.audio.addEventListener('loadedmetadata', () => {
+                        console.log(`🎵 Mini player: loadedmetadata fired, duration=${this.audio.duration}s`);
+                        
+                        if (state.currentTime > 0 && state.currentTime < this.audio.duration) {
+                            this.audio.currentTime = state.currentTime;
+                            console.log(`🎵 Mini player: Set current time to ${state.currentTime}s`);
+                        }
+                        
+                        // Resume playback if it was playing when we navigated away
+                        if (state.isPlaying) {
+                            console.log(`📻 Mini player resuming playback at ${Math.floor(state.currentTime)}s`);
+                            this.audio.play().then(() => {
+                                this.isPlaying = true;
+                                this.updatePlayButton();
+                                console.log(`✅ Mini player: Successfully resumed playback`);
+                            }).catch(error => {
+                                console.warn('🚫 Mini player autoplay prevented:', error);
+                                // Update UI to show ready-to-play state
+                                this.isPlaying = false;
+                                this.updatePlayButton();
+                            });
+                        }
+                    }, { once: true });
+                    
+                    // Add error handling for audio loading
+                    this.audio.addEventListener('error', (e) => {
+                        console.error('❌ Mini player: Audio loading error:', e);
+                    }, { once: true });
+                }
+            }
+
+        } catch (error) {
+            console.error('Error restoring shared state:', error);
+        }
+    }
+
+
+
+    // Periodic state synchronization
+    syncState() {
+        // Save current state if we're the active player
+        if (this.isPlaying) {
+            this.savePlaybackState();
+        }
+    }
+
+    // Enhanced cleanup
+    cleanup() {
+        if (this.stateSyncInterval) {
+            clearInterval(this.stateSyncInterval);
+        }
+        if (typeof window !== 'undefined') {
+            window.removeEventListener('storage', this.handleRemoteStateChange);
         }
     }
 
@@ -448,37 +719,37 @@ class WavelengthRadio {
 
     // Control bindings
     bindControls() {
-        // Play/Pause
-        const playPauseBtn = document.getElementById('playPauseBtn');
+        // Play/Pause - support both full player and mini player
+        const playPauseBtn = document.getElementById('playPauseBtn') || document.getElementById('globalPlayBtn');
         if (playPauseBtn) {
             playPauseBtn.addEventListener('click', () => this.togglePlay());
         }
 
-        // Previous/Next
-        const prevBtn = document.getElementById('prevBtn');
+        // Previous/Next - support both full player and mini player
+        const prevBtn = document.getElementById('prevBtn') || document.getElementById('globalPrevBtn');
         if (prevBtn) {
             prevBtn.addEventListener('click', () => this.previous());
         }
 
-        const nextBtn = document.getElementById('nextBtn');
+        const nextBtn = document.getElementById('nextBtn') || document.getElementById('globalNextBtn');
         if (nextBtn) {
             nextBtn.addEventListener('click', () => this.next());
         }
 
-        // Shuffle
+        // Shuffle (full player only)
         const shuffleBtn = document.getElementById('shuffleBtn');
         if (shuffleBtn) {
             shuffleBtn.addEventListener('click', () => this.toggleShuffle());
         }
 
-        // Repeat
+        // Repeat (full player only)
         const repeatBtn = document.getElementById('repeatBtn');
         if (repeatBtn) {
             repeatBtn.addEventListener('click', () => this.cycleRepeat());
         }
 
-        // Volume
-        const volumeSlider = document.getElementById('volumeSlider');
+        // Volume - support both full player and mini player
+        const volumeSlider = document.getElementById('volumeSlider') || document.getElementById('globalVolumeSlider');
         if (volumeSlider) {
             volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
             this.setVolume(volumeSlider.value);
@@ -557,6 +828,11 @@ class WavelengthRadio {
 
     // Audio event bindings
     bindAudioEvents() {
+        if (!this.audio) {
+            console.error('Radio player: No audio element found, cannot bind events');
+            return;
+        }
+
         this.audio.addEventListener('timeupdate', () => {
             this.updateProgress();
             // Save state periodically while playing
@@ -605,13 +881,19 @@ class WavelengthRadio {
             this.screensaver.updateImages();
         }
 
+        // Save state immediately when track changes (before playing)
+        this.savePlaybackState();
+
         // Play
         const playPromise = this.audio.play();
         if (playPromise !== undefined) {
             playPromise.then(() => {
                 this.isPlaying = true;
                 this.updatePlayButton();
-                document.querySelector('.album-art').classList.add('playing');
+                const albumArt = document.querySelector('.album-art');
+                if (albumArt) albumArt.classList.add('playing');
+                // Save state again after successful play start
+                this.savePlaybackState();
             }).catch(error => {
                 console.error('Playback error:', error);
             });
@@ -637,6 +919,8 @@ class WavelengthRadio {
         }
 
         this.updatePlayButton();
+        // Immediately sync state when play/pause changes
+        this.savePlaybackState();
     }
 
     // Previous track
@@ -734,8 +1018,18 @@ class WavelengthRadio {
 
     // Set volume
     setVolume(value) {
+        if (!this.audio) return;
+        
         this.audio.volume = value / 100;
-        document.getElementById('volumeValue').textContent = `${value}%`;
+        
+        // Update volume display for full player (if element exists)
+        const volumeValue = document.getElementById('volumeValue');
+        if (volumeValue) {
+            volumeValue.textContent = `${value}%`;
+        }
+        
+        // Save volume change to shared state immediately for sync
+        this.savePlaybackState();
     }
 
     // Seek to position
@@ -750,15 +1044,23 @@ class WavelengthRadio {
         if (!this.audio.duration) return;
 
         const percent = (this.audio.currentTime / this.audio.duration) * 100;
-        document.getElementById('progressFill').style.width = `${percent}%`;
-        document.getElementById('progressHandle').style.left = `${percent}%`;
-
-        document.getElementById('currentTime').textContent = this.formatTime(this.audio.currentTime);
+        
+        // Update progress bar elements (full player only)
+        const progressFill = document.getElementById('progressFill');
+        const progressHandle = document.getElementById('progressHandle');
+        const currentTime = document.getElementById('currentTime');
+        
+        if (progressFill) progressFill.style.width = `${percent}%`;
+        if (progressHandle) progressHandle.style.left = `${percent}%`;
+        if (currentTime) currentTime.textContent = this.formatTime(this.audio.currentTime);
     }
 
     // Update duration display
     updateDuration() {
-        document.getElementById('duration').textContent = this.formatTime(this.audio.duration);
+        const duration = document.getElementById('duration');
+        if (duration) {
+            duration.textContent = this.formatTime(this.audio.duration);
+        }
     }
 
     // Format time (seconds to mm:ss)
@@ -771,11 +1073,22 @@ class WavelengthRadio {
 
     // Update now playing display
     updateNowPlaying(track) {
-        document.getElementById('trackTitle').textContent = track.title;
-        document.getElementById('trackEpisode').textContent = `Season ${track.season} • Episode ${track.episode}`;
+        // Update full player elements
+        const trackTitle = document.getElementById('trackTitle');
+        const trackEpisode = document.getElementById('trackEpisode');
+        if (trackTitle) trackTitle.textContent = track.title;
+        if (trackEpisode) trackEpisode.textContent = `Season ${track.season} • Episode ${track.episode}`;
+        
+        // Update mini player elements
+        const globalTrackTitle = document.getElementById('globalTrackTitle');
+        const globalTrackMeta = document.getElementById('globalTrackMeta');
+        if (globalTrackTitle) globalTrackTitle.textContent = track.title;
+        if (globalTrackMeta) globalTrackMeta.textContent = `S${track.season}E${track.episode}`;
 
-        // Update broadcast status with in-world narrative
-        this.updateBroadcastStatus(track);
+        // Update broadcast status with in-world narrative (full player only)
+        if (!this.isMiniPlayer) {
+            this.updateBroadcastStatus(track);
+        }
 
         // Get the playlist item for this track
         const playlistItem = document.querySelector(`.playlist-item[data-index="${this.currentTrackIndex}"]`);
@@ -854,8 +1167,18 @@ class WavelengthRadio {
 
     // Update play button
     updatePlayButton() {
+        // Update full player icon
         const icon = document.getElementById('playIcon');
-        icon.textContent = this.isPlaying ? '⏸' : '▶';
+        if (icon) {
+            icon.textContent = this.isPlaying ? '⏸' : '▶';
+        }
+        
+        // Update mini player button
+        const globalPlayBtn = document.getElementById('globalPlayBtn');
+        if (globalPlayBtn) {
+            globalPlayBtn.textContent = this.isPlaying ? '⏸' : '▶';
+            globalPlayBtn.title = this.isPlaying ? 'Pause' : 'Play';
+        }
     }
 
     // Update playlist UI
@@ -2334,12 +2657,17 @@ document.addEventListener('DOMContentLoaded', () => {
     window.wavelengthRadio = new WavelengthRadio();
 });
 
-// Add level up animation
-const levelUpAnimationStyle = document.createElement('style');
-levelUpAnimationStyle.textContent = `
+// Add level up animation (only once).
+// Guard against duplicate insertion when the same script or init file
+// is included more than once across pages.
+if (!document.getElementById('wavelength-levelup-style')) {
+    const levelUpAnimationStyle = document.createElement('style');
+    levelUpAnimationStyle.id = 'wavelength-levelup-style';
+    levelUpAnimationStyle.textContent = `
     @keyframes levelUpPulse {
         0%, 100% { transform: translate(-50%, -50%) scale(1); }
         50% { transform: translate(-50%, -50%) scale(1.2); }
     }
-`;
-document.head.appendChild(levelUpAnimationStyle);
+    `;
+    document.head.appendChild(levelUpAnimationStyle);
+}

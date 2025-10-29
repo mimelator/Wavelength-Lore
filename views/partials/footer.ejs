@@ -32,9 +32,8 @@
 </script>
 <% } %>
 
-<!-- Global Radio Game Widget (appears on all pages except /forum/* and /radio) -->
+<!-- Wavelength Radio Widget (appears on all pages except /forum/* and /radio) -->
 <% if (typeof currentPage !== 'undefined' && !currentPage.startsWith('/forum') && currentPage !== '/radio') { %>
-<script src="/js/global-radio-game.js?v=<%= Date.now() %>"></script>
 
 <!-- Full-page collectible overlay -->
 <div id="globalGameCanvas" class="global-game-canvas"></div>
@@ -88,7 +87,7 @@
     </div>
 
     <!-- Mini Radio Player -->
-    <div class="mini-radio-player">
+    <div class="mini-radio-player wavelength-radio-widget" data-wavelength-radio-widget>
       <audio id="globalRadioAudio" preload="metadata"></audio>
 
       <div class="now-playing">
@@ -115,6 +114,9 @@
     </div>
   </div>
 </div>
+
+<!-- Radio Player Scripts (loaded globally except on /forum/* and /radio pages) -->
+<script src="<%= cdnUrl %>/js/radio-player.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
 <% } %>
 
 <footer>
