@@ -56,6 +56,14 @@ class ImageCapturer {
       let shouldProcess = false;
       for (const mutation of mutations) {
         if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+          // Skip mutations originating from carousel/slick elements
+          const target = mutation.target;
+          if (target.closest('.carousel') ||
+              target.closest('.slick-slider') ||
+              target.closest('#episode-carousel') ||
+              target.closest('#lore-carousel')) {
+            continue; // Skip carousel mutations
+          }
           shouldProcess = true;
           break;
         }
