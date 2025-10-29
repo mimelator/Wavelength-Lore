@@ -52,25 +52,17 @@ class ImageCapturer {
     this.processPage();
     
     // Create mutation observer to detect new images
-    const self = this;
-    this.observer = new MutationObserver(function(mutations) {
+    this.observer = new MutationObserver((mutations) => {
       let shouldProcess = false;
-      let logInfo = {
-        totalMutations: mutations.length,
-        timestamp: new Date().toISOString()
-      };
-
-      for (let i = 0; i < mutations.length; i++) {
-        const mutation = mutations[i];
+      for (const mutation of mutations) {
         if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
           shouldProcess = true;
           break;
         }
       }
-
       if (shouldProcess) {
-        console.log('🔄 MutationObserver fired - debouncing...', logInfo);
-        self.debouncedProcessPage();
+        // Use debounced version to prevent rapid reprocessing
+        this.debouncedProcessPage();
       }
     });
     
@@ -113,19 +105,13 @@ class ImageCapturer {
    * Waits for mutations to settle before reprocessing
    */
   debouncedProcessPage() {
-    const hadExistingTimeout = !!this.processPageTimeout;
-
     // Clear any existing timeout
     if (this.processPageTimeout) {
-      console.log('⏱️ Debounce: Clearing existing timeout, resetting timer...');
       clearTimeout(this.processPageTimeout);
-    } else {
-      console.log('⏱️ Debounce: Starting new debounce timer (500ms)');
     }
 
     // Set a new timeout to process the page after the debounce delay
     this.processPageTimeout = setTimeout(() => {
-      console.log('⏱️ Debounce: Timer expired, calling processPage()');
       this.processPage();
       this.processPageTimeout = null;
     }, this.debounceDelay);
@@ -136,12 +122,8 @@ class ImageCapturer {
    */
   processPage() {
     if (!this.enabled) return;
-
-    const startTime = performance.now();
-    console.log('🔍 Image Capturer: Starting page processing...', {
-      timestamp: new Date().toISOString(),
-      existingButtons: this.captureButtons.length
-    });
+    
+    console.log('🔍 Image Capturer: Processing page for images');
     
     // Find all images that meet our criteria
     const images = Array.from(document.querySelectorAll('img')).filter(img => {
@@ -167,17 +149,10 @@ class ImageCapturer {
       return true;
     });
     
-    console.log(`📷 Image Capturer: Found ${images.length} images eligible for buttons`);
-
+    console.log(`📷 Image Capturer: Found ${images.length} images`);
+    
     // Add buttons to each image
     images.forEach(this.addCaptureButtonToImage);
-
-    const endTime = performance.now();
-    console.log('✅ Image Capturer: Completed processing', {
-      imagesProcessed: images.length,
-      duration: `${(endTime - startTime).toFixed(2)}ms`,
-      totalButtons: this.captureButtons.length
-    });
   }
   
   /**
