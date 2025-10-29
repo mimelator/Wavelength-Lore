@@ -131,8 +131,10 @@ router.get('/edit/lore/:loreId', async (req, res) => {
 
 /**
  * Content Creation Page
+ * DISABLED - Content creation moved to CLI tool
  * Protected client-side - requires content_manager role or higher
  */
+/* COMMENTED OUT - Using CLI tool instead
 router.get('/create', async (req, res) => {
   try {
     // Get all episodes to help user pick next episode number
@@ -159,5 +161,6 @@ router.get('/create', async (req, res) => {
     res.status(500).send('Error loading create page');
   }
 });
+*/
 
 module.exports = router;

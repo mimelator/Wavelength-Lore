@@ -343,6 +343,9 @@
                                     <button class="btn btn-secondary" onclick="viewSettings()">
                                         ⚙️ Settings
                                     </button>
+                                    <a href="/my-orders" class="btn btn-primary">
+                                        📦 My Orders
+                                    </a>
                                 </div>
                             ` : ''}
                         </div>
@@ -418,6 +421,19 @@
                         </div>
                     </div>
 
+                    <!-- My Orders Section (only for own profile) -->
+                    ${isOwnProfile ? `
+                        <div class="profile-orders">
+                            <div class="orders-header">
+                                <h3>📦 My Recent Orders</h3>
+                                <a href="/my-orders" class="btn btn-link">View All Orders →</a>
+                            </div>
+                            <div class="orders-preview" id="orders-preview">
+                                <div class="loading-orders">Loading recent orders...</div>
+                            </div>
+                        </div>
+                    ` : ''}
+
                     <!-- Recent Activity -->
                     <div class="profile-activity">
                         <h3>📈 Recent Activity</h3>
@@ -432,6 +448,9 @@
             loadGameStats(profile.id);
             loadFavoriteSongs(profile.id);
             loadRecentActivity(profile.id);
+            if (isOwnProfile) {
+                loadRecentOrders(profile.id);
+            }
         }
         
         function updateAuthUI() {
@@ -688,6 +707,93 @@
             }).join('');
             
             activityList.innerHTML = activityHTML;
+        }
+
+        function loadRecentOrders(userId) {
+            // Load user's recent merchandise orders
+            const ordersPreview = document.getElementById('orders-preview');
+            if (!ordersPreview) return;
+            
+            // Fetch orders from the merchandise API
+            fetch('/api/my-orders', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.orders) {
+                    const recentOrders = data.orders
+                        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                        .slice(0, 3); // Show 3 most recent orders
+                    
+                    if (recentOrders.length === 0) {
+                        ordersPreview.innerHTML = `
+                            <div class="no-orders">
+                                <div class="no-orders-icon">🛍️</div>
+                                <p>No orders yet</p>
+                                <a href="/merchandise" class="btn btn-primary">Shop Now</a>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    const ordersHTML = recentOrders.map(order => {
+                        const orderDate = new Date(order.createdAt).toLocaleDateString();
+                        const itemCount = order.items ? order.items.length : 0;
+                        const statusBadge = getOrderStatusBadge(order.status);
+                        const totalAmount = ((order.amount || 0) / 100).toFixed(2);
+                        
+                        return `
+                            <div class="order-preview-item">
+                                <div class="order-info">
+                                    <div class="order-id">Order #${order.orderId}</div>
+                                    <div class="order-meta">
+                                        ${orderDate} · ${itemCount} item${itemCount !== 1 ? 's' : ''} · $${totalAmount}
+                                    </div>
+                                </div>
+                                <div class="order-status">
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    ordersPreview.innerHTML = ordersHTML;
+                } else {
+                    ordersPreview.innerHTML = `
+                        <div class="no-orders">
+                            <div class="no-orders-icon">🛍️</div>
+                            <p>No orders yet</p>
+                            <a href="/merchandise" class="btn btn-primary">Shop Now</a>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading recent orders:', error);
+                ordersPreview.innerHTML = `
+                    <div class="error-loading-orders">
+                        <p>Unable to load orders</p>
+                        <a href="/my-orders" class="btn btn-link">View Orders Page →</a>
+                    </div>
+                `;
+            });
+        }
+        
+        function getOrderStatusBadge(status) {
+            const statusMap = {
+                'paid': { class: 'success', icon: '✅', text: 'Paid' },
+                'processing': { class: 'warning', icon: '⏳', text: 'Processing' },
+                'shipped': { class: 'info', icon: '🚚', text: 'Shipped' },
+                'delivered': { class: 'success', icon: '📦', text: 'Delivered' },
+                'cancelled': { class: 'danger', icon: '❌', text: 'Cancelled' }
+            };
+            
+            const statusInfo = statusMap[status] || statusMap['paid'];
+            return `<span class="status-badge status-${statusInfo.class}">${statusInfo.icon} ${statusInfo.text}</span>`;
         }
 
         function playFromRadio(songId) {

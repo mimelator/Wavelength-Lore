@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %> - Wavelength Lore</title>
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
+    
+    <!-- Forum CSS for consistent styling -->
+    <link rel="stylesheet" href="/css/forum.css?v=<%= version %>">
+    
+    <style>
+        .orders-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .orders-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+        }
+        
+        .orders-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .order-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .order-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .order-id {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .order-status {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-paid {
+            background: #10b981;
+            color: white;
+        }
+        
+        .status-processing {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .status-shipped {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .status-delivered {
+            background: #06d6a0;
+            color: white;
+        }
+        
+        .order-body {
+            padding: 1.5rem;
+        }
+        
+        .order-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .meta-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .meta-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .order-items {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 1.5rem;
+        }
+        
+        .items-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+        
+        .item-list {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .order-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 10px;
+            align-items: center;
+        }
+        
+        .item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #e5e7eb;
+        }
+        
+        .item-details {
+            flex: 1;
+        }
+        
+        .item-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        
+        .item-price {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .item-quantity {
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+        
+        .empty-description {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+        
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .support-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .support-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+        
+        .support-description {
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+        
+        .support-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        
+        .support-button:hover {
+            background: #5a67d8;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .orders-container {
+                padding: 0 0.5rem;
+            }
+            
+            .order-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .order-meta {
+                grid-template-columns: 1fr;
+            }
+            
+            .order-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .item-image {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+    
+    <div class="orders-container">
+        <div class="orders-header">
+            <h1>📦 My Orders</h1>
+            <p>Track your Wavelength Lore merchandise orders</p>
+        </div>
+        
+        <div id="orders-content">
+            <!-- Orders will be loaded here -->
+            <div class="loading-state" style="text-align: center; padding: 2rem;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">⏳</div>
+                <p>Loading your orders...</p>
+            </div>
+        </div>
+        
+        <div class="support-section">
+            <div class="support-title">Need Help?</div>
+            <div class="support-description">Have questions about an order or need assistance?</div>
+            <a href="/support" class="support-button">
+                <span>📞</span>
+                Contact Support
+            </a>
+        </div>
+    </div>
+    
+    <%- include('partials/footer') %>
+    
+    <script>
+        class OrderHistoryManager {
+            constructor() {
+                this.ordersContainer = document.getElementById('orders-content');
+                this.loadOrders();
+            }
+            
+            async loadOrders() {
+                try {
+                    const response = await fetch('/api/my-orders');
+                    const data = await response.json();
+                    
+                    if (!data.success) {
+                        throw new Error(data.error || 'Failed to load orders');
+                    }
+                    
+                    this.renderOrders(data.orders || []);
+                } catch (error) {
+                    console.error('Error loading orders:', error);
+                    this.renderError(error.message);
+                }
+            }
+            
+            renderOrders(orders) {
+                if (orders.length === 0) {
+                    this.renderEmptyState();
+                    return;
+                }
+                
+                const ordersHTML = orders
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .map(order => this.renderOrderCard(order))
+                    .join('');
+                
+                this.ordersContainer.innerHTML = `
+                    <div class="orders-grid">
+                        ${ordersHTML}
+                    </div>
+                `;
+            }
+            
+            renderOrderCard(order) {
+                const statusClass = `status-${order.status.toLowerCase()}`;
+                const orderDate = new Date(order.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                const orderTime = new Date(order.createdAt).toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const itemsHTML = (order.items || []).map(item => `
+                    <div class="order-item">
+                        <img src="${item.image || '/images/placeholder-product.jpg'}" 
+                             alt="${item.title}" 
+                             class="item-image"
+                             onerror="this.src='/images/placeholder-product.jpg'">
+                        <div class="item-details">
+                            <div class="item-title">${item.title}</div>
+                            <div class="item-price">$${item.price}</div>
+                        </div>
+                        <div class="item-quantity">Qty: ${item.quantity}</div>
+                    </div>
+                `).join('');
+                
+                return `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-id">Order #${order.orderId}</div>
+                            <div class="order-status ${statusClass}">${order.status}</div>
+                        </div>
+                        <div class="order-body">
+                            <div class="order-meta">
+                                <div class="meta-item">
+                                    <div class="meta-label">Order Date</div>
+                                    <div class="meta-value">${orderDate}</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-label">Order Time</div>
+                                    <div class="meta-value">${orderTime}</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-label">Total Amount</div>
+                                    <div class="meta-value">$${(order.amount / 100).toFixed(2)}</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-label">Payment ID</div>
+                                    <div class="meta-value">${order.paymentId}</div>
+                                </div>
+                            </div>
+                            <div class="order-items">
+                                <div class="items-header">Order Items (${order.items?.length || 0})</div>
+                                <div class="item-list">
+                                    ${itemsHTML}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderEmptyState() {
+                this.ordersContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <div class="empty-title">No Orders Yet</div>
+                        <div class="empty-description">
+                            You haven't placed any orders yet. Start shopping to see your orders here!
+                        </div>
+                        <a href="/merchandise" class="cta-button">
+                            <span>🛍️</span>
+                            Shop Merchandise
+                        </a>
+                    </div>
+                `;
+            }
+            
+            renderError(message) {
+                this.ordersContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <div class="empty-title">Error Loading Orders</div>
+                        <div class="empty-description">${message}</div>
+                        <button onclick="location.reload()" class="cta-button">
+                            <span>🔄</span>
+                            Try Again
+                        </button>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new OrderHistoryManager();
+        });
+    </script>
+</body>
+</html>

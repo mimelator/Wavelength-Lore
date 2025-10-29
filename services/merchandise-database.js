@@ -774,6 +774,144 @@ class MerchandiseDatabase {
       throw error;
     }
   }
+
+  /**
+   * Get all orders for admin management
+   * @returns {Promise<Array>} All orders across all users
+   */
+  async getAllOrders() {
+    this.initializeDatabase();
+    
+    try {
+      const snapshot = await this.ordersRef.once('value');
+      const orders = [];
+      
+      snapshot.forEach((childSnapshot) => {
+        const order = childSnapshot.val();
+        orders.push({
+          ...order,
+          localId: childSnapshot.key
+        });
+      });
+      
+      // Sort by creation date (newest first)
+      orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      
+      return orders;
+      
+    } catch (error) {
+      console.error('Error getting all orders:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get specific order by ID
+   * @param {string} orderId - Order ID to find
+   * @returns {Promise<Object|null>} Order data or null if not found
+   */
+  async getOrderById(orderId) {
+    this.initializeDatabase();
+    
+    try {
+      // Search in global orders first
+      const snapshot = await this.ordersRef.orderByChild('orderId').equalTo(orderId).once('value');
+      
+      let foundOrder = null;
+      snapshot.forEach((childSnapshot) => {
+        foundOrder = {
+          ...childSnapshot.val(),
+          localId: childSnapshot.key
+        };
+      });
+      
+      if (foundOrder) {
+        return foundOrder;
+      }
+      
+      // If not found in global orders, search user orders
+      const userOrdersSnapshot = await this.userOrdersRef.once('value');
+      userOrdersSnapshot.forEach((userSnapshot) => {
+        userSnapshot.forEach((orderSnapshot) => {
+          const order = orderSnapshot.val();
+          if (order.orderId === orderId) {
+            foundOrder = {
+              ...order,
+              localId: orderSnapshot.key,
+              userId: userSnapshot.key
+            };
+          }
+        });
+      });
+      
+      return foundOrder;
+      
+    } catch (error) {
+      console.error('Error getting order by ID:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Create support ticket
+   * @param {Object} ticketData - Support ticket data
+   * @returns {Promise<Object>} Operation result
+   */
+  async createSupportTicket(ticketData) {
+    this.initializeDatabase();
+    
+    try {
+      // Initialize support tickets reference if not exists
+      if (!this.supportTicketsRef) {
+        this.supportTicketsRef = this.db.ref('merchandise/supportTickets');
+      }
+      
+      // Store the ticket
+      await this.supportTicketsRef.child(ticketData.id).set(ticketData);
+      
+      console.log('✅ Support ticket created successfully:', ticketData.id);
+      return { success: true, ticketId: ticketData.id };
+      
+    } catch (error) {
+      console.error('❌ Error creating support ticket:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all support tickets
+   * @returns {Promise<Array>} All support tickets
+   */
+  async getAllSupportTickets() {
+    this.initializeDatabase();
+    
+    try {
+      // Initialize support tickets reference if not exists
+      if (!this.supportTicketsRef) {
+        this.supportTicketsRef = this.db.ref('merchandise/supportTickets');
+      }
+      
+      const snapshot = await this.supportTicketsRef.once('value');
+      const tickets = [];
+      
+      snapshot.forEach((childSnapshot) => {
+        const ticket = childSnapshot.val();
+        tickets.push({
+          ...ticket,
+          localId: childSnapshot.key
+        });
+      });
+      
+      // Sort by creation date (newest first)
+      tickets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      
+      return tickets;
+      
+    } catch (error) {
+      console.error('Error getting all support tickets:', error);
+      return [];
+    }
+  }
 }
 
 /**

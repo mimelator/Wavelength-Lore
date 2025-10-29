@@ -285,6 +285,7 @@ async function createApp() {
   // Mount merchandise routes for custom print-on-demand store (protected by authentication)
   app.use('/api/merchandise', merchandiseRoutes);
   app.use('/merchandise', merchandiseRoutes); // Also mount at /merchandise for the main store page
+  app.use('/', merchandiseRoutes); // Also mount at root for easier access to /my-orders, /support, etc.
   app.use('/api/enhanced-merchandise', enhancedMerchandiseRoutes);
   app.use('/enhanced-merchandise', enhancedMerchandiseRoutes); // Also mount at /enhanced-merchandise for the AI store page
 

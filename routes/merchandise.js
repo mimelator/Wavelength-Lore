@@ -19,6 +19,7 @@ const galleryStorage = require('../utils/gallery/storage');
 const { getUserBookmarks } = require('../services/firebase/galleryService');
 const axios = require('axios');
 const { generateProductTitle, prettifyImageName } = require('../utils/product-name-formatter');
+const emailService = require('../services/email-service');
 const ImageOptimizer = require('../services/ImageOptimizer');
 const productSpecifications = require('../config/productSpecifications');
 const productTemplates = require('../config/productTemplates');
@@ -1649,6 +1650,15 @@ router.post('/confirm-payment', ensureAuthenticated, async (req, res) => {
     };
     
     await merchandiseDB.storeUserOrder(req.user.uid, userOrder);
+
+    // Send order confirmation email
+    try {
+      await emailService.sendOrderConfirmation(userOrder, req.user.email);
+      console.log('✅ Order confirmation email sent successfully');
+    } catch (emailError) {
+      console.error('⚠️ Order confirmation email failed (order still successful):', emailError);
+      // Don't fail the order if email fails
+    }
 
     res.json({
       success: true,
@@ -4636,6 +4646,299 @@ router.post('/generate-printify-mockup', ensureAuthenticated, groupAuth.requireA
     res.status(500).json({
       success: false,
       error: 'Failed to generate mockup: ' + (error.message || 'Unknown error')
+    });
+  }
+});
+
+/**
+ * GET /my-orders
+ * User order history page
+ * 📦 USER FEATURE: View personal order history and status
+ */
+router.get('/my-orders', ensureAuthenticated, async (req, res) => {
+  try {
+    res.render('my-orders', {
+      title: 'My Orders',
+      pageTitle: 'My Orders',
+      pageDescription: 'View your Wavelength Lore merchandise order history',
+      user: req.user,
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`
+    });
+  } catch (error) {
+    console.error('Error rendering my-orders page:', error);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Unable to load order history',
+      error: process.env.NODE_ENV === 'development' ? error : {}
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/my-orders
+ * Get current user's order history
+ * 📦 USER API: Fetch personal order data
+ */
+router.get('/api/my-orders', ensureAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    const userOrders = await merchandiseDB.getUserOrders(userId);
+    
+    res.json({
+      success: true,
+      orders: userOrders || [],
+      count: userOrders?.length || 0
+    });
+  } catch (error) {
+    console.error('❌ Error fetching user orders:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch user orders'
+    });
+  }
+});
+
+/**
+ * GET /admin/orders
+ * Admin order management dashboard
+ * 🛡️ ADMIN ONLY: Order management interface
+ */
+router.get('/admin/orders', ensureAuthenticated, groupAuth.requireAction('admin_access'), async (req, res) => {
+  try {
+    res.render('admin-orders', {
+      title: 'Order Management',
+      pageTitle: 'Order Management',
+      pageDescription: 'Manage all Wavelength Lore merchandise orders',
+      user: req.user,
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`
+    });
+  } catch (error) {
+    console.error('Error rendering admin orders page:', error);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Unable to load admin order management',
+      error: process.env.NODE_ENV === 'development' ? error : {}
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/admin/all-orders
+ * Get all orders for admin management
+ * 🛡️ ADMIN API: Fetch all order data
+ */
+router.get('/api/admin/all-orders', ensureAuthenticated, groupAuth.requireAction('admin_access'), async (req, res) => {
+  try {
+    const allOrders = await merchandiseDB.getAllOrders();
+    
+    res.json({
+      success: true,
+      orders: allOrders || [],
+      count: allOrders?.length || 0
+    });
+  } catch (error) {
+    console.error('❌ Error fetching all orders:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch orders'
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/admin/order/:orderId
+ * Get specific order details for admin
+ * 🛡️ ADMIN API: Fetch single order data
+ */
+router.get('/api/admin/order/:orderId', ensureAuthenticated, groupAuth.requireAction('admin_access'), async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const order = await merchandiseDB.getOrderById(orderId);
+    
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: 'Order not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      order: order
+    });
+  } catch (error) {
+    console.error('❌ Error fetching order details:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch order details'
+    });
+  }
+});
+
+/**
+ * PUT /api/merchandise/admin/order/:orderId/status
+ * Update order status
+ * 🛡️ ADMIN API: Update order status
+ */
+router.put('/api/admin/order/:orderId/status', ensureAuthenticated, groupAuth.requireAction('admin_access'), async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+    
+    const validStatuses = ['paid', 'processing', 'shipped', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid status'
+      });
+    }
+    
+    await merchandiseDB.updateOrderStatus(orderId, { status, updatedAt: new Date().toISOString() });
+    
+    res.json({
+      success: true,
+      message: 'Order status updated successfully'
+    });
+  } catch (error) {
+    console.error('❌ Error updating order status:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update order status'
+    });
+  }
+});
+
+/**
+ * GET /support
+ * Customer support page
+ * 📞 SUPPORT: Customer support form and help center
+ */
+router.get('/support', async (req, res) => {
+  try {
+    res.render('support', {
+      title: 'Customer Support',
+      pageTitle: 'Customer Support',
+      pageDescription: 'Get help with your Wavelength Lore orders and questions',
+      user: req.user,
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`
+    });
+  } catch (error) {
+    console.error('Error rendering support page:', error);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Unable to load support page',
+      error: process.env.NODE_ENV === 'development' ? error : {}
+    });
+  }
+});
+
+/**
+ * POST /api/support/ticket
+ * Create support ticket
+ * 📞 SUPPORT API: Submit customer support request
+ */
+router.post('/api/support/ticket', async (req, res) => {
+  try {
+    const { subject, orderId, email, message, priority } = req.body;
+    
+    // Validate required fields
+    if (!subject || !email || !message) {
+      return res.status(400).json({
+        success: false,
+        error: 'Subject, email, and message are required'
+      });
+    }
+    
+    // Create support ticket
+    const ticketId = `TICKET_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const ticket = {
+      id: ticketId,
+      subject,
+      orderId: orderId || null,
+      email,
+      message,
+      priority: priority || 'normal',
+      status: 'open',
+      userId: req.user?.uid || null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    // Store ticket in database
+    await merchandiseDB.createSupportTicket(ticket);
+    
+    // Send email notification to support team
+    try {
+      await emailService.sendSupportNotification(ticket);
+      console.log('✅ Support notification email sent successfully');
+    } catch (emailError) {
+      console.error('⚠️ Support notification email failed (ticket still created):', emailError);
+      // Don't fail the ticket creation if email fails
+    }
+    
+    console.log('📞 New support ticket created:', ticketId);
+    
+    res.json({
+      success: true,
+      ticketId: ticketId,
+      message: 'Support ticket created successfully'
+    });
+  } catch (error) {
+    console.error('❌ Error creating support ticket:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create support ticket'
+    });
+  }
+});
+
+/**
+ * GET /admin/support
+ * Admin support ticket management
+ * 🛡️ ADMIN: Support ticket dashboard
+ */
+router.get('/admin/support', ensureAuthenticated, groupAuth.requireAction('admin_access'), async (req, res) => {
+  try {
+    res.render('admin-support', {
+      title: 'Support Management',
+      pageTitle: 'Support Management',
+      pageDescription: 'Manage customer support tickets and requests',
+      user: req.user,
+      cdnUrl: process.env.CDN_URL,
+      version: `v${Date.now()}`
+    });
+  } catch (error) {
+    console.error('Error rendering admin support page:', error);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Unable to load support management',
+      error: process.env.NODE_ENV === 'development' ? error : {}
+    });
+  }
+});
+
+/**
+ * GET /api/admin/support/tickets
+ * Get all support tickets for admin
+ * 🛡️ ADMIN API: Fetch all support tickets
+ */
+router.get('/api/admin/support/tickets', ensureAuthenticated, groupAuth.requireAction('admin_access'), async (req, res) => {
+  try {
+    const tickets = await merchandiseDB.getAllSupportTickets();
+    
+    res.json({
+      success: true,
+      tickets: tickets || [],
+      count: tickets?.length || 0
+    });
+  } catch (error) {
+    console.error('❌ Error fetching support tickets:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch support tickets'
     });
   }
 });

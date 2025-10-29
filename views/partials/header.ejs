@@ -40,7 +40,6 @@
         <a href="/merchandise" class="promo-nav-link">🛍️ Get Merch</a>
       </li>
       
-      <li id="content-creator-nav-item" style="display: none;"><a href="/create">✨ Create</a></li>
       <li id="admin-nav-item" style="display: none;"><a href="/forum/admin">⚙️ Admin</a></li>
     </ul>
     
@@ -115,16 +114,6 @@
                   // Show admin link if user is admin
                   if (data.isAdmin) {
                     document.getElementById('admin-nav-item').style.display = 'block';
-                  }
-
-                  // Show create content link if user is content_manager or higher
-                  const hasContentAccess = data.groups && (
-                    data.groups.includes('content_manager') ||
-                    data.groups.includes('admin') ||
-                    data.groups.includes('super_admin')
-                  );
-                  if (hasContentAccess) {
-                    document.getElementById('content-creator-nav-item').style.display = 'block';
                   }
 
                   // Show games link if user is VIP or higher

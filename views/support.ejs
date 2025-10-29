@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %> - Wavelength Lore</title>
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
+    
+    <!-- Enhanced UI Styles -->
+    <link rel="stylesheet" href="/static/css/enhanced-product-ui.css?v=<%= version %>">
+    <link rel="stylesheet" href="/static/css/merchandise-styles.css?v=<%= version %>">
+    <link rel="stylesheet" href="/static/css/main.css?v=<%= version %>">
+    
+    <style>
+        .support-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .support-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            color: white;
+        }
+        
+        .support-title {
+            font-size: 2.5rem;
+            margin: 0 0 1rem 0;
+            font-weight: 700;
+        }
+        
+        .support-subtitle {
+            font-size: 1.2rem;
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .support-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .contact-form-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .quick-help-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 1.5rem 0;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .help-options {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .help-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .help-option:hover {
+            background: #e0e7ff;
+            border-color: #667eea;
+        }
+        
+        .help-icon {
+            font-size: 2rem;
+            min-width: 3rem;
+            text-align: center;
+        }
+        
+        .help-content h3 {
+            margin: 0 0 0.5rem 0;
+            color: #1f2937;
+            font-size: 1.1rem;
+        }
+        
+        .help-content p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .faq-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .faq-item {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1.5rem 0;
+        }
+        
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+        
+        .faq-question {
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 0.5rem 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .faq-answer {
+            color: #6b7280;
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        .contact-info {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .contact-method {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .contact-method-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .contact-method h4 {
+            margin: 0 0 0.5rem 0;
+            color: #1f2937;
+        }
+        
+        .contact-method p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        @media (max-width: 768px) {
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .support-title {
+                font-size: 2rem;
+            }
+            
+            .contact-methods {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+    
+    <div class="support-container">
+        <div class="support-header">
+            <h1 class="support-title">📞 Customer Support</h1>
+            <p class="support-subtitle">We're here to help with your Wavelength Lore orders and questions</p>
+        </div>
+        
+        <div class="support-grid">
+            <!-- Contact Form -->
+            <div class="contact-form-section">
+                <h2 class="section-title">
+                    <span>📧</span>
+                    Contact Us
+                </h2>
+                
+                <div id="form-alerts"></div>
+                
+                <form id="support-form">
+                    <div class="form-group">
+                        <label for="subject" class="form-label">Subject *</label>
+                        <select id="subject" name="subject" class="form-select" required>
+                            <option value="">Select a topic...</option>
+                            <option value="order-status">Order Status & Tracking</option>
+                            <option value="refund-exchange">Refund & Exchange</option>
+                            <option value="product-issue">Product Quality Issue</option>
+                            <option value="payment-issue">Payment & Billing</option>
+                            <option value="shipping-issue">Shipping Problem</option>
+                            <option value="technical-issue">Website Technical Issue</option>
+                            <option value="general-inquiry">General Inquiry</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="order-id" class="form-label">Order ID (if applicable)</label>
+                        <input type="text" id="order-id" name="orderId" class="form-input" 
+                               placeholder="MOCK_ORDER_123456789...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address *</label>
+                        <input type="email" id="email" name="email" class="form-input" 
+                               placeholder="your.email@example.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message" class="form-label">Message *</label>
+                        <textarea id="message" name="message" class="form-textarea" 
+                                  placeholder="Please describe your issue or question in detail..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="priority" class="form-label">Priority</label>
+                        <select id="priority" name="priority" class="form-select">
+                            <option value="normal">Normal</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <span id="submit-text">📤 Send Message</span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Quick Help -->
+            <div class="quick-help-section">
+                <h2 class="section-title">
+                    <span>⚡</span>
+                    Quick Help
+                </h2>
+                
+                <div class="help-options">
+                    <div class="help-option" onclick="location.href='/my-orders'">
+                        <div class="help-icon">📦</div>
+                        <div class="help-content">
+                            <h3>Track My Order</h3>
+                            <p>Check the status and details of your recent orders</p>
+                        </div>
+                    </div>
+                    
+                    <div class="help-option" onclick="fillQuickForm('refund-exchange')">
+                        <div class="help-icon">💸</div>
+                        <div class="help-content">
+                            <h3>Request Refund</h3>
+                            <p>Start a refund or exchange request for your order</p>
+                        </div>
+                    </div>
+                    
+                    <div class="help-option" onclick="fillQuickForm('shipping-issue')">
+                        <div class="help-icon">🚚</div>
+                        <div class="help-content">
+                            <h3>Shipping Issue</h3>
+                            <p>Report problems with delivery or shipping</p>
+                        </div>
+                    </div>
+                    
+                    <div class="help-option" onclick="fillQuickForm('product-issue')">
+                        <div class="help-icon">🔧</div>
+                        <div class="help-content">
+                            <h3>Product Quality</h3>
+                            <p>Report issues with product quality or defects</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <h2 class="section-title">
+                <span>❓</span>
+                Frequently Asked Questions
+            </h2>
+            
+            <div class="faq-item">
+                <h3 class="faq-question">How long does shipping take?</h3>
+                <p class="faq-answer">
+                    Standard shipping typically takes 7-10 business days. Express shipping options are available at checkout for faster delivery within 3-5 business days.
+                </p>
+            </div>
+            
+            <div class="faq-item">
+                <h3 class="faq-question">What is your return policy?</h3>
+                <p class="faq-answer">
+                    We offer a 30-day return policy for all merchandise. Items must be unused and in original condition. Custom and personalized items cannot be returned unless defective.
+                </p>
+            </div>
+            
+            <div class="faq-item">
+                <h3 class="faq-question">How do I track my order?</h3>
+                <p class="faq-answer">
+                    You can track your order by visiting the "My Orders" page in your account. You'll receive email notifications with tracking information once your order ships.
+                </p>
+            </div>
+            
+            <div class="faq-item">
+                <h3 class="faq-question">Can I change or cancel my order?</h3>
+                <p class="faq-answer">
+                    Orders can be modified or cancelled within 24 hours of placement. Once production begins, changes cannot be made. Contact support immediately if you need to make changes.
+                </p>
+            </div>
+            
+            <div class="faq-item">
+                <h3 class="faq-question">What payment methods do you accept?</h3>
+                <p class="faq-answer">
+                    We accept all major credit cards (Visa, Mastercard, American Express) through our secure Stripe payment system. All transactions are encrypted and secure.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Contact Information -->
+        <div class="contact-info">
+            <h2 class="section-title">
+                <span>📬</span>
+                Other Ways to Reach Us
+            </h2>
+            
+            <div class="contact-methods">
+                <div class="contact-method">
+                    <div class="contact-method-icon">📧</div>
+                    <h4>Email Support</h4>
+                    <p>support@wavelengthlore.com<br>Response within 24 hours</p>
+                </div>
+                
+                <div class="contact-method">
+                    <div class="contact-method-icon">💬</div>
+                    <h4>Live Chat</h4>
+                    <p>Available Mon-Fri<br>9 AM - 6 PM PST</p>
+                </div>
+                
+                <div class="contact-method">
+                    <div class="contact-method-icon">🏢</div>
+                    <h4>Business Hours</h4>
+                    <p>Monday - Friday<br>9:00 AM - 6:00 PM PST</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('partials/footer') %>
+    
+    <script>
+        class SupportManager {
+            constructor() {
+                this.form = document.getElementById('support-form');
+                this.alertContainer = document.getElementById('form-alerts');
+                this.submitBtn = document.querySelector('.submit-btn');
+                this.submitText = document.getElementById('submit-text');
+                
+                this.setupEventListeners();
+                this.prefillUserEmail();
+            }
+            
+            setupEventListeners() {
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            }
+            
+            async prefillUserEmail() {
+                try {
+                    // Try to get user info and prefill email
+                    const response = await fetch('/api/user/profile');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.user && data.user.email) {
+                            document.getElementById('email').value = data.user.email;
+                        }
+                    }
+                } catch (error) {
+                    // Silently fail - email will remain empty
+                }
+            }
+            
+            async handleSubmit(e) {
+                e.preventDefault();
+                
+                if (this.submitBtn.disabled) return;
+                
+                this.setLoading(true);
+                this.clearAlerts();
+                
+                try {
+                    const formData = new FormData(this.form);
+                    const supportData = {
+                        subject: formData.get('subject'),
+                        orderId: formData.get('orderId'),
+                        email: formData.get('email'),
+                        message: formData.get('message'),
+                        priority: formData.get('priority') || 'normal'
+                    };
+                    
+                    const response = await fetch('/api/support/ticket', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(supportData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.showAlert('success', `✅ Support ticket created successfully! Ticket ID: ${result.ticketId}`);
+                        this.form.reset();
+                        this.prefillUserEmail(); // Refill email after reset
+                    } else {
+                        throw new Error(result.error || 'Failed to create support ticket');
+                    }
+                } catch (error) {
+                    console.error('Error submitting support ticket:', error);
+                    this.showAlert('error', `❌ Failed to submit support request: ${error.message}`);
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+            
+            setLoading(loading) {
+                this.submitBtn.disabled = loading;
+                this.submitText.textContent = loading ? '⏳ Sending...' : '📤 Send Message';
+            }
+            
+            showAlert(type, message) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type}`;
+                alertDiv.textContent = message;
+                
+                this.alertContainer.innerHTML = '';
+                this.alertContainer.appendChild(alertDiv);
+                
+                // Auto-hide success alerts after 5 seconds
+                if (type === 'success') {
+                    setTimeout(() => {
+                        if (alertDiv.parentNode) {
+                            alertDiv.remove();
+                        }
+                    }, 5000);
+                }
+            }
+            
+            clearAlerts() {
+                this.alertContainer.innerHTML = '';
+            }
+        }
+        
+        // Global function for quick help options
+        function fillQuickForm(subject) {
+            document.getElementById('subject').value = subject;
+            document.getElementById('subject').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new SupportManager();
+        });
+    </script>
+</body>
+</html>
