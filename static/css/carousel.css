@@ -11,10 +11,22 @@
 
 .carousel {
     width: 100%;
+    display: flex;
+    align-items: stretch;
 }
 
 .carousel .slick-slide {
     padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel .slick-slide > div {
+    width: 100%;
+    height: auto;
+    display: flex;
+    align-items: center;
 }
 
 .carousel .slick-slide div {
