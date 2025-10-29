@@ -144,6 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
         '.thumbnail img',
         '.profile-picture img',
 
+        // Screensaver images - don't add save buttons to screensaver gallery
+        '#screensaverOverlay img',
+        '.screensaver-gallery img',
+        '.screensaver-controls img',
+        '.screensaver-customization img',
+        '[id*="screensaver"] img',
+
         // Additional selectors
         '[role="button"] img',
         '[role="navigation"] img'
