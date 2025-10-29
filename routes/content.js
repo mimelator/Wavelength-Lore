@@ -15,6 +15,9 @@ const characterHelpers = require('../helpers/character-helpers');
 const loreHelpers = require('../helpers/lore-helpers');
 const episodeHelpers = require('../helpers/episode-helpers');
 
+// Import NPC boundaries configuration
+const npcBoundaries = require('../config/npc-boundaries');
+
 /**
  * Home page route
  */
@@ -24,12 +27,19 @@ router.get('/', async (req, res) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     res.set('Pragma', 'no-cache');
     res.set('Expires', '0');
-    
+
     const videos = await fetchDataAsAdmin('videos');
-    
+
+    // Generate random NPC boundaries for each season
+    // Each season gets a random NPC boundary using weighted distribution
+    const seasonBoundaries = {};
+    for (const season in videos) {
+      seasonBoundaries[season] = npcBoundaries.getRandomBoundary();
+    }
+
     // Store videos data in app for API access
     req.app.set('videosData', videos);
-    
+
     res.render('index', {
       title: 'Welcome to Wavelength Lore',
       pageTitle: 'Wavelength Lore: Original Animated Series, Music & Fantasy Storytelling',
@@ -64,6 +74,7 @@ router.get('/', async (req, res) => {
       cdnUrl: process.env.CDN_URL,
       version: `v${Date.now()}`,
       videos: videos || {},
+      seasonBoundaries: seasonBoundaries, // Pass randomly selected NPC boundaries to template
       req: req
     });
   } catch (error) {

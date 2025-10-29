@@ -192,6 +192,23 @@ router.get('/debug', async (req, res) => {
 });
 
 /**
+ * GET /merchandise/badge-demo
+ * Badge placement UI demo page (development only)
+ */
+router.get('/badge-demo', async (req, res) => {
+  if (process.env.NODE_ENV !== 'development') {
+    return res.status(404).json({ error: 'Not found' });
+  }
+
+  try {
+    res.sendFile(require('path').join(__dirname, '../static/html/badge-placement-demo.html'));
+  } catch (error) {
+    console.error('Error serving badge demo page:', error);
+    res.status(500).json({ error: 'Failed to load badge demo page' });
+  }
+});
+
+/**
  * GET /merchandise/cache-admin
  * Cache administration dashboard (standalone)
  * Shows analytics, metrics, and cache management controls

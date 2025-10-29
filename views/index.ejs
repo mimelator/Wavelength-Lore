@@ -144,7 +144,7 @@
         </div>
         <br /><br />
         <div class="carousel" id="carousel-<%= season %>">
-            <% 
+            <%
             // Sort episodes numerically by episode number
             const episodeKeys = Object.keys(videos[season].episodes).sort((a, b) => {
                 const numA = parseInt(a.replace('episode', ''));
@@ -178,9 +178,11 @@
             <% }); %>
         </div>
 
-        <!-- Season Divider with NPC Character -->
-        <div class="season-divider">
-            <img src="/assets/npc-characters/sneaky-goblin.png" alt="Sneaky Goblin - Wavelength Lore NPC" class="npc-image">
+        <!-- Season Divider with Rotating NPC Character -->
+        <div class="season-divider" title="<%= seasonBoundaries[season] ? seasonBoundaries[season].description : 'Wavelength NPC' %>">
+            <img src="<%= seasonBoundaries[season] ? seasonBoundaries[season].path : '/assets/npc-characters/sneaky-goblin.png' %>"
+                 alt="<%= seasonBoundaries[season] ? seasonBoundaries[season].altText : 'Sneaky Goblin - Wavelength Lore NPC' %>"
+                 class="npc-image">
         </div>
     <% } %>
 
