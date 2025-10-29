@@ -1330,8 +1330,8 @@ class MerchandiseStore {
         return;
       }
       
-      // Show checkout modal
-      this.showCheckoutModal();
+      // Use the proper checkout initiation method
+      this.handleCheckoutInitiate();
       
     } catch (error) {
       console.error('Error during checkout:', error);
@@ -3528,105 +3528,7 @@ class MerchandiseStore {
     modal.querySelector('.close').onclick = () => modal.style.display = 'none';
     modal.querySelector('.cancel-btn').onclick = () => modal.style.display = 'none';
   }
-  
-  async showCheckoutModal() {
-    const modal = document.getElementById('checkout-modal');
-    const content = document.getElementById('checkout-content');
 
-    const cartSummary = this.cartService.getSummary();
-
-    content.innerHTML = `
-      <div class="checkout-form">
-        <h2>Complete Your Order</h2>
-
-        <!-- Order Summary -->
-        <div class="order-summary">
-          <h3>Order Summary</h3>
-          <div class="summary-items">
-            ${cartSummary.items.map(item => `
-              <div class="summary-item">
-                <span>${item.title}</span>
-                <span>$${item.price.toFixed(2)}</span>
-              </div>
-            `).join('')}
-          </div>
-          <div class="summary-total">
-            <strong>Total: $${cartSummary.total.toFixed(2)}</strong>
-          </div>
-        </div>
-
-        <form id="checkout-form">
-          <h3>Shipping Information</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="first-name">First Name</label>
-              <input type="text" id="first-name" required />
-            </div>
-            <div class="form-group">
-              <label for="last-name">Last Name</label>
-              <input type="text" id="last-name" required />
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" required />
-          </div>
-          <div class="form-group">
-            <label for="address1">Address Line 1</label>
-            <input type="text" id="address1" required />
-          </div>
-          <div class="form-group">
-            <label for="address2">Address Line 2 (Optional)</label>
-            <input type="text" id="address2" />
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="city">City</label>
-              <input type="text" id="city" required />
-            </div>
-            <div class="form-group">
-              <label for="state">State</label>
-              <input type="text" id="state" required />
-            </div>
-            <div class="form-group">
-              <label for="zip">ZIP Code</label>
-              <input type="text" id="zip" required />
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="country">Country</label>
-            <select id="country" required>
-              <option value="US">United States</option>
-              <option value="CA">Canada</option>
-            </select>
-          </div>
-
-          <h3>Payment Information</h3>
-          <div id="payment-element">
-            <!-- Stripe payment element will be mounted here -->
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" id="checkout-submit-btn" class="btn-primary">
-              <span id="submit-text">Place Order</span>
-              <span id="submit-spinner" class="spinner" style="display: none;"></span>
-            </button>
-            <button type="button" class="btn-secondary cancel-btn">Cancel</button>
-          </div>
-          <div id="checkout-error-message" style="color: #dc3545; margin-top: 10px; display: none;"></div>
-        </form>
-      </div>
-    `;
-
-    modal.style.display = 'block';
-
-    // Setup close handlers
-    modal.querySelector('.close').onclick = () => modal.style.display = 'none';
-    modal.querySelector('.cancel-btn').onclick = () => modal.style.display = 'none';
-
-    // Initialize Stripe Payment Element
-    await this.initializeCheckout();
-  }
 
   /**
    * Initialize Stripe checkout on form display
