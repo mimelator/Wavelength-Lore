@@ -67,6 +67,31 @@ class EmailService {
   }
 
   /**
+   * Send support ticket acknowledgment to customer
+   * @param {Object} ticketData - Support ticket details
+   */
+  async sendSupportAcknowledgment(ticketData) {
+    try {
+      const emailContent = this.generateSupportAcknowledgmentEmail(ticketData);
+      
+      const emailData = {
+        to: ticketData.email,
+        from: this.fromEmail,
+        subject: `Support Ticket Received - ${ticketData.subject} (${ticketData.id})`,
+        html: emailContent,
+        ticketData: ticketData
+      };
+
+      await this.sendEmail(emailData);
+      console.log(`✅ Support acknowledgment email sent to customer: ${ticketData.email}`);
+      
+    } catch (error) {
+      console.error('❌ Error sending support acknowledgment email:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Generate order confirmation email HTML
    * @param {Object} orderData - Order details
    * @returns {string} HTML email content
@@ -269,6 +294,112 @@ class EmailService {
            style="display: inline-block; background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 5px;">
             Reply to Customer
         </a>
+    </div>
+</body>
+</html>
+    `;
+  }
+
+  /**
+   * Generate support acknowledgment email HTML for customer
+   * @param {Object} ticketData - Support ticket details
+   * @returns {string} HTML email content
+   */
+  generateSupportAcknowledgmentEmail(ticketData) {
+    const ticketDate = new Date(ticketData.createdAt).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const priorityEmoji = {
+      normal: '📋',
+      high: '⚡',
+      urgent: '🚨'
+    };
+
+    const priorityText = {
+      normal: 'Normal Priority',
+      high: 'High Priority',
+      urgent: 'Urgent Priority'
+    };
+
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Ticket Received - ${ticketData.id}</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
+        <h1 style="margin: 0 0 10px 0; font-size: 2rem;">✅ Support Ticket Received!</h1>
+        <p style="margin: 0; font-size: 1.1rem; opacity: 0.9;">We've received your support request and will respond soon</p>
+    </div>
+
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
+        <h2 style="margin: 0 0 15px 0; color: #1f2937; font-size: 1.3rem;">📋 Your Ticket Details</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Ticket ID:</td>
+                <td style="padding: 8px 0; font-family: monospace; background: #e5e7eb; padding: 6px 12px; border-radius: 6px;">${ticketData.id}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Subject:</td>
+                <td style="padding: 8px 0;">${ticketData.subject}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Priority:</td>
+                <td style="padding: 8px 0;">${priorityEmoji[ticketData.priority]} ${priorityText[ticketData.priority]}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Submitted:</td>
+                <td style="padding: 8px 0;">${ticketDate}</td>
+            </tr>
+            ${ticketData.orderId ? `
+            <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Related Order:</td>
+                <td style="padding: 8px 0;">${ticketData.orderId}</td>
+            </tr>` : ''}
+        </table>
+    </div>
+
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
+        <h2 style="margin: 0 0 15px 0; color: #1f2937; font-size: 1.3rem;">💬 Your Message</h2>
+        <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea;">
+            ${ticketData.message.replace(/\n/g, '<br>')}
+        </div>
+    </div>
+
+    <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 1px solid #a7f3d0; border-radius: 12px; padding: 25px; text-align: center; margin-bottom: 25px;">
+        <h2 style="margin: 0 0 15px 0; color: #065f46;">⏰ What Happens Next?</h2>
+        <div style="text-align: left; color: #064e3b;">
+            <p style="margin: 0 0 10px 0;">📧 <strong>Email Confirmation:</strong> This email confirms we received your request</p>
+            <p style="margin: 0 0 10px 0;">👀 <strong>Review:</strong> Our support team will review your ticket</p>
+            <p style="margin: 0 0 10px 0;">📞 <strong>Response:</strong> We'll respond within 24-48 hours (or sooner for urgent issues)</p>
+            <p style="margin: 0;">💌 <strong>Updates:</strong> We'll email you when there are updates to your ticket</p>
+        </div>
+    </div>
+
+    <div style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); border-radius: 12px; padding: 25px; text-align: center;">
+        <h2 style="margin: 0 0 15px 0; color: #1f2937;">Need Additional Help?</h2>
+        <p style="margin: 0 0 20px 0; color: #4b5563;">Keep your ticket ID handy for reference: <strong>${ticketData.id}</strong></p>
+        <a href="https://wavelengthlore.com/support" 
+           style="display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 5px;">
+            Visit Support Center
+        </a>
+        <a href="https://wavelengthlore.com/my-orders" 
+           style="display: inline-block; background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 5px;">
+            View My Orders
+        </a>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 0.9rem;">
+        <p style="margin: 0;">Thank you for choosing Wavelength Lore!</p>
+        <p style="margin: 5px 0 0 0;">🌊 Where music is magic and your support matters ✨</p>
     </div>
 </body>
 </html>

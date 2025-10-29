@@ -4870,13 +4870,18 @@ router.post('/api/support/ticket', async (req, res) => {
     // Store ticket in database
     await merchandiseDB.createSupportTicket(ticket);
     
-    // Send email notification to support team
+    // Send email notifications
     try {
+      // Send notification to admin team
       await emailService.sendSupportNotification(ticket);
-      console.log('✅ Support notification email sent successfully');
+      console.log('✅ Admin support notification email sent successfully');
+      
+      // Send acknowledgment to customer
+      await emailService.sendSupportAcknowledgment(ticket);
+      console.log('✅ Customer support acknowledgment email sent successfully');
     } catch (emailError) {
-      console.error('⚠️ Support notification email failed (ticket still created):', emailError);
-      // Don't fail the ticket creation if email fails
+      console.error('⚠️ Support email notifications failed (ticket still created):', emailError);
+      // Don't fail the ticket creation if email fails - customer gets their ticket ID
     }
     
     console.log('📞 New support ticket created:', ticketId);

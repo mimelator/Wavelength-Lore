@@ -12,6 +12,8 @@
     "cache-bust": "node scripts/cloudfront-cache-bust.js",
     "cli": "node wavelength-content-cli.js",
     "cli:start": "node wavelength-content-cli.js",
+    "chat": "node wavelength-chat-cli.js",
+    "chat:cli": "node wavelength-chat-cli.js",
     "cli:admin": "node cli-admin-tools/index.js",
     "cli:sync": "node cli-admin-tools/sync-assets.js",
     "cli:status": "node cli-admin-tools/deployment-status.js --quick",
