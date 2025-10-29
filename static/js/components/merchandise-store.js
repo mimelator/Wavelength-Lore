@@ -1472,6 +1472,11 @@ class MerchandiseStore {
   }
   
   showTourStep(stepIndex) {
+    if (!this.tourSteps || !Array.isArray(this.tourSteps)) {
+      console.error('🌊 Tour steps not initialized! Call startGuidedTour() first.');
+      return;
+    }
+    
     console.log(`🌊 Showing tour step ${stepIndex} of ${this.tourSteps.length - 1} (total: ${this.tourSteps.length})`);
     
     if (stepIndex >= this.tourSteps.length) {
@@ -1613,11 +1618,19 @@ class MerchandiseStore {
   }
   
   nextTourStep() {
+    if (!this.tourSteps || !Array.isArray(this.tourSteps)) {
+      console.error('🌊 Tour steps not initialized! Cannot advance to next step.');
+      return;
+    }
     console.log(`🌊 Next tour step requested: ${this.currentTourStep} -> ${this.currentTourStep + 1}`);
     this.showTourStep(this.currentTourStep + 1);
   }
   
   previousTourStep() {
+    if (!this.tourSteps || !Array.isArray(this.tourSteps)) {
+      console.error('🌊 Tour steps not initialized! Cannot go to previous step.');
+      return;
+    }
     this.showTourStep(this.currentTourStep - 1);
   }
   
@@ -1677,11 +1690,103 @@ class MerchandiseStore {
   replayTour() {
     // Remove any existing notifications
     document.querySelectorAll('.tour-replay-notification').forEach(el => el.remove());
-    // Start tour from beginning
-    this.currentTourStep = 0;
-    this.showTourStep(0);
+    // Start the guided tour from beginning (this will initialize tour steps)
+    this.startGuidedTour();
   }
-  
+
+  /**
+   * Show FAQ Modal with collapsible questions
+   */
+  showFaqModal() {
+    // Remove any existing FAQ modal
+    const existingModal = document.getElementById('faq-modal-overlay');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Create modal overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'faq-modal-overlay';
+    overlay.className = 'faq-modal-overlay';
+    overlay.innerHTML = `
+      <div class="faq-modal">
+        <div class="faq-modal-header">
+          <h2>📖 Shipping & Returns FAQ</h2>
+          <button class="faq-modal-close" onclick="document.getElementById('faq-modal-overlay').remove()">×</button>
+        </div>
+
+        <div class="faq-modal-content">
+          <div class="faq-item-collapsible">
+            <div class="faq-question-header" onclick="this.parentNode.classList.toggle('open')">
+              <span class="faq-toggle">▶</span>
+              <h3>How long does shipping take?</h3>
+            </div>
+            <div class="faq-answer">
+              <p>Standard shipping typically takes 7-10 business days. Express shipping options are available at checkout for faster delivery within 3-5 business days.</p>
+            </div>
+          </div>
+
+          <div class="faq-item-collapsible">
+            <div class="faq-question-header" onclick="this.parentNode.classList.toggle('open')">
+              <span class="faq-toggle">▶</span>
+              <h3>What is your return policy?</h3>
+            </div>
+            <div class="faq-answer">
+              <p>We offer a 30-day return policy for all merchandise. Items must be unused and in original condition. Custom and personalized items cannot be returned unless defective.</p>
+            </div>
+          </div>
+
+          <div class="faq-item-collapsible">
+            <div class="faq-question-header" onclick="this.parentNode.classList.toggle('open')">
+              <span class="faq-toggle">▶</span>
+              <h3>How do I track my order?</h3>
+            </div>
+            <div class="faq-answer">
+              <p>You can track your order by visiting the "My Orders" page in your account. You'll receive email notifications with tracking information once your order ships.</p>
+            </div>
+          </div>
+
+          <div class="faq-item-collapsible">
+            <div class="faq-question-header" onclick="this.parentNode.classList.toggle('open')">
+              <span class="faq-toggle">▶</span>
+              <h3>Can I change or cancel my order?</h3>
+            </div>
+            <div class="faq-answer">
+              <p>Orders can be modified or cancelled within 24 hours of placement. Once production begins, changes cannot be made. Contact support immediately if you need to make changes.</p>
+            </div>
+          </div>
+
+          <div class="faq-item-collapsible">
+            <div class="faq-question-header" onclick="this.parentNode.classList.toggle('open')">
+              <span class="faq-toggle">▶</span>
+              <h3>What is your refund process?</h3>
+            </div>
+            <div class="faq-answer">
+              <p>Once we receive and inspect your returned item, refunds typically process within 5-7 business days. Refunds are issued to your original payment method.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-modal-footer">
+          <p>Need more help?</p>
+          <a href="/support" target="_blank" class="view-full-faq-btn">View Full Support & FAQ →</a>
+        </div>
+      </div>
+    `;
+
+    // Add overlay to body
+    document.body.appendChild(overlay);
+
+    // Close modal when clicking overlay background
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.remove();
+      }
+    });
+
+    console.log('📖 FAQ Modal opened');
+  }
+
   removeTourOverlay() {
     const existing = document.querySelector('.liberation-tour-overlay');
     if (existing) {

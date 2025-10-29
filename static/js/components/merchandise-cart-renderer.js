@@ -234,8 +234,11 @@ class MerchandiseCartRenderer {
           <p class="shipping-info">
             📦 Free shipping on orders over $50
           </p>
+          <p class="help-faq-link">
+            <span>❓</span> <a href="#" onclick="window.merchandiseStore && window.merchandiseStore.showFaqModal ? window.merchandiseStore.showFaqModal() : window.open('/support', '_blank'); return false;">Need help? View FAQ</a>
+          </p>
         </div>
-        
+
         <div class="continue-shopping">
           <button class="continue-shopping-btn">
             ← Continue Shopping

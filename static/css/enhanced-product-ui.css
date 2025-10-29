@@ -1475,6 +1475,31 @@
   color: #4CAF50;
 }
 
+/* Help & FAQ Link */
+.help-faq-link {
+  color: #00d4ff !important;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.help-faq-link a {
+  color: #00d4ff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.help-faq-link a:hover {
+  color: #00ffff;
+  text-decoration: underline;
+}
+
+.help-faq-link span {
+  margin-right: 5px;
+}
+
 /* Continue shopping section */
 .continue-shopping {
   text-align: center;
