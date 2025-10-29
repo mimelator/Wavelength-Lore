@@ -3892,8 +3892,11 @@ class MerchandiseStore {
       const shippingAddress = this.stripeCheckoutService.getShippingAddressFromForm();
 
       // First create payment intent with cart items
+      const cartItems = this.cartService.getItems();
+      console.log('🛒 Cart items for payment:', cartItems);
+      
       const paymentIntentResult = await this.stripeCheckoutService.createPaymentIntent(
-        this.cart, 
+        cartItems, 
         shippingAddress, 
         0 // shipping cost - calculate if needed
       );

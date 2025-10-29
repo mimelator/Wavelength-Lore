@@ -1560,6 +1560,9 @@ router.post('/create-payment-intent', ensureAuthenticated, async (req, res) => {
     const { items, shippingAddress, shippingCost = 0 } = req.body;
     
     console.log('🔑 Creating payment intent for checkout');
+    console.log('📦 Request body:', JSON.stringify(req.body, null, 2));
+    console.log('📦 Items received:', items);
+    console.log('🏠 Shipping address:', shippingAddress);
     
     // Calculate order total including tax and shipping
     const orderTotal = stripePaymentService.calculateOrderTotal(items, shippingAddress, shippingCost);

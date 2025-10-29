@@ -99,6 +99,13 @@ class StripePaymentService {
    */
   calculateOrderTotal(lineItems, shippingAddress, shippingCost = 0) {
     try {
+      console.log('💰 calculateOrderTotal called with:', { lineItems, shippingAddress, shippingCost });
+      
+      // Validate lineItems
+      if (!lineItems || !Array.isArray(lineItems) || lineItems.length === 0) {
+        throw new Error('Invalid line items: must be non-empty array');
+      }
+      
       // Calculate subtotal
       const subtotal = lineItems.reduce((total, item) => {
         const itemPrice = typeof item.price === 'string' ? 

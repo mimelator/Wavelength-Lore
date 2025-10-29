@@ -9,6 +9,7 @@ class StripeCheckoutService {
     this.paymentElement = null;
     this.clientSecret = null;
     this.paymentIntentId = null;
+    this.currentItems = [];
     this.isProcessing = false;
     this.isReady = false;
 
@@ -164,6 +165,7 @@ class StripeCheckoutService {
 
       this.clientSecret = data.clientSecret;
       this.paymentIntentId = data.paymentIntentId;
+      this.currentItems = items; // Store items for later use in confirmPayment
 
       console.log('✅ Payment intent created:', {
         paymentIntentId: this.paymentIntentId,
@@ -243,7 +245,7 @@ class StripeCheckoutService {
         },
         body: JSON.stringify({
           paymentIntentId: this.paymentIntentId,
-          items: window.merchandiseStore?.cart || [],
+          items: this.currentItems || [],
           shippingAddress: this.getShippingAddressFromForm()
         })
       });
@@ -343,6 +345,7 @@ class StripeCheckoutService {
   reset() {
     this.clientSecret = null;
     this.paymentIntentId = null;
+    this.currentItems = [];
     this.isProcessing = false;
     this.paymentElement = null;
     this.elements = null;
