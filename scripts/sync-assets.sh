@@ -34,9 +34,9 @@ if [ -d "$LOCAL_STATIC_DIR" ]; then
     LOCAL_COUNT=$(find "$LOCAL_STATIC_DIR" -type f | wc -l | tr -d ' ')
     echo "📊 Found $LOCAL_COUNT files in static/"
 
-    aws s3 sync "$LOCAL_STATIC_DIR" "s3://$BUCKET_NAME/" \
-        --delete \
+    aws s3 sync "$LOCAL_STATIC_DIR" "s3://$BUCKET_NAME" \
         --exact-timestamps \
+        --no-progress \
         --exclude ".DS_Store" \
         --exclude "*.md"
 
@@ -59,7 +59,6 @@ if [ -d "$LOCAL_PUBLIC_DIR" ]; then
     echo "📊 Found $PUBLIC_COUNT files in public/"
 
     aws s3 sync "$LOCAL_PUBLIC_DIR" "s3://$BUCKET_NAME/" \
-        --delete \
         --exact-timestamps \
         --exclude ".DS_Store" \
         --exclude "*.md"

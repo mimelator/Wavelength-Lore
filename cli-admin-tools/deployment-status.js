@@ -8,6 +8,7 @@
 
 const { AppRunnerClient, DescribeServiceCommand, ListServicesCommand } = require('@aws-sdk/client-apprunner');
 const { ECRClient, DescribeRepositoriesCommand, DescribeImagesCommand } = require('@aws-sdk/client-ecr');
+const { S3Client, ListObjectsV2Command } = require('@aws-sdk/client-s3');
 const chalk = require('chalk');
 const fs = require('fs');
 const path = require('path');
@@ -20,8 +21,10 @@ class WavelengthDeploymentStatus {
     constructor() {
         this.appRunner = new AppRunnerClient({ region: 'us-east-1' });
         this.ecr = new ECRClient({ region: 'us-east-1' });
+        this.s3 = new S3Client({ region: 'us-east-1' });
         this.serviceName = process.env.APPRUNNER_SERVICE_NAME || 'wavelength-lore';
         this.ecrRepository = process.env.ECR_REPOSITORY_NAME || 'wavelength-lore';
+        this.s3Bucket = process.env.S3_BUCKET_NAME || 'wavelength-lore-bucket';
         this.rootDir = process.cwd();
     }
 
@@ -31,24 +34,27 @@ class WavelengthDeploymentStatus {
     async getStatus() {
         console.log(chalk.cyan('🌊 WAVELENGTH ADMIN: Deployment Status'));
         console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
-        
+
         try {
             const status = {};
-            
+
             // Get App Runner status
             status.appRunner = await this.getAppRunnerStatus();
-            
+
             // Get ECR status
             status.ecr = await this.getECRStatus();
-            
+
             // Get local build info
             status.local = await this.getLocalStatus();
-            
+
+            // Get S3 asset status (NEW)
+            status.s3Assets = await this.getS3AssetStatus();
+
             // Display comprehensive status
             await this.displayStatus(status);
-            
+
             return status;
-            
+
         } catch (error) {
             console.error(chalk.red('❌ Status check failed:'), error.message);
             return null;
@@ -216,6 +222,383 @@ class WavelengthDeploymentStatus {
     }
 
     /**
+     * 📦 Get S3 asset status - Verify critical assets are synced
+     */
+    async getS3AssetStatus() {
+        console.log(chalk.yellow('📦 Checking S3 asset status...'));
+
+        const status = {
+            checks: [],
+            errors: [],
+            warnings: [],
+            healthy: true
+        };
+
+        try {
+            // Count local files
+            const localCounts = await this.countLocalAssets();
+
+            // Count S3 files for each critical directory
+            const s3Counts = await this.countS3Assets();
+
+            // Check JavaScript files
+            const jsCheck = {
+                name: 'JavaScript Files',
+                local: localCounts.js,
+                s3: s3Counts.js,
+                healthy: s3Counts.js > 0,
+                critical: true
+            };
+            if (s3Counts.js === 0) {
+                jsCheck.error = 'No JS files found in S3/CDN';
+                status.errors.push('Critical: JavaScript files missing from CDN');
+                status.healthy = false;
+            } else if (s3Counts.js < localCounts.js * 0.5) {
+                jsCheck.warning = `Only ${s3Counts.js}/${localCounts.js} JS files synced`;
+                status.warnings.push('Warning: Many JS files missing from CDN');
+                status.healthy = false;
+            }
+            status.checks.push(jsCheck);
+
+            // Check CSS files
+            const cssCheck = {
+                name: 'CSS Files',
+                local: localCounts.css,
+                s3: s3Counts.css,
+                healthy: s3Counts.css > 0,
+                critical: true
+            };
+            if (s3Counts.css === 0) {
+                cssCheck.error = 'No CSS files found in S3/CDN';
+                status.errors.push('Critical: CSS files missing from CDN');
+                status.healthy = false;
+            } else if (s3Counts.css < localCounts.css * 0.5) {
+                cssCheck.warning = `Only ${s3Counts.css}/${localCounts.css} CSS files synced`;
+                status.warnings.push('Warning: Many CSS files missing from CDN');
+                status.healthy = false;
+            }
+            status.checks.push(cssCheck);
+
+            // Check MP3 audio files - Enhanced reporting
+            const mp3Check = {
+                name: 'Audio Files (MP3)',
+                local: localCounts.mp3,
+                s3: s3Counts.mp3,
+                healthy: s3Counts.mp3 > 0,
+                critical: true,
+                details: localCounts.mp3Details || null,
+                s3Details: s3Counts.mp3Details || null
+            };
+            if (s3Counts.mp3 === 0) {
+                mp3Check.error = 'No MP3 files found in S3/CDN';
+                status.errors.push('Critical: Audio files missing from CDN - Radio will not work');
+                status.healthy = false;
+            } else if (s3Counts.mp3 < localCounts.mp3) {
+                mp3Check.warning = `Only ${s3Counts.mp3}/${localCounts.mp3} audio files synced`;
+                status.warnings.push('Warning: Some audio files missing from CDN');
+            } else if (s3Counts.mp3 === localCounts.mp3 && s3Counts.mp3 > 0) {
+                mp3Check.success = `All ${s3Counts.mp3} audio files synced successfully`;
+            }
+            status.checks.push(mp3Check);
+
+            // Check critical Firebase config
+            const firebaseCheck = {
+                name: 'Firebase Config',
+                local: localCounts.firebaseConfig ? 1 : 0,
+                s3: s3Counts.firebaseConfig ? 1 : 0,
+                healthy: s3Counts.firebaseConfig,
+                critical: true
+            };
+            if (!s3Counts.firebaseConfig) {
+                firebaseCheck.error = 'firebase-config.js missing from CDN';
+                status.errors.push('Critical: Firebase config missing - Authentication will fail');
+                status.healthy = false;
+            }
+            status.checks.push(firebaseCheck);
+
+            // Check image assets
+            const imageCheck = {
+                name: 'Season Images',
+                local: localCounts.seasonImages,
+                s3: s3Counts.seasonImages,
+                healthy: s3Counts.seasonImages > 0,
+                critical: false
+            };
+            if (s3Counts.seasonImages === 0 && localCounts.seasonImages > 0) {
+                imageCheck.warning = 'Season images not synced';
+                status.warnings.push('Warning: Season images missing from CDN');
+            }
+            status.checks.push(imageCheck);
+
+            return status;
+
+        } catch (error) {
+            status.errors.push(`S3 check failed: ${error.message}`);
+            status.healthy = false;
+            return status;
+        }
+    }
+
+    /**
+     * 📊 Count local asset files
+     */
+    async countLocalAssets() {
+        const counts = {
+            js: 0,
+            css: 0,
+            mp3: 0,
+            firebaseConfig: false,
+            seasonImages: 0
+        };
+
+        try {
+            // Count JS files
+            const jsDir = path.join(this.rootDir, 'static', 'js');
+            if (fs.existsSync(jsDir)) {
+                counts.js = this.countFilesRecursive(jsDir, '.js');
+                const firebaseConfigPath = path.join(jsDir, 'firebase-config.js');
+                counts.firebaseConfig = fs.existsSync(firebaseConfigPath);
+            }
+
+            // Count CSS files
+            const cssDir = path.join(this.rootDir, 'static', 'css');
+            if (fs.existsSync(cssDir)) {
+                counts.css = this.countFilesRecursive(cssDir, '.css');
+            }
+
+            // Count MP3 files with detailed breakdown
+            const seasonsDir = path.join(this.rootDir, 'static', 'images', 'seasons');
+            if (fs.existsSync(seasonsDir)) {
+                const mp3Details = this.getMP3Details(seasonsDir);
+                counts.mp3 = mp3Details.total;
+                counts.mp3Details = mp3Details;
+                counts.seasonImages = this.countFilesRecursive(seasonsDir, '.webp');
+            }
+
+        } catch (error) {
+            console.log(chalk.gray(`   Note: Could not count local files (${error.message})`));
+        }
+
+        return counts;
+    }
+
+    /**
+     * 🗂️ Count files recursively with extension filter
+     */
+    countFilesRecursive(dir, extension) {
+        let count = 0;
+        try {
+            const files = fs.readdirSync(dir);
+            for (const file of files) {
+                const filePath = path.join(dir, file);
+                const stat = fs.statSync(filePath);
+                if (stat.isDirectory()) {
+                    count += this.countFilesRecursive(filePath, extension);
+                } else if (file.endsWith(extension)) {
+                    count++;
+                }
+            }
+        } catch (error) {
+            // Silently skip directories that can't be read
+        }
+        return count;
+    }
+
+    /**
+     * 🎵 Get detailed MP3 file breakdown by season
+     */
+    getMP3Details(seasonsDir) {
+        const details = {
+            total: 0,
+            bySeason: {},
+            files: []
+        };
+
+        try {
+            const seasons = fs.readdirSync(seasonsDir).filter(item => {
+                const seasonPath = path.join(seasonsDir, item);
+                return fs.statSync(seasonPath).isDirectory() && item.startsWith('season');
+            });
+
+            for (const season of seasons) {
+                const seasonPath = path.join(seasonsDir, season);
+                const seasonMP3s = this.findMP3FilesInSeason(seasonPath, season);
+                
+                if (seasonMP3s.length > 0) {
+                    details.bySeason[season] = {
+                        count: seasonMP3s.length,
+                        files: seasonMP3s.map(f => f.name)
+                    };
+                    details.files.push(...seasonMP3s);
+                    details.total += seasonMP3s.length;
+                }
+            }
+        } catch (error) {
+            console.log(chalk.gray(`   Note: Could not analyze MP3 details (${error.message})`));
+        }
+
+        return details;
+    }
+
+    /**
+     * 🔍 Find MP3 files in a season directory
+     */
+    findMP3FilesInSeason(seasonPath, seasonName) {
+        const mp3Files = [];
+        
+        try {
+            const episodes = fs.readdirSync(seasonPath).filter(item => {
+                const episodePath = path.join(seasonPath, item);
+                return fs.statSync(episodePath).isDirectory() && item.startsWith('episode');
+            });
+
+            for (const episode of episodes) {
+                const episodePath = path.join(seasonPath, episode);
+                const files = fs.readdirSync(episodePath);
+                
+                for (const file of files) {
+                    if (file.endsWith('.mp3')) {
+                        const filePath = path.join(episodePath, file);
+                        const stat = fs.statSync(filePath);
+                        mp3Files.push({
+                            name: file,
+                            season: seasonName,
+                            episode: episode,
+                            size: Math.round(stat.size / 1024 / 1024 * 100) / 100, // MB
+                            path: path.relative(this.rootDir, filePath)
+                        });
+                    }
+                }
+            }
+        } catch (error) {
+            // Silently skip directories that can't be read
+        }
+
+        return mp3Files;
+    }
+
+    /**
+     * ☁️ Count S3 asset files
+     */
+    async countS3Assets() {
+        const counts = {
+            js: 0,
+            css: 0,
+            mp3: 0,
+            firebaseConfig: false,
+            seasonImages: 0
+        };
+
+        try {
+            // Count JS files in S3
+            counts.js = await this.countS3Files('js/', '.js');
+
+            // Check for firebase-config.js specifically
+            const firebaseObjects = await this.listS3Objects('js/firebase-config.js', 1);
+            counts.firebaseConfig = firebaseObjects.length > 0;
+
+            // Count CSS files in S3
+            counts.css = await this.countS3Files('css/', '.css');
+
+            // Count MP3 files in S3 with details
+            const s3MP3Details = await this.getS3MP3Details();
+            counts.mp3 = s3MP3Details.total;
+            counts.mp3Details = s3MP3Details;
+
+            // Count season images
+            counts.seasonImages = await this.countS3Files('images/seasons/', '.webp');
+
+        } catch (error) {
+            console.log(chalk.gray(`   Note: Could not count S3 files (${error.message})`));
+        }
+
+        return counts;
+    }
+
+    /**
+     * 🔢 Count files in S3 with prefix and extension
+     */
+    async countS3Files(prefix, extension) {
+        const objects = await this.listS3Objects(prefix);
+        return objects.filter(obj => obj.Key.endsWith(extension)).length;
+    }
+
+    /**
+     * 📋 List S3 objects with prefix
+     */
+    async listS3Objects(prefix, maxKeys = 1000) {
+        const command = new ListObjectsV2Command({
+            Bucket: this.s3Bucket,
+            Prefix: prefix,
+            MaxKeys: maxKeys
+        });
+
+        const response = await this.s3.send(command);
+        return response.Contents || [];
+    }
+
+    /**
+     * 🎵 Get detailed MP3 file breakdown from S3
+     */
+    async getS3MP3Details() {
+        const details = {
+            total: 0,
+            bySeason: {},
+            files: [],
+            lastSyncTime: null
+        };
+
+        try {
+            const objects = await this.listS3Objects('images/seasons/');
+            const mp3Objects = objects.filter(obj => obj.Key.endsWith('.mp3'));
+
+            // Find the most recent sync time
+            if (mp3Objects.length > 0) {
+                details.lastSyncTime = mp3Objects.reduce((latest, obj) => {
+                    return new Date(obj.LastModified) > new Date(latest) ? obj.LastModified : latest;
+                }, mp3Objects[0].LastModified);
+            }
+
+            for (const obj of mp3Objects) {
+                const keyParts = obj.Key.split('/');
+                const fileName = keyParts[keyParts.length - 1];
+                
+                // Extract season info from path
+                const seasonMatch = obj.Key.match(/images\/seasons\/(season\d+)\/episodes\/(episode\d+)\//);
+                if (seasonMatch) {
+                    const season = seasonMatch[1];
+                    const episode = seasonMatch[2];
+                    
+                    if (!details.bySeason[season]) {
+                        details.bySeason[season] = {
+                            count: 0,
+                            files: []
+                        };
+                    }
+                    
+                    details.bySeason[season].count++;
+                    details.bySeason[season].files.push(fileName);
+                    
+                    details.files.push({
+                        name: fileName,
+                        season: season,
+                        episode: episode,
+                        size: Math.round(obj.Size / 1024 / 1024 * 100) / 100, // MB
+                        lastModified: obj.LastModified,
+                        key: obj.Key
+                    });
+                    
+                    details.total++;
+                }
+            }
+        } catch (error) {
+            console.log(chalk.gray(`   Note: Could not analyze S3 MP3 details (${error.message})`));
+        }
+
+        return details;
+    }
+
+    /**
      * 📁 Get local build status
      */
     async getLocalStatus() {
@@ -272,6 +655,76 @@ class WavelengthDeploymentStatus {
         console.log(chalk.white(`   Git Status: ${status.local.gitStatus}`));
         console.log(chalk.white(`   Docker: ${status.local.dockerfileExists ? '✓' : '❌'}`));
         console.log(chalk.white(`   Dependencies: ${status.local.nodeModulesExists ? '✓' : '❌'}`));
+        console.log('');
+
+        // S3 Asset Status (ENHANCED)
+        console.log(chalk.cyan('📦 S3/CDN ASSET STATUS:'));
+        if (status.s3Assets && status.s3Assets.checks) {
+            status.s3Assets.checks.forEach(check => {
+                const icon = check.healthy ? '✅' : (check.critical ? '❌' : '⚠️');
+                const syncStatus = check.s3 === check.local ?
+                    chalk.green(`${check.s3}/${check.local}`) :
+                    chalk.yellow(`${check.s3}/${check.local}`);
+                console.log(chalk.white(`   ${icon} ${check.name}: ${syncStatus}`));
+                
+                // Special detailed display for MP3 files
+                if (check.name === 'Audio Files (MP3)' && check.details && check.s3Details) {
+                    if (check.s3 > 0) {
+                        console.log(chalk.gray(`      └─ Seasons with audio:`));
+                        Object.keys(check.s3Details.bySeason).sort().forEach(season => {
+                            const seasonData = check.s3Details.bySeason[season];
+                            const localSeasonData = check.details.bySeason[season];
+                            const localCount = localSeasonData ? localSeasonData.count : 0;
+                            const syncIcon = seasonData.count === localCount ? '✅' : '⚠️';
+                            console.log(chalk.gray(`         ${syncIcon} ${season}: ${seasonData.count}/${localCount} files`));
+                        });
+                        
+                        if (check.s3Details.lastSyncTime) {
+                            const syncAgo = this.getTimeAgo(check.s3Details.lastSyncTime);
+                            console.log(chalk.gray(`      └─ Last sync: ${syncAgo}`));
+                        }
+                        
+                        // Calculate total audio size
+                        const totalSize = check.s3Details.files.reduce((sum, file) => sum + file.size, 0);
+                        console.log(chalk.gray(`      └─ Total size: ${Math.round(totalSize * 100) / 100} MB`));
+                    }
+                }
+                
+                if (check.error) {
+                    console.log(chalk.red(`      └─ ${check.error}`));
+                }
+                if (check.warning) {
+                    console.log(chalk.yellow(`      └─ ${check.warning}`));
+                }
+                if (check.success) {
+                    console.log(chalk.green(`      └─ ${check.success}`));
+                }
+            });
+
+            // Display errors and warnings summary
+            if (status.s3Assets.errors.length > 0) {
+                console.log('');
+                console.log(chalk.red('   ⚠️  CRITICAL ISSUES:'));
+                status.s3Assets.errors.forEach(error => {
+                    console.log(chalk.red(`      • ${error}`));
+                });
+            }
+            if (status.s3Assets.warnings.length > 0 && status.s3Assets.errors.length === 0) {
+                console.log('');
+                console.log(chalk.yellow('   ⚠️  WARNINGS:'));
+                status.s3Assets.warnings.forEach(warning => {
+                    console.log(chalk.yellow(`      • ${warning}`));
+                });
+            }
+
+            // Provide fix suggestion
+            if (!status.s3Assets.healthy) {
+                console.log('');
+                console.log(chalk.cyan('   💡 FIX: Run npm run cli:admin sync to upload missing assets'));
+            }
+        } else {
+            console.log(chalk.red('   ❌ Could not check S3 asset status'));
+        }
         console.log('');
         
         // ECR Status
@@ -367,7 +820,8 @@ class WavelengthDeploymentStatus {
         const localHealthy = status.local.dockerfileExists && status.local.nodeModulesExists;
         const ecrHealthy = status.ecr.status !== 'Error';
         const appRunnerHealthy = status.appRunner.status === 'RUNNING';
-        
+        const s3AssetsHealthy = status.s3Assets ? status.s3Assets.healthy : false;
+
         // Check deployment synchronization
         let deploymentSync = 'Unknown';
         if (status.local.commit && status.appRunner.source) {
@@ -385,10 +839,11 @@ class WavelengthDeploymentStatus {
             }
         }
         
-        const isHealthy = localHealthy && ecrHealthy && appRunnerHealthy;
-        
+        const isHealthy = localHealthy && ecrHealthy && appRunnerHealthy && s3AssetsHealthy;
+
         console.log(chalk.cyan('🌊 DEPLOYMENT STATUS SUMMARY:'));
         console.log(chalk.white(`   Local Environment: ${localHealthy ? '✅' : '❌'}`));
+        console.log(chalk.white(`   S3/CDN Assets: ${s3AssetsHealthy ? '✅' : '❌'}`));
         console.log(chalk.white(`   ECR Repository: ${ecrHealthy ? '✅' : '❌'}`));
         console.log(chalk.white(`   App Runner Service: ${appRunnerHealthy ? '✅' : '❌'}`));
         
@@ -414,7 +869,8 @@ class WavelengthDeploymentStatus {
         } else {
             console.log(chalk.red('   🔧 ATTENTION NEEDED - Critical issues detected'));
             if (!localHealthy) console.log(chalk.red('      • Local environment issues detected'));
-            if (!ecrHealthy) console.log(chalk.red('      • ECR repository issues detected'));  
+            if (!s3AssetsHealthy) console.log(chalk.red('      • S3/CDN assets missing or incomplete'));
+            if (!ecrHealthy) console.log(chalk.red('      • ECR repository issues detected'));
             if (!appRunnerHealthy) console.log(chalk.red('      • App Runner service not running'));
         }
         

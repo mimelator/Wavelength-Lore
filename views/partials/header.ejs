@@ -146,8 +146,10 @@
                     }
                     
                     // Show VIP AI Assistant floating icon for same access levels as games
+                    // AI Assistant disabled by default (Issue #113) - only enable if explicitly set to true
                     const aiAssistantIcon = document.getElementById('ai-assistant-icon');
-                    if (aiAssistantIcon) {
+                    const aiAssistantEnabled = '<%= process.env.ENABLE_AI_ASSISTANT === "true" ? "true" : "false" %>' === 'true';
+                    if (aiAssistantIcon && aiAssistantEnabled) {
                       aiAssistantIcon.style.display = 'block';
                     }
                   }
