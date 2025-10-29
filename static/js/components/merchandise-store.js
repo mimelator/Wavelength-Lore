@@ -117,6 +117,7 @@ class MerchandiseStore {
     // Clear all tour-related localStorage items
     localStorage.removeItem('liberation_vault_entered');
     localStorage.removeItem('liberation_vault_tour_completed');
+    localStorage.removeItem('wavelength_vault_tour_completed');
     
     // Reset internal state
     this.hasEnteredVault = false;
@@ -1426,11 +1427,16 @@ class MerchandiseStore {
     
     // Check if user has completed tour before
     const tourCompleted = localStorage.getItem('wavelength_vault_tour_completed') === 'true';
+    console.log('🔍 Tour completed check:', tourCompleted);
+    
     if (tourCompleted) {
+      console.log('🔄 Tour already completed, showing replay option');
       // Show option to replay tour
       this.showTourReplayOption();
       return;
     }
+    
+    console.log('✅ Starting fresh tour - no completion flag found');
     
     this.currentTourStep = 0;
     this.tourSteps = [
@@ -1468,6 +1474,7 @@ class MerchandiseStore {
       }
     ];
     
+    console.log('🎯 Tour steps initialized, calling showTourStep(0)');
     this.showTourStep(0);
   }
   
@@ -1491,9 +1498,11 @@ class MerchandiseStore {
     // Note: We no longer skip steps - dynamic content shows what they'll look like
     
     // Remove existing tour overlay
+    console.log('🧹 Removing existing tour overlay');
     this.removeTourOverlay();
     
     // Create tour overlay
+    console.log('🏗️ Creating new tour overlay');
     const overlay = document.createElement('div');
     overlay.className = 'liberation-tour-overlay';
     overlay.innerHTML = `
@@ -1522,14 +1531,19 @@ class MerchandiseStore {
       </div>
     `;
     
+    console.log('📎 Appending overlay to document.body');
     document.body.appendChild(overlay);
+    
+    console.log('✅ Overlay added to DOM, setting up positioning');
     
     // Position tooltip near target element
     setTimeout(() => {
+      console.log('🎯 Positioning tour tooltip for target:', step.target);
       this.positionTourTooltip(step.target, step.placement);
     }, 50);
     
     this.currentTourStep = stepIndex;
+    console.log('🏁 Tour step', stepIndex, 'setup complete. Current step set to:', this.currentTourStep);
   }
   
   positionTourTooltip(targetSelector, placement) {
@@ -1864,7 +1878,8 @@ class MerchandiseStore {
 
   // Developer utility to reset tour state for testing
   resetTourState() {
-    localStorage.removeItem('wavelength_vault_entered');
+    localStorage.removeItem('liberation_vault_entered');
+    localStorage.removeItem('liberation_vault_tour_completed');
     localStorage.removeItem('wavelength_vault_tour_completed');
     this.hasEnteredVault = false;
     console.log('🔄 Tour state reset - reload page to see welcome section');
