@@ -997,9 +997,21 @@ class RadioScreenSaver {
         // Start auto-countdown when radio starts playing (with small delay for better UX)
         if (!this.active) {
             setTimeout(() => {
-                // Double-check that we're still playing and not in screensaver mode
-                if (this.radio.isPlaying && !this.active) {
+                // Triple-check that audio is actually playing
+                if (this.radio.isPlaying && 
+                    !this.active && 
+                    this.radio.audio && 
+                    !this.radio.audio.paused && 
+                    this.radio.audio.readyState >= 2) {
+                    console.log('🎨 Starting screensaver countdown - audio confirmed playing');
                     this.startAutoCountdown();
+                } else {
+                    console.log('🎨 Skipping screensaver countdown - audio not actually playing', {
+                        isPlaying: this.radio.isPlaying,
+                        active: this.active,
+                        paused: this.radio.audio?.paused,
+                        readyState: this.radio.audio?.readyState
+                    });
                 }
             }, 1000); // 1 second delay
         }

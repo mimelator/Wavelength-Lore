@@ -850,10 +850,18 @@ class WavelengthRadio {
         this.audio.addEventListener('play', () => {
             this.isPlaying = true;
             this.savePlaybackState();
+            // Notify screensaver when audio actually starts playing
+            if (this.screensaver) {
+                this.screensaver.onRadioPlay();
+            }
         });
         this.audio.addEventListener('pause', () => {
             this.isPlaying = false;
             this.savePlaybackState();
+            // Notify screensaver when audio pauses
+            if (this.screensaver) {
+                this.screensaver.onRadioStop();
+            }
         });
         this.audio.addEventListener('error', (e) => {
             console.error('Audio error:', e);
@@ -899,10 +907,7 @@ class WavelengthRadio {
                 if (albumArt) albumArt.classList.add('playing');
                 // Save state again after successful play start
                 this.savePlaybackState();
-                // Notify screensaver that radio started playing
-                if (this.screensaver) {
-                    this.screensaver.onRadioPlay();
-                }
+                // Screensaver notification handled by audio 'play' event listener
             }).catch(error => {
                 console.error('Playback error:', error);
             });
@@ -921,17 +926,24 @@ class WavelengthRadio {
             this.audio.pause();
             this.isPlaying = false;
             document.querySelector('.album-art').classList.remove('playing');
-            // Notify screensaver that radio stopped
-            if (this.screensaver) {
-                this.screensaver.onRadioStop();
-            }
+            // Screensaver notification handled by audio 'pause' event listener
         } else {
-            this.audio.play();
-            this.isPlaying = true;
-            document.querySelector('.album-art').classList.add('playing');
-            // Notify screensaver that radio started playing
-            if (this.screensaver) {
-                this.screensaver.onRadioPlay();
+            const playPromise = this.audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    this.isPlaying = true;
+                    document.querySelector('.album-art').classList.add('playing');
+                    // Screensaver notification handled by audio 'play' event listener
+                }).catch(error => {
+                    console.error('Play error in togglePlay:', error);
+                    this.isPlaying = false;
+                    document.querySelector('.album-art').classList.remove('playing');
+                });
+            } else {
+                // Fallback for older browsers
+                this.isPlaying = true;
+                document.querySelector('.album-art').classList.add('playing');
+                // Screensaver notification handled by audio 'play' event listener
             }
         }
 
