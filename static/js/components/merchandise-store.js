@@ -3920,7 +3920,7 @@ class MerchandiseStore {
       this.showSuccess(`Order placed successfully! Order ID: ${result.orderId}`);
 
       // Clear cart
-      this.cartService.clearCart();
+      this.cartService.clear();
 
       // Close modal
       const modal = document.getElementById('checkout-modal');
