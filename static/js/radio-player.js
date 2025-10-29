@@ -1,5 +1,10 @@
 // Wavelength Radio Player - Interactive Music Player with Game Elements
 
+// Guard against double-loading
+if (typeof window.WavelengthRadio !== 'undefined') {
+    console.log('🎵 WavelengthRadio already loaded, skipping redefinition');
+} else {
+
 class WavelengthRadio {
     constructor() {
         // Detect player type and set appropriate audio element
@@ -2650,11 +2655,17 @@ class WavelengthRadio {
     }
 }
 
-// Initialize radio player when DOM is ready
+// Make class available globally
+window.WavelengthRadio = WavelengthRadio;
 
-// Initialize radio player when DOM is ready
+// Initialize radio player when DOM is ready (guard against double initialization)
 document.addEventListener('DOMContentLoaded', () => {
-    window.wavelengthRadio = new WavelengthRadio();
+    if (!window.wavelengthRadio) {
+        console.log('🎵 Initializing WavelengthRadio instance');
+        window.wavelengthRadio = new WavelengthRadio();
+    } else {
+        console.log('🎵 WavelengthRadio already initialized, skipping');
+    }
 });
 
 // Add level up animation (only once).
@@ -2671,3 +2682,5 @@ if (!document.getElementById('wavelength-levelup-style')) {
     `;
     document.head.appendChild(levelUpAnimationStyle);
 }
+
+} // End of WavelengthRadio guard
