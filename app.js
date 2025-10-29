@@ -276,6 +276,9 @@ async function createApp() {
   // Mount deployment status API
   app.use('/', deploymentApiRoutes);
   
+  // Mount content routes FIRST (handles homepage and main content)
+  app.use('/', contentRoutes);
+
   // Mount blueprint preview API routes FIRST to avoid conflicts with merchandise routes
   app.use('/api/merchandise', blueprintPreviewRoutes);
 
@@ -319,9 +322,6 @@ app.get('/merchandise-store-browser-test', (req, res) => {
 app.get('/simple-merch-test', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'simple-merch-test.html'));
 });
-
-  // Mount content routes
-  app.use('/', contentRoutes);
   
   // Product selection page route
   app.get('/product-selection', (req, res) => {
