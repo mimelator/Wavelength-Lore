@@ -9,6 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+require('dotenv').config();
 
 // Configuration
 const AUDIT_FILE = path.join(__dirname, '../reports/cta-audit.json');

@@ -14,6 +14,7 @@ const fs = require('fs');
 const path = require('path');
 const CTACollector = require('./cta-collector');
 const CTAValidator = require('./cta-validator');
+const { validateSetup } = require('./cta-setup');
 
 const AUDIT_FILE = path.join(__dirname, '../reports/cta-audit.json');
 const VALIDATION_REPORT = path.join(__dirname, '../reports/cta-validation-report.json');
@@ -152,6 +153,14 @@ async function runValidation() {
   if (!fs.existsSync(AUDIT_FILE)) {
     console.error(`❌ Audit file not found: ${AUDIT_FILE}`);
     console.error(`Run \`npm run cta:collect\` first`);
+    process.exit(1);
+  }
+
+  // Check if API key is configured
+  const isSetupValid = await validateSetup();
+  if (!isSetupValid) {
+    console.error('\n❌ Setup validation failed');
+    console.error('Run: npm run cta:setup -- --interactive');
     process.exit(1);
   }
 

@@ -1,0 +1,397 @@
+{
+  "timestamp": "2025-10-29T03:54:31.148Z",
+  "stats": {
+    "total": 36,
+    "characters": 0,
+    "episodes": 25,
+    "lore": 11,
+    "empty": 16
+  },
+  "ctas": [
+    {
+      "type": "episode",
+      "id": "episode1",
+      "title": "My Lucky Charm",
+      "season": "1",
+      "source": "seasons/season1.yaml",
+      "cta_tagline": "What happens when music awakens ancient vengeance?",
+      "cliffhanger_hook": "But when the Goblin King hears Wavelength's innocent lyrics, their peaceful concert sets in motion a vengeful plot that will shatter the Shire's tranquility forever.",
+      "next_episode_tease": "The adventure continues as Wavelength faces the consequences of their words...",
+      "description": "Everyone needs a little luck sometimes, except for maybe Goblins who need no one"
+    },
+    {
+      "type": "episode",
+      "id": "episode10",
+      "title": "Keep On",
+      "season": "1",
+      "source": "seasons/season1.yaml",
+      "cta_tagline": "Can love keep them together when everything falls apart?",
+      "cliffhanger_hook": "But as Wavelength celebrates the power of love and connection, dark forces are already mobilizing in the shadows, preparing to test whether their bonds are strong enough to survive the storm that's coming.",
+      "next_episode_tease": "Love will be their greatest strength—and their most vulnerable target.",
+      "description": "There are 3 or 4 little words that I enjoy hearing everyday… But as Wavelength searches for love and connection, they're unaware that the Goblin King's forces are already closing in, threatening to si"
+    },
+    {
+      "type": "episode",
+      "id": "episode11",
+      "title": "Back to the Shire (Encore)",
+      "season": "1",
+      "source": "seasons/season1.yaml",
+      "cta_tagline": "What happens when paradise becomes a target?",
+      "cliffhanger_hook": "But as Wavelength's triumphant return fills the Shire with celebration, a sinister presence watches from the shadows, knowing that this moment of perfect peace is the ideal time to strike and shatter their world forever.",
+      "next_episode_tease": "The greatest victories often precede the darkest defeats.",
+      "description": "There's a place where people practice paradise... But as Wavelength returns to their sanctuary, they discover that even paradise isn't immune to the darkness spreading across the realms, and their nex"
+    },
+    {
+      "type": "episode",
+      "id": "episode2",
+      "title": "Jump Right In!",
+      "season": "1",
+      "source": "seasons/season1.yaml",
+      "cta_tagline": "What happens when courage meets chaos?",
+      "cliffhanger_hook": "But as Wavelength encourages everyone to jump right in, they remain unaware that something sinister has already taken the leap—lurking in the shadows, ready to strike when they least expect it.",
+      "next_episode_tease": "Sometimes taking chances means facing the consequences of what follows.",
+      "description": "Life is about choices, so make one and see what happens next!"
+    },
+    {
+      "type": "episode",
+      "id": "episode3",
+      "title": "Dream with Me",
+      "season": "1",
+      "source": "seasons/season1.yaml",
+      "cta_tagline": "Can shared dreams overcome dark nightmares?",
+      "cliffhanger_hook": "But as the Shire folk drift into peaceful dreams, a nightmare begins to stir in the depths of the goblin realm, where dark visions of conquest and revenge consume the Goblin King's restless sleep.",
+      "next_episode_tease": "When dreams collide with nightmares, which vision will shape reality?",
+      "description": "What dreams can be made when two are united in destiny?"
+    },
+    {
+      "type": "episode",
+      "id": "episode4",
+      "title": "Daphne",
+      "season": "1",
+      "source": "seasons/season1.yaml",
+      "cta_tagline": "Will courage triumph over looming shadows?",
+      "cliffhanger_hook": "But when the haunting rhythm of Daphne's drums echoes through the Shire, a shadow looms on the horizon, hinting at a darkness that has yet to awaken.",
+      "next_episode_tease": "As whispers of the Goblin King's return grow louder, Wavelength must unite to protect their home and their hearts.",
+      "description": "The intoxicating Daphne flower calls to both pollinators and humans alike"
+    },
+    {
+      "type": "episode",
+      "id": "episode5",
+      "title": "Falling",
+      "season": "1",
+      "source": "seasons/season1.yaml",
+      "cta_tagline": "Will love conquer the coming storm?",
+      "cliffhanger_hook": "But as the melody of love fades, a shadow falls across the Shire, and the whispers of an ancient darkness begin to stir, threatening to turn their falling in love into a fall from grace.",
+      "next_episode_tease": "Love may bloom, but can it survive when the very ground beneath them starts to crumble?",
+      "description": "When they make your heart go ah-ah-ah-ah"
+    },
+    {
+      "type": "episode",
+      "id": "episode6",
+      "title": "Once More",
+      "season": "1",
+      "source": "seasons/season1.yaml",
+      "cta_tagline": "What price comes with remembering the forgotten?",
+      "cliffhanger_hook": "But as Wavelength honors the memory of those they've lost, a chilling realization dawns—their song of remembrance has awakened something that was meant to stay buried, and now the past threatens to consume the present.",
+      "next_episode_tease": "Some memories are doors that should never be opened.",
+      "description": "In remembrance of dear friends"
+    },
+    {
+      "type": "episode",
+      "id": "episode7",
+      "title": "History Lessons",
+      "season": "1",
+      "source": "seasons/season1.yaml",
+      "cta_tagline": "Will they rise or fall in darkness?",
+      "cliffhanger_hook": "But when Wavelength discovers a hidden prophecy buried deep within the ancient ruins of the Shire, they realize that the fate of their world hinges on a choice that could either unite the Shirefolk or doom them to eternal servitude under the Goblin King.",
+      "next_episode_tease": "As secrets unravel, alliances will be tested like never before.",
+      "description": "In memory of a precious friend, a jewel that couldn't be outshone"
+    },
+    {
+      "type": "episode",
+      "id": "episode8",
+      "title": "Life in the Shire",
+      "season": "1",
+      "source": "seasons/season1.yaml",
+      "cta_tagline": "Will the Shire stand united against evil?",
+      "cliffhanger_hook": "But when a shadow looms over the horizon, the once-peaceful melodies of the Shire are drowned out by the sinister chants of the Goblin King, threatening to shatter their tranquil existence forever.",
+      "next_episode_tease": "As darkness descends, the Shire Folk must rally together to defend their home against an encroaching misery.",
+      "description": "When home is a haven, there's no limit to what can be done"
+    },
+    {
+      "type": "episode",
+      "id": "episode9",
+      "title": "Feed the Crows",
+      "season": "1",
+      "source": "seasons/season1.yaml",
+      "cta_tagline": "Can compassion survive when it becomes a weapon?",
+      "cliffhanger_hook": "But as Wavelength feeds the crows with hope and healing, they unknowingly attract a different kind of scavenger—one that feeds on despair and grows stronger with each act of kindness it corrupts.",
+      "next_episode_tease": "Sometimes the greatest acts of mercy become the deadliest traps.",
+      "description": "Living in and Loving Nature can be a great balm for your pain"
+    },
+    {
+      "type": "episode",
+      "id": "episode1",
+      "title": "Goblin King",
+      "season": "2",
+      "source": "seasons/season2.yaml",
+      "cta_tagline": "Can they reclaim hope from despair?",
+      "cliffhanger_hook": "But when Wavelength finally gathers the courage to confront the Goblin King, an unexpected betrayal from within their ranks threatens to shatter their unity and plunge the Shire into eternal darkness. NEXT_EPISODE_TEASE: As the dust settles, secrets will unravel, and the true power of friendship will be tested in the heart of despair.",
+      "next_episode_tease": "As the dust settles, secrets will unravel, and the true power of friendship will be tested in the heart of despair.",
+      "description": "You've been punched in the head So many times that you don't know Which is way is left or right"
+    },
+    {
+      "type": "episode",
+      "id": "episode2",
+      "title": "Psychopath",
+      "season": "2",
+      "source": "seasons/season2.yaml",
+      "cta_tagline": "Will Wavelength outsmart the Goblin King?",
+      "cliffhanger_hook": "But when Wavelength strums the first chord of their song, an unexpected shadow looms behind the Goblin King, revealing a hidden ally with dark intentions. NEXT_EPISODE_TEASE: As the music swells, secrets unravel, and Wavelength must choose between deception and sacrifice to escape the Goblin King's grasp.",
+      "next_episode_tease": "As the music swells, secrets unravel, and Wavelength must choose between deception and sacrifice to escape the Goblin King's grasp.",
+      "description": "Everyday I see what's yours and I think about taking it all away"
+    },
+    {
+      "type": "episode",
+      "id": "episode3",
+      "title": "Countdown",
+      "season": "2",
+      "source": "seasons/season2.yaml",
+      "cta_tagline": "Can friendship triumph over impending despair?",
+      "cliffhanger_hook": "But when the ominous countdown reaches its final chime, Wavelength discovers a hidden betrayal within their ranks that could spell doom for the Shire. NEXT_EPISODE_TEASE: As darkness looms, an unexpected ally may hold the key to their survival.",
+      "next_episode_tease": "As darkness looms, an unexpected ally may hold the key to their survival.",
+      "description": "There's a countdown to living There's a countdown to the end"
+    },
+    {
+      "type": "episode",
+      "id": "episode4",
+      "title": "A Misery of Goblins",
+      "season": "2",
+      "source": "seasons/season2.yaml",
+      "cta_tagline": "Can friendship withstand the darkness within?",
+      "cliffhanger_hook": "But when Wavelength finally unravels the dark truth behind the Goblins' misery, they discover a sinister plot that threatens to consume the Shire forever. NEXT_EPISODE_TEASE: As shadows loom and alliances shift, Wavelength must decide if understanding the enemy is worth the risk of becoming like them.",
+      "next_episode_tease": "As shadows loom and alliances shift, Wavelength must decide if understanding the enemy is worth the risk of becoming like them.",
+      "description": "Hey everybody look what I've found: Misery is our Dream"
+    },
+    {
+      "type": "episode",
+      "id": "episode5",
+      "title": "Slow Time",
+      "season": "2",
+      "source": "seasons/season2.yaml",
+      "cta_tagline": "Will loyalty save the Shire or doom it?",
+      "cliffhanger_hook": "But when Wavelength hesitates, a shadow looms behind them—an unexpected ally has turned traitor, and the Goblin King's forces are closer than ever. NEXT_EPISODE_TEASE: As darkness descends, Wavelength must confront not only the Goblin King but the true nature of friendship and betrayal.",
+      "next_episode_tease": "As darkness descends, Wavelength must confront not only the Goblin King but the true nature of friendship and betrayal.",
+      "description": "And every moment that you give into the greed your soul will drift away"
+    },
+    {
+      "type": "episode",
+      "id": "episode6",
+      "title": "Won't See it Coming",
+      "season": "2",
+      "source": "seasons/season2.yaml",
+      "cta_tagline": "Can Wavelength save the Shire in time?",
+      "cliffhanger_hook": "But when Wavelength activates the machine, a surge of energy pulses through the air, awakening a hidden force that even the Goblins cannot comprehend. NEXT_EPISODE_TEASE: As chaos erupts, Wavelength must harness newfound power to confront an enemy that threatens to consume the Shire.",
+      "next_episode_tease": "As chaos erupts, Wavelength must harness newfound power to confront an enemy that threatens to consume the Shire.",
+      "description": "The Goblins don't comprehend science because they aren't able to learn, and won't see the threat right in front of them."
+    },
+    {
+      "type": "episode",
+      "id": "episode2",
+      "title": "Ice Whales",
+      "season": "3",
+      "source": "seasons/season3.yaml",
+      "cta_tagline": "Will they unite against the darkness?",
+      "cliffhanger_hook": "But when the first Ice Whale breaches the icy surface, its haunting song echoes through the frozen air, revealing an unexpected ally lurking in the depths below. NEXT_EPISODE_TEASE: As shadows loom closer, the Shire Folk must decide whether to trust this mysterious creature or face the wrath of the Goblin King's forces once more.",
+      "next_episode_tease": "As shadows loom closer, the Shire Folk must decide whether to trust this mysterious creature or face the wrath of the Goblin King's forces once more.",
+      "description": "Desperate times call for action"
+    },
+    {
+      "type": "episode",
+      "id": "episode3",
+      "title": "Sneak Attack",
+      "season": "3",
+      "source": "seasons/season3.yaml",
+      "cta_tagline": "Will they stand strong against the darkness?",
+      "cliffhanger_hook": "But when the howling winds carried whispers of the Goblin King's approaching raiding party, the Shire Folk realized that their sanctuary was about to be shattered once more. NEXT_EPISODE_TEASE: As shadows loom over the Ice Fortress, alliances will be tested, and courage will be forged in the heart of battle.",
+      "next_episode_tease": "As shadows loom over the Ice Fortress, alliances will be tested, and courage will be forged in the heart of battle.",
+      "description": "The goblins enjoy spreading terror by sending raiding parties up to the far, frozen North to harass and spy on the Shire Folk."
+    },
+    {
+      "type": "episode",
+      "id": "episode4",
+      "title": "Frozen Peace",
+      "season": "3",
+      "source": "seasons/season3.yaml",
+      "cta_tagline": "Will peace turn to peril once more?",
+      "cliffhanger_hook": "But when the icy winds began to howl, a shadow crept across the fortress walls, whispering secrets of a dark betrayal lurking within their newfound sanctuary. NEXT_EPISODE_TEASE: As tensions rise, the Shirefolk must decide who they can trust before the Goblin King strikes again.",
+      "next_episode_tease": "As tensions rise, the Shirefolk must decide who they can trust before the Goblin King strikes again.",
+      "description": "Here we are, on this frozen shore, very far from our dear home"
+    },
+    {
+      "type": "episode",
+      "id": "episode1",
+      "title": "Locked And Loaded",
+      "season": "4",
+      "source": "seasons/season4.yaml",
+      "cta_tagline": "Will courage be enough to reclaim home?",
+      "cliffhanger_hook": "But when the Shire folk finally gather their strength and march toward the horizon, a chilling howl echoes through the air—revealing that the Goblin King has summoned an ancient beast to thwart their plans. NEXT_EPISODE_TEASE: As the battle intensifies, alliances will be tested and secrets unveiled in the heart of the Shire.",
+      "next_episode_tease": "As the battle intensifies, alliances will be tested and secrets unveiled in the heart of the Shire.",
+      "description": "Nothing will stop us now from reclaiming our Shire."
+    },
+    {
+      "type": "episode",
+      "id": "episode2",
+      "title": "The King has Fled",
+      "season": "4",
+      "source": "seasons/season4.yaml",
+      "cta_tagline": "Will courage triumph over looming darkness?",
+      "cliffhanger_hook": "But when the Shire Folk finally believed they had driven the Goblin King away for good, a chilling howl echoed through the night, signaling his return with a darker force at his command. NEXT_EPISODE_TEASE: As shadows gather and alliances shift, the true battle for the Shire begins anew.",
+      "next_episode_tease": "As shadows gather and alliances shift, the true battle for the Shire begins anew.",
+      "description": "The Goblin King fled the Shire before the battle again and took captives."
+    },
+    {
+      "type": "episode",
+      "id": "episode3",
+      "title": "Goblin's Rule",
+      "season": "4",
+      "source": "seasons/season4.yaml",
+      "cta_tagline": "Will the Shire reclaim its lost dream?",
+      "cliffhanger_hook": "But when the moon hung high, illuminating the Goblin King's sinister grin, a chilling whisper echoed through the Shire—a prophecy of doom that foretold the rise of an ancient force that even the Goblin King feared. NEXT_EPISODE_TEASE: As the Shire folk rally their courage, an unexpected ally emerges from the shadows, offering hope in the darkest of times.",
+      "next_episode_tease": "As the Shire folk rally their courage, an unexpected ally emerges from the shadows, offering hope in the darkest of times.",
+      "description": "The only goblin rule for you is that Goblins gonna Rule all over you"
+    },
+    {
+      "type": "episode",
+      "id": "episode4",
+      "title": "Ice Blue Greed",
+      "season": "4",
+      "source": "seasons/season4.yaml",
+      "cta_tagline": "Will they reclaim their dream or fall?",
+      "cliffhanger_hook": "But when Lucky's trap is finally sprung, an unexpected twist reveals that the Goblin King has anticipated their every move, and darkness looms over the Shire once more. NEXT_EPISODE_TEASE: As the battle escalates, secrets long buried will emerge, testing the bonds of the Shire folk and Wavelength like never before.",
+      "next_episode_tease": "As the battle escalates, secrets long buried will emerge, testing the bonds of the Shire folk and Wavelength like never before.",
+      "description": "There's no way that the King can resist the trap set by Lucky"
+    },
+    {
+      "type": "episode",
+      "id": "episode8",
+      "title": "The Shire Dream",
+      "season": "4",
+      "source": "seasons/season4.yaml",
+      "cta_tagline": "Will they rise to face the darkness?",
+      "cliffhanger_hook": "But when the first rays of dawn break over the Shire, a shadow looms on the horizon, hinting that the Goblin King’s reign of terror may not be over yet. NEXT_EPISODE_TEASE: As whispers of a new threat arise, the Shire Folk must unite once more to protect their fragile peace.",
+      "next_episode_tease": "As whispers of a new threat arise, the Shire Folk must unite once more to protect their fragile peace.",
+      "description": "I choose to live free and find the shire dream in me."
+    },
+    {
+      "type": "lore",
+      "category": "nature",
+      "id": "daphne-flower",
+      "title": "🌸 Daphne 🌸",
+      "source": "lore/wavelength-lore.yaml",
+      "intrigue_hook": null,
+      "enhanced_title": "\"Daphne: The Enchantress of Fragrance\" TAGLINE: \"Beware the allure of the Daphne flower; its scent is a seductive veil hiding a perilous truth.\" DESCRIPTION: The Daphne flower, with its intoxicating aroma that dances between sweetness and spice, is not merely a botanical marvel—it is a potent instru",
+      "description": "The Daphne flower is renowned for its incredibly fragrant blossoms, which are often described as having a sweet, heady, and sometimes spicy scent. The intensity and specific nuances can vary slightly "
+    },
+    {
+      "type": "lore",
+      "category": "villain",
+      "id": "goblin",
+      "title": "Goblins",
+      "source": "lore/wavelength-lore.yaml",
+      "intrigue_hook": null,
+      "enhanced_title": "\"Goblins: Agents of Chaos and Misery\" TAGLINE: \"Born from darkness, these creatures thrive on fear, spreading chaos wherever they roam.\" DESCRIPTION: Goblins are not merely creatures; they are the embodiment of malevolence, capable of donning any disguise to infiltrate the hearts of the unsuspecting",
+      "description": "A Goblin can be nearly anyone in disguise.  They often hate others without reason, and are only vaguely happy when they are spreading fear and hatred.  They live to rule, and their lust for power is i"
+    },
+    {
+      "type": "lore",
+      "category": "villain",
+      "id": "goblin-king",
+      "title": "Goblin King",
+      "source": "lore/wavelength-lore.yaml",
+      "intrigue_hook": null,
+      "enhanced_title": "\"The Goblin King: Harbinger of Desolation\" TAGLINE: \"A tyrant whose insatiable greed threatens to plunge the Shire into eternal darkness.\" DESCRIPTION: The Goblin King reigns supreme over his Misery of Goblins, a twisted horde that thrives on chaos and destruction. Guided by the ruthless decree of \"",
+      "description": "The Goblin King is a Psychopath that leads a Misery of Goblins to invade the Shire and begin the Battle of the Shire.  He lives by one Rule: Goblin's Rule, which means that the only rule you ever need"
+    },
+    {
+      "type": "lore",
+      "category": "villain",
+      "id": "misery",
+      "title": "Misery of Goblins",
+      "source": "lore/wavelength-lore.yaml",
+      "intrigue_hook": null,
+      "enhanced_title": "\"The Misery of Goblins: The Corrupted Horde of Greed\" TAGLINE: \"A relentless swarm, fueled by insatiable greed, bent on spreading darkness and despair across the Shire.\" DESCRIPTION: \"The Misery of Goblins is no ordinary horde; it is a nightmarish legion enthralled by the Goblin King’s sinister will",
+      "description": "A Misery of Goblins is a goblin horde that is enthralled by the Goblin King to do his bidding.  They are driven by one thing: Greed.  Goblins are insatiably greedy and will do anything to get their ha"
+    },
+    {
+      "type": "lore",
+      "category": "thing",
+      "id": "ice-blue-diamond",
+      "title": "Ice Blue Diamond",
+      "source": "lore/wavelength-lore.yaml",
+      "intrigue_hook": null,
+      "enhanced_title": "The Relic of Infinite Greed TAGLINE: The jewel that awakens the darkest desires of the heart. DESCRIPTION: The Ice Blue Diamond, known as the Relic of Infinite Greed, is not merely a stunning gemstone; it is a beacon of corruption that calls to the greedy and power-hungry. Found only in the perilous",
+      "description": "Ice Blue Diamonds are rare and precious gemstones found only in the lairs of Ice Dragons. These diamonds are known for their stunning blue color and are highly sought after by collectors and adventure"
+    },
+    {
+      "type": "lore",
+      "category": "thing",
+      "id": "ice-dragons",
+      "title": "Ice Dragons",
+      "source": "lore/wavelength-lore.yaml",
+      "intrigue_hook": null,
+      "enhanced_title": "\"Ice Dragons: Guardians of Frozen Fury\" TAGLINE: \"These titanic beasts wield the fury of winter, their icy breath a harbinger of doom for those who dare intrude.\" DESCRIPTION: \"In the desolate expanse of the far North, Ice Dragons reign supreme, their majestic forms cloaked in shimmering scales of f",
+      "description": "Ice Dragons are majestic and powerful creatures that inhabit the frozen landscapes of the far North. With their shimmering scales and icy breath, they are both feared and revered by the inhabitants of"
+    },
+    {
+      "type": "lore",
+      "category": "thing",
+      "id": "ice-whales",
+      "title": "Ice Whales",
+      "source": "lore/wavelength-lore.yaml",
+      "intrigue_hook": null,
+      "enhanced_title": "\"The Ice Whales: Harbingers of Frozen Terror\" TAGLINE: \"These malevolent leviathans unleash chaos upon the seas, feeding on despair and destruction.\" DESCRIPTION: \"In the treacherous depths of the far, frozen North, Ice Whales reign as the most feared creatures of the ocean. Unlike any ordinary whal",
+      "description": "Ice Whales are the most dangerous evil creatures known to the deep oceans in the far, frozen North and are very different from more normally known types of whales found in the Oceans.  These ferocious"
+    },
+    {
+      "type": "lore",
+      "category": "place",
+      "id": "ice-fortress",
+      "title": "Ice Fortress",
+      "source": "lore/wavelength-lore.yaml",
+      "intrigue_hook": null,
+      "enhanced_title": "\"The Ice Fortress: Bastion of Frozen Resolve\" TAGLINE: \"Within these glacial walls lies the power to either shield the innocent or unleash unspeakable terror.\" DESCRIPTION: The Ice Fortress stands as a towering sentinel of ice, a majestic yet haunting stronghold within the desolate frozen landscape.",
+      "description": "A majestic fortress made of ice, standing tall against the backdrop of a frozen landscape. The Ice Fortress is home to the Frostborne, a community of denizens who welcome all strangers, no matter weal"
+    },
+    {
+      "type": "lore",
+      "category": "place",
+      "id": "shire-sanctuary",
+      "title": "Shire Sanctuary",
+      "source": "lore/wavelength-lore.yaml",
+      "intrigue_hook": null,
+      "enhanced_title": "\"The Shire Sanctuary: Bastion of Hope Amidst Shadows\" TAGLINE: \"A sacred refuge, yet a target for darkness, where the line between healing and despair blurs.\" DESCRIPTION: Nestled in the heart of the Shire, the Shire Sanctuary stands as a beacon of tranquility, but its peace is threatened by the sin",
+      "description": "A serene and peaceful sanctuary located in the heart of the Shire. The Shire Sanctuary is a place of healing and tranquility, where the weary can find rest and solace. Surrounded by lush greenery and "
+    },
+    {
+      "type": "lore",
+      "category": "place",
+      "id": "the-shire",
+      "title": "The Shire",
+      "source": "lore/wavelength-lore.yaml",
+      "intrigue_hook": null,
+      "enhanced_title": "\"The Shire: Heart of Tranquility, Battleground of Shadows\" TAGLINE: \"A peaceful realm now teetering on the brink of darkness, threatened by the sinister forces of greed and despair.\" DESCRIPTION: The Shire, once a tranquil haven where nature flourished and harmony reigned among the Shire Folk, now s",
+      "description": "A quiet realm where peace is abundant, and nature thrives alongside the residents of the Shire who are known as The Shire Folk. The Shire is known for its rolling green hills, crystal-clear streams, a"
+    },
+    {
+      "type": "lore",
+      "category": "band",
+      "id": "wavelength",
+      "title": "Wavelength",
+      "source": "lore/wavelength-lore.yaml",
+      "intrigue_hook": null,
+      "enhanced_title": "\"Wavelength: The Harmonious Guardians of the Shire\" TAGLINE: \"In a world torn asunder by the Goblin King, their music is the last beacon of hope against darkness.\" DESCRIPTION: Wavelength is not just a band; they are a family united by a mission to reclaim their home from the clutches of despair. Bo",
+      "description": "Wavelength is a mostly family band of musicians who use music to help them explore the natural world and culture. Wavelength gained their fame due to the Battle of the Shire that they personally exper"
+    }
+  ]
+}

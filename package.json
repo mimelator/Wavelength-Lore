@@ -14,6 +14,11 @@
     "cli:start": "node wavelength-content-cli.js",
     "chat": "node wavelength-chat-cli.js",
     "chat:cli": "node wavelength-chat-cli.js",
+    "cta:setup": "node scripts/cta-setup.js",
+    "cta:audit": "node scripts/cta-audit.js",
+    "cta:collect": "node scripts/cta-audit.js collect",
+    "cta:validate": "node scripts/cta-audit.js validate",
+    "cta:report": "node scripts/cta-audit.js report",
     "cli:admin": "node cli-admin-tools/index.js",
     "cli:sync": "node cli-admin-tools/sync-assets.js",
     "cli:status": "node cli-admin-tools/deployment-status.js --quick",
@@ -36,7 +41,10 @@
     "wavelength:ses-dns": "node wavelength-tools/wavelength-ses-dns-helper.js",
     "wavelength:ses-verify": "node wavelength-tools/wavelength-ses-verification-checker.js",
     "wavelength:route53-dns": "node wavelength-tools/wavelength-route53-automation.js",
-    "wavelength:route53-dry-run": "node wavelength-tools/wavelength-route53-automation.js --dry-run"
+    "wavelength:route53-dry-run": "node wavelength-tools/wavelength-route53-automation.js --dry-run",
+    "wavelength:extract-icons": "node wavelength-tools/wavelength-npc-icon-extractor.js",
+    "wavelength:extract-icons-help": "node wavelength-tools/wavelength-npc-icon-extractor.js --help",
+    "wavelength:extract-icons-sample": "node wavelength-tools/wavelength-npc-icon-extractor.js --sample-config"
   },
   "dependencies": {
     "@aws-sdk/client-apprunner": "^3.917.0",

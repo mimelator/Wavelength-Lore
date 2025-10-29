@@ -1,0 +1,309 @@
+{
+  "timestamp": "2025-10-29T04:00:48.897Z",
+  "summary": {
+    "total_ctas": 36,
+    "successfully_validated": 0,
+    "with_issues": 0,
+    "validation_errors": 36,
+    "success_rate": "0.00%"
+  },
+  "validations": [
+    {
+      "id": "episode-episode1",
+      "type": "episode",
+      "title": "My Lucky Charm",
+      "source": "seasons/season1.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:40.523Z"
+    },
+    {
+      "id": "episode-episode10",
+      "type": "episode",
+      "title": "Keep On",
+      "source": "seasons/season1.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:40.805Z"
+    },
+    {
+      "id": "episode-episode11",
+      "type": "episode",
+      "title": "Back to the Shire (Encore)",
+      "source": "seasons/season1.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:41.038Z"
+    },
+    {
+      "id": "episode-episode2",
+      "type": "episode",
+      "title": "Jump Right In!",
+      "source": "seasons/season1.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:41.263Z"
+    },
+    {
+      "id": "episode-episode3",
+      "type": "episode",
+      "title": "Dream with Me",
+      "source": "seasons/season1.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:41.503Z"
+    },
+    {
+      "id": "episode-episode4",
+      "type": "episode",
+      "title": "Daphne",
+      "source": "seasons/season1.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:41.734Z"
+    },
+    {
+      "id": "episode-episode5",
+      "type": "episode",
+      "title": "Falling",
+      "source": "seasons/season1.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:41.976Z"
+    },
+    {
+      "id": "episode-episode6",
+      "type": "episode",
+      "title": "Once More",
+      "source": "seasons/season1.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:42.202Z"
+    },
+    {
+      "id": "episode-episode7",
+      "type": "episode",
+      "title": "History Lessons",
+      "source": "seasons/season1.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:42.429Z"
+    },
+    {
+      "id": "episode-episode8",
+      "type": "episode",
+      "title": "Life in the Shire",
+      "source": "seasons/season1.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:42.644Z"
+    },
+    {
+      "id": "episode-episode9",
+      "type": "episode",
+      "title": "Feed the Crows",
+      "source": "seasons/season1.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:42.880Z"
+    },
+    {
+      "id": "episode-episode1",
+      "type": "episode",
+      "title": "Goblin King",
+      "source": "seasons/season2.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:43.119Z"
+    },
+    {
+      "id": "episode-episode2",
+      "type": "episode",
+      "title": "Psychopath",
+      "source": "seasons/season2.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:43.355Z"
+    },
+    {
+      "id": "episode-episode3",
+      "type": "episode",
+      "title": "Countdown",
+      "source": "seasons/season2.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:43.583Z"
+    },
+    {
+      "id": "episode-episode4",
+      "type": "episode",
+      "title": "A Misery of Goblins",
+      "source": "seasons/season2.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:43.826Z"
+    },
+    {
+      "id": "episode-episode5",
+      "type": "episode",
+      "title": "Slow Time",
+      "source": "seasons/season2.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:44.063Z"
+    },
+    {
+      "id": "episode-episode6",
+      "type": "episode",
+      "title": "Won't See it Coming",
+      "source": "seasons/season2.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:44.303Z"
+    },
+    {
+      "id": "episode-episode2",
+      "type": "episode",
+      "title": "Ice Whales",
+      "source": "seasons/season3.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:44.527Z"
+    },
+    {
+      "id": "episode-episode3",
+      "type": "episode",
+      "title": "Sneak Attack",
+      "source": "seasons/season3.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:44.754Z"
+    },
+    {
+      "id": "episode-episode4",
+      "type": "episode",
+      "title": "Frozen Peace",
+      "source": "seasons/season3.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:44.980Z"
+    },
+    {
+      "id": "episode-episode1",
+      "type": "episode",
+      "title": "Locked And Loaded",
+      "source": "seasons/season4.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:45.224Z"
+    },
+    {
+      "id": "episode-episode2",
+      "type": "episode",
+      "title": "The King has Fled",
+      "source": "seasons/season4.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:45.453Z"
+    },
+    {
+      "id": "episode-episode3",
+      "type": "episode",
+      "title": "Goblin's Rule",
+      "source": "seasons/season4.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:45.671Z"
+    },
+    {
+      "id": "episode-episode4",
+      "type": "episode",
+      "title": "Ice Blue Greed",
+      "source": "seasons/season4.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:45.906Z"
+    },
+    {
+      "id": "episode-episode8",
+      "type": "episode",
+      "title": "The Shire Dream",
+      "source": "seasons/season4.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:46.134Z"
+    },
+    {
+      "id": "lore-daphne-flower",
+      "type": "lore",
+      "title": "🌸 Daphne 🌸",
+      "source": "lore/wavelength-lore.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:46.370Z"
+    },
+    {
+      "id": "lore-goblin",
+      "type": "lore",
+      "title": "Goblins",
+      "source": "lore/wavelength-lore.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:46.629Z"
+    },
+    {
+      "id": "lore-goblin-king",
+      "type": "lore",
+      "title": "Goblin King",
+      "source": "lore/wavelength-lore.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:46.887Z"
+    },
+    {
+      "id": "lore-misery",
+      "type": "lore",
+      "title": "Misery of Goblins",
+      "source": "lore/wavelength-lore.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:47.152Z"
+    },
+    {
+      "id": "lore-ice-blue-diamond",
+      "type": "lore",
+      "title": "Ice Blue Diamond",
+      "source": "lore/wavelength-lore.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:47.393Z"
+    },
+    {
+      "id": "lore-ice-dragons",
+      "type": "lore",
+      "title": "Ice Dragons",
+      "source": "lore/wavelength-lore.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:47.638Z"
+    },
+    {
+      "id": "lore-ice-whales",
+      "type": "lore",
+      "title": "Ice Whales",
+      "source": "lore/wavelength-lore.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:47.876Z"
+    },
+    {
+      "id": "lore-ice-fortress",
+      "type": "lore",
+      "title": "Ice Fortress",
+      "source": "lore/wavelength-lore.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:48.114Z"
+    },
+    {
+      "id": "lore-shire-sanctuary",
+      "type": "lore",
+      "title": "Shire Sanctuary",
+      "source": "lore/wavelength-lore.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:48.403Z"
+    },
+    {
+      "id": "lore-the-shire",
+      "type": "lore",
+      "title": "The Shire",
+      "source": "lore/wavelength-lore.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:48.652Z"
+    },
+    {
+      "id": "lore-wavelength",
+      "type": "lore",
+      "title": "Wavelength",
+      "source": "lore/wavelength-lore.yaml",
+      "error": "Request failed with status code 401",
+      "timestamp": "2025-10-29T04:00:48.896Z"
+    }
+  ],
+  "issues_summary": {},
+  "recommendations": [
+    {
+      "priority": "medium",
+      "action": "Retry validation for failed CTAs",
+      "count": 36,
+      "details": "Some CTAs failed validation; retry after API issues are resolved"
+    }
+  ]
+}
