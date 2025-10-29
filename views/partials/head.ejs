@@ -69,3 +69,15 @@
     background-image: url('<%= cdnUrl %>/icons/hero-icon.svg') !important;
 }
 </style>
+
+<!-- Fix for stray text nodes in body -->
+<script>
+// Remove stray text nodes that are just whitespace and quotes
+document.addEventListener('DOMContentLoaded', function() {
+  Array.from(document.body.childNodes).forEach(node => {
+    if (node.nodeType === 3 && /^\s*["\s]*$/.test(node.textContent)) {
+      node.parentNode.removeChild(node);
+    }
+  });
+});
+</script>
