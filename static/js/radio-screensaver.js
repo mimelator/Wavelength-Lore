@@ -14,7 +14,7 @@ class RadioScreenSaver {
         
         // Auto-countdown properties
         this.autoCountdownEnabled = localStorage.getItem('wavelength_auto_screensaver') !== 'false'; // enabled by default
-        this.countdownDuration = parseInt(localStorage.getItem('wavelength_screensaver_countdown') || '30'); // 30 seconds default
+        this.countdownDuration = parseInt(localStorage.getItem('wavelength_screensaver_countdown') || '5'); // 5 seconds default
         this.countdownTimer = null;
         this.countdownInterval = null;
         this.countdownOverlay = null;
@@ -930,6 +930,7 @@ class RadioScreenSaver {
                 <div class="setting-group">
                     <label>Countdown duration (seconds):</label>
                     <select id="countdownDuration">
+                        <option value="5" ${this.countdownDuration === 5 ? 'selected' : ''}>5 seconds</option>
                         <option value="10" ${this.countdownDuration === 10 ? 'selected' : ''}>10 seconds</option>
                         <option value="30" ${this.countdownDuration === 30 ? 'selected' : ''}>30 seconds</option>
                         <option value="60" ${this.countdownDuration === 60 ? 'selected' : ''}>1 minute</option>
