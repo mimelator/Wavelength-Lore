@@ -88,12 +88,12 @@
         .form-input {
             width: 100%;
             padding: 0.75rem 1rem;
-            border: 2px solid #e5e7eb;
+            border: 2px solid #cbd5e1;
             border-radius: 10px;
             font-size: 1rem;
-            transition: border-color 0.3s ease, background-color 0.3s ease;
-            background-color: #f9fafb;
-            color: #111827 !important;
+            transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #ffffff;
+            color: #0f172a !important;
             box-sizing: border-box;
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -101,71 +101,78 @@
         }
 
         .form-input::placeholder {
-            color: #9ca3af !important;
+            color: #64748b !important;
         }
 
         .form-input:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), inset 0 0 0 1px rgba(102, 126, 234, 0.2);
             background-color: #ffffff;
         }
 
         .form-select {
             width: 100%;
             padding: 0.75rem 1rem;
-            border: 2px solid #e5e7eb;
+            border: 2px solid #cbd5e1;
             border-radius: 10px;
             font-size: 1rem;
-            background-color: #f9fafb;
-            color: #111827 !important;
+            font-family: inherit;
+            font-weight: 500;
+            background-color: #ffffff;
+            color: #0f172a !important;
             cursor: pointer;
             box-sizing: border-box;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 0.75rem center;
-            background-size: 1.5em 1.5em;
-            padding-right: 2.5rem;
-            background-color: #f9fafb;
-            transition: border-color 0.3s ease, background-color 0.3s ease;
+            background-size: 1.2em 1.2em;
+            padding-right: 2.75rem;
+            transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-select option {
+            color: #0f172a;
+            background-color: #ffffff;
+            padding: 0.5rem 1rem;
         }
 
         .form-select:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), inset 0 0 0 1px rgba(102, 126, 234, 0.2);
             background-color: #ffffff;
         }
 
         .form-textarea {
             width: 100%;
             padding: 0.75rem 1rem;
-            border: 2px solid #e5e7eb;
+            border: 2px solid #cbd5e1;
             border-radius: 10px;
             font-size: 1rem;
             min-height: 120px;
             resize: vertical;
             font-family: inherit;
-            background-color: #f9fafb;
-            color: #111827 !important;
+            background-color: #ffffff;
+            color: #0f172a !important;
             box-sizing: border-box;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            transition: border-color 0.3s ease, background-color 0.3s ease;
+            transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .form-textarea::placeholder {
-            color: #9ca3af !important;
+            color: #64748b !important;
         }
 
         .form-textarea:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), inset 0 0 0 1px rgba(102, 126, 234, 0.2);
             background-color: #ffffff;
         }
         
