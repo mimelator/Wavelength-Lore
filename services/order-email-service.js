@@ -27,7 +27,14 @@ class OrderEmailService {
 
   async initializeTransporter() {
     try {
-      this.transporter = nodemailer.createTransporter({
+      // Skip initialization if no SMTP credentials are provided
+      if (!this.config.smtpUser || !this.config.smtpPass) {
+        console.log('⚠️  Email service not configured (SMTP credentials missing)');
+        this.transporter = null;
+        return;
+      }
+
+      this.transporter = nodemailer.createTransport({
         host: this.config.smtpHost,
         port: this.config.smtpPort,
         secure: this.config.smtpPort === 465,
@@ -38,12 +45,8 @@ class OrderEmailService {
       });
 
       // Verify connection
-      if (this.config.smtpUser && this.config.smtpPass) {
-        await this.transporter.verify();
-        console.log('✅ Email service initialized successfully');
-      } else {
-        console.log('⚠️  Email service not configured (SMTP credentials missing)');
-      }
+      await this.transporter.verify();
+      console.log('✅ Email service initialized successfully');
     } catch (error) {
       console.error('❌ Email service initialization failed:', error.message);
       this.transporter = null;

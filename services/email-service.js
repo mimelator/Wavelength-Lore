@@ -119,7 +119,7 @@ class EmailService {
             </tr>
             <tr>
                 <td style="padding: 8px 0; font-weight: bold;">Total Amount:</td>
-                <td style="padding: 8px 0; color: #059669; font-weight: bold;">$${((orderData.amount || 0) / 100).toFixed(2)}</td>
+                <td style="padding: 8px 0; color: #059669; font-weight: bold;">$${(orderData.total || orderData.amount || 0).toFixed(2)}</td>
             </tr>
             <tr>
                 <td style="padding: 8px 0; font-weight: bold;">Payment ID:</td>
@@ -132,6 +132,7 @@ class EmailService {
         <h2 style="margin: 0 0 15px 0; color: #1f2937; font-size: 1.3rem;">📍 Shipping Address</h2>
         <div style="line-height: 1.8;">
             ${orderData.shippingAddress?.firstName} ${orderData.shippingAddress?.lastName}<br>
+            ${orderData.customerData?.email || orderData.shippingAddress?.email}<br>
             ${orderData.shippingAddress?.address1}<br>
             ${orderData.shippingAddress?.address2 ? orderData.shippingAddress.address2 + '<br>' : ''}
             ${orderData.shippingAddress?.city}, ${orderData.shippingAddress?.state} ${orderData.shippingAddress?.zip}<br>
@@ -307,23 +308,107 @@ class EmailService {
   }
 
   /**
-   * SendGrid email provider (placeholder)
+   * SendGrid email provider
    * @param {Object} emailData - Email details
    */
   async sendSendGridEmail(emailData) {
-    // TODO: Implement SendGrid integration
-    console.log('📧 SendGrid email would be sent here');
-    return { success: true, provider: 'sendgrid' };
+    const sgMail = require('@sendgrid/mail');
+    
+    if (!process.env.SENDGRID_API_KEY) {
+      throw new Error('SENDGRID_API_KEY environment variable is required for SendGrid email service');
+    }
+    
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    
+    const msg = {
+      to: emailData.to,
+      from: {
+        email: emailData.from,
+        name: 'Wavelength Lore'
+      },
+      subject: emailData.subject,
+      html: emailData.html,
+      text: emailData.text || this.stripHtml(emailData.html)
+    };
+    
+    try {
+      const result = await sgMail.send(msg);
+      console.log(`✅ SendGrid email sent successfully to ${emailData.to}`);
+      return { 
+        success: true, 
+        provider: 'sendgrid',
+        messageId: result[0].headers['x-message-id']
+      };
+    } catch (error) {
+      console.error('❌ SendGrid email failed:', error);
+      throw new Error(`SendGrid email failed: ${error.message}`);
+    }
   }
 
   /**
-   * AWS SES email provider (placeholder)
+   * AWS SES email provider
    * @param {Object} emailData - Email details
    */
   async sendSESEmail(emailData) {
-    // TODO: Implement AWS SES integration
-    console.log('📧 AWS SES email would be sent here');
-    return { success: true, provider: 'ses' };
+    const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses');
+    
+    if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
+      throw new Error('AWS credentials are required for SES email service');
+    }
+    
+    const sesClient = new SESClient({
+      region: process.env.AWS_SES_REGION || 'us-east-1',
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+      }
+    });
+    
+    const params = {
+      Source: emailData.from,
+      Destination: {
+        ToAddresses: [emailData.to]
+      },
+      Message: {
+        Subject: {
+          Data: emailData.subject,
+          Charset: 'UTF-8'
+        },
+        Body: {
+          Html: {
+            Data: emailData.html,
+            Charset: 'UTF-8'
+          },
+          Text: {
+            Data: emailData.text || this.stripHtml(emailData.html),
+            Charset: 'UTF-8'
+          }
+        }
+      }
+    };
+    
+    try {
+      const command = new SendEmailCommand(params);
+      const result = await sesClient.send(command);
+      console.log(`✅ AWS SES email sent successfully to ${emailData.to}`);
+      return { 
+        success: true, 
+        provider: 'ses',
+        messageId: result.MessageId
+      };
+    } catch (error) {
+      console.error('❌ AWS SES email failed:', error);
+      throw new Error(`AWS SES email failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Strip HTML tags for plain text version
+   * @param {string} html - HTML content
+   * @returns {string} Plain text content
+   */
+  stripHtml(html) {
+    return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
   }
 }
 
