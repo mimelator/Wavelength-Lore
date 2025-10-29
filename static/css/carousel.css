@@ -74,6 +74,84 @@
     color: #666;
 }
 
+/* Episode Carousel - Custom Horizontal Scrolling */
+.episode-carousel {
+    margin: 20px 0;
+}
+
+.episode-carousel .carousel {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px 0;
+    scroll-behavior: smooth;
+}
+
+.episode-carousel .carousel-item {
+    flex: 0 0 auto;
+    width: 200px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.episode-carousel .carousel-item img {
+    width: 100% !important;
+    height: 180px !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: block;
+    margin: 0 auto;
+}
+
+.episode-carousel .carousel-item img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Lore Carousel - Custom Horizontal Scrolling */
+.lore-carousel {
+    margin: 20px 0;
+}
+
+.lore-carousel .carousel {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px 0;
+    scroll-behavior: smooth;
+}
+
+.lore-carousel .carousel-item {
+    flex: 0 0 auto;
+    width: 220px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.lore-carousel .carousel-item img {
+    width: 100% !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: block;
+    margin: 0 auto;
+}
+
+.lore-carousel .carousel-item img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
 /* Episode titles in season carousels */
 .episode-title {
     margin-bottom: 1rem;

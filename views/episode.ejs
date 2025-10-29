@@ -5,10 +5,7 @@
     <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css">
     <link rel="stylesheet" href="<%= cdnUrl %>/css/modal_styles.css">
     <link rel="stylesheet" href="<%= cdnUrl %>/css/radio-player.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
-
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
-    <link rel="stylesheet" type="text/css" href="<%= cdnUrl %>/css/carousel.css">
+    <link rel="stylesheet" href="<%= cdnUrl %>/css/carousel.css">
     <%- simpleDisambiguationStyles %>
 </head>
 <body>
@@ -83,12 +80,17 @@
             </p>
         </section>
 
-        <section class="carousel">
-            <div class="carousel-container" id="episode-carousel">
-                <% carouselImages.forEach(image => { %>
-                    <div>
-                        <img src="<%= cdnUrl %><%= image %>" alt="Carousel Image">
+        <section class="episode-carousel">
+            <div class="carousel" id="episode-carousel">
+                <% carouselImages.forEach((image, index) => { %>
+                    <div class="carousel-item" data-index="<%= index %>">
+                        <img src="<%= cdnUrl %><%= image %>" alt="Carousel Image" class="gallery-image">
                     </div>
+                <% }); %>
+            </div>
+            <div class="carousel-dots">
+                <% carouselImages.forEach((_, index) => { %>
+                    <span class="dot <%= index === 0 ? 'active' : '' %>" data-index="<%= index %>"></span>
                 <% }); %>
             </div>
         </section>
@@ -310,24 +312,41 @@
 
     <%- include('partials/footer') %>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
     <script src="<%= cdnUrl %>/js/radio-player.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
     <script>
-        $(document).ready(function() {
-            $('#episode-carousel').slick({
-                infinite: true,
-                slidesToShow: window.innerWidth <= 768 ? 2 : 5,
-                slidesToScroll: 1,
-                autoplay: true,
-                autoplaySpeed: 4000,
-                dots: true,
-                arrows: true,
-                centerMode: false,
-                variableWidth: false,
-                adaptiveHeight: false
+        document.addEventListener('DOMContentLoaded', () => {
+            // Simple carousel handling for episode carousel
+            const carousel = document.getElementById('episode-carousel');
+            const dots = document.querySelectorAll('.carousel-dots .dot');
+            const items = document.querySelectorAll('#episode-carousel .carousel-item');
+
+            if (!carousel || items.length === 0) return;
+
+            // Set up dot click handlers
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    const index = parseInt(dot.dataset.index);
+                    const offset = items[index].offsetLeft - carousel.offsetLeft;
+                    carousel.scrollLeft = offset;
+
+                    // Update active dot
+                    dots.forEach(d => d.classList.remove('active'));
+                    dot.classList.add('active');
+                });
             });
 
+            // Update active dot on scroll
+            carousel.addEventListener('scroll', () => {
+                const scrollLeft = carousel.scrollLeft;
+                const itemWidth = items[0].offsetWidth;
+                const currentIndex = Math.round(scrollLeft / itemWidth);
+
+                if (currentIndex >= 0 && currentIndex < items.length) {
+                    dots.forEach((d, i) => {
+                        d.classList.toggle('active', i === currentIndex);
+                    });
+                }
+            });
             // Initialize radio player for this episode only
             if (typeof RadioPlayer !== 'undefined') {
                 const episodeData = {
@@ -341,7 +360,7 @@
                 };
 
                 const player = new RadioPlayer('<%= cdnUrl %>', '<%= version %>');
-                
+
                 // Create minimal playlist with just this episode
                 const playlistElement = document.createElement('div');
                 playlistElement.className = 'playlist-item';
@@ -352,10 +371,10 @@
                 playlistElement.dataset.episodeImage = '<%= cdnUrl %>' + episodeData.episodeImage;
                 playlistElement.dataset.images = JSON.stringify(episodeData.images.map(img => '<%= cdnUrl %>' + img));
                 playlistElement.dataset.characters = '<%- JSON.stringify(characters || []) %>';
-                
+
                 player.playlist = [playlistElement];
                 player.currentTrackIndex = 0;
-                
+
                 // Auto-play the track
                 player.playTrack(0);
             }
