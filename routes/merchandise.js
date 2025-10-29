@@ -1644,12 +1644,11 @@ router.post('/confirm-payment', ensureAuthenticated, async (req, res) => {
       amount: paymentResult.amount,
       items: items,
       shippingAddress: shippingAddress,
-      userId: req.user.uid,
       status: 'paid',
       createdAt: new Date().toISOString()
     };
     
-    await merchandiseDB.saveOrder(printifyOrder.orderId, userOrder);
+    await merchandiseDB.storeUserOrder(req.user.uid, userOrder);
 
     res.json({
       success: true,
