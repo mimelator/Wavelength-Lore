@@ -60,9 +60,11 @@ class WavelengthRadio {
         this.initSoundSystem();
         this.bindSoundToggle();
         this.initWeatherEffects();
-        
-        // Initialize screensaver module
-        this.screensaver = new RadioScreenSaver(this);
+
+        // Initialize screensaver module (if available)
+        if (typeof RadioScreenSaver !== 'undefined') {
+            this.screensaver = new RadioScreenSaver(this);
+        }
 
         // Restore saved player settings
         this.restorePlayerSettings();
@@ -1052,6 +1054,12 @@ class WavelengthRadio {
     // Spawn a mystical element
     spawnMysticalElement() {
         const canvas = document.getElementById('mystical-canvas');
+
+        // Don't spawn if canvas doesn't exist
+        if (!canvas) {
+            return;
+        }
+
         const element = document.createElement('div');
         element.classList.add('mystical-element', 'appearing');
 
