@@ -332,22 +332,12 @@
   width: 100%;
   padding: 0;
   margin: 0;
-  display: flex;
-  justify-content: center;
-}
-
-/* Inner merchandise store container (rendered by JS) */
-#merchandise-store {
-  width: 80%;
-  max-width: 80%;
-  display: flex;
-  justify-content: center;
 }
 
 .merchandise-store {
-  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 20px;
-  box-sizing: border-box;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   color: white;
