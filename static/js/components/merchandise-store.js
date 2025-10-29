@@ -574,6 +574,10 @@ class MerchandiseStore {
     console.log('🔓 Initializing The Liberation Vault');
     
     try {
+      // Check if user has previously entered the vault
+      const hasSeenWelcome = localStorage.getItem('wavelength_vault_entered') === 'true';
+      this.hasEnteredVault = hasSeenWelcome;
+      
       // Check for pre-selected image from URL parameters
       const urlParams = new URLSearchParams(window.location.search);
       const preselectImageId = urlParams.get('preselect') || urlParams.get('imageId');
@@ -1340,7 +1344,284 @@ class MerchandiseStore {
     }
   }
   
+  setupWelcomeEventListeners() {
+    console.log('🔧 Setting up Liberation Vault welcome event listeners...');
+    
+    // Handle vault entrance button
+    const vaultEnterButton = document.getElementById('vault-enter-button');
+    if (vaultEnterButton) {
+      vaultEnterButton.addEventListener('click', () => {
+        this.enterVault();
+      });
+    }
+  }
+  
+  enterVault() {
+    console.log('🔓 Entering the Liberation Vault...');
+    this.hasEnteredVault = true;
+    
+    // Save that user has seen the welcome
+    localStorage.setItem('wavelength_vault_entered', 'true');
+    
+    // Start the guided tour for first-time users
+    this.render(); // Re-render with main interface
+    
+    // Auto-start tour after a brief delay to let interface load
+    setTimeout(() => {
+      this.startGuidedTour();
+    }, 500);
+  }
+  
+  startGuidedTour() {
+    console.log('🎭 Starting Liberation Vault guided tour...');
+    
+    // Check if user has completed tour before
+    const tourCompleted = localStorage.getItem('wavelength_vault_tour_completed') === 'true';
+    if (tourCompleted) {
+      // Show option to replay tour
+      this.showTourReplayOption();
+      return;
+    }
+    
+    this.currentTourStep = 0;
+    this.tourSteps = [
+      {
+        title: "Welcome to the Liberation Vault",
+        content: "This is not commerce. This is provision. Here you'll create 'Crests of Liberation' - symbols worn by those who have awakened.",
+        target: ".store-header",
+        placement: "bottom"
+      },
+      {
+        title: "Select Your Gallery Image",
+        content: "Choose an image from your personal gallery. This will be the foundation of your custom merchandise - your personal symbol of liberation.",
+        target: ".gallery-grid",
+        placement: "top"
+      },
+      {
+        title: "Choose Your Product Category",
+        content: "Once you select an image, you'll see product categories: Field Uniforms (clothing), Signal Gear (tech), Archived Relics (collectibles), and The Crest Pack (small items).",
+        target: "#choose-product-section",
+        placement: "top",
+        requiresImage: true
+      },
+      {
+        title: "Your Designed Products",
+        content: "Products you create appear here. You can preview, edit, delete, or add them to your cart. Each purchase fuels the signal that helps others find their way out.",
+        target: ".products-grid",
+        placement: "top"
+      },
+      {
+        title: "Complete Your Mission",
+        content: "When ready, use the cart to complete your order. Your symbols will be created and shipped, carrying the frequency wherever you go.",
+        target: ".cart-container",
+        placement: "top"
+      }
+    ];
+    
+    this.showTourStep(0);
+  }
+  
+  showTourStep(stepIndex) {
+    if (stepIndex >= this.tourSteps.length) {
+      this.completeTour();
+      return;
+    }
+    
+    const step = this.tourSteps[stepIndex];
+    
+    // Skip steps that require conditions if not met
+    if (step.requiresImage && !this.selectedImage) {
+      console.log(`⏭️ Skipping step ${stepIndex} - requires image selection`);
+      this.showTourStep(stepIndex + 1);
+      return;
+    }
+    
+    // Remove existing tour overlay
+    this.removeTourOverlay();
+    
+    // Create tour overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'liberation-tour-overlay';
+    overlay.innerHTML = `
+      <div class="tour-backdrop"></div>
+      <div class="tour-spotlight" id="tour-spotlight"></div>
+      <div class="tour-tooltip" id="tour-tooltip">
+        <div class="tour-header">
+          <h3>${step.title}</h3>
+          <div class="tour-progress">
+            <span>${stepIndex + 1} of ${this.tourSteps.length}</span>
+          </div>
+        </div>
+        <div class="tour-content">
+          <p>${step.content}</p>
+        </div>
+        <div class="tour-actions">
+          <button class="tour-btn tour-skip" onclick="window.merchandiseStore.skipTour()">Skip Tour</button>
+          <div class="tour-nav">
+            ${stepIndex > 0 ? '<button class="tour-btn tour-prev" onclick="window.merchandiseStore.previousTourStep()">Previous</button>' : ''}
+            <button class="tour-btn tour-next primary" onclick="window.merchandiseStore.nextTourStep()">
+              ${stepIndex === this.tourSteps.length - 1 ? 'Complete Tour' : 'Next'}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    
+    // Position tooltip near target element
+    setTimeout(() => {
+      this.positionTourTooltip(step.target, step.placement);
+    }, 50);
+    
+    this.currentTourStep = stepIndex;
+  }
+  
+  positionTourTooltip(targetSelector, placement) {
+    const target = document.querySelector(targetSelector);
+    const tooltip = document.getElementById('tour-tooltip');
+    const spotlight = document.getElementById('tour-spotlight');
+    
+    if (!target || !tooltip) {
+      console.warn('Tour target or tooltip not found:', targetSelector);
+      return;
+    }
+    
+    const targetRect = target.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    
+    // Position spotlight on target
+    spotlight.style.left = `${targetRect.left - 10}px`;
+    spotlight.style.top = `${targetRect.top - 10}px`;
+    spotlight.style.width = `${targetRect.width + 20}px`;
+    spotlight.style.height = `${targetRect.height + 20}px`;
+    
+    // Position tooltip based on placement
+    let tooltipLeft, tooltipTop;
+    
+    switch (placement) {
+      case 'bottom':
+        tooltipLeft = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
+        tooltipTop = targetRect.bottom + 20;
+        break;
+      case 'top':
+        tooltipLeft = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
+        tooltipTop = targetRect.top - tooltipRect.height - 20;
+        break;
+      case 'right':
+        tooltipLeft = targetRect.right + 20;
+        tooltipTop = targetRect.top + (targetRect.height / 2) - (tooltipRect.height / 2);
+        break;
+      case 'left':
+        tooltipLeft = targetRect.left - tooltipRect.width - 20;
+        tooltipTop = targetRect.top + (targetRect.height / 2) - (tooltipRect.height / 2);
+        break;
+      default:
+        tooltipLeft = targetRect.left;
+        tooltipTop = targetRect.bottom + 20;
+    }
+    
+    // Keep tooltip within viewport
+    tooltipLeft = Math.max(20, Math.min(tooltipLeft, window.innerWidth - tooltipRect.width - 20));
+    tooltipTop = Math.max(20, Math.min(tooltipTop, window.innerHeight - tooltipRect.height - 20));
+    
+    tooltip.style.left = `${tooltipLeft}px`;
+    tooltip.style.top = `${tooltipTop}px`;
+  }
+  
+  nextTourStep() {
+    this.showTourStep(this.currentTourStep + 1);
+  }
+  
+  previousTourStep() {
+    this.showTourStep(this.currentTourStep - 1);
+  }
+  
+  skipTour() {
+    this.removeTourOverlay();
+    // Don't mark as completed if skipped, so they get the option again
+  }
+  
+  completeTour() {
+    console.log('✅ Liberation Vault tour completed!');
+    localStorage.setItem('wavelength_vault_tour_completed', 'true');
+    this.removeTourOverlay();
+    this.showTourCompletionMessage();
+  }
+  
+  showTourCompletionMessage() {
+    // Create a brief celebration message
+    const message = document.createElement('div');
+    message.className = 'tour-completion-message';
+    message.innerHTML = `
+      <div class="completion-content">
+        <h3>🎉 Welcome to the Liberation Vault!</h3>
+        <p>You're now ready to create your Crests of Liberation. Your symbols await.</p>
+      </div>
+    `;
+    
+    document.body.appendChild(message);
+    
+    setTimeout(() => {
+      if (message.parentNode) {
+        message.parentNode.removeChild(message);
+      }
+    }, 4000);
+  }
+  
+  showTourReplayOption() {
+    // Subtle notification that tour can be replayed
+    const notification = document.createElement('div');
+    notification.className = 'tour-replay-notification';
+    notification.innerHTML = `
+      <div class="replay-content">
+        <span>📖 Want a refresher?</span>
+        <button onclick="window.merchandiseStore.replayTour()">Replay Tour</button>
+        <button onclick="this.parentNode.parentNode.remove()">×</button>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 8000);
+  }
+  
+  replayTour() {
+    // Remove any existing notifications
+    document.querySelectorAll('.tour-replay-notification').forEach(el => el.remove());
+    // Start tour from beginning
+    this.currentTourStep = 0;
+    this.showTourStep(0);
+  }
+  
+  removeTourOverlay() {
+    const existing = document.querySelector('.liberation-tour-overlay');
+    if (existing) {
+      existing.remove();
+    }
+  }
+  
+  // Developer utility to reset tour state for testing
+  resetTourState() {
+    localStorage.removeItem('wavelength_vault_entered');
+    localStorage.removeItem('wavelength_vault_tour_completed');
+    this.hasEnteredVault = false;
+    console.log('🔄 Tour state reset - reload page to see welcome section');
+  }
+  
   setupEventListeners() {
+    // Show tour button functionality
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'show-tour-btn') {
+        this.startGuidedTour();
+        return;
+      }
+    });
+    
     // Image selection
     document.addEventListener('click', (e) => {
       // Handle select button click
@@ -1517,11 +1798,21 @@ class MerchandiseStore {
     }
     
     try {
+      // Show Liberation Vault welcome section for first-time users
+      if (!this.hasEnteredVault) {
+        container.innerHTML = this.renderWelcomeSection();
+        this.setupWelcomeEventListeners();
+        return;
+      }
+      
       container.innerHTML = `
         <div class="merchandise-store">
           <div class="store-header">
-            <h1>🔓 Unlock Your Freedom - Create Merchandise</h1>
-            <p>Turn your favorite Wavelength moments into premium merchandise</p>
+            <h1>🔓 The Liberation Vault</h1>
+            <p>Your symbols of freedom await customization</p>
+            <div class="vault-controls">
+              <button class="show-tour-btn" id="show-tour-btn">📖 Show Tour</button>
+            </div>
           </div>
 
           <div class="store-content">
@@ -1568,6 +1859,9 @@ class MerchandiseStore {
       setTimeout(() => {
         this.initializeEventListeners();
       }, 100); // Brief delay to ensure DOM is updated
+      
+      // Make tour system globally accessible
+      window.merchandiseStore = this;
       
     } catch (error) {
       console.error('Error rendering merchandise store:', error);

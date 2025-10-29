@@ -4,6 +4,251 @@
  * Styling for the custom merchandise creation and shopping interface
  */
 
+/* Liberation Vault Welcome Section */
+.vault-welcome-section {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated background elements */
+.vault-welcome-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+  animation: vaultGlow 8s ease-in-out infinite alternate;
+}
+
+@keyframes vaultGlow {
+  0% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.vault-welcome-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.vault-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.vault-title {
+  font-size: 4rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff 0%, #00d4ff 50%, #ff00aa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 20px;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+  animation: titlePulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes titlePulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.02); }
+}
+
+.vault-status-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  color: #00ff88;
+  margin-top: 20px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  background: #00ff88;
+  border-radius: 50%;
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.vault-welcome-message {
+  text-align: center;
+  margin: 60px 0;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.vault-frequency {
+  font-size: 1.3rem;
+  color: #00d4ff;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.vault-philosophy {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 30px 0;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.vault-mission {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #cccccc;
+  margin: 30px 0;
+}
+
+.crests {
+  color: #ff00aa;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 0, 170, 0.5);
+}
+
+.vault-categories-intro {
+  margin: 80px 0;
+}
+
+.vault-categories-intro h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #ffffff;
+  margin-bottom: 40px;
+}
+
+.vault-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  margin: 40px 0;
+}
+
+.vault-category-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 30px 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.vault-category-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.vault-category-card:hover::before {
+  left: 100%;
+}
+
+.vault-category-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(0, 212, 255, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.vault-category-card .category-icon {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.vault-category-card h3 {
+  font-size: 1.3rem;
+  color: #ffffff;
+  margin: 15px 0 10px 0;
+}
+
+.vault-category-card p {
+  color: #aaaaaa;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.vault-cta {
+  text-align: center;
+  margin-top: 80px;
+}
+
+.vault-enter-button {
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 20px 50px;
+  background: linear-gradient(135deg, #ff00aa 0%, #00d4ff 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 10px 30px rgba(255, 0, 170, 0.3);
+}
+
+.vault-enter-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(255, 0, 170, 0.5);
+  background: linear-gradient(135deg, #ff00aa 20%, #00d4ff 80%);
+}
+
+.vault-enter-button:active {
+  transform: translateY(-1px);
+}
+
+.vault-footer-text {
+  margin-top: 20px;
+  color: #888888;
+  font-style: italic;
+}
+
+/* Vault Controls in Main Interface */
+.vault-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.show-tour-btn {
+  background: rgba(0, 212, 255, 0.2);
+  color: #00d4ff;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.show-tour-btn:hover {
+  background: rgba(0, 212, 255, 0.3);
+  transform: translateY(-1px);
+}
+
 /* AI Enhancement Notice */
 .ai-enhancement-notice {
   max-width: 1200px;
@@ -4589,5 +4834,307 @@
   }
   100% {
     box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+  }
+}
+
+/* Liberation Vault Tour System */
+.liberation-tour-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.tour-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(2px);
+}
+
+.tour-spotlight {
+  position: absolute;
+  background: transparent;
+  border: 3px solid #00d4ff;
+  border-radius: 10px;
+  box-shadow: 
+    0 0 0 9999px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(0, 212, 255, 0.6),
+    inset 0 0 20px rgba(0, 212, 255, 0.2);
+  transition: all 0.3s ease;
+  animation: spotlightPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes spotlightPulse {
+  0% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 212, 255, 0.6), inset 0 0 20px rgba(0, 212, 255, 0.2); }
+  100% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 212, 255, 0.8), inset 0 0 30px rgba(0, 212, 255, 0.3); }
+}
+
+.tour-tooltip {
+  position: absolute;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  border-radius: 15px;
+  padding: 0;
+  max-width: 400px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(0, 212, 255, 0.2);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  pointer-events: auto;
+  animation: tourTooltipSlide 0.4s ease-out;
+}
+
+@keyframes tourTooltipSlide {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tour-header {
+  padding: 20px 25px 15px 25px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tour-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #00d4ff;
+  font-weight: 600;
+}
+
+.tour-progress {
+  font-size: 0.9rem;
+  color: #aaaaaa;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 12px;
+  border-radius: 15px;
+}
+
+.tour-content {
+  padding: 20px 25px;
+}
+
+.tour-content p {
+  margin: 0;
+  line-height: 1.6;
+  color: #cccccc;
+}
+
+.tour-actions {
+  padding: 15px 25px 25px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tour-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.tour-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.tour-btn.primary {
+  background: linear-gradient(135deg, #00d4ff 0%, #ff00aa 100%);
+  color: white;
+}
+
+.tour-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+}
+
+.tour-btn.tour-prev {
+  background: rgba(255, 255, 255, 0.1);
+  color: #cccccc;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tour-btn.tour-prev:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tour-btn.tour-skip {
+  background: transparent;
+  color: #888888;
+  border: 1px solid rgba(136, 136, 136, 0.3);
+}
+
+.tour-btn.tour-skip:hover {
+  color: #aaaaaa;
+  border-color: rgba(170, 170, 170, 0.5);
+}
+
+/* Tour Completion Message */
+.tour-completion-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10001;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(0, 212, 255, 0.3);
+  border: 2px solid rgba(0, 212, 255, 0.4);
+  animation: completionPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes completionPop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.completion-content h3 {
+  margin: 0 0 15px 0;
+  font-size: 1.8rem;
+  color: #00d4ff;
+}
+
+.completion-content p {
+  margin: 0;
+  color: #cccccc;
+  font-size: 1.1rem;
+}
+
+/* Tour Replay Notification */
+.tour-replay-notification {
+  position: fixed;
+  top: 100px;
+  right: 30px;
+  z-index: 9999;
+  background: rgba(26, 26, 46, 0.95);
+  backdrop-filter: blur(10px);
+  color: white;
+  border-radius: 15px;
+  padding: 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  animation: slideInRight 0.4s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.replay-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+}
+
+.replay-content span {
+  color: #cccccc;
+  font-size: 0.9rem;
+}
+
+.replay-content button:first-of-type {
+  background: rgba(0, 212, 255, 0.2);
+  color: #00d4ff;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  padding: 6px 14px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.replay-content button:first-of-type:hover {
+  background: rgba(0, 212, 255, 0.3);
+}
+
+.replay-content button:last-child {
+  background: none;
+  border: none;
+  color: #888888;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.3s ease;
+}
+
+.replay-content button:last-child:hover {
+  color: #cccccc;
+}
+
+/* Responsive Design for Welcome Section */
+@media (max-width: 768px) {
+  .vault-welcome-container {
+    padding: 40px 20px;
+  }
+  
+  .vault-title {
+    font-size: 2.5rem;
+  }
+  
+  .vault-philosophy {
+    font-size: 1.5rem;
+  }
+  
+  .vault-category-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .vault-enter-button {
+    font-size: 1.2rem;
+    padding: 15px 35px;
+  }
+  
+  .tour-tooltip {
+    max-width: 300px;
+  }
+  
+  .tour-header {
+    padding: 15px 20px 10px 20px;
+  }
+  
+  .tour-content {
+    padding: 15px 20px;
+  }
+  
+  .tour-actions {
+    padding: 10px 20px 20px 20px;
   }
 }
