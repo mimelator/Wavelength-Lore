@@ -131,14 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
         '.grid-item img',
         '.index-card img',
 
-        // Carousel images on episode, character, and lore pages
-        '.carousel-image',
-        '.carousel img',
-        '.carousel-item img',
-        '.carousel-container img',
-        '#episode-carousel img',
-        '#lore-carousel img',
-
         // UI elements that shouldn't have save buttons
         '.icon img',
         '.logo img',
