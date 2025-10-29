@@ -953,10 +953,10 @@ class MerchandiseModalRenderer {
                       </div>
                       
                       <!-- Stripe Elements will be inserted here -->
-                      <div id="stripe-card-element" class="stripe-element">
-                        <!-- Stripe card element placeholder -->
+                      <div id="payment-element" class="stripe-element">
+                        <!-- Stripe payment element placeholder -->
                       </div>
-                      <div id="stripe-card-errors" class="stripe-errors" role="alert"></div>
+                      <div id="payment-element-errors" class="stripe-errors" role="alert"></div>
                     </div>
 
                     <!-- Terms and Conditions -->

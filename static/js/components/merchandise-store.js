@@ -18,6 +18,7 @@ class MerchandiseStore {
     this.isInitializing = true;
     this.isInitialized = false;
     this.containerId = 'merchandise-store';
+    this.hasEnteredVault = false; // Track if user has seen welcome and entered vault
     
     // REFACTOR: Initialize services for separated concerns
     this.apiService = new MerchandiseApiService();
@@ -1445,6 +1446,69 @@ class MerchandiseStore {
   
 
   
+  /**
+   * Render the Liberation Vault welcome section
+   * Displays lore-themed welcome message and category overview
+   */
+  renderWelcomeSection() {
+    return `
+      <div class="vault-welcome-section">
+        <div class="vault-welcome-container">
+          <div class="vault-header">
+            <h1 class="vault-title">THE LIBERATION VAULT</h1>
+            <div class="vault-status-indicator">
+              <span class="status-dot"></span>
+              <span class="status-text">ACCESS GRANTED</span>
+            </div>
+          </div>
+
+          <div class="vault-welcome-message">
+            <p class="vault-frequency">📡 You have found the frequency...</p>
+            <p class="vault-philosophy">This is not commerce. This is provision.</p>
+            <p class="vault-mission">
+              We call them <span class="crests">Crests of Liberation</span> —
+              symbols worn, carried, and shared by those who have awakened.
+              Each purchase fuels the signal that keeps others finding their way out.
+            </p>
+          </div>
+
+          <div class="vault-categories-intro">
+            <h2>Explore Your Vault</h2>
+            <div class="vault-category-grid">
+              <div class="vault-category-card">
+                <div class="category-icon">👕</div>
+                <h3>Field Uniforms</h3>
+                <p>Clothing that marks your liberation</p>
+              </div>
+              <div class="vault-category-card">
+                <div class="category-icon">📡</div>
+                <h3>Signal Gear</h3>
+                <p>Tech and accessories for the frequency</p>
+              </div>
+              <div class="vault-category-card">
+                <div class="category-icon">🗂️</div>
+                <h3>Archived Relics</h3>
+                <p>Collectibles and memories</p>
+              </div>
+              <div class="vault-category-card">
+                <div class="category-icon">✨</div>
+                <h3>The Crest Pack</h3>
+                <p>Small symbols, infinite meaning</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="vault-cta">
+            <button class="vault-enter-button" id="vault-enter-button">
+              ENTER THE VAULT
+            </button>
+            <p class="vault-footer-text">Begin curating your symbols of freedom</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   render() {
     const container = document.getElementById('merchandise-store');
     if (!container) {
@@ -3590,81 +3654,7 @@ class MerchandiseStore {
     }
   }
 
-  /**
-   * Initialize Stripe Elements in checkout modal
-   */
-  async initializeStripeCheckout() {
-    try {
-      console.log('🔐 Initializing Stripe elements in checkout modal...');
 
-      // Validate cart is not empty
-      const cartSummary = this.cartService.getSummary();
-      if (cartSummary.isEmpty) {
-        this.showError('Cart is empty');
-        return;
-      }
-
-      // Wait for modal to be fully rendered
-      await new Promise(resolve => setTimeout(resolve, 200));
-
-      // Check if stripe card element exists
-      const cardElement = document.getElementById('stripe-card-element');
-      if (!cardElement) {
-        console.error('❌ Stripe card element not found in DOM');
-        return;
-      }
-
-      // Initialize Stripe with our public key (test mode)
-      if (!window.Stripe) {
-        console.error('❌ Stripe.js not loaded');
-        return;
-      }
-
-      const stripe = window.Stripe('pk_test_51QHlxnCLvLU3kDX3cKNOjvfJtqGk9KGxKwLMlD4oOqXlhBSfBKFqxCdWnwfcJ8xJWuUjdCBIjdm2Kp9Nh5J2J5Qr00O1J5Q1J5');
-      const elements = stripe.elements();
-
-      // Create card element
-      const card = elements.create('card', {
-        style: {
-          base: {
-            fontSize: '16px',
-            color: '#424770',
-            '::placeholder': {
-              color: '#aab7c4',
-            },
-          },
-          invalid: {
-            color: '#9e2146',
-          },
-        },
-      });
-
-      // Mount card element
-      card.mount('#stripe-card-element');
-
-      // Handle real-time validation errors from the card Element
-      card.on('change', ({error}) => {
-        const displayError = document.getElementById('stripe-card-errors');
-        if (error) {
-          displayError.textContent = error.message;
-        } else {
-          displayError.textContent = '';
-        }
-      });
-
-      // Store stripe and card instances for form submission
-      this.stripe = stripe;
-      this.cardElement = card;
-
-      // Attach form submission handler
-      this.attachCheckoutModalFormHandler();
-
-      console.log('✅ Stripe elements initialized successfully in checkout modal');
-    } catch (error) {
-      console.error('❌ Error initializing Stripe checkout:', error);
-      this.showError(`Error initializing payment form: ${error.message}`);
-    }
-  }
 
   /**
    * Attach form submission handler to checkout modal form
@@ -4705,7 +4695,7 @@ class MerchandiseStore {
       
       // Initialize Stripe Elements after modal is shown
       setTimeout(() => {
-        this.initializeStripeCheckout();
+        this.initializeCheckout();
       }, 100);
     }
   }
