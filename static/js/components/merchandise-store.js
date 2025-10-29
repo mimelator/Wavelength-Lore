@@ -234,7 +234,22 @@ class MerchandiseStore {
       this.handleCheckout();
     });
 
+    this.eventBus.on('cart.show', () => {
+      console.log('📡 EVENT: cart.show received');
+      this.showCartModal();
+    });
+
+    // DIAGNOSTIC: Track checkout.initiate events only (safer approach)
+    const originalHandleCheckoutInitiate = this.handleCheckoutInitiate.bind(this);
+    this.handleCheckoutInitiate = function() {
+      console.log('🚨 CHECKOUT.INITIATE CALLED!');
+      console.log('   ├─ Stack trace:', new Error().stack.split('\n').slice(1, 6).map(line => line.trim()));
+      return originalHandleCheckoutInitiate.apply(this, arguments);
+    };
+
     this.eventBus.on('checkout.initiate', () => {
+      console.log('📡 EVENT: checkout.initiate received');
+      console.log('   ├─ 🔍 DIAGNOSTIC: checkout.initiate event triggered!');
       this.handleCheckoutInitiate();
     });
     
@@ -704,26 +719,8 @@ class MerchandiseStore {
       this.isInitializing = false;
       this.isInitialized = true;
       
-      // DEBUG: Add scroll event logging to track unwanted scrolling
-      let scrollDebugTimeout;
-      window.addEventListener('scroll', () => {
-        console.log('📜 SCROLL EVENT:', window.scrollY, 'px from top');
-        clearTimeout(scrollDebugTimeout);
-        scrollDebugTimeout = setTimeout(() => {
-          console.log('📜 SCROLL SETTLED at:', window.scrollY, 'px');
-        }, 100);
-      });
-      
-      // Log initial scroll position
-      console.log('📜 INITIAL SCROLL POSITION:', window.scrollY, 'px');
-      
       // Render the initial UI
       this.render();
-      
-      // Log scroll position after render
-      setTimeout(() => {
-        console.log('📜 SCROLL AFTER RENDER:', window.scrollY, 'px');
-      }, 100);
       
     } catch (error) {
       this.isInitializing = false;
@@ -2289,6 +2286,134 @@ class MerchandiseStore {
     `;
   }
 
+  // 💰 UNIFIED PRICING CALCULATION METHOD
+  calculateProductPrice(product, enableDiagnostics = false) {
+    let priceDisplay = 'Price Available at Checkout';
+    
+    if (enableDiagnostics) {
+      console.log(`💰 [TILE PRICING] Calculating price for: ${product.name || product.id}`);
+      console.log(`   blueprintId: ${product.blueprintId}, printProviderId: ${product.printProviderId}`);
+    }
+
+    // PRIORITY 1: Try to get pricing from the service first
+    if (product.blueprintId && product.printProviderId) {
+      try {
+        const pricingData = this.pricingService.lookupProductPricing(product.blueprintId, product.printProviderId);
+        if (enableDiagnostics) {
+          console.log(`   🔍 Pricing service result:`, pricingData?.success ? 'SUCCESS' : 'FAILED');
+        }
+        
+        if (pricingData && pricingData.success && pricingData.variants && pricingData.variants.length > 0) {
+          if (enableDiagnostics) {
+            console.log(`   🔬 VARIANT STRUCTURE ANALYSIS:`);
+            console.log(`      variants.length: ${pricingData.variants.length}`);
+            console.log(`      first variant sample:`, pricingData.variants[0]);
+            console.log(`      first variant keys:`, Object.keys(pricingData.variants[0] || {}));
+          }
+          
+          // Calculate range from ALL variants in pricing service (handle string and numeric prices)
+          const validPrices = pricingData.variants
+            .map(v => {
+              if (v.price) {
+                // Handle numeric prices (in cents)
+                if (typeof v.price === 'number') {
+                  return v.price / 100;
+                }
+                // Handle string prices like '$29.99'
+                if (typeof v.price === 'string') {
+                  const numericPrice = parseFloat(v.price.replace(/[$,]/g, ''));
+                  return !isNaN(numericPrice) ? numericPrice : null;
+                }
+              }
+              return null;
+            })
+            .filter(price => price !== null && price > 0);
+          
+          if (enableDiagnostics) {
+            console.log(`   💵 Valid prices found: [${validPrices.join(', ')}]`);
+          }
+          
+          if (validPrices.length > 0) {
+            const minPrice = Math.min(...validPrices);
+            const maxPrice = Math.max(...validPrices);
+            priceDisplay = minPrice === maxPrice ? 
+              `$${minPrice.toFixed(2)}` : 
+              `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
+            if (enableDiagnostics) {
+              console.log(`   ✅ Pricing service result: ${priceDisplay}`);
+            }
+          }
+        }
+      } catch (error) {
+        // Continue to fallback methods
+      }
+    }
+
+    // PRIORITY 2: Fallback to direct variant data if available
+    if (priceDisplay === 'Price Available at Checkout' && product.variants && product.variants.length > 0) {
+      try {
+        const validPrices = product.variants
+          .map(v => v.price)
+          .filter(price => price !== undefined && price !== null && !isNaN(price))
+          .map(price => price / 100);
+        
+        if (validPrices.length > 0) {
+          const minPrice = Math.min(...validPrices);
+          const maxPrice = Math.max(...validPrices);
+          priceDisplay = minPrice === maxPrice ? 
+            `$${minPrice.toFixed(2)}` : 
+            `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
+          if (enableDiagnostics) {
+            console.log(`   ✅ Direct variant fallback: ${priceDisplay}`);
+          }
+        }
+      } catch (error) {
+        // Continue to next fallback
+      }
+    }
+
+    // PRIORITY 3: Emergency fallback to availableProducts data
+    if (priceDisplay === 'Price Available at Checkout' && this.availableProducts) {
+      const availableProduct = this.availableProducts.find(p => 
+        p.blueprintId === product.blueprintId && p.printProviderId === product.printProviderId
+      );
+      if (availableProduct && availableProduct.variants && availableProduct.variants.length > 0) {
+        if (enableDiagnostics) {
+          console.log(`   🆘 Emergency fallback: FOUND matching product`);
+        }
+        try {
+          const validPrices = availableProduct.variants
+            .map(v => v.price)
+            .filter(price => price !== undefined && price !== null && !isNaN(price))
+            .map(price => price / 100);
+          
+          if (validPrices.length > 0) {
+            const minPrice = Math.min(...validPrices);
+            const maxPrice = Math.max(...validPrices);
+            priceDisplay = minPrice === maxPrice ? 
+              `$${minPrice.toFixed(2)}` : 
+              `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
+            if (enableDiagnostics) {
+              console.log(`   ✅ Emergency fallback result: ${priceDisplay}`);
+            }
+          }
+        } catch (error) {
+          if (enableDiagnostics) {
+            console.log(`   ❌ Emergency fallback failed:`, error.message);
+          }
+        }
+      } else if (enableDiagnostics) {
+        console.log(`   🆘 Emergency fallback: NO matching product found`);
+      }
+    }
+
+    if (enableDiagnostics) {
+      console.log(`   🏷️ Final price display: ${priceDisplay}`);
+    }
+    
+    return priceDisplay;
+  }
+
   renderCategoryProducts(container) {
     // Initialize categoryView if it doesn't exist
     if (!this.categoryView) {
@@ -2305,19 +2430,8 @@ class MerchandiseStore {
     }
 
     const productsHTML = categoryData.products.map(product => {
-      // Try to get pricing from the service
-      let priceDisplay = 'Price Available at Checkout';
-
-      if (product.blueprintId && product.printProviderId) {
-        try {
-          const pricingData = this.pricingService.lookupProductPricing(product.blueprintId, product.printProviderId);
-          if (pricingData && pricingData.success && pricingData.variants && pricingData.variants[0]) {
-            priceDisplay = pricingData.variants[0].price;
-          }
-        } catch (error) {
-          // Silently continue - pricing just won't be shown
-        }
-      }
+      // 💰 USE UNIFIED PRICING CALCULATION METHOD
+      const priceDisplay = this.calculateProductPrice(product, true);
       
       return `
       <div class="product-item">
@@ -2327,7 +2441,7 @@ class MerchandiseStore {
                  src="/images/previews/loading-preview.svg" 
                  alt="${product.name} Preview"
                  onerror="this.src='/images/previews/generic-product-preview.svg'"
-                 style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+                 style="width: 100%; height: 100%; object-fit: cover;">
             <div class="product-preview-text">${product.name}</div>
           </div>
         </div>
@@ -2377,8 +2491,9 @@ class MerchandiseStore {
         try {
           const pricingData = this.pricingService.lookupProductPricing(p.blueprintId, p.printProviderId);
           if (pricingData && pricingData.success && pricingData.variants && pricingData.variants[0]) {
-            const priceStr = pricingData.variants[0].price;
-            const price = parseFloat(priceStr.replace('$', ''));
+            // Price comes in cents, convert to dollars
+            const priceInCents = pricingData.variants[0].price;
+            const price = priceInCents / 100;
             return price > 0 ? price : null;
           }
         } catch (error) {
@@ -2643,19 +2758,8 @@ class MerchandiseStore {
     const newProducts = categoryData.products.slice(fromIndex, toIndex);
     
     newProducts.forEach((product, index) => {
-      // Try to get pricing from the service
-      let priceDisplay = 'Price Available at Checkout';
-
-      if (product.blueprintId && product.printProviderId) {
-        try {
-          const pricingData = this.pricingService.lookupProductPricing(product.blueprintId, product.printProviderId);
-          if (pricingData && pricingData.success && pricingData.variants && pricingData.variants[0]) {
-            priceDisplay = pricingData.variants[0].price;
-          }
-        } catch (error) {
-          // Silently continue - pricing just won't be shown
-        }
-      }
+      // 💰 USE UNIFIED PRICING CALCULATION METHOD (no diagnostics for lazy-loaded products)
+      const priceDisplay = this.calculateProductPrice(product, false);
       
       const productElement = document.createElement('div');
       productElement.className = 'simple-category progressive-item progressive-new';
@@ -3215,6 +3319,14 @@ class MerchandiseStore {
         
         // Add event listeners for category cards and product selection
         container.addEventListener('click', (e) => {
+          // 🚨 EMERGENCY DEBUGGING - Log ALL clicks to debug button issues
+          console.log('🖱️ CLICK DETECTED:', {
+            target: e.target.tagName,
+            classes: Array.from(e.target.classList || []),
+            hasSelectClass: e.target.classList.contains('select-simple-product'),
+            parentClasses: e.target.parentElement ? Array.from(e.target.parentElement.classList || []) : []
+          });
+          
           if (e.target.classList.contains('select-simple-product')) {
             const productType = e.target.dataset.product;
             const blueprintId = parseInt(e.target.dataset.blueprint, 10);
@@ -3740,7 +3852,9 @@ class MerchandiseStore {
       const firstVariant = product.variants[0];
       const variantTitle = firstVariant.title?.toLowerCase() || '';
       
-      console.log('🔍 First variant title:', variantTitle);
+      if (this.debugMode) {
+        console.log('🔍 First variant title:', variantTitle);
+      }
       
       // Enhanced product type detection from variant titles
       if (variantTitle.includes('hoodie') || variantTitle.includes('pullover')) {
@@ -3768,7 +3882,9 @@ class MerchandiseStore {
       // Check blueprint ID patterns if available
       if (product.blueprintId || firstVariant.blueprintId) {
         const blueprintId = product.blueprintId || firstVariant.blueprintId;
-        console.log('🔍 Blueprint ID:', blueprintId);
+        if (this.debugMode) {
+          console.log('🔍 Blueprint ID:', blueprintId);
+        }
         
         // Map common blueprint IDs to product types
         const blueprintMap = {
@@ -3781,7 +3897,9 @@ class MerchandiseStore {
         };
         
         if (blueprintMap[blueprintId]) {
-          console.log('🔍 Mapped blueprint to type:', blueprintMap[blueprintId]);
+          if (this.debugMode) {
+            console.log('🔍 Mapped blueprint to type:', blueprintMap[blueprintId]);
+          }
           return blueprintMap[blueprintId];
         }
       }
@@ -3792,7 +3910,10 @@ class MerchandiseStore {
     
     // Fallback to title analysis
     const title = product.title?.toLowerCase() || '';
-    console.log('🔍 Product title:', title);
+    // Only log if debugMode is enabled to prevent spam
+    if (this.debugMode) {
+      console.log('🔍 Product title:', title);
+    }
     
     if (title.includes('hoodie') || title.includes('pullover')) {
       return 'hoodie';
@@ -3811,7 +3932,9 @@ class MerchandiseStore {
     }
     
     // Default fallback
-    console.log('🔍 Using default product type: premium-tshirt');
+    if (this.debugMode) {
+      console.log('🔍 Using default product type: premium-tshirt for product:', product.id || product.name);
+    }
     return 'premium-tshirt';
   }
   
@@ -4232,17 +4355,11 @@ class MerchandiseStore {
         return;
       }
 
-      console.log('✅ Payment intent created, now creating Stripe Elements...');
+      console.log('✅ Payment intent created, now mounting payment element...');
 
-      // Create Stripe Elements with client secret (NOW we have it)
-      const elementsCreated = this.stripeCheckoutService.createElements();
-      if (!elementsCreated) {
-        this.showError('Failed to initialize payment form');
-        return;
-      }
-
-      // Mount payment element
-      const mounted = this.stripeCheckoutService.mountPaymentElement('payment-element');
+      // Mount payment element with the client secret from payment intent result
+      // (createElements is already called inside createPaymentIntent)
+      const mounted = await this.stripeCheckoutService.mountPaymentElement(result.clientSecret);
       if (!mounted) {
         this.showError('Failed to load payment form');
         return;
@@ -5093,6 +5210,70 @@ class MerchandiseStore {
       }
     }
 
+    // 🔍 PRICING FIX: Find the matching product to get proper variant pricing
+    let productWithVariants = null;
+    if (this.availableProducts && Array.isArray(this.availableProducts)) {
+      productWithVariants = this.availableProducts.find(product => {
+        const typeMatch = product.id === productConfig.id || 
+                         product.productType === productConfig.id ||
+                         product.type === productConfig.id;
+        const categoryMatch = product.category === productConfig.category;
+        return typeMatch || categoryMatch;
+      });
+    }
+
+    console.log('💰 CUSTOM PRODUCT PRICING DIAGNOSTIC:');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('   productConfig.basePrice:', productConfig.basePrice);
+    console.log('   productWithVariants found:', !!productWithVariants);
+    if (productWithVariants) {
+      console.log('   variants available:', Object.keys(productWithVariants.variants || {}).length);
+      console.log('   variant sample:', productWithVariants.variants ? Object.entries(productWithVariants.variants).slice(0, 2) : 'none');
+    }
+
+    // Calculate price range from variants if available
+    let priceDisplay = productConfig.basePrice ? (productConfig.basePrice / 100) : 15.00; // Default fallback
+    let priceRange = null;
+
+    if (productWithVariants && productWithVariants.variants) {
+      const variantPrices = Object.values(productWithVariants.variants)
+        .map(variant => variant.price)
+        .filter(price => price != null && !isNaN(price) && price > 0);
+      
+      console.log('   🔍 Raw variant prices (cents):', variantPrices);
+      
+      if (variantPrices.length > 0) {
+        const minPrice = Math.min(...variantPrices) / 100;
+        const maxPrice = Math.max(...variantPrices) / 100;
+        
+        console.log('   💵 Price range calculation:');
+        console.log('      minPrice:', minPrice);
+        console.log('      maxPrice:', maxPrice);
+        
+        if (minPrice === maxPrice) {
+          priceDisplay = minPrice;
+          priceRange = `$${minPrice.toFixed(2)}`;
+          console.log('   ✅ Single price result:', priceRange);
+        } else {
+          priceDisplay = minPrice; // Use minimum as base
+          priceRange = `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
+          console.log('   ✅ Price range result:', priceRange);
+        }
+      } else {
+        console.log('   ⚠️ No valid variant prices found, using basePrice fallback');
+        // Ensure we have a reasonable price range even without valid variant prices
+        priceRange = `$${priceDisplay.toFixed(2)}`;
+        console.log('   🔧 Generated basePrice fallback range:', priceRange);
+      }
+    } else {
+      console.log('   ⚠️ No product variants found, using basePrice fallback');
+      // Ensure we have a reasonable price range even without variants
+      if (!priceRange) {
+        priceRange = `$${priceDisplay.toFixed(2)}`;
+        console.log('   🔧 Generated fallback price range:', priceRange);
+      }
+    }
+
     // Create a temporary product object for the modal renderer
     const product = {
       id: productConfig.id,
@@ -5104,12 +5285,13 @@ class MerchandiseStore {
       name: productConfig.name,
       blueprintId: blueprintId,
       printProviderId: providerId,
-      price: productConfig.basePrice / 100, // Convert cents to dollars
+      price: priceDisplay, // Use calculated display price
       basePrice: productConfig.basePrice,
+      priceRange: priceRange, // Add price range for display
       image: previewImageUrl,
       previewImage: previewImageUrl,
       sourceImage: this.selectedImage ? { id: this.selectedImage } : null,
-      variants: {},
+      variants: productWithVariants ? productWithVariants.variants : {},
       customization: {
         colorEffects: [],
         atmosphericEffects: [],
@@ -5119,7 +5301,23 @@ class MerchandiseStore {
       }
     };
 
-    console.log('📦 Created temporary product object:', product);
+    console.log('📦 Created temporary product object with pricing:', {
+      id: product.id,
+      price: product.price,
+      priceRange: product.priceRange,
+      variantCount: product.variants ? Object.keys(product.variants).length : 0
+    });
+    
+    // 🚨 CRITICAL CHECK: Verify we won't show "Price Available at Checkout"
+    const willShowFallback = !product.priceRange && !product.price;
+    console.log('🚨 FALLBACK CHECK: Will show "Price varies by options"?', willShowFallback);
+    if (willShowFallback) {
+      console.error('❌ CRITICAL: Custom product will show fallback pricing text!');
+      console.error('   This means the fix failed - we need priceRange or price set');
+    } else {
+      console.log('✅ SUCCESS: Custom product has valid pricing data');
+    }
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
     // Render and show the customization modal
     const modalHtml = this.modalRenderer.renderCustomizationModal(product);
@@ -5276,6 +5474,18 @@ class MerchandiseStore {
     this.render(); // Re-render to update cart display
   }
   
+  /**
+   * Show cart modal (without triggering checkout logic)
+   */
+  showCartModal() {
+    console.log('🛒 Show cart modal');
+    const cartSummary = this.cartService.getSummary();
+    if (!cartSummary.isEmpty) {
+      const modalHtml = this.modalRenderer.renderCartModal(cartSummary);
+      this.modalRenderer.showModal(modalHtml);
+    }
+  }
+
   /**
    * Handle checkout from CartRenderer
    */
@@ -5597,6 +5807,13 @@ class MerchandiseStore {
    */
   handleModalClosed(modalId) {
     console.log('❌ Modal closed:', modalId);
+    
+    // Clean up Stripe checkout when checkout modal is closed
+    if (modalId === 'checkout-modal' && this.stripeCheckoutService) {
+      console.log('🧹 Cleaning up Stripe checkout service on modal close');
+      this.stripeCheckoutService.reset();
+    }
+    
     // Any cleanup needed when modals close
   }
   
@@ -5613,6 +5830,13 @@ class MerchandiseStore {
    */
   handleDialogCancelled(modalId) {
     console.log('❌ Dialog cancelled:', modalId);
+    
+    // Clean up Stripe checkout when checkout dialog is cancelled
+    if (modalId === 'checkout-modal' && this.stripeCheckoutService) {
+      console.log('🧹 Cleaning up Stripe checkout service on dialog cancel');
+      this.stripeCheckoutService.reset();
+    }
+    
     // Handle cancellation actions
   }
 

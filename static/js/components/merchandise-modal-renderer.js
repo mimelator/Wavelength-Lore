@@ -639,7 +639,14 @@ class MerchandiseModalRenderer {
                     
                     <div class="preview-pricing">
                       <span class="preview-price">
-                        ${product.price ? `$${product.price.toFixed(2)}` : 'Price varies by options'}
+                        ${(() => {
+                          const displayPrice = product.priceRange ? product.priceRange : 
+                            product.price ? `$${product.price.toFixed(2)}` : 'Price varies by options';
+                          console.log('🏷️ MODAL PREVIEW PRICE DISPLAY:', displayPrice);
+                          console.log('   product.priceRange:', product.priceRange);
+                          console.log('   product.price:', product.price);
+                          return displayPrice;
+                        })()}
                       </span>
                     </div>
                   </div>
@@ -1492,7 +1499,14 @@ class MerchandiseModalRenderer {
           <div class="summary-item">
             <span class="summary-label">Price:</span>
             <span class="summary-value price-value" id="customization-price">
-              ${product.price ? `$${product.price.toFixed(2)}` : 'Calculate'}
+              ${(() => {
+                const summaryPrice = product.priceRange ? product.priceRange : 
+                  product.price ? `$${product.price.toFixed(2)}` : 'Calculate';
+                console.log('🏷️ MODAL SUMMARY PRICE DISPLAY:', summaryPrice);
+                console.log('   product.priceRange:', product.priceRange);
+                console.log('   product.price:', product.price);
+                return summaryPrice;
+              })()}
             </span>
           </div>
         </div>
@@ -2200,6 +2214,9 @@ class MerchandiseModalRenderer {
           this.debugLog(`Border ${isChecked ? 'enabled' : 'disabled'}`, 'info');
         }
 
+        // Update the customization summary to reflect border changes
+        this.updateCustomizationSummary(modal);
+
         this.updateCustomizationSummary(modal);
       }
 
@@ -2468,6 +2485,9 @@ class MerchandiseModalRenderer {
         pixels: borderPixels
       });
     }
+
+    // Update the customization summary to reflect border width changes
+    this.updateCustomizationSummary(modal);
   }
 
   /**
@@ -2494,6 +2514,9 @@ class MerchandiseModalRenderer {
         color: borderColor
       });
     }
+
+    // Update the customization summary to reflect border color changes
+    this.updateCustomizationSummary(modal);
   }
 
   /**
@@ -2902,6 +2925,9 @@ class MerchandiseModalRenderer {
 
         // Store the customized image URL in modal state
         modal.dataset.customizedImageUrl = result.metadata.customizedImageUrl;
+
+        // CRITICAL: Update the customization summary after successful preview update
+        this.updateCustomizationSummary(modal);
       }
 
     } catch (error) {
@@ -3477,12 +3503,33 @@ class MerchandiseModalRenderer {
    * @param {HTMLElement} modal - Modal element
    */
   updateCustomizationSummary(modal) {
-    const summaryEl = modal.querySelector('[id$="-summary"]');
-    if (!summaryEl) return;
+    // Try multiple selectors to find the summary element
+    let summaryEl = modal.querySelector('[id$="-summary"]');
+    if (!summaryEl) {
+      summaryEl = modal.querySelector('[id*="customization-summary"]');
+    }
+    if (!summaryEl) {
+      summaryEl = modal.querySelector('.summary-text');
+    }
+    
+    if (!summaryEl) {
+      console.warn('⚠️ updateCustomizationSummary: summaryEl not found with any selector');
+      console.warn('Available elements with IDs:', Array.from(modal.querySelectorAll('[id]')).map(el => el.id));
+      return;
+    }
+    
+    console.log('✅ Found summary element:', summaryEl.id, summaryEl.className);
 
     const selectedEffects = JSON.parse(modal.dataset.selectedEffects || '{}');
     const selectedSize = modal.dataset.selectedSize;
     const borderEnabled = modal.dataset.borderEnabled === 'true';
+    const borderWidth = modal.dataset.selectedBorderWidth || '0';
+
+    console.log('🔍 updateCustomizationSummary DEBUG:');
+    console.log('  selectedEffects:', selectedEffects);
+    console.log('  borderEnabled:', borderEnabled);
+    console.log('  borderWidth:', borderWidth);
+    console.log('  selectedSize:', selectedSize);
 
     const effectCount = Object.values(selectedEffects).filter(v => v === true).length;
     const parts = [];
@@ -3491,11 +3538,9 @@ class MerchandiseModalRenderer {
       parts.push(`${effectCount} effect${effectCount !== 1 ? 's' : ''}`);
     }
 
+    // Fix: If border is enabled, show it regardless of width stored (the width might be stored differently)
     if (borderEnabled) {
-      const borderWidth = modal.dataset.selectedBorderWidth || '0';
-      if (borderWidth !== '0') {
-        parts.push('border');
-      }
+      parts.push('border');
     }
 
     if (selectedSize) {
@@ -3503,7 +3548,11 @@ class MerchandiseModalRenderer {
     }
 
     const summary = parts.length > 0 ? `Selected: ${parts.join(', ')}` : 'No customizations selected';
+    console.log('  parts:', parts);
+    console.log('  final summary:', summary);
+    console.log('  summaryEl.id:', summaryEl.id);
     summaryEl.textContent = summary;
+    console.log('  summaryEl.textContent after update:', summaryEl.textContent);
   }
 
   /**
@@ -3521,7 +3570,7 @@ class MerchandiseModalRenderer {
         }
       } else if (e.target.classList.contains('checkout-modal-btn')) {
         // Handle checkout from cart modal
-        console.log('💳 Checkout button clicked from cart modal');
+        console.log('💳 Checkout button clicked from cart modal (isTrusted:', e.isTrusted + ')');
         if (this.eventBus) {
           this.eventBus.emit('checkout.initiate');
         }
@@ -3545,10 +3594,16 @@ class MerchandiseModalRenderer {
         console.log('🔙 Back to cart from checkout modal');
         this.hideModal('checkout-modal'); // Close checkout modal
         
-        // Show cart modal again
+        // Call merchandise store directly (bypass event bus entirely)
         setTimeout(() => {
-          if (this.eventBus) {
-            this.eventBus.emit('cart.checkout'); // This will show cart modal
+          if (this.merchandiseStore && typeof this.merchandiseStore.showCartModal === 'function') {
+            console.log('🛒 Calling showCartModal directly to avoid event bus issues');
+            this.merchandiseStore.showCartModal();
+          } else {
+            console.warn('⚠️ merchandiseStore.showCartModal not available, falling back to event bus');
+            if (this.eventBus) {
+              this.eventBus.emit('cart.show');
+            }
           }
         }, 100);
         
@@ -3598,16 +3653,7 @@ class MerchandiseModalRenderer {
       });
     }
   }
-  
-  /**
-   * Update customization summary
-   * @param {HTMLElement} modal - Modal element
-   */
-  updateCustomizationSummary(modal) {
-    // This would be implemented to update the summary section
-    // based on current selections
-    console.log('Updating customization summary...');
-  }
+
 
   /**
    * Show finished product preview modal
