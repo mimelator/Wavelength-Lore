@@ -16,11 +16,11 @@
         </ul>
       </li>
       
-      <!-- Games - Now Top Level -->
-      <li id="games-nav-item" class="featured-nav-item" style="display: none;">
-        <a href="/games" class="games-nav-link">🎮 Play & Earn</a>
+      <!-- Radio - Now Top Level with Featured Styling -->
+      <li id="radio-nav-item" class="featured-nav-item">
+        <a href="/radio" class="radio-nav-link">🎵 Experience Music</a>
       </li>
-      
+
       <!-- Enhanced Community Dropdown -->
       <li class="has-dropdown">
         <a href="#" onclick="return false;">✨ Join Community</a>
@@ -31,8 +31,11 @@
           <li id="gallery-dropdown-item" style="display: none;"><a href="/my-gallery">🖼️ Your Collection</a></li>
         </ul>
       </li>
-      
-      <li><a href="/radio">🎵 Experience Music</a></li>
+
+      <!-- Games - Now Below Community -->
+      <li id="games-nav-item" class="featured-nav-item" style="display: none;">
+        <a href="/games" class="games-nav-link">🎮 Play & Earn</a>
+      </li>
       <li><a href="/search">🔍 Discover More</a></li>
       
       <!-- VIP-Only Merchandise Store CTA -->
@@ -439,6 +442,43 @@
     border-color: rgba(255, 215, 0, 0.6) !important;
   }
 
+  /* Featured Radio Link Styling */
+  .featured-nav-item .radio-nav-link {
+    background: linear-gradient(135deg, #ec4899, #f97316) !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    color: #ffd700 !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+    border: 2px solid rgba(255, 215, 0, 0.3) !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .featured-nav-item .radio-nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .featured-nav-item .radio-nav-link:hover::before {
+    left: 100%;
+  }
+
+  .featured-nav-item .radio-nav-link:hover {
+    background: linear-gradient(135deg, #f43f5e, #fb923c) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4) !important;
+    border-color: rgba(255, 215, 0, 0.6) !important;
+  }
+
   /* AI Assistant Floating Icon */
   .ai-assistant-icon {
     position: absolute;
@@ -590,6 +630,13 @@
 
     /* Featured Games link mobile styling */
     .featured-nav-item .games-nav-link {
+      padding: 12px 20px !important;
+      font-size: 16px !important;
+      border-radius: 25px !important;
+    }
+
+    /* Featured Radio link mobile styling */
+    .featured-nav-item .radio-nav-link {
       padding: 12px 20px !important;
       font-size: 16px !important;
       border-radius: 25px !important;
