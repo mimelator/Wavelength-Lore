@@ -4908,6 +4908,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 15px;
 }
 
 .tour-header h3 {
@@ -4915,14 +4916,20 @@
   font-size: 1.3rem;
   color: #00d4ff;
   font-weight: 600;
+  flex: 1;
+  min-width: 0;
 }
 
 .tour-progress {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #aaaaaa;
   background: rgba(255, 255, 255, 0.1);
-  padding: 4px 12px;
-  border-radius: 15px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 60px;
+  text-align: center;
 }
 
 .tour-content {
@@ -5128,6 +5135,19 @@
   
   .tour-header {
     padding: 15px 20px 10px 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .tour-header h3 {
+    font-size: 1.1rem;
+  }
+  
+  .tour-progress {
+    align-self: flex-end;
+    font-size: 0.8rem;
+    padding: 4px 10px;
   }
   
   .tour-content {
@@ -5136,5 +5156,12 @@
   
   .tour-actions {
     padding: 10px 20px 20px 20px;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .tour-nav {
+    width: 100%;
+    justify-content: space-between;
   }
 }
