@@ -7,8 +7,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "node scripts/unified/test-runner.js all",
-    "sync": "scripts/sync-assets.sh",
-    "sync-assets": "scripts/sync-assets.sh",
+    "sync": "node cli-admin-tools/sync-assets.js",
+    "sync-assets": "node cli-admin-tools/sync-assets.js",
     "cache-bust": "node scripts/cloudfront-cache-bust.js",
     "cli": "node wavelength-content-cli.js",
     "cli:start": "node wavelength-content-cli.js",
@@ -55,7 +55,8 @@
     "wavelength:extract-batch": "node wavelength-tools/character-extractor/batch-cli.js",
     "wavelength:extract-batch-sample": "node wavelength-tools/character-extractor/batch-cli.js --sample-config",
     "wavelength:content-audit": "node wavelength-content-audit.js",
-    "wavelength:content-audit-html": "python3 -m http.server 8080 && open http://localhost:8080/wavelength-content-audit-report.html"
+    "wavelength:content-audit-html": "python3 -m http.server 8080 && open http://localhost:8080/wavelength-content-audit-report.html",
+    "wavelength:ai-assistant": "node wavelength-ai-assistant-controller.js"
   },
   "dependencies": {
     "@aws-sdk/client-apprunner": "^3.917.0",
