@@ -52,54 +52,25 @@ class ImageCapturer {
     this.processPage();
     
     // Create mutation observer to detect new images
-    this.observer = new MutationObserver((mutations) => {
+    const self = this;
+    this.observer = new MutationObserver(function(mutations) {
       let shouldProcess = false;
-      let mutationDetails = [];
-      let hasCarouselMutations = false;
+      let logInfo = {
+        totalMutations: mutations.length,
+        timestamp: new Date().toISOString()
+      };
 
-      for (const mutation of mutations) {
-        // Track carousel mutations separately
-        if (mutation.target.id === 'episode-carousel' ||
-            mutation.target.id === 'lore-carousel' ||
-            (mutation.target.classList && (
-              mutation.target.classList.contains('carousel') ||
-              mutation.target.classList.contains('slick-list')
-            ))) {
-          hasCarouselMutations = true;
-        }
-
+      for (let i = 0; i < mutations.length; i++) {
+        const mutation = mutations[i];
         if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
           shouldProcess = true;
-          mutationDetails.push({
-            type: mutation.type,
-            addedNodes: mutation.addedNodes.length,
-            removedNodes: mutation.removedNodes.length,
-            target: mutation.target.className || mutation.target.tagName,
-            targetId: mutation.target.id || 'no-id'
-          });
+          break;
         }
       }
 
       if (shouldProcess) {
-        console.log('🔄 MutationObserver fired:', {
-          totalMutations: mutations.length,
-          hasCarouselMutations: hasCarouselMutations,
-          relevantMutations: mutationDetails.slice(0, 3), // Show first 3 for brevity
-          hasExistingTimeout: !!this.processPageTimeout,
-          timestamp: new Date().toISOString()
-        });
-        // Use debounced version to prevent rapid reprocessing
-        this.debouncedProcessPage();
-      } else if (mutations.length > 0) {
-        // Log mutations that don't trigger processing (for debugging)
-        const mutationTypes = new Set();
-        mutations.forEach(m => mutationTypes.add(m.type));
-        if (mutations.length < 50) { // Don't spam for huge mutation batches
-          console.log('🔍 MutationObserver (no process needed):', {
-            types: Array.from(mutationTypes),
-            count: mutations.length
-          });
-        }
+        console.log('🔄 MutationObserver fired - debouncing...', logInfo);
+        self.debouncedProcessPage();
       }
     });
     
