@@ -15,7 +15,7 @@
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
       import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-      import { getDatabase, ref, push, set, onValue, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+      import { getDatabase, ref, push, set, update, onValue, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
       
       // Initialize Firebase with your existing config
       const firebaseConfig = {
@@ -119,6 +119,7 @@
         ref, 
         push, 
         set, 
+        update,
         onValue, 
         query, 
         orderByChild 
@@ -233,6 +234,6 @@
     <!-- Forum Modals -->
     <div id="forum-modals"></div>
     
-    <%- include('../partials/radio-player-widget') %>
+    <!-- No radio widget on forum pages per unified system design -->
 </body>
 </html>
