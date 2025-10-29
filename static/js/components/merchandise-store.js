@@ -1601,12 +1601,15 @@ class MerchandiseStore {
         tooltipTop = targetRect.bottom + 20;
     }
     
-    // Keep tooltip within viewport
-    tooltipLeft = Math.max(20, Math.min(tooltipLeft, window.innerWidth - tooltipRect.width - 20));
-    tooltipTop = Math.max(20, Math.min(tooltipTop, window.innerHeight - tooltipRect.height - 20));
+    // Keep tooltip within viewport with extra safety margin
+    const safeMargin = 40;
+    tooltipLeft = Math.max(safeMargin, Math.min(tooltipLeft, window.innerWidth - tooltipRect.width - safeMargin));
+    tooltipTop = Math.max(safeMargin, Math.min(tooltipTop, window.innerHeight - tooltipRect.height - safeMargin));
     
     tooltip.style.left = `${tooltipLeft}px`;
     tooltip.style.top = `${tooltipTop}px`;
+    tooltip.style.position = 'fixed';
+    tooltip.style.zIndex = '10001';
   }
   
   nextTourStep() {
