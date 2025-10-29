@@ -3924,7 +3924,9 @@ class MerchandiseStore {
 
       // Close modal
       const modal = document.getElementById('checkout-modal');
-      modal.style.display = 'none';
+      if (modal) {
+        modal.style.display = 'none';
+      }
 
       // Reset Stripe service
       this.stripeCheckoutService.reset();
