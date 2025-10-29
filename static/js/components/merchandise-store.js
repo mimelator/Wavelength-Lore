@@ -3891,6 +3891,28 @@ class MerchandiseStore {
       // Get shipping address
       const shippingAddress = this.stripeCheckoutService.getShippingAddressFromForm();
 
+      // First create payment intent with cart items
+      const paymentIntentResult = await this.stripeCheckoutService.createPaymentIntent(
+        this.cart, 
+        shippingAddress, 
+        0 // shipping cost - calculate if needed
+      );
+
+      if (!paymentIntentResult.success) {
+        const errorDiv = document.getElementById('checkout-error-message');
+        if (errorDiv) {
+          errorDiv.textContent = paymentIntentResult.error || 'Failed to create payment. Please try again.';
+          errorDiv.style.display = 'block';
+        }
+
+        // Reset button
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>💳</span> Complete Order';
+        }
+        return;
+      }
+
       // Confirm payment with Stripe and backend
       const result = await this.stripeCheckoutService.confirmPayment(shippingAddress);
 

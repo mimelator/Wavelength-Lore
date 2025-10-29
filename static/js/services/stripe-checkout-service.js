@@ -170,6 +170,9 @@ class StripeCheckoutService {
         orderTotal: data.orderTotal
       });
 
+      // Initialize Stripe Elements with the client secret
+      this.createElements();
+
       return {
         success: true,
         clientSecret: data.clientSecret,
