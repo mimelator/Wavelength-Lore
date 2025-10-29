@@ -1,0 +1,14 @@
+# Wavelength NPC Gallery Extraction - Phase 2 (Battle of the Shire)
+# Focus: Background NPCs - Goblins, Sprites, Creatures
+# Format: imagePath,description,characterId,outputName,crop
+
+# BATTLE OF THE SHIRE (diverse creatures) - CORRECTED FILENAMES
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/TheBattleOfTheShire-005.png,creature in background,bots-creature-1,bots_creature_1.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/TheBattleOfTheShire-010.png,woodland creature,bots-creature-2,bots_creature_2.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/TheBattleOfTheShire-015.png,goblin or sprite,bots-creature-3,bots_creature_3.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/TheBattleOfTheShire-020.png,background npc,bots-creature-4,bots_creature_4.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/TheBattleOfTheShire-025.png,forest creature,bots-creature-5,bots_creature_5.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/TheBattleOfTheShire-030.png,sprite or pixie,bots-creature-6,bots_creature_6.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/TheBattleOfTheShire-035.png,goblin npc,bots-creature-7,bots_creature_7.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/TheBattleOfTheShire-040.png,woodland character,bots-creature-8,bots_creature_8.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/TheBattleOfTheShire-045.png,creature character,bots-creature-9,bots_creature_9.png,true

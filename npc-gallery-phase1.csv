@@ -1,0 +1,26 @@
+# Wavelength NPC Gallery Extraction - Phase 1 (Verified)
+# Focus: Background NPCs - Goblins, Sprites, Creatures
+# Format: imagePath,description,characterId,outputName,crop
+
+# ICE BLUE GREED EPISODE (27 images, proven source)
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-01.png,goblin in audience watching concert,ibg-goblin-concert-1,ibg_goblin_1.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-02.png,goblin background character,ibg-goblin-2,ibg_goblin_2.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-03.png,woodland creature or sprite,ibg-sprite-1,ibg_sprite_1.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-04.png,goblin in scene,ibg-goblin-3,ibg_goblin_3.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-05.png,goblin watching performance,ibg-goblin-4,ibg_goblin_4.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-06.png,background character,ibg-creature-1,ibg_creature_1.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Ice Blue Greed/IceBlueGreed-07.png,sprite or magical creature,ibg-sprite-2,ibg_sprite_2.png,true
+
+# GOBLINS RULE EPISODE (goblin-centric)
+/Volumes/5bits/current/Battle of the Shire Assets/GoblinsRule/GoblinsRule-01.png,goblin in crowd,gr-goblin-1,gr_goblin_1.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/GoblinsRule/GoblinsRule-02.png,goblin character,gr-goblin-2,gr_goblin_2.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/GoblinsRule/GoblinsRule-03.png,goblin background,gr-goblin-3,gr_goblin_3.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/GoblinsRule/GoblinsRule-04.png,goblin npc,gr-goblin-4,gr_goblin_4.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/GoblinsRule/GoblinsRule-05.png,goblin in scene,gr-goblin-5,gr_goblin_5.png,true
+
+# BATTLE OF THE SHIRE (diverse creatures)
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-10.png,creature in background,bots-creature-1,bots_creature_1.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-15.png,woodland creature,bots-creature-2,bots_creature_2.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-20.png,goblin or sprite,bots-creature-3,bots_creature_3.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-25.png,background npc,bots-creature-4,bots_creature_4.png,true
+/Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-30.png,forest creature,bots-creature-5,bots_creature_5.png,true

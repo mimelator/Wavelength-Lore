@@ -1,0 +1,65 @@
+{
+  "timestamp": "2025-10-29T08:53:15.135Z",
+  "summary": {
+    "total": 9,
+    "successful": 9,
+    "failed": 0,
+    "successRate": "100.0%"
+  },
+  "characters": [
+    {
+      "characterId": "bots-creature-1",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/bots_creature_1.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "bots-creature-2",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/bots_creature_2.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "bots-creature-3",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/bots_creature_3.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "bots-creature-4",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/bots_creature_4.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "bots-creature-5",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/bots_creature_5.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "bots-creature-6",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/bots_creature_6.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "bots-creature-7",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/bots_creature_7.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "bots-creature-8",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/bots_creature_8.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "bots-creature-9",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/bots_creature_9.png",
+      "confidence": "high"
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "timestamp": "2025-10-29T08:51:13.977Z",
+  "summary": {
+    "total": 17,
+    "successful": 11,
+    "failed": 6,
+    "successRate": "64.7%"
+  },
+  "characters": [
+    {
+      "characterId": "ibg-goblin-concert-1",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/ibg_goblin_1.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "ibg-goblin-2",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/ibg_goblin_2.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "ibg-sprite-1",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/ibg_sprite_1.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "ibg-goblin-3",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/ibg_goblin_3.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "ibg-goblin-4",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/ibg_goblin_4.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "ibg-creature-1",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/ibg_creature_1.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "ibg-sprite-2",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/ibg_sprite_2.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "gr-goblin-1",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/gr_goblin_1.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "gr-goblin-2",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/gr_goblin_2.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "gr-goblin-3",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/gr_goblin_3.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "gr-goblin-4",
+      "success": false,
+      "error": "Character detection failed: Character not detected: goblin npc"
+    },
+    {
+      "characterId": "gr-goblin-5",
+      "success": true,
+      "outputPath": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/wavelength-tools/assets/extracted-characters/gr_goblin_5.png",
+      "confidence": "high"
+    },
+    {
+      "characterId": "bots-creature-1",
+      "success": false,
+      "error": "Image file not found: /Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-10.png"
+    },
+    {
+      "characterId": "bots-creature-2",
+      "success": false,
+      "error": "Image file not found: /Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-15.png"
+    },
+    {
+      "characterId": "bots-creature-3",
+      "success": false,
+      "error": "Image file not found: /Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-20.png"
+    },
+    {
+      "characterId": "bots-creature-4",
+      "success": false,
+      "error": "Image file not found: /Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-25.png"
+    },
+    {
+      "characterId": "bots-creature-5",
+      "success": false,
+      "error": "Image file not found: /Volumes/5bits/current/Battle of the Shire Assets/Battle of the Shire/BattleOfTheShire-30.png"
+    }
+  ]
+}
