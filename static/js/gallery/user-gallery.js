@@ -204,7 +204,15 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       actions.appendChild(deleteBtn);
 
-      if (window.userGroups && (window.userGroups.includes('admin') || window.userGroups.includes('content_manager'))) {
+      // Show merchandise button for VIP access (matching EJS template logic)
+      const hasVipAccess = window.userGroups && (
+        window.userGroups.includes('vip') ||
+        window.userGroups.includes('content_manager') ||
+        window.userGroups.includes('admin') ||
+        window.userGroups.includes('super_admin')
+      );
+      
+      if (hasVipAccess) {
         const merchBtn = document.createElement('button');
         merchBtn.innerHTML = '<span class="icon">🛍️</span>';
         merchBtn.className = 'merch-store-button';
@@ -290,7 +298,15 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       actions.appendChild(deleteBtn);
 
-      if (window.userGroups && (window.userGroups.includes('admin') || window.userGroups.includes('content_manager'))) {
+      // Show merchandise button for VIP access (matching EJS template logic)
+      const hasVipAccess = window.userGroups && (
+        window.userGroups.includes('vip') ||
+        window.userGroups.includes('content_manager') ||
+        window.userGroups.includes('admin') ||
+        window.userGroups.includes('super_admin')
+      );
+      
+      if (hasVipAccess) {
         const merchBtn = document.createElement('button');
         merchBtn.innerHTML = '<span class="icon">🛍️</span>';
         merchBtn.className = 'merch-store-button';
