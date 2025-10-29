@@ -228,6 +228,37 @@
         });
       });
 
+      // Dynamic dropdown positioning to prevent clipping
+      function adjustDropdownPositions() {
+        const dropdowns = document.querySelectorAll('header nav .has-dropdown');
+        
+        dropdowns.forEach(dropdown => {
+          const rect = dropdown.getBoundingClientRect();
+          const dropdownMenu = dropdown.querySelector('ul.dropdown');
+          
+          if (dropdownMenu) {
+            // Check if dropdown would extend beyond right edge of viewport
+            const dropdownWidth = 200; // min-width from CSS
+            const rightEdge = rect.left + dropdownWidth;
+            const viewportWidth = window.innerWidth;
+            
+            if (rightEdge > viewportWidth - 20) { // 20px buffer
+              // Position dropdown to the right
+              dropdownMenu.style.left = 'auto';
+              dropdownMenu.style.right = '0';
+            } else {
+              // Position dropdown to the left (default)
+              dropdownMenu.style.left = '0';
+              dropdownMenu.style.right = 'auto';
+            }
+          }
+        });
+      }
+      
+      // Adjust positions on load and resize
+      adjustDropdownPositions();
+      window.addEventListener('resize', adjustDropdownPositions);
+
       // Hamburger menu functionality
       const menuIcon = document.querySelector('.menu-icon');
       const navLinks = document.querySelector('.nav-links');
@@ -318,6 +349,22 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
     backdrop-filter: blur(10px) !important;
     transition: max-height 0.3s ease, opacity 0.3s ease, visibility 0.3s ease !important;
+  }
+  
+  /* Auto-adjust dropdown position to prevent clipping on right edge */
+  @media (max-width: 1200px) {
+    header nav .has-dropdown:nth-last-child(-n+3) ul.dropdown {
+      left: auto !important;
+      right: 0 !important;
+    }
+  }
+  
+  /* For very small screens, always position dropdowns to avoid clipping */
+  @media (max-width: 768px) {
+    header nav ul.dropdown {
+      left: auto !important;
+      right: 0 !important;
+    }
   }
   /* Show dropdown on hover of parent li */
   header nav .has-dropdown:hover > ul.dropdown,
