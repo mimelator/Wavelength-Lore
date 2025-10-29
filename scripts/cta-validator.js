@@ -26,7 +26,8 @@ if (!fs.existsSync(REPORTS_DIR)) {
  */
 class CTAValidator {
   constructor() {
-    this.chatbotUrl = process.env.CHATBOT_URL || 'us-central1-wavelength-lore.cloudfunctions.net';
+    // Use the same endpoint as the working chat CLI
+    this.chatbotUrl = 'us-central1-wavelength-lore.cloudfunctions.net';
     this.apiKey = process.env.CHATBOT_API_KEY;
     this.conversationHistory = [];
     this.validations = [];
@@ -47,15 +48,16 @@ class CTAValidator {
     }
 
     try {
+      // Use /legacy/chat endpoint with X-API-Key header (like the working chat CLI)
       const response = await axios.post(
-        `https://${this.chatbotUrl}/chat`,
+        `https://${this.chatbotUrl}/legacy/chat`,
         {
           message,
-          conversation_history: this.conversationHistory.slice(-20) // Last 20 messages for context
+          conversationHistory: this.conversationHistory.slice(-20) // Last 20 messages for context
         },
         {
           headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
+            'X-API-Key': this.apiKey,
             'Content-Type': 'application/json'
           },
           timeout: 30000
@@ -121,7 +123,7 @@ class CTAValidator {
   }
 
   /**
-   * Validate a single CTA
+   * Validate a single CTA with retry logic
    */
   async validateCTA(cta, index, total) {
     this.stats.total++;
@@ -129,8 +131,52 @@ class CTAValidator {
     try {
       process.stdout.write(`[${index}/${total}] Validating ${cta.type}: ${cta.title}... `);
 
+      // Reset conversation history for each CTA evaluation
+      // Each CTA is independent and should not carry context from previous evaluations
+      this.conversationHistory = [];
+
       const prompt = this.buildValidationPrompt(cta);
-      const response = await this.askChatbot(prompt);
+      let response;
+      let retries = 0;
+      const maxRetries = 5;
+
+      // Retry logic for rate limiting
+      while (retries < maxRetries) {
+        try {
+          response = await this.askChatbot(prompt);
+
+          // Verify we got a response
+          if (!response || response.trim().length === 0) {
+            throw new Error('Empty response from chatbot');
+          }
+
+          break; // Success, exit retry loop
+        } catch (error) {
+          // Check for 429 rate limit error
+          const status = error.response?.status;
+          const is429 = status === 429;
+
+          if (is429) {
+            retries++;
+            if (retries < maxRetries) {
+              // Get retry-after header or use exponential backoff
+              const retryAfter = error.response?.data?.retryAfter || (retries * 10);
+              const delayMs = retryAfter * 1000;
+              process.stdout.write(`(rate limited, retry ${retries}/${maxRetries}, waiting ${Math.ceil(delayMs/1000)}s)... `);
+              await new Promise(resolve => setTimeout(resolve, delayMs));
+            } else {
+              throw error; // Give up after max retries
+            }
+          } else {
+            throw error; // Not a rate limit error, re-throw
+          }
+        }
+      }
+
+      // Ensure response is not undefined
+      if (!response) {
+        throw new Error('Failed to get chatbot response after retries');
+      }
 
       const validation = {
         id: `${cta.type}-${cta.id}`,
@@ -161,8 +207,9 @@ class CTAValidator {
         console.log(`✅`);
       }
 
-      // Rate limit to avoid overwhelming the API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Conservative rate limiting: 15 seconds between successful requests
+      // This is well below the API's burst limit threshold
+      await new Promise(resolve => setTimeout(resolve, 15000));
     } catch (error) {
       console.log(`❌ Error`);
       this.stats.errors++;
