@@ -1182,7 +1182,7 @@ class WavelengthRadio {
             'totalPoints': this.stats.totalPoints
         };
 
-        // Update each element if it exists
+        // Update each element if it exists (silently skip if not found)
         for (const [elementId, value] of Object.entries(elements)) {
             const element = document.getElementById(elementId);
             if (element) {
@@ -1191,9 +1191,8 @@ class WavelengthRadio {
                 } else {
                     element.textContent = value;
                 }
-            } else {
-                console.warn(`⚠️ Element not found: ${elementId}`);
             }
+            // Silently skip if element not found (radio player runs on multiple pages)
         }
 
         console.log('📊 Stats updated:', {
