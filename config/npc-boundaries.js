@@ -9,14 +9,19 @@
  * 1. Add an entry to the `boundaries` array
  * 2. Include: id, path, name, altText, and season/episode info
  * 3. The system will automatically include it in rotation
+ *
+ * Note: Paths are relative to CDN_URL (from .env) or root if CDN_URL not set
  */
+
+// Get CDN URL from environment or use empty string for relative paths
+const CDN_URL = process.env.CDN_URL || '';
 
 module.exports = {
   // Available NPCs for visual boundaries
   boundaries: [
     {
       id: 'sneaky-goblin',
-      path: '/assets/npc-characters/sneaky-goblin.png',
+      path: `${CDN_URL}/images/npc-characters/sneaky-goblin.png`,
       name: 'Sneaky Goblin',
       altText: 'Sneaky Goblin - Wavelength Lore NPC',
       season: 'ice-blue-greed',
@@ -25,7 +30,7 @@ module.exports = {
     },
     {
       id: 'winter-elf-rabbit',
-      path: '/assets/npc-characters/fp_elf_1.png',
+      path: `${CDN_URL}/images/npc-characters/fp_elf_1.png`,
       name: 'Arctic Hare',
       altText: 'Arctic Hare - Wavelength Lore Frozen Peace NPC',
       season: 'frozen-peace',
@@ -34,7 +39,7 @@ module.exports = {
     },
     {
       id: 'leprechaun',
-      path: '/assets/npc-characters/fp_elf_2.png',
+      path: `${CDN_URL}/images/npc-characters/fp_elf_2.png`,
       name: 'Magical Leprechaun',
       altText: 'Magical Leprechaun - Wavelength Lore Frozen Peace NPC',
       season: 'frozen-peace',
@@ -43,7 +48,7 @@ module.exports = {
     },
     {
       id: 'ice-dragon-large',
-      path: '/assets/npc-characters/fp_ice_dragon_1.png',
+      path: `${CDN_URL}/images/npc-characters/fp_ice_dragon_1.png`,
       name: 'Ice Dragon',
       altText: 'Ice Dragon - Wavelength Lore Frozen Peace NPC',
       season: 'frozen-peace',
