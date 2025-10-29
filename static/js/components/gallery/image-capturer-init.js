@@ -144,12 +144,18 @@ document.addEventListener('DOMContentLoaded', () => {
         '.thumbnail img',
         '.profile-picture img',
 
-        // Screensaver images - don't add save buttons to screensaver gallery
+        // Screensaver images - don't add save buttons to screensaver gallery (shared and radio screensaver)
         '#screensaverOverlay img',
         '.screensaver-gallery img',
         '.screensaver-controls img',
         '.screensaver-customization img',
+        '.screensaver-minimal-controls img',
+        '.screensaver-exit-hint img',
+        '.screensaver-lyrics img',
+        '.screensaver-title-overlay img',
+        '.screensaver-summary-overlay img',
         '[id*="screensaver"] img',
+        '[class*="screensaver"] img',
 
         // Additional selectors
         '[role="button"] img',
