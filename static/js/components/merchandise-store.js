@@ -704,8 +704,26 @@ class MerchandiseStore {
       this.isInitializing = false;
       this.isInitialized = true;
       
+      // DEBUG: Add scroll event logging to track unwanted scrolling
+      let scrollDebugTimeout;
+      window.addEventListener('scroll', () => {
+        console.log('📜 SCROLL EVENT:', window.scrollY, 'px from top');
+        clearTimeout(scrollDebugTimeout);
+        scrollDebugTimeout = setTimeout(() => {
+          console.log('📜 SCROLL SETTLED at:', window.scrollY, 'px');
+        }, 100);
+      });
+      
+      // Log initial scroll position
+      console.log('📜 INITIAL SCROLL POSITION:', window.scrollY, 'px');
+      
       // Render the initial UI
       this.render();
+      
+      // Log scroll position after render
+      setTimeout(() => {
+        console.log('📜 SCROLL AFTER RENDER:', window.scrollY, 'px');
+      }, 100);
       
     } catch (error) {
       this.isInitializing = false;
@@ -2466,7 +2484,7 @@ class MerchandiseStore {
     return descriptions[categoryKey] || 'Custom merchandise items with your favorite designs';
   }
 
-  showCategoryProducts(categoryKey) {
+  showCategoryProducts(categoryKey, shouldScroll = true) {
     // Initialize categoryView if it doesn't exist
     if (!this.categoryView) {
       this.categoryView = {
@@ -2486,39 +2504,41 @@ class MerchandiseStore {
       // Load blueprint preview images after rendering
       this.loadBlueprintPreviews();
       
-      // 🎯 SCROLL TO ENSURE PRODUCT TYPES ARE VISIBLE
-      // Add a brief delay to ensure rendering is complete
-      setTimeout(() => {
-        // First try to scroll to the product types container
-        const productTypesContainer = container.querySelector('.category-products-view') || 
-                                     container.querySelector('.products-grid') ||
-                                     container;
-        
-        if (productTypesContainer) {
-          productTypesContainer.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start',
-            inline: 'nearest' 
-          });
+      // 🎯 SCROLL TO ENSURE PRODUCT TYPES ARE VISIBLE (only on user interaction)
+      if (shouldScroll) {
+        // Add a brief delay to ensure rendering is complete
+        setTimeout(() => {
+          // First try to scroll to the product types container
+          const productTypesContainer = container.querySelector('.category-products-view') || 
+                                       container.querySelector('.products-grid') ||
+                                       container;
           
-          if (this.debugMode) {
-            console.log('🎯 Scrolled to product types for category:', categoryKey);
-          }
-        } else {
-          // Fallback: scroll to the choose-product-section
-          const chooseProductSection = document.getElementById('choose-product-section');
-          if (chooseProductSection) {
-            chooseProductSection.scrollIntoView({ 
+          if (productTypesContainer) {
+            productTypesContainer.scrollIntoView({ 
               behavior: 'smooth', 
-              block: 'start' 
+              block: 'start',
+              inline: 'nearest' 
             });
             
             if (this.debugMode) {
-              console.log('🎯 Fallback scroll to choose-product-section');
+              console.log('🎯 Scrolled to product types for category:', categoryKey);
+            }
+          } else {
+            // Fallback: scroll to the choose-product-section
+            const chooseProductSection = document.getElementById('choose-product-section');
+            if (chooseProductSection) {
+              chooseProductSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+              });
+              
+              if (this.debugMode) {
+                console.log('🎯 Fallback scroll to choose-product-section');
+              }
             }
           }
-        }
-      }, 300); // Brief delay to ensure DOM updates complete
+        }, 300); // Brief delay to ensure DOM updates complete
+      }
     }
   }
 
