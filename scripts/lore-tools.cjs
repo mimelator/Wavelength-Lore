@@ -40,19 +40,42 @@ class LoreToolsManager {
         }
       };
 
-      const command = `echo '${JSON.stringify(mcpCall)}' | node "${this.mcpServerPath}"`;
-      const result = execSync(command, { encoding: 'utf8', cwd: path.dirname(this.mcpServerPath) });
+      // Create a temporary input for the MCP server instead of using shell pipes
+      const fs = require('fs');
+      const os = require('os');
+      const tempInputFile = path.join(os.tmpdir(), `mcp-input-${Date.now()}.json`);
       
-      // Parse the JSON response
-      const lines = result.split('\n').filter(line => line.trim());
-      const jsonLine = lines.find(line => line.startsWith('{"result"'));
-      
-      if (jsonLine) {
-        const parsed = JSON.parse(jsonLine);
-        return parsed.result.content[0].text;
+      try {
+        // Write the MCP call to a temporary file
+        fs.writeFileSync(tempInputFile, JSON.stringify(mcpCall), 'utf8');
+        
+        // Use input redirection instead of piping to avoid shell issues
+        const result = execSync(`node "${this.mcpServerPath}" < "${tempInputFile}"`, { 
+          encoding: 'utf8', 
+          cwd: path.dirname(this.mcpServerPath),
+          shell: true
+        });
+        
+        // Parse the JSON response
+        const lines = result.split('\n').filter(line => line.trim());
+        const jsonLine = lines.find(line => line.startsWith('{"result"'));
+        
+        if (jsonLine) {
+          const parsed = JSON.parse(jsonLine);
+          return parsed.result.content[0].text;
+        }
+        
+        return result;
+      } finally {
+        // Clean up temporary file
+        try {
+          if (fs.existsSync(tempInputFile)) {
+            fs.unlinkSync(tempInputFile);
+          }
+        } catch (cleanupError) {
+          // Ignore cleanup errors
+        }
       }
-      
-      return result;
     } catch (error) {
       return `❌ Error calling MCP tool: ${error.message}`;
     }
