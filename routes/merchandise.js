@@ -1620,7 +1620,7 @@ router.post('/confirm-payment', ensureAuthenticated, async (req, res) => {
     }
 
     // Payment successful - create Printify order
-    const printifyOrder = await createPrintifyOrder(items, shippingAddress);
+    const printifyOrder = await printifyService.createOrder(items, shippingAddress);
     
     if (!printifyOrder.success) {
       console.error('❌ Order creation failed after successful payment:', printifyOrder.error);

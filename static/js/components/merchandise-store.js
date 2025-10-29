@@ -3902,9 +3902,10 @@ class MerchandiseStore {
         }
 
         // Reset button
-        submitBtn.disabled = false;
-        submitText.style.display = 'inline';
-        submitSpinner.style.display = 'none';
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>💳</span> Complete Order';
+        }
         return;
       }
 
