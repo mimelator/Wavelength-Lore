@@ -12,6 +12,13 @@ class RadioScreenSaver {
         this.titleFadeTimeout = null;
         this.badgeSpawnInterval = null;
         
+        // Auto-countdown properties
+        this.autoCountdownEnabled = localStorage.getItem('wavelength_auto_screensaver') !== 'false'; // enabled by default
+        this.countdownDuration = parseInt(localStorage.getItem('wavelength_screensaver_countdown') || '30'); // 30 seconds default
+        this.countdownTimer = null;
+        this.countdownInterval = null;
+        this.countdownOverlay = null;
+        
         this.init();
     }
 
@@ -750,5 +757,256 @@ class RadioScreenSaver {
             badgeWrapper.classList.add('fading-out');
             setTimeout(() => badgeWrapper.remove(), 2000);
         }, lifetime);
+    }
+
+    // Auto-countdown functionality
+    startAutoCountdown() {
+        // Only start countdown if enabled and not already in screensaver mode
+        if (!this.autoCountdownEnabled || this.active) {
+            return;
+        }
+
+        console.log(`🎨 Starting screensaver auto-countdown: ${this.countdownDuration}s`);
+        
+        this.createCountdownOverlay();
+        this.countdownTimer = this.countdownDuration;
+        
+        // Update countdown display immediately
+        this.updateCountdownDisplay();
+        
+        // Start countdown interval
+        this.countdownInterval = setInterval(() => {
+            this.countdownTimer--;
+            this.updateCountdownDisplay();
+            
+            if (this.countdownTimer <= 0) {
+                this.executeAutoScreensaver();
+            }
+        }, 1000);
+        
+        // Set up interruption listeners
+        this.setupCountdownInterruption();
+    }
+
+    createCountdownOverlay() {
+        // Remove existing overlay if present
+        this.removeCountdownOverlay();
+        
+        this.countdownOverlay = document.createElement('div');
+        this.countdownOverlay.className = 'screensaver-auto-countdown';
+        this.countdownOverlay.innerHTML = `
+            <div class="countdown-content">
+                <div class="countdown-icon">🎨</div>
+                <div class="countdown-text">Screen Saver starting in</div>
+                <div class="countdown-timer" id="countdownTimer">${this.countdownTimer}</div>
+                <div class="countdown-actions">
+                    <button class="countdown-cancel" id="countdownCancel">Cancel</button>
+                    <button class="countdown-settings" id="countdownSettings">⚙️</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(this.countdownOverlay);
+        
+        // Bind cancel button
+        document.getElementById('countdownCancel').addEventListener('click', () => {
+            this.cancelAutoCountdown();
+        });
+        
+        // Bind settings button  
+        document.getElementById('countdownSettings').addEventListener('click', () => {
+            this.showCountdownSettings();
+        });
+        
+        // Fade in
+        setTimeout(() => {
+            this.countdownOverlay.classList.add('visible');
+        }, 100);
+    }
+
+    updateCountdownDisplay() {
+        const timerElement = document.getElementById('countdownTimer');
+        if (timerElement) {
+            timerElement.textContent = this.countdownTimer;
+        }
+    }
+
+    setupCountdownInterruption() {
+        // Add a delay before enabling interruption detection to avoid initial play click
+        setTimeout(() => {
+            if (!this.countdownInterval) return; // Countdown already finished or cancelled
+            
+            let mouseMoveCount = 0;
+            const mouseMoveThreshold = 3; // Require 3 mouse moves to cancel
+            
+            const handleInterruption = (event) => {
+                // For mousemove, require multiple movements to avoid accidental cancellation
+                if (event.type === 'mousemove') {
+                    mouseMoveCount++;
+                    if (mouseMoveCount < mouseMoveThreshold) {
+                        return;
+                    }
+                }
+                
+                console.log(`🎨 Screensaver auto-countdown cancelled by user interaction: ${event.type}`);
+                this.cancelAutoCountdown();
+                
+                // Remove all event listeners after cancellation
+                document.removeEventListener('mousemove', handleInterruption);
+                document.removeEventListener('keydown', handleInterruption);
+                document.removeEventListener('scroll', handleInterruption);
+                document.removeEventListener('touchstart', handleInterruption);
+                document.removeEventListener('click', handleInterruption);
+            };
+            
+            // Add interruption listeners (removed mousedown as it's too sensitive)
+            document.addEventListener('mousemove', handleInterruption);
+            document.addEventListener('keydown', handleInterruption);
+            document.addEventListener('scroll', handleInterruption);
+            document.addEventListener('touchstart', handleInterruption);
+            // Only listen for clicks outside the radio player area
+            document.addEventListener('click', (event) => {
+                // Don't cancel if clicking on radio controls
+                if (!event.target.closest('.radio-player') && 
+                    !event.target.closest('.screensaver-auto-countdown')) {
+                    handleInterruption(event);
+                }
+            });
+            
+        }, 2000); // Wait 2 seconds before enabling interruption detection
+    }
+
+    cancelAutoCountdown() {
+        console.log('🎨 Screensaver auto-countdown cancelled by user interaction');
+        
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+            this.countdownInterval = null;
+        }
+        
+        this.removeCountdownOverlay();
+    }
+
+    removeCountdownOverlay() {
+        if (this.countdownOverlay) {
+            this.countdownOverlay.classList.remove('visible');
+            setTimeout(() => {
+                if (this.countdownOverlay && this.countdownOverlay.parentNode) {
+                    this.countdownOverlay.parentNode.removeChild(this.countdownOverlay);
+                }
+                this.countdownOverlay = null;
+            }, 300);
+        }
+    }
+
+    executeAutoScreensaver() {
+        console.log('🎨 Auto-launching screensaver');
+        
+        // Clear countdown
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+            this.countdownInterval = null;
+        }
+        
+        this.removeCountdownOverlay();
+        
+        // Launch screensaver
+        this.enter();
+    }
+
+    showCountdownSettings() {
+        // Create quick settings popup
+        const settingsOverlay = document.createElement('div');
+        settingsOverlay.className = 'countdown-settings-overlay';
+        settingsOverlay.innerHTML = `
+            <div class="countdown-settings-popup">
+                <h3>🎨 Auto-Screensaver Settings</h3>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="autoScreensaverEnabled" ${this.autoCountdownEnabled ? 'checked' : ''}>
+                        Enable auto-screensaver
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>Countdown duration (seconds):</label>
+                    <select id="countdownDuration">
+                        <option value="10" ${this.countdownDuration === 10 ? 'selected' : ''}>10 seconds</option>
+                        <option value="30" ${this.countdownDuration === 30 ? 'selected' : ''}>30 seconds</option>
+                        <option value="60" ${this.countdownDuration === 60 ? 'selected' : ''}>1 minute</option>
+                        <option value="120" ${this.countdownDuration === 120 ? 'selected' : ''}>2 minutes</option>
+                        <option value="300" ${this.countdownDuration === 300 ? 'selected' : ''}>5 minutes</option>
+                    </select>
+                </div>
+                <div class="setting-actions">
+                    <button id="saveCountdownSettings">Save</button>
+                    <button id="cancelCountdownSettings">Cancel</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(settingsOverlay);
+        
+        // Show popup
+        setTimeout(() => {
+            settingsOverlay.classList.add('visible');
+        }, 100);
+        
+        // Bind save button
+        document.getElementById('saveCountdownSettings').addEventListener('click', () => {
+            const enabled = document.getElementById('autoScreensaverEnabled').checked;
+            const duration = parseInt(document.getElementById('countdownDuration').value);
+            
+            this.autoCountdownEnabled = enabled;
+            this.countdownDuration = duration;
+            
+            // Save to localStorage
+            localStorage.setItem('wavelength_auto_screensaver', enabled.toString());
+            localStorage.setItem('wavelength_screensaver_countdown', duration.toString());
+            
+            console.log(`🎨 Auto-screensaver settings saved: enabled=${enabled}, duration=${duration}s`);
+            
+            // Remove settings popup
+            settingsOverlay.classList.remove('visible');
+            setTimeout(() => {
+                if (settingsOverlay.parentNode) {
+                    settingsOverlay.parentNode.removeChild(settingsOverlay);
+                }
+            }, 300);
+            
+            // If we're currently in countdown, restart with new duration
+            if (this.countdownInterval && enabled) {
+                this.cancelAutoCountdown();
+                this.startAutoCountdown();
+            }
+        });
+        
+        // Bind cancel button
+        document.getElementById('cancelCountdownSettings').addEventListener('click', () => {
+            settingsOverlay.classList.remove('visible');
+            setTimeout(() => {
+                if (settingsOverlay.parentNode) {
+                    settingsOverlay.parentNode.removeChild(settingsOverlay);
+                }
+            }, 300);
+        });
+    }
+
+    // Method to be called when radio starts playing
+    onRadioPlay() {
+        // Start auto-countdown when radio starts playing (with small delay for better UX)
+        if (!this.active) {
+            setTimeout(() => {
+                // Double-check that we're still playing and not in screensaver mode
+                if (this.radio.isPlaying && !this.active) {
+                    this.startAutoCountdown();
+                }
+            }, 1000); // 1 second delay
+        }
+    }
+
+    // Method to be called when radio stops/pauses
+    onRadioStop() {
+        // Cancel countdown if radio stops
+        this.cancelAutoCountdown();
     }
 }

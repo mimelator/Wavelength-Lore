@@ -899,6 +899,10 @@ class WavelengthRadio {
                 if (albumArt) albumArt.classList.add('playing');
                 // Save state again after successful play start
                 this.savePlaybackState();
+                // Notify screensaver that radio started playing
+                if (this.screensaver) {
+                    this.screensaver.onRadioPlay();
+                }
             }).catch(error => {
                 console.error('Playback error:', error);
             });
@@ -917,10 +921,18 @@ class WavelengthRadio {
             this.audio.pause();
             this.isPlaying = false;
             document.querySelector('.album-art').classList.remove('playing');
+            // Notify screensaver that radio stopped
+            if (this.screensaver) {
+                this.screensaver.onRadioStop();
+            }
         } else {
             this.audio.play();
             this.isPlaying = true;
             document.querySelector('.album-art').classList.add('playing');
+            // Notify screensaver that radio started playing
+            if (this.screensaver) {
+                this.screensaver.onRadioPlay();
+            }
         }
 
         this.updatePlayButton();
