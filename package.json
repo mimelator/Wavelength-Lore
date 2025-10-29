@@ -29,13 +29,19 @@
     "wavelength:configure-email": "node wavelength-tools/wavelength-email-configurator.js",
     "wavelength:test-email": "node wavelength-tools/wavelength-email-test-suite.js",
     "wavelength:test-order-flow": "node wavelength-tools/wavelength-order-flow-test.js",
-    "wavelength:debug-email": "node wavelength-tools/wavelength-email-debug.js"
+    "wavelength:debug-email": "node wavelength-tools/wavelength-email-debug.js",
+    "wavelength:ses-setup": "node wavelength-tools/wavelength-ses-setup-assistant.js",
+    "wavelength:ses-dns": "node wavelength-tools/wavelength-ses-dns-helper.js",
+    "wavelength:ses-verify": "node wavelength-tools/wavelength-ses-verification-checker.js",
+    "wavelength:route53-dns": "node wavelength-tools/wavelength-route53-automation.js",
+    "wavelength:route53-dry-run": "node wavelength-tools/wavelength-route53-automation.js --dry-run"
   },
   "dependencies": {
     "@aws-sdk/client-apprunner": "^3.917.0",
     "@aws-sdk/client-cloudfront": "^3.917.0",
     "@aws-sdk/client-ecr": "^3.917.0",
     "@aws-sdk/client-iam": "^3.917.0",
+    "@aws-sdk/client-route-53": "^3.919.0",
     "@aws-sdk/client-s3": "^3.917.0",
     "@aws-sdk/client-ses": "^3.919.0",
     "@aws-sdk/credential-providers": "^3.916.0",
