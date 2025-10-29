@@ -33,8 +33,7 @@
           <!-- User Profile Section (top of dropdown) -->
           <li id="profile-dropdown-item" style="display: none;"><a href="/forum/profile">👤 Your Journey</a></li>
           <li id="leaderboard-dropdown-item" style="display: none;"><a href="/leaderboard">🏆 Compete & Win</a></li>
-          <!-- Community Discussion Section (below profile) -->
-          <li class="dropdown-divider"><a href="/forum">💭 Share Theories</a></li>
+          <li id="profile-forum-dropdown-item" style="display: none;"><a href="/forum">💭 Share Theories</a></li>
         </ul>
       </li>
 
@@ -108,6 +107,11 @@
                   const leaderboardDropdownItem = document.getElementById('leaderboard-dropdown-item');
                   if (leaderboardDropdownItem) {
                     leaderboardDropdownItem.style.display = 'block';
+                  }
+
+                  const profileForumDropdownItem = document.getElementById('profile-forum-dropdown-item');
+                  if (profileForumDropdownItem) {
+                    profileForumDropdownItem.style.display = 'block';
                   }
 
                   const profileDropdownItem = document.getElementById('profile-dropdown-item');
