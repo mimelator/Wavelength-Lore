@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '.nav-item img',
         '.navbar img',
         '.menu img',
+        '.nav-image',
         '.nav-card img',
         '.link-card img',
         '.card img',
