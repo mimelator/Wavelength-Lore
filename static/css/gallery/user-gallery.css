@@ -167,30 +167,64 @@
 .gallery-item.selectable {
   cursor: pointer;
   position: relative;
+  transition: all 0.3s ease;
+}
+
+.gallery-item.selectable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .gallery-item.selectable::before {
   content: '';
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 15px;
+  right: 15px;
   width: 24px;
   height: 24px;
   border-radius: 50%;
   border: 2px solid #fff;
-  background-color: transparent;
-  z-index: 10;
-  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  background-color: rgba(0,0,0,0.5);
+  z-index: 15;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  transition: all 0.3s ease;
+  pointer-events: none; /* Ensure it doesn't interfere with clicks */
+}
+
+.gallery-item.selectable::after {
+  content: '✓';
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 16;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none; /* Ensure it doesn't interfere with clicks */
 }
 
 .gallery-item.selected::before {
   background-color: #4CAF50;
   border-color: #fff;
+  transform: scale(1.1);
+}
+
+.gallery-item.selected::after {
+  opacity: 1;
 }
 
 .gallery-item.selected img {
   opacity: 0.8;
   border: 3px solid #4CAF50;
+  transform: scale(0.95);
 }
 
 .intro {

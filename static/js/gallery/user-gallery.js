@@ -6,6 +6,85 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Enhanced error handling utility
+  function showError(message, error = null) {
+    console.error('Gallery Error:', message, error);
+    
+    // Create or update error display
+    let errorDiv = document.getElementById('gallery-error');
+    if (!errorDiv) {
+      errorDiv = document.createElement('div');
+      errorDiv.id = 'gallery-error';
+      errorDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #ff4444;
+        color: white;
+        padding: 15px;
+        border-radius: 5px;
+        z-index: 10000;
+        max-width: 300px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      `;
+      document.body.appendChild(errorDiv);
+    }
+    
+    errorDiv.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <strong>Gallery Error</strong><br>
+          ${message}
+        </div>
+        <button onclick="this.parentElement.parentElement.remove()" 
+                style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">×</button>
+      </div>
+    `;
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      if (errorDiv && errorDiv.parentNode) {
+        errorDiv.remove();
+      }
+    }, 5000);
+  }
+
+  // Success notification utility  
+  function showSuccess(message) {
+    console.log('Gallery Success:', message);
+    
+    let successDiv = document.createElement('div');
+    successDiv.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #44aa44;
+      color: white;
+      padding: 15px;
+      border-radius: 5px;
+      z-index: 10000;
+      max-width: 300px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    `;
+    successDiv.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <strong>Success</strong><br>
+          ${message}
+        </div>
+        <button onclick="this.remove()" 
+                style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">×</button>
+      </div>
+    `;
+    document.body.appendChild(successDiv);
+    
+    setTimeout(() => {
+      if (successDiv && successDiv.parentNode) {
+        successDiv.remove();
+      }
+    }, 3000);
+  }
+
   // DOM element references
   const carouselEl = document.getElementById('gallery-carousel');
   const gridEl = document.getElementById('gallery-grid');
@@ -229,7 +308,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     document.querySelectorAll('#gallery-carousel img, .gallery-item img').forEach(img => {
-      img.addEventListener('click', () => {
+      img.addEventListener('click', (e) => {
+        // In select mode, don't open modal - let select handler work
+        if (selectMode && e.target.closest('.gallery-item')) {
+          return;
+        }
         openModal(img.src, img.dataset.caption, img.dataset.id, img.dataset.relativePath);
       });
     });
@@ -261,23 +344,67 @@ document.addEventListener('DOMContentLoaded', () => {
   function deleteImage(imageId, relativePath, itemElement) {
     if (!confirm('Are you sure you want to remove this image from your gallery?')) return;
     
+    // Determine what to send based on what we have
+    let deleteData = {};
+    if (relativePath) {
+      deleteData.relativePath = relativePath;
+    } else if (imageId) {
+      // If no relativePath, this is likely a bookmark - use bookmarkId
+      deleteData.bookmarkId = imageId;
+    } else {
+      alert('Unable to identify image for deletion');
+      return;
+    }
+    
+    console.log('🗑️ Deleting image:', deleteData);
+    
     fetch('/api/gallery/user/delete', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
       credentials: 'include',
-      body: JSON.stringify({ relativePath })
+      body: JSON.stringify(deleteData)
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    })
     .then(data => {
-      if (data.success && itemElement && itemElement.parentNode) {
-        itemElement.parentNode.removeChild(itemElement);
+      if (data.success) {
+        // Remove from UI
+        if (itemElement && itemElement.parentNode) {
+          itemElement.parentNode.removeChild(itemElement);
+        }
+        
+        // Update local data
+        const identifier = relativePath || imageId;
+        userImages = userImages.filter(img => 
+          img.relativePath !== identifier && 
+          img.id !== identifier &&
+          img.bookmarkId !== identifier
+        );
+        
+        // If carousel is active, refresh it
+        if ($('#gallery-carousel').hasClass('slick-initialized')) {
+          if (userImages.length > 0) {
+            populateGallery(userImages);
+          } else {
+            showEmptyGallery();
+          }
+        }
+        
+        console.log('✅ Image deleted successfully');
       } else {
-        alert('Failed to delete image: ' + (data.error || 'Unknown error'));
+        throw new Error(data.error || 'Unknown error from server');
       }
     })
     .catch(error => {
       console.error('Error deleting image:', error);
-      alert('Failed to delete image. Please try again.');
+      alert('Failed to delete image: ' + error.message);
     });
   }
   
@@ -312,28 +439,68 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   deleteBtn.addEventListener('click', () => {
-    if (!currentRelativePath) return;
+    if (!currentImageId && !currentRelativePath) {
+      alert('No image selected for deletion');
+      return;
+    }
+    
+    if (!confirm('Are you sure you want to remove this image from your gallery?')) return;
+    
+    // Determine what to send for deletion
+    let deleteData = {};
+    if (currentRelativePath) {
+      deleteData.relativePath = currentRelativePath;
+    } else if (currentImageId) {
+      deleteData.bookmarkId = currentImageId;
+    }
+    
+    console.log('🗑️ Modal delete:', deleteData);
     
     fetch('/api/gallery/user/delete', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json', 
+        'Accept': 'application/json' 
+      },
       credentials: 'include',
-      body: JSON.stringify({ relativePath: currentRelativePath })
+      body: JSON.stringify(deleteData)
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    })
     .then(data => {
       if (data.success) {
-        userImages = userImages.filter(img => img.relativePath !== currentRelativePath);
+        // Filter out the deleted image
+        const identifier = currentRelativePath || currentImageId;
+        userImages = userImages.filter(img => 
+          img.relativePath !== identifier && 
+          img.id !== identifier &&
+          img.bookmarkId !== identifier
+        );
+        
+        // Close modal
         modal.style.display = 'none';
         document.body.style.overflow = '';
+        
+        // Refresh gallery
         if (userImages.length > 0) {
           populateGallery(userImages);
         } else {
           showEmptyGallery();
         }
+        
+        console.log('✅ Image deleted from modal successfully');
+      } else {
+        throw new Error(data.error || 'Delete failed');
       }
     })
-    .catch(error => console.error('Error deleting image:', error));
+    .catch(error => {
+      console.error('Error deleting image from modal:', error);
+      alert('Failed to delete image: ' + error.message);
+    });
   });
   
   downloadAllBtn.addEventListener('click', () => {
@@ -427,6 +594,12 @@ document.addEventListener('DOMContentLoaded', () => {
       
       document.querySelectorAll('.gallery-item').forEach(item => {
         item.classList.add('selectable');
+        // Remove existing click handlers that open modal
+        const img = item.querySelector('img');
+        if (img) {
+          img.replaceWith(img.cloneNode(true));
+        }
+        // Add select handler
         item.addEventListener('click', selectImageHandler);
       });
     } else {
@@ -435,20 +608,61 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   
   function selectImageHandler(e) {
+    // Only prevent default if we're actually in select mode and clicking on the image
+    if (!selectMode) {
+      return; // Let normal modal opening work
+    }
+    
+    // Check if click was on action buttons - don't interfere with those
+    if (e.target.closest('.gallery-item-actions')) {
+      return; // Let action buttons work normally
+    }
+    
     e.preventDefault();
     e.stopPropagation();
     const item = this;
     const img = item.querySelector('img');
     const relativePath = img.dataset.relativePath;
-    if (!relativePath) return;
+    const imageId = img.dataset.id;
+    
+    console.log('🔍 Select handler - Image data:', {
+      relativePath,
+      imageId,
+      datasetId: img.dataset.id,
+      datasetRelativePath: img.dataset.relativePath
+    });
+    
+    // For selection, we need to store the right identifier that matches what's in userImages
+    let imageIdentifier;
+    
+    // Find the actual image in userImages to get the correct identifier
+    const matchingImage = userImages.find(userImg => {
+      return (userImg.relativePath && userImg.relativePath === relativePath) ||
+             (userImg.id === imageId) ||
+             (userImg.bookmarkId === imageId);
+    });
+    
+    if (matchingImage) {
+      // Use the identifier that will work for deletion
+      imageIdentifier = matchingImage.relativePath || matchingImage.bookmarkId || matchingImage.id;
+      console.log('🎯 Found matching image:', matchingImage);
+      console.log('🎯 Using identifier:', imageIdentifier);
+    } else {
+      console.error('❌ No matching image found in userImages for:', { relativePath, imageId });
+      return;
+    }
     
     if (item.classList.contains('selected')) {
       item.classList.remove('selected');
-      selectedImages = selectedImages.filter(path => path !== relativePath);
+      selectedImages = selectedImages.filter(id => id !== imageIdentifier);
+      console.log('🗑️ Deselected:', imageIdentifier);
     } else {
       item.classList.add('selected');
-      selectedImages.push(relativePath);
+      selectedImages.push(imageIdentifier);
+      console.log('✅ Selected:', imageIdentifier);
     }
+    
+    console.log('📊 Current selection:', selectedImages);
     deleteSelectedButton.textContent = `Delete Selected (${selectedImages.length})`;
   }
   
@@ -467,25 +681,106 @@ document.addEventListener('DOMContentLoaded', () => {
     if (selectedImages.length === 0) return;
     if (!confirm(`Are you sure you want to delete ${selectedImages.length} selected images?`)) return;
     
-    fetch('/api/gallery/user/batch-delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ relativePaths: selectedImages })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        userImages = userImages.filter(img => !selectedImages.includes(img.relativePath));
+    console.log('🔍 Batch delete - selectedImages:', selectedImages);
+    console.log('🔍 Batch delete - userImages:', userImages.map(img => ({
+      id: img.id,
+      bookmarkId: img.bookmarkId,
+      relativePath: img.relativePath,
+      type: img.type
+    })));
+    
+    // Separate S3 images from bookmarks more carefully
+    const s3Images = [];
+    const bookmarks = [];
+    
+    selectedImages.forEach(selectedId => {
+      const matchingImage = userImages.find(userImg => {
+        return (userImg.relativePath === selectedId) ||
+               (userImg.id === selectedId) ||
+               (userImg.bookmarkId === selectedId);
+      });
+      
+      if (matchingImage) {
+        if (matchingImage.relativePath) {
+          // This is an S3 image - use relativePath for deletion
+          s3Images.push(matchingImage.relativePath);
+        } else if (matchingImage.bookmarkId) {
+          // This is a bookmark - use bookmarkId for deletion
+          bookmarks.push(matchingImage.bookmarkId);
+        } else {
+          console.warn('⚠️ Image has no relativePath or bookmarkId:', matchingImage);
+        }
+      } else {
+        console.error('❌ No matching image found for selected ID:', selectedId);
+      }
+    });
+    
+    console.log('🗑️ Batch delete:', { s3Images, bookmarks });
+    
+    // Process deletions
+    const deletePromises = [];
+    
+    // Delete S3 images
+    if (s3Images.length > 0) {
+      deletePromises.push(
+        fetch('/api/gallery/user/batch-delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ relativePaths: s3Images })
+        }).then(r => r.json())
+      );
+    }
+    
+    // Delete bookmarks individually (no batch endpoint for bookmarks)
+    bookmarks.forEach(bookmarkId => {
+      deletePromises.push(
+        fetch('/api/gallery/user/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ bookmarkId })
+        }).then(r => r.json())
+      );
+    });
+    
+    Promise.all(deletePromises)
+    .then(results => {
+      console.log('🗑️ Batch delete results:', results);
+      
+      let totalSuccess = 0;
+      let totalFailed = 0;
+      
+      results.forEach(result => {
+        if (result.success) {
+          totalSuccess++;
+        } else {
+          totalFailed++;
+          console.error('Delete failed:', result);
+        }
+      });
+      
+      if (totalSuccess > 0) {
+        // Remove deleted images from local array
+        userImages = userImages.filter(img => {
+          const imgId = img.relativePath || img.id || img.bookmarkId;
+          return !selectedImages.includes(imgId);
+        });
+        
         exitSelectMode();
+        
         if (userImages.length > 0) {
           populateGallery(userImages);
         } else {
           showEmptyGallery();
         }
-        alert(`Successfully deleted ${data.message}`);
+        
+        const message = totalFailed > 0 
+          ? `${totalSuccess} images deleted, ${totalFailed} failed`
+          : `${totalSuccess} images deleted successfully`;
+        alert(message);
       } else {
-        alert(`Error: ${data.error || 'Failed to delete selected images'}`);
+        alert('Failed to delete any images');
       }
     })
     .catch(error => {
