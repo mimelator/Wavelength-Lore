@@ -196,15 +196,95 @@ router.get('/debug', async (req, res) => {
  * Badge placement UI demo page (development only)
  */
 router.get('/badge-demo', async (req, res) => {
-  if (process.env.NODE_ENV !== 'development') {
-    return res.status(404).json({ error: 'Not found' });
-  }
+  // Temporarily allow access without development mode for testing
+  // if (process.env.NODE_ENV !== 'development') {
+  //   return res.status(404).json({ error: 'Not found' });
+  // }
 
   try {
     res.sendFile(require('path').join(__dirname, '../static/html/badge-placement-demo.html'));
   } catch (error) {
     console.error('Error serving badge demo page:', error);
     res.status(500).json({ error: 'Failed to load badge demo page' });
+  }
+});
+
+/**
+ * GET /api/merchandise/badge-collection-demo
+ * Demo badge collection endpoint (no auth required)
+ */
+router.get('/badge-collection-demo', async (req, res) => {
+  try {
+    console.log('🏆 Loading demo badge collection...');
+    
+    // Mock badge collection for demo
+    const mockBadgeCollection = {
+      success: true,
+      badges: [
+        {
+          id: 'harmony-student',
+          name: 'Harmony Student',
+          description: 'Completed Alexandria\'s violin harmony challenge',
+          image: 'https://via.placeholder.com/100x100/FFD700/000000?text=🎻',
+          rarity: 'uncommon',
+          unlockedDate: '2024-10-15',
+          exclusiveDesigns: 3,
+          isUnlocked: true
+        },
+        {
+          id: 'wisdom-seeker',
+          name: 'Wisdom Seeker',
+          description: 'Discovered ancient knowledge from the archives',
+          image: 'https://via.placeholder.com/100x100/8A2BE2/FFFFFF?text=📚',
+          rarity: 'rare',
+          unlockedDate: '2024-10-20',
+          exclusiveDesigns: 5,
+          isUnlocked: true
+        },
+        {
+          id: 'cultural-explorer',
+          name: 'Cultural Explorer',
+          description: 'Traveled across the Great and Mighty mountains',
+          image: 'https://via.placeholder.com/100x100/32CD32/000000?text=🏔️',
+          rarity: 'common',
+          unlockedDate: '2024-10-25',
+          exclusiveDesigns: 2,
+          isUnlocked: true
+        },
+        {
+          id: 'master-storyteller',
+          name: 'Master Storyteller',
+          description: 'Crafted legendary tales of Wavelength Lore',
+          image: 'https://via.placeholder.com/100x100/FF4500/FFFFFF?text=📖',
+          rarity: 'legendary',
+          unlockedDate: '2024-10-28',
+          exclusiveDesigns: 8,
+          isUnlocked: true
+        },
+        {
+          id: 'freedom-fighter',
+          name: 'Freedom Fighter',
+          description: 'Stood for liberation and independence',
+          image: 'https://via.placeholder.com/100x100/DC143C/FFFFFF?text=⚔️',
+          rarity: 'epic',
+          unlockedDate: '2024-10-29',
+          exclusiveDesigns: 6,
+          isUnlocked: false // Some badges locked for demo
+        }
+      ],
+      totalBadges: 5,
+      unlockedBadges: 4,
+      availableDesigns: 24
+    };
+    
+    res.json(mockBadgeCollection);
+    
+  } catch (error) {
+    console.error('❌ Error loading demo badge collection:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load demo badge collection'
+    });
   }
 });
 

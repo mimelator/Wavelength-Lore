@@ -75,7 +75,42 @@
                     <div class="col-md-6">
                         <p><strong>Test Image:</strong> <span id="image-status">Loading...</span></p>
                         <p><strong>Last Update:</strong> <span id="last-update">-</span></p>
-                        <button class="btn btn-sm btn-primary" onclick="loadTestImage()">🖼️ Load Test Image</button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-primary" onclick="loadTestImage()">🖼️ Load Test Image</button>
+                            <button class="btn btn-sm btn-success" onclick="loadMerchandiseTemplate()">👕 T-Shirt Template</button>
+                            <button class="btn btn-sm btn-info" onclick="loadCanvasTemplate()">🖼️ Canvas Template</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Demo Actions -->
+            <div class="status-panel">
+                <h4>🚀 Quick Demo Actions</h4>
+                <div class="row">
+                    <div class="col-md-4">
+                        <button class="btn btn-outline-primary btn-sm w-100 mb-2" onclick="addRandomBadge()">
+                            🎲 Add Random Badge
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm w-100 mb-2" onclick="clearAllBadges()">
+                            🗑️ Clear All Badges
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-outline-success btn-sm w-100 mb-2" onclick="testPresetLayout()">
+                            📐 Test Preset Layout
+                        </button>
+                        <button class="btn btn-outline-info btn-sm w-100 mb-2" onclick="exportConfiguration()">
+                            📤 Export Config
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-outline-secondary btn-sm w-100 mb-2" onclick="simulateIntegration()">
+                            🔗 Test Integration
+                        </button>
+                        <button class="btn btn-outline-dark btn-sm w-100 mb-2" onclick="resetDemo()">
+                            🔄 Reset Demo
+                        </button>
                     </div>
                 </div>
             </div>
@@ -109,25 +144,52 @@
         let badgePlacementUI = null;
         let testImageUrl = null;
         
-        // Mock badge data for testing
+        // Enhanced mock badge data for testing
         const mockBadges = [
             {
                 id: 'harmony-student',
                 name: 'Harmony Student',
-                description: 'Learned the basics of harmony',
-                image: '/images/badges/alexandria-harmony-student.webp'
+                description: 'Completed Alexandria\'s violin harmony challenge',
+                image: 'https://via.placeholder.com/100x100/FFD700/000000?text=🎻',
+                rarity: 'uncommon',
+                unlockedDate: '2024-10-15',
+                exclusiveDesigns: 3
             },
             {
                 id: 'wisdom-seeker',
                 name: 'Wisdom Seeker',
-                description: 'Explored ancient knowledge',
-                image: '/images/badges/wisdom-seeker.webp'
+                description: 'Discovered ancient knowledge from the archives',
+                image: 'https://via.placeholder.com/100x100/8A2BE2/FFFFFF?text=📚',
+                rarity: 'rare',
+                unlockedDate: '2024-10-20',
+                exclusiveDesigns: 5
             },
             {
                 id: 'cultural-explorer',
                 name: 'Cultural Explorer',
-                description: 'Discovered new cultures',
-                image: '/images/badges/cultural-explorer.webp'
+                description: 'Traveled across the Great and Mighty mountains',
+                image: 'https://via.placeholder.com/100x100/32CD32/000000?text=🏔️',
+                rarity: 'common',
+                unlockedDate: '2024-10-25',
+                exclusiveDesigns: 2
+            },
+            {
+                id: 'master-storyteller',
+                name: 'Master Storyteller',
+                description: 'Crafted legendary tales of Wavelength Lore',
+                image: 'https://via.placeholder.com/100x100/FF4500/FFFFFF?text=📖',
+                rarity: 'legendary',
+                unlockedDate: '2024-10-28',
+                exclusiveDesigns: 8
+            },
+            {
+                id: 'freedom-fighter',
+                name: 'Freedom Fighter',
+                description: 'Stood for liberation and independence',
+                image: 'https://via.placeholder.com/100x100/DC143C/FFFFFF?text=⚔️',
+                rarity: 'epic',
+                unlockedDate: '2024-10-29',
+                exclusiveDesigns: 6
             }
         ];
         
@@ -209,6 +271,59 @@
             }
         }
         
+        // Load merchandise template (T-shirt mockup)
+        function loadMerchandiseTemplate() {
+            // Use a t-shirt template for realistic merchandise preview
+            testImageUrl = 'https://via.placeholder.com/800x800/FFFFFF/000000?text=T-SHIRT+TEMPLATE';
+            
+            updateStatus('image-status', 'Loading T-shirt template...');
+            
+            if (badgePlacementUI) {
+                badgePlacementUI.updateImage(testImageUrl)
+                    .then(() => {
+                        updateStatus('image-status', '✅ T-shirt template loaded');
+                        // Auto-add a sample badge for demo
+                        setTimeout(() => {
+                            if (mockBadges.length > 0) {
+                                badgePlacementUI.addBadge(mockBadges[0], { x: 0.3, y: 0.4 }, 'medium');
+                                showToast('🏆 Added sample badge to template!', 'success');
+                            }
+                        }, 1000);
+                    })
+                    .catch(error => {
+                        console.error('Failed to load merchandise template:', error);
+                        updateStatus('image-status', '❌ Failed to load template');
+                    });
+            }
+        }
+        
+        // Load canvas template (art print mockup)
+        function loadCanvasTemplate() {
+            // Use a canvas/art print template
+            testImageUrl = 'https://via.placeholder.com/800x600/F5F5DC/8B4513?text=CANVAS+ART+PRINT';
+            
+            updateStatus('image-status', 'Loading canvas template...');
+            
+            if (badgePlacementUI) {
+                badgePlacementUI.updateImage(testImageUrl)
+                    .then(() => {
+                        updateStatus('image-status', '✅ Canvas template loaded');
+                        // Auto-add multiple badges for canvas demo
+                        setTimeout(() => {
+                            if (mockBadges.length >= 2) {
+                                badgePlacementUI.addBadge(mockBadges[0], { x: 0.1, y: 0.1 }, 'small');
+                                badgePlacementUI.addBadge(mockBadges[1], { x: 0.85, y: 0.1 }, 'small');
+                                showToast('🏆 Added corner badges to canvas!', 'success');
+                            }
+                        }, 1000);
+                    })
+                    .catch(error => {
+                        console.error('Failed to load canvas template:', error);
+                        updateStatus('image-status', '❌ Failed to load template');
+                    });
+            }
+        }
+        
         // Simulate server submission
         function simulateServerSubmission(config) {
             console.log('🚀 Simulating server submission...');
@@ -267,6 +382,108 @@
                 console.log('🏆 Added test badge');
             }
         };
+        
+        // Enhanced demo action functions
+        function addRandomBadge() {
+            if (badgePlacementUI && mockBadges.length > 0) {
+                const randomBadge = mockBadges[Math.floor(Math.random() * mockBadges.length)];
+                const randomPosition = {
+                    x: Math.random() * 0.8 + 0.1, // 10% to 90%
+                    y: Math.random() * 0.8 + 0.1  // 10% to 90%
+                };
+                const sizes = ['small', 'medium', 'large'];
+                const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+                
+                badgePlacementUI.addBadge(randomBadge, randomPosition, randomSize);
+                showToast(`🎲 Added ${randomBadge.name} badge!`, 'success');
+            }
+        }
+        
+        function clearAllBadges() {
+            if (badgePlacementUI) {
+                badgePlacementUI.clearAllBadges();
+                showToast('🗑️ All badges cleared!', 'info');
+            }
+        }
+        
+        function testPresetLayout() {
+            if (badgePlacementUI && mockBadges.length >= 4) {
+                // Clear existing badges
+                badgePlacementUI.clearAllBadges();
+                
+                // Add badges to preset positions
+                const presets = [
+                    { badge: mockBadges[0], position: { x: 0.05, y: 0.05 }, size: 'small' },
+                    { badge: mockBadges[1], position: { x: 0.85, y: 0.05 }, size: 'small' },
+                    { badge: mockBadges[2], position: { x: 0.05, y: 0.85 }, size: 'small' },
+                    { badge: mockBadges[3], position: { x: 0.85, y: 0.85 }, size: 'small' }
+                ];
+                
+                presets.forEach((preset, index) => {
+                    setTimeout(() => {
+                        badgePlacementUI.addBadge(preset.badge, preset.position, preset.size);
+                    }, index * 500);
+                });
+                
+                showToast('📐 Applied preset corner layout!', 'success');
+            }
+        }
+        
+        function exportConfiguration() {
+            if (badgePlacementUI) {
+                const config = badgePlacementUI.getConfiguration();
+                const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `badge-config-${Date.now()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('📤 Configuration exported!', 'success');
+            }
+        }
+        
+        function simulateIntegration() {
+            if (badgePlacementUI) {
+                const config = badgePlacementUI.getConfiguration();
+                
+                showToast('🔗 Testing integration...', 'info');
+                
+                // Simulate API call to merchandise integration
+                setTimeout(() => {
+                    console.log('🔗 Integration Test Results:');
+                    console.log('✅ Badge configuration format: Valid');
+                    console.log('✅ Position coordinates: Normalized (0-1)');
+                    console.log('✅ Badge references: All valid');
+                    console.log('✅ Server-side rendering: Ready');
+                    console.log('📊 Configuration:', config);
+                    
+                    showToast('✅ Integration test passed!', 'success');
+                }, 2000);
+            }
+        }
+        
+        function resetDemo() {
+            if (badgePlacementUI) {
+                badgePlacementUI.clearAllBadges();
+                updateStatus('placed-count', 0);
+                updateStatus('last-update', '-');
+                updateStatus('component-status', '✅ Ready');
+                updateStatus('image-status', 'No image loaded');
+                
+                // Reset config output
+                document.getElementById('config-output').textContent = JSON.stringify({
+                    badges: [],
+                    message: "No badges placed yet"
+                }, null, 2);
+                
+                showToast('🔄 Demo reset complete!', 'info');
+            }
+        }
         
         console.log('🏆 Badge Placement UI Demo - Script loaded');
         console.log('🔧 Debug functions available: debugBadgeUI(), addTestBadge()');

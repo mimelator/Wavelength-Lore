@@ -332,13 +332,24 @@ class BadgePlacementUI {
     try {
       console.log('🏆 Loading available badges...');
       
-      // Use existing badge service to get user's badges
-      const response = await fetch('/api/merchandise/badge-collection', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      // Try demo endpoint first, then fall back to authenticated endpoint
+      let response;
+      try {
+        response = await fetch('/merchandise/badge-collection-demo', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+      } catch (demoError) {
+        console.log('🔄 Demo endpoint failed, trying authenticated endpoint...');
+        response = await fetch('/api/merchandise/badge-collection', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+      }
       
       if (!response.ok) {
         throw new Error(`Failed to load badges: ${response.statusText}`);
@@ -449,18 +460,26 @@ class BadgePlacementUI {
   /**
    * Render badge loading error
    */
-  renderBadgeError() {
+  displayBadgeError() {
     const grid = document.getElementById('available-badges-grid');
     if (!grid) return;
     
     grid.innerHTML = `
       <div class="badge-error">
         <p>❌ Failed to load badges</p>
-        <button class="btn btn-secondary btn-sm" onclick="this.loadAvailableBadges()">
+        <button class="btn btn-secondary btn-sm" id="retry-load-badges">
           🔄 Retry
         </button>
       </div>
     `;
+    
+    // Bind retry button with proper context
+    const retryButton = document.getElementById('retry-load-badges');
+    if (retryButton) {
+      retryButton.addEventListener('click', () => {
+        this.loadAvailableBadges();
+      });
+    }
   }
   
   /**
@@ -779,29 +798,95 @@ class BadgePlacementUI {
   /**
    * Show final preview modal
    */
-  showFinalPreview() {
+  async showFinalPreview() {
+    console.log('🏆 Generating final preview with badges...');
+    console.log('📊 Selected badges:', this.selectedBadges.length);
+    
     // Create a temporary canvas for full resolution preview
     const previewCanvas = document.createElement('canvas');
     previewCanvas.width = 800;
     previewCanvas.height = 600;
     const previewCtx = previewCanvas.getContext('2d');
     
-    // Draw high-res version
+    // Draw high-res background image
     if (this.imageLoaded && this.previewImage) {
       previewCtx.drawImage(this.previewImage, 0, 0, previewCanvas.width, previewCanvas.height);
+      console.log('✅ Background image drawn');
+    } else {
+      // Fill with placeholder background
+      previewCtx.fillStyle = '#f0f0f0';
+      previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+      previewCtx.fillStyle = '#666';
+      previewCtx.font = '24px Arial';
+      previewCtx.textAlign = 'center';
+      previewCtx.fillText('No Background Image', previewCanvas.width / 2, previewCanvas.height / 2);
+      console.log('⚠️ No background image, using placeholder');
     }
     
-    // Draw badges at higher resolution
-    this.selectedBadges.forEach(badgeConfig => {
+    // Draw badges at higher resolution - ensure images are loaded
+    const badgePromises = this.selectedBadges.map(async (badgeConfig, index) => {
       const { badge, position, size } = badgeConfig;
       const x = position.x * previewCanvas.width;
       const y = position.y * previewCanvas.height;
       const badgeSize = this.badgeSizes[size] * previewCanvas.width;
       
-      if (badge.imageElement) {
-        previewCtx.drawImage(badge.imageElement, x, y, badgeSize, badgeSize);
+      console.log(`🏆 Processing badge ${index + 1}:`, badge.name, `at (${x.toFixed(0)}, ${y.toFixed(0)}) size ${badgeSize.toFixed(0)}px`);
+      
+      // Create or use existing image element
+      let imageElement = badge.imageElement;
+      
+      if (!imageElement || imageElement.src !== badge.image) {
+        console.log(`🔄 Loading image for badge: ${badge.name}`);
+        imageElement = new Image();
+        imageElement.crossOrigin = 'anonymous';
+        
+        // Wait for image to load
+        await new Promise((resolve, reject) => {
+          imageElement.onload = () => {
+            console.log(`✅ Badge image loaded: ${badge.name}`);
+            resolve();
+          };
+          imageElement.onerror = () => {
+            console.error(`❌ Failed to load badge image: ${badge.name}`);
+            reject(new Error(`Failed to load badge image: ${badge.name}`));
+          };
+          imageElement.src = badge.image;
+        });
+        
+        // Cache the loaded image
+        badge.imageElement = imageElement;
+      }
+      
+      // Draw the badge
+      try {
+        previewCtx.drawImage(imageElement, x, y, badgeSize, badgeSize);
+        console.log(`✅ Badge drawn: ${badge.name}`);
+        
+        // Add badge border for better visibility
+        previewCtx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+        previewCtx.lineWidth = 2;
+        previewCtx.strokeRect(x, y, badgeSize, badgeSize);
+        
+      } catch (error) {
+        console.error(`❌ Error drawing badge ${badge.name}:`, error);
+        
+        // Draw placeholder for failed badge
+        previewCtx.fillStyle = '#ff4444';
+        previewCtx.fillRect(x, y, badgeSize, badgeSize);
+        previewCtx.fillStyle = 'white';
+        previewCtx.font = '16px Arial';
+        previewCtx.textAlign = 'center';
+        previewCtx.fillText('❌', x + badgeSize/2, y + badgeSize/2);
       }
     });
+    
+    // Wait for all badges to be processed
+    try {
+      await Promise.all(badgePromises);
+      console.log('✅ All badges processed for final preview');
+    } catch (error) {
+      console.error('⚠️ Some badges failed to load:', error);
+    }
     
     // Show in modal
     const modalHtml = `
