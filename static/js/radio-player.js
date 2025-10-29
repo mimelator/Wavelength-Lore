@@ -880,16 +880,23 @@ class WavelengthRadio {
             btn.classList.toggle('active', btn.dataset.mode === mode);
         });
 
+        const shuffleBtn = document.getElementById('shuffleBtn');
         if (mode === 'random') {
             this.isShuffle = true;
-            document.getElementById('shuffleBtn').classList.add('active');
+            if (shuffleBtn) {
+                shuffleBtn.classList.add('active');
+            }
         } else if (mode === 'sequential') {
             this.isShuffle = false;
-            document.getElementById('shuffleBtn').classList.remove('active');
+            if (shuffleBtn) {
+                shuffleBtn.classList.remove('active');
+            }
         } else if (mode === 'loop') {
             // Loop through favorites
             this.isShuffle = false;
-            document.getElementById('shuffleBtn').classList.remove('active');
+            if (shuffleBtn) {
+                shuffleBtn.classList.remove('active');
+            }
 
             // Check if there are favorites
             if (this.favorites.length === 0) {
