@@ -4948,4 +4948,198 @@ router.get('/api/admin/support/tickets', ensureAuthenticated, groupAuth.requireA
   }
 });
 
+// 🏆 BADGE-EXCLUSIVE MERCHANDISE ROUTES - THE ULTIMATE NPC QUEST PAYOFF!
+
+/**
+ * GET /api/merchandise/badge-collection
+ * Get user's badge collection and exclusive merchandise dashboard
+ * 🏆 REVOLUTIONARY: Show user their NPC Quest achievements and unlocked exclusive merch
+ */
+router.get('/badge-collection', ensureAuthenticated, async (req, res) => {
+  try {
+    const BadgeMerchandiseIntegrationService = require('../services/badge-merchandise-integration');
+    const badgeService = new BadgeMerchandiseIntegrationService();
+    
+    console.log('🏆 Loading badge collection dashboard for user:', req.user.uid);
+    
+    const dashboard = await badgeService.getBadgeCollectionDashboard(req.user.uid);
+    
+    if (!dashboard.success) {
+      return res.status(500).json({
+        success: false,
+        error: dashboard.error
+      });
+    }
+    
+    console.log(`✅ Badge dashboard loaded: ${dashboard.stats.totalBadgesEarned} badges, ${dashboard.stats.exclusiveDesignsUnlocked} exclusive designs`);
+    
+    res.json({
+      success: true,
+      dashboard: dashboard
+    });
+    
+  } catch (error) {
+    console.error('❌ Error loading badge collection:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load badge collection'
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/badge-exclusives
+ * Get badge-exclusive merchandise available to the user
+ * 🎯 GAME-CHANGER: Only show merchandise that user can access via earned badges
+ */
+router.get('/badge-exclusives', ensureAuthenticated, async (req, res) => {
+  try {
+    const BadgeMerchandiseIntegrationService = require('../services/badge-merchandise-integration');
+    const badgeService = new BadgeMerchandiseIntegrationService();
+    
+    console.log('🛍️ Loading badge-exclusive merchandise for user:', req.user.uid);
+    
+    const exclusiveMerch = await badgeService.getBadgeExclusiveMerchandise(req.user.uid);
+    
+    console.log(`✅ Found ${exclusiveMerch.length} badge-exclusive merchandise items`);
+    
+    res.json({
+      success: true,
+      exclusiveMerchandise: exclusiveMerch,
+      count: exclusiveMerch.length,
+      categories: [...new Set(exclusiveMerch.map(item => item.exclusiveInfo.character))]
+    });
+    
+  } catch (error) {
+    console.error('❌ Error loading badge-exclusive merchandise:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load badge-exclusive merchandise'
+    });
+  }
+});
+
+/**
+ * POST /api/merchandise/check-badge-access
+ * Check if user has badge access to a specific design
+ * 🔑 GATEKEEPER: Verify badge ownership before allowing exclusive purchase
+ */
+router.post('/check-badge-access', ensureAuthenticated, async (req, res) => {
+  try {
+    const { designId } = req.body;
+    
+    if (!designId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Design ID is required'
+      });
+    }
+    
+    const BadgeMerchandiseIntegrationService = require('../services/badge-merchandise-integration');
+    const badgeService = new BadgeMerchandiseIntegrationService();
+    
+    console.log(`🔑 Checking badge access for user ${req.user.uid}, design ${designId}`);
+    
+    const accessCheck = await badgeService.checkBadgeAccess(req.user.uid, designId);
+    
+    console.log(`   Access result: ${accessCheck.hasAccess ? 'GRANTED' : 'DENIED'} (${accessCheck.reason})`);
+    
+    res.json({
+      success: true,
+      access: accessCheck
+    });
+    
+  } catch (error) {
+    console.error('❌ Error checking badge access:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to check badge access'
+    });
+  }
+});
+
+/**
+ * POST /api/merchandise/award-test-badge
+ * Award a test badge to user (development/demo only)
+ * 🧪 TESTING: Allow awarding badges to test the integration
+ */
+router.post('/award-test-badge', ensureAuthenticated, async (req, res) => {
+  try {
+    // Only allow in development mode
+    if (process.env.NODE_ENV !== 'development') {
+      return res.status(403).json({
+        success: false,
+        error: 'Badge awarding only available in development mode'
+      });
+    }
+    
+    const { badgeId } = req.body;
+    
+    if (!badgeId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Badge ID is required'
+      });
+    }
+    
+    const BadgeMerchandiseIntegrationService = require('../services/badge-merchandise-integration');
+    const badgeService = new BadgeMerchandiseIntegrationService();
+    
+    console.log(`🧪 TEST: Awarding badge ${badgeId} to user ${req.user.uid}`);
+    
+    const awardResult = await badgeService.awardBadge(req.user.uid, badgeId);
+    
+    if (!awardResult.success) {
+      return res.status(400).json(awardResult);
+    }
+    
+    console.log(`✅ TEST: Badge awarded successfully, unlocked ${awardResult.merchUnlocked} merchandise items`);
+    
+    res.json({
+      success: true,
+      badge: awardResult.badge,
+      merchUnlocked: awardResult.merchUnlocked,
+      message: awardResult.message
+    });
+    
+  } catch (error) {
+    console.error('❌ Error awarding test badge:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to award test badge'
+    });
+  }
+});
+
+/**
+ * GET /api/merchandise/badge-integration-status
+ * Check the status of badge-merchandise integration
+ * 🔍 DIAGNOSTICS: Verify integration is working properly
+ */
+router.get('/badge-integration-status', async (req, res) => {
+  try {
+    const BadgeMerchandiseIntegrationService = require('../services/badge-merchandise-integration');
+    const badgeService = new BadgeMerchandiseIntegrationService();
+    
+    console.log('🔍 Validating badge-merchandise integration...');
+    
+    const validation = await badgeService.validateIntegration();
+    
+    console.log(`Integration validation: ${validation.success ? 'PASSED' : 'FAILED'}`);
+    
+    res.json({
+      success: true,
+      integration: validation,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('❌ Error checking integration status:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to check integration status'
+    });
+  }
+});
+
 module.exports = router;
