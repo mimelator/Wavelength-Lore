@@ -143,6 +143,11 @@ document.addEventListener('DOMContentLoaded', () => {
         '.button img',
         '.thumbnail img',
         '.profile-picture img',
+        
+        // Radio player character badges - disable Save to Gallery overlay
+        '.character-badge',
+        '#characterBadges img',
+        '.radio-container .character-badge',
 
         // Screensaver images - don't add save buttons to screensaver gallery (shared and radio screensaver)
         '#screensaverOverlay img',
