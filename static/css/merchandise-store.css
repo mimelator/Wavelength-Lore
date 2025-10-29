@@ -4937,9 +4937,156 @@
 }
 
 .tour-content p {
-  margin: 0;
+  margin: 0 0 15px 0;
   line-height: 1.6;
   color: #cccccc;
+}
+
+/* Tour Preview Content */
+.tour-preview-content {
+  margin-top: 15px;
+}
+
+.preview-categories {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.preview-category-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.preview-category-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(0, 212, 255, 0.4);
+}
+
+.preview-category-card .category-icon {
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+}
+
+.preview-category-card h4 {
+  margin: 5px 0 3px 0;
+  font-size: 0.9rem;
+  color: #00d4ff;
+}
+
+.preview-category-card p {
+  margin: 0 0 5px 0;
+  font-size: 0.75rem;
+  color: #aaa;
+  line-height: 1.2;
+}
+
+.preview-count {
+  font-size: 0.7rem;
+  color: #888;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.preview-products {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.preview-product-card {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px;
+  gap: 10px;
+}
+
+.preview-image {
+  font-size: 2rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.preview-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.preview-details h4 {
+  margin: 0 0 2px 0;
+  font-size: 0.85rem;
+  color: #00d4ff;
+}
+
+.preview-details p {
+  margin: 0 0 4px 0;
+  font-size: 0.7rem;
+  color: #aaa;
+  line-height: 1.2;
+}
+
+.preview-price {
+  font-size: 0.8rem;
+  color: #00ff88;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.preview-btn {
+  font-size: 0.65rem;
+  padding: 3px 8px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  transition: all 0.3s ease;
+}
+
+.preview-btn.primary {
+  background: rgba(0, 212, 255, 0.3);
+  color: #00d4ff;
+}
+
+.preview-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.preview-btn.primary:hover {
+  background: rgba(0, 212, 255, 0.5);
+}
+
+.preview-note {
+  font-size: 0.75rem;
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  margin: 8px 0 0 0 !important;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border-left: 3px solid rgba(0, 212, 255, 0.4);
 }
 
 .tour-actions {

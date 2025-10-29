@@ -5,6 +5,34 @@
  * REFACTORED: Now uses MerchandiseApiService for all API operations
  */
 
+// IMMEDIATE TEST: Set global marker to verify file loading
+if (typeof window !== 'undefined') {
+  window.MERCHANDISE_STORE_LOADED = true;
+  console.log('🌊 MERCHANDISE STORE JS FILE LOADED!');
+  
+  // IMMEDIATE FUNCTION: Available as soon as file loads
+  window.checkMerchandiseStore = function() {
+    console.log('🌊 MERCHANDISE STORE AVAILABILITY CHECK');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('- File loaded:', !!window.MERCHANDISE_STORE_LOADED);
+    console.log('- Global store available:', !!window.merchandiseStore);
+    console.log('- Store constructor available:', !!window.MerchandiseStore);
+    
+    if (window.merchandiseStore) {
+      console.log('- Store initialized:', window.merchandiseStore.isInitialized);
+      console.log('- resetTourState method:', typeof window.merchandiseStore.resetTourState);
+      console.log('- startGuidedTour method:', typeof window.merchandiseStore.startGuidedTour);
+      console.log('✅ Store is ready for tour commands!');
+      return true;
+    } else {
+      console.log('❌ Store not yet available. Try refreshing the page or waiting for initialization.');
+      return false;
+    }
+  };
+  
+  console.log('🌊 checkMerchandiseStore() function loaded and ready!');
+}
+
 class MerchandiseStore {
   constructor() {
     // UI State
@@ -70,10 +98,31 @@ class MerchandiseStore {
     
     console.log('🔓 Liberation Vault - MerchandiseStore constructor called with refactored services');
     
+    // Make globally accessible immediately upon construction
+    if (typeof window !== 'undefined') {
+      window.merchandiseStore = this;
+      console.log('🌊 Global merchandiseStore reference set');
+    }
+    
     // Add a simple health check
     this.healthCheck();
     
     this.init();
+  }
+  
+  /**
+   * Reset tour state for testing purposes
+   */
+  resetTourState() {
+    // Clear all tour-related localStorage items
+    localStorage.removeItem('liberation_vault_entered');
+    localStorage.removeItem('liberation_vault_tour_completed');
+    
+    // Reset internal state
+    this.hasEnteredVault = false;
+    
+    console.log('🌊 Liberation Vault tour state reset - user will see welcome screen on next visit');
+    return true;
   }
   
   /**
@@ -1399,16 +1448,17 @@ class MerchandiseStore {
       },
       {
         title: "Choose Your Product Category",
-        content: "Once you select an image, you'll see product categories: Field Uniforms (clothing), Signal Gear (tech), Archived Relics (collectibles), and The Crest Pack (small items).",
+        content: "Once you select an image, you'll see product categories like these:",
         target: "#choose-product-section",
         placement: "top",
-        requiresImage: true
+        dynamicContent: this.renderCategoryPreview()
       },
       {
         title: "Your Designed Products",
-        content: "Products you create appear here. You can preview, edit, delete, or add them to your cart. Each purchase fuels the signal that helps others find their way out.",
-        target: ".products-grid",
-        placement: "top"
+        content: "Products you create appear here. You'll see preview cards with options to customize, add to cart, or manage your designs:",
+        target: ".store-section:nth-child(3)",
+        placement: "top",
+        dynamicContent: this.renderProductPreview()
       },
       {
         title: "Complete Your Mission",
@@ -1422,19 +1472,18 @@ class MerchandiseStore {
   }
   
   showTourStep(stepIndex) {
+    console.log(`🌊 Showing tour step ${stepIndex} of ${this.tourSteps.length - 1} (total: ${this.tourSteps.length})`);
+    
     if (stepIndex >= this.tourSteps.length) {
+      console.log(`✅ Tour complete! Step ${stepIndex} >= ${this.tourSteps.length}`);
       this.completeTour();
       return;
     }
     
     const step = this.tourSteps[stepIndex];
+    console.log(`🎯 Step ${stepIndex}: ${step.title}`);
     
-    // Skip steps that require conditions if not met
-    if (step.requiresImage && !this.selectedImage) {
-      console.log(`⏭️ Skipping step ${stepIndex} - requires image selection`);
-      this.showTourStep(stepIndex + 1);
-      return;
-    }
+    // Note: We no longer skip steps - dynamic content shows what they'll look like
     
     // Remove existing tour overlay
     this.removeTourOverlay();
@@ -1454,6 +1503,7 @@ class MerchandiseStore {
         </div>
         <div class="tour-content">
           <p>${step.content}</p>
+          ${step.dynamicContent ? step.dynamicContent : ''}
         </div>
         <div class="tour-actions">
           <button class="tour-btn tour-skip" onclick="window.merchandiseStore.skipTour()">Skip Tour</button>
@@ -1483,12 +1533,42 @@ class MerchandiseStore {
     const spotlight = document.getElementById('tour-spotlight');
     
     if (!target || !tooltip) {
-      console.warn('Tour target or tooltip not found:', targetSelector);
+      console.warn('🌊 Tour target not found, using fallback positioning:', targetSelector);
+      // Fallback: center the tooltip safely within viewport
+      if (tooltip) {
+        const tooltipRect = tooltip.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // Center horizontally, but ensure it fits
+        let left = Math.max(20, (viewportWidth - tooltipRect.width) / 2);
+        let top = Math.max(20, (viewportHeight - tooltipRect.height) / 2);
+        
+        // Ensure tooltip doesn't go off bottom of screen
+        if (top + tooltipRect.height > viewportHeight - 20) {
+          top = viewportHeight - tooltipRect.height - 20;
+        }
+        
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
+        tooltip.style.transform = '';
+        tooltip.style.position = 'fixed';
+        tooltip.style.zIndex = '10001';
+      }
+      if (spotlight) {
+        spotlight.style.display = 'none';
+      }
       return;
     }
     
     const targetRect = target.getBoundingClientRect();
     const tooltipRect = tooltip.getBoundingClientRect();
+    
+    // Reset any fallback positioning
+    tooltip.style.transform = '';
+    if (spotlight) {
+      spotlight.style.display = 'block';
+    }
     
     // Position spotlight on target
     spotlight.style.left = `${targetRect.left - 10}px`;
@@ -1530,6 +1610,7 @@ class MerchandiseStore {
   }
   
   nextTourStep() {
+    console.log(`🌊 Next tour step requested: ${this.currentTourStep} -> ${this.currentTourStep + 1}`);
     this.showTourStep(this.currentTourStep + 1);
   }
   
@@ -1605,6 +1686,74 @@ class MerchandiseStore {
     }
   }
   
+  renderCategoryPreview() {
+    return `
+      <div class="tour-preview-content">
+        <div class="preview-categories">
+          <div class="preview-category-card">
+            <div class="category-icon">👕</div>
+            <h4>Field Uniforms</h4>
+            <p>T-shirts, hoodies, tank tops</p>
+            <span class="preview-count">12 products</span>
+          </div>
+          <div class="preview-category-card">
+            <div class="category-icon">📡</div>
+            <h4>Signal Gear</h4>
+            <p>Mugs, phone cases, stickers</p>
+            <span class="preview-count">8 products</span>
+          </div>
+          <div class="preview-category-card">
+            <div class="category-icon">🗂️</div>
+            <h4>Archived Relics</h4>
+            <p>Posters, canvas prints</p>
+            <span class="preview-count">6 products</span>
+          </div>
+          <div class="preview-category-card">
+            <div class="category-icon">✨</div>
+            <h4>The Crest Pack</h4>
+            <p>Pins, magnets, keychains</p>
+            <span class="preview-count">4 products</span>
+          </div>
+        </div>
+        <p class="preview-note">💡 These categories appear once you select a gallery image above</p>
+      </div>
+    `;
+  }
+  
+  renderProductPreview() {
+    return `
+      <div class="tour-preview-content">
+        <div class="preview-products">
+          <div class="preview-product-card">
+            <div class="preview-image">🖼️</div>
+            <div class="preview-details">
+              <h4>Custom T-Shirt</h4>
+              <p>Your Image • Unisex • Size M</p>
+              <div class="preview-price">$24.99</div>
+              <div class="preview-actions">
+                <button class="preview-btn">Preview</button>
+                <button class="preview-btn primary">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="preview-product-card">
+            <div class="preview-image">☕</div>
+            <div class="preview-details">
+              <h4>Liberation Mug</h4>
+              <p>Your Image • Ceramic • 11oz</p>
+              <div class="preview-price">$16.99</div>
+              <div class="preview-actions">
+                <button class="preview-btn">Preview</button>
+                <button class="preview-btn primary">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="preview-note">💡 Your custom products will appear here after creation</p>
+      </div>
+    `;
+  }
+
   // Developer utility to reset tour state for testing
   resetTourState() {
     localStorage.removeItem('wavelength_vault_entered');
@@ -5473,6 +5622,8 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = MerchandiseStore;
 }
 
+
+
 // Make available in browser global scope
 if (typeof window !== 'undefined') {
   window.MerchandiseStore = MerchandiseStore;
@@ -5609,6 +5760,7 @@ if (typeof window !== 'undefined') {
   // Add helpful console message
   console.log('🌊 WAVELENGTH DIAGNOSTICS LOADED');
   console.log('🔍 Use these functions in console:');
+  console.log('• checkMerchandiseStore() - Check store availability');
   console.log('• wavelengthStoreDiagnostics() - Store status');
   console.log('• wavelengthCartDiagnostics() - Cart status');  
   console.log('• wavelengthFullDiagnostics() - Complete system scan');
