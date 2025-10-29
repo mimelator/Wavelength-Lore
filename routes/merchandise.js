@@ -1607,6 +1607,8 @@ router.post('/confirm-payment', ensureAuthenticated, async (req, res) => {
     const { paymentIntentId, items, shippingAddress } = req.body;
     
     console.log('✅ Confirming payment and creating order');
+    console.log('📦 Items received:', JSON.stringify(items, null, 2));
+    console.log('📮 Shipping address:', JSON.stringify(shippingAddress, null, 2));
     
     // Confirm payment with Stripe
     const paymentResult = await stripePaymentService.confirmPayment(paymentIntentId);

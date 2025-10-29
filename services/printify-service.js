@@ -701,6 +701,19 @@ class PrintifyService {
    */
   async createOrder(lineItems, shippingAddress, orderOptions = {}) {
     try {
+      // Mock response for development/testing
+      if (PrintifyConfig.development.mockResponses) {
+        console.log('🎭 Using mock response for Printify order creation');
+        return {
+          success: true,
+          orderId: `MOCK_ORDER_${Date.now()}`,
+          status: 'draft',
+          total: 2099, // $20.99 in cents
+          lineItems: lineItems,
+          shippingCost: 499, // $4.99
+          totalCost: 2598 // $25.98
+        };
+      }
       const orderData = {
         external_id: orderOptions.externalId || `WL_${Date.now()}`,
         line_items: lineItems,
