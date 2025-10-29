@@ -131,6 +131,11 @@ document.addEventListener('DOMContentLoaded', () => {
         '.grid-item img',
         '.index-card img',
 
+        // CTA (call-to-action) sections with navigation images
+        '.next-episode-cta img',
+        '.character-cta img',
+        '.lore-cta img',
+
         // UI elements that shouldn't have save buttons
         '.icon img',
         '.logo img',
