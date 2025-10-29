@@ -702,6 +702,33 @@
   max-width: 900px;
   max-height: 90vh;
   overflow-y: auto;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #fff;
+}
+
+/* Checkout modal header styling */
+.checkout-modal .modal-header {
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.checkout-modal .modal-header h3 {
+  color: #fff;
+}
+
+/* Checkout modal body */
+.checkout-modal .modal-body {
+  background: transparent;
+  color: #fff;
+}
+
+/* Checkout modal close button */
+.checkout-modal .modal-close-btn {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.checkout-modal .modal-close-btn:hover {
+  color: #fff;
 }
 
 .checkout-container {
@@ -951,6 +978,7 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 20px;
   margin-top: 20px;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .back-to-cart-btn {
