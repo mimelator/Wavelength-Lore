@@ -25,11 +25,14 @@ class ImageCapturer {
     
     this.captureButtons = [];      // Track buttons added to the page
     this.enabled = false;          // Is the capturer enabled
-    
+    this.processPageTimeout = null; // Debounce timer for processPage
+    this.debounceDelay = 500;      // Wait 500ms before reprocessing
+
     // Bind methods
     this.enable = this.enable.bind(this);
     this.disable = this.disable.bind(this);
     this.processPage = this.processPage.bind(this);
+    this.debouncedProcessPage = this.debouncedProcessPage.bind(this);
     this.addCaptureButtonToImage = this.addCaptureButtonToImage.bind(this);
     this.handleCaptureClick = this.handleCaptureClick.bind(this);
     this.handleMouseEnter = this.handleMouseEnter.bind(this);
@@ -58,7 +61,8 @@ class ImageCapturer {
         }
       }
       if (shouldProcess) {
-        this.processPage();
+        // Use debounced version to prevent rapid reprocessing
+        this.debouncedProcessPage();
       }
     });
     
@@ -77,19 +81,42 @@ class ImageCapturer {
   disable() {
     if (!this.enabled) return;
     this.enabled = false;
-    
+
+    // Clear any pending debounce timeout
+    if (this.processPageTimeout) {
+      clearTimeout(this.processPageTimeout);
+      this.processPageTimeout = null;
+    }
+
     // Stop the observer
     if (this.observer) {
       this.observer.disconnect();
       this.observer = null;
     }
-    
+
     // Remove all buttons
     this.cleanupButtons();
-    
+
     console.log('❌ Image Capturer: Disabled');
   }
-  
+
+  /**
+   * Debounced version of processPage to prevent rapid reprocessing
+   * Waits for mutations to settle before reprocessing
+   */
+  debouncedProcessPage() {
+    // Clear any existing timeout
+    if (this.processPageTimeout) {
+      clearTimeout(this.processPageTimeout);
+    }
+
+    // Set a new timeout to process the page after the debounce delay
+    this.processPageTimeout = setTimeout(() => {
+      this.processPage();
+      this.processPageTimeout = null;
+    }, this.debounceDelay);
+  }
+
   /**
    * Process the page to find images and add capture buttons
    */
