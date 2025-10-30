@@ -1718,7 +1718,16 @@ router.post('/confirm-payment', ensureAuthenticated, async (req, res) => {
     console.log('🖨️ Creating Printify order with items:', JSON.stringify(items, null, 2));
     console.log('📍 Shipping address for Printify:', JSON.stringify(shippingAddress, null, 2));
     
-    const printifyOrder = await printifyService.createOrder(items, shippingAddress);
+    // 🔧 CRITICAL FIX: Transform cart items to Printify line items format
+    const printifyLineItems = items.map(item => ({
+      product_id: item.productId || item.product_id || item.id,
+      variant_id: parseInt(item.variantId || item.variant_id),
+      quantity: parseInt(item.quantity) || 1
+    }));
+    
+    console.log('🔄 Transformed line items for Printify:', JSON.stringify(printifyLineItems, null, 2));
+    
+    const printifyOrder = await printifyService.createOrder(printifyLineItems, shippingAddress);
     
     console.log('🖨️ Printify order result:', JSON.stringify(printifyOrder, null, 2));
     
