@@ -2168,8 +2168,9 @@ class MerchandiseStore {
       
       console.log('✅ Merchandise store rendered successfully');
       
-      // Initialize event listeners (prevent duplicates with flag)
+      // Initialize event listeners (reset flag to ensure re-initialization after DOM changes)
       setTimeout(() => {
+        this.resetEventListeners(); // Reset flag to allow re-initialization
         this.initializeEventListeners();
       }, 100); // Brief delay to ensure DOM is updated
       
