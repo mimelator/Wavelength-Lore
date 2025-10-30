@@ -285,11 +285,14 @@ router.get('/gallery-images', ensureAuthenticated, async (req, res) => {
       const { getUserBookmarks } = require('../services/firebase/galleryService');
       const bookmarks = await getUserBookmarks(userId);
     
+      // 🔧 CRITICAL FIX: Transform any localhost URLs to production CDN URLs
+      const cdnUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' ? 'https://df5sj8f594cdx.cloudfront.net' : 'http://localhost:3001');
+
       // Format S3 images for merchandise
       const merchandiseS3Images = s3Images.map(image => ({
         id: image.relativePath,
-        url: image.url,
-        thumbnailUrl: image.url,
+        url: image.url ? image.url.replace(/http:\/\/localhost:\d+/, cdnUrl) : image.url,
+        thumbnailUrl: image.url ? image.url.replace(/http:\/\/localhost:\d+/, cdnUrl) : image.url,
         title: image.originalName || image.fileName,
         size: image.size,
         dimensions: image.dimensions,
@@ -302,8 +305,8 @@ router.get('/gallery-images', ensureAuthenticated, async (req, res) => {
       // Format bookmarks for merchandise
       const merchandiseBookmarks = bookmarks.map(bookmark => ({
         id: bookmark.bookmarkId,
-        url: bookmark.url,
-        thumbnailUrl: bookmark.url,
+        url: bookmark.url ? bookmark.url.replace(/http:\/\/localhost:\d+/, cdnUrl) : bookmark.url,
+        thumbnailUrl: bookmark.url ? bookmark.url.replace(/http:\/\/localhost:\d+/, cdnUrl) : bookmark.url,
         title: bookmark.title || bookmark.fileName,
         size: 0, // Bookmarks don't track size
         dimensions: null, // Unknown for bookmarks
@@ -970,9 +973,30 @@ router.get('/products', ensureAuthenticated, async (req, res) => {
     const userId = req.user.uid;
     const userProducts = await merchandiseDB.getUserProducts(userId);
     
+    // 🔧 CRITICAL FIX: Transform any localhost URLs to production CDN URLs
+    const cdnUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' ? 'https://df5sj8f594cdx.cloudfront.net' : 'http://localhost:3001');
+    const transformedProducts = userProducts.map(product => {
+      const transformedProduct = { ...product };
+      
+      // Fix sourceImage URLs
+      if (transformedProduct.sourceImage && transformedProduct.sourceImage.url) {
+        transformedProduct.sourceImage.url = transformedProduct.sourceImage.url.replace(/http:\/\/localhost:\d+/, cdnUrl);
+      }
+      
+      // Fix any other image URLs in the product
+      if (transformedProduct.images && Array.isArray(transformedProduct.images)) {
+        transformedProduct.images = transformedProduct.images.map(img => ({
+          ...img,
+          src: img.src ? img.src.replace(/http:\/\/localhost:\d+/, cdnUrl) : img.src
+        }));
+      }
+      
+      return transformedProduct;
+    });
+    
     res.json({
       success: true,
-      products: userProducts
+      products: transformedProducts
     });
     
   } catch (error) {
@@ -1103,11 +1127,18 @@ router.get('/vendor-preview/:productId', async (req, res) => {
     
     console.log(`   ✅ Printify product data retrieved successfully`);
     
+    // 🔧 CRITICAL FIX: Transform any localhost URLs to production CDN URLs
+    const cdnUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' ? 'https://df5sj8f594cdx.cloudfront.net' : 'http://localhost:3001');
+    const transformedSourceImage = productSource.sourceImage ? {
+      ...productSource.sourceImage,
+      url: productSource.sourceImage.url ? productSource.sourceImage.url.replace(/http:\/\/localhost:\d+/, cdnUrl) : productSource.sourceImage.url
+    } : productSource.sourceImage;
+
     res.json({
       success: true,
       product: {
         ...productResult.product,
-        sourceImage: productSource.sourceImage,
+        sourceImage: transformedSourceImage,
         isVendorPreview: true,
         dataSource: 'vendor-preview',
         // Add vendor preview metadata
@@ -1240,11 +1271,18 @@ router.get('/product/:productId', ensureAuthenticated, async (req, res) => {
     
     console.log(`   ✅ Printify product data retrieved successfully`);
     
+    // 🔧 CRITICAL FIX: Transform any localhost URLs to production CDN URLs
+    const cdnUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' ? 'https://df5sj8f594cdx.cloudfront.net' : 'http://localhost:3001');
+    const transformedSourceImage = productSource.sourceImage ? {
+      ...productSource.sourceImage,
+      url: productSource.sourceImage.url ? productSource.sourceImage.url.replace(/http:\/\/localhost:\d+/, cdnUrl) : productSource.sourceImage.url
+    } : productSource.sourceImage;
+
     res.json({
       success: true,
       product: {
         ...productResult.product,
-        sourceImage: productSource.sourceImage,
+        sourceImage: transformedSourceImage,
         isVendorPreview: lookupResult.isVendorPreview,
         dataSource: lookupResult.source
       }
