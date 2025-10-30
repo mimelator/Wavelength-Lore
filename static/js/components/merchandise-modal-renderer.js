@@ -2962,6 +2962,78 @@ class MerchandiseModalRenderer {
   }
 
   /**
+   * Show variant status message in the UI
+   * @param {string} elementId - Target element ID for the message
+   * @param {string} message - Message to display
+   * @param {string} type - Message type ('success', 'warning', 'error')
+   */
+  showVariantStatusMessage(elementId, message, type = 'info') {
+    // Find the status element by ID or create one
+    let statusElement = document.getElementById(elementId);
+    
+    if (!statusElement) {
+      // If no specific element found, try to find a general status area
+      statusElement = document.querySelector('.variant-status, .status-message, .preview-status');
+    }
+    
+    if (!statusElement) {
+      // Create a temporary status element if none exists
+      statusElement = document.createElement('div');
+      statusElement.className = 'variant-status-message';
+      statusElement.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 6px;
+        z-index: 10000;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        max-width: 300px;
+      `;
+      document.body.appendChild(statusElement);
+      
+      // Auto-remove after 3 seconds
+      setTimeout(() => {
+        if (statusElement && statusElement.parentNode) {
+          statusElement.parentNode.removeChild(statusElement);
+        }
+      }, 3000);
+    }
+    
+    // Set message and styling based on type
+    statusElement.textContent = message;
+    statusElement.className = `variant-status-message ${type}`;
+    
+    // Apply type-specific styling
+    switch (type) {
+      case 'success':
+        statusElement.style.backgroundColor = '#d4edda';
+        statusElement.style.color = '#155724';
+        statusElement.style.border = '1px solid #c3e6cb';
+        break;
+      case 'warning':
+        statusElement.style.backgroundColor = '#fff3cd';
+        statusElement.style.color = '#856404';
+        statusElement.style.border = '1px solid #ffeaa7';
+        break;
+      case 'error':
+        statusElement.style.backgroundColor = '#f8d7da';
+        statusElement.style.color = '#721c24';
+        statusElement.style.border = '1px solid #f5c6cb';
+        break;
+      default:
+        statusElement.style.backgroundColor = '#d1ecf1';
+        statusElement.style.color = '#0c5460';
+        statusElement.style.border = '1px solid #bee5eb';
+    }
+    
+    if (this.debugMode) {
+      this.debugLog(`Status message: ${message}`, type, { elementId, type });
+    }
+  }
+
+  /**
    * Handle add to cart from fullscreen customization modal
    * Gathers all customization options and adds to cart
    * @param {string} productId - Product ID
