@@ -646,6 +646,7 @@ class MerchandiseStore {
       // Check for pre-selected image from URL parameters
       const urlParams = new URLSearchParams(window.location.search);
       const preselectImageId = urlParams.get('preselect') || urlParams.get('imageId');
+      const preselectCategoryId = urlParams.get('category');
       
       // Check enhancement capabilities
       console.log('🔍 Loading enhancement status...');
@@ -715,6 +716,10 @@ class MerchandiseStore {
             console.error('❌ Error initializing product navigator for pre-selected image:', error);
           }
         }, 500);
+      }
+
+      if (preselectCategoryId) {
+        this.showCategoryProducts(preselectCategoryId, false);
       }
       
       console.log('🎉 The Liberation Vault is now open!');
@@ -4902,17 +4907,22 @@ class MerchandiseStore {
       url.searchParams.delete('imageId');
       window.history.replaceState({}, '', url);
       
+      const urlParams = new URLSearchParams(window.location.search);
+      const preselectCategoryId = urlParams.get('category');
+
       // Auto-scroll to the Choose Product section for better UX
-      setTimeout(() => {
-        const chooseProductSection = document.getElementById('choose-product-section');
-        if (chooseProductSection) {
-          chooseProductSection.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-          });
-          console.log('📍 Auto-scrolled to Choose Product section');
-        }
-      }, 800); // Delay to ensure DOM updates and previous scrolling completes
+      if (!preselectCategoryId) {
+        setTimeout(() => {
+          const chooseProductSection = document.getElementById('choose-product-section');
+          if (chooseProductSection) {
+            chooseProductSection.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'start' 
+            });
+            console.log('📍 Auto-scrolled to Choose Product section');
+          }
+        }, 800); // Delay to ensure DOM updates and previous scrolling completes
+      }
     } else {
       console.warn('Pre-select image not found:', imageId);
     }
