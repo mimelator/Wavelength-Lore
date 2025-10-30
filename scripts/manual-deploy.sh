@@ -65,17 +65,36 @@ echo ""
 echo "📋 Step 2: Generating Version Information..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# Get current version from package.json
+# Get current version from package.json and increment patch version
 CURRENT_VERSION=$(node -p "require('./package.json').version")
+NEW_VERSION=$(node -p "
+  const ver = require('./package.json').version.split('.');
+  ver[2] = parseInt(ver[2]) + 1;
+  ver.join('.');
+")
+
 COMMIT_HASH=$(git rev-parse HEAD)
 COMMIT_SHORT=$(git rev-parse --short HEAD)
 BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 BUILD_NUMBER="manual-$(date +%s)"
 
-echo "📦 Version: $CURRENT_VERSION"
-echo "🔗 Commit: $COMMIT_SHORT ($COMMIT_HASH)"
+echo "📦 Old Version: $CURRENT_VERSION"
+echo "� New Version: $NEW_VERSION"
+echo "�🔗 Commit: $COMMIT_SHORT ($COMMIT_HASH)"
 echo "📅 Build Date: $BUILD_DATE"
 echo "🔢 Build Number: $BUILD_NUMBER"
+
+# Update package.json with new version
+echo "🔄 Updating package.json version..."
+node -e "
+  const fs = require('fs');
+  const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  pkg.version = '$NEW_VERSION';
+  fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+"
+
+# Use the new version for the rest of the script
+CURRENT_VERSION=$NEW_VERSION
 
 # Update version.json
 cat > version.json << EOF

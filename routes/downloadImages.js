@@ -55,8 +55,8 @@ router.post('/api/download/images', async (req, res) => {
       
       // Convert relative URLs to absolute URLs
       if (url.startsWith('/')) {
-        // Use CDN_URL if available, otherwise construct from localhost
-        const baseUrl = process.env.CDN_URL || 'http://localhost:3001';
+        // Use CDN_URL if available, otherwise use production-safe CDN or localhost for dev
+        const baseUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' ? 'https://df5sj8f594cdx.cloudfront.net' : 'http://localhost:3001');
         url = baseUrl + url;
       }
       

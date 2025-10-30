@@ -1920,8 +1920,8 @@ async function downloadImageFromS3(imageUrl) {
     // Convert to absolute URL using CDN_URL environment variable
     let fullUrl = imageUrl;
     if (imageUrl.startsWith('/')) {
-      // Use production-safe CDN URL - defaults to current domain instead of localhost
-      const cdnUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001');
+      // Use production-safe CDN URL - defaults to CloudFront CDN instead of localhost
+      const cdnUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' ? 'https://df5sj8f594cdx.cloudfront.net' : 'http://localhost:3001');
       fullUrl = `${cdnUrl}${imageUrl}`;
     }
 
@@ -4299,7 +4299,8 @@ router.post('/openai-upscaler/apply-effects', ensureAuthenticated, groupAuth.req
 
     // Handle relative URLs
     if (upscaledImageUrl.startsWith('/')) {
-      imageUrl = `http://localhost:${process.env.PORT || 3001}${upscaledImageUrl}`;
+      const cdnUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' ? 'https://df5sj8f594cdx.cloudfront.net' : `http://localhost:${process.env.PORT || 3001}`);
+      imageUrl = `${cdnUrl}${upscaledImageUrl}`;
     }
 
     console.log(`📥 Downloading image from: ${imageUrl}`);

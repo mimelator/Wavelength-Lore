@@ -1,6 +1,6 @@
 {
   "name": "wavelength-lore",
-  "version": "1.1.52",
+  "version": "1.1.56",
   "description": "The Lore Site for the Wavelength Canon",
   "main": "index.js",
   "scripts": {
@@ -22,6 +22,8 @@
     "deploy": "scripts/manual-deploy.sh",
     "deploy:manual": "scripts/manual-deploy.sh",
     "deploy:env": "scripts/manual-deploy.sh && npm run admin:env-sync -- --apply",
+    "verify:build": "node wavelength-build-verifier.js",
+    "verify:deployment": "node wavelength-build-verifier.js",
     "cta:collect": "node scripts/cta-audit.js collect",
     "cta:validate": "node scripts/cta-audit.js validate",
     "cta:report": "node scripts/cta-audit.js report",

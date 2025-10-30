@@ -1394,7 +1394,8 @@ class ImageUpscalingService {
 
         // Test server proxy access
         try {
-          const proxyUrl = validation.upscaledImage.url.replace(/^https:\/\/[^\/]+/, 'http://localhost:3001');
+          const baseUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' ? 'https://df5sj8f594cdx.cloudfront.net' : `http://localhost:${process.env.PORT || 3001}`);
+          const proxyUrl = validation.upscaledImage.url.replace(/^https:\/\/[^\/]+/, baseUrl);
           const axios = require('axios');
           const response = await axios.head(proxyUrl, { 
             timeout: 5000,
