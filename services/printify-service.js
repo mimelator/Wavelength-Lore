@@ -746,10 +746,24 @@ class PrintifyService {
       };
       
     } catch (error) {
-      console.error('Error creating order:', error);
+      console.error('❌ PRINTIFY ORDER ERROR:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: error.config ? {
+          url: error.config.url,
+          method: error.config.method,
+          data: error.config.data
+        } : 'No config'
+      });
+      
       return {
         success: false,
-        error: error.message || 'Failed to create order'
+        error: error.message || 'Failed to create order',
+        statusCode: error.response?.status,
+        apiResponse: error.response?.data
       };
     }
   }

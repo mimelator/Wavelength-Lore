@@ -1696,6 +1696,13 @@ router.post('/confirm-payment', ensureAuthenticated, async (req, res) => {
     console.log('📦 Items received:', JSON.stringify(items, null, 2));
     console.log('📮 Shipping address:', JSON.stringify(shippingAddress, null, 2));
     
+    // 🔍 ENHANCED DEBUGGING: Log environment and service state
+    console.log('🔍 PRINTIFY DEBUG INFO:');
+    console.log('   PRINTIFY_MOCK_MODE:', process.env.PRINTIFY_MOCK_MODE);
+    console.log('   NODE_ENV:', process.env.NODE_ENV);
+    console.log('   printifyService type:', printifyService.constructor.name);
+    console.log('   createOrder method exists:', typeof printifyService.createOrder === 'function');
+    
     // Confirm payment with Stripe
     const paymentResult = await stripePaymentService.confirmPayment(paymentIntentId);
     
@@ -1708,15 +1715,22 @@ router.post('/confirm-payment', ensureAuthenticated, async (req, res) => {
     }
 
     // Payment successful - create Printify order
+    console.log('🖨️ Creating Printify order with items:', JSON.stringify(items, null, 2));
+    console.log('📍 Shipping address for Printify:', JSON.stringify(shippingAddress, null, 2));
+    
     const printifyOrder = await printifyService.createOrder(items, shippingAddress);
+    
+    console.log('🖨️ Printify order result:', JSON.stringify(printifyOrder, null, 2));
     
     if (!printifyOrder.success) {
       console.error('❌ Order creation failed after successful payment:', printifyOrder.error);
+      console.error('❌ Full Printify response:', JSON.stringify(printifyOrder, null, 2));
       // Payment succeeded but order failed - this needs manual handling
       return res.status(500).json({
         success: false,
         error: 'Payment succeeded but order creation failed. Please contact support.',
-        paymentId: paymentResult.paymentId
+        paymentId: paymentResult.paymentId,
+        printifyError: printifyOrder.error
       });
     }
 
