@@ -4,6 +4,8 @@
 
 # 🔴 CRITICAL: Development Tools (NEVER in production)
 scripts/
+# EXCEPTION: Static overlay generator needed by EffectsProcessor
+!scripts/generate-static-overlays.js
 debug/
 deployment/
 content-management/
