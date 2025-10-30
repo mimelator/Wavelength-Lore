@@ -2364,8 +2364,10 @@ class MerchandiseModalRenderer {
     if (variantImageUrl) {
       console.log(`   🖼️ Updating preview image: ${variantImageUrl}`);
       this.updatePreviewImage(modal, variantImageUrl);
+      this.showPreviewStatus(modal, `Showing ${variantTitle} preview`);
     } else {
       console.warn(`   ⚠️ [WARN] No image URL found - preview WILL NOT UPDATE`);
+      this.showPreviewStatus(modal, `⚠️ No preview available for ${variantTitle}`, true);
     }
 
     // Update price display if present
@@ -2448,6 +2450,35 @@ class MerchandiseModalRenderer {
 
     if (this.debugMode) {
       this.debugLog(`Preview image updated: ${imageUrl}`, 'info');
+    }
+  }
+
+  /**
+   * 📝 Show preview status message
+   * @param {HTMLElement} modal - Modal element
+   * @param {string} message - Status message to display
+   * @param {boolean} isWarning - Whether this is a warning message
+   */
+  showPreviewStatus(modal, message, isWarning = false) {
+    const productId = modal.dataset.productId;
+    const statusElement = modal.querySelector(`#preview-status-text-${productId}`);
+    const statusContainer = modal.querySelector('.preview-status');
+    
+    if (statusElement) {
+      statusElement.textContent = message;
+      
+      // Apply warning styling
+      if (statusContainer) {
+        if (isWarning) {
+          statusContainer.classList.add('warning');
+        } else {
+          statusContainer.classList.remove('warning');
+        }
+      }
+      
+      console.log(`📝 Preview status updated: "${message}" (warning: ${isWarning})`);
+    } else {
+      console.warn(`❌ Preview status element not found for product ${productId}`);
     }
   }
 

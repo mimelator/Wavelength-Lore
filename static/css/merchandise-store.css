@@ -4329,11 +4329,23 @@ main.merchandise-main {
   background: #f0f2ff;
   border-left: 4px solid #667eea;
   border-radius: 6px;
+  transition: all 0.3s ease;
 }
 
 .preview-status small {
   color: #667eea;
   font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+/* Warning state for preview status */
+.preview-status.warning {
+  background: #fff5f5;
+  border-left-color: #ff6b6b;
+}
+
+.preview-status.warning small {
+  color: #ff6b6b;
 }
 
 /* RIGHT: Options Panel */

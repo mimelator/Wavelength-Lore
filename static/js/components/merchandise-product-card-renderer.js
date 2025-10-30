@@ -117,6 +117,9 @@ class MerchandiseProductCardRenderer {
           <div class="product-variants">
             ${this.renderInlineVariants(product)}
           </div>
+          <div class="variant-status-display" id="variant-status-${productId}" style="display: none;">
+            <small class="variant-status-message"></small>
+          </div>
         </div>
       </div>
     `;
@@ -859,6 +862,9 @@ class MerchandiseProductCardRenderer {
       if (!imageUrl) console.log(`      - No image URL provided`);
       if (!productImage) console.log(`      - Product image element not found`);
     }
+
+    // Show variant status message
+    this.showVariantStatus(productCard, imageUrl ? null : `⚠️ No preview available for ${selectedOption.textContent.split(' - ')[0]}`);
     
     if (variantId && cartButton) {
       // Enable cart button and update variant ID + IMAGE URL
@@ -976,6 +982,39 @@ class MerchandiseProductCardRenderer {
   handleAddToCart(productId, variantId, variantImageUrl = '') {
     if (this.eventBus) {
       this.eventBus.emit('cart.addItem', { productId, variantId, variantImageUrl });
+    }
+  }
+
+  /**
+   * Show or hide variant status message
+   * @param {HTMLElement} productCard - Product card element
+   * @param {string|null} message - Status message to show, or null to hide
+   */
+  showVariantStatus(productCard, message) {
+    const productId = productCard.dataset.productId;
+    const statusDisplay = productCard.querySelector('.variant-status-display');
+    const statusMessage = productCard.querySelector('.variant-status-message');
+    
+    if (!statusDisplay || !statusMessage) {
+      console.warn(`❌ Variant status elements not found for product ${productId}`);
+      return;
+    }
+    
+    if (message) {
+      statusMessage.textContent = message;
+      statusMessage.style.color = '#ff6b6b';
+      statusMessage.style.fontWeight = 'bold';
+      statusDisplay.style.display = 'block';
+      statusDisplay.style.marginTop = '8px';
+      statusDisplay.style.padding = '8px 12px';
+      statusDisplay.style.background = '#fff5f5';
+      statusDisplay.style.border = '1px solid #ffb3b3';
+      statusDisplay.style.borderRadius = '6px';
+      statusDisplay.style.fontSize = '0.85rem';
+      console.log(`📝 Variant status shown: "${message}"`);
+    } else {
+      statusDisplay.style.display = 'none';
+      console.log(`📝 Variant status hidden`);
     }
   }
 }
