@@ -3169,8 +3169,38 @@ main.merchandise-main {
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 20px;
+}
+
+/* FIXED: Designed Product Cards - Make them wider for better UX */
+.product-card.complete-product {
+  min-width: 450px;
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Ensure finished products container uses full width */
+.finished-products-container,
+.created-products-grid,
+.designed-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 25px;
+  width: 100%;
+}
+
+/* FIXED: Variant selector layout - Prevent narrow columns */
+.product-card .variant-selector-container {
+  width: 100%;
+  min-width: 400px;
+}
+
+.product-card .variant-selector {
+  width: 100%;
+  min-width: 350px;
+  font-size: 0.9rem;
+  padding: 8px 12px;
 }
 
 .product-item {
