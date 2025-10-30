@@ -9,6 +9,7 @@
 const { AppRunnerClient, DescribeServiceCommand, ListServicesCommand } = require('@aws-sdk/client-apprunner');
 const { ECRClient, DescribeRepositoriesCommand, DescribeImagesCommand } = require('@aws-sdk/client-ecr');
 const { S3Client, ListObjectsV2Command } = require('@aws-sdk/client-s3');
+const { CloudWatchLogsClient, FilterLogEventsCommand, DescribeLogGroupsCommand } = require('@aws-sdk/client-cloudwatch-logs');
 const chalk = require('chalk');
 const fs = require('fs');
 const path = require('path');
@@ -22,9 +23,11 @@ class WavelengthDeploymentStatus {
         this.appRunner = new AppRunnerClient({ region: 'us-east-1' });
         this.ecr = new ECRClient({ region: 'us-east-1' });
         this.s3 = new S3Client({ region: 'us-east-1' });
+        this.cloudWatchLogs = new CloudWatchLogsClient({ region: 'us-east-1' });
         this.serviceName = process.env.APPRUNNER_SERVICE_NAME || 'wavelength-lore';
         this.ecrRepository = process.env.ECR_REPOSITORY_NAME || 'wavelength-lore';
         this.s3Bucket = process.env.S3_BUCKET_NAME || 'wavelength-lore-bucket';
+        this.logGroupName = process.env.CLOUDWATCH_LOG_GROUP || '/aws/apprunner/wavelength-lore-service/829c542fc95c419090494817f7046eaa/application';
         this.rootDir = process.cwd();
     }
 
@@ -47,8 +50,11 @@ class WavelengthDeploymentStatus {
             // Get local build info
             status.local = await this.getLocalStatus();
 
-            // Get S3 asset status (NEW)
+            // Get S3 asset status
             status.s3Assets = await this.getS3AssetStatus();
+
+            // Get runtime version validation (NEW)
+            status.runtimeVersion = await this.validateRuntimeVersion();
 
             // Display comprehensive status
             await this.displayStatus(status);
@@ -642,6 +648,90 @@ class WavelengthDeploymentStatus {
     }
 
     /**
+     * 📋 Validate runtime version from CloudWatch logs
+     */
+    async validateRuntimeVersion() {
+        console.log(chalk.yellow('📋 Validating runtime version from logs...'));
+        
+        const validation = {
+            status: 'Unknown',
+            deployedVersion: null,
+            localVersion: null,
+            lastStartupLog: null,
+            versionMatch: false,
+            error: null
+        };
+
+        try {
+            // Get local version for comparison
+            const packageJsonPath = path.join(this.rootDir, 'package.json');
+            if (fs.existsSync(packageJsonPath)) {
+                const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+                validation.localVersion = packageJson.version;
+            }
+
+            // Search for version logs in the past hour
+            const endTime = new Date();
+            const startTime = new Date(endTime.getTime() - (60 * 60 * 1000)); // 1 hour ago
+
+            const filterCommand = new FilterLogEventsCommand({
+                logGroupName: this.logGroupName,
+                startTime: startTime.getTime(),
+                endTime: endTime.getTime(),
+                filterPattern: '"Wavelength Lore v"',
+                limit: 50
+            });
+
+            const logResponse = await this.cloudWatchLogs.send(filterCommand);
+            
+            if (logResponse.events && logResponse.events.length > 0) {
+                // Get the most recent version log
+                const mostRecentLog = logResponse.events[logResponse.events.length - 1];
+                validation.lastStartupLog = {
+                    timestamp: new Date(mostRecentLog.timestamp),
+                    message: mostRecentLog.message
+                };
+
+                // Extract version from log message
+                const versionMatch = mostRecentLog.message.match(/Wavelength Lore v([\d.]+)/);
+                if (versionMatch) {
+                    validation.deployedVersion = versionMatch[1];
+                    validation.status = 'Found';
+                    
+                    // Compare with local version
+                    if (validation.localVersion && validation.deployedVersion === validation.localVersion) {
+                        validation.versionMatch = true;
+                    }
+                }
+
+                // Additional startup details
+                validation.totalVersionLogs = logResponse.events.length;
+                validation.allVersionLogs = logResponse.events.map(event => ({
+                    timestamp: new Date(event.timestamp),
+                    message: event.message
+                }));
+
+            } else {
+                validation.status = 'No version logs found';
+                validation.error = 'No "Wavelength Lore v" logs found in the past hour';
+            }
+
+        } catch (error) {
+            validation.status = 'Error';
+            validation.error = error.message;
+            
+            // Check if it's a log group access issue
+            if (error.name === 'ResourceNotFoundException') {
+                validation.error = `Log group not found: ${this.logGroupName}`;
+            } else if (error.name === 'AccessDenied') {
+                validation.error = 'Access denied to CloudWatch Logs - check AWS credentials';
+            }
+        }
+
+        return validation;
+    }
+
+    /**
      * 📊 Display comprehensive status
      */
     async displayStatus(status) {
@@ -655,6 +745,49 @@ class WavelengthDeploymentStatus {
         console.log(chalk.white(`   Git Status: ${status.local.gitStatus}`));
         console.log(chalk.white(`   Docker: ${status.local.dockerfileExists ? '✓' : '❌'}`));
         console.log(chalk.white(`   Dependencies: ${status.local.nodeModulesExists ? '✓' : '❌'}`));
+        console.log('');
+
+        // Runtime Version Validation (NEW)
+        console.log(chalk.cyan('📋 RUNTIME VERSION VALIDATION:'));
+        if (status.runtimeVersion) {
+            const rv = status.runtimeVersion;
+            
+            if (rv.status === 'Found') {
+                console.log(chalk.white(`   Local Version: ${rv.localVersion || 'Unknown'}`));
+                console.log(chalk.white(`   Deployed Version: ${rv.deployedVersion}`));
+                
+                if (rv.versionMatch) {
+                    console.log(chalk.green(`   ✅ Version Match: Deployment synchronized`));
+                } else {
+                    console.log(chalk.yellow(`   ⚠️  Version Mismatch: Deployment may be outdated`));
+                }
+                
+                if (rv.lastStartupLog) {
+                    const timeAgo = this.getTimeAgo(rv.lastStartupLog.timestamp);
+                    console.log(chalk.white(`   Last Startup: ${timeAgo}`));
+                    console.log(chalk.gray(`   Startup Time: ${rv.lastStartupLog.timestamp.toLocaleString()}`));
+                }
+                
+                if (rv.totalVersionLogs > 1) {
+                    console.log(chalk.gray(`   Recent Restarts: ${rv.totalVersionLogs} startup logs in past hour`));
+                }
+                
+            } else if (rv.status === 'No version logs found') {
+                console.log(chalk.yellow(`   ⚠️  No version logs found in past hour`));
+                console.log(chalk.gray(`   This may indicate the application hasn't started recently`));
+                console.log(chalk.gray(`   💡 Try: Check if App Runner service is running`));
+                
+            } else if (rv.status === 'Error') {
+                console.log(chalk.red(`   ❌ Version check failed: ${rv.error}`));
+                if (rv.error.includes('Log group not found')) {
+                    console.log(chalk.gray(`   💡 Tip: Verify CLOUDWATCH_LOG_GROUP environment variable`));
+                } else if (rv.error.includes('Access denied')) {
+                    console.log(chalk.gray(`   💡 Tip: Check AWS credentials and CloudWatch Logs permissions`));
+                }
+            }
+        } else {
+            console.log(chalk.red(`   ❌ Runtime version validation unavailable`));
+        }
         console.log('');
 
         // S3 Asset Status (ENHANCED)
@@ -821,22 +954,33 @@ class WavelengthDeploymentStatus {
         const ecrHealthy = status.ecr.status !== 'Error';
         const appRunnerHealthy = status.appRunner.status === 'RUNNING';
         const s3AssetsHealthy = status.s3Assets ? status.s3Assets.healthy : false;
+        const runtimeVersionHealthy = status.runtimeVersion && status.runtimeVersion.versionMatch;
 
-        // Check deployment synchronization
+        // Enhanced deployment synchronization check with runtime version
         let deploymentSync = 'Unknown';
-        if (status.local.commit && status.appRunner.source) {
+        if (status.runtimeVersion && status.runtimeVersion.status === 'Found') {
+            // Use runtime version validation as primary sync check
+            if (status.runtimeVersion.versionMatch) {
+                deploymentSync = 'Synchronized (Runtime Verified)';
+            } else {
+                deploymentSync = 'Version Mismatch (Runtime)';
+            }
+        } else if (status.local.commit && status.appRunner.source) {
+            // Fallback to ECR image tag matching
             const imageMatch = status.appRunner.source.match(/wavelength-lore:(.+)$/);
             if (imageMatch) {
                 const imageTag = imageMatch[1];
                 // Check if App Runner is using latest commit or version
                 if (imageTag.includes(status.local.commit) || imageTag.startsWith('v')) {
-                    deploymentSync = 'Synchronized';
+                    deploymentSync = 'Synchronized (ECR)';
                 } else if (imageTag === 'latest') {
                     deploymentSync = 'Rollback detected';
                 } else {
                     deploymentSync = 'Out of sync';
                 }
             }
+        } else if (status.runtimeVersion && status.runtimeVersion.status === 'No version logs found') {
+            deploymentSync = 'Runtime not started recently';
         }
         
         const isHealthy = localHealthy && ecrHealthy && appRunnerHealthy && s3AssetsHealthy;
@@ -846,6 +990,7 @@ class WavelengthDeploymentStatus {
         console.log(chalk.white(`   S3/CDN Assets: ${s3AssetsHealthy ? '✅' : '❌'}`));
         console.log(chalk.white(`   ECR Repository: ${ecrHealthy ? '✅' : '❌'}`));
         console.log(chalk.white(`   App Runner Service: ${appRunnerHealthy ? '✅' : '❌'}`));
+        console.log(chalk.white(`   Runtime Version: ${runtimeVersionHealthy ? '✅' : (status.runtimeVersion?.status === 'Found' ? '⚠️' : '❓')}`));
         
         // Add uptime to summary if service is running
         if (appRunnerHealthy && status.appRunner.uptimeDisplay !== 'Unknown') {
@@ -857,12 +1002,12 @@ class WavelengthDeploymentStatus {
             console.log(chalk.white(`   App Uptime: 🚀 ${status.appRunner.applicationUptime}`));
         }
         
-        console.log(chalk.white(`   Deployment Sync: ${deploymentSync === 'Synchronized' ? '✅' : 
+        console.log(chalk.white(`   Deployment Sync: ${deploymentSync.includes('Synchronized') ? '✅' : 
                                                       deploymentSync === 'Rollback detected' ? '🔄' : 
-                                                      deploymentSync === 'Out of sync' ? '⚠️' : '❓'} ${deploymentSync}`));
+                                                      deploymentSync.includes('Mismatch') || deploymentSync.includes('Out of sync') ? '⚠️' : '❓'} ${deploymentSync}`));
         console.log('');
         
-        if (isHealthy && deploymentSync === 'Synchronized') {
+        if (isHealthy && deploymentSync.includes('Synchronized')) {
             console.log(chalk.green('   🚀 OPTIMAL - All systems operational and synchronized'));
         } else if (isHealthy) {
             console.log(chalk.yellow('   ⚠️ HEALTHY - Systems running but may need sync'));
@@ -872,6 +1017,9 @@ class WavelengthDeploymentStatus {
             if (!s3AssetsHealthy) console.log(chalk.red('      • S3/CDN assets missing or incomplete'));
             if (!ecrHealthy) console.log(chalk.red('      • ECR repository issues detected'));
             if (!appRunnerHealthy) console.log(chalk.red('      • App Runner service not running'));
+            if (!runtimeVersionHealthy && status.runtimeVersion?.status === 'Found') {
+                console.log(chalk.red('      • Runtime version mismatch detected'));
+            }
         }
         
         if (deploymentSync === 'Rollback detected') {
