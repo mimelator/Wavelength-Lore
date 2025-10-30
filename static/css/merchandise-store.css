@@ -6423,21 +6423,58 @@ main.merchandise-main {
   max-height: 85vh !important;
 }
 
-/* Checkout container layout */
+/* Checkout container layout - Top row split, bottom row form */
 .checkout-container {
   display: grid;
-  grid-template-columns: 30% 70%;
-  gap: 30px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 20px;
   align-items: start;
 }
 
-/* Order summary styling */
+/* Order summary (left side) - contains totals only */
 .checkout-order-summary {
+  grid-column: 1;
+  grid-row: 1;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
   padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+.checkout-order-summary h4 {
+  color: #ffd700;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+/* Move checkout items (preview) to right side */
+.checkout-order-summary .checkout-items {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 20px);
+  width: calc(100% - 20px);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Scale down the preview image */
+.checkout-items .checkout-item-image img {
+  max-width: 150px !important;
+  max-height: 150px !important;
+  object-fit: contain;
+}
+
+/* Payment section spans full width below */
+.checkout-payment-section {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  position: relative;
+}
+
+/* Order summary styling - now positioned at top left */
 
 .checkout-order-summary h4 {
   color: #ffd700;
@@ -6469,10 +6506,11 @@ main.merchandise-main {
 
 /* Checkout form styling - Fix white-on-white issue */
 .checkout-form {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.5);
   border-radius: 12px;
   padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
 }
 
 .checkout-form .form-section {
@@ -6555,10 +6593,43 @@ main.merchandise-main {
 }
 
 /* Mobile responsive */
+/* Additional styling for checkout items */
+.checkout-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.checkout-item-details h5 {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  color: white;
+}
+
+.checkout-item-variant,
+.checkout-item-quantity {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 2px 0;
+}
+
+.checkout-item-price {
+  font-weight: bold;
+  color: #ffd700;
+  font-size: 1rem;
+}
+
 @media (max-width: 768px) {
   .checkout-container {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: 1fr !important;
+  }
+  
+  .checkout-order-summary .checkout-items {
+    position: static !important;
+    left: auto !important;
+    width: 100% !important;
+    margin-top: 20px;
   }
   
   .checkout-form .form-row {
