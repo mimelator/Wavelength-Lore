@@ -1438,10 +1438,17 @@ class MerchandiseStore {
     // Start the guided tour for first-time users
     this.render(); // Re-render with main interface
     
-    // Auto-start tour after a brief delay to let interface load
-    setTimeout(() => {
-      this.startGuidedTour();
-    }, 500);
+    // Only auto-start tour for first-time users who haven't completed it
+    const tourCompleted = localStorage.getItem('wavelength_vault_tour_completed') === 'true';
+    if (!tourCompleted) {
+      console.log('🎭 First-time user - auto-starting guided tour');
+      // Auto-start tour after a brief delay to let interface load
+      setTimeout(() => {
+        this.startGuidedTour();
+      }, 500);
+    } else {
+      console.log('🔄 Returning user - skipping auto-tour (completed: ' + tourCompleted + ')');
+    }
   }
   
   startGuidedTour(forceStart = false) {
