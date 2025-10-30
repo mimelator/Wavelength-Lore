@@ -5652,7 +5652,9 @@ class MerchandiseStore {
         imageContext: {
           effects: customization.effects,
           borderEnabled: customization.borderEnabled,
-          borderColor: customization.borderColor
+          borderColor: customization.borderColor,
+          borderWidth: customization.borderWidth,
+          borderWidthPixels: customization.borderWidthPixels
         }
       };
 

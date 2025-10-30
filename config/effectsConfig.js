@@ -198,6 +198,8 @@ const effectsConfig = {
    * Combines presets of all enabled effects
    */
   buildEffectsFromToggles: function(enabledToggles = {}) {
+    console.log('🔍 EFFECTS CONFIG DEBUG: buildEffectsFromToggles called with:', JSON.stringify(enabledToggles, null, 2));
+    
     const finalEffects = {
       saturation: 1.0,
       colorTemperature: 5500,
@@ -211,11 +213,13 @@ const effectsConfig = {
 
     // Border customization parameters
     const borderParams = {};
+    console.log('🔍 BORDER PROCESSING: Starting border parameter extraction...');
 
     // Apply each enabled effect's preset and collect border params
     for (const [toggleKey, enabled] of Object.entries(enabledToggles)) {
       // Handle border parameters separately
       if (toggleKey === 'borderEnabled' || toggleKey === 'borderColor' || toggleKey === 'borderWidth' || toggleKey === 'borderWidthPixels') {
+        console.log(`🔍 BORDER PARAM: ${toggleKey} = ${enabled}`);
         borderParams[toggleKey] = enabledToggles[toggleKey];
         continue;
       }
@@ -226,12 +230,17 @@ const effectsConfig = {
         if (effect && effect.preset) {
           // Merge effect values
           Object.assign(finalEffects, effect.preset);
+          console.log(`✅ Applied effect ${toggleKey}:`, effect.preset);
         }
       }
     }
 
+    console.log('🔍 COLLECTED BORDER PARAMS:', borderParams);
+    
     // Merge border parameters into final effects
     Object.assign(finalEffects, borderParams);
+    
+    console.log('🎯 FINAL EFFECTS AFTER MERGE:', JSON.stringify(finalEffects, null, 2));
 
     return finalEffects;
   }

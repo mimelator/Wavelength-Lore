@@ -578,6 +578,14 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
       console.log('\n🔥 GITHUB ISSUE #96 FIX: Preparing effects to apply AFTER upscaling...');
       console.log('   imageContext.effects:', imageContext.effects);
       console.log('   imageContext.borderEnabled:', imageContext.borderEnabled);
+      
+      // 🔍 CRITICAL BORDER DIAGNOSTIC: Check all border-related fields in imageContext
+      console.log('🔍 CRITICAL IMAGECONTEXT BORDER DIAGNOSTIC:');
+      console.log('   imageContext.borderColor:', imageContext.borderColor);
+      console.log('   imageContext.borderWidth:', imageContext.borderWidth);
+      console.log('   imageContext.borderWidthPixels:', imageContext.borderWidthPixels);
+      console.log('   Full imageContext keys:', Object.keys(imageContext));
+      console.log('   Full imageContext:', JSON.stringify(imageContext, null, 2));
 
       const effectsConfig = require('../config/effectsConfig');
 

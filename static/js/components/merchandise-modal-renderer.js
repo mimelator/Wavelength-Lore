@@ -2592,13 +2592,41 @@ class MerchandiseModalRenderer {
     const width = modal.dataset.selectedBorderWidth || '0';
     const pixels = modal.dataset.selectedBorderPixels || '0';
     const color = modal.dataset.selectedBorderColor || '#000000';
+    const borderEnabled = modal.dataset.borderEnabled === 'true';
 
-    return {
-      borderEnabled: width !== '0',
-      borderWidth: parseInt(width),
-      borderWidthPixels: parseInt(pixels),
+    // 🔍 CRITICAL BORDER DEBUGGING
+    console.log('🔍 CRITICAL BORDER WIDTH DIAGNOSTIC:');
+    console.log('  modal.dataset.borderEnabled:', modal.dataset.borderEnabled);
+    console.log('  modal.dataset.selectedBorderWidth:', modal.dataset.selectedBorderWidth);
+    console.log('  modal.dataset.selectedBorderPixels:', modal.dataset.selectedBorderPixels);
+    console.log('  modal.dataset.selectedBorderColor:', modal.dataset.selectedBorderColor);
+    console.log('  Computed width:', width);
+    console.log('  Computed pixels:', pixels);
+    console.log('  Computed borderEnabled:', borderEnabled);
+    console.log('  width !== \'0\':', width !== '0');
+
+    // 🚨 CRITICAL FIX: Use borderEnabled flag directly, not width calculation
+    const finalBorderEnabled = borderEnabled && (width !== '0' || width !== '');
+    
+    // 🚨 If border is enabled but width is 0, set default width
+    let finalWidth = parseInt(width);
+    let finalPixels = parseInt(pixels);
+    
+    if (borderEnabled && (width === '0' || width === '')) {
+      console.log('🚨 BORDER FIX: Border enabled but width is 0, setting default width');
+      finalWidth = 1;  // Default to "Thin"
+      finalPixels = 10;  // 10 pixels
+    }
+
+    const result = {
+      borderEnabled: finalBorderEnabled,
+      borderWidth: finalWidth,
+      borderWidthPixels: finalPixels,
       borderColor: color
     };
+    
+    console.log('🎯 FINAL BORDER RESULT:', result);
+    return result;
   }
 
   /**
@@ -2886,6 +2914,21 @@ class MerchandiseModalRenderer {
       // The current preview.src may contain a previously customized image (with old borders/effects)
       // We need to always start from the original gallery image and apply fresh effects each time
       const imageUrl = previewImage?.dataset?.originalImageUrl || previewImage?.src || '/images/previews/generic-product-preview.svg';
+      
+      // 🔍 CRITICAL DIAGNOSTIC: Check for URL truncation/corruption
+      console.log('🔍 CRITICAL IMAGE URL DIAGNOSTIC:');
+      console.log('  previewImage.dataset.originalImageUrl:', previewImage?.dataset?.originalImageUrl);
+      console.log('  previewImage.src:', previewImage?.src);
+      console.log('  FINAL imageUrl being sent to API:', imageUrl);
+      console.log('  imageUrl length:', imageUrl.length);
+      console.log('  imageUrl ends with .webp?', imageUrl.endsWith('.webp'));
+      console.log('  imageUrl ends with .jpg?', imageUrl.endsWith('.jpg'));
+      console.log('  imageUrl ends with .png?', imageUrl.endsWith('.png'));
+      
+      if (imageUrl.length < 50 || (!imageUrl.includes('.webp') && !imageUrl.includes('.jpg') && !imageUrl.includes('.png'))) {
+        console.error('🚨 CRITICAL: Image URL appears malformed or truncated!');
+        console.error('  This will cause effects API to fail or apply to wrong image');
+      }
 
       // Call effects API
       console.log('🌐 Making API call to /api/merchandise/openai-upscaler/apply-effects');
@@ -2917,22 +2960,56 @@ class MerchandiseModalRenderer {
         this.debugLog(`Preview effects applied successfully`, 'success', result);
       }
 
-      // Update preview image with smooth status messages
+      // Update preview image with enhanced debugging
+      console.log('🔍 DIAGNOSTIC: API Result structure:', {
+        hasResult: !!result,
+        hasMetadata: !!(result && result.metadata),
+        hasCustomizedImageUrl: !!(result && result.metadata && result.metadata.customizedImageUrl),
+        customizedImageUrl: result?.metadata?.customizedImageUrl,
+        resultKeys: result ? Object.keys(result) : [],
+        metadataKeys: result?.metadata ? Object.keys(result.metadata) : []
+      });
+
       if (previewImage && result.metadata && result.metadata.customizedImageUrl) {
-        previewImage.src = result.metadata.customizedImageUrl;
-        previewImage.style.opacity = '1';
+        console.log('✅ UPDATING PREVIEW IMAGE');
+        console.log('  - Original src:', previewImage.src);
+        console.log('  - New customized URL:', result.metadata.customizedImageUrl);
         
-        // Show success status with smooth fade in/out
-        this.showVariantStatusMessage(statusText, '✅ Preview updated', 'success');
+        // Add cache-busting and load verification
+        const customizedUrl = result.metadata.customizedImageUrl + '?t=' + Date.now();
+        console.log('  - Cache-busted URL:', customizedUrl);
+        
+        previewImage.onload = () => {
+          console.log('✅ CUSTOMIZED IMAGE LOADED SUCCESSFULLY');
+          previewImage.style.opacity = '1';
+        };
+        
+        previewImage.onerror = (e) => {
+          console.error('❌ CUSTOMIZED IMAGE FAILED TO LOAD:', e);
+          console.error('  - Failed URL:', customizedUrl);
+          previewImage.style.opacity = '1'; // Show original even if customized fails
+        };
+        
+        previewImage.src = customizedUrl;
+        
+        // Show success status
+        if (statusText) {
+          statusText.textContent = '✅ Preview updated';
+          statusText.style.color = '#155724';
+        } else {
+          this.showVariantStatusMessage('', '✅ Preview updated', 'success');
+        }
 
         // Store the customized image URL in modal state
         modal.dataset.customizedImageUrl = result.metadata.customizedImageUrl;
+        console.log('  - Stored in modal dataset:', modal.dataset.customizedImageUrl);
 
         // CRITICAL: Update the customization summary after successful preview update
         this.updateCustomizationSummary(modal);
       } else if (statusText) {
         // Show "no preview available" message for variants without mockup images
-        this.showVariantStatusMessage(statusText, '⚠️ No preview available', 'warning');
+        statusText.textContent = '⚠️ No preview available';
+        statusText.style.color = '#856404';
       }
 
     } catch (error) {
@@ -2956,7 +3033,12 @@ class MerchandiseModalRenderer {
       if (previewImage && statusText) {
         previewImage.style.opacity = '1';
         // Show error message with smooth fade
-        this.showVariantStatusMessage(statusText, `❌ Error: ${error.message}`, 'error');
+        if (statusText) {
+          statusText.textContent = `❌ Error: ${error.message}`;
+          statusText.style.color = '#721c24';
+        } else {
+          this.showVariantStatusMessage('', `❌ Error: ${error.message}`, 'error');
+        }
       }
     }
   }
