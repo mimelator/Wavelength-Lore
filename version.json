@@ -6,5 +6,5 @@
   "buildNumber": "manual-1761797063",
   "environment": "production",
   "workflowId": "manual-build",
-  "deploymentStatus": "building"
+  "deploymentStatus": "deployed"
 }
