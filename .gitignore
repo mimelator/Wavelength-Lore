@@ -153,6 +153,9 @@ htmlcov/
 # Public directory - use /static instead
 public/
 
+# Wavelength-Chatbot-Public is its own repository
+Wavelength-Chatbot-Public/
+
 # Firebase config (already in config/)
 .firebase.rules.json
 
