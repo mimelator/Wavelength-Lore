@@ -252,7 +252,8 @@ function configureTemplateLocals(app) {
     
     // Add version information to templates
     const versionInfo = versionManager.getTemplateData();
-    res.locals.version = versionInfo.version;
+    // Force cache bust for CSS changes by adding timestamp
+    res.locals.version = `${versionInfo.version}.${Date.now()}`;
     res.locals.displayVersion = versionInfo.displayVersion;
     res.locals.buildNumber = versionInfo.buildNumber;
     res.locals.environment = versionInfo.environment;
