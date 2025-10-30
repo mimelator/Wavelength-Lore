@@ -6030,3 +6030,326 @@ main.merchandise-main {
     font-size: 18px;
   }
 }
+
+/* =============================================================================
+   ENHANCED CART UI IMPROVEMENTS (Extracted from enhanced-product-ui.css.bak)
+   ============================================================================= */
+
+/* Cart highlight animation when navigating after add-to-cart */
+.cart-highlight {
+  animation: cartPulse 2s ease-in-out;
+  position: relative;
+}
+
+.cart-highlight::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: linear-gradient(45deg, #4CAF50, #2196F3, #FF9800, #4CAF50);
+  background-size: 300% 300%;
+  border-radius: 15px;
+  z-index: -1;
+  animation: cartGlow 2s ease-in-out;
+}
+
+@keyframes cartPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@keyframes cartGlow {
+  0% { 
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+  50% { 
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+  100% { 
+    background-position: 0% 50%;
+    opacity: 0;
+  }
+}
+
+/* Enhanced continue shopping button */
+.continue-shopping-btn {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'AnimeAce', Arial, sans-serif;
+}
+
+.continue-shopping-btn:hover {
+  background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+
+.continue-shopping-btn::before {
+  content: '←';
+  font-size: 1.1em;
+  transition: transform 0.3s ease;
+}
+
+.continue-shopping-btn:hover::before {
+  transform: translateX(-3px);
+}
+
+/* Cart section enhanced visibility */
+.cart-container {
+  position: relative;
+  scroll-margin-top: 80px; /* Account for any fixed headers */
+}
+
+/* CART ITEM CONTROLS LAYOUT FIX - Fixes vertical stacking issues */
+.cart-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: flex-end;
+  min-width: 280px; /* Ensure enough space for all controls */
+}
+
+/* Quantity controls - keep horizontal layout */
+.cart-item-controls .quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px; /* Fixed width for consistent alignment */
+}
+
+.cart-item-controls .quantity-controls button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.cart-item-controls .quantity-controls button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.cart-item-controls .quantity-input {
+  width: 50px;
+  height: 32px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.cart-item-controls .quantity-input:focus {
+  outline: none;
+  border-color: #2196F3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+/* Item total price - centered and prominent */
+.cart-item-total {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #4CAF50;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* Remove button - styled consistently */
+.remove-item-btn {
+  background: rgba(244, 67, 54, 0.15);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  color: #f44336;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+}
+
+.remove-item-btn:hover {
+  background: rgba(244, 67, 54, 0.25);
+  border-color: #f44336;
+  transform: scale(1.05);
+}
+
+.remove-item-btn span {
+  font-size: 1.1rem;
+}
+
+/* CART FOOTER SPACING FIX - Better spacing and padding */
+.cart-footer {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cart-summary {
+  margin-bottom: 25px; /* Add space before checkout section */
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px; /* Add breathing room between rows */
+  padding: 0 4px; /* Subtle padding for better alignment */
+}
+
+.summary-row:last-child {
+  margin-bottom: 0;
+}
+
+.summary-row.total-row {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.summary-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+}
+
+.summary-value {
+  color: #fff;
+  font-weight: 500;
+}
+
+.total-value {
+  color: #4CAF50;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* Improved checkout button styling */
+.checkout-btn {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 16px 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'AnimeAce', Arial, sans-serif;
+}
+
+.checkout-btn:hover {
+  background: linear-gradient(135deg, #45a049 0%, #3e8e41 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+/* Clear cart button font consistency */
+.clear-cart-btn {
+  font-family: 'AnimeAce', Arial, sans-serif;
+  background: rgba(244, 67, 54, 0.15);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  color: #f44336;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.clear-cart-btn:hover {
+  background: rgba(244, 67, 54, 0.25);
+  border-color: #f44336;
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments for cart improvements */
+@media (max-width: 768px) {
+  .cart-item-controls {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    min-width: auto;
+  }
+  
+  .cart-item-controls .quantity-controls {
+    justify-content: center;
+    min-width: auto;
+  }
+  
+  .cart-item-total {
+    text-align: center;
+    min-width: auto;
+  }
+  
+  .cart-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+  }
+  
+  .checkout-btn {
+    padding: 14px 16px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cart-item-controls {
+    gap: 8px;
+  }
+  
+  .cart-item-controls .quantity-controls button {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+  
+  .cart-item-controls .quantity-input {
+    width: 45px;
+    height: 28px;
+  }
+  
+  .checkout-btn {
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 12px;
+  }
+}
