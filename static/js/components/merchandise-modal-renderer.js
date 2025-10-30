@@ -266,6 +266,7 @@ class MerchandiseModalRenderer {
                   <div class="preview-overlay">
                     <div class="preview-info">
                       <span class="info-label">Preview</span>
+                      <span class="zoom-hint">🔍 Click to zoom</span>
                     </div>
                   </div>
                 </div>

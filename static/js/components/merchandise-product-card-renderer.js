@@ -687,7 +687,7 @@ class MerchandiseProductCardRenderer {
     // 🔍 LOG: Rendering dropdown (6+ variants)
     const dropdownOptions = variants.map(variant => {
       const imageUrl = variant.image?.url || product.images?.[0]?.url || '';
-      console.log(`🖼️ [DROPDOWN] Variant: ${variant.title} | ID: ${variant.id} | Image: ${imageUrl ? '✅ Present' : '❌ Missing'}`);
+      // Quieter logging - only log summary
       return `
         <option value="${variant.id}"
                 data-price="${(variant.price / 100).toFixed(2)}"
@@ -697,7 +697,8 @@ class MerchandiseProductCardRenderer {
       `;
     }).join('');
 
-    console.log(`🎯 [DROPDOWN] Product ${productId}: ${variants.length} variants - Dropdown rendered with image URLs`);
+    const variantsWithImages = variants.filter(v => v.image?.url || product.images?.[0]?.url).length;
+    console.log(`🎯 [DROPDOWN] Product ${productId}: ${variants.length} variants (${variantsWithImages} with images)`);
 
     return `
       <div class="variant-summary">
