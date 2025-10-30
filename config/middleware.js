@@ -330,7 +330,8 @@ function configureTemplateLocals(app) {
       const currentUrl = req.originalUrl || req.url;
       return simpleDisambiguation.applySmartLinkingSimple(text, currentUrl);
     };
-    res.locals.simpleDisambiguationScript = simpleDisambiguation.getSimpleDisambiguationScript(process.env.CDN_URL);
+    const cdnUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' ? 'https://df5sj8f594cdx.cloudfront.net' : '');
+    res.locals.simpleDisambiguationScript = simpleDisambiguation.getSimpleDisambiguationScript(cdnUrl);
     res.locals.simpleDisambiguationStyles = simpleDisambiguation.getSimpleDisambiguationStyles();
 
     // Add current page path for conditional rendering (e.g., global radio game widget)

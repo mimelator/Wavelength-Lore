@@ -33,14 +33,32 @@ class LoreToolsManager {
     try {
       const fs = require('fs');
       
+      // Enhanced pre-flight checks
+      console.log(`🔍 DIAGNOSTIC: Preparing ${operation} operation...`);
+      
       // Map operations to direct script calls
       switch (operation) {
         case 'sync-docs':
           console.log('🔄 Running Google Docs sync...');
+          
+          // Pre-flight checks
+          const syncScript = path.join(this.chatbotDir, 'scripts', 'sync-google-docs.js');
+          if (!fs.existsSync(syncScript)) {
+            return `❌ Sync script not found: ${syncScript}`;
+          }
+          
+          const credentialsPath = path.join(this.chatbotDir, 'config', 'google-docs-credentials.json');
+          if (!fs.existsSync(credentialsPath)) {
+            return `❌ Google credentials not found: ${credentialsPath}\n💡 Please set up Google Docs credentials first.`;
+          }
+          
+          console.log('✅ Pre-flight checks passed');
+          console.log('⏱️  Starting sync operation (this may take a few minutes)...');
+          
           const syncResult = execSync(`cd "${this.chatbotDir}" && node scripts/sync-google-docs.js`, { 
-            encoding: 'utf8', stdio: 'pipe' 
+            encoding: 'utf8', stdio: 'pipe', timeout: 300000  // 5 minute timeout
           });
-          return syncResult;
+          return `✅ Google Docs sync completed:\n${syncResult}`;
           
         case 'sync-lore':
           console.log('🔄 Syncing lore content...');
@@ -57,12 +75,37 @@ class LoreToolsManager {
           
         case 'ingest':
           console.log('🔄 Running lore ingestion...');
+          
+          // Pre-flight checks
+          const ingestScript = path.join(this.chatbotDir, 'scripts', 'ingest-lore.js');
+          if (!fs.existsSync(ingestScript)) {
+            return `❌ Ingest script not found: ${ingestScript}`;
+          }
+          
+          const contentDir = path.join(this.chatbotDir, 'content');
+          if (!fs.existsSync(contentDir)) {
+            return `❌ Content directory not found: ${contentDir}\n💡 Run sync operations first to populate content.`;
+          }
+          
+          // Check for content files
+          const contentFiles = fs.readdirSync(contentDir, { recursive: true })
+            .filter(file => file.endsWith('.md') || file.endsWith('.txt'));
+          
+          console.log(`📊 Found ${contentFiles.length} content files to ingest`);
+          
+          if (contentFiles.length === 0) {
+            return `⚠️  No content files found in ${contentDir}\n💡 Run document sync first to generate content files.`;
+          }
+          
+          console.log('✅ Pre-flight checks passed');
+          console.log('⏱️  Starting ingestion (this may take several minutes)...');
+          
           execSync(`cd "${this.chatbotDir}" && node scripts/ingest-lore.js`, { 
             encoding: 'utf8', 
             stdio: 'inherit',
-            timeout: 60000 
+            timeout: 300000  // 5 minute timeout
           });
-          return '✅ Lore ingestion completed';
+          return `✅ Lore ingestion completed successfully\n📊 Processed ${contentFiles.length} files`;
           
         case 'full-sync':
           console.log('🔄 Running full synchronization...');
@@ -104,7 +147,31 @@ class LoreToolsManager {
       }
       
     } catch (error) {
-      return `❌ Error executing operation: ${error.message}`;
+      console.log(`❌ OPERATION FAILED: ${operation}`);
+      console.log(`📄 Error details: ${error.message}`);
+      
+      // Enhanced error diagnostics
+      if (error.code === 'ETIMEDOUT') {
+        console.log('⏱️  TIMEOUT: Operation took longer than expected');
+        console.log('💡 Try running the operation again or check network connectivity');
+      } else if (error.code === 'ENOENT') {
+        console.log('📁 FILE NOT FOUND: Required script or file is missing');
+        console.log('💡 Check that all required scripts are properly installed');
+      } else if (error.message.includes('permission')) {
+        console.log('🔒 PERMISSION ERROR: Insufficient file or API permissions');
+        console.log('💡 Check file permissions and Google API credentials');
+      } else if (error.message.includes('EACCES')) {
+        console.log('🔒 ACCESS DENIED: File system permission issue');
+        console.log('💡 Check that the script has write access to required directories');
+      }
+      
+      console.log('\n🛠️  TROUBLESHOOTING STEPS:');
+      console.log('1. Check system status (option 6) for missing dependencies');
+      console.log('2. Verify Google credentials are properly configured');
+      console.log('3. Ensure all required scripts exist in Wavelength-Chatbot');
+      console.log('4. Try running individual operations to isolate the issue');
+      
+      return `❌ Operation failed: ${error.message}`;
     }
   }
 
@@ -119,14 +186,30 @@ class LoreToolsManager {
     console.log('6. 📊 System Status');
     console.log('7. 🛠️  Direct Chatbot Tools');
     console.log('8. 📚 Documentation Navigator');
-    console.log('9. Exit');
+    console.log('9. 🔗 Google Docs Sharing Guide');
+    console.log('10. Exit');
   }
 
   async registerDocument() {
     console.log('\n📄 REGISTER NEW GOOGLE DOCUMENT');
     console.log('===============================');
-    console.log('⚠️  Document registration requires manual configuration');
-    console.log('📋 Please add the document to the Google Docs config file manually:');
+    
+    // Enhanced diagnostics
+    console.log('🔍 DIAGNOSTIC: Checking prerequisites...');
+    const configFilePath = path.join(this.chatbotDir, 'config', 'google-docs-config.js');
+    const fs = require('fs');
+    
+    if (!fs.existsSync(configFilePath)) {
+      console.log('❌ CRITICAL: Google Docs config file not found!');
+      console.log(`📁 Expected location: ${configFilePath}`);
+      console.log('💡 Please ensure Wavelength-Chatbot is properly set up.');
+      return;
+    }
+    
+    console.log('✅ Config file found');
+    console.log('📋 Document registration supports both manual and guided configuration');
+    
+    const registrationMode = await this.askQuestion('🔧 Choose mode:\n  1. Manual configuration (show config to copy)\n  2. Automatic configuration (add directly to config file)\n📋 Choose (1-2): ');
     
     const url = await this.askQuestion('🔗 Google Docs URL or Document ID: ');
     const name = await this.askQuestion('📝 Document name: ');
@@ -147,34 +230,172 @@ class LoreToolsManager {
     
     const description = await this.askQuestion('📄 Brief description (optional): ');
     
-    console.log('\n📋 CONFIGURATION TO ADD:');
-    console.log('========================');
-    console.log('Add this to your Wavelength-Chatbot/config/google-docs-config.js:');
-    console.log('');
-    console.log('{');
-    console.log(`  id: "${url.includes('docs.google.com') ? url.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] || url : url}",`);
-    console.log(`  name: "${name}",`);
-    console.log(`  category: "${category}",`);
-    console.log(`  description: "${description || ''}"`);
-    console.log('}');
-    console.log('');
-    console.log('💡 After adding the configuration, run option 2 (Document Ingestion) to sync the document.');
+    const documentId = url.includes('docs.google.com') ? url.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] || url : url;
+    const newDocument = {
+      name: name,
+      documentId: documentId,
+      category: category,
+      tags: [category, 'user-added'],
+      description: description || `User-added document: ${name}`
+    };
     
-    const configPath = path.join(this.chatbotDir, 'config', 'google-docs-config.js');
-    console.log(`📁 Config file location: ${configPath}`);
+    if (registrationMode === '2') {
+      // Automatic configuration
+      console.log('\n� AUTOMATIC CONFIGURATION');
+      console.log('==========================');
+      console.log('🔍 DIAGNOSTIC: Reading current configuration...');
+      
+      try {
+        // Read the config file
+        const configContent = fs.readFileSync(configFilePath, 'utf8');
+        
+        // Find the DOCUMENTS_CONFIG array
+        const arrayMatch = configContent.match(/const DOCUMENTS_CONFIG = \[([\s\S]*?)\];/);
+        if (!arrayMatch) {
+          console.log('❌ Could not find DOCUMENTS_CONFIG array in config file');
+          console.log('💡 Falling back to manual configuration...');
+          registrationMode = '1';
+        } else {
+          console.log('✅ Found DOCUMENTS_CONFIG array');
+          
+          // Parse existing documents
+          let existingDocs;
+          try {
+            // Use require to load the config
+            delete require.cache[require.resolve(configFilePath)];
+            const config = require(configFilePath);
+            existingDocs = config.DOCUMENTS_CONFIG || [];
+            
+            // Check for duplicates
+            const duplicate = existingDocs.find(doc => 
+              doc.documentId === documentId || doc.name === name
+            );
+            
+            if (duplicate) {
+              console.log('⚠️  DUPLICATE DETECTED:');
+              console.log(`   Existing: ${duplicate.name} (${duplicate.documentId})`);
+              console.log(`   New: ${name} (${documentId})`);
+              
+              const overwrite = await this.askQuestion('🔄 Overwrite existing document? (y/n): ');
+              if (overwrite.toLowerCase() !== 'y') {
+                console.log('❌ Registration cancelled');
+                return;
+              }
+              
+              // Remove duplicate
+              const index = existingDocs.findIndex(doc => doc.documentId === documentId);
+              if (index !== -1) {
+                existingDocs.splice(index, 1);
+                console.log('🗑️  Removed existing duplicate');
+              }
+            }
+            
+            // Add new document
+            existingDocs.push(newDocument);
+            console.log('✅ Document added to configuration');
+            
+            // Write back to file
+            const newArrayContent = JSON.stringify(existingDocs, null, 2);
+            const newConfigContent = configContent.replace(
+              /const DOCUMENTS_CONFIG = \[([\s\S]*?)\];/,
+              `const DOCUMENTS_CONFIG = ${newArrayContent};`
+            );
+            
+            // Backup original
+            const backupPath = configFilePath + '.backup.' + Date.now();
+            fs.writeFileSync(backupPath, configContent);
+            console.log(`💾 Backup created: ${path.basename(backupPath)}`);
+            
+            // Write new config
+            fs.writeFileSync(configFilePath, newConfigContent);
+            console.log('✅ Configuration file updated successfully!');
+            
+            console.log('\n🎉 REGISTRATION COMPLETE');
+            console.log('========================');
+            console.log(`📄 Document: ${name}`);
+            console.log(`🆔 ID: ${documentId}`);
+            console.log(`📂 Category: ${category}`);
+            console.log(`📝 Description: ${description || 'None'}`);
+            console.log('\n💡 Next steps:');
+            console.log('   1. 🔗 SHARE the document with the service account (CRITICAL!)');
+            console.log(`      Email: ${serviceAccountEmail}`);
+            console.log(`      Document: https://docs.google.com/document/d/${documentId}/edit`);
+            console.log('   2. Run option 9 (Google Docs Sharing Guide) for detailed instructions');
+            console.log('   3. Run option 2 (Document Ingestion) to sync the document');
+            console.log('   4. Verify the document appears in the list');
+            
+          } catch (parseError) {
+            console.log('❌ Error parsing configuration:', parseError.message);
+            registrationMode = '1';
+          }
+        }
+      } catch (readError) {
+        console.log('❌ Error reading configuration file:', readError.message);
+        registrationMode = '1';
+      }
+    }
+    
+    if (registrationMode === '1') {
+      // Manual configuration
+      console.log('\n📋 MANUAL CONFIGURATION');
+      console.log('========================');
+      console.log('Add this to your Wavelength-Chatbot/config/google-docs-config.js:');
+      console.log('');
+      console.log('{');
+      console.log(`  "name": "${name}",`);
+      console.log(`  "documentId": "${documentId}",`);
+      console.log(`  "category": "${category}",`);
+      console.log(`  "tags": [${newDocument.tags.map(tag => `"${tag}"`).join(', ')}],`);
+      console.log(`  "description": "${newDocument.description}"`);
+      console.log('}');
+      console.log('');
+      console.log('💡 Next steps:');
+      console.log('   1. Add the configuration above to the config file');
+      console.log('   2. 🔗 SHARE the document with the service account:');
+      console.log(`      📧 Email: ${serviceAccountEmail}`);
+      console.log(`      📄 Document: https://docs.google.com/document/d/${documentId}/edit`);
+      console.log('   3. Run option 9 (Google Docs Sharing Guide) for detailed sharing instructions');
+      console.log('   4. Run option 2 (Document Ingestion) to sync the document');
+      console.log(`📁 Config file location: ${configFilePath}`);
+    }
   }
 
   async manageIngestion() {
     console.log('\n📚 DOCUMENT INGESTION MANAGEMENT');
     console.log('===============================');
-    console.log('1. List configured documents');
-    console.log('2. Sync Google Docs');
-    console.log('3. Ingest lore content');
-    console.log('4. Sync and ingest (full pipeline)');
     
-    const choice = await this.askQuestion('\n📋 Choose action (1-4): ');
+    // Enhanced diagnostics
+    console.log('🔍 DIAGNOSTIC: Checking ingestion prerequisites...');
+    const fs = require('fs');
+    
+    // Check if credentials exist
+    const credentialsPath = path.join(this.chatbotDir, 'config', 'google-docs-credentials.json');
+    const hasCredentials = fs.existsSync(credentialsPath);
+    console.log(`📋 Google credentials: ${hasCredentials ? '✅ Found' : '❌ Missing'}`);
+    
+    if (!hasCredentials) {
+      console.log('⚠️  WARNING: Google Docs credentials not found!');
+      console.log(`📁 Expected location: ${credentialsPath}`);
+      console.log('💡 Some operations may fail without proper credentials.');
+    }
+    
+    // Check script availability
+    const syncScript = path.join(this.chatbotDir, 'scripts', 'sync-google-docs.js');
+    const ingestScript = path.join(this.chatbotDir, 'scripts', 'ingest-lore.js');
+    
+    console.log(`🔄 Sync script: ${fs.existsSync(syncScript) ? '✅ Available' : '❌ Missing'}`);
+    console.log(`📥 Ingest script: ${fs.existsSync(ingestScript) ? '✅ Available' : '❌ Missing'}`);
+    
+    console.log('\n📋 Available operations:');
+    console.log('1. List configured documents (always available)');
+    console.log('2. Sync Google Docs (requires credentials)');
+    console.log('3. Ingest lore content (requires content files)');
+    console.log('4. Sync and ingest (full pipeline)');
+    console.log('5. Test connection (diagnostic)');
+    
+    const choice = await this.askQuestion('\n📋 Choose action (1-5): ');
     const actionMap = {
-      '1': 'list', '2': 'sync-docs', '3': 'ingest', '4': 'full-sync'
+      '1': 'list', '2': 'sync-docs', '3': 'ingest', '4': 'full-sync', '5': 'test-connection'
     };
     
     const action = actionMap[choice];
@@ -184,8 +405,61 @@ class LoreToolsManager {
     }
     
     console.log('\n🔄 Processing...');
+    
+    if (action === 'test-connection') {
+      await this.testConnection();
+      return;
+    }
+    
+    // Show progress indicator for longer operations
+    if (['sync-docs', 'full-sync'].includes(action)) {
+      console.log('⏱️  This operation may take several minutes...');
+      console.log('📊 Progress will be shown as the operation proceeds');
+    }
+    
     const result = await this.callDirectScript(action);
     console.log(result);
+  }
+
+  async testConnection() {
+    console.log('\n🔌 CONNECTION TEST');
+    console.log('==================');
+    
+    const fs = require('fs');
+    const credentialsPath = path.join(this.chatbotDir, 'config', 'google-docs-credentials.json');
+    
+    if (!fs.existsSync(credentialsPath)) {
+      console.log('❌ FAIL: Credentials file not found');
+      return;
+    }
+    
+    try {
+      const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
+      console.log('✅ Credentials file readable');
+      console.log(`📧 Service account: ${credentials.client_email || 'Unknown'}`);
+      
+      // Test basic Google API access
+      console.log('🔄 Testing Google API connection...');
+      
+      const { google } = require('googleapis');
+      const auth = new google.auth.JWT(
+        credentials.client_email,
+        null,
+        credentials.private_key,
+        ['https://www.googleapis.com/auth/documents.readonly']
+      );
+      
+      await auth.authorize();
+      console.log('✅ Google API authentication successful');
+      
+    } catch (error) {
+      console.log('❌ FAIL: Connection test failed');
+      console.log(`📄 Error: ${error.message}`);
+      console.log('\n💡 Troubleshooting:');
+      console.log('   1. Check credentials file format');
+      console.log('   2. Verify service account permissions');
+      console.log('   3. Ensure Google Docs API is enabled');
+    }
   }
 
   async manageContentSync() {
@@ -419,6 +693,365 @@ class LoreToolsManager {
     }
   }
 
+  async googleDocsSharingGuide() {
+    console.log('\n🔗 GOOGLE DOCS SHARING GUIDE');
+    console.log('============================');
+    
+    // Get service account email from config
+    const configPath = path.join(this.chatbotDir, 'config', 'google-docs-config.js');
+    const fs = require('fs');
+    
+    let serviceAccountEmail = 'wavelength-docs-sync@wavelength-lore.iam.gserviceaccount.com';
+    
+    try {
+      delete require.cache[require.resolve(configPath)];
+      const config = require(configPath);
+      serviceAccountEmail = config.GOOGLE_SERVICE_ACCOUNT_EMAIL || serviceAccountEmail;
+    } catch (error) {
+      console.log('⚠️  Could not read config file, using default service account email');
+    }
+    
+    console.log('📧 SERVICE ACCOUNT EMAIL:');
+    console.log(`   ${serviceAccountEmail}`);
+    console.log('');
+    
+    console.log('🔍 SHARING OPTIONS:');
+    console.log('1. Share a specific document (guided walkthrough)');
+    console.log('2. Share all configured documents (batch guide)');
+    console.log('3. Verify document permissions');
+    console.log('4. Troubleshoot sharing issues');
+    
+    const choice = await this.askQuestion('\n📋 Choose option (1-4): ');
+    
+    switch (choice) {
+      case '1':
+        await this.shareSpecificDocument(serviceAccountEmail);
+        break;
+      case '2':
+        await this.shareAllDocuments(serviceAccountEmail);
+        break;
+      case '3':
+        await this.verifyDocumentPermissions(serviceAccountEmail);
+        break;
+      case '4':
+        await this.troubleshootSharing(serviceAccountEmail);
+        break;
+      default:
+        console.log('❌ Invalid choice');
+    }
+  }
+
+  async shareSpecificDocument(serviceAccountEmail) {
+    console.log('\n📄 SHARE SPECIFIC DOCUMENT');
+    console.log('==========================');
+    
+    const docUrl = await this.askQuestion('🔗 Google Docs URL or Document ID: ');
+    const documentId = docUrl.includes('docs.google.com') ? 
+      docUrl.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] || docUrl : docUrl;
+    
+    if (!documentId) {
+      console.log('❌ Invalid document URL or ID');
+      return;
+    }
+    
+    console.log('\n📋 STEP-BY-STEP SHARING INSTRUCTIONS:');
+    console.log('=====================================');
+    console.log('');
+    console.log('🌐 Step 1: Open the Google Document');
+    console.log(`   📎 URL: https://docs.google.com/document/d/${documentId}/edit`);
+    console.log('   💡 Click the link above or paste it into your browser');
+    console.log('');
+    console.log('🔗 Step 2: Access the Share Menu');
+    console.log('   🖱️  Click the "Share" button (blue button in top-right corner)');
+    console.log('   📧 Or click "Share with others" if prompted');
+    console.log('');
+    console.log('👥 Step 3: Add the Service Account');
+    console.log('   📧 In the "Add people" field, enter:');
+    console.log(`      ${serviceAccountEmail}`);
+    console.log('   ⌨️  Press Enter or click "Send"');
+    console.log('');
+    console.log('🔒 Step 4: Set Permissions');
+    console.log('   📖 Permission level: "Viewer" (default - this is correct!)');
+    console.log('   🔔 Notification: You can uncheck "Notify people" (optional)');
+    console.log('   ✅ Click "Send" or "Done"');
+    console.log('');
+    console.log('✅ Step 5: Verification');
+    console.log('   📋 You should see the service account email in the shared users list');
+    console.log('   🎯 Status should show "Can view"');
+    console.log('');
+    
+    console.log('💡 QUICK COPY-PASTE:');
+    console.log('===================');
+    console.log('🔗 Document URL:');
+    console.log(`https://docs.google.com/document/d/${documentId}/edit`);
+    console.log('');
+    console.log('📧 Service Account Email:');
+    console.log(serviceAccountEmail);
+    console.log('');
+    
+    const testAccess = await this.askQuestion('🧪 Test document access after sharing? (y/n): ');
+    if (testAccess.toLowerCase() === 'y') {
+      await this.testDocumentAccess(documentId);
+    }
+  }
+
+  async shareAllDocuments(serviceAccountEmail) {
+    console.log('\n📚 SHARE ALL CONFIGURED DOCUMENTS');
+    console.log('==================================');
+    
+    // Get all configured documents
+    const configPath = path.join(this.chatbotDir, 'config', 'google-docs-config.js');
+    const fs = require('fs');
+    
+    let documents = [];
+    try {
+      delete require.cache[require.resolve(configPath)];
+      const config = require(configPath);
+      documents = config.DOCUMENTS_CONFIG || [];
+    } catch (error) {
+      console.log('❌ Could not read document configuration');
+      return;
+    }
+    
+    if (documents.length === 0) {
+      console.log('📝 No documents configured yet');
+      console.log('💡 Use option 1 (Register New Google Document) to add documents first');
+      return;
+    }
+    
+    console.log(`📊 Found ${documents.length} configured documents:`);
+    console.log('');
+    
+    documents.forEach((doc, index) => {
+      console.log(`${index + 1}. ${doc.name}`);
+      console.log(`   📄 ID: ${doc.documentId}`);
+      console.log(`   🔗 URL: https://docs.google.com/document/d/${doc.documentId}/edit`);
+      console.log(`   📂 Category: ${doc.category}`);
+      console.log('');
+    });
+    
+    console.log('🔗 BATCH SHARING INSTRUCTIONS:');
+    console.log('==============================');
+    console.log('📧 Service Account Email to Share With:');
+    console.log(`   ${serviceAccountEmail}`);
+    console.log('');
+    console.log('📋 For EACH document above:');
+    console.log('1. 🌐 Open the document URL');
+    console.log('2. 🔗 Click "Share" button');
+    console.log(`3. 📧 Add: ${serviceAccountEmail}`);
+    console.log('4. 🔒 Set permission: "Viewer"');
+    console.log('5. ✅ Click "Send"');
+    console.log('');
+    
+    console.log('⚡ QUICK REFERENCE:');
+    console.log('==================');
+    console.log('📧 Copy this email for sharing:');
+    console.log(serviceAccountEmail);
+    console.log('');
+    console.log('🔗 Document URLs:');
+    documents.forEach((doc, index) => {
+      console.log(`${index + 1}. https://docs.google.com/document/d/${doc.documentId}/edit`);
+    });
+    
+    const testAll = await this.askQuestion('\n🧪 Test access for all documents after sharing? (y/n): ');
+    if (testAll.toLowerCase() === 'y') {
+      for (const doc of documents) {
+        console.log(`\n🧪 Testing: ${doc.name}`);
+        await this.testDocumentAccess(doc.documentId);
+      }
+    }
+  }
+
+  async verifyDocumentPermissions(serviceAccountEmail) {
+    console.log('\n🔍 VERIFY DOCUMENT PERMISSIONS');
+    console.log('==============================');
+    
+    const docUrl = await this.askQuestion('🔗 Google Docs URL or Document ID: ');
+    const documentId = docUrl.includes('docs.google.com') ? 
+      docUrl.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] || docUrl : docUrl;
+    
+    if (!documentId) {
+      console.log('❌ Invalid document URL or ID');
+      return;
+    }
+    
+    console.log('\n📋 MANUAL VERIFICATION STEPS:');
+    console.log('=============================');
+    console.log(`🌐 1. Open: https://docs.google.com/document/d/${documentId}/edit`);
+    console.log('🔗 2. Click the "Share" button');
+    console.log('👥 3. Look for this email in the shared users list:');
+    console.log(`      ${serviceAccountEmail}`);
+    console.log('🔒 4. Verify permission shows "Can view"');
+    console.log('');
+    
+    await this.testDocumentAccess(documentId);
+  }
+
+  async testDocumentAccess(documentId) {
+    console.log('🧪 Testing API access...');
+    
+    try {
+      const { google } = require('googleapis');
+      const credentialsPath = path.join(this.chatbotDir, 'config', 'google-docs-credentials.json');
+      const fs = require('fs');
+      
+      if (!fs.existsSync(credentialsPath)) {
+        console.log('❌ Credentials file not found - cannot test API access');
+        return;
+      }
+      
+      const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
+      const auth = new google.auth.JWT(
+        credentials.client_email,
+        null,
+        credentials.private_key,
+        ['https://www.googleapis.com/auth/documents.readonly']
+      );
+      
+      const docs = google.docs({ version: 'v1', auth });
+      const response = await docs.documents.get({ documentId });
+      
+      console.log('✅ API ACCESS SUCCESS!');
+      console.log(`📄 Document title: ${response.data.title}`);
+      console.log(`📊 Content length: ${response.data.body?.content?.length || 0} elements`);
+      
+    } catch (error) {
+      console.log('❌ API ACCESS FAILED');
+      console.log(`📄 Error: ${error.message}`);
+      
+      if (error.code === 403) {
+        console.log('');
+        console.log('🔒 PERMISSION DENIED - Document not shared correctly');
+        console.log('💡 SOLUTION: Share the document with the service account:');
+        console.log(`   📧 ${error.config?.serviceAccountEmail || 'Service account email'}`);
+      } else if (error.code === 404) {
+        console.log('');
+        console.log('📄 DOCUMENT NOT FOUND');
+        console.log('💡 SOLUTION: Check the document ID is correct');
+      } else {
+        console.log('');
+        console.log('🛠️  POSSIBLE CAUSES:');
+        console.log('   1. Document not shared with service account');
+        console.log('   2. Incorrect document ID');
+        console.log('   3. Service account credentials invalid');
+        console.log('   4. Google Docs API not enabled');
+      }
+    }
+  }
+
+  async troubleshootSharing(serviceAccountEmail) {
+    console.log('\n🛠️  TROUBLESHOOT SHARING ISSUES');
+    console.log('===============================');
+    
+    console.log('🔍 COMMON ISSUES & SOLUTIONS:');
+    console.log('');
+    console.log('1. ❌ "Permission denied" or 403 errors');
+    console.log('   🔒 CAUSE: Document not shared with service account');
+    console.log('   ✅ SOLUTION: Share document with:');
+    console.log(`      ${serviceAccountEmail}`);
+    console.log('');
+    console.log('2. ❌ "Document not found" or 404 errors');
+    console.log('   📄 CAUSE: Wrong document ID or private document');
+    console.log('   ✅ SOLUTION: Check document URL and sharing settings');
+    console.log('');
+    console.log('3. ❌ Service account email bounces/not found');
+    console.log('   📧 CAUSE: Service account not created or wrong email');
+    console.log('   ✅ SOLUTION: Verify service account in Google Cloud Console');
+    console.log('');
+    console.log('4. ❌ API timeout or connection errors');
+    console.log('   🌐 CAUSE: Network issues or API limits');
+    console.log('   ✅ SOLUTION: Check internet connection, try again later');
+    console.log('');
+    
+    console.log('🧪 DIAGNOSTIC CHECKLIST:');
+    console.log('========================');
+    console.log('□ Service account email is correct');
+    console.log('□ Document is shared with service account');
+    console.log('□ Permission is set to "Viewer"');
+    console.log('□ Document ID extracted correctly from URL');
+    console.log('□ Google Docs API is enabled in Cloud Console');
+    console.log('□ Service account credentials file exists');
+    console.log('');
+    
+    console.log('📧 Current Service Account Email:');
+    console.log(serviceAccountEmail);
+    console.log('');
+    
+    const runDiagnostic = await this.askQuestion('🔧 Run full diagnostic test? (y/n): ');
+    if (runDiagnostic.toLowerCase() === 'y') {
+      await this.runSharingDiagnostic(serviceAccountEmail);
+    }
+  }
+
+  async runSharingDiagnostic(serviceAccountEmail) {
+    console.log('\n🔧 RUNNING DIAGNOSTIC TEST');
+    console.log('==========================');
+    
+    const fs = require('fs');
+    
+    // Test 1: Check credentials file
+    console.log('🧪 Test 1: Service Account Credentials');
+    const credentialsPath = path.join(this.chatbotDir, 'config', 'google-docs-credentials.json');
+    
+    if (!fs.existsSync(credentialsPath)) {
+      console.log('❌ FAIL: Credentials file not found');
+      console.log(`📁 Expected: ${credentialsPath}`);
+      return;
+    }
+    
+    try {
+      const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
+      console.log('✅ PASS: Credentials file readable');
+      console.log(`📧 Email: ${credentials.client_email}`);
+      
+      if (credentials.client_email !== serviceAccountEmail) {
+        console.log('⚠️  WARNING: Email mismatch!');
+        console.log(`   Config: ${serviceAccountEmail}`);
+        console.log(`   Credentials: ${credentials.client_email}`);
+      }
+    } catch (error) {
+      console.log('❌ FAIL: Credentials file invalid JSON');
+      return;
+    }
+    
+    // Test 2: Google API connection
+    console.log('\n🧪 Test 2: Google API Connection');
+    try {
+      const { google } = require('googleapis');
+      const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
+      const auth = new google.auth.JWT(
+        credentials.client_email,
+        null,
+        credentials.private_key,
+        ['https://www.googleapis.com/auth/documents.readonly']
+      );
+      
+      await auth.authorize();
+      console.log('✅ PASS: Google API authentication successful');
+    } catch (error) {
+      console.log('❌ FAIL: Google API authentication failed');
+      console.log(`📄 Error: ${error.message}`);
+      return;
+    }
+    
+    // Test 3: Test document access
+    console.log('\n🧪 Test 3: Document Access Test');
+    const testDocId = await this.askQuestion('📄 Enter test document ID (or press Enter to skip): ');
+    
+    if (testDocId.trim()) {
+      await this.testDocumentAccess(testDocId.trim());
+    } else {
+      console.log('⏭️  Skipped document access test');
+    }
+    
+    console.log('\n🎯 DIAGNOSTIC COMPLETE');
+    console.log('======================');
+    console.log('💡 If all tests pass but sync still fails, the issue is likely:');
+    console.log('   1. Document not shared with service account');
+    console.log('   2. Wrong document ID in configuration');
+    console.log('   3. Document is in a different Google account');
+  }
+
   async directChatbotTools() {
     console.log('\n🛠️  DIRECT CHATBOT TOOLS');
     console.log('=======================');
@@ -475,7 +1108,7 @@ class LoreToolsManager {
       while (continueMenu) {
         this.displayMainMenu();
         
-        const choice = await this.askQuestion('\n📋 Choose an option (1-8): ');
+        const choice = await this.askQuestion('\n📋 Choose an option (1-10): ');
         
         switch (choice) {
           case '1':
@@ -503,11 +1136,14 @@ class LoreToolsManager {
             await this.documentationNavigator();
             break;
           case '9':
+            await this.googleDocsSharingGuide();
+            break;
+          case '10':
             console.log('👋 Goodbye!');
             continueMenu = false;
             break;
           default:
-            console.log('❌ Invalid choice. Please choose 1-9.');
+            console.log('❌ Invalid choice. Please choose 1-10.');
         }
         
         if (continueMenu) {

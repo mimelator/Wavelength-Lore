@@ -308,7 +308,7 @@ class VendorPreviewHelper {
    * @param {string} baseUrl - Base URL for the application
    * @returns {string} Complete product URL
    */
-  generateProductUrl(productId, baseUrl = 'http://localhost:3001') {
+  generateProductUrl(productId, baseUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' ? 'https://df5sj8f594cdx.cloudfront.net' : 'http://localhost:3001')) {
     return `${baseUrl}/merchandise/product/${productId}`;
   }
 
