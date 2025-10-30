@@ -343,7 +343,7 @@ main.merchandise-main {
 
 .merchandise-store {
   max-width: 1400px;
-  margin: 20px;
+  margin: 20px auto;
   padding: 20px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
@@ -3169,38 +3169,204 @@ main.merchandise-main {
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-/* FIXED: Designed Product Cards - Make them wider for better UX */
+/* Prevent card overlapping - ensure proper spacing */
+.product-card {
+  margin-bottom: 30px;
+  z-index: 1;
+}
+
+.product-card:hover {
+  z-index: 10;
+}
+
+/* SIMPLIFIED: Clean Complete Product Cards */
 .product-card.complete-product {
-  min-width: 450px;
-  max-width: 600px;
   width: 100%;
+  max-width: 400px;
+  margin: 0 auto 20px auto;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+  position: relative;
 }
 
-/* Ensure finished products container uses full width */
+.product-card.complete-product:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+}
+
+/* Clean grid layout for complete products - properly sized cards */
 .finished-products-container,
 .created-products-grid,
 .designed-products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
   width: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-/* FIXED: Variant selector layout - Prevent narrow columns */
-.product-card .variant-selector-container {
-  width: 100%;
-  min-width: 400px;
+/* Simplified product type header */
+.product-card.complete-product .product-type-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  text-align: center;
 }
 
-.product-card .variant-selector {
-  width: 100%;
-  min-width: 350px;
+.product-card.complete-product .product-type-name {
   font-size: 0.9rem;
-  padding: 8px 12px;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Clean image container */
+.product-card.complete-product .product-image {
+  position: relative;
+  padding: 0;
+  background: white;
+}
+
+.product-card.complete-product .gorgeous-mockup-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 0;
+}
+
+/* Simplified product info */
+.product-card.complete-product .product-info {
+  padding: 20px;
+  background: white;
+}
+
+.product-card.complete-product .product-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 15px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* Clean product details */
+.product-card.complete-product .product-details {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.product-card.complete-product .detail-item {
+  font-size: 0.85rem;
+  color: #4a5568;
+  text-align: center;
+  flex: 1;
+}
+
+.product-card.complete-product .detail-item strong {
+  color: #667eea;
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* Simplified variant selection */
+.product-card.complete-product .variant-selector-container {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.product-card.complete-product .variant-selector {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: white;
+  color: #2d3748;
+  transition: border-color 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+.product-card.complete-product .variant-selector:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.product-card.complete-product .variant-selector:hover {
+  border-color: #667eea;
+}
+
+/* Clean add to cart button */
+.product-card.complete-product .add-to-cart-btn {
+  width: 100%;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.product-card.complete-product .add-to-cart-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.product-card.complete-product .add-to-cart-btn:disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Force hide unnecessary elements */
+.product-card.complete-product .variant-summary,
+.product-card.complete-product .inline-variants h5,
+.product-card.complete-product .variant-selector-hint,
+.product-card.complete-product .selected-variant-price,
+.product-card.complete-product .inline-variants.many-variants h5 {
+  display: none !important;
+}
+
+/* Simplify mockup quality badge */
+.product-card.complete-product .mockup-quality-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(102, 126, 234, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .product-item {

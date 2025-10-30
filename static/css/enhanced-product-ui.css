@@ -223,12 +223,14 @@
    RESPONSIVE IMPROVEMENTS FOR ALL SCREEN SIZES
    ============================================================================= */
 
-/* Product cards container */
+/* Product cards container - WIDER CARDS FOR BETTER LAYOUT */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
   box-sizing: border-box;
 }
 
@@ -246,10 +248,11 @@
   overflow: hidden;
 }
 
-/* Desktop adjustments for narrow columns */
+/* Desktop adjustments - KEEP WIDE CARDS */
 @media (min-width: 1200px) {
   .products-grid {
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    max-width: 1600px;
   }
 }
 
