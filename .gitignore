@@ -173,5 +173,7 @@ content/prompts/wavelength/Wavelength-Lore.code-workspace
 .env.test
 .package-backups/
 .package.lock
+# Ignore PNG files except static overlays (needed for production)
 *.png
+!static-overlays/**/*.png
 .private-notes-never-ever-update.md
