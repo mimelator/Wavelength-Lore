@@ -65,6 +65,7 @@ class WavelengthAppRunnerSync {
             'PRINTIFY_API_TOKEN', 'PRINTIFY_SHOP_ID', 'PRINTIFY_API_URL',
             'PRINTIFY_ENVIRONMENT', 'PRINTIFY_MOCK_MODE',
             'STRIPE_SECRET_KEY', 'STRIPE_PUBLISHABLE_KEY', 'STRIPE_ENVIRONMENT',
+            'STRIPE_WEBHOOK_SECRET',
             
             // Security & Admin
             'ADMIN_SECRET_KEY', 'ADMIN_ALLOWED_IPS',
