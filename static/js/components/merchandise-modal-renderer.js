@@ -1002,7 +1002,12 @@ class MerchandiseModalRenderer {
                   ← Back to Cart
                 </button>
                 <button class="btn-primary complete-order-btn" form="checkout-form">
-                  <span>💳</span> Complete Order ($${cartSummary.total.toFixed(2)})
+                  <span>💳</span> Complete Order ($${(() => {
+                    const subtotal = cartSummary.total;
+                    const shipping = this.calculateShipping(subtotal);
+                    const tax = this.calculateTax(subtotal);
+                    return (subtotal + shipping + tax).toFixed(2);
+                  })()})
                 </button>
               </div>
             </div>

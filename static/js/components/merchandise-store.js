@@ -4527,7 +4527,14 @@ class MerchandiseStore {
       // Reset button state
       const completeOrderBtn = document.querySelector('.complete-order-btn');
       const cartSummary = this.cartService.getSummary();
-      completeOrderBtn.innerHTML = `<span>💳</span> Complete Order ($${cartSummary.total.toFixed(2)})`;
+      
+      // Calculate full total including shipping and tax
+      const subtotal = cartSummary.total;
+      const shipping = subtotal >= 50 ? 0 : 5.99;
+      const tax = subtotal * 0.08;
+      const fullTotal = subtotal + shipping + tax;
+      
+      completeOrderBtn.innerHTML = `<span>💳</span> Complete Order ($${fullTotal.toFixed(2)})`;
       completeOrderBtn.disabled = false;
     }
   }
