@@ -42,7 +42,7 @@ class EndToEndTest {
     const uiToggles = {
       staticLightning: true,
       staticSparkles: true,
-      warmth: true,
+      sepia: true,
       borderEnabled: false
     };
 
@@ -97,7 +97,7 @@ class EndToEndTest {
     const userSelections = {
       staticSnow: true,
       staticFireflies: true,
-      warmth: true,
+      sepia: true,
       borderEnabled: false,
       borderWidth: 0,
       borderWidthPixels: 0,

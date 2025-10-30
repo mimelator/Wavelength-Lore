@@ -340,7 +340,7 @@ class MerchandiseModalRenderer {
         title: '🎨 Color Effects',
         effects: [
           { key: 'vibrancy', label: 'Enhanced Vibrancy', emoji: '🌈' },
-          { key: 'warmth', label: 'Golden Warmth', emoji: '🔥' },
+          { key: 'sepia', label: 'Sepia', emoji: '🤎' },
           { key: 'coolness', label: 'Cool Elegance', emoji: '❄️' }
         ]
       },

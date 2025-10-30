@@ -233,7 +233,7 @@ MODAL STATE TRACKING:
 Customization Modal State:
 ┌────────────────────────────────────────────────────────────────────┐
 │ modal.dataset {                                                    │
-│   selectedEffects: '{"vibrancy":true,"warmth":false}'             │
+│   selectedEffects: '{"vibrancy":true,"sepia":false}'              │
 │   selectedBorderWidth: '2'                                         │
 │   selectedBorderPixels: '20'                                       │
 │   selectedBorderColor: '#FF0000'                                   │

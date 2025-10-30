@@ -8,9 +8,9 @@ const effectsConfig = require('../config/effectsConfig');
 
 console.log('🧪 Testing Static Overlay Parameter Passing...\n');
 
-// Test case: Warmth effect + Static overlays + Border
+// Test case: Sepia effect + Static overlays + Border
 const testToggles = {
-  warmth: true,
+  sepia: true,
   staticSnow: true,
   staticSparkles: true,
   staticLightning: false,
