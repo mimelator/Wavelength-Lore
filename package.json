@@ -1,6 +1,6 @@
 {
   "name": "wavelength-lore",
-  "version": "1.1.66",
+  "version": "1.1.67",
   "description": "The Lore Site for the Wavelength Canon",
   "main": "index.js",
   "scripts": {
@@ -62,6 +62,10 @@
     "wavelength:content-audit": "node wavelength-content-audit.js",
     "wavelength:content-audit-html": "python3 -m http.server 8080 && open http://localhost:8080/wavelength-content-audit-report.html",
     "wavelength:ai-assistant": "node wavelength-ai-assistant-controller.js",
+    "firebase:validate": "node scripts/firebase-security-validation.js",
+    "firebase:validate-local": "node scripts/firebase-security-validation.js",
+    "firebase:validate-prod": "NODE_ENV=production node scripts/firebase-security-validation.js",
+    "firebase:validate-all": "scripts/validate-firebase-security.sh",
     "episode:create": "node cli/episode-creator.js",
     "episode:cli": "node cli/episode-creator.js"
   },
