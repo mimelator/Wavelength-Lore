@@ -670,11 +670,13 @@ class MerchandiseStore {
         // For testing scenarios, create a mock image if gallery is empty
         if (this.galleryImages.length === 0) {
           console.log('🧪 Test mode: Creating mock gallery image for testing');
+          // Use production-safe test image URL
+          const testImageUrl = window.location.origin + '/test-image.jpg';
           this.galleryImages = [{
             id: preselectImageId,
             title: 'Test Image',
-            url: 'http://localhost:3001/test-image.jpg',
-            thumbnailUrl: 'http://localhost:3001/test-image.jpg',
+            url: testImageUrl,
+            thumbnailUrl: testImageUrl,
             suitableForPrint: true
           }];
         }
