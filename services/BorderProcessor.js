@@ -8,10 +8,10 @@ const Sharp = require('sharp');
 
 class BorderProcessor {
   /**
-   * Apply border to image
+   * Apply border to image (INSET - preserves original dimensions)
    * @param {Buffer} imageBuffer - Input image buffer
    * @param {Object} borderParams - Border parameters
-   * @returns {Promise<Buffer>} - Image with border applied
+   * @returns {Promise<Buffer>} - Image with inset border applied
    */
   async applyBorder(imageBuffer, borderParams = {}) {
     try {
@@ -27,41 +27,45 @@ class BorderProcessor {
         return imageBuffer;
       }
 
-      console.log(`🖼️ Applying border: ${widthPixels}px, Color: ${colorHex}`);
+      console.log(`🖼️ Applying INSET border: ${widthPixels}px, Color: ${colorHex}`);
 
       // Get image metadata
       const metadata = await Sharp(imageBuffer).metadata();
       const { width: imgWidth, height: imgHeight } = metadata;
 
-      // Calculate new dimensions with border
-      const newWidth = imgWidth + (widthPixels * 2);
-      const newHeight = imgHeight + (widthPixels * 2);
+      console.log(`📐 Image dimensions preserved: ${imgWidth}x${imgHeight} (no dimension change)`);
 
-      // Parse hex color to RGB
-      const { r, g, b } = this.hexToRGB(colorHex);
+      // Clean SVG approach - single composite operation with proper inset border
+      const maxAllowedBorder = Math.min(imgWidth, imgHeight) / 4; // 25% of smallest dimension
+      const actualBorderWidth = Math.min(widthPixels, maxAllowedBorder);
+      
+      console.log(`🎨 Clean SVG Border: ${actualBorderWidth}px, inset within ${imgWidth}x${imgHeight}`);
 
-      console.log(`📐 Original: ${imgWidth}x${imgHeight}, With border: ${newWidth}x${newHeight}`);
+      // Create clean SVG with proper inset border frame
+      const borderSvg = `<svg width="${imgWidth}" height="${imgHeight}" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="${imgWidth}" height="${actualBorderWidth}" fill="${colorHex}"/>
+        <rect x="0" y="${imgHeight - actualBorderWidth}" width="${imgWidth}" height="${actualBorderWidth}" fill="${colorHex}"/>
+        <rect x="0" y="0" width="${actualBorderWidth}" height="${imgHeight}" fill="${colorHex}"/>
+        <rect x="${imgWidth - actualBorderWidth}" y="0" width="${actualBorderWidth}" height="${imgHeight}" fill="${colorHex}"/>
+      </svg>`;
 
-      // Create image with border using extend
+      // Single composite operation - most reliable approach
       const result = await Sharp(imageBuffer)
-        .extend({
-          top: widthPixels,
-          bottom: widthPixels,
-          left: widthPixels,
-          right: widthPixels,
-          background: { r, g, b, alpha: 1 }
-        })
-        .webp({
-          quality: 85,
-          alphaQuality: 100
-        })
+        .composite([{
+          input: Buffer.from(borderSvg),
+          top: 0,
+          left: 0,
+          blend: 'over'
+        }])
+        .png()
         .toBuffer();
 
-      console.log(`✅ Border applied successfully: ${(result.length / 1024).toFixed(2)} KB`);
+      console.log(`✅ INSET border applied successfully: ${(result.length / 1024).toFixed(2)} KB`);
+      console.log(`✅ Dimensions unchanged: ${imgWidth}x${imgHeight} - compatible with all Printify products`);
       return result;
 
     } catch (error) {
-      console.error(`❌ Error applying border:`, error.message);
+      console.error(`❌ Error applying inset border:`, error.message);
       throw error;
     }
   }
