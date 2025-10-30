@@ -14,15 +14,38 @@ if ! command -v aws &> /dev/null; then
     exit 1
 fi
 
-# Check AWS configuration
-if ! aws sts get-caller-identity &> /dev/null; then
-    echo "❌ AWS credentials not configured. Run 'aws configure' first."
+# Load environment variables for reliable AWS credentials
+if [ -f .env ]; then
+    # Load only the AWS credentials we need, avoiding problematic variable assignments
+    export AWS_ACCESS_KEY_ID=$(grep "^aws_wavelength_dev_access_key_id=" .env | cut -d '=' -f2)
+    export AWS_SECRET_ACCESS_KEY=$(grep "^aws_wavelength_dev_secret_access_key=" .env | cut -d '=' -f2)
+    export AWS_REGION=$(grep "^AWS_REGION=" .env | cut -d '=' -f2 | head -1)
+    export CLOUDFRONT_DISTRIBUTION_ID=$(grep "^CLOUDFRONT_DISTRIBUTION_ID=" .env | cut -d '=' -f2 | head -1)
+fi
+
+# Set default region if not found
+export AWS_DEFAULT_REGION="${AWS_REGION:-us-east-1}"
+
+# Verify AWS credentials are available
+if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+    echo "❌ AWS credentials not found in environment variables"
+    echo "   Required: aws_wavelength_dev_access_key_id and aws_wavelength_dev_secret_access_key"
     exit 1
 fi
 
-# Configuration
+# Test AWS connectivity
+echo "🔐 Testing AWS credentials..."
+IDENTITY=$(aws sts get-caller-identity --query 'Account' --output text 2>/dev/null)
+if [ $? -eq 0 ]; then
+    echo "✅ AWS credentials verified (Account: $IDENTITY)"
+else
+    echo "❌ AWS credentials invalid or insufficient permissions"
+    exit 1
+fi
+
+# Configuration - use production CloudFront distribution
 BUCKET_NAME=${S3_BUCKET_NAME:-"wavelength-lore-bucket"}
-CLOUDFRONT_ID=${CLOUDFRONT_DISTRIBUTION_ID:-""}
+CLOUDFRONT_ID=${CLOUDFRONT_DISTRIBUTION_ID:-"E2QFR8E7I4A6ZT"}
 
 echo "📦 Bucket: $BUCKET_NAME"
 echo ""
