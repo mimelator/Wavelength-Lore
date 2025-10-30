@@ -218,7 +218,7 @@
         .priority-medium { background: #17a2b8; }
         .priority-low { background: #28a745; }
         
-        /* Product Types Grid */
+        /* Product Types Grid - CRITICAL: Uses .product-type-card NOT .product-item */
         .product-category {
             margin-bottom: 40px;
         }
@@ -229,22 +229,21 @@
             font-size: 1.5rem;
         }
         
-        .product-types-grid {
+        .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
         }
         
         .product-type-card {
             background: white;
             border: 2px solid #e9ecef;
-            border-radius: 15px;
-            padding: 25px;
+            border-radius: 12px;
+            padding: 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
         .product-type-card:hover {
@@ -260,9 +259,8 @@
         }
         
         .product-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            display: block;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
         }
         
         .product-name {
@@ -310,17 +308,16 @@
         }
         
         .current-image img {
-            max-width: 300px;
-            max-height: 300px;
+            max-width: 200px;
+            max-height: 200px;
             object-fit: cover;
-            border-radius: 12px;
+            border-radius: 8px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         
         .enhanced-placeholder {
-            width: 300px;
-            height: 300px;
+            width: 200px;
+            height: 200px;
             border: 2px dashed #667eea;
             border-radius: 8px;
             display: flex;
@@ -643,8 +640,8 @@
                 <a class="navbar-brand" href="/">Wavelength Lore</a>
                 <div class="navbar-nav ms-auto">
                     <a class="nav-link" href="/gallery">Gallery</a>
-                    <a class="nav-link" href="/merchandise">Standard Merchandise</a>
-                    <a class="nav-link active" href="/enhanced-merchandise">AI-Enhanced Merchandise</a>
+                    <a class="nav-link" href="/merchandise">Liberation Vault Store</a>
+                    <a class="nav-link active" href="/ai-enhanced-merchandise">AI-Enhanced Creator</a>
                     <a class="nav-link" href="/logout">Logout</a>
                 </div>
             </div>

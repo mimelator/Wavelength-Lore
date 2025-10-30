@@ -373,18 +373,36 @@ class LoreToolsManager {
     const hasCredentials = fs.existsSync(credentialsPath);
     console.log(`📋 Google credentials: ${hasCredentials ? '✅ Found' : '❌ Missing'}`);
     
+    // Check script availability
+    const syncScript = path.join(this.chatbotDir, 'scripts', 'sync-google-docs.js');
+    const ingestScript = path.join(this.chatbotDir, 'scripts', 'ingest-lore.js');
+    const packageJsonPath = path.join(this.chatbotDir, 'package.json');
+    
+    console.log(`� Sync script: ${fs.existsSync(syncScript) ? '✅ Available' : '❌ Missing'}`);
+    console.log(`� Ingest script: ${fs.existsSync(ingestScript) ? '✅ Available' : '❌ Missing'}`);
+    console.log(`📦 Chatbot project: ${fs.existsSync(packageJsonPath) ? '✅ Found' : '❌ Missing'}`);
+    
+    // Check Node.js dependencies
+    if (fs.existsSync(packageJsonPath)) {
+      const nodeModulesPath = path.join(this.chatbotDir, 'node_modules');
+      const hasNodeModules = fs.existsSync(nodeModulesPath);
+      const hasGoogleApis = fs.existsSync(path.join(this.chatbotDir, 'node_modules', 'googleapis'));
+      
+      console.log(`� Dependencies: ${hasNodeModules ? '✅ Installed' : '❌ Missing (run npm install)'}`);
+      console.log(`🔗 Google APIs: ${hasGoogleApis ? '✅ Available' : '❌ Missing (run npm install googleapis)'}`);
+      
+      if (!hasNodeModules) {
+        console.log(`� TIP: cd "${this.chatbotDir}" && npm install`);
+      } else if (!hasGoogleApis) {
+        console.log(`💡 TIP: cd "${this.chatbotDir}" && npm install googleapis`);
+      }
+    }
+    
     if (!hasCredentials) {
       console.log('⚠️  WARNING: Google Docs credentials not found!');
       console.log(`📁 Expected location: ${credentialsPath}`);
       console.log('💡 Some operations may fail without proper credentials.');
     }
-    
-    // Check script availability
-    const syncScript = path.join(this.chatbotDir, 'scripts', 'sync-google-docs.js');
-    const ingestScript = path.join(this.chatbotDir, 'scripts', 'ingest-lore.js');
-    
-    console.log(`🔄 Sync script: ${fs.existsSync(syncScript) ? '✅ Available' : '❌ Missing'}`);
-    console.log(`📥 Ingest script: ${fs.existsSync(ingestScript) ? '✅ Available' : '❌ Missing'}`);
     
     console.log('\n📋 Available operations:');
     console.log('1. List configured documents (always available)');
@@ -430,6 +448,7 @@ class LoreToolsManager {
     
     if (!fs.existsSync(credentialsPath)) {
       console.log('❌ FAIL: Credentials file not found');
+      console.log(`📁 Expected: ${credentialsPath}`);
       return;
     }
     
@@ -438,19 +457,62 @@ class LoreToolsManager {
       console.log('✅ Credentials file readable');
       console.log(`📧 Service account: ${credentials.client_email || 'Unknown'}`);
       
-      // Test basic Google API access
+      // Test basic Google API access by running the test from the chatbot directory
       console.log('🔄 Testing Google API connection...');
+      console.log('📍 Running test from Wavelength-Chatbot directory...');
       
-      const { google } = require('googleapis');
-      const auth = new google.auth.JWT(
-        credentials.client_email,
-        null,
-        credentials.private_key,
-        ['https://www.googleapis.com/auth/documents.readonly']
-      );
-      
-      await auth.authorize();
-      console.log('✅ Google API authentication successful');
+      try {
+        // Test by running the sync script with a dry-run or test flag
+        const testScript = `
+          const { google } = require('googleapis');
+          const fs = require('fs');
+          
+          const credentials = JSON.parse(fs.readFileSync('config/google-docs-credentials.json', 'utf8'));
+          const auth = new google.auth.JWT(
+            credentials.client_email,
+            null,
+            credentials.private_key,
+            ['https://www.googleapis.com/auth/documents.readonly']
+          );
+          
+          auth.authorize()
+            .then(() => console.log('✅ Google API authentication successful'))
+            .catch(err => {
+              console.log('❌ Google API authentication failed:', err.message);
+              process.exit(1);
+            });
+        `;
+        
+        const { execSync } = require('child_process');
+        const result = execSync(`cd "${this.chatbotDir}" && node -e "${testScript.replace(/"/g, '\\"')}"`, { 
+          encoding: 'utf8',
+          timeout: 30000
+        });
+        
+        console.log(result.trim());
+        
+      } catch (testError) {
+        console.log('❌ FAIL: Google API connection test failed');
+        console.log(`📄 Error: ${testError.message}`);
+        
+        if (testError.message.includes('googleapis')) {
+          console.log('\n🔧 MISSING DEPENDENCY: googleapis module not installed');
+          console.log('💡 SOLUTION: Install dependencies in Wavelength-Chatbot:');
+          console.log(`   cd "${this.chatbotDir}"`);
+          console.log('   npm install googleapis');
+        } else if (testError.message.includes('ENOENT')) {
+          console.log('\n📁 MISSING FILES: Chatbot project not properly set up');
+          console.log('💡 SOLUTION: Ensure Wavelength-Chatbot is properly installed:');
+          console.log(`   cd "${this.chatbotDir}"`);
+          console.log('   npm install');
+        } else {
+          console.log('\n💡 Troubleshooting:');
+          console.log('   1. Check credentials file format');
+          console.log('   2. Verify service account permissions');
+          console.log('   3. Ensure Google Docs API is enabled');
+          console.log('   4. Install googleapis in Wavelength-Chatbot: npm install googleapis');
+        }
+      }
       
     } catch (error) {
       console.log('❌ FAIL: Connection test failed');

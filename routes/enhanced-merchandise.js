@@ -18,9 +18,10 @@ const enhancedPrintifyService = new EnhancedPrintifyService();
  * GET /enhanced-merchandise
  */
 router.get('/', ensureAuthenticated, (req, res) => {
-  res.render('enhanced-merchandise', {
+  res.render('ai-enhanced-merchandise', {
     title: 'AI-Enhanced Merchandise Creator',
-    user: req.user
+    user: req.user,
+    version: require('../package.json').version || '1.0.0'
   });
 });
 

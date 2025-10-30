@@ -8,6 +8,331 @@
     <link rel="stylesheet" href="/css/enhanced-product-ui.css?v=<%= version %>">
     <link rel="stylesheet" href="/css/gorgeous-mockups.css?v=<%= version %>">
 
+    <!-- ULTIMATE ENHANCED PRODUCT STYLING - Best UX from AI-Enhanced System -->
+    <style>
+        /* Enhanced Products Grid with Perfect Spacing */
+        .products-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+            gap: 20px !important;
+            padding: 25px 0 !important;
+            margin: 20px 0 !important;
+        }
+        
+        /* Beautiful Product Cards with Hover Magic */
+        .product-item {
+            background: white !important;
+            border: 2px solid #e9ecef !important;
+            border-radius: 15px !important;
+            padding: 25px !important;
+            text-align: center !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08) !important;
+            overflow: hidden !important;
+        }
+        
+        .product-item:hover {
+            border-color: #667eea !important;
+            transform: translateY(-8px) !important;
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2) !important;
+        }
+        
+        .product-item.selected {
+            border-color: #667eea !important;
+            background: linear-gradient(135deg, #667eea, #764ba2) !important;
+            color: white !important;
+            transform: translateY(-5px) !important;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+        }
+        
+        /* FIXED: Larger Product Preview Images - No More Postage Stamps */
+        .product-preview-image {
+            width: 100% !important;
+            height: 240px !important;
+            margin-bottom: 20px !important;
+            border-radius: 12px !important;
+            overflow: hidden !important;
+            position: relative !important;
+        }
+        
+        .product-preview-image img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            border-radius: 12px !important;
+        }
+        
+        /* FIXED: Product Preview Text Overlay - No More Cropping */
+        .product-preview-text {
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8)) !important;
+            color: white !important;
+            padding: 15px 10px 10px !important;
+            font-size: 0.9rem !important;
+            font-weight: 600 !important;
+            text-align: center !important;
+            border-radius: 0 0 12px 12px !important;
+        }
+        
+        /* Selection Indicator Badge */
+        .product-item::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 0;
+            height: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .product-item.selected::after {
+            content: '✓';
+            width: 28px;
+            height: 28px;
+            background: rgba(255,255,255,0.9);
+            color: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* FIXED: Product Info Section - No More Text Cropping */
+        .product-info {
+            padding: 0 5px !important;
+            min-height: 120px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+        }
+        
+        .product-item .product-name {
+            font-weight: 600 !important;
+            font-size: 1.05rem !important;
+            line-height: 1.3 !important;
+            margin-bottom: 8px !important;
+            color: #333 !important;
+            overflow: hidden !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+        }
+        
+        .product-item.selected .product-name {
+            color: white !important;
+        }
+        
+        .product-description {
+            font-size: 0.85rem !important;
+            color: #666 !important;
+            line-height: 1.3 !important;
+            margin-bottom: 12px !important;
+            overflow: hidden !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+        }
+        
+        .product-item.selected .product-description {
+            color: rgba(255,255,255,0.9) !important;
+        }
+        
+        .product-item .product-price {
+            color: #28a745 !important;
+            font-weight: bold !important;
+            font-size: 1.1rem !important;
+            margin-top: auto !important;
+        }
+        
+        .product-item.selected .product-price {
+            color: #a8e6cf !important;
+        }
+        
+        /* FIXED: Product Select Button - Better Positioning */
+        .product-select-btn {
+            margin-top: 15px !important;
+            padding: 10px 15px !important;
+            font-size: 0.9rem !important;
+            border-radius: 8px !important;
+            border: 2px solid #667eea !important;
+            background: white !important;
+            color: #667eea !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .product-select-btn:hover {
+            background: #667eea !important;
+            color: white !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        .product-item.selected .product-select-btn {
+            background: rgba(255,255,255,0.9) !important;
+            color: #667eea !important;
+            border-color: rgba(255,255,255,0.9) !important;
+        }
+        
+        /* Enhanced Preview Dialog Improvements */
+        .modal-dialog.modal-lg {
+            max-width: 900px !important;
+        }
+        
+        .product-preview-container {
+            display: flex !important;
+            gap: 30px !important;
+            align-items: flex-start !important;
+            margin-bottom: 25px !important;
+        }
+        
+        .preview-image-section {
+            flex: 1 !important;
+            text-align: center !important;
+        }
+        
+        .preview-image-section img {
+            max-width: 100% !important;
+            max-height: 400px !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        }
+        
+        .product-details-section {
+            flex: 1 !important;
+            padding-left: 20px !important;
+        }
+        
+        .product-details-section h4 {
+            color: #333 !important;
+            margin-bottom: 15px !important;
+            font-size: 1.4rem !important;
+        }
+        
+        .product-features {
+            list-style: none !important;
+            padding: 0 !important;
+        }
+        
+        .product-features li {
+            padding: 8px 0 !important;
+            border-bottom: 1px solid #f0f0f0 !important;
+            display: flex !important;
+            justify-content: space-between !important;
+        }
+        
+        .product-features li:last-child {
+            border-bottom: none !important;
+        }
+        
+        .feature-label {
+            font-weight: 500 !important;
+            color: #666 !important;
+        }
+        
+        .feature-value {
+            font-weight: bold !important;
+            color: #333 !important;
+        }
+        
+        /* Enhanced Modal Styling */
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2) !important;
+            color: white !important;
+            border-bottom: none !important;
+        }
+        
+        .modal-title {
+            font-weight: 600 !important;
+        }
+        
+        .btn-close {
+            filter: brightness(0) invert(1) !important;
+        }
+        
+        .modal-body {
+            padding: 30px !important;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid #f0f0f0 !important;
+            padding: 20px 30px !important;
+        }
+        
+        /* Responsive Design for Mobile */
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+                gap: 15px !important;
+                padding: 15px 0 !important;
+            }
+            
+            .product-item {
+                padding: 20px !important;
+            }
+            
+            .product-preview-image {
+                height: 150px !important;
+            }
+            
+            .product-preview-container {
+                flex-direction: column !important;
+                gap: 20px !important;
+            }
+            
+            .product-details-section {
+                padding-left: 0 !important;
+            }
+        }
+        
+        /* Enhanced Product Info */
+        .product-info h4.product-name {
+            font-size: 1.3rem !important;
+            font-weight: bold !important;
+            margin-bottom: 10px !important;
+            color: #333 !important;
+        }
+        
+        .product-item.selected .product-info h4.product-name {
+            color: white !important;
+        }
+        
+        .product-price {
+            color: #28a745 !important;
+            font-weight: bold !important;
+            font-size: 1.1rem !important;
+        }
+        
+        .product-item.selected .product-price {
+            color: #a8e6cf !important;
+        }
+        
+        /* Enhanced Select Button */
+        .product-select-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2) !important;
+            color: white !important;
+            border: none !important;
+            padding: 12px 24px !important;
+            border-radius: 8px !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            margin-top: 15px !important;
+        }
+        
+        .product-select-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+        }
+    </style>
+
     <title>The Liberation Vault | Wavelength Lore</title>
     <meta name="description" content="The Liberation Vault - A sanctuary where liberated minds create and share symbols of their freedom. Transform your gallery images into premium merchandise.">
 </head>

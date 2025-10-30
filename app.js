@@ -289,8 +289,9 @@ async function createApp() {
   app.use('/api/merchandise', merchandiseRoutes);
   app.use('/merchandise', merchandiseRoutes); // Also mount at /merchandise for the main store page
   app.use('/', merchandiseRoutes); // Also mount at root for easier access to /my-orders, /support, etc.
+  // Enhanced merchandise API still available for quality analysis features
   app.use('/api/enhanced-merchandise', enhancedMerchandiseRoutes);
-  app.use('/enhanced-merchandise', enhancedMerchandiseRoutes); // Also mount at /enhanced-merchandise for the AI store page
+  // app.use('/enhanced-merchandise', enhancedMerchandiseRoutes); // DISABLED - Using unified store
 
   // Mount product image resolution API routes
   app.use('/api/product-image', productImageApiRoutes);

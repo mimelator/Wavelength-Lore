@@ -134,7 +134,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
   try {
     res.render('merchandise-store', {
       title: 'The Liberation Vault',
-      pageTitle: 'The Liberation Vault - Symbols of Your Freedom',
+      pageTitle: 'The Liberation Vault - Symbols of Your Freedom',  
       pageDescription: 'The Liberation Vault: Where liberated minds create and share symbols of their freedom through custom merchandise.',
       user: req.user,
       cdnUrl: process.env.CDN_URL,
