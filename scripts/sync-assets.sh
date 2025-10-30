@@ -73,6 +73,42 @@ else
     echo "⚠️  Static directory not found: $LOCAL_STATIC_DIR"
 fi
 
+# Sync static overlay files (critical for EffectsProcessor)
+LOCAL_OVERLAYS_DIR="./static-overlays"
+if [ -d "$LOCAL_OVERLAYS_DIR" ]; then
+    echo ""
+    echo "🔄 Syncing static overlay files..."
+    OVERLAY_COUNT=$(find "$LOCAL_OVERLAYS_DIR" -name "*.png" | wc -l | tr -d ' ')
+    echo "📊 Found $OVERLAY_COUNT overlay files"
+
+    aws s3 sync "$LOCAL_OVERLAYS_DIR" "s3://$BUCKET_NAME/static-overlays" \
+        --exact-timestamps \
+        --no-progress \
+        --exclude ".DS_Store" \
+        --exclude "*.md" \
+        --include "*.png" \
+        --include "*.json"
+
+    if [ $? -eq 0 ]; then
+        echo "✅ Static overlay sync completed"
+        
+        # Verify critical overlay files
+        echo "🔍 Verifying critical overlay files..."
+        LIGHTNING_FILE="static-overlays/lightning/lightning-master.png"
+        if aws s3 ls "s3://$BUCKET_NAME/$LIGHTNING_FILE" &> /dev/null; then
+            echo "✅ Lightning overlay confirmed in S3"
+        else
+            echo "⚠️  Lightning overlay may not have uploaded correctly"
+        fi
+    else
+        echo "❌ Static overlay sync failed (critical for effects)"
+        exit 1
+    fi
+else
+    echo "⚠️  Static overlays directory not found: $LOCAL_OVERLAYS_DIR"
+    echo "   Run: node scripts/generate-static-overlays.js to create overlay files"
+fi
+
 # Sync public directory (for legacy assets)
 LOCAL_PUBLIC_DIR="./public"
 if [ -d "$LOCAL_PUBLIC_DIR" ]; then
@@ -130,11 +166,13 @@ echo "🌊 WAVELENGTH ASSET SYNC COMPLETE!"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "📊 Synced assets from:"
 echo "   • static/ directory"
+echo "   • static-overlays/ directory (EffectsProcessor)"
 echo "   • public/ directory (legacy)"
 echo ""
 echo "🌐 CDN URLs:"
 echo "   • Images: https://df5sj8f594cdx.cloudfront.net/images/"
 echo "   • NPC Characters: https://df5sj8f594cdx.cloudfront.net/images/npc-characters/"
+echo "   • Static Overlays: https://df5sj8f594cdx.cloudfront.net/static-overlays/"
 echo "   • CSS/JS: https://df5sj8f594cdx.cloudfront.net/css/ & /js/"
 echo ""
 echo "ℹ️  Note: Assets are served via CloudFront CDN"

@@ -265,6 +265,7 @@ class EffectsProcessor {
   /**
    * Load and resize overlay to match target dimensions
    * Uses caching to avoid repeated file operations
+   * Supports both local files and CDN URLs for production
    */
   async loadAndResizeOverlay(effectType, targetWidth, targetHeight) {
     try {
@@ -276,27 +277,52 @@ class EffectsProcessor {
         return this.overlayCache.get(cacheKey);
       }
       
-      // Load master overlay
-      const overlayPath = this.overlayGenerator.getOverlayPath(effectType);
+      // Try local file first, then CDN as fallback
+      let overlayBuffer = null;
       
-      // Verify overlay exists
+      // Attempt 1: Load from local file system
+      const localOverlayPath = this.overlayGenerator.getOverlayPath(effectType);
       try {
-        await fs.access(overlayPath);
-      } catch (error) {
-        console.warn(`⚠️ Overlay not found: ${overlayPath}`);
+        await fs.access(localOverlayPath);
+        console.log(`📁 Loading overlay from local file: ${localOverlayPath}`);
+        overlayBuffer = await fs.readFile(localOverlayPath);
+      } catch (localError) {
+        console.log(`⚠️ Local overlay not found: ${localOverlayPath}`);
+        
+        // Attempt 2: Load from CDN (production fallback)
+        const cdnUrl = process.env.CDN_URL || 'https://df5sj8f594cdx.cloudfront.net';
+        const cdnOverlayUrl = `${cdnUrl}/static-overlays/${effectType}/${effectType}-master.png`;
+        
+        try {
+          console.log(`🌐 Loading overlay from CDN: ${cdnOverlayUrl}`);
+          const axios = require('axios');
+          const response = await axios.get(cdnOverlayUrl, { responseType: 'arraybuffer' });
+          overlayBuffer = Buffer.from(response.data);
+          console.log(`✅ CDN overlay loaded: ${overlayBuffer.length} bytes`);
+        } catch (cdnError) {
+          console.error(`❌ CDN overlay failed: ${cdnError.message}`);
+          console.warn(`⚠️ Overlay not available locally or via CDN: ${effectType}`);
+          return null;
+        }
+      }
+      
+      if (!overlayBuffer) {
+        console.warn(`⚠️ No overlay buffer available for: ${effectType}`);
         return null;
       }
       
-      // Resize overlay to target dimensions
-      const resizedBuffer = await this.overlayGenerator.resizeOverlay(
-        overlayPath, 
-        targetWidth, 
-        targetHeight
-      );
+      // Resize overlay to target dimensions using Sharp directly
+      const resizedBuffer = await Sharp(overlayBuffer)
+        .resize(targetWidth, targetHeight, {
+          fit: 'cover',
+          position: 'center'
+        })
+        .png()
+        .toBuffer();
       
       // Cache the resized overlay
       this.overlayCache.set(cacheKey, resizedBuffer);
-      console.log(`💾 Cached resized overlay: ${cacheKey}`);
+      console.log(`💾 Cached resized overlay: ${cacheKey} (${resizedBuffer.length} bytes)`);
       
       return resizedBuffer;
       
