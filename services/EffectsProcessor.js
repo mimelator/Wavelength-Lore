@@ -10,12 +10,20 @@ const path = require('path');
 const crypto = require('crypto');
 const effectsConfig = require('../config/effectsConfig');
 
+// Static overlay system
+const StaticOverlayGenerator = require('../scripts/generate-static-overlays');
+
 class EffectsProcessor {
+  constructor() {
+    this.overlayGenerator = new StaticOverlayGenerator();
+    this.overlayCache = new Map(); // Cache loaded overlays
+  }
+
   /**
    * Process image with effects
    * @param {Buffer} imageBuffer - Input image buffer
    * @param {Object} effectParams - Effect parameters
-   * @returns {Promise<Buffer>} - Processed image buffer (WebP)
+   * @returns {Promise<Buffer>} - Processed image buffer (PNG)
    */
   async processImage(imageBuffer, effectParams = {}) {
     try {
@@ -28,7 +36,12 @@ class EffectsProcessor {
         blur: effectParams.blur ?? 0,
         brightness: effectParams.brightness ?? 1.0,
         contrast: effectParams.contrast ?? 1.0,
-        lightning: effectParams.lightning ?? 0
+        lightning: effectParams.lightning ?? 0,
+        // Static overlay effects
+        staticLightning: effectParams.staticLightning ?? false,
+        staticSnow: effectParams.staticSnow ?? false,
+        staticFireflies: effectParams.staticFireflies ?? false,
+        staticSparkles: effectParams.staticSparkles ?? false
       };
 
       console.log(`🎨 Processing image with effects:`, finalParams);
@@ -44,6 +57,9 @@ class EffectsProcessor {
       pipeline = await this.applyColorGrading(pipeline, finalParams);
       pipeline = await this.applyLightingEffects(pipeline, finalParams, imageMetadata);
       pipeline = await this.applySpecialEffects(pipeline, finalParams, imageMetadata);
+      
+      // Apply static overlays
+      pipeline = await this.applyStaticOverlays(pipeline, finalParams, imageMetadata);
 
       // PROACTIVE FORMAT TRACKING: Use PNG for Printify compatibility instead of WebP
       // This maintains the format expected by Printify API
@@ -159,6 +175,134 @@ class EffectsProcessor {
     } catch (error) {
       console.error(`⚠️ Error applying special effects:`, error.message);
       return pipeline;
+    }
+  }
+
+  /**
+   * Apply static overlay effects
+   * Loads master overlays and resizes them to match image dimensions
+   */
+  async applyStaticOverlays(pipeline, params, imageMetadata = {}) {
+    try {
+      const width = imageMetadata.width || 1000;
+      const height = imageMetadata.height || 1000;
+      
+      console.log(`🎨 Applying static overlays to ${width}x${height} image`);
+      
+      // Lightning overlay
+      if (params.staticLightning) {
+        console.log('⚡ Applying static lightning overlay...');
+        const lightningOverlay = await this.loadAndResizeOverlay('lightning', width, height);
+        pipeline = pipeline.composite([
+          {
+            input: lightningOverlay,
+            blend: 'screen',
+            opacity: 0.8
+          }
+        ]);
+      }
+      
+      // Snow overlay
+      if (params.staticSnow) {
+        console.log('❄️ Applying static snow overlay...');
+        const snowOverlay = await this.loadAndResizeOverlay('snow', width, height);
+        pipeline = pipeline.composite([
+          {
+            input: snowOverlay,
+            blend: 'screen',
+            opacity: 0.7
+          }
+        ]);
+      }
+      
+      // Fireflies overlay
+      if (params.staticFireflies) {
+        console.log('🐛 Applying static fireflies overlay...');
+        const firefliesOverlay = await this.loadAndResizeOverlay('fireflies', width, height);
+        pipeline = pipeline.composite([
+          {
+            input: firefliesOverlay,
+            blend: 'screen',
+            opacity: 0.6
+          }
+        ]);
+      }
+      
+      // Sparkles overlay
+      if (params.staticSparkles) {
+        console.log('✨ Applying static sparkles overlay...');
+        const sparklesOverlay = await this.loadAndResizeOverlay('sparkles', width, height);
+        pipeline = pipeline.composite([
+          {
+            input: sparklesOverlay,
+            blend: 'screen',
+            opacity: 0.5
+          }
+        ]);
+      }
+      
+      // Vignette overlay (separate from dynamic vignette)
+      if (params.staticVignette) {
+        console.log('🎭 Applying static vignette overlay...');
+        const vignetteOverlay = await this.loadAndResizeOverlay('vignette', width, height);
+        pipeline = pipeline.composite([
+          {
+            input: vignetteOverlay,
+            blend: 'multiply',
+            opacity: 0.8
+          }
+        ]);
+      }
+
+      return pipeline;
+
+    } catch (error) {
+      console.error(`⚠️ Error applying static overlays:`, error.message);
+      return pipeline;
+    }
+  }
+
+  /**
+   * Load and resize overlay to match target dimensions
+   * Uses caching to avoid repeated file operations
+   */
+  async loadAndResizeOverlay(effectType, targetWidth, targetHeight) {
+    try {
+      const cacheKey = `${effectType}-${targetWidth}x${targetHeight}`;
+      
+      // Check cache first
+      if (this.overlayCache.has(cacheKey)) {
+        console.log(`📋 Using cached overlay: ${cacheKey}`);
+        return this.overlayCache.get(cacheKey);
+      }
+      
+      // Load master overlay
+      const overlayPath = this.overlayGenerator.getOverlayPath(effectType);
+      
+      // Verify overlay exists
+      try {
+        await fs.access(overlayPath);
+      } catch (error) {
+        console.warn(`⚠️ Overlay not found: ${overlayPath}`);
+        return null;
+      }
+      
+      // Resize overlay to target dimensions
+      const resizedBuffer = await this.overlayGenerator.resizeOverlay(
+        overlayPath, 
+        targetWidth, 
+        targetHeight
+      );
+      
+      // Cache the resized overlay
+      this.overlayCache.set(cacheKey, resizedBuffer);
+      console.log(`💾 Cached resized overlay: ${cacheKey}`);
+      
+      return resizedBuffer;
+      
+    } catch (error) {
+      console.error(`❌ Error loading overlay ${effectType}:`, error.message);
+      return null;
     }
   }
 

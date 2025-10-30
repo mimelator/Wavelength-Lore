@@ -5661,7 +5661,13 @@ class MerchandiseStore {
           borderEnabled: customization.borderEnabled,
           borderColor: customization.borderColor,
           borderWidth: customization.borderWidth,
-          borderWidthPixels: customization.borderWidthPixels
+          borderWidthPixels: customization.borderWidthPixels,
+          // Include static overlay parameters for Printify API generation
+          staticLightning: customization.staticLightning,
+          staticFireflies: customization.staticFireflies,
+          staticSparkles: customization.staticSparkles,
+          staticSnow: customization.staticSnow,
+          staticVignette: customization.staticVignette
         }
       };
 

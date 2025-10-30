@@ -1,0 +1,42 @@
+{
+  "lightning": {
+    "masterFile": "lightning-master.png",
+    "masterSize": {
+      "width": 800,
+      "height": 800
+    },
+    "description": "Electric lightning effects with jagged branching patterns"
+  },
+  "snow": {
+    "masterFile": "snow-master.png",
+    "masterSize": {
+      "width": 800,
+      "height": 800
+    },
+    "description": "Beautiful snow effects with varied particle sizes"
+  },
+  "fireflies": {
+    "masterFile": "fireflies-master.png",
+    "masterSize": {
+      "width": 800,
+      "height": 800
+    },
+    "description": "Magical firefly effects with warm glowing particles"
+  },
+  "vignette": {
+    "masterFile": "vignette-master.png",
+    "masterSize": {
+      "width": 800,
+      "height": 800
+    },
+    "description": "Dramatic edge darkening for photo focus"
+  },
+  "sparkles": {
+    "masterFile": "sparkles-master.png",
+    "masterSize": {
+      "width": 800,
+      "height": 800
+    },
+    "description": "Sparkling star effects with magical twinkles"
+  }
+}

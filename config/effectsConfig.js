@@ -215,12 +215,22 @@ const effectsConfig = {
     const borderParams = {};
     console.log('🔍 BORDER PROCESSING: Starting border parameter extraction...');
 
-    // Apply each enabled effect's preset and collect border params
+    // Static overlay parameters
+    const staticOverlayParams = {};
+
+    // Apply each enabled effect's preset and collect border/static overlay params
     for (const [toggleKey, enabled] of Object.entries(enabledToggles)) {
       // Handle border parameters separately
       if (toggleKey === 'borderEnabled' || toggleKey === 'borderColor' || toggleKey === 'borderWidth' || toggleKey === 'borderWidthPixels') {
         console.log(`🔍 BORDER PARAM: ${toggleKey} = ${enabled}`);
         borderParams[toggleKey] = enabledToggles[toggleKey];
+        continue;
+      }
+
+      // Handle static overlay parameters separately
+      if (toggleKey.startsWith('static')) {
+        console.log(`🔍 STATIC OVERLAY PARAM: ${toggleKey} = ${enabled}`);
+        staticOverlayParams[toggleKey] = enabled;
         continue;
       }
 
@@ -236,9 +246,10 @@ const effectsConfig = {
     }
 
     console.log('🔍 COLLECTED BORDER PARAMS:', borderParams);
+    console.log('🔍 COLLECTED STATIC OVERLAY PARAMS:', staticOverlayParams);
     
-    // Merge border parameters into final effects
-    Object.assign(finalEffects, borderParams);
+    // Merge border and static overlay parameters into final effects
+    Object.assign(finalEffects, borderParams, staticOverlayParams);
     
     console.log('🎯 FINAL EFFECTS AFTER MERGE:', JSON.stringify(finalEffects, null, 2));
 

@@ -574,7 +574,9 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
     // Effects will be applied AFTER upscaling to ensure they're preserved on quality image
     let effectParams = null;
 
-    if (imageContext && (imageContext.effects || imageContext.borderEnabled)) {
+    if (imageContext && (imageContext.effects || imageContext.borderEnabled || 
+                        imageContext.staticLightning || imageContext.staticFireflies || 
+                        imageContext.staticSparkles || imageContext.staticSnow || imageContext.staticVignette)) {
       console.log('\n🔥 GITHUB ISSUE #96 FIX: Preparing effects to apply AFTER upscaling...');
       console.log('   imageContext.effects:', imageContext.effects);
       console.log('   imageContext.borderEnabled:', imageContext.borderEnabled);
@@ -602,7 +604,13 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
         borderEnabled: imageContext.borderEnabled || false,
         borderColor: imageContext.borderColor || '#000000',
         borderWidth: imageContext.borderWidth || 0,
-        borderWidthPixels: imageContext.borderWidthPixels || 0
+        borderWidthPixels: imageContext.borderWidthPixels || 0,
+        // 🎨 GITHUB ISSUE #148: Static overlay parameters for Printify API generation
+        staticLightning: imageContext.staticLightning || false,
+        staticFireflies: imageContext.staticFireflies || false,
+        staticSparkles: imageContext.staticSparkles || false,
+        staticSnow: imageContext.staticSnow || false,
+        staticVignette: imageContext.staticVignette || false
       };
 
       console.log('\n🔍 Converting effect selections to numeric parameters:');
@@ -631,6 +639,17 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
 
       console.log('\n✅ Effect parameters prepared for post-upscaling application:');
       console.log('   ', effectParams);
+      
+      // 🎨 GITHUB ISSUE #148: Log static overlay parameters specifically
+      const staticOverlays = [
+        'staticLightning', 'staticFireflies', 'staticSparkles', 'staticSnow', 'staticVignette'
+      ].filter(key => effectParams[key]).join(', ');
+      if (staticOverlays.length > 0) {
+        console.log('   🎨 Static overlays to apply:', staticOverlays);
+      } else {
+        console.log('   ℹ️ No static overlays selected');
+      }
+      
       console.log('   ℹ️ These will be applied to the image AFTER upscaling to preserve quality');
     } else {
       console.log('\nℹ️ No user customizations to apply (no effects or borders)');

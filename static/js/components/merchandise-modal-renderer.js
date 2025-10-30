@@ -347,9 +347,11 @@ class MerchandiseModalRenderer {
       atmospheric: {
         title: '✨ Atmospheric Effects',
         effects: [
-          { key: 'glow', label: 'Luminous Glow', emoji: '✨' },
-          { key: 'dramatic', label: 'Dramatic Focus', emoji: '🎭' },
-          { key: 'lightning', label: 'Lightning Strike', emoji: '⚡' }
+          { key: 'staticLightning', label: 'Lightning Strike', emoji: '⚡' },
+          { key: 'staticFireflies', label: 'Fireflies Glow', emoji: '🐛' },
+          { key: 'staticSparkles', label: 'Magic Sparkles', emoji: '✨' },
+          { key: 'staticSnow', label: 'Winter Snow', emoji: '❄️' },
+          { key: 'staticVignette', label: 'Portrait Vignette', emoji: '🖼️' }
         ]
       }
     };
@@ -3242,9 +3244,27 @@ class MerchandiseModalRenderer {
       }
 
       console.log('📊 Step 2: Building customization object');
-      // Build customization object
+      
+      // 🔥 CRITICAL FIX: Merge selectedEffects with static overlay parameters
+      // selectedEffects only contains traditional UI toggles, but we also need static overlay flags
+      const staticOverlayParams = {};
+      const staticOverlayKeys = ['staticLightning', 'staticFireflies', 'staticSparkles', 'staticSnow', 'staticVignette'];
+      
+      // Extract static overlay states from effect checkboxes
+      staticOverlayKeys.forEach(key => {
+        const checkbox = modal.querySelector(`.effect-toggle[data-effect="${key}"]`);
+        if (checkbox) {
+          staticOverlayParams[key] = checkbox.checked;
+          console.log(`📋 Collected static overlay: ${key} = ${checkbox.checked}`);
+        }
+      });
+      
+      console.log('🔍 Static overlay parameters collected:', staticOverlayParams);
+      
+      // Build complete customization object with both traditional effects and static overlays
       const customization = {
         effects: selectedEffects,
+        ...staticOverlayParams, // Include static overlay parameters at top level
         borderEnabled: borderCustomization.borderEnabled,
         borderWidth: borderCustomization.borderWidth,
         borderWidthPixels: borderCustomization.borderWidthPixels,
@@ -3252,7 +3272,7 @@ class MerchandiseModalRenderer {
         customizedImageUrl: customizedImageUrl,
         timestamp: new Date().toISOString()
       };
-      console.log('✅ Customization object built:', customization);
+      console.log('✅ Complete customization object built:', customization);
 
       console.log('📊 Step 3: Getting product data from modal');
       console.log('   modal element:', modal);
