@@ -94,6 +94,51 @@ EOF
 echo "✅ Version information updated"
 echo ""
 
+# Step 2.5: Load Production Environment Variables
+echo "🌍 Step 2.5: Loading Production Environment..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# Load .env.production if it exists
+if [ -f ".env.production" ]; then
+    echo "✅ Loading .env.production file"
+    set -a  # automatically export all variables
+    source .env.production
+    set +a  # turn off auto-export
+    
+    echo "📝 Production environment variables loaded:"
+    echo "   NODE_ENV: ${NODE_ENV:-not set}"
+    echo "   CDN_URL: ${CDN_URL:-not set}"
+    echo "   PORT: ${PORT:-not set}"
+    echo "   SITE_URL: ${SITE_URL:-not set}"
+    
+    # Validate critical production variables
+    if [ -z "$NODE_ENV" ] || [ "$NODE_ENV" != "production" ]; then
+        echo "⚠️  Warning: NODE_ENV not set to production"
+    fi
+    
+    if [ -z "$CDN_URL" ]; then
+        echo "⚠️  Warning: CDN_URL not set (may cause mixed content warnings)"
+    fi
+    
+    if [ -z "$PORT" ]; then
+        echo "⚠️  Warning: PORT not set, defaulting to 8080"
+        export PORT="8080"
+    fi
+    
+else
+    echo "⚠️  .env.production file not found"
+    echo "💡 Creating minimal production environment..."
+    export NODE_ENV="production"
+    export PORT="8080"
+    export CDN_URL="https://df5sj8f594cdx.cloudfront.net"
+    export SITE_URL="https://wavelengthlore.com"
+fi
+
+echo "✅ Production environment configured"
+echo ""
+
+# Step 3: Docker Build Process
+
 # Step 3: Build Docker Image
 echo "🐳 Step 3: Building Docker Image..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

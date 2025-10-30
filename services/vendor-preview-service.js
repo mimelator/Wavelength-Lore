@@ -388,7 +388,8 @@ class VendorPreviewService extends AutoEnhancedPrintifyService {
       
       // CRITICAL: Use gallery API instead of direct S3 access
       const axios = require('axios');
-      const baseUrl = process.env.CDN_URL || 'http://localhost:3001';
+      // Use production-safe base URL - defaults to current domain instead of localhost
+      const baseUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001');
       
       // Check if imageId is a URL (bookmark) or a path/filename (uploaded)
       const isUrl = imageId.startsWith('http://') || imageId.startsWith('https://');

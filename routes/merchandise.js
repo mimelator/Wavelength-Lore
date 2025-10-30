@@ -1920,7 +1920,8 @@ async function downloadImageFromS3(imageUrl) {
     // Convert to absolute URL using CDN_URL environment variable
     let fullUrl = imageUrl;
     if (imageUrl.startsWith('/')) {
-      const cdnUrl = process.env.CDN_URL || 'http://localhost:3001';
+      // Use production-safe CDN URL - defaults to current domain instead of localhost
+      const cdnUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001');
       fullUrl = `${cdnUrl}${imageUrl}`;
     }
 

@@ -21,6 +21,7 @@
     "cta:audit": "node scripts/cta-audit.js",
     "deploy": "scripts/manual-deploy.sh",
     "deploy:manual": "scripts/manual-deploy.sh",
+    "deploy:env": "scripts/manual-deploy.sh && npm run admin:env-sync -- --apply",
     "cta:collect": "node scripts/cta-audit.js collect",
     "cta:validate": "node scripts/cta-audit.js validate",
     "cta:report": "node scripts/cta-audit.js report",
