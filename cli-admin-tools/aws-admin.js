@@ -18,6 +18,8 @@ const { ECRClient, DescribeRepositoriesCommand, DescribeImagesCommand,
 const { S3Client, ListObjectsV2Command, PutObjectCommand, 
         DeleteObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { IAMClient, ListUsersCommand, GetUserCommand } = require('@aws-sdk/client-iam');
+const { CloudWatchLogsClient, DescribeLogGroupsCommand, DescribeLogStreamsCommand, 
+        GetLogEventsCommand, FilterLogEventsCommand } = require('@aws-sdk/client-cloudwatch-logs');
 const chalk = require('chalk');
 const dotenv = require('dotenv');
 
@@ -56,6 +58,7 @@ class WavelengthAWSAdmin {
     this.ecr = new ECRClient(clientConfig);
     this.s3 = new S3Client(clientConfig);
     this.iam = new IAMClient(clientConfig);
+    this.cloudwatchlogs = new CloudWatchLogsClient(clientConfig);
     
     this.logInfo(`Using wavelength-dev user: arn:aws:iam::170023515523:user/wavelength-dev`);
   }
@@ -361,6 +364,224 @@ class WavelengthAWSAdmin {
   }
 
   /**
+   * 📊 CLOUDWATCH LOGS OPERATIONS
+   */
+  async logsListGroups() {
+    this.logHeader('CloudWatch Log Groups');
+    
+    try {
+      const command = new DescribeLogGroupsCommand({ limit: 20 });
+      const response = await this.cloudwatchlogs.send(command);
+      
+      if (!response.logGroups?.length) {
+        this.logInfo('No log groups found');
+        return;
+      }
+      
+      console.log('\n📊 Log Groups:');
+      response.logGroups
+        .sort((a, b) => (b.creationTime || 0) - (a.creationTime || 0))
+        .forEach((group, index) => {
+          console.log(`${index + 1}. ${chalk.bold(group.logGroupName)}`);
+          if (group.logGroupName.includes('apprunner')) {
+            console.log(`   🏃 ${chalk.green('App Runner Service Log')}`);
+          }
+          if (group.storedBytes) {
+            const sizeMB = Math.round(group.storedBytes / 1024 / 1024);
+            console.log(`   📊 Size: ${sizeMB} MB`);
+          }
+          if (group.creationTime) {
+            console.log(`   🕐 Created: ${new Date(group.creationTime).toLocaleString()}`);
+          }
+          if (group.retentionInDays) {
+            console.log(`   ⏰ Retention: ${group.retentionInDays} days`);
+          }
+          console.log('');
+        });
+      
+    } catch (error) {
+      this.logError(`Failed to list log groups: ${error.message}`);
+    }
+  }
+
+  async logsGet(logGroupName, lines = 50, follow = false) {
+    this.logHeader(`CloudWatch Logs - Latest ${lines} lines`);
+    
+    try {
+      if (!logGroupName) {
+        // Try to find AppRunner log group automatically
+        const groupsCommand = new DescribeLogGroupsCommand({});
+        const groupsResponse = await this.cloudwatchlogs.send(groupsCommand);
+        
+        const apprunnerGroup = groupsResponse.logGroups?.find(group => 
+          group.logGroupName.includes('apprunner') || 
+          group.logGroupName.includes('wavelength')
+        );
+        
+        if (apprunnerGroup) {
+          logGroupName = apprunnerGroup.logGroupName;
+          this.logInfo(`Auto-detected log group: ${logGroupName}`);
+        } else {
+          this.logError('Log group name required. Use --group option or set APPRUNNER_LOG_GROUP_NAME');
+          this.logInfo('Available groups:');
+          await this.logsListGroups();
+          return;
+        }
+      }
+
+      console.log(`📊 Log Group: ${chalk.bold(logGroupName)}`);
+      console.log(`📄 Lines: ${lines}`);
+      
+      // Get the most recent log stream
+      const streamsCommand = new DescribeLogStreamsCommand({
+        logGroupName: logGroupName,
+        orderBy: 'LastEventTime',
+        descending: true,
+        limit: 5
+      });
+      
+      const streamsResponse = await this.cloudwatchlogs.send(streamsCommand);
+      
+      if (!streamsResponse.logStreams?.length) {
+        this.logWarning('No log streams found in this group');
+        return;
+      }
+
+      console.log(`🔍 Using stream: ${chalk.blue(streamsResponse.logStreams[0].logStreamName)}`);
+      console.log(chalk.gray('━'.repeat(80)));
+      
+      // Get recent log events
+      const endTime = Date.now();
+      const startTime = endTime - (24 * 60 * 60 * 1000); // Last 24 hours
+      
+      const eventsCommand = new FilterLogEventsCommand({
+        logGroupName: logGroupName,
+        startTime: startTime,
+        endTime: endTime,
+        limit: lines
+      });
+      
+      const eventsResponse = await this.cloudwatchlogs.send(eventsCommand);
+      
+      if (!eventsResponse.events?.length) {
+        this.logWarning('No recent log events found');
+        return;
+      }
+
+      // Display logs with colors and formatting
+      console.log('\n📋 Recent Logs:\n');
+      
+      eventsResponse.events
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .forEach((event, index) => {
+          const timestamp = new Date(event.timestamp).toLocaleString();
+          const message = event.message.trim();
+          
+          // Color code log messages
+          let coloredMessage = message;
+          if (message.includes('ERROR') || message.includes('❌')) {
+            coloredMessage = chalk.red(message);
+          } else if (message.includes('WARN') || message.includes('⚠️')) {
+            coloredMessage = chalk.yellow(message);
+          } else if (message.includes('INFO') || message.includes('✅')) {
+            coloredMessage = chalk.green(message);
+          } else if (message.includes('DEBUG')) {
+            coloredMessage = chalk.gray(message);
+          }
+          
+          console.log(`${chalk.gray(timestamp)} ${coloredMessage}`);
+        });
+      
+      console.log(`\n${chalk.gray('━'.repeat(80))}`);
+      this.logSuccess(`Displayed ${eventsResponse.events.length} log entries`);
+      
+      if (follow) {
+        this.logInfo('Follow mode not yet implemented. Use --no-follow for one-time fetch.');
+      }
+      
+    } catch (error) {
+      this.logError(`Failed to get logs: ${error.message}`);
+      
+      if (error.name === 'ResourceNotFoundException') {
+        this.logInfo('Log group not found. Available groups:');
+        await this.logsListGroups();
+      }
+    }
+  }
+
+  async logsSearch(logGroupName, searchTerm, hours = 24) {
+    this.logHeader(`CloudWatch Logs Search - "${searchTerm}"`);
+    
+    try {
+      if (!logGroupName) {
+        // Try to find AppRunner log group automatically
+        const groupsCommand = new DescribeLogGroupsCommand({});
+        const groupsResponse = await this.cloudwatchlogs.send(groupsCommand);
+        
+        const apprunnerGroup = groupsResponse.logGroups?.find(group => 
+          group.logGroupName.includes('apprunner') || 
+          group.logGroupName.includes('wavelength')
+        );
+        
+        if (apprunnerGroup) {
+          logGroupName = apprunnerGroup.logGroupName;
+          this.logInfo(`Auto-detected log group: ${logGroupName}`);
+        } else {
+          this.logError('Log group name required. Use --group option');
+          return;
+        }
+      }
+
+      console.log(`🔍 Searching in: ${chalk.bold(logGroupName)}`);
+      console.log(`🎯 Term: "${chalk.yellow(searchTerm)}"`);
+      console.log(`⏰ Time window: ${hours} hours`);
+      
+      const endTime = Date.now();
+      const startTime = endTime - (hours * 60 * 60 * 1000);
+      
+      const command = new FilterLogEventsCommand({
+        logGroupName: logGroupName,
+        filterPattern: searchTerm,
+        startTime: startTime,
+        endTime: endTime,
+        limit: 100
+      });
+      
+      const response = await this.cloudwatchlogs.send(command);
+      
+      if (!response.events?.length) {
+        this.logWarning(`No matches found for "${searchTerm}"`);
+        return;
+      }
+
+      console.log(chalk.gray('━'.repeat(80)));
+      console.log(`\n📋 Found ${response.events.length} matches:\n`);
+      
+      response.events
+        .sort((a, b) => b.timestamp - a.timestamp) // Most recent first
+        .forEach((event, index) => {
+          const timestamp = new Date(event.timestamp).toLocaleString();
+          const message = event.message.trim();
+          
+          // Highlight search term
+          const highlightedMessage = message.replace(
+            new RegExp(searchTerm, 'gi'),
+            chalk.bgYellow.black(searchTerm)
+          );
+          
+          console.log(`${index + 1}. ${chalk.gray(timestamp)}`);
+          console.log(`   ${highlightedMessage}`);
+          console.log('');
+        });
+      
+      this.logSuccess(`Found ${response.events.length} matching log entries`);
+      
+    } catch (error) {
+      this.logError(`Log search failed: ${error.message}`);
+    }
+  }
+
+  /**
    * 🎯 Utility methods
    */
   formatStatus(status) {
@@ -396,6 +617,10 @@ class WavelengthAWSAdmin {
           break;
         case 'iam':
           await this.handleIAM(operation, options);
+          break;
+        case 'logs':
+        case 'cloudwatch':
+          await this.handleLogs(operation, options);
           break;
         default:
           this.showHelp();
@@ -471,6 +696,33 @@ class WavelengthAWSAdmin {
     }
   }
 
+  async handleLogs(operation, options) {
+    switch (operation) {
+      case 'list':
+      case 'groups':
+        await this.logsListGroups();
+        break;
+      case 'get':
+      case 'tail':
+      case 'latest':
+        const lines = parseInt(options.lines) || 50;
+        const follow = options.follow === 'true';
+        await this.logsGet(options.group, lines, follow);
+        break;
+      case 'search':
+        if (!options.term) {
+          this.logError('Search term required. Use --term "search text"');
+          return;
+        }
+        const hours = parseInt(options.hours) || 24;
+        await this.logsSearch(options.group, options.term, hours);
+        break;
+      default:
+        this.logError(`Unknown logs operation: ${operation}`);
+        this.showLogsHelp();
+    }
+  }
+
   /**
    * 📚 Help methods
    */
@@ -485,6 +737,7 @@ class WavelengthAWSAdmin {
     console.log('  ecr           - ECR repository and image management');
     console.log('  s3            - S3 bucket operations');
     console.log('  iam           - IAM user information');
+    console.log('  logs          - CloudWatch Logs (AppRunner application logs)');
     console.log('');
     
     console.log(chalk.bold('Examples:'));
@@ -492,6 +745,8 @@ class WavelengthAWSAdmin {
     console.log('  npm run cli:admin aws apprunner status');
     console.log('  npm run cli:admin aws ecr list');
     console.log('  npm run cli:admin aws s3 list');
+    console.log('  npm run cli:admin aws logs get --lines 100');
+    console.log('  npm run cli:admin aws logs search --term "ERROR"');
     console.log('');
   }
 
@@ -521,6 +776,19 @@ class WavelengthAWSAdmin {
   showIAMHelp() {
     console.log(chalk.bold('\nIAM Operations:'));
     console.log('  info  - Show IAM user information');
+  }
+
+  showLogsHelp() {
+    console.log(chalk.bold('\nCloudWatch Logs Operations:'));
+    console.log('  list                                 - List all log groups');
+    console.log('  get --lines 50 --group <name>       - Get latest N log lines');
+    console.log('  search --term "ERROR" --hours 24    - Search logs for term');
+    console.log('');
+    console.log(chalk.bold('Examples:'));
+    console.log('  npm run cli:admin aws logs list');
+    console.log('  npm run cli:admin aws logs get --lines 100');
+    console.log('  npm run cli:admin aws logs search --term "Apply effects"');
+    console.log('  npm run cli:admin aws logs search --term "❌" --hours 6');
   }
 }
 

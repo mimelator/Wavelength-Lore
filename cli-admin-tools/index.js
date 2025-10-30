@@ -46,6 +46,12 @@ class WavelengthAdminToolkit {
                 name: 'Deployment Manager',
                 description: 'Clean room deployment pipeline management',
                 script: 'deploy-admin.js',
+            },
+            'logs': {
+                name: 'Application Logs',
+                description: 'Fetch latest logs from CloudWatch (AppRunner)',
+                script: 'aws-admin.js',
+                icon: '📋'
             }
         };
     }
@@ -74,6 +80,9 @@ class WavelengthAdminToolkit {
         console.log(chalk.white('  Example: npm run cli:admin aws apprunner status'));
         console.log(chalk.white('  Example: npm run cli:admin deploy deploy'));
         console.log(chalk.white('  Example: npm run cli:admin deploy monitor'));
+        console.log(chalk.white('  Example: npm run cli:admin logs'));
+        console.log(chalk.white('  Example: npm run cli:admin logs get --lines 100'));
+        console.log(chalk.white('  Example: npm run cli:admin logs search --term "ERROR"'));
         console.log('');
         
         console.log(chalk.green('🌟 Pristine Tools - Isolated & Reliable'));
@@ -177,6 +186,26 @@ class WavelengthAdminToolkit {
                     }
                     
                     await toolInstance.handleCommand(operation, options);
+                    
+                } else if (toolKey === 'logs') {
+                    // Handle logs subcommands - default to getting latest logs
+                    const operation = args[0] || 'get';
+                    const subArgs = args.slice(1);
+                    
+                    // Parse options
+                    const options = {};
+                    for (let i = 0; i < subArgs.length; i += 2) {
+                        if (subArgs[i]?.startsWith('--')) {
+                            const key = subArgs[i].substring(2);
+                            const value = subArgs[i + 1];
+                            options[key] = value;
+                        }
+                    }
+                    
+                    // Set default lines if not specified
+                    if (!options.lines) options.lines = '50';
+                    
+                    await toolInstance.handleCommand('logs', operation, options);
                     
                 } else if (toolKey === 'chatbot') {
                     // Handle chatbot subcommands
