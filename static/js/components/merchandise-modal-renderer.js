@@ -2917,17 +2917,22 @@ class MerchandiseModalRenderer {
         this.debugLog(`Preview effects applied successfully`, 'success', result);
       }
 
-      // Update preview image
+      // Update preview image with smooth status messages
       if (previewImage && result.metadata && result.metadata.customizedImageUrl) {
         previewImage.src = result.metadata.customizedImageUrl;
         previewImage.style.opacity = '1';
-        statusText.textContent = '✅ Effects applied!';
+        
+        // Show success status with smooth fade in/out
+        this.showVariantStatusMessage(statusText, '✅ Preview updated', 'success');
 
         // Store the customized image URL in modal state
         modal.dataset.customizedImageUrl = result.metadata.customizedImageUrl;
 
         // CRITICAL: Update the customization summary after successful preview update
         this.updateCustomizationSummary(modal);
+      } else if (statusText) {
+        // Show "no preview available" message for variants without mockup images
+        this.showVariantStatusMessage(statusText, '⚠️ No preview available', 'warning');
       }
 
     } catch (error) {
@@ -2950,7 +2955,8 @@ class MerchandiseModalRenderer {
 
       if (previewImage && statusText) {
         previewImage.style.opacity = '1';
-        statusText.textContent = `❌ Error: ${error.message}`;
+        // Show error message with smooth fade
+        this.showVariantStatusMessage(statusText, `❌ Error: ${error.message}`, 'error');
       }
     }
   }

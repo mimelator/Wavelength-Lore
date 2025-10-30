@@ -1,14 +1,39 @@
-name: Build and Deploy to ECR
+# ⚠️  WORKFLOW DISABLED ⚠️
+# 
+# This GitHub Actions workflow has been DISABLED in favor of manual deployment control.
+# 
+# PREFERRED DEPLOYMENT METHOD:
+#   npm run deploy          (uses scripts/manual-deploy.sh)
+#   scripts/manual-deploy.sh
+# 
+# REASON FOR DISABLING:
+#   Manual deployments provide better control, immediate feedback, and eliminate
+#   CI/CD pipeline issues that were causing deployment inconsistencies.
+#
+# TO RE-ENABLE:
+#   1. Change 'workflow_dispatch' back to 'push' trigger
+#   2. Remove the DISABLED comments
+#   3. Test thoroughly before relying on automated deployments
+#
+# LAST DISABLED: 2025-10-29
 
+name: Build and Deploy to ECR (DISABLED)
+
+# DISABLED: GitHub Actions deployment workflow
+# Use npm run deploy or scripts/manual-deploy.sh for deployments instead
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:  # Manual trigger only - workflow effectively disabled
+  # DISABLED - Automatic deployment disabled in favor of manual control
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
   build-and-push:
-    name: Build and Push Docker Image to ECR
+    name: Build and Push Docker Image to ECR (DISABLED)
     runs-on: ubuntu-latest
+    # Workflow disabled - will not run on push events
+    if: false  # Force disable entire job
     permissions:
       contents: write
       actions: read
