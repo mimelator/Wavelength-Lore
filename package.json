@@ -1,6 +1,6 @@
 {
   "name": "wavelength-lore",
-  "version": "1.1.58",
+  "version": "1.1.60",
   "description": "The Lore Site for the Wavelength Canon",
   "main": "index.js",
   "scripts": {
@@ -61,7 +61,9 @@
     "wavelength:extract-batch-sample": "node wavelength-tools/character-extractor/batch-cli.js --sample-config",
     "wavelength:content-audit": "node wavelength-content-audit.js",
     "wavelength:content-audit-html": "python3 -m http.server 8080 && open http://localhost:8080/wavelength-content-audit-report.html",
-    "wavelength:ai-assistant": "node wavelength-ai-assistant-controller.js"
+    "wavelength:ai-assistant": "node wavelength-ai-assistant-controller.js",
+    "episode:create": "node cli/episode-creator.js",
+    "episode:cli": "node cli/episode-creator.js"
   },
   "dependencies": {
     "@aws-sdk/client-apprunner": "^3.917.0",
@@ -121,7 +123,8 @@
     "uuid": "^13.0.0",
     "validator": "^13.11.0",
     "winston": "^3.18.3",
-    "xss": "^1.0.14"
+    "xss": "^1.0.14",
+    "music-metadata": "^7.14.0"
   },
   "devDependencies": {
     "glob": "^11.0.3",
