@@ -20,15 +20,53 @@ dotenv.config();
 
 class WavelengthDeploymentStatus {
     constructor() {
-        this.appRunner = new AppRunnerClient({ region: 'us-east-1' });
-        this.ecr = new ECRClient({ region: 'us-east-1' });
-        this.s3 = new S3Client({ region: 'us-east-1' });
-        this.cloudWatchLogs = new CloudWatchLogsClient({ region: 'us-east-1' });
+        this.region = 'us-east-1';
+        
+        // Initialize AWS clients with wavelength-dev user credentials
+        this.validateAndInitializeAWS();
+        
         this.serviceName = process.env.APPRUNNER_SERVICE_NAME || 'wavelength-lore';
         this.ecrRepository = process.env.ECR_REPOSITORY_NAME || 'wavelength-lore';
         this.s3Bucket = process.env.S3_BUCKET_NAME || 'wavelength-lore-bucket';
         this.logGroupName = process.env.CLOUDWATCH_LOG_GROUP || '/aws/apprunner/wavelength-lore-service/829c542fc95c419090494817f7046eaa/application';
         this.rootDir = process.cwd();
+    }
+
+    /**
+     * 🛡️ Validate credentials and initialize AWS clients
+     */
+    validateAndInitializeAWS() {
+        // Use specific wavelength-dev user credentials
+        const requiredVars = ['aws_wavelength_dev_access_key_id', 'aws_wavelength_dev_secret_access_key'];
+        const missing = requiredVars.filter(key => !process.env[key]);
+        
+        if (missing.length > 0) {
+            console.log(chalk.yellow(`⚠️ Missing wavelength-dev AWS credentials: ${missing.join(', ')}`));
+            console.log(chalk.gray('   Falling back to default AWS credentials...'));
+            
+            // Fallback to default credentials
+            const clientConfig = { region: this.region };
+            this.appRunner = new AppRunnerClient(clientConfig);
+            this.ecr = new ECRClient(clientConfig);
+            this.s3 = new S3Client(clientConfig);
+            this.cloudWatchLogs = new CloudWatchLogsClient(clientConfig);
+        } else {
+            // Initialize AWS clients with wavelength-dev user credentials
+            const clientConfig = { 
+                region: this.region,
+                credentials: {
+                    accessKeyId: process.env.aws_wavelength_dev_access_key_id,
+                    secretAccessKey: process.env.aws_wavelength_dev_secret_access_key
+                }
+            };
+            
+            this.appRunner = new AppRunnerClient(clientConfig);
+            this.ecr = new ECRClient(clientConfig);
+            this.s3 = new S3Client(clientConfig);
+            this.cloudWatchLogs = new CloudWatchLogsClient(clientConfig);
+            
+            console.log(chalk.gray('ℹ️  Using wavelength-dev user: arn:aws:iam::170023515523:user/wavelength-dev'));
+        }
     }
 
     /**
