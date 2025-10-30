@@ -137,6 +137,8 @@ class WavelengthRadio {
             // Mini player: core functionality for state synchronization
             console.log('🎵 Initializing mini radio player with state sync');
             this.bindPlaylist(); // Need playlist for track switching and state restoration
+            this.recalculateTotalPoints(); // Ensure total points are accurate
+            this.updateStats(); // Update widget stats display
             this.loadFavorites();
             this.initSoundSystem();
             this.initStateSync(); // Enhanced state synchronization for mini player
@@ -1590,8 +1592,9 @@ class WavelengthRadio {
 
     // Update game stats display
     updateStats() {
-        // Update individual stat counters
+        // Update individual stat counters (for both full player and widget)
         const elements = {
+            // Full radio player elements
             'mushroomCount': this.stats.mushrooms,
             'starCount': this.stats.stars,
             'horseshoeCount': this.stats.horseshoes,
@@ -1600,14 +1603,23 @@ class WavelengthRadio {
             'moonCount': this.stats.moons,
             'goblinCount': this.stats.goblins,
             'magicLevel': this.stats.magicLevel,
-            'totalPoints': this.stats.totalPoints
+            'totalPoints': this.stats.totalPoints,
+            // Widget elements
+            'globalMushrooms': this.stats.mushrooms,
+            'globalStars': this.stats.stars,
+            'globalHorseshoes': this.stats.horseshoes,
+            'globalSparkles': this.stats.sparkles,
+            'globalCrystals': this.stats.crystals,
+            'globalMoons': this.stats.moons,
+            'globalGoblins': this.stats.goblins,
+            'globalTotalScore': this.stats.totalPoints
         };
 
         // Update each element if it exists (silently skip if not found)
         for (const [elementId, value] of Object.entries(elements)) {
             const element = document.getElementById(elementId);
             if (element) {
-                if (elementId === 'totalPoints') {
+                if (elementId === 'totalPoints' || elementId === 'globalTotalScore') {
                     element.textContent = value.toLocaleString();
                 } else {
                     element.textContent = value;
