@@ -3,7 +3,7 @@
 <head>
     <!-- Include the shared header partial -->
     <%- include('partials/head') %>
-    <link rel="stylesheet" href="<%= cdnUrl %>/css/modal_styles.css">
+    <link rel="stylesheet" href="<%= cdnUrl %>/css/modal_styles.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
 </head>
 <body>
     <!-- Include the shared header -->

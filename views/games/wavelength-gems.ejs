@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <%- include('../partials/head') %>
-    <link rel="stylesheet" href="/css/games.css">
-    <link rel="stylesheet" href="/css/wavelength-gems.css">
-    <link rel="stylesheet" href="/css/admin-panel.css">
-    <link rel="stylesheet" href="/css/retry-threshold.css">
+    <link rel="stylesheet" href="/css/games.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
+    <link rel="stylesheet" href="/css/wavelength-gems.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
+    <link rel="stylesheet" href="/css/admin-panel.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
+    <link rel="stylesheet" href="/css/retry-threshold.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
     <style>
         /* Target both main.gems-game-wrapper and .gems-game-wrapper */
         main.gems-game-wrapper,

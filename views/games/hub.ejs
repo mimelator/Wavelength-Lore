@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <%- include('../partials/head') %>
-    <link rel="stylesheet" href="/css/games.css">
+    <link rel="stylesheet" href="/css/games.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
     <style>
         .games-container {
             max-width: 1400px;

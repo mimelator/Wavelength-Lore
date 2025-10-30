@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <%- include('partials/head') %>
-    <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css">
+    <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
     <style>
         body {
             background: #f5f7fa;
