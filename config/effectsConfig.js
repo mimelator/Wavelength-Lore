@@ -58,15 +58,16 @@ const effectsConfig = {
         bloom: 0.4
       }
     },
-    warmth: {
-      name: '🔥 Golden Warmth',
-      description: 'Cozy warm tones perfect for home products',
+    sepia: {
+      name: '🤎 Sepia',
+      description: 'Classic vintage sepia tone for timeless appeal',
       type: 'toggle',
       enabled: false,
       preset: {
-        colorTemperature: 3500,
-        saturation: 1.2,
-        brightness: 1.1
+        colorTemperature: 3200,
+        saturation: 0.3,
+        brightness: 1.05,
+        contrast: 1.1
       }
     },
     coolness: {
@@ -155,8 +156,8 @@ const effectsConfig = {
     {
       id: 'color',
       name: '🎨 Color Effects',
-      description: 'Enhance colors and warmth',
-      effects: ['vibrancy', 'warmth', 'coolness']
+      description: 'Enhance colors and mood',
+      effects: ['vibrancy', 'sepia', 'coolness']
     },
     {
       id: 'atmospheric',
