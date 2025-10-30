@@ -130,6 +130,7 @@ class WavelengthRadio {
         this.pauseGlobalPlayer();
 
         this.bindControls();
+        this.bindWidgetToggle(); // Add widget toggle functionality
         this.bindAudioEvents();
         
         if (this.isMiniPlayer) {
@@ -799,6 +800,60 @@ class WavelengthRadio {
         }
     }
 
+    // Widget toggle functionality for radio widget on every page
+    bindWidgetToggle() {
+        const toggle = document.getElementById('radioGameToggle');
+        const closeBtn = document.getElementById('closeGameBtn');
+
+        if (toggle) {
+            toggle.addEventListener('click', () => this.toggleWidget());
+            console.log('🎵 Radio widget toggle bound successfully');
+        } else {
+            console.warn('🚫 Radio widget toggle element not found');
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.hideWidget());
+        }
+
+        // Initialize widget state
+        this.isWidgetActive = localStorage.getItem('global_radio_game_active') === 'true';
+        if (this.isWidgetActive) {
+            this.showWidget();
+        }
+    }
+
+    // Toggle widget visibility
+    toggleWidget() {
+        if (this.isWidgetActive) {
+            this.hideWidget();
+        } else {
+            this.showWidget();
+        }
+    }
+
+    // Show widget
+    showWidget() {
+        const widget = document.getElementById('radioGameWidget');
+        if (widget) {
+            widget.classList.add('active');
+            this.isWidgetActive = true;
+            localStorage.setItem('global_radio_game_active', 'true');
+            console.log('🎵 Radio widget opened');
+        }
+    }
+
+    // Hide widget  
+    hideWidget() {
+        const widget = document.getElementById('radioGameWidget');
+        if (widget) {
+            widget.classList.remove('active');
+            this.isWidgetActive = false;
+            localStorage.setItem('global_radio_game_active', 'false');
+            console.log('🎵 Radio widget closed');
+        }
+    }
+
     // Playlist item bindings
     bindPlaylist() {
         document.querySelectorAll('.playlist-item').forEach((item) => {
@@ -872,7 +927,10 @@ class WavelengthRadio {
 
     // Play specific track
     playTrack(index) {
-        if (index < 0 || index >= this.playlist.length) return;
+        if (index < 0 || index >= this.playlist.length) {
+            console.warn(`🚫 Cannot play track ${index}: playlist has ${this.playlist.length} tracks`);
+            return;
+        }
 
         this.currentTrackIndex = index;
         const track = this.playlist[index];
@@ -917,6 +975,13 @@ class WavelengthRadio {
     // Toggle play/pause
     togglePlay() {
         if (this.currentTrackIndex === -1) {
+            // Check if playlist is loaded
+            if (!this.playlist || this.playlist.length === 0) {
+                console.warn('🚫 Cannot play: playlist not loaded yet');
+                // Try to load playlist if it's missing
+                this.loadPlaylistFromAPI();
+                return;
+            }
             // Start with first track
             this.playTrack(0);
             return;
@@ -925,24 +990,28 @@ class WavelengthRadio {
         if (this.isPlaying) {
             this.audio.pause();
             this.isPlaying = false;
-            document.querySelector('.album-art').classList.remove('playing');
+            const albumArt = document.querySelector('.album-art');
+            if (albumArt) albumArt.classList.remove('playing');
             // Screensaver notification handled by audio 'pause' event listener
         } else {
             const playPromise = this.audio.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
                     this.isPlaying = true;
-                    document.querySelector('.album-art').classList.add('playing');
+                    const albumArt = document.querySelector('.album-art');
+                    if (albumArt) albumArt.classList.add('playing');
                     // Screensaver notification handled by audio 'play' event listener
                 }).catch(error => {
                     console.error('Play error in togglePlay:', error);
                     this.isPlaying = false;
-                    document.querySelector('.album-art').classList.remove('playing');
+                    const albumArt = document.querySelector('.album-art');
+                    if (albumArt) albumArt.classList.remove('playing');
                 });
             } else {
                 // Fallback for older browsers
                 this.isPlaying = true;
-                document.querySelector('.album-art').classList.add('playing');
+                const albumArt = document.querySelector('.album-art');
+                if (albumArt) albumArt.classList.add('playing');
                 // Screensaver notification handled by audio 'play' event listener
             }
         }
