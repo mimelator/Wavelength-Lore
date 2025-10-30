@@ -30,7 +30,9 @@
       <li class="has-dropdown">
         <a href="#" onclick="return false;">✨ Join Community</a>
         <ul class="dropdown">
-          <!-- User Profile Section (top of dropdown) -->
+          <!-- ALWAYS VISIBLE: Public Sign-In Link -->
+          <li id="public-signin-item"><a href="/forum">🚪 Sign In / Register</a></li>
+          <!-- User Profile Section (shown after authentication) -->
           <li id="profile-dropdown-item" style="display: none;"><a href="/forum/profile">👤 Your Journey</a></li>
           <li id="leaderboard-dropdown-item" style="display: none;"><a href="/leaderboard">🏆 Compete & Win</a></li>
           <li id="profile-forum-dropdown-item" style="display: none;"><a href="/forum">💭 Share Theories</a></li>
@@ -103,6 +105,12 @@
                   // Expose user groups globally
                   window.wavelengthUserGroups = data.groups || [];
 
+                  // Hide public sign-in link and show authenticated user links
+                  const publicSigninItem = document.getElementById('public-signin-item');
+                  if (publicSigninItem) {
+                    publicSigninItem.style.display = 'none';
+                  }
+
                   // Show leaderboard, profile, and gallery links for all authenticated users
                   const leaderboardDropdownItem = document.getElementById('leaderboard-dropdown-item');
                   if (leaderboardDropdownItem) {
@@ -167,14 +175,46 @@
                 console.error('❌ Error checking admin status:', error);
               }
             } else {
-              // User not authenticated - hide VIP features
+              // User not authenticated - show public sign-in link and hide VIP features
               console.log('👤 No user authenticated');
               window.wavelengthUserGroups = null;
+              
+              // Show public sign-in link for unauthenticated users
+              const publicSigninItem = document.getElementById('public-signin-item');
+              if (publicSigninItem) {
+                publicSigninItem.style.display = 'block';
+              }
+              
+              // Hide authenticated user features
+              const profileDropdownItem = document.getElementById('profile-dropdown-item');
+              if (profileDropdownItem) {
+                profileDropdownItem.style.display = 'none';
+              }
+              
+              const leaderboardDropdownItem = document.getElementById('leaderboard-dropdown-item');
+              if (leaderboardDropdownItem) {
+                leaderboardDropdownItem.style.display = 'none';
+              }
+              
+              const profileForumDropdownItem = document.getElementById('profile-forum-dropdown-item');
+              if (profileForumDropdownItem) {
+                profileForumDropdownItem.style.display = 'none';
+              }
+              
+              const galleryNavItem = document.getElementById('gallery-nav-item');
+              if (galleryNavItem) {
+                galleryNavItem.style.display = 'none';
+              }
               
               // Ensure VIP features are hidden
               const gamesNavItem = document.getElementById('games-nav-item');
               if (gamesNavItem) {
                 gamesNavItem.style.display = 'none';
+              }
+              
+              const merchandiseNavItem = document.getElementById('merchandise-nav-item');
+              if (merchandiseNavItem) {
+                merchandiseNavItem.style.display = 'none';
               }
               
               const aiAssistantIcon = document.getElementById('ai-assistant-icon');
@@ -397,6 +437,23 @@
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
     color: var(--primary-color, #ffd700);
     padding-left: 1.5rem;
+  }
+
+  /* Special styling for public sign-in link */
+  #public-signin-item a {
+    background: linear-gradient(135deg, rgba(76, 201, 240, 0.2), rgba(67, 160, 71, 0.2)) !important;
+    color: #4fc3f7 !important;
+    font-weight: bold !important;
+    border: 1px solid rgba(79, 195, 247, 0.3) !important;
+    border-radius: 8px !important;
+    margin: 4px 8px !important;
+  }
+  
+  #public-signin-item a:hover {
+    background: linear-gradient(135deg, rgba(76, 201, 240, 0.4), rgba(67, 160, 71, 0.4)) !important;
+    color: #81c784 !important;
+    transform: translateX(4px) !important;
+    border-color: rgba(129, 199, 132, 0.5) !important;
   }
 
   /* Dropdown divider for section separation */
