@@ -1790,13 +1790,13 @@ router.get('/payment-health', async (req, res) => {
 router.post('/stripe-webhook', async (req, res) => {
   try {
     const signature = req.headers['stripe-signature'];
-    const payload = req.body;
+    const payload = req.body; // This is now a raw Buffer thanks to express.raw()
 
     console.log('🔔 Stripe webhook received');
 
     // Verify webhook signature and parse event
     const webhookResult = stripePaymentService.verifyWebhookSignature(
-      JSON.stringify(payload), 
+      payload, // Pass raw Buffer directly for signature verification
       signature
     );
 

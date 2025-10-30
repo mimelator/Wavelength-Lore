@@ -50,6 +50,11 @@ function configureMiddleware(app) {
 
   // Body parser middleware for JSON requests
   // Increased limit to 50MB to support base64-encoded image uploads for OpenAI upscaler
+  
+  // Special handling for Stripe webhooks - need raw body for signature verification
+  app.use('/api/merchandise/stripe-webhook', express.raw({ type: 'application/json' }));
+  
+  // Regular JSON parsing for all other routes
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
   
