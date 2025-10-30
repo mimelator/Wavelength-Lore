@@ -4372,9 +4372,9 @@ class MerchandiseStore {
 
       console.log('✅ Payment intent created, now mounting payment element...');
 
-      // Mount payment element with the client secret from payment intent result
-      // (createElements is already called inside createPaymentIntent)
-      const mounted = await this.stripeCheckoutService.mountPaymentElement(result.clientSecret);
+      // Mount payment element to the correct container ID
+      // (createElements is already called inside createPaymentIntent with client secret)
+      const mounted = await this.stripeCheckoutService.mountPaymentElement('payment-element');
       if (!mounted) {
         this.showError('Failed to load payment form');
         return;

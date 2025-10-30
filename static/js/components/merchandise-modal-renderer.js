@@ -880,18 +880,31 @@ class MerchandiseModalRenderer {
                     ${cartSummary.items.map(item => this.renderCheckoutItem(item)).join('')}
                   </div>
                   <div class="checkout-totals">
-                    <div class="total-row">
-                      <span>Subtotal:</span>
-                      <span>$${cartSummary.total.toFixed(2)}</span>
-                    </div>
-                    <div class="total-row">
-                      <span>Shipping:</span>
-                      <span>FREE</span>
-                    </div>
-                    <div class="total-row total">
-                      <span>Total:</span>
-                      <span>$${cartSummary.total.toFixed(2)}</span>
-                    </div>
+                    ${(() => {
+                      const subtotal = cartSummary.total;
+                      const shipping = this.calculateShipping(subtotal);
+                      const tax = this.calculateTax(subtotal);
+                      const total = subtotal + shipping + tax;
+                      
+                      return `
+                        <div class="total-row">
+                          <span>Subtotal:</span>
+                          <span>$${subtotal.toFixed(2)}</span>
+                        </div>
+                        <div class="total-row">
+                          <span>Shipping:</span>
+                          <span>${shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2)}</span>
+                        </div>
+                        <div class="total-row">
+                          <span>Tax (estimated):</span>
+                          <span>$${tax.toFixed(2)}</span>
+                        </div>
+                        <div class="total-row total">
+                          <span>Total:</span>
+                          <span>$${total.toFixed(2)}</span>
+                        </div>
+                      `;
+                    })()}
                   </div>
                 </div>
 
@@ -4092,6 +4105,26 @@ class MerchandiseModalRenderer {
         ${options}
       </select>
     `;
+  }
+
+  /**
+   * Calculate shipping cost
+   * @param {number} subtotal - Subtotal amount
+   * @returns {number} Shipping cost
+   */
+  calculateShipping(subtotal) {
+    // Free shipping over $50, otherwise $5.99
+    return subtotal >= 50 ? 0 : 5.99;
+  }
+
+  /**
+   * Calculate tax estimate
+   * @param {number} subtotal - Subtotal amount
+   * @returns {number} Tax amount
+   */
+  calculateTax(subtotal) {
+    // Rough 8% tax estimate
+    return subtotal * 0.08;
   }
 }
 
