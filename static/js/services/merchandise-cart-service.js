@@ -326,14 +326,16 @@ class MerchandiseCartService {
     try {
       // Try to find variant-specific price
       if (product.variants && Array.isArray(product.variants)) {
-        const variant = product.variants.find(v => v.id === variantId);
+        const variant = product.variants.find(v => v.id == variantId); // Use loose equality for type flexibility
         if (variant && variant.price) {
-          return parseFloat(variant.price) || 0;
+          // Convert cents to dollars (Printify prices are in cents)
+          return (parseFloat(variant.price) / 100) || 0;
         }
       }
       
       // Fallback to product price
       if (product.price) {
+        // Assume product price is already in dollars
         return parseFloat(product.price) || 0;
       }
       
