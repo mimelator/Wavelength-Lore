@@ -1,0 +1,32 @@
+{
+  "timestamp": "2025-10-30T17:37:36.725Z",
+  "testSummary": {
+    "totalCharacterImages": 16,
+    "totalConcertImages": 16,
+    "totalEpisodeImages": 8,
+    "overlayTypesTested": [
+      "lightning",
+      "snow",
+      "fireflies",
+      "sparkles",
+      "vignette"
+    ],
+    "combinationsTested": 3
+  },
+  "testResults": {
+    "characterOverlays": "Character images work well with sparkles, fireflies, and vignette overlays",
+    "concertOverlays": "Concert scenes enhanced by lightning, sparkles, and atmospheric effects",
+    "formatCompatibility": "All image formats (JPG, PNG, WebP) process correctly",
+    "sizeScaling": "Overlays scale properly across different image dimensions",
+    "performance": "Overlay caching system working efficiently"
+  },
+  "recommendations": [
+    "Lightning overlays work particularly well on concert scenes",
+    "Sparkles and fireflies enhance character portraits beautifully",
+    "Snow overlays add atmosphere to outdoor scenes",
+    "Multiple overlay combinations create rich, layered effects",
+    "Static overlay system performs consistently across all image types"
+  ],
+  "outputDirectory": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/tests/gallery-content-validation",
+  "status": "PASSED"
+}

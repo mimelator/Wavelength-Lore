@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-10-30T17:31:46.070Z",
+  "tests": [
+    "Lightning overlay application",
+    "Multiple overlay combination",
+    "Dynamic overlay resizing",
+    "Cross-size consistency"
+  ],
+  "status": "PASSED",
+  "outputDirectory": "/Volumes/5bits/current/wavelength-dev/Wavelength-Lore/Wavelength-Lore.fresh/tests/static-overlay-validation",
+  "notes": [
+    "Static overlays load and resize correctly",
+    "Overlay caching is working",
+    "Multiple overlays composite properly",
+    "Consistent appearance across different image sizes"
+  ]
+}
