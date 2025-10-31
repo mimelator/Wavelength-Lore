@@ -668,18 +668,12 @@ class EpisodeCommands {
     }
 
     /**
-     * Extract assets for an episode (with approval workflow)
-     * @param {Array} args - Command arguments (episode ID)
+     * Extract assets from any gallery (with approval workflow)
+     * @param {Array} args - Command arguments
      */
     async extractAssets(args) {
-        if (!args.length) {
-            console.log(chalk.red('❌ Episode ID is required'));
-            console.log(chalk.yellow('Usage: episodes extract <episode-id>'));
-            return;
-        }
-
-        const episodeId = args[0];
         const skipApproval = args.includes('--skip-approval') || args.includes('--auto-approve');
+        const episodeIdArg = args.find(arg => !arg.startsWith('--'));
 
         if (!this.episodeService) {
             console.log(chalk.red('❌ Episode service not initialized'));
@@ -687,35 +681,81 @@ class EpisodeCommands {
         }
 
         try {
-            // Fetch episode data
-            const episode = await this.episodeService.getEpisodeById(episodeId);
-            
-            if (!episode) {
-                console.log(chalk.red(`❌ Episode not found: ${episodeId}`));
-                return;
+            let sourceImages = [];
+            let sourceInfo = {};
+
+            // If episode ID provided, use legacy workflow (episode images)
+            if (episodeIdArg && !episodeIdArg.includes(':')) {
+                const episode = await this.episodeService.getEpisodeById(episodeIdArg);
+                
+                if (!episode) {
+                    console.log(chalk.red(`❌ Episode not found: ${episodeIdArg}`));
+                    return;
+                }
+
+                sourceImages = episode.approvedImages || episode.images || episode.carouselImages || [];
+                sourceInfo = {
+                    type: 'episode',
+                    id: episodeIdArg,
+                    title: episode.title || episodeIdArg,
+                    season: episode.season,
+                    episodeNumber: episode.episodeNumber || episode.episode
+                };
+
+                if (sourceImages.length === 0) {
+                    console.log(chalk.yellow('⚠️  No images found in episode'));
+                    console.log(chalk.gray('   Please add images to the episode first (via image generation or upload)'));
+                    return;
+                }
+            } else {
+                // New workflow: select content type and gallery
+                const workflowResult = await this.selectSourceImageAndEpisode();
+                if (!workflowResult) {
+                    return; // User cancelled
+                }
+                sourceImages = workflowResult.sourceImages;
+                sourceInfo = workflowResult.sourceInfo;
             }
 
-            console.log(chalk.cyan(`\n🎨 Extracting assets for: ${episode.title || episodeId}`));
+            // Get target episode (for asset manifest)
+            let targetEpisode;
+            if (sourceInfo.type === 'episode') {
+                targetEpisode = {
+                    id: sourceInfo.id,
+                    season: sourceInfo.season,
+                    episodeNumber: sourceInfo.episodeNumber
+                };
+            } else {
+                // Prompt for target episode
+                const episodeId = await this.cli.promptUser(chalk.cyan('\n📺 Target Episode for Assets:\n') + 
+                    chalk.yellow('Enter episode ID (e.g., s5e1) to associate these assets: '));
+                
+                if (!episodeId) {
+                    console.log(chalk.red('❌ Episode ID required to save assets'));
+                    return;
+                }
 
-            // Get source images from episode
-            const sourceImages = episode.approvedImages || episode.images || episode.carouselImages || [];
-            
-            if (sourceImages.length === 0) {
-                console.log(chalk.yellow('⚠️  No images found in episode'));
-                console.log(chalk.gray('   Please add images to the episode first (via image generation or upload)'));
-                return;
+                targetEpisode = await this.episodeService.getEpisodeById(episodeId);
+                if (!targetEpisode) {
+                    console.log(chalk.red(`❌ Episode not found: ${episodeId}`));
+                    return;
+                }
+
+                console.log(chalk.green(`✅ Assets will be saved for: ${targetEpisode.title || episodeId}`));
             }
 
-            console.log(chalk.gray(`Found ${sourceImages.length} image(s)`));
+            console.log(chalk.cyan(`\n🎨 Extracting assets from: ${sourceInfo.title || sourceInfo.id}`));
+            console.log(chalk.gray(`   Source: ${sourceInfo.type} | Images: ${sourceImages.length}`));
+            console.log(chalk.gray(`   Target episode: ${targetEpisode.title || targetEpisode.id || targetEpisode}`));
 
             // Initialize asset extraction service
             const assetService = new AssetExtractionService();
 
             // Extract assets in preview mode (don't upload yet)
             const result = await assetService.extractEpisodeAssets({
-                episodeId,
-                season: episode.season,
-                episodeNumber: episode.episodeNumber || episode.episode,
+                episodeId: targetEpisode.id || targetEpisode,
+                season: targetEpisode.season,
+                episodeNumber: targetEpisode.episodeNumber || targetEpisode.episode,
                 sourceImages
             }, true); // skipUpload = true for approval workflow
 
@@ -737,9 +777,9 @@ class EpisodeCommands {
                 console.log(chalk.yellow('\n⚠️  Auto-approving all assets (--skip-approval flag)...'));
                 
                 const approvedResult = await assetService.approveAndSaveAssets(pendingAssets.assets, {
-                    episodeId,
-                    season: episode.season,
-                    episodeNumber: episode.episodeNumber || episode.episode
+                    episodeId: targetEpisode.id || targetEpisode,
+                    season: targetEpisode.season,
+                    episodeNumber: targetEpisode.episodeNumber || targetEpisode.episode
                 });
 
                 if (approvedResult.success) {
@@ -776,9 +816,9 @@ class EpisodeCommands {
 
             // Interactive approval workflow
             await this.approveAssetsInteractively(assetService, pendingAssets, {
-                episodeId,
-                season: episode.season,
-                episodeNumber: episode.episodeNumber || episode.episode
+                episodeId: targetEpisode.id || targetEpisode,
+                season: targetEpisode.season,
+                episodeNumber: targetEpisode.episodeNumber || targetEpisode.episode
             });
 
         } catch (error) {
@@ -787,6 +827,145 @@ class EpisodeCommands {
                 console.error(error.stack);
             }
         }
+    }
+
+    /**
+     * Interactive workflow to select source image from any gallery
+     */
+    async selectSourceImageAndEpisode() {
+        const { fetchDataAsAdmin } = require('../services/firebase-admin-utils');
+        const loreHelpers = require('../utils/lore-helpers');
+
+        console.log(chalk.cyan('\n🎨 Asset Extraction from Gallery'));
+        console.log(chalk.cyan('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+        console.log(chalk.yellow('Select a content type to browse galleries:\n'));
+
+        // Content type selection
+        const contentTypeChoice = await this.cli.promptUser(
+            chalk.cyan('Content Type:\n') +
+            chalk.gray('  1. Lore (places, things, concepts)\n') +
+            chalk.gray('  2. Characters\n') +
+            chalk.gray('  3. Episodes\n') +
+            chalk.yellow('\nSelect (1-3): ')
+        );
+
+        let contentType, contentId, item;
+        const contentTypes = { '1': 'lore', '2': 'characters', '3': 'episodes' };
+        contentType = contentTypes[contentTypeChoice?.trim()];
+
+        if (!contentType) {
+            console.log(chalk.red('❌ Invalid selection'));
+            return null;
+        }
+
+        // Get content ID
+        contentId = await this.cli.promptUser(
+            chalk.cyan(`\n📝 Enter ${contentType.slice(0, -1)} ID: `) + 
+            chalk.gray(`(e.g., daphne-flower, andrew, s5e1)\n`)
+        );
+
+        if (!contentId) {
+            console.log(chalk.red('❌ Content ID required'));
+            return null;
+        }
+
+        // Fetch the item
+        try {
+            if (contentType === 'lore') {
+                item = loreHelpers.getLoreByIdSync(contentId);
+                if (!item) {
+                    const loreData = await fetchDataAsAdmin('lore');
+                    item = loreData?.[contentId];
+                }
+            } else if (contentType === 'characters') {
+                const charData = await fetchDataAsAdmin('characters');
+                item = charData?.[contentId];
+            } else if (contentType === 'episodes') {
+                item = await this.episodeService.getEpisodeById(contentId);
+            }
+
+            if (!item) {
+                console.log(chalk.red(`❌ ${contentType.slice(0, -1)} not found: ${contentId}`));
+                return null;
+            }
+
+            console.log(chalk.green(`✅ Found: ${item.title || item.name || contentId}`));
+
+        } catch (error) {
+            console.log(chalk.red(`❌ Error loading ${contentType.slice(0, -1)}: ${error.message}`));
+            return null;
+        }
+
+        // Get images from the item
+        let images = [];
+        if (contentType === 'lore') {
+            if (item.image) images.push(item.image);
+            if (item.image_gallery && Array.isArray(item.image_gallery)) {
+                images.push(...item.image_gallery);
+            }
+        } else if (contentType === 'characters') {
+            if (item.image) images.push(item.image);
+            if (item.image_gallery && Array.isArray(item.image_gallery)) {
+                images.push(...item.image_gallery);
+            }
+            if (item.avatarGallery && Array.isArray(item.avatarGallery)) {
+                images.push(...item.avatarGallery);
+            }
+        } else if (contentType === 'episodes') {
+            images = item.approvedImages || item.images || item.carouselImages || [];
+        }
+
+        if (images.length === 0) {
+            console.log(chalk.yellow(`⚠️  No images found in ${contentType.slice(0, -1)} gallery`));
+            return null;
+        }
+
+        // Filter out empty/null images
+        images = images.filter(img => img && img.trim());
+
+        if (images.length === 0) {
+            console.log(chalk.yellow(`⚠️  No valid images found`));
+            return null;
+        }
+
+        console.log(chalk.green(`\n🖼️  Found ${images.length} image(s) in gallery:\n`));
+        images.forEach((img, i) => {
+            console.log(chalk.gray(`  ${i + 1}. ${img}`));
+        });
+
+        // Select image(s)
+        const imageChoice = await this.cli.promptUser(
+            chalk.cyan('\n📸 Select image(s):\n') +
+            chalk.gray(`  1-${images.length}: Single image\n`) +
+            chalk.gray('  all: All images\n') +
+            chalk.yellow(`\nChoice (1-${images.length}, all, or Enter for first): `)
+        );
+
+        let selectedImages = [];
+        if (!imageChoice || imageChoice.trim() === '' || imageChoice.trim() === 'first') {
+            selectedImages = [images[0]];
+        } else if (imageChoice.toLowerCase().trim() === 'all') {
+            selectedImages = images;
+        } else {
+            const index = parseInt(imageChoice.trim()) - 1;
+            if (index >= 0 && index < images.length) {
+                selectedImages = [images[index]];
+            } else {
+                console.log(chalk.red('❌ Invalid selection'));
+                return null;
+            }
+        }
+
+        console.log(chalk.green(`✅ Selected ${selectedImages.length} image(s) for extraction`));
+
+        return {
+            sourceImages: selectedImages,
+            sourceInfo: {
+                type: contentType,
+                id: contentId,
+                title: item.title || item.name || contentId
+            }
+        };
     }
 
     /**

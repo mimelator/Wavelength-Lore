@@ -81,24 +81,40 @@ Multiple game assets are extracted:
 
 ### Basic Usage
 
+**Option 1: Extract from Episode Images**
 ```bash
 # Start the CLI
 npm run cli
 
-# Extract assets for an episode (with approval workflow)
+# Extract assets directly from an episode
 wavelength> episodes extract s5e1
 ```
 
+**Option 2: Extract from Any Gallery (New!)**
+```bash
+# Interactive gallery browser
+wavelength> episodes extract
+
+# Then follow the prompts to:
+# 1. Select content type (lore, characters, episodes)
+# 2. Enter content ID (e.g., daphne-flower, andrew)
+# 3. Browse and select image(s) from gallery
+# 4. Specify target episode for assets (e.g., s5e1)
+```
+
 The pipeline will:
-1. ✅ Load your episode and find all images
+1. ✅ Load source images (from episode or selected gallery)
 2. ✅ Generate all asset variants (stored temporarily)
 3. ✅ Open a preview page in your browser showing all assets
 4. ✅ Prompt you to approve/reject each asset in the CLI
 5. ✅ Upload only approved assets to S3
-6. ✅ Create an asset manifest with approved assets only
+6. ✅ Create an asset manifest with approved assets only (associated with target episode)
 7. ✅ Show you a summary
 
-**Important**: Asset extraction uses an **approval workflow** by default. You review and approve each extracted asset before it's saved. This ensures quality control and allows you to iterate on extractions.
+**Important**: 
+- Asset extraction uses an **approval workflow** by default. You review and approve each extracted asset before it's saved.
+- Assets are always saved to a target episode's manifest, even if the source image came from a lore object or character gallery.
+- This allows you to extract assets from any content type and associate them with in-progress episodes.
 
 ---
 
