@@ -836,7 +836,7 @@ class EpisodeCommands {
      */
     async selectSourceImageAndEpisode() {
         const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
-        const loreHelpers = require('../utils/lore-helpers');
+        const loreHelpers = require('../helpers/lore-helpers');
 
         console.log(chalk.cyan('\n🎨 Asset Extraction from Gallery'));
         console.log(chalk.cyan('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
