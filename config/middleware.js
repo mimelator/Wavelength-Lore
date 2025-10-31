@@ -215,6 +215,8 @@ function configureTemplateLocals(app) {
     res.locals.userPermissions = [];
     res.locals.userActions = [];
     res.locals.isContentCreator = false;
+    res.locals.isPreviewUser = false;
+    res.locals.isBetaTester = false;
 
     // Check if user is authenticated and get their groups
     if (req.user && req.user.uid) {
@@ -228,7 +230,20 @@ function configureTemplateLocals(app) {
           res.locals.isContentCreator = userData.groups.includes('content_manager') ||
                                        userData.groups.includes('admin') ||
                                        userData.groups.includes('super_admin');
-          console.log(`👤 User ${req.user.uid} isContentCreator: ${res.locals.isContentCreator}, groups: ${JSON.stringify(userData.groups)}`);
+          
+          // Check for preview/beta tester flags (from userData or groups)
+          res.locals.isPreviewUser = userData.isPreviewUser === true ||
+                                     userData.groups.includes('preview_user') ||
+                                     userData.groups.includes('beta_tester');
+          res.locals.isBetaTester = userData.isBetaTester === true ||
+                                    userData.groups.includes('beta_tester');
+          
+          console.log(`👤 User ${req.user.uid} permissions:`, {
+            isContentCreator: res.locals.isContentCreator,
+            isPreviewUser: res.locals.isPreviewUser,
+            isBetaTester: res.locals.isBetaTester,
+            groups: JSON.stringify(userData.groups)
+          });
         }
       } catch (error) {
         console.error('Error loading user groups:', error);
@@ -294,23 +309,42 @@ function configureTemplateLocals(app) {
       res.locals.saveToGalleryButton = galleryUi.createSaveToGalleryButton;
     }
 
-    // Character helpers
+    // Create user object for visibility filtering
+    const user = {
+      isContentCreator: res.locals.isContentCreator || false,
+      isPreviewUser: res.locals.isPreviewUser || false,
+      isBetaTester: res.locals.isBetaTester || false
+    };
+
+    // Character helpers (with user context for visibility filtering)
     res.locals.characterHelpers = characterHelpers;
     res.locals.characterLink = characterHelpers.generateCharacterLinkSync;
-    res.locals.linkifyCharacters = characterHelpers.linkifyCharacterMentionsSync;
-    res.locals.allCharacters = characterHelpers.getAllCharactersSync(showHidden);
+    res.locals.linkifyCharacters = (text) => characterHelpers.linkifyCharacterMentionsSync(text, user);
+    res.locals.allCharacters = characterHelpers.getAllCharactersSync(user);
 
-    // Lore helpers
+    // Lore helpers (with user context for visibility filtering)
     res.locals.loreHelpers = loreHelpers;
     res.locals.loreLink = loreHelpers.generateLoreLinkSync;
-    res.locals.linkifyLore = loreHelpers.linkifyLoreMentionsSync;
-    res.locals.allLore = loreHelpers.getAllLoreSync(showHidden);
+    res.locals.linkifyLore = (text) => {
+      // Update lore helpers to accept user parameter when implemented
+      return loreHelpers.linkifyLoreMentionsSync(text, user);
+    };
+    res.locals.allLore = () => {
+      // Update lore helpers to accept user parameter when implemented
+      return loreHelpers.getAllLoreSync(user);
+    };
 
-    // Episode helpers
+    // Episode helpers (with user context for visibility filtering)
     res.locals.episodeHelpers = episodeHelpers;
     res.locals.episodeLink = episodeHelpers.generateEpisodeLinkSync;
-    res.locals.linkifyEpisodes = episodeHelpers.linkifyEpisodeMentionsSync;
-    res.locals.allEpisodes = episodeHelpers.getAllEpisodesSync(showHidden);
+    res.locals.linkifyEpisodes = (text) => {
+      // Update episode helpers to accept user parameter when implemented
+      return episodeHelpers.linkifyEpisodeMentionsSync(text, user);
+    };
+    res.locals.allEpisodes = () => {
+      // Update episode helpers to accept user parameter when implemented
+      return episodeHelpers.getAllEpisodesSync(user);
+    };
 
     // Also provide async versions for routes that can use them
     res.locals.characterLinkAsync = characterHelpers.generateCharacterLink;

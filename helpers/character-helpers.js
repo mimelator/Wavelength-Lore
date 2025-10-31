@@ -117,18 +117,15 @@ async function getCharacters() {
 
 /**
  * Get all characters with optional visibility filtering
- * @param {boolean} showHidden - Whether to include hidden characters (for content creators)
- * @returns {Promise<Array>} Array of character objects
+ * @param {Object} user - User object with permissions (optional)
+ * @returns {Promise<Array>} Array of character objects visible to user
  */
-async function getAllCharacters(showHidden = false) {
+async function getAllCharacters(user = null) {
   const allCharacters = await getCharacters();
   
-  // Filter out hidden characters for public users
-  if (!showHidden) {
-    return allCharacters.filter(char => !char.hidden);
-  }
-  
-  return allCharacters;
+  // Use unified visibility system
+  const visibilityHelpers = require('./visibility-helpers');
+  return visibilityHelpers.filterByVisibility(allCharacters, user);
 }
 
 /**
@@ -202,27 +199,30 @@ function generateCharacterLinkSync(id, customText = null) {
 /**
  * Replace character mentions in text with links (sync version)
  * @param {string} text - Text to process
+ * @param {Object} user - User object with permissions (optional)
  * @returns {string} Text with character names replaced by links
  */
-function linkifyCharacterMentionsSync(text) {
-  const characters = cacheUtils.getSync(charactersCache, fallbackCharacters);
-  return linkingUtils.linkifyItemMentions(text, characters, 'character');
+function linkifyCharacterMentionsSync(text, user = null) {
+  const allCharacters = cacheUtils.getSync(charactersCache, fallbackCharacters);
+  
+  // Filter by visibility before linking
+  const visibilityHelpers = require('./visibility-helpers');
+  const visibleCharacters = visibilityHelpers.filterByVisibility(allCharacters, user);
+  
+  return linkingUtils.linkifyItemMentions(text, visibleCharacters, 'character');
 }
 
 /**
  * Get all characters list (sync version)
- * @param {boolean} showHidden - Whether to include hidden characters (for content creators)
- * @returns {array} Array of all characters
+ * @param {Object} user - User object with permissions (optional)
+ * @returns {array} Array of characters visible to user
  */
-function getAllCharactersSync(showHidden = false) {
+function getAllCharactersSync(user = null) {
   const allCharacters = cacheUtils.getSync(charactersCache, fallbackCharacters);
   
-  // Filter out hidden characters for public users
-  if (!showHidden) {
-    return allCharacters.filter(char => !char.hidden);
-  }
-  
-  return allCharacters;
+  // Use unified visibility system
+  const visibilityHelpers = require('./visibility-helpers');
+  return visibilityHelpers.filterByVisibility(allCharacters, user);
 }
 
 /**

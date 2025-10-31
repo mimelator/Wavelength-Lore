@@ -369,8 +369,15 @@ router.get('/character/:characterId', async (req, res) => {
         hasCTA: !!character.cta_text
       });
 
-      // Check visibility - if hidden and user is not a content creator, show 404
-      if (character.hidden && !res.locals.isContentCreator) {
+      // Check visibility using unified system
+      const visibilityHelpers = require('../helpers/visibility-helpers');
+      const user = {
+        isContentCreator: res.locals.isContentCreator || false,
+        isPreviewUser: res.locals.isPreviewUser || false,
+        isBetaTester: res.locals.isBetaTester || false
+      };
+      
+      if (!visibilityHelpers.isVisibleToUser(character, user)) {
         return res.status(404).send('Character not found');
       }
 
@@ -448,9 +455,13 @@ router.get('/characters', async (req, res) => {
     res.set('Pragma', 'no-cache');
     res.set('Expires', '0');
     
-    // Use character helpers with visibility filtering
-    const showHidden = res.locals.isContentCreator || false;
-    const allCharacters = await characterHelpers.getAllCharacters(showHidden);
+    // Use unified visibility system
+    const user = {
+      isContentCreator: res.locals.isContentCreator || false,
+      isPreviewUser: res.locals.isPreviewUser || false,
+      isBetaTester: res.locals.isBetaTester || false
+    };
+    const allCharacters = await characterHelpers.getAllCharacters(user);
 
     res.render('character-gallery', {
         title: 'Character Gallery',
