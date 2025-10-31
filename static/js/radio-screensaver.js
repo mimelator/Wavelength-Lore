@@ -299,37 +299,35 @@ class RadioScreenSaver {
             this.radio.playTrack(0);
         }
 
-        // Collect images
+        // Collect images from episode directories
         this.images = [];
+        console.log('🎨 Screensaver: Collecting images from episode directories');
         
+        // Load images from the current track first
         if (this.radio.currentTrackIndex >= 0) {
             const track = this.radio.playlist[this.radio.currentTrackIndex];
-            
-            if (track.images?.length > 0) {
-                track.images.forEach(img => this.images.push(this.radio.cdnUrl + img));
-            }
-            
-            if (this.images.length === 0 && track.episodeImage) {
-                this.images.push(this.radio.cdnUrl + track.episodeImage);
-            }
+            console.log(`🎨 Current track: S${track.season}E${track.episodeNumber}`);
+            this.addEpisodeImages(track);
         }
 
-        // Fallback to all episodes
+        // If no images from current track, load from all episodes
         if (this.images.length === 0) {
+            console.log('🎨 No images from current track, loading from all episodes');
             this.radio.playlist.forEach(track => {
-                if (track.images) {
-                    track.images.forEach(img => this.images.push(this.radio.cdnUrl + img));
-                } else if (track.episodeImage) {
-                    this.images.push(this.radio.cdnUrl + track.episodeImage);
-                }
+                this.addEpisodeImages(track);
             });
         }
 
+        // Remove duplicates
         this.images = [...new Set(this.images)];
+        console.log(`🎨 Total screensaver images loaded: ${this.images.length}`);
 
         if (this.images.length === 0) {
-            console.warn('No images for screensaver');
-            return;
+            console.warn('🎨 No images found for screensaver');
+            // Fallback to a default image if available
+            const defaultImage = '/images/wavelength-og-default.webp';
+            this.images.push(defaultImage);
+            console.log('🎨 Using default fallback image');
         }
 
         // Populate gallery
@@ -373,6 +371,47 @@ class RadioScreenSaver {
         }
 
         console.log(`🎨 Screensaver activated with ${this.images.length} images`);
+    }
+
+    addEpisodeImages(track) {
+        // Try to load images from episode directory structure
+        const season = track.season;
+        const episode = track.episodeNumber;
+        
+        // Default images that should exist for most episodes
+        const potentialImages = [
+            `/images/seasons/season${season}/episodes/episode${episode}/image.webp`,
+            `/images/seasons/season${season}/image.webp`
+        ];
+        
+        // Add these base images
+        potentialImages.forEach(imagePath => {
+            this.images.push(imagePath);
+        });
+        
+        // Also try to load from the images/ subdirectory
+        // These are the gallery images we found
+        const episodeImagePatterns = [
+            'MyLuckyCharm', 'JumpRightIn', 'DreamWithMe', 'Daphne', 'Falling', 
+            'OnceMore', 'HistoryLessons', 'LifeInTheShire', 'FeedTheCrows', 'KeepOn', 
+            'BackToTheShire', 'GoblinKing', 'Psychopath', 'Countdown', 'AMiseryOfGoblins',
+            'SlowTime', 'YouWontSeeItComing', 'SayGoodbyeToTheShire', 'IceFortress',
+            'TheIceWhales', 'SneakAttack', 'FrozenPeace', 'RebuildTheShire', 
+            'WereComingForYou', 'PrepareForBattle', 'LockedAndLoaded', 'TheKingHasFled',
+            'GoblinsRule', 'IceBlueGreed', 'TheShireFortress', 'BattleOfTheShire',
+            'SongOfMourning', 'TheShireDream'
+        ];
+        
+        // Try to find images that match episode patterns
+        episodeImagePatterns.forEach(pattern => {
+            for (let i = 1; i <= 20; i++) {
+                const paddedNum = i.toString().padStart(2, '0');
+                const imagePath = `/images/seasons/season${season}/episodes/episode${episode}/images/${pattern}-${paddedNum}.webp`;
+                this.images.push(imagePath);
+            }
+        });
+        
+        console.log(`🎨 Added potential images for S${season}E${episode}: ${track.title}`);
     }
 
     exit() {
