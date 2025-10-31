@@ -796,7 +796,7 @@ router.post('/create-guided-product', ensureAuthenticated, async (req, res) => {
  * POST /api/merchandise/create-product
  * Create a custom product from a gallery image with automatic AI enhancement
  */
-router.post('/create-product', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+router.post('/create-product', ensureAuthenticated, async (req, res) => {
   try {
     // Ensure database is ready
     if (!ensureDatabaseReady(res)) {
@@ -2107,7 +2107,7 @@ async function processPayment(paymentToken, lineItems, shippingAddress, shipping
  * POST /api/merchandise/preview-enhancement
  * Preview AI enhancement for an image before creating products
  */
-router.post('/preview-enhancement', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+router.post('/preview-enhancement', ensureAuthenticated, async (req, res) => {
   console.log('🔍 ROUTE: /api/merchandise/preview-enhancement called');
   console.log('🔍 Request body:', req.body);
   console.log('🔍 User groups:', req.user?.groups);
@@ -2327,7 +2327,7 @@ router.get('/test-printify', async (req, res) => {
  * POST /api/merchandise/check-enhancement-status
  * Check if an image has a cached enhanced version
  */
-router.post('/check-enhancement-status', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+router.post('/check-enhancement-status', ensureAuthenticated, async (req, res) => {
   try {
     // Ensure database is ready
     if (!ensureDatabaseReady(res)) {
@@ -3978,7 +3978,7 @@ router.get('/templates-list', (req, res) => {
  * GET /api/merchandise/gallery-list
  * Get list of user's gallery images for selection
  */
-router.get('/gallery-list', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+router.get('/gallery-list', ensureAuthenticated, async (req, res) => {
   try {
     const userId = req.user.uid;
 
@@ -4549,7 +4549,7 @@ router.get('/openai-upscaler', ensureAuthenticated, groupAuth.requireAction('gam
  * GET /api/merchandise/gallery-random-image
  * Get a random image from user's gallery (S3 uploads + Firebase bookmarks)
  */
-router.get('/gallery-random-image', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+router.get('/gallery-random-image', ensureAuthenticated, async (req, res) => {
   try {
     const userId = req.user.uid;
 
@@ -4673,7 +4673,7 @@ router.get('/openai-upscaler/status', (req, res) => {
  *   printProviderId: string - Printify print provider ID
  * }
  */
-router.post('/generate-printify-mockup', ensureAuthenticated, groupAuth.requireAction('game_access'), async (req, res) => {
+router.post('/generate-printify-mockup', ensureAuthenticated, async (req, res) => {
   try {
     console.log('🎨 MOCKUP GENERATION: Starting Printify mockup creation');
 
