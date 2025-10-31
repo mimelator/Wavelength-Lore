@@ -24,7 +24,13 @@ router.get('/api/episodes', async (req, res) => {
         
         // Format episodes for response
         const episodes = allEpisodes
-            .filter(ep => ep.visible !== false) // Only return visible episodes
+            .filter(ep => {
+                // Filter out hidden/unpublished episodes for public users
+                // Check multiple visibility fields: visible, published, hidden
+                return ep.visible !== false && 
+                       ep.published !== false && 
+                       ep.hidden !== true;
+            }) // Only return visible/published episodes
             .map(ep => ({
                 id: ep.id,
                 seasonNumber: ep.seasonNumber,
