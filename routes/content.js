@@ -597,6 +597,7 @@ router.get('/lore/:loreId', async (req, res) => {
       },
       previousLore,
       nextLore,
+      allLore: Array.isArray(allLore) ? allLore : [],
       cdnUrl: process.env.CDN_URL,
       version: `v${Date.now()}`,
       req: req
