@@ -781,40 +781,26 @@ class EpisodeCommands {
      */
     async uploadSongForEpisode(episodeId, episode) {
         try {
-            // Close main CLI's readline to prevent input conflicts
-            // This is necessary because multiple readline interfaces on the same stdin cause double input
-            const mainRl = this.cli.rl;
-            
-            // Store the original handlers to restore later
-            const lineHandlers = mainRl.listeners('line').slice(); // Create a copy
-            const closeHandlers = mainRl.listeners('close').slice();
-            
-            // Temporarily remove close handlers to prevent exit on close
-            mainRl.removeAllListeners('close');
-            
-            // Set stdin to raw mode to prevent double input
-            // This ensures only one interface processes input at a time
-            const stdinWasRaw = process.stdin.isRaw;
-            if (!stdinWasRaw) {
-                process.stdin.setRawMode(false);
-                process.stdin.resume();
-            }
-            
-            // Pause the main readline completely
-            if (!mainRl.paused) {
-                mainRl.pause();
-            }
-            mainRl.removeAllListeners('line');
-            
-            // Small delay to ensure stdin state is settled
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
-            // Create readline interface for SongUploadStep
-            const rl = readline.createInterface({
-                input: process.stdin,
-                output: process.stdout,
-                terminal: true
-            });
+            // Instead of creating a new readline (which causes double input), 
+            // create a mock readline object that uses the main CLI's promptUser
+            // This completely avoids stdin conflicts
+            const mockRl = {
+                question: (prompt, callback) => {
+                    // Use the main CLI's promptUser (which already handles pausing/resuming)
+                    this.cli.promptUser(prompt).then(answer => {
+                        if (callback) callback(answer);
+                    }).catch(err => {
+                        if (callback) callback('');
+                    });
+                },
+                close: () => {
+                    // No-op - don't close the main CLI readline
+                },
+                paused: false,
+                pause: () => {},
+                resume: () => {},
+                prompt: () => {}
+            };
 
             // Create a minimal state manager wrapper for song upload
             const stateManager = {
@@ -855,7 +841,7 @@ class EpisodeCommands {
                 }
             };
 
-            const songUploadStep = new SongUploadStep(stateManager, rl);
+            const songUploadStep = new SongUploadStep(stateManager, mockRl);
             
             try {
                 // Execute song upload
@@ -872,38 +858,6 @@ class EpisodeCommands {
                     console.log(chalk.red(`\n❌ Song upload failed: ${uploadError.message}`));
                 }
                 // Don't re-throw - allow CLI to continue
-            } finally {
-                // Always restore the main CLI readline, even if upload fails
-                try {
-                    // Close song upload's readline
-                    rl.close();
-                } catch (e) {
-                    // Ignore errors when closing (might already be closed)
-                }
-                
-                // Small delay to ensure stdin is fully released
-                await new Promise(resolve => setTimeout(resolve, 100));
-                
-                // Restore stdin state if we changed it
-                if (!stdinWasRaw) {
-                    process.stdin.setRawMode(false);
-                }
-                
-                // Restore the original event handlers to the existing (paused) readline
-                lineHandlers.forEach(handler => {
-                    mainRl.on('line', handler);
-                });
-                closeHandlers.forEach(handler => {
-                    mainRl.on('close', handler);
-                });
-                
-                // Resume the main readline
-                if (mainRl.paused) {
-                    mainRl.resume();
-                }
-                
-                // Restore the prompt
-                mainRl.prompt();
             }
 
         } catch (error) {
