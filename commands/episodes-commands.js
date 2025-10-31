@@ -781,18 +781,19 @@ class EpisodeCommands {
      */
     async uploadSongForEpisode(episodeId, episode) {
         try {
-            // Pause main CLI's readline to prevent input conflicts
+            // Close main CLI's readline to prevent input conflicts
+            // This is necessary because multiple readline interfaces on the same stdin cause double input
             const mainRl = this.cli.rl;
-            const wasPaused = mainRl.paused;
             
-            // Store the original line handler to restore later
-            const lineHandlers = mainRl.listeners('line');
+            // Store the original handlers to restore later
+            const lineHandlers = mainRl.listeners('line').slice(); // Create a copy
+            const closeHandlers = mainRl.listeners('close').slice();
             
-            if (!wasPaused) {
-                mainRl.pause();
-                // Remove the 'line' listener temporarily to prevent double input
-                mainRl.removeAllListeners('line');
-            }
+            // Close the main readline to free up stdin
+            mainRl.close();
+            
+            // Small delay to ensure stdin is fully released
+            await new Promise(resolve => setTimeout(resolve, 100));
             
             // Create readline interface for SongUploadStep
             const rl = readline.createInterface({
@@ -847,16 +848,30 @@ class EpisodeCommands {
             // Close song upload's readline
             rl.close();
             
-            // Restore main CLI's readline
-            if (!wasPaused) {
-                // Restore the original line handlers
-                lineHandlers.forEach(handler => {
-                    mainRl.on('line', handler);
-                });
-                mainRl.resume();
-                // Restore the prompt
-                mainRl.prompt();
-            }
+            // Small delay to ensure stdin is fully released
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Recreate the main CLI's readline interface
+            const newRl = readline.createInterface({
+                input: process.stdin,
+                output: process.stdout,
+                prompt: chalk.cyan('wavelength> '),
+                completer: this.cli.autocomplete ? this.cli.autocomplete.bind(this.cli) : undefined
+            });
+            
+            // Restore the original event handlers
+            lineHandlers.forEach(handler => {
+                newRl.on('line', handler);
+            });
+            closeHandlers.forEach(handler => {
+                newRl.on('close', handler);
+            });
+            
+            // Replace the main CLI's readline reference
+            this.cli.rl = newRl;
+            
+            // Restore the prompt
+            newRl.prompt();
 
             console.log(chalk.green('\n✅ Song uploaded and attached to episode!'));
             
