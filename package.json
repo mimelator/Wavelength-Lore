@@ -27,6 +27,7 @@
     "validate:episode-content": "node scripts/validate-episode-content.js",
     "validate:audio-urls": "node scripts/test-all-song-urls.js",
     "validate:song-urls": "node scripts/validate-song-urls.js",
+    "fix:song-urls": "node scripts/fix-song-urls.js --dry-run",
     "validate:s3-files": "node scripts/copy-mp3s-to-normalized-paths.js --dry-run",
     "validate:all": "npm run validate:episode-content && npm run validate:audio-urls",
     "cta:collect": "node scripts/cta-audit.js collect",
