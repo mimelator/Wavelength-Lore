@@ -783,13 +783,26 @@ class EpisodeCommands {
         try {
             // Instead of creating a new readline (which causes double input), 
             // create a mock readline object that uses the main CLI's promptUser
-            // This completely avoids stdin conflicts
+            // This completely avoids stdin conflicts by using the same readline interface
+            const mainRl = this.cli.rl;
             const mockRl = {
                 question: (prompt, callback) => {
-                    // Use the main CLI's promptUser (which already handles pausing/resuming)
+                    // Temporarily remove line handler to prevent double processing
+                    const lineHandlers = mainRl.listeners('line').slice();
+                    mainRl.removeAllListeners('line');
+                    
+                    // Use the main CLI's promptUser (which handles pausing/resuming)
                     this.cli.promptUser(prompt).then(answer => {
+                        // Restore line handlers after getting answer
+                        lineHandlers.forEach(handler => {
+                            mainRl.on('line', handler);
+                        });
                         if (callback) callback(answer);
                     }).catch(err => {
+                        // Restore line handlers even on error
+                        lineHandlers.forEach(handler => {
+                            mainRl.on('line', handler);
+                        });
                         if (callback) callback('');
                     });
                 },
