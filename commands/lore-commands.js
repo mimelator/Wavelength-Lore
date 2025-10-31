@@ -22,7 +22,7 @@
 
 const chalk = require('chalk');
 const FirebaseLoreService = require('../services/firebase-lore-service');
-const { validateLoreData, validateLoreQuality, validateLoreSearchParams } = require('../utils/lore-validator');
+const { validateLoreData, assessLoreQuality, validateSearchParams } = require('../utils/lore-validator');
 
 class LoreCommands {
     constructor(cli) {
@@ -200,7 +200,7 @@ class LoreCommands {
             }
             
             // Show quality assessment
-            const quality = validateLoreQuality(loreData);
+            const quality = assessLoreQuality(loreData);
             const qualityColor = quality.level === 'excellent' ? 'green' : 
                                quality.level === 'good' ? 'cyan' :
                                quality.level === 'fair' ? 'yellow' : 'red';
@@ -286,7 +286,7 @@ class LoreCommands {
                 
                 if (options.detailed) {
                     // Show quality score
-                    const quality = validateLoreQuality(entry);
+                    const quality = assessLoreQuality(entry);
                     const qualityColor = quality.level === 'excellent' ? 'green' : 
                                        quality.level === 'good' ? 'cyan' :
                                        quality.level === 'fair' ? 'yellow' : 'red';
@@ -436,7 +436,7 @@ class LoreCommands {
 
             // Quality Assessment
             console.log(chalk.green.bold('\n📊 QUALITY ASSESSMENT'));
-            const quality = validateLoreQuality(entry);
+            const quality = assessLoreQuality(entry);
             const qualityColor = quality.level === 'excellent' ? 'green' : 
                                quality.level === 'good' ? 'cyan' :
                                quality.level === 'fair' ? 'yellow' : 'red';
