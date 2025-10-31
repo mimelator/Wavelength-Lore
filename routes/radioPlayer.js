@@ -239,8 +239,13 @@ router.get('/radio', optionalAuth, async (req, res) => {
     // Check if this is authenticated content creator for unpublished content
     let isAdmin = false;
     
-    // Check if user is authenticated and is a content creator (no development bypass)
-    if (req.user && (req.user.isContentCreator || (req.user.groups && req.user.groups.includes('content_manager')))) {
+    // Development override: allow ?creator=true for local testing
+    if (process.env.NODE_ENV !== 'production' && req.query.creator === 'true') {
+      isAdmin = true;
+      console.log('🔧 DEV MODE: Content creator mode enabled via ?creator=true (PAGE)');
+    }
+    // Production: Check if user is authenticated and is a content creator
+    else if (req.user && (req.user.isContentCreator || (req.user.groups && req.user.groups.includes('content_manager')))) {
       isAdmin = true;
       console.log('🔐 Content creator detected:', req.user.email);
     } else {
@@ -274,8 +279,13 @@ router.get('/api/radio/playlist', optionalAuth, async (req, res) => {
     // Check if this is authenticated content creator for unpublished content
     let isAdmin = false;
     
-    // Check if user is authenticated and is a content creator
-    if (req.user && (req.user.isContentCreator || (req.user.groups && req.user.groups.includes('content_manager')))) {
+    // Development override: allow ?creator=true for local testing
+    if (process.env.NODE_ENV !== 'production' && req.query.creator === 'true') {
+      isAdmin = true;
+      console.log('🔧 DEV MODE: Content creator mode enabled via ?creator=true');
+    }
+    // Production: Check if user is authenticated and is a content creator
+    else if (req.user && (req.user.isContentCreator || (req.user.groups && req.user.groups.includes('content_manager')))) {
       isAdmin = true;
       console.log('🔐 API Content creator detected:', req.user.email);
     } else {
