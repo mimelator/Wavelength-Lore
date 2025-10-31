@@ -126,5 +126,7 @@ const requireAdmin = (req, res, next) => {
 module.exports = {
   ensureAuthenticated,
   ensureInGroup,
-  requireAdmin
+  requireAdmin,
+  isDevelopmentBypass,
+  getTestUser
 };

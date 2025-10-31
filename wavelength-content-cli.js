@@ -15,6 +15,7 @@ const { WavelengthChatCLI } = require('./wavelength-chat-cli');
 const loreHelpers = require('./helpers/lore-helpers');
 const characterHelpers = require('./helpers/character-helpers');
 const episodeHelpers = require('./helpers/episode-helpers');
+const FirebaseSongsService = require('./services/firebase-songs-service');
 
 class WavelengthContentCLI {
     constructor() {
@@ -22,6 +23,7 @@ class WavelengthContentCLI {
         this.currentContext = 'root';
         this.currentItem = null;
         this.chatCLI = new WavelengthChatCLI();
+        this.songsService = null; // Initialize later in start()
         
         this.rl = readline.createInterface({
             input: process.stdin,
@@ -60,6 +62,15 @@ class WavelengthContentCLI {
                 console.log(chalk.green('✅ Episode cache initialized'));
             } catch (error) {  
                 console.log(chalk.yellow('⚠️ Episode cache failed to initialize'));
+            }
+            
+            try {
+                console.log(chalk.gray('🎵 Initializing Firebase Songs Service...'));
+                this.songsService = new FirebaseSongsService();
+                console.log(chalk.green('✅ Firebase Songs Service initialized'));
+            } catch (error) {
+                console.log(chalk.yellow('⚠️ Firebase Songs Service failed to initialize:', error.message));
+                console.log(chalk.gray('   Song management commands will show status only'));
             }
             
             console.log(chalk.green('✅ Content initialization complete'));
@@ -392,6 +403,15 @@ class WavelengthContentCLI {
                     await this.batchOperations(args);
                     break;
                     
+                // Song Management Commands for Episode Creation Pipeline
+                case 'songs':
+                    await this.handleSongCommands(args);
+                    break;
+                    
+                case 'radio':
+                    await this.handleRadioCommands(args);
+                    break;
+                    
                 case 'clear':
                     console.clear();
                     this.showWelcome();
@@ -464,6 +484,12 @@ class WavelengthContentCLI {
         console.log('  publish item <id> - Publish specific item to Firebase');
         console.log('  publish status   - Check Firebase connection');
         console.log('  publish validate <id> - Validate item before publishing');
+        
+        console.log(chalk.green('\nSong & Radio Management:'));
+        console.log('  songs <command>  - Manage songs in Firebase (list, add, publish, hide)');
+        console.log('  radio <command>  - Radio player management (playlist, health, test)');
+        console.log('  songs help       - Show detailed song management commands');
+        console.log('  radio help       - Show detailed radio player commands');
         
         console.log(chalk.green('\nAdmin Tools:'));
         console.log(chalk.red('  admin            - Access pristine admin toolkit'));
@@ -1361,7 +1387,7 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
             'help', '?', 'ls', 'dir', 'cd', 'pwd', 'view', 'cat', 'edit', 
             'enhance', 'hide', 'show', 'preview', 'admin', 'clear', 'exit', 'quit',
             'create', 'duplicate', 'clone', 'template', 'search', 'find', 'recent',
-            'batch', 'bulk-edit'
+            'batch', 'bulk-edit', 'songs', 'radio', 'publish', 'query'
         ];
 
         if (args.length === 1) {
@@ -1503,6 +1529,40 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
                         } catch (error) {
                             // Some content might not be loaded yet
                         }
+                    }
+                    break;
+
+                case 'songs':
+                    if (args.length === 2) {
+                        // Songs subcommands
+                        const songCommands = ['list', 'ls', 'add', 'update', 'publish', 'hide', 'migrate', 'sync', 'health', 'help'];
+                        completions.push(...songCommands.filter(cmd => cmd.startsWith(partial)));
+                    } else if (args.length >= 3) {
+                        const subCommand = args[1].toLowerCase();
+                        if (['update', 'publish', 'hide'].includes(subCommand)) {
+                            // Suggest season numbers
+                            if (args.length === 3) {
+                                const seasons = ['1', '2', '3', '4', '5'];
+                                completions.push(...seasons.filter(s => s.startsWith(partial)));
+                            }
+                            // Episode numbers would need Firebase data, skip for now
+                        } else if (['list', 'ls'].includes(subCommand) && args.length === 3) {
+                            // Suggest season numbers for list command
+                            const seasons = ['1', '2', '3', '4', '5'];
+                            completions.push(...seasons.filter(s => s.startsWith(partial)));
+                        }
+                    }
+                    break;
+
+                case 'radio':
+                    if (args.length === 2) {
+                        // Radio subcommands
+                        const radioCommands = ['playlist', 'health', 'migrate', 'test', 'help'];
+                        completions.push(...radioCommands.filter(cmd => cmd.startsWith(partial)));
+                    } else if (args.length === 3 && args[1] === 'playlist') {
+                        // Suggest season numbers for playlist command
+                        const seasons = ['1', '2', '3', '4', '5'];
+                        completions.push(...seasons.filter(s => s.startsWith(partial)));
                     }
                     break;
             }
@@ -2515,6 +2575,546 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
             valid: warnings.length === 0,
             warnings: warnings
         };
+    }
+
+    // =================== SONG MANAGEMENT COMMANDS ===================
+    // Episode Creation Pipeline Integration - GitHub Issue #130
+
+    async handleSongCommands(args) {
+        if (!this.songsService) {
+            console.log(chalk.red('❌ Firebase Songs Service not available'));
+            console.log(chalk.yellow('   Check Firebase configuration and try again'));
+            return;
+        }
+
+        if (args.length === 0) {
+            this.showSongHelp();
+            return;
+        }
+
+        const subCommand = args[0].toLowerCase();
+        const subArgs = args.slice(1);
+
+        try {
+            switch (subCommand) {
+                case 'list':
+                case 'ls':
+                    await this.listSongs(subArgs);
+                    break;
+                    
+                case 'add':
+                    await this.addSong(subArgs);
+                    break;
+                    
+                case 'update':
+                    await this.updateSong(subArgs);
+                    break;
+                    
+                case 'publish':
+                    await this.publishSong(subArgs);
+                    break;
+                    
+                case 'hide':
+                    await this.hideSong(subArgs);
+                    break;
+                    
+                case 'migrate':
+                    await this.migrateLegacyPlaylist();
+                    break;
+                    
+                case 'sync':
+                    await this.syncSongsWithEpisodes(subArgs);
+                    break;
+                    
+                case 'health':
+                case 'status':
+                    await this.showSongsHealth();
+                    break;
+                    
+                default:
+                    console.log(chalk.red(`❌ Unknown song command: ${subCommand}`));
+                    this.showSongHelp();
+            }
+        } catch (error) {
+            console.log(chalk.red(`❌ Song command failed: ${error.message}`));
+        }
+    }
+
+    async handleRadioCommands(args) {
+        if (args.length === 0) {
+            this.showRadioHelp();
+            return;
+        }
+
+        const subCommand = args[0].toLowerCase();
+        const subArgs = args.slice(1);
+
+        try {
+            switch (subCommand) {
+                case 'playlist':
+                    await this.showRadioPlaylist(subArgs);
+                    break;
+                    
+                case 'health':
+                    await this.checkRadioHealth();
+                    break;
+                    
+                case 'migrate':
+                    await this.migrateRadioPlaylist();
+                    break;
+                    
+                case 'test':
+                    await this.testRadioEndpoints();
+                    break;
+                    
+                default:
+                    console.log(chalk.red(`❌ Unknown radio command: ${subCommand}`));
+                    this.showRadioHelp();
+            }
+        } catch (error) {
+            console.log(chalk.red(`❌ Radio command failed: ${error.message}`));
+        }
+    }
+
+    // Song Management Methods
+
+    async listSongs(args) {
+        console.log(chalk.blue('🎵 Loading songs from Firebase...'));
+        
+        const season = args.length > 0 ? parseInt(args[0]) : null;
+        const songs = season ? 
+            await this.songsService.getSongsBySeason(season) : 
+            await this.songsService.getPublishedSongs();
+
+        if (!songs || songs.length === 0) {
+            console.log(chalk.yellow('📭 No songs found'));
+            if (season) {
+                console.log(chalk.gray(`   Try: songs list (to see all songs)`));
+            } else {
+                console.log(chalk.gray(`   Try: songs migrate (to import legacy playlist)`));
+            }
+            return;
+        }
+
+        console.log(chalk.green(`📻 Found ${songs.length} song${songs.length > 1 ? 's' : ''}${season ? ` in Season ${season}` : ''}`));
+        console.log('');
+
+        // Group by season for better display
+        const songsBySeason = songs.reduce((acc, song) => {
+            if (!acc[song.season]) acc[song.season] = [];
+            acc[song.season].push(song);
+            return acc;
+        }, {});
+
+        for (const [seasonNum, seasonSongs] of Object.entries(songsBySeason).sort()) {
+            console.log(chalk.cyan.bold(`Season ${seasonNum}:`));
+            
+            seasonSongs.sort((a, b) => a.episode - b.episode).forEach(song => {
+                const status = song.isPublished ? chalk.green('✅ Published') : chalk.red('🚫 Hidden');
+                const duration = song.duration || 'Unknown';
+                console.log(`  ${chalk.white(`S${song.season}E${song.episode.toString().padStart(2, '0')}`)} ${chalk.magenta(song.title.padEnd(25))} ${duration.padEnd(8)} ${status}`);
+            });
+            console.log('');
+        }
+    }
+
+    async addSong(args) {
+        if (args.length < 5) {
+            console.log(chalk.red('❌ Usage: songs add <season> <episode> <title> <file> <duration>'));
+            console.log(chalk.gray('   Example: songs add 1 12 "New Song" "NewSong_v1.mp3" "3:45"'));
+            return;
+        }
+
+        const [season, episode, title, file, duration] = args;
+        const songData = {
+            season: parseInt(season),
+            episode: parseInt(episode),
+            title: title.replace(/"/g, ''),
+            file: file,
+            duration: duration,
+            isPublished: false // Default to hidden until explicitly published
+        };
+
+        console.log(chalk.blue('🎵 Adding song to Firebase...'));
+        console.log(chalk.gray(`   ${JSON.stringify(songData, null, 2)}`));
+
+        const result = await this.songsService.createOrUpdateSong(songData);
+        
+        if (result.success) {
+            console.log(chalk.green(`✅ Song added successfully: ${title}`));
+            console.log(chalk.yellow('   Note: Song is hidden by default. Use "songs publish" to make it visible.'));
+        } else {
+            console.log(chalk.red(`❌ Failed to add song: ${result.error}`));
+        }
+    }
+
+    async updateSong(args) {
+        if (args.length < 3) {
+            console.log(chalk.red('❌ Usage: songs update <season> <episode> <field>=<value> [field2=value2...]'));
+            console.log(chalk.gray('   Example: songs update 1 12 title="Updated Title" duration="4:20"'));
+            return;
+        }
+
+        const season = parseInt(args[0]);
+        const episode = parseInt(args[1]);
+        const updates = {};
+
+        // Parse field=value pairs
+        for (let i = 2; i < args.length; i++) {
+            const [field, value] = args[i].split('=');
+            if (field && value) {
+                updates[field] = value.replace(/"/g, '');
+            }
+        }
+
+        if (Object.keys(updates).length === 0) {
+            console.log(chalk.red('❌ No valid field=value pairs provided'));
+            return;
+        }
+
+        console.log(chalk.blue(`🎵 Updating S${season}E${episode} song...`));
+        console.log(chalk.gray(`   Updates: ${JSON.stringify(updates, null, 2)}`));
+
+        // Find existing song
+        const songs = await this.songsService.getSongsBySeason(season);
+        const existingSong = songs.find(s => s.episode === episode);
+        
+        if (!existingSong) {
+            console.log(chalk.red(`❌ Song S${season}E${episode} not found`));
+            return;
+        }
+
+        const updatedSong = { ...existingSong, ...updates };
+        const result = await this.songsService.createOrUpdateSong(updatedSong);
+        
+        if (result.success) {
+            console.log(chalk.green(`✅ Song updated successfully`));
+        } else {
+            console.log(chalk.red(`❌ Failed to update song: ${result.error}`));
+        }
+    }
+
+    async publishSong(args) {
+        if (args.length < 2) {
+            console.log(chalk.red('❌ Usage: songs publish <season> <episode>'));
+            console.log(chalk.gray('   Example: songs publish 1 12'));
+            return;
+        }
+
+        const season = parseInt(args[0]);
+        const episode = parseInt(args[1]);
+
+        console.log(chalk.blue(`🎵 Publishing S${season}E${episode} song...`));
+
+        const result = await this.songsService.updatePublishedStatus(season, episode, true);
+        
+        if (result.success) {
+            console.log(chalk.green(`✅ Song S${season}E${episode} is now published and visible in radio player`));
+        } else {
+            console.log(chalk.red(`❌ Failed to publish song: ${result.error}`));
+        }
+    }
+
+    async hideSong(args) {
+        if (args.length < 2) {
+            console.log(chalk.red('❌ Usage: songs hide <season> <episode>'));
+            console.log(chalk.gray('   Example: songs hide 1 12'));
+            return;
+        }
+
+        const season = parseInt(args[0]);
+        const episode = parseInt(args[1]);
+
+        console.log(chalk.blue(`🎵 Hiding S${season}E${episode} song...`));
+
+        const result = await this.songsService.updatePublishedStatus(season, episode, false);
+        
+        if (result.success) {
+            console.log(chalk.green(`✅ Song S${season}E${episode} is now hidden from radio player`));
+        } else {
+            console.log(chalk.red(`❌ Failed to hide song: ${result.error}`));
+        }
+    }
+
+    async migrateLegacyPlaylist() {
+        console.log(chalk.blue('🔄 Starting legacy playlist migration...'));
+        
+        // Legacy playlist data (Season 1 only for testing - same as routes/radioPlayer.js)
+        const LEGACY_PLAYLIST = [
+            { season: 1, episode: 1, title: "Lucky Charm", file: "LuckyCharm_v35.mp3", duration: "3:45" },
+            { season: 1, episode: 2, title: "Jump Right In", file: "JumpRightIn_v25.mp3", duration: "3:42" },
+            { season: 1, episode: 3, title: "Dream With Me", file: "DreamWithMe_v5.mp3", duration: "3:20" },
+            { season: 1, episode: 4, title: "Daphne", file: "Daphne_v21.mp3", duration: "3:48" },
+            { season: 1, episode: 5, title: "Falling", file: "Falling_v32.mp3", duration: "3:32" },
+            { season: 1, episode: 6, title: "Once More", file: "OnceMore_v20.mp3", duration: "4:52" },
+            { season: 1, episode: 7, title: "History Lessons", file: "HistoryLessons_v8.mp3", duration: "3:57" },
+            { season: 1, episode: 8, title: "Life In The Shire", file: "LIfeInTheShire_v19.mp3", duration: "4:02" },
+            { season: 1, episode: 9, title: "Feed The Crows", file: "FeedTheCrows_v24.mp3", duration: "2:48" },
+            { season: 1, episode: 10, title: "Keep On", file: "Keep On_v26.mp3", duration: "2:26" },
+            { season: 1, episode: 11, title: "Back To The Shire", file: "BackToTheShire_v18.mp3", duration: "4:22" }
+        ];
+
+        const result = await this.songsService.migrateHardcodedPlaylist(LEGACY_PLAYLIST);
+        
+        console.log(chalk.green(`✅ Migration completed:`));
+        console.log(chalk.white(`   📦 Migrated: ${result.migrated} songs`));
+        console.log(chalk.gray(`   ⏭️ Skipped: ${result.skipped} existing songs`));
+        
+        if (result.errors.length > 0) {
+            console.log(chalk.red(`   ❌ Errors: ${result.errors.length}`));
+            result.errors.forEach(error => {
+                console.log(chalk.red(`      ${error}`));
+            });
+        }
+    }
+
+    async syncSongsWithEpisodes(args) {
+        console.log(chalk.blue('🔄 Synchronizing songs with episode visibility...'));
+        
+        // This would integrate with the episode creation pipeline
+        // to automatically publish/hide songs based on episode status
+        
+        const publishedEpisodes = await this.getPublishedEpisodes();
+        const allSongs = await this.songsService.getAllSongs();
+        
+        let synced = 0;
+        let errors = 0;
+
+        for (const song of allSongs) {
+            const episodeKey = `S${song.season}E${song.episode}`;
+            const episodePublished = publishedEpisodes.some(ep => 
+                ep.season === song.season && ep.episode === song.episode
+            );
+            
+            if (song.isPublished !== episodePublished) {
+                try {
+                    await this.songsService.updatePublishedStatus(song.season, song.episode, episodePublished);
+                    console.log(chalk.green(`   ✅ ${episodeKey}: ${episodePublished ? 'Published' : 'Hidden'}`));
+                    synced++;
+                } catch (error) {
+                    console.log(chalk.red(`   ❌ ${episodeKey}: ${error.message}`));
+                    errors++;
+                }
+            }
+        }
+        
+        console.log(chalk.green(`🔄 Sync completed: ${synced} songs updated, ${errors} errors`));
+    }
+
+    async getPublishedEpisodes() {
+        // This would integrate with the existing episode helpers
+        // For now, return a placeholder - this should be implemented
+        // to check actual episode visibility in Firebase
+        return [];
+    }
+
+    async showSongsHealth() {
+        console.log(chalk.blue('🏥 Firebase Songs Service Health Check'));
+        console.log('');
+
+        try {
+            const allSongs = await this.songsService.getAllSongs();
+            const publishedSongs = allSongs.filter(s => s.isPublished);
+            const hiddenSongs = allSongs.filter(s => !s.isPublished);
+
+            // Group by season
+            const seasonStats = allSongs.reduce((acc, song) => {
+                if (!acc[song.season]) {
+                    acc[song.season] = { total: 0, published: 0, hidden: 0 };
+                }
+                acc[song.season].total++;
+                if (song.isPublished) {
+                    acc[song.season].published++;
+                } else {
+                    acc[song.season].hidden++;
+                }
+                return acc;
+            }, {});
+
+            console.log(chalk.green(`📊 Total Songs: ${allSongs.length}`));
+            console.log(chalk.green(`   ✅ Published: ${publishedSongs.length}`));
+            console.log(chalk.yellow(`   🚫 Hidden: ${hiddenSongs.length}`));
+            console.log('');
+
+            console.log(chalk.cyan('📺 By Season:'));
+            for (const [season, stats] of Object.entries(seasonStats).sort()) {
+                console.log(`   Season ${season}: ${stats.total} total (${chalk.green(stats.published + ' published')}, ${chalk.yellow(stats.hidden + ' hidden')})`);
+            }
+            console.log('');
+
+            console.log(chalk.blue('🔧 Service Status: ✅ Connected'));
+            console.log(chalk.gray(`   Database: ${this.songsService.initialized ? 'Ready' : 'Initializing'}`));
+            
+        } catch (error) {
+            console.log(chalk.red(`❌ Health check failed: ${error.message}`));
+        }
+    }
+
+    // Radio Player Methods
+
+    async showRadioPlaylist(args) {
+        console.log(chalk.blue('📻 Current Radio Playlist'));
+        
+        try {
+            const season = args.length > 0 ? parseInt(args[0]) : null;
+            const songs = season ? 
+                await this.songsService.getSongsBySeason(season) : 
+                await this.songsService.getPublishedSongs();
+            
+            if (!songs || songs.length === 0) {
+                console.log(chalk.yellow('📭 Radio playlist is empty'));
+                console.log(chalk.gray('   Songs are only visible in radio when published'));
+                return;
+            }
+
+            console.log(chalk.green(`🎵 Radio has ${songs.length} available song${songs.length > 1 ? 's' : ''}${season ? ` in Season ${season}` : ''}`));
+            
+            // Show playlist in radio player order
+            songs.sort((a, b) => {
+                if (a.season !== b.season) return a.season - b.season;
+                return a.episode - b.episode;
+            }).forEach((song, index) => {
+                console.log(`${chalk.gray((index + 1).toString().padStart(3))}.  ${chalk.white(`S${song.season}E${song.episode.toString().padStart(2, '0')}`)} ${chalk.magenta(song.title.padEnd(30))} ${song.duration}`);
+            });
+            
+        } catch (error) {
+            console.log(chalk.red(`❌ Failed to load radio playlist: ${error.message}`));
+        }
+    }
+
+    async checkRadioHealth() {
+        console.log(chalk.blue('🔍 Radio Player Health Check'));
+        
+        try {
+            // Check if the radio API endpoints are responding
+            console.log(chalk.gray('   Checking /api/radio/health...'));
+            
+            // Use native fetch (Node 18+) or axios as fallback
+            const response = await fetch('http://localhost:3001/api/radio/health');
+            
+            if (response.ok) {
+                const health = await response.json();
+                console.log(chalk.green('   ✅ Radio API is responding'));
+                console.log(chalk.white(`   📊 Firebase Service: ${health.firebaseService ? '✅ Connected' : '❌ Offline'}`));
+                console.log(chalk.white(`   📻 Songs Available: ${health.firebaseSongs || 0}`));
+                console.log(chalk.white(`   📦 Legacy Playlist: ${health.legacyPlaylistSize} songs`));
+                console.log(chalk.gray(`   🕐 Last Check: ${new Date(health.timestamp).toLocaleString()}`));
+            } else {
+                console.log(chalk.red('   ❌ Radio API not responding'));
+                console.log(chalk.gray('   Make sure the server is running on port 3001'));
+            }
+            
+        } catch (error) {
+            console.log(chalk.red(`❌ Health check failed: ${error.message}`));
+            console.log(chalk.gray('   Make sure the server is running: npm start'));
+        }
+    }
+
+    async migrateRadioPlaylist() {
+        console.log(chalk.blue('🔄 Triggering radio playlist migration via API...'));
+        
+        try {
+            // Use native fetch (Node 18+)
+            const response = await fetch('http://localhost:3001/api/radio/migrate-playlist', {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                console.log(chalk.green('✅ Migration triggered successfully'));
+                console.log(chalk.white(`   📦 Migrated: ${result.migrated} songs`));
+                console.log(chalk.gray(`   ⏭️ Skipped: ${result.skipped} existing songs`));
+                
+                if (result.errors && result.errors.length > 0) {
+                    console.log(chalk.red(`   ❌ Errors: ${result.errors.length}`));
+                }
+            } else {
+                const error = await response.json();
+                console.log(chalk.red(`❌ Migration failed: ${error.error}`));
+            }
+            
+        } catch (error) {
+            console.log(chalk.red(`❌ Migration request failed: ${error.message}`));
+        }
+    }
+
+    async testRadioEndpoints() {
+        console.log(chalk.blue('🧪 Testing Radio Player Endpoints'));
+        
+        const endpoints = [
+            { url: '/api/radio/playlist', method: 'GET', name: 'Full Playlist' },
+            { url: '/api/radio/playlist?season=1', method: 'GET', name: 'Season 1 Playlist' },
+            { url: '/api/radio/health', method: 'GET', name: 'Health Check' },
+            { url: '/radio', method: 'GET', name: 'Radio Player Page' }
+        ];
+
+        // Use native fetch (Node 18+)
+        const baseUrl = 'http://localhost:3001';
+
+        for (const endpoint of endpoints) {
+            try {
+                console.log(chalk.gray(`   Testing ${endpoint.name}...`));
+                const response = await fetch(baseUrl + endpoint.url);
+                
+                if (response.ok) {
+                    const data = endpoint.url.includes('/radio') && !endpoint.url.includes('/api') ? 
+                        `HTML (${response.headers.get('content-type')})` : 
+                        await response.json();
+                    
+                    console.log(chalk.green(`   ✅ ${endpoint.name}: OK`));
+                    
+                    if (Array.isArray(data)) {
+                        console.log(chalk.gray(`      ${data.length} items returned`));
+                    } else if (typeof data === 'object' && data.firebaseSongs !== undefined) {
+                        console.log(chalk.gray(`      Firebase: ${data.firebaseService ? 'Connected' : 'Offline'}, Songs: ${data.firebaseSongs || 0}`));
+                    }
+                } else {
+                    console.log(chalk.red(`   ❌ ${endpoint.name}: ${response.status} ${response.statusText}`));
+                }
+                
+            } catch (error) {
+                console.log(chalk.red(`   ❌ ${endpoint.name}: ${error.message}`));
+            }
+        }
+    }
+
+    // Help Methods
+
+    showSongHelp() {
+        console.log(chalk.cyan.bold('🎵 Song Management Commands'));
+        console.log(chalk.cyan('============================'));
+        console.log('');
+        console.log(chalk.white('songs list [season]         ') + chalk.gray('List all songs or songs for specific season'));
+        console.log(chalk.white('songs add <s> <e> <title> <file> <duration>  ') + chalk.gray('Add new song'));
+        console.log(chalk.white('songs update <s> <e> field=value [...]       ') + chalk.gray('Update song properties'));
+        console.log(chalk.white('songs publish <season> <episode>             ') + chalk.gray('Publish song (make visible in radio)'));
+        console.log(chalk.white('songs hide <season> <episode>                ') + chalk.gray('Hide song from radio'));
+        console.log(chalk.white('songs migrate                                ') + chalk.gray('Import legacy playlist to Firebase'));
+        console.log(chalk.white('songs sync                                   ') + chalk.gray('Sync song visibility with episodes'));
+        console.log(chalk.white('songs health                                 ') + chalk.gray('Show Firebase connection status'));
+        console.log('');
+        console.log(chalk.yellow('Examples:'));
+        console.log(chalk.gray('  songs list 1                              # Show Season 1 songs'));
+        console.log(chalk.gray('  songs add 1 12 "New Song" "song.mp3" "3:45"  # Add new song'));
+        console.log(chalk.gray('  songs publish 1 12                        # Make song visible'));
+        console.log(chalk.gray('  songs update 1 12 title="Updated Title"   # Update song title'));
+        console.log('');
+    }
+
+    showRadioHelp() {
+        console.log(chalk.cyan.bold('📻 Radio Player Commands'));
+        console.log(chalk.cyan('========================='));
+        console.log('');
+        console.log(chalk.white('radio playlist [season]    ') + chalk.gray('Show current radio playlist'));
+        console.log(chalk.white('radio health               ') + chalk.gray('Check radio API endpoints'));
+        console.log(chalk.white('radio migrate              ') + chalk.gray('Trigger playlist migration via API'));
+        console.log(chalk.white('radio test                 ') + chalk.gray('Test all radio endpoints'));
+        console.log('');
+        console.log(chalk.yellow('Examples:'));
+        console.log(chalk.gray('  radio playlist 1           # Show Season 1 radio tracks'));
+        console.log(chalk.gray('  radio health               # Check if radio API is working'));
+        console.log(chalk.gray('  radio test                 # Test all radio endpoints'));
+        console.log('');
     }
 
     sanitizeForFirebase(item) {

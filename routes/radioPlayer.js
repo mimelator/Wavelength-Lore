@@ -1,12 +1,33 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs').promises;
-const path = require('path');
 const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
 const characterHelpers = require('../helpers/character-helpers');
+const { isDevelopmentBypass, getTestUser } = require('../middleware/auth');
+const { verifyToken, optionalAuth } = require('../middleware/firebaseAuth');
 
-// Radio player playlist - all 33 episode songs
-const playlist = [
+// Lazy-load Firebase Songs Service after Firebase Admin is ready
+let FirebaseSongsService;
+let songsService;
+
+function initializeSongsService() {
+    if (songsService) return songsService; // Already initialized
+    
+    try {
+        if (!FirebaseSongsService) {
+            FirebaseSongsService = require('../services/firebase-songs-service');
+        }
+        songsService = new FirebaseSongsService();
+        console.log('✅ Firebase Songs Service initialized successfully');
+        return songsService;
+    } catch (error) {
+        console.error('❌ Failed to initialize Firebase Songs Service:', error.message);
+        console.log('⚠️  Falling back to legacy hardcoded playlist');
+        return null;
+    }
+}
+
+// Complete hardcoded playlist for fallback when Firebase is unavailable
+const LEGACY_PLAYLIST = [
   // Season 1
   { season: 1, episode: 1, title: "Lucky Charm", file: "LuckyCharm_v35.mp3", duration: "3:45" },
   { season: 1, episode: 2, title: "Jump Right In", file: "JumpRightIn_v25.mp3", duration: "3:42" },
@@ -46,101 +67,166 @@ const playlist = [
   { season: 4, episode: 5, title: "The Shire Fortress", file: "TheShireFortress_v2.mp3", duration: "3:40" },
   { season: 4, episode: 6, title: "Battle Of The Shire", file: "BattleOfTheShire_v4.mp3", duration: "6:19" },
   { season: 4, episode: 7, title: "Song Of Mourning", file: "SongOfMourning_v1.mp3", duration: "4:14" },
-  { season: 4, episode: 8, title: "The Shire Dream", file: "TheShireDream_v1.mp3", duration: "4:50" }
+    { season: 4, episode: 8, title: "The Shire Dream", file: "TheShireDream_v1.mp3", duration: "4:50" }
 ];
 
-// Enhance playlist with episode data
-async function getEnhancedPlaylist() {
-  const allCharacters = characterHelpers.getAllCharactersSync(false);
+/**
+ * Get playlist from Firebase with optional episode data enhancement
+  { season: 1, episode: 3, title: "Dream With Me", file: "DreamWithMe_v5.mp3", duration: "3:20" },
+  { season: 1, episode: 4, title: "Daphne", file: "Daphne_v21.mp3", duration: "3:48" },
+  { season: 1, episode: 5, title: "Falling", file: "Falling_v32.mp3", duration: "3:32" },
+  { season: 1, episode: 6, title: "Once More", file: "OnceMore_v20.mp3", duration: "4:52" },
+  { season: 1, episode: 7, title: "History Lessons", file: "HistoryLessons_v8.mp3", duration: "3:57" },
+  { season: 1, episode: 8, title: "Life In The Shire", file: "LIfeInTheShire_v19.mp3", duration: "4:02" },
+  { season: 1, episode: 9, title: "Feed The Crows", file: "FeedTheCrows_v24.mp3", duration: "2:48" },
+  { season: 1, episode: 10, title: "Keep On", file: "Keep On_v26.mp3", duration: "2:26" },
+  { season: 1, episode: 11, title: "Back To The Shire", file: "BackToTheShire_v18.mp3", duration: "4:22" }
+];
 
-  const enhancedTracks = await Promise.all(playlist.map(async (track) => {
-    try {
-      const episodeData = await fetchDataAsAdmin(`videos/season${track.season}/episodes/episode${track.episode}`);
-
-      if (episodeData) {
-        // Debug logging for summary field
-        /*if (track.season === 1 && track.episode === 1) {
-          console.log('📖 Episode data fields:', Object.keys(episodeData));
-          console.log('📖 Story field:', episodeData.story);
-          console.log('📖 Summary field:', episodeData.summary);
-        }*/
-
-        return {
-          ...track,
-          episodeImage: episodeData.image || '',
-          episodeUrl: `/season/${track.season}/episode/${track.episode}`,
-          images: episodeData.carouselImages || episodeData.image_gallery || episodeData.images || [],
-          lyrics: episodeData.lyrics || '',
-          summary: episodeData.story || episodeData.summary || '',
-          episodeTitle: episodeData.title || track.title,
-          characters: (() => {
-            // Get matching characters
-            const matchedCharacters = allCharacters.filter(char =>
-              episodeData.keywords?.some(keyword =>
-                char.keywords?.some(ck => ck.toLowerCase() === keyword.toLowerCase())
-              )
-            ).map(char => ({
-              id: char.id,
-              title: char.title,
-              image: char.image,
-              type: 'character',
-              url: `/character/${char.id}`
-            }));
-
-            // Get matching lore items
-            const loreHelpers = require('../helpers/lore-helpers');
-            const allLore = loreHelpers.getAllLoreSync(false);
-            
-            // Debug: Show all lore for S2E1
-            /*
-            if (track.season === 2 && track.episode === 1) {
-              console.log('🔍 All lore items:', allLore.map(l => ({ id: l.id, name: l.name, keywords: l.keywords })));
-            }*/
-            
-            const matchedLore = allLore.filter(lore =>
-              episodeData.keywords?.some(keyword =>
-                lore.keywords?.some(lk => lk.toLowerCase() === keyword.toLowerCase())
-              )
-            ).map(lore => ({
-              id: lore.id,
-              title: lore.name,
-              image: lore.image,
-              type: 'lore',
-              url: `/lore/${lore.id}`
-            }));
-
-            // Combine characters and lore
-            const combined = [...matchedCharacters, ...matchedLore];
-            
-            // Debug logging for Goblin King episode
-            if (track.season === 2 && track.episode === 1) {
-              console.log('🔍 S2E1 Goblin King - Episode keywords:', episodeData.keywords);
-              console.log('🔍 S2E1 Goblin King - Matched characters:', matchedCharacters);
-              console.log('🔍 S2E1 Goblin King - Matched lore:', matchedLore);
-              console.log('🔍 S2E1 Goblin King - Combined:', combined);
-            }
-            
-            return combined;
-          })()
-        };
+/**
+ * Get the current playlist - either from Firebase (dynamic) or legacy fallback
+ * @param {number|null} season - Optional season filter
+ * @param {boolean} includeUnpublished - Include unpublished songs for admin users
+ * @returns {Promise<Array>} Playlist array
+ */
+/**
+ * Get playlist from Firebase with optional episode data enhancement
+ * @param {number} season - Filter by season number (optional)
+ * @param {boolean} includeUnpublished - Include unpublished songs for admin users
+ * @param {boolean} includeEpisodeData - Include character/lore data from episode files
+ * @returns {Promise<Array>} Enhanced playlist
+ */
+async function getEnhancedPlaylist(season = null, includeUnpublished = false, includeEpisodeData = false) {
+  try {
+    // Try to initialize Firebase Songs Service if not already done
+    const activeSongsService = initializeSongsService();
+    
+    let playlist = [];
+    
+    if (activeSongsService) {
+      console.log(`🎵 Fetching dynamic playlist from Firebase... (includeUnpublished: ${includeUnpublished})`);
+      
+      // Get songs from Firebase (published + unpublished for admins)
+      const songs = await activeSongsService.getPublishedSongs(season, includeUnpublished);
+      
+      if (songs && songs.length > 0) {
+        console.log(`🎵 Loaded ${songs.length} songs from Firebase`);
+        
+        // Filter by season if requested (only if not already filtered by service)
+        if (season && !songs.every(song => song.season === season)) {
+          playlist = songs.filter(song => song.season === season);
+          console.log(`🎵 Filtered to ${playlist.length} songs for Season ${season}`);
+        } else {
+          playlist = songs;
+        }
+      } else {
+        console.log('⚠️ No songs found in Firebase, falling back to legacy playlist');
+        // Fallback to legacy playlist
+        playlist = season 
+          ? LEGACY_PLAYLIST.filter(song => song.season === season)
+          : LEGACY_PLAYLIST;
       }
-    } catch (error) {
-      console.error(`Error fetching episode data for S${track.season}E${track.episode}:`, error.message);
+    } else {
+      console.log('⚠️ Firebase Songs Service not available, using legacy playlist');
+      // Fallback to legacy playlist
+      playlist = season 
+        ? LEGACY_PLAYLIST.filter(song => song.season === season)
+        : LEGACY_PLAYLIST;
     }
+    
+    console.log(`🎵 Using playlist with ${playlist.length} songs`);
+    
+    // If episode data enhancement is not requested, return the basic playlist
+    if (!includeEpisodeData) {
+      return playlist;
+    }
+    
+    // Enhance with episode data for full radio player page
+    console.log('🔧 Enhancing playlist with episode data...');
+    const enhancedTracks = await Promise.all(playlist.map(async (track) => {
+      try {
+        // Fetch episode data from Firebase with correct path structure  
+        const episodeNumber = track.episodeNumber || track.episode;
+        const episodeData = await fetchDataAsAdmin(`videos/season${track.season}/episodes/episode${episodeNumber}`);
+        
+        if (episodeData) {
+          const loreHelpers = require('../helpers/lore-helpers');
+          
+          return {
+            ...track,
+            characters: await (async () => {
+              // Get matched characters
+              const characterHelpers = require('../helpers/character-helpers');
+              const matchedCharacters = await characterHelpers.getCharactersForEpisode(
+                track.season, 
+                episodeNumber, 
+                episodeData.keywords || []
+              );
 
-    // Return track with empty characters array if no data was fetched
-    return { ...track, characters: [] };
-  }));
+              // Get matched lore
+              const allLore = loreHelpers.getAllLoreSync(false);
+              
+              const matchedLore = allLore.filter(lore =>
+                episodeData.keywords?.some(keyword =>
+                  lore.keywords?.some(lk => lk.toLowerCase() === keyword.toLowerCase())
+                )
+              ).map(lore => ({
+                id: lore.id,
+                title: lore.name,
+                image: lore.image,
+                type: 'lore',
+                url: `/lore/${lore.id}`
+              }));
 
-  return enhancedTracks;
+              // Combine characters and lore
+              return [...matchedCharacters, ...matchedLore];
+            })()
+          };
+        }
+      } catch (error) {
+        console.error(`Error fetching episode data for S${track.season}E${track.episodeNumber || track.episode}:`, error.message);
+      }
+
+      // Return track with empty characters array if no data was fetched
+      return { ...track, characters: [] };
+    }));
+
+    return enhancedTracks;
+    
+  } catch (error) {
+    console.error('❌ Error fetching playlist:', error.message);
+    
+    // Fallback to legacy playlist on error
+    const playlist = season 
+      ? LEGACY_PLAYLIST.filter(song => song.season === season)
+      : LEGACY_PLAYLIST;
+      
+    console.log(`🎵 Error fallback: Using legacy playlist with ${playlist.length} songs`);
+    return playlist;
+  }
 }
 
+// Optional authentication middleware - sets req.user if authenticated, but doesn't redirect
+
+
 // Radio player page route
-router.get('/radio', async (req, res) => {
+router.get('/radio', optionalAuth, async (req, res) => {
   try {
     console.log('🎵 Loading radio player page...');
-    const enhancedPlaylist = await getEnhancedPlaylist();
-    console.log('🎵 Enhanced playlist loaded with', enhancedPlaylist.length, 'tracks');
+    
+    // Check if this is authenticated content creator for unpublished content
+    let isAdmin = false;
+    
+    // Check if user is authenticated and is a content creator (no development bypass)
+    if (req.user && (req.user.isContentCreator || (req.user.groups && req.user.groups.includes('content_manager')))) {
+      isAdmin = true;
+      console.log('🔐 Content creator detected:', req.user.email);
+    } else {
+      console.log('👤 Regular user (no access to unpublished content)');
+    }
+    
+    const enhancedPlaylist = await getEnhancedPlaylist(null, isAdmin, true); // includeEpisodeData = true for page
+    console.log('🎵 Enhanced playlist loaded with', enhancedPlaylist.length, 'tracks (admin:', isAdmin + ')');
 
     res.render('radio-player', {
       title: 'Wavelength Radio',
@@ -158,15 +244,90 @@ router.get('/radio', async (req, res) => {
   }
 });
 
-// API endpoint to get playlist data
-router.get('/api/radio/playlist', async (_req, res) => {
+// Get radio station playlist  
+router.get('/api/radio/playlist', optionalAuth, async (req, res) => {
   try {
-    const enhancedPlaylist = await getEnhancedPlaylist();
-    res.json(enhancedPlaylist);
+    const season = req.query.season ? parseInt(req.query.season) : null;
+    
+    // Check if this is authenticated content creator for unpublished content
+    let isAdmin = false;
+    
+    // Check if user is authenticated and is a content creator
+    if (req.user && (req.user.isContentCreator || (req.user.groups && req.user.groups.includes('content_manager')))) {
+      isAdmin = true;
+      console.log('🔐 API Content creator detected:', req.user.email);
+    } else {
+      console.log('👤 API Regular user (no access to unpublished content)');
+    }
+    
+    console.log('Radio API request: season=' + season + ', isAdmin=' + isAdmin + ', hostname=' + req.hostname);
+    
+    const playlist = await getEnhancedPlaylist(season, isAdmin, false); // includeEpisodeData = false for API
+    
+    console.log('Got playlist: ' + (playlist ? playlist.length : 0) + ' tracks');
+    res.json(playlist || []);
   } catch (error) {
-    console.error('Error loading playlist:', error);
-    res.status(500).json({ error: 'Failed to load playlist' });
+    console.error('Error fetching playlist:', error.message);
+    console.error('Stack trace:', error.stack);
+    res.status(500).json({ 
+      error: 'Failed to fetch playlist', 
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
+});
+
+// API endpoint for playlist migration (for admin/CLI use)
+router.post('/api/radio/migrate-playlist', async (req, res) => {
+  try {
+    const activeSongsService = initializeSongsService();
+    
+    if (!activeSongsService) {
+      return res.status(503).json({ 
+        error: 'Firebase Songs Service not available',
+        fallback: 'Using legacy playlist'
+      });
+    }
+
+    console.log('🔄 Starting playlist migration to Firebase...');
+    const result = await activeSongsService.migrateHardcodedPlaylist(LEGACY_PLAYLIST);
+    
+    res.json({
+      message: 'Playlist migration completed',
+      migrated: result.migrated,
+      skipped: result.skipped,
+      errors: result.errors
+    });
+    
+  } catch (error) {
+    console.error('❌ Playlist migration failed:', error);
+    res.status(500).json({ 
+      error: 'Migration failed', 
+      message: error.message 
+    });
+  }
+});
+
+// Health check endpoint
+router.get('/api/radio/health', async (req, res) => {
+  const activeSongsService = initializeSongsService();
+  
+  const health = {
+    timestamp: new Date().toISOString(),
+    firebaseService: !!activeSongsService,
+    legacyPlaylistSize: LEGACY_PLAYLIST.length
+  };
+
+  if (activeSongsService) {
+    try {
+      const songs = await activeSongsService.getPublishedSongs();
+      health.firebaseSongs = songs ? songs.length : 0;
+    } catch (error) {
+      health.firebaseError = error.message;
+    }
+  }
+
+  res.json(health);
 });
 
 module.exports = router;

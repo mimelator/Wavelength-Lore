@@ -148,14 +148,30 @@ class FirebaseAuth {
    */
   optionalAuth = async (req, res, next) => {
     try {
+      // Check Authorization header first
       const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        // No token provided, but that's okay
+      let idToken = null;
+      
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        idToken = authHeader.substring(7);
+        console.log('🎫 Optional auth: Found token in Authorization header');
+      } else if (req.cookies && req.cookies.__session) {
+        // Try __session cookie (Firebase Auth standard)
+        idToken = req.cookies.__session;
+        console.log('🎫 Optional auth: Found token in __session cookie');
+      } else if (req.cookies && req.cookies.session) {
+        // Try session cookie (fallback)
+        idToken = req.cookies.session;
+        console.log('🎫 Optional auth: Found token in session cookie');
+      }
+      
+      if (!idToken) {
+        // No token provided, continue without authentication
+        console.log('👤 Optional auth: No token found, continuing as unauthenticated user');
         req.user = null;
         return next();
       }
 
-      const idToken = authHeader.substring(7);
       const decodedToken = await this.getAuth().verifyIdToken(idToken);
       
       req.user = {
@@ -166,7 +182,7 @@ class FirebaseAuth {
         emailVerified: decodedToken.email_verified
       };
 
-      console.log(`✅ Optional auth - User: ${req.user.uid}`);
+      console.log(`✅ Optional auth - User authenticated: ${req.user.uid} (${req.user.email})`);
       next();
 
     } catch (error) {

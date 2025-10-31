@@ -69,6 +69,12 @@ class WavelengthRadio {
             if (window.WAVELENGTH_PLAYLIST && window.WAVELENGTH_PLAYLIST.length > 0) {
                 this.playlist = window.WAVELENGTH_PLAYLIST;
                 console.log(`🎵 Loaded playlist from window.WAVELENGTH_PLAYLIST: ${this.playlist.length} tracks`);
+                
+                // If we're in full player mode, update the display immediately
+                if (!this.isMiniPlayer) {
+                    // Delay slightly to ensure DOM is ready
+                    setTimeout(() => this.updatePlaylistDisplay(), 100);
+                }
                 return;
             }
 
@@ -99,18 +105,25 @@ class WavelengthRadio {
         }
     }
 
-    // Load playlist directly from API
+    // Load playlist directly from dynamic Firebase API
     async loadPlaylistFromAPI() {
         try {
-            console.log('🌐 Loading playlist from API...');
+            console.log(`🌐 Loading full playlist from Firebase API...`);
             const response = await fetch('/api/radio/playlist');
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
+            
             const data = await response.json();
             if (data && data.length > 0) {
                 this.playlist = data;
-                console.log(`🎵 Loaded playlist from API: ${this.playlist.length} tracks`);
+                console.log(`🎵 Loaded full playlist from Firebase: ${this.playlist.length} tracks`);
+                
+                // Update playlist UI if we're in full player mode
+                if (!this.isMiniPlayer) {
+                    this.updatePlaylistDisplay();
+                }
                 
                 // If we have state waiting to be restored, try again now
                 if (this.pendingStateRestore && this.pendingState) {
@@ -119,10 +132,134 @@ class WavelengthRadio {
                     this.pendingStateRestore = false;
                     this.pendingState = null;
                 }
+            } else {
+                console.log('⚠️ No songs returned from Firebase API, keeping existing playlist');
             }
         } catch (error) {
-            console.warn('⚠️ Failed to load playlist from API:', error);
+            console.warn('⚠️ Failed to load playlist from Firebase API:', error);
+            console.log('🔄 Retrying with fallback endpoint...');
+            
+            // Try legacy endpoint as fallback
+            try {
+                const fallbackResponse = await fetch('/radio');
+                if (fallbackResponse.ok) {
+                    console.log('✅ Fallback endpoint available, playlist may load from server render');
+                }
+            } catch (fallbackError) {
+                console.warn('⚠️ Fallback also failed:', fallbackError);
+            }
         }
+    }
+
+    // Update playlist display in the UI (for full player)
+    updatePlaylistDisplay() {
+        const playlistContainer = document.querySelector('.playlist-items');
+        if (!playlistContainer || this.isMiniPlayer) return;
+
+        // Clear existing playlist items
+        playlistContainer.innerHTML = '';
+
+        // Add each track to the display
+        this.playlist.forEach((track, index) => {
+            const playlistItem = this.createPlaylistItem(track, index);
+            playlistContainer.appendChild(playlistItem);
+        });
+
+        // Update season filter buttons dynamically
+        this.updateSeasonFilterButtons();
+
+        // Update playlist count
+        this.updatePlaylistCount();
+
+        // Rebind playlist events
+        this.bindPlaylist();
+        
+        // Restore favorites
+        this.loadFavorites();
+        
+        // Apply current season filter
+        if (this.currentSeasonFilter && this.currentSeasonFilter !== 'all') {
+            this.filterBySeason(this.currentSeasonFilter);
+        }
+
+        console.log(`🎵 Updated playlist display with ${this.playlist.length} tracks`);
+    }
+
+    // Update season filter buttons based on available seasons in playlist
+    updateSeasonFilterButtons() {
+        const filtersContainer = document.querySelector('.playlist-filters');
+        if (!filtersContainer) return;
+
+        // Get unique seasons from playlist
+        const availableSeasons = [...new Set(this.playlist.map(track => track.season))].sort((a, b) => a - b);
+        
+        // Clear existing buttons
+        filtersContainer.innerHTML = '';
+        
+        // Add "All" button
+        const allBtn = document.createElement('button');
+        allBtn.className = 'filter-btn active';
+        allBtn.dataset.season = 'all';
+        allBtn.textContent = 'All';
+        filtersContainer.appendChild(allBtn);
+        
+        // Add season buttons
+        availableSeasons.forEach(season => {
+            const seasonBtn = document.createElement('button');
+            seasonBtn.className = 'filter-btn';
+            seasonBtn.dataset.season = season;
+            seasonBtn.textContent = `Season ${season}`;
+            filtersContainer.appendChild(seasonBtn);
+        });
+
+        // Rebind filter events
+        this.bindSeasonFilters();
+        
+        console.log(`🎵 Updated season filters: All + ${availableSeasons.join(', ')}`);
+    }
+
+    // Update playlist count display
+    updatePlaylistCount() {
+        const countElement = document.getElementById('playlistCount');
+        if (countElement) {
+            countElement.textContent = `(${this.playlist.length} songs)`;
+        }
+    }
+
+    // Bind season filter events
+    bindSeasonFilters() {
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.filterBySeason(e.target.dataset.season));
+        });
+    }
+
+    // Create a playlist item element
+    createPlaylistItem(track, index) {
+        const item = document.createElement('div');
+        const episodeNum = this.getEpisodeNumber(track);
+        
+        item.className = 'playlist-item';
+        item.dataset.index = index;
+        item.dataset.season = track.season;
+        item.dataset.episode = episodeNum;
+        item.dataset.title = track.title;
+        item.dataset.characters = JSON.stringify(track.characters || []);
+        
+        // Add episode image if available
+        if (track.episodeImage) {
+            item.dataset.episodeImage = track.episodeImage;
+        }
+
+        item.innerHTML = `
+            <div class="playlist-item-info">
+                <div class="playlist-item-title">${track.title}</div>
+                <div class="playlist-item-episode">Season ${track.season} • Episode ${episodeNum}</div>
+                <div class="playlist-item-duration">${track.durationFormatted || track.duration}</div>
+            </div>
+            <button class="playlist-item-favorite" title="Add to Favorites">♡</button>
+        `;
+
+        return item;
     }
 
     init() {
@@ -174,12 +311,12 @@ class WavelengthRadio {
         // Initialize page visibility handling
         this.initVisibilityHandling();
         
-        // Make this instance globally accessible for debugging
-        // Initialize Media Session API for system controls
-        this.initMediaSession();
+        // Initialize health monitoring (full player only)
+        if (!this.isMiniPlayer) {
+            this.initHealthMonitoring();
+        }
         
-        // Initialize page visibility handling
-        this.initVisibilityHandling();
+        // Make this instance globally accessible for debugging
         window.radioPlayer = this;
     }
 
@@ -423,8 +560,9 @@ class WavelengthRadio {
                         return;
                     }
                     
-                    console.log(`🎵 Mini player loading track: "${track.title}" (S${track.season}E${track.episode})`);
-                    const audioPath = `${this.cdnUrl}/images/seasons/season${track.season}/episodes/episode${track.episode}/${track.file}`;
+                    const episodeNum = this.getEpisodeNumber(track);
+                    console.log(`🎵 Mini player loading track: "${track.title}" (S${track.season}E${episodeNum})`);
+                    const audioPath = this.getAudioUrl(track);
                     this.audio.src = audioPath;
                     this.audio.load();
                     
@@ -475,10 +613,106 @@ class WavelengthRadio {
         }
     }
 
+    // Removed real-time playlist synchronization - not needed during development
+    // Songs are not being released at runtime, so this just causes UX issues
+
+    // Initialize health monitoring for Firebase connection
+    initHealthMonitoring() {
+        // Check health status on startup
+        this.checkApiHealth();
+        
+        // Monitor health every 2 minutes
+        this.healthCheckInterval = setInterval(() => {
+            this.checkApiHealth();
+        }, 120000);
+    }
+
+    // Check API health and Firebase connection status
+    async checkApiHealth() {
+        try {
+            const response = await fetch('/api/radio/health');
+            const health = await response.json();
+            
+            console.log('🏥 Radio API Health:', health);
+            
+            // Update health indicator in UI if it exists
+            const healthIndicator = document.getElementById('apiHealthIndicator');
+            if (healthIndicator) {
+                if (health.firebaseService && health.firebaseSongs > 0) {
+                    healthIndicator.textContent = '🟢';
+                    healthIndicator.title = `Firebase Connected: ${health.firebaseSongs} songs available`;
+                } else if (health.firebaseService) {
+                    healthIndicator.textContent = '🟡';
+                    healthIndicator.title = 'Firebase Connected: No songs found';
+                } else {
+                    healthIndicator.textContent = '🔴';
+                    healthIndicator.title = `Firebase Disconnected: Using ${health.legacyPlaylistSize} legacy songs`;
+                }
+            }
+            
+            // Store health status for other components
+            this.apiHealth = health;
+            
+        } catch (error) {
+            console.warn('⚠️ Health check failed:', error);
+            
+            const healthIndicator = document.getElementById('apiHealthIndicator');
+            if (healthIndicator) {
+                healthIndicator.textContent = '❌';
+                healthIndicator.title = 'Health check failed - may be using cached data';
+            }
+        }
+    }
+
+    // Manual refresh functionality
+    async refreshPlaylist() {
+        console.log('🔄 Manual playlist refresh requested...');
+        
+        // Show loading indicator
+        const refreshBtn = document.getElementById('refreshPlaylistBtn');
+        if (refreshBtn) {
+            refreshBtn.innerHTML = '🔄';
+            refreshBtn.disabled = true;
+        }
+
+        try {
+            const currentSeason = this.currentSeasonFilter === 'all' ? null : parseInt(this.currentSeasonFilter);
+            await this.loadPlaylistFromAPI(currentSeason);
+            
+            // Also check health after refresh
+            await this.checkApiHealth();
+            
+            // Show success feedback
+            if (refreshBtn) {
+                refreshBtn.innerHTML = '✅';
+                setTimeout(() => {
+                    refreshBtn.innerHTML = '🔄';
+                    refreshBtn.disabled = false;
+                }, 1500);
+            }
+            
+            console.log('✅ Manual playlist refresh completed');
+            
+        } catch (error) {
+            console.error('❌ Manual playlist refresh failed:', error);
+            
+            if (refreshBtn) {
+                refreshBtn.innerHTML = '❌';
+                setTimeout(() => {
+                    refreshBtn.innerHTML = '🔄';
+                    refreshBtn.disabled = false;
+                }, 2000);
+            }
+        }
+    }
+
     // Enhanced cleanup
     cleanup() {
         if (this.stateSyncInterval) {
             clearInterval(this.stateSyncInterval);
+        }
+        if (this.healthCheckInterval) {
+            clearInterval(this.healthCheckInterval);
         }
         if (typeof window !== 'undefined') {
             window.removeEventListener('storage', this.handleRemoteStateChange);
@@ -787,10 +1021,13 @@ class WavelengthRadio {
             btn.addEventListener('click', (e) => this.setPlayMode(e.target.dataset.mode));
         });
 
-        // Season filters
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.filterBySeason(e.target.dataset.season));
-        });
+        // Season filters are now bound dynamically in updateSeasonFilterButtons()
+
+        // Refresh playlist button (full player only)
+        const refreshBtn = document.getElementById('refreshPlaylistBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.refreshPlaylist());
+        }
 
         // Mobile expand button
         const expandBtn = document.getElementById('mobileExpandBtn');
@@ -927,6 +1164,22 @@ class WavelengthRadio {
         });
     }
 
+    // Helper method to get episode number from track (handles both legacy and Firebase formats)
+    getEpisodeNumber(track) {
+        return track.episodeNumber || track.episode;
+    }
+
+    // Helper method to get audio URL from track (handles both legacy and Firebase formats)  
+    getAudioUrl(track) {
+        // Firebase format has CDN URL in track.url
+        if (track.url && !track.file) {
+            return this.cdnUrl + track.url;
+        }
+        // Legacy format builds path from track.file
+        const episodeNum = this.getEpisodeNumber(track);
+        return `${this.cdnUrl}/images/seasons/season${track.season}/episodes/episode${episodeNum}/${track.file}`;
+    }
+
     // Play specific track
     playTrack(index) {
         if (index < 0 || index >= this.playlist.length) {
@@ -937,10 +1190,11 @@ class WavelengthRadio {
         this.currentTrackIndex = index;
         const track = this.playlist[index];
 
-        console.log(`🎵 Playing track ${index}: "${track.title}" (S${track.season}E${track.episode})`);
+        const episodeNum = this.getEpisodeNumber(track);
+        console.log(`🎵 Playing track ${index}: "${track.title}" (S${track.season}E${episodeNum})`);
 
-        // Build audio path
-        const audioPath = `${this.cdnUrl}/images/seasons/season${track.season}/episodes/episode${track.episode}/${track.file}`;
+        // Get audio path (handles both Firebase and legacy formats)
+        const audioPath = this.getAudioUrl(track);
 
         this.audio.src = audioPath;
         this.audio.load();
@@ -1173,17 +1427,19 @@ class WavelengthRadio {
 
     // Update now playing display
     updateNowPlaying(track) {
+        const episodeNum = this.getEpisodeNumber(track);
+        
         // Update full player elements
         const trackTitle = document.getElementById('trackTitle');
         const trackEpisode = document.getElementById('trackEpisode');
         if (trackTitle) trackTitle.textContent = track.title;
-        if (trackEpisode) trackEpisode.textContent = `Season ${track.season} • Episode ${track.episode}`;
+        if (trackEpisode) trackEpisode.textContent = `Season ${track.season} • Episode ${episodeNum}`;
         
         // Update mini player elements
         const globalTrackTitle = document.getElementById('globalTrackTitle');
         const globalTrackMeta = document.getElementById('globalTrackMeta');
         if (globalTrackTitle) globalTrackTitle.textContent = track.title;
-        if (globalTrackMeta) globalTrackMeta.textContent = `S${track.season}E${track.episode}`;
+        if (globalTrackMeta) globalTrackMeta.textContent = `S${track.season}E${episodeNum}`;
 
         // Update broadcast status with in-world narrative (full player only)
         if (!this.isMiniPlayer) {
@@ -1336,23 +1592,39 @@ class WavelengthRadio {
         }
     }
 
-    // Filter by season
+    // Filter by season - show/hide tracks from existing playlist
     filterBySeason(season) {
         // Save current filter
         this.currentSeasonFilter = season;
         localStorage.setItem('wavelength_season_filter', season);
 
+        // Update filter button UI
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.season === season);
         });
 
+        // Show/hide tracks based on season filter
+        let visibleCount = 0;
         document.querySelectorAll('.playlist-item').forEach(item => {
             if (season === 'all' || item.dataset.season === season) {
                 item.classList.remove('hidden');
+                visibleCount++;
             } else {
                 item.classList.add('hidden');
             }
         });
+        
+        // Update playlist count to show filtered count if not showing all
+        const countElement = document.getElementById('playlistCount');
+        if (countElement) {
+            if (season === 'all') {
+                countElement.textContent = `(${this.playlist.length} songs)`;
+            } else {
+                countElement.textContent = `(${visibleCount} songs - Season ${season})`;
+            }
+        }
+        
+        console.log(`🎵 Season ${season} filter applied - ${visibleCount} tracks visible`);
     }
 
     // Toggle favorite
@@ -2786,6 +3058,111 @@ if (!document.getElementById('wavelength-levelup-style')) {
     }
     `;
     document.head.appendChild(levelUpAnimationStyle);
+
+    // Add dynamic radio player styles for Firebase integration
+    const dynamicRadioStyles = document.createElement('style');
+    dynamicRadioStyles.id = 'wavelength-dynamic-radio-styles';
+    dynamicRadioStyles.textContent = `
+    /* Notification animations */
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+
+    /* Loading indicator styles */
+    .loading-indicator {
+        text-align: center;
+        padding: 40px 20px;
+        font-size: 1.1rem;
+        color: #7b68ee;
+        animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 0.6;
+        }
+        50% {
+            opacity: 1;
+        }
+    }
+
+    /* Health indicator styles */
+    #apiHealthIndicator {
+        font-size: 1.2rem;
+        cursor: pointer;
+        margin-left: 10px;
+        transition: transform 0.2s ease;
+    }
+
+    #apiHealthIndicator:hover {
+        transform: scale(1.2);
+    }
+
+    /* Refresh button styles */
+    #refreshPlaylistBtn {
+        background: linear-gradient(135deg, #4a90e2, #7b68ee);
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        margin-left: 10px;
+    }
+
+    #refreshPlaylistBtn:hover:not(:disabled) {
+        background: linear-gradient(135deg, #357abd, #6a59d9);
+        transform: translateY(-1px);
+    }
+
+    #refreshPlaylistBtn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* Enhanced playlist item animations */
+    .playlist-item {
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .playlist-item:hover {
+        background: rgba(123, 104, 238, 0.1);
+        border-left-color: #7b68ee;
+    }
+
+    .playlist-item.active {
+        background: linear-gradient(90deg, rgba(123, 104, 238, 0.2), transparent);
+        border-left-color: #7b68ee;
+    }
+
+    .playlist-item.hidden {
+        display: none;
+    }
+    `;
+    
+    if (!document.getElementById('wavelength-dynamic-radio-styles')) {
+        document.head.appendChild(dynamicRadioStyles);
+    }
 }
 
 } // End of WavelengthRadio guard
