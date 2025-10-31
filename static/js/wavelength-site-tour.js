@@ -501,3 +501,10 @@ if (typeof document !== 'undefined') {
   }
 }
 
+// Make class globally available
+if (typeof window !== 'undefined') {
+  window.WavelengthSiteTour = WavelengthSiteTour;
+}
+
+} // End of double-loading guard
+
