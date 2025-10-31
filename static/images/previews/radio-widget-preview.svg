@@ -1,0 +1,40 @@
+<svg width="400" height="250" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="250" fill="#1a1a2e" rx="8"/>
+  
+  <!-- Mini Radio Player Widget -->
+  <g transform="translate(50, 100)">
+    <!-- Widget Container -->
+    <rect x="0" y="0" width="300" height="120" fill="#2b2b42" rx="12" stroke="#667eea" stroke-width="2"/>
+    
+    <!-- Header -->
+    <rect x="0" y="0" width="300" height="35" fill="#667eea" rx="12 12 0 0"/>
+    <text x="150" y="22" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">✨ Wavelength Radio ✨</text>
+    
+    <!-- Track Info -->
+    <text x="20" y="65" fill="#e0e0e0" font-family="Arial, sans-serif" font-size="12" font-weight="bold">Now Playing: My Lucky Charm</text>
+    <text x="20" y="82" fill="#b0b0b0" font-family="Arial, sans-serif" font-size="10">Season 1, Episode 1</text>
+    
+    <!-- Player Controls -->
+    <g transform="translate(90, 95)">
+      <!-- Previous -->
+      <rect x="0" y="0" width="25" height="25" fill="#667eea" rx="4"/>
+      <text x="12.5" y="17" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="12">⏮</text>
+      <!-- Play -->
+      <rect x="35" y="0" width="30" height="25" fill="#764ba2" rx="4"/>
+      <text x="50" y="17" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="12">▶</text>
+      <!-- Next -->
+      <rect x="75" y="0" width="25" height="25" fill="#667eea" rx="4"/>
+      <text x="87.5" y="17" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="12">⏭</text>
+    </g>
+    
+    <!-- Volume -->
+    <rect x="220" y="95" width="60" height="4" fill="#444" rx="2"/>
+    <rect x="220" y="95" width="45" height="4" fill="#667eea" rx="2"/>
+    <circle cx="265" cy="97" r="6" fill="#764ba2"/>
+    <text x="230" y="115" fill="#b0b0b0" font-family="Arial, sans-serif" font-size="9">🔊</text>
+  </g>
+  
+  <!-- Bottom indicator -->
+  <text x="200" y="235" text-anchor="middle" fill="#888" font-family="Arial, sans-serif" font-size="10">Appears at bottom of every page</text>
+</svg>

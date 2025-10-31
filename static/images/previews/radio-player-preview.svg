@@ -1,0 +1,51 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="300" fill="#1a1a2e" rx="8"/>
+  
+  <!-- Full Radio Player -->
+  <g transform="translate(30, 30)">
+    <!-- Main Player Container -->
+    <rect x="0" y="0" width="340" height="240" fill="#2b2b42" rx="12" stroke="#667eea" stroke-width="2"/>
+    
+    <!-- Header Section -->
+    <rect x="0" y="0" width="340" height="50" fill="url(#gradient1)" rx="12 12 0 0"/>
+    <text x="170" y="32" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">🎵 Wavelength Radio Player</text>
+    
+    <!-- Screensaver Visual Area -->
+    <rect x="20" y="60" width="300" height="100" fill="#1a1a2e" rx="6" stroke="#764ba2" stroke-width="1" stroke-dasharray="5,5"/>
+    <circle cx="110" cy="110" r="15" fill="#667eea" opacity="0.7"/>
+    <circle cx="170" cy="110" r="20" fill="#764ba2" opacity="0.8"/>
+    <circle cx="230" cy="110" r="15" fill="#667eea" opacity="0.7"/>
+    <text x="170" y="140" text-anchor="middle" fill="#888" font-family="Arial, sans-serif" font-size="10">Screensaver Mode</text>
+    
+    <!-- Track Info -->
+    <text x="20" y="180" fill="#e0e0e0" font-family="Arial, sans-serif" font-size="13" font-weight="bold">My Lucky Charm</text>
+    <text x="20" y="195" fill="#b0b0b0" font-family="Arial, sans-serif" font-size="11">Season 1 • Episode 1</text>
+    
+    <!-- Player Controls -->
+    <g transform="translate(70, 210)">
+      <rect x="0" y="0" width="30" height="30" fill="#667eea" rx="5"/>
+      <text x="15" y="21" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14">⏮</text>
+      
+      <rect x="40" y="0" width="40" height="30" fill="#764ba2" rx="5"/>
+      <text x="60" y="21" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14">▶</text>
+      
+      <rect x="90" y="0" width="30" height="30" fill="#667eea" rx="5"/>
+      <text x="105" y="21" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14">⏭</text>
+    </g>
+    
+    <!-- Playlist Indicator -->
+    <text x="200" y="225" fill="#667eea" font-family="Arial, sans-serif" font-size="11">📋 Playlist</text>
+  </g>
+  
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Label -->
+  <text x="200" y="290" text-anchor="middle" fill="#888" font-family="Arial, sans-serif" font-size="10">Full player with screensaver &amp; playlist features</text>
+</svg>
