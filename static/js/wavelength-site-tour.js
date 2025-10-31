@@ -7,6 +7,11 @@
  * Based on GitHub Issue #149: Welcome to WavelengthLore Tour
  */
 
+// Guard against double-loading
+if (typeof window.WavelengthSiteTour !== 'undefined') {
+  console.log('🌊 WavelengthSiteTour already loaded, skipping redefinition');
+} else {
+
 class WavelengthSiteTour {
   constructor() {
     this.currentTourStep = 0;

@@ -194,7 +194,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
     <script src="/js/wavelength-data-loader.js"></script>
-    <script src="/js/wavelength-site-tour.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+    <!-- Site tour script loaded in footer.ejs - no need to load twice -->
     <script>
         // Safe data loading - no more JSON parsing errors!
         $(document).ready(async function(){
