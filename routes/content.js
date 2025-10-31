@@ -527,13 +527,25 @@ router.get('/lore/:loreId', async (req, res) => {
       return res.status(404).send('Lore not found');
     }
 
-    // Get all lore for navigation
-    const allLore = await loreHelpers.getAllLore();
+    // Get all lore for navigation - use unified visibility system
+    const user = {
+      isContentCreator: res.locals.isContentCreator || false,
+      isPreviewUser: res.locals.isPreviewUser || false,
+      isBetaTester: res.locals.isBetaTester || false
+    };
+    let allLore = await loreHelpers.getAllLore(user.isContentCreator);
+    
+    // Ensure allLore is always an array
+    if (!Array.isArray(allLore)) {
+      console.warn('⚠️ getAllLore did not return an array, using empty array');
+      allLore = [];
+    }
+    
     const currentIndex = allLore.findIndex(l => l.id === loreId);
     
     // Adjust navigation to wrap around
-    const previousLore = currentIndex > 0 ? allLore[currentIndex - 1] : allLore[allLore.length - 1];
-    const nextLore = currentIndex < allLore.length - 1 ? allLore[currentIndex + 1] : allLore[0];
+    const previousLore = currentIndex > 0 ? allLore[currentIndex - 1] : (allLore.length > 0 ? allLore[allLore.length - 1] : null);
+    const nextLore = currentIndex < allLore.length - 1 ? allLore[currentIndex + 1] : (allLore.length > 0 ? allLore[0] : null);
 
     res.render('lore', {
       title: loreItem.title,
