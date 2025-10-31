@@ -180,3 +180,4 @@ content/prompts/wavelength/Wavelength-Lore.code-workspace
 *.png
 !static-overlays/**/*.png
 .private-notes-never-ever-update.md
+docs/.account

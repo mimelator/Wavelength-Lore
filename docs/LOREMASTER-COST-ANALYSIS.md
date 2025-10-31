@@ -13,10 +13,15 @@
 #### **Hosting & Computing**
 ```javascript
 const HOSTING_COSTS = {
-  // Multi-tenant architecture = shared costs across all sites
-  database_postgresql: {
-    cost_per_month: 0.50, // $50/month ÷ 100 sites = $0.50 per site
-    notes: 'Shared PostgreSQL instance with row-level security'
+  // Firebase-first architecture = cost-efficient per-usage pricing
+  database_firebase: {
+    cost_per_month: 1.25, // $0.50-2.00 average per active site
+    notes: 'Firebase Firestore with collection-based tenant isolation'
+  },
+  
+  database_analytics: {
+    cost_per_month: 0.39, // $19.29/month ÷ 50 sites
+    notes: 'Optional shared PostgreSQL for cross-tenant analytics'
   },
   
   web_hosting_vercel: {
@@ -34,7 +39,7 @@ const HOSTING_COSTS = {
     notes: 'Error tracking, performance monitoring, logs'
   },
   
-  total_hosting: 1.90 // $1.90 per site per month
+  total_hosting: 2.64 // $2.64 per site per month (includes database)
 };
 
 const STORAGE_COSTS = {
@@ -276,15 +281,15 @@ const REVENUE_PROJECTIONS = {
 };
 
 const COST_STRUCTURE = {
-  // Costs scale with number of sites
-  monthly_infrastructure: 'sites × $3.55',
+  // Costs scale with number of sites (updated with realistic database costs)
+  monthly_infrastructure: 'sites × $4.29', // Updated: $2.64 hosting + $0.80 storage + $0.85 services
   support_overhead: 'sites × $1.00 (customer success)',
   platform_development: 8000, // Fixed monthly development costs
   marketing: 3000, // Fixed monthly marketing budget
   
   break_even_point: {
-    sites_needed: 45, // At average $25/month per site
-    timeline: 'Month 4-5 projected'
+    sites_needed: 52, // At average $25/month per site (updated for $4.29 infrastructure cost)
+    timeline: 'Month 5-6 projected'
   }
 };
 ```
@@ -293,9 +298,9 @@ const COST_STRUCTURE = {
 ```javascript
 const UNIT_ECONOMICS = {
   average_revenue_per_site: 31, // Blended across tiers
-  cost_to_serve_per_site: 4.55, // Infrastructure + support
-  gross_margin_per_site: 26.45,
-  gross_margin_percentage: 85.3,
+  cost_to_serve_per_site: 5.29, // Infrastructure ($4.29) + support ($1.00)
+  gross_margin_per_site: 25.71,
+  gross_margin_percentage: 82.9,
   
   // Additional revenue streams
   commerce_commission: {

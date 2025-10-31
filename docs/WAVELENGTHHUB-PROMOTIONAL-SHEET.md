@@ -1,4 +1,4 @@
-# 🌟 WAVELENGTHHUB: YOUR CREATIVE EMPIRE AWAITS
+# 🌟 CANONNODE: YOUR CREATIVE EMPIRE AWAITS
 
 **Transform Your Stories Into A Thriving Digital Universe**  
 *Everything You Need to Build, Grow & Monetize Your Lore-Based Community*
@@ -8,7 +8,7 @@
 ## 🚀 **FOR JUST $19/MONTH, YOU GET:**
 
 ### 🏠 **Your Professional Digital Home**
-- ✅ **Custom Subdomain:** `yourname.wavelengthhub.com` with automatic SSL
+- ✅ **Custom Subdomain:** `yourname.canonnode.com` with automatic SSL
 - ✅ **Beautiful Site Templates:** Music, Art, Literature, or Gaming themes
 - ✅ **Mobile-Optimized Design:** Perfect on every device
 - ✅ **Lightning-Fast Performance:** Global CDN + enterprise hosting
@@ -104,7 +104,7 @@
 
 ## 🆚 **VS THE COMPETITION**
 
-| Feature | WavelengthHub | Shopify | WordPress | Squarespace |
+| Feature | CanonNode | Shopify | WordPress | Squarespace |
 |---------|---------------|---------|-----------|-------------|
 | **Monthly Cost** | $19 | $29 | $25+ | $18 |
 | **Transaction Fees** | 0% | 2.9% | Varies | 3% |
@@ -144,17 +144,17 @@
 ## 🌟 **SUCCESS STORIES**
 
 ### *"From Bedroom Producer to $2,000/Month"*
-> "I started with just my concept album about time travelers. Six months later, I'm earning more from my WavelengthHub site than my day job. The cross-promotion is incredible - fans of other sci-fi musicians found me through the marketplace."
+> "I started with just my concept album about time travelers. Six months later, I'm earning more from my CanonNode site than my day job. The cross-promotion is incredible - fans of other sci-fi musicians found me through the marketplace."
 > 
 > **— Alex Chen, Electronic Music Producer**
 
 ### *"My Fantasy Series Found Its Home"*
-> "I was posting chapters on Medium and selling nothing. WavelengthHub gave me a real platform. My readers love the character galleries, and I've made $800 this month just from merchandise featuring my AI-generated character portraits."
+> "I was posting chapters on Medium and selling nothing. CanonNode gave me a real platform. My readers love the character galleries, and I've made $800 this month just from merchandise featuring my AI-generated character portraits."
 > 
 > **— Maria Santos, Fantasy Author**
 
 ### *"D&D Campaign Became a Business"*
-> "Our weekly D&D game became a serialized story on WavelengthHub. Now we have 500 followers and make $300/month selling character art and campaign guides. It's like having our own little media empire."
+> "Our weekly D&D game became a serialized story on CanonNode. Now we have 500 followers and make $300/month selling character art and campaign guides. It's like having our own little media empire."
 > 
 > **— The Crimson Tavern Collective**
 
@@ -182,7 +182,7 @@
    - Your professional site is live and ready for fans
 
 ### **What You Get Immediately:**
-- ✅ Professional subdomain: `yourname.wavelengthhub.com`
+- ✅ Professional subdomain: `yourname.canonnode.com`
 - ✅ SSL certificate and CDN (enterprise-grade security & speed)
 - ✅ Complete site with your chosen template
 - ✅ Access to unified marketplace for instant sales
@@ -215,7 +215,7 @@ Absolutely! The platform encourages cross-promotion. Many creators do guest epis
 ### **Start Your Free 14-Day Trial**
 **No Credit Card • No Risk • Full Features**
 
-👆 **[CLAIM YOUR FREE TRIAL NOW](https://wavelengthhub.com/start-trial)**
+👆 **[CLAIM YOUR FREE TRIAL NOW](https://canonnode.com/start-trial)**
 
 ### **Or Join Our Launch Community**
 - Get updates on launch timeline
@@ -223,11 +223,11 @@ Absolutely! The platform encourages cross-promotion. Many creators do guest epis
 - Influence platform development
 - Early access to beta features
 
-📧 **[JOIN THE WAITLIST](https://wavelengthhub.com/waitlist)**
+📧 **[JOIN THE WAITLIST](https://canonnode.com/waitlist)**
 
 ---
 
-**Questions? Email us:** support@wavelengthhub.com  
-**Follow our journey:** [@WavelengthHub](https://twitter.com/wavelengthhub)
+**Questions? Email us:** support@canonnode.com  
+**Follow our journey:** [@CanonNode](https://twitter.com/canonnode)
 
-*WavelengthHub - Where Stories Become Worlds, and Worlds Become Profitable*
+*CanonNode - Where Stories Become Worlds, and Worlds Become Profitable*
