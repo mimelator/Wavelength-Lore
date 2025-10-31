@@ -668,7 +668,7 @@ class EpisodeCommands {
     }
 
     /**
-     * Extract assets for an episode
+     * Extract assets for an episode (with approval workflow)
      * @param {Array} args - Command arguments (episode ID)
      */
     async extractAssets(args) {
@@ -679,6 +679,7 @@ class EpisodeCommands {
         }
 
         const episodeId = args[0];
+        const skipApproval = args.includes('--skip-approval') || args.includes('--auto-approve');
 
         if (!this.episodeService) {
             console.log(chalk.red('❌ Episode service not initialized'));
@@ -710,28 +711,204 @@ class EpisodeCommands {
             // Initialize asset extraction service
             const assetService = new AssetExtractionService();
 
-            // Extract assets
+            // Extract assets in preview mode (don't upload yet)
             const result = await assetService.extractEpisodeAssets({
                 episodeId,
                 season: episode.season,
                 episodeNumber: episode.episodeNumber || episode.episode,
                 sourceImages
-            });
+            }, true); // skipUpload = true for approval workflow
 
-            if (result.success) {
-                console.log(chalk.green('\n✅ Asset extraction completed!'));
-                console.log(chalk.cyan(`\n📊 Summary:`));
-                console.log(chalk.gray(`   Navigation icons: ${result.manifest.assets.navigationIcons.length}`));
-                console.log(chalk.gray(`   Badges: ${result.manifest.assets.badges.length}`));
-                console.log(chalk.gray(`   Game assets: ${result.manifest.assets.gameAssets.length}`));
-                console.log(chalk.gray(`   Manifest path: ${result.manifestPath}`));
+            if (!result.success || !result.readyForApproval) {
+                console.log(chalk.red('❌ Asset extraction failed'));
+                return;
             }
+
+            const pendingAssets = result.pendingAssets;
+            const totalAssets = 
+                (pendingAssets.assets.navigationIcons?.length || 0) +
+                (pendingAssets.assets.badges?.length || 0) +
+                (pendingAssets.assets.gameAssets?.length || 0);
+
+            console.log(chalk.green(`\n✅ ${totalAssets} assets extracted and ready for review!`));
+
+            // Skip approval if requested
+            if (skipApproval) {
+                console.log(chalk.yellow('\n⚠️  Auto-approving all assets (--skip-approval flag)...'));
+                
+                const approvedResult = await assetService.approveAndSaveAssets(pendingAssets.assets, {
+                    episodeId,
+                    season: episode.season,
+                    episodeNumber: episode.episodeNumber || episode.episode
+                });
+
+                if (approvedResult.success) {
+                    console.log(chalk.green('\n✅ All assets approved and saved!'));
+                    console.log(chalk.gray(`   Manifest: ${approvedResult.manifestPath}`));
+                }
+                return;
+            }
+
+            // Show preview and collect approvals
+            console.log(chalk.cyan('\n📋 Review & Approval Workflow'));
+            console.log(chalk.cyan('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+
+            // Create preview HTML
+            const fs = require('fs').promises;
+            const path = require('path');
+            const os = require('os');
+            const tempFile = path.join(os.tmpdir(), `asset-preview-${Date.now()}.html`);
+            
+            console.log(chalk.cyan('\n🖼️  Generating preview page...'));
+            await assetService.createPreviewHTML(pendingAssets, tempFile);
+            
+            // Try to open in browser
+            try {
+                const open = require('open');
+                await open(tempFile);
+                console.log(chalk.green('✅ Preview opened in browser'));
+            } catch (e) {
+                console.log(chalk.yellow('💡 Preview file created (browser not auto-opened):'));
+            }
+            
+            console.log(chalk.gray(`   Preview file: ${tempFile}`));
+            console.log(chalk.yellow('\n💡 Review assets in the browser, then return here to approve/reject.'));
+
+            // Interactive approval workflow
+            await this.approveAssetsInteractively(assetService, pendingAssets, {
+                episodeId,
+                season: episode.season,
+                episodeNumber: episode.episodeNumber || episode.episode
+            });
 
         } catch (error) {
             console.log(chalk.red(`❌ Asset extraction failed: ${error.message}`));
             if (process.env.DEBUG) {
                 console.error(error.stack);
             }
+        }
+    }
+
+    /**
+     * Interactive asset approval workflow
+     */
+    async approveAssetsInteractively(assetService, pendingAssets, config) {
+        const allAssets = [];
+        
+        // Collect all assets with their metadata
+        for (const icon of pendingAssets.assets.navigationIcons || []) {
+            allAssets.push({ ...icon, category: 'navigationIcon', displayName: `Icon ${icon.size} (${icon.usage})` });
+        }
+        for (const badge of pendingAssets.assets.badges || []) {
+            allAssets.push({ ...badge, category: 'badge', displayName: `Badge ${badge.size} (${badge.usage})` });
+        }
+        for (const asset of pendingAssets.assets.gameAssets || []) {
+            const label = `${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)}${asset.index ? ` ${asset.index}` : ''}`;
+            allAssets.push({ ...asset, category: 'gameAsset', displayName: label });
+        }
+
+        if (allAssets.length === 0) {
+            console.log(chalk.yellow('⚠️  No assets to approve'));
+            return;
+        }
+
+        const approvedAssets = {
+            navigationIcons: [],
+            badges: [],
+            gameAssets: []
+        };
+
+        console.log(chalk.cyan(`\n📋 Asset Approval (${allAssets.length} total)`));
+        console.log(chalk.yellow('You can:'));
+        console.log(chalk.gray('  - Approve all: type "all" or "a"'));
+        console.log(chalk.gray('  - Reject all: type "reject all" or "r"'));
+        console.log(chalk.gray('  - Approve individually: type asset number or "y"'));
+        console.log(chalk.gray('  - Reject: type "n"'));
+        console.log(chalk.gray('  - Skip to save: type "save" or "done"\n'));
+
+        for (let i = 0; i < allAssets.length; i++) {
+            const asset = allAssets[i];
+            
+            console.log(chalk.cyan(`\n[${i + 1}/${allAssets.length}] ${asset.displayName}`));
+            console.log(chalk.gray(`   Type: ${asset.category} | Size: ${asset.size || 'N/A'} | Format: ${asset.format}`));
+            
+            // Show preview URL if available
+            if (asset.buffer) {
+                const dataUrl = assetService.bufferToDataUrl(
+                    asset.buffer, 
+                    asset.format === 'jpg' ? 'image/jpeg' : `image/${asset.format}`
+                );
+                console.log(chalk.gray(`   Preview: Available (in browser)`));
+            }
+
+            const response = await this.cli.promptUser(chalk.yellow('Approve this asset? (y/n/all/reject all/save, default: y): '));
+            const answer = response.toLowerCase().trim();
+
+            if (answer === 'all' || answer === 'a') {
+                // Approve all remaining
+                console.log(chalk.green(`✅ Approving all remaining ${allAssets.length - i} assets...`));
+                for (let j = i; j < allAssets.length; j++) {
+                    const remainingAsset = allAssets[j];
+                    if (remainingAsset.category === 'navigationIcon') {
+                        approvedAssets.navigationIcons.push(remainingAsset);
+                    } else if (remainingAsset.category === 'badge') {
+                        approvedAssets.badges.push(remainingAsset);
+                    } else if (remainingAsset.category === 'gameAsset') {
+                        approvedAssets.gameAssets.push(remainingAsset);
+                    }
+                }
+                break;
+            } else if (answer === 'reject all' || answer === 'r') {
+                console.log(chalk.red(`❌ Rejecting all remaining ${allAssets.length - i} assets...`));
+                break;
+            } else if (answer === 'save' || answer === 'done') {
+                console.log(chalk.yellow('⏭️  Skipping remaining assets'));
+                break;
+            } else if (answer === 'n' || answer === 'no') {
+                console.log(chalk.red(`❌ Rejected: ${asset.displayName}`));
+                continue;
+            } else {
+                // Default: approve
+                console.log(chalk.green(`✅ Approved: ${asset.displayName}`));
+                if (asset.category === 'navigationIcon') {
+                    approvedAssets.navigationIcons.push(asset);
+                } else if (asset.category === 'badge') {
+                    approvedAssets.badges.push(asset);
+                } else if (asset.category === 'gameAsset') {
+                    approvedAssets.gameAssets.push(asset);
+                }
+            }
+        }
+
+        // Summary
+        const totalApproved = 
+            approvedAssets.navigationIcons.length +
+            approvedAssets.badges.length +
+            approvedAssets.gameAssets.length;
+        const totalRejected = allAssets.length - totalApproved;
+
+        console.log(chalk.cyan('\n📊 Approval Summary:'));
+        console.log(chalk.green(`   ✅ Approved: ${totalApproved}`));
+        console.log(chalk.red(`   ❌ Rejected: ${totalRejected}`));
+
+        if (totalApproved === 0) {
+            console.log(chalk.yellow('\n⚠️  No assets approved. Nothing will be saved.'));
+            return;
+        }
+
+        // Save approved assets
+        const saveResponse = await this.cli.promptUser(chalk.yellow(`\n💾 Save ${totalApproved} approved asset(s)? (y/n, default: y): `));
+        if (saveResponse.toLowerCase().trim() === 'n') {
+            console.log(chalk.yellow('⚠️  Approval cancelled'));
+            return;
+        }
+
+        const approvedResult = await assetService.approveAndSaveAssets(approvedAssets, config);
+
+        if (approvedResult.success) {
+            console.log(chalk.green('\n✅ Approved assets saved successfully!'));
+            console.log(chalk.gray(`   Manifest: ${approvedResult.manifestPath}`));
+            console.log(chalk.yellow('\n💡 You can run extraction again to regenerate rejected assets.'));
         }
     }
 }

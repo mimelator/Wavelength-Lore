@@ -85,16 +85,20 @@ Multiple game assets are extracted:
 # Start the CLI
 npm run cli
 
-# Extract assets for an episode
+# Extract assets for an episode (with approval workflow)
 wavelength> episodes extract s5e1
 ```
 
-That's it! The pipeline will:
+The pipeline will:
 1. ✅ Load your episode and find all images
-2. ✅ Generate all asset variants
-3. ✅ Upload everything to S3
-4. ✅ Create an asset manifest
-5. ✅ Show you a summary
+2. ✅ Generate all asset variants (stored temporarily)
+3. ✅ Open a preview page in your browser showing all assets
+4. ✅ Prompt you to approve/reject each asset in the CLI
+5. ✅ Upload only approved assets to S3
+6. ✅ Create an asset manifest with approved assets only
+7. ✅ Show you a summary
+
+**Important**: Asset extraction uses an **approval workflow** by default. You review and approve each extracted asset before it's saved. This ensures quality control and allows you to iterate on extractions.
 
 ---
 
@@ -103,8 +107,12 @@ That's it! The pipeline will:
 ### Command Options
 
 ```bash
-# Standard extraction
+# Standard extraction (with approval workflow)
 episodes extract <episode-id>
+
+# Auto-approve all assets (skip approval step)
+episodes extract <episode-id> --skip-approval
+episodes extract <episode-id> --auto-approve
 
 # Alternative command names
 episodes assets <episode-id>
@@ -131,6 +139,7 @@ episodes extract s4e9
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Episode: S5E1 (s5e1)
 Source images: 3
+⚠️  Preview mode: Assets will NOT be uploaded until approved
 
 📸 Processing primary image: /images/episodes/season-5/episode-1/image-1.png
 
@@ -156,11 +165,47 @@ Source images: 3
    Extracting background (1920x1080)...
    ✓ Extracted background
 
-✅ Asset extraction complete!
+✅ 8 assets extracted and ready for review!
+
+📋 Review & Approval Workflow
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  Generating preview page...
+✅ Preview opened in browser
+
+💡 Review assets in the browser, then return here to approve/reject.
+
+📋 Asset Approval (8 total)
+You can:
+  - Approve all: type "all" or "a"
+  - Reject all: type "reject all" or "r"
+  - Approve individually: type asset number or "y"
+  - Reject: type "n"
+  - Skip to save: type "save" or "done"
+
+[1/8] Icon 64x64 (menu) - Approve? (y/n/all/r, default: y): y
+✅ Approved: Icon 64x64 (menu)
+
+[2/8] Icon 128x128 (header) - Approve? (y/n/all/r, default: y): y
+✅ Approved: Icon 128x128 (header)
+
+... (continue for all assets) ...
+
+📊 Approval Summary:
+   ✅ Approved: 6
+   ❌ Rejected: 2
+
+💾 Save 6 approved asset(s)? (y/n, default: y): y
+
+💾 Saving approved assets...
+
+✅ Approved assets saved!
    Navigation icons: 3
-   Badges: 2
-   Game assets: 3
+   Badges: 1
+   Game assets: 2
    Manifest: /images/episodes/season-5/episode-1/assets/manifest.json
+
+💡 You can run extraction again to regenerate rejected assets.
 ```
 
 ---
@@ -206,6 +251,74 @@ wavelength> episodes extract s5e1
 ```
 
 ---
+
+## Approval Workflow
+
+The asset extraction pipeline uses an **approval workflow** to ensure quality control. Here's how it works:
+
+### Step 1: Asset Extraction (Preview Mode)
+
+When you run `episodes extract`, assets are generated but **not uploaded to S3**. Instead:
+- All assets are stored in memory as image buffers
+- A preview HTML page is generated with all assets
+- The preview page opens in your browser automatically
+
+### Step 2: Visual Review
+
+The preview page shows:
+- All extracted assets in a grid layout
+- Asset type, size, and format information
+- Click-to-toggle approval status (visual feedback)
+- Summary counters for total, approved, and rejected assets
+
+### Step 3: Interactive Approval
+
+After reviewing in the browser, return to the CLI to approve/reject:
+
+**Approval Options:**
+- `y` or Enter: Approve the current asset
+- `n`: Reject the current asset
+- `all` or `a`: Approve all remaining assets
+- `reject all` or `r`: Reject all remaining assets
+- `save` or `done`: Skip remaining assets and save current approvals
+
+### Step 4: Save Approved Assets
+
+Only approved assets are:
+- Uploaded to S3
+- Added to the manifest
+- Saved to the episode record
+
+### Iterating on Extractions
+
+Since extraction isn't 100% reliable, you can iterate:
+
+```bash
+# First attempt - approve what you like
+wavelength> episodes extract s5e1
+# Review and approve 3 out of 8 assets
+
+# Second attempt - regenerate rejected assets
+wavelength> episodes extract s5e1
+# Review and approve 2 more assets
+
+# Continue until you're satisfied
+```
+
+**Note**: Each extraction regenerates ALL assets. You can approve different combinations on each run.
+
+### Auto-Approve Mode
+
+If you want to skip approval and auto-approve everything:
+
+```bash
+episodes extract s5e1 --skip-approval
+```
+
+This is useful for:
+- Automated workflows
+- Testing
+- When you're confident in the extraction quality
 
 ## Understanding the Asset Manifest
 
@@ -307,7 +420,45 @@ wavelength> episodes extract s5e1
 # Result: All navigation icons, badges, and game assets ready!
 ```
 
-### Use Case 2: Updating Existing Episode
+### Use Case 2: Iterative Quality Improvement
+
+**Scenario**: You want to extract assets multiple times, approving only the best results each time.
+
+```bash
+# 1. First extraction attempt
+wavelength> episodes extract s5e1
+# Review in browser, approve 4 out of 8 assets
+# Save approved assets
+
+# 2. Second extraction attempt (regenerates all assets)
+wavelength> episodes extract s5e1
+# Review in browser, approve 3 different assets
+# Save approved assets
+
+# 3. Third attempt if needed
+wavelength> episodes extract s5e1
+# Review and approve remaining assets you need
+
+# Result: You've curated the best assets across multiple attempts!
+```
+
+### Use Case 3: Selective Asset Types
+
+**Scenario**: You only want navigation icons, not badges or game assets.
+
+```bash
+# Extract assets
+wavelength> episodes extract s5e1
+
+# During approval:
+# - Approve all navigation icons (3 assets)
+# - Reject all badges (2 assets)
+# - Reject all game assets (3 assets)
+
+# Result: Only navigation icons saved to manifest!
+```
+
+### Use Case 4: Updating Existing Episode
 
 **Scenario**: You've added new images to an existing episode and want fresh assets.
 
@@ -320,13 +471,14 @@ wavelength> edit s4e9
 # Navigate to "Manage Image Gallery"
 # Add new approved images
 
-# 3. Re-extract assets (this will overwrite previous assets)
+# 3. Re-extract assets (this will regenerate all assets)
 wavelength> episodes extract s4e9
 
 # Result: New assets generated from updated images!
+# Previous approved assets remain in manifest until you approve new ones
 ```
 
-### Use Case 3: Batch Processing Multiple Episodes
+### Use Case 5: Batch Processing Multiple Episodes
 
 **Scenario**: You want to extract assets for all episodes in a season.
 
@@ -341,7 +493,7 @@ wavelength> episodes extract s5e3
 # ... and so on
 ```
 
-### Use Case 4: Using Assets in Your Code
+### Use Case 6: Using Assets in Your Code
 
 **Scenario**: You want to use extracted assets in your application.
 
@@ -425,9 +577,10 @@ wavelength> episodes view s5e1
 ### Problem: Assets generated but not visible on site
 
 **Solution**: 
-1. **Check CloudFront cache**: Assets may be cached
-2. **Verify paths**: Ensure CloudFront is configured to serve `/images/episodes/...`
-3. **Check manifest**: Load manifest and verify asset URLs
+1. **Check if assets were approved**: Only approved assets are uploaded
+2. **Check CloudFront cache**: Assets may be cached
+3. **Verify paths**: Ensure CloudFront is configured to serve `/images/episodes/...`
+4. **Check manifest**: Load manifest and verify asset URLs
 
 ```bash
 # Verify assets exist in S3
@@ -435,6 +588,32 @@ wavelength> episodes view s5e1
 
 # Test a direct URL (from manifest)
 curl https://df5sj8f594cdx.cloudfront.net/images/episodes/season-5/episode-1/assets/icons/icon-64x64.png
+```
+
+### Problem: Browser preview not opening
+
+**Solution**: The preview file is created in your system temp directory. You can manually open it:
+
+```bash
+# On macOS/Linux, the path is shown in the CLI output
+# Example: /var/folders/.../asset-preview-1234567890.html
+
+# Open manually:
+open /path/to/asset-preview-1234567890.html  # macOS
+xdg-open /path/to/asset-preview-1234567890.html  # Linux
+start /path/to/asset-preview-1234567890.html  # Windows
+```
+
+### Problem: Want to change approval after saving
+
+**Solution**: Run extraction again and approve/reject different assets. The manifest will be updated with the new approved set.
+
+```bash
+# Re-run extraction
+wavelength> episodes extract s5e1
+
+# Approve different assets this time
+# The manifest will be overwritten with new approved assets
 ```
 
 ### Problem: Image quality issues
