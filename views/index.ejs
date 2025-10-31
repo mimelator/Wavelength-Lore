@@ -166,8 +166,8 @@
                     return;
                 }
             %>
-                <div class="<%= episodeData.visible === false ? 'hidden-episode' : '' %>">
-                    <% if (isContentCreator && episodeData.visible === false) { %>
+                <div class="<%= isHidden ? 'hidden-episode' : '' %>">
+                    <% if (isContentCreator && isHidden) { %>
                         <div class="episode-visibility-indicator" title="This episode is hidden from public view">
                             🔒 <span>HIDDEN</span>
                         </div>
