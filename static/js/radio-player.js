@@ -1250,11 +1250,21 @@ class WavelengthRadio {
         return this.cdnUrl + path;
     }
 
-    // Helper method to get audio URL from track - ONLY uses normalized url field
+    // Helper method to get audio URL from track - requires valid url field
     getAudioUrl(track) {
         if (!track.url) {
             console.error(`🚨 TRACK MISSING URL FIELD:`, track);
-            return '';
+            throw new Error(`Track "${track.title}" (S${track.season}E${track.episode || track.episodeNumber}) is missing required 'url' field. Check Firebase songs data.`);
+        }
+        
+        // Check for incorrect URL patterns that need to be fixed in the data
+        if (track.url.match(/\/images\/seasons\/S\d+E\d+\.mp3$/)) {
+            console.error(`🚨 TRACK HAS INCORRECT URL PATTERN:`, {
+                track: track,
+                url: track.url,
+                message: 'URL appears to be in old normalized format. Should be: /images/seasons/season{N}/episodes/episode{N}/{filename}.mp3'
+            });
+            throw new Error(`Track "${track.title}" has incorrect URL format: ${track.url}. Expected format: /images/seasons/season{N}/episodes/episode{N}/{filename}.mp3`);
         }
         
         // Check if track.url is already a full URL (starts with http)
