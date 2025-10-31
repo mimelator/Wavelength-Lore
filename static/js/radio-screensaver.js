@@ -290,6 +290,7 @@ class RadioScreenSaver {
     }
 
     enter() {
+        console.log('🎨 Screensaver entering active mode');
         this.active = true;
         const overlay = document.getElementById('screensaverOverlay');
         const gallery = overlay.querySelector('.screensaver-gallery');
@@ -387,7 +388,8 @@ class RadioScreenSaver {
             track.images.forEach(img => {
                 this.images.push(this.radio.cdnUrl + img);
             });
-            console.log(`🎨 Added ${track.images.length} images from metadata array`);
+            console.log(`🎨 S${track.season}E${track.episodeNumber} GALLERY: Added ${track.images.length} images`);
+            console.log(`🎨 Gallery images: ${track.images.slice(0, 3).map(img => img.split('/').pop()).join(', ')}${track.images.length > 3 ? ` +${track.images.length - 3} more` : ''}`);
         }
         
         // If no metadata images, use fallback image (wavelength default)
@@ -398,6 +400,7 @@ class RadioScreenSaver {
     }
 
     exit() {
+        console.log('🎨 Screensaver exiting active mode');
         this.active = false;
         const overlay = document.getElementById('screensaverOverlay');
 
@@ -435,24 +438,32 @@ class RadioScreenSaver {
     }
 
     updateImages() {
+        console.log('🎨 updateImages() called - active:', this.active);
         if (!this.active) return;
         
         const overlay = document.getElementById('screensaverOverlay');
         const gallery = overlay?.querySelector('.screensaver-gallery');
-        if (!gallery) return;
+        if (!gallery) {
+            console.log('🎨 updateImages() - no gallery found');
+            return;
+        }
 
         // Collect new images
         this.images = [];
+        console.log('🎨 updateImages() - collecting new images for track:', this.radio.currentTrackIndex);
         
         if (this.radio.currentTrackIndex >= 0) {
             const track = this.radio.playlist[this.radio.currentTrackIndex];
+            console.log(`🎨 SONG CHANGE → S${track.season}E${track.episodeNumber}: "${track.title}"`);
             
             if (track.images?.length > 0) {
                 track.images.forEach(img => this.images.push(this.radio.cdnUrl + img));
+                console.log(`🎨 ↳ Loaded ${track.images.length} gallery images: ${track.images.slice(0, 3).map(img => img.split('/').pop()).join(', ')}${track.images.length > 3 ? ` +${track.images.length - 3} more` : ''}`);
             }
             
             if (this.images.length === 0 && track.episodeImage) {
                 this.images.push(this.radio.cdnUrl + track.episodeImage);
+                console.log(`🎨 ↳ Using single episode image: ${track.episodeImage.split('/').pop()}`);
             }
         }
 

@@ -1250,7 +1250,14 @@ class WavelengthRadio {
         this.updatePlaylistUI();
 
         // Update screen saver images if active
+        console.log('🎵 playTrack() - checking screensaver:', {
+            hasScreensaver: !!this.screensaver,
+            screensaverActive: this.screensaver?.active,
+            trackIndex: index,
+            trackTitle: track.title
+        });
         if (this.screensaver?.active) {
+            console.log('🎵 playTrack() - calling screensaver.updateImages()');
             this.screensaver.updateImages();
         }
 

@@ -1,14 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
-const characterHelpers = require('../helpers/character-helpers');
+// const characterHelpers = require('../helpers/character-helpers');
 const { isDevelopmentBypass, getTestUser } = require('../middleware/auth');
 const { verifyToken, optionalAuth } = require('../middleware/firebaseAuth');
 
-// Cache management for radio playlist
-let playlistCache = null;
-let cacheTimestamp = null;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
+// No caching - always fetch fresh data for dynamic content
 
 // Lazy-load Firebase Songs Service after Firebase Admin is ready
 let FirebaseSongsService;
@@ -103,16 +100,8 @@ const LEGACY_PLAYLIST = [
  */
 async function getEnhancedPlaylist(season = null, includeUnpublished = false, includeEpisodeData = false) {
   try {
-    // Check cache first (only for published data without episode enhancement)
-    const cacheKey = `${season || 'all'}_${includeUnpublished}_${includeEpisodeData}`;
-    if (playlistCache && cacheTimestamp && !includeEpisodeData) {
-      const cacheAge = Date.now() - cacheTimestamp;
-      if (cacheAge < CACHE_TTL) {
-        console.log(`🎵 Using cached playlist (${Math.round(cacheAge/1000)}s old)`);
-        return season ? playlistCache.filter(song => song.season === season) : playlistCache;
-      }
-    }
-
+    console.log(`🎵 Getting playlist: season=${season}, includeUnpublished=${includeUnpublished}, includeEpisodeData=${includeEpisodeData}`);
+    
     // Try to initialize Firebase Songs Service if not already done
     const activeSongsService = initializeSongsService();
     
@@ -151,13 +140,6 @@ async function getEnhancedPlaylist(season = null, includeUnpublished = false, in
     
     console.log(`🎵 Using playlist with ${playlist.length} songs`);
     
-    // Cache the basic playlist (without episode data enhancement)
-    if (!includeEpisodeData && !includeUnpublished) {
-      playlistCache = playlist;
-      cacheTimestamp = Date.now();
-      console.log('💾 Cached playlist data');
-    }
-    
     // If episode data enhancement is not requested, return the basic playlist
     if (!includeEpisodeData) {
       return playlist;
@@ -166,63 +148,71 @@ async function getEnhancedPlaylist(season = null, includeUnpublished = false, in
     // Enhance with episode data for full radio player page
     console.log('🔧 Enhancing playlist with episode data...');
     console.log('🔧 Input playlist length:', playlist.length);
+    console.log('🔧 includeEpisodeData:', includeEpisodeData);
     
     const enhancedTracks = [];
     
     // Process each track individually to avoid Promise.all issues
-    for (const track of playlist) {
+    for (let i = 0; i < playlist.length; i++) {
+      const track = playlist[i];
       try {
-        console.log(`🔍 Processing S${track.season}E${track.episodeNumber || track.episode}: ${track.title}`);
+        console.log(`🔍 Processing track ${i+1}/${playlist.length}: S${track.season}E${track.episodeNumber || track.episode}: ${track.title}`);
         
         // Always add the track, with or without episode data
         const enhancedTrack = { ...track, characters: [] };
         
         try {
           const episodeNumber = track.episodeNumber || track.episode;
+          console.log(`🔍 Fetching episode data for: videos/season${track.season}/episodes/episode${episodeNumber}`);
           const episodeData = await fetchDataAsAdmin(`videos/season${track.season}/episodes/episode${episodeNumber}`);
+          
+          console.log(`🔍 Episode data result:`, episodeData ? 'found' : 'null');
+          if (episodeData && episodeData.image) {
+            console.log(`🔍 Episode has image: ${episodeData.image}`);
+          }
+          if (episodeData && episodeData.carouselImages) {
+            console.log(`🔍 Episode has ${episodeData.carouselImages.length} carousel images`);
+          }
           
           if (episodeData) {
             console.log(`✅ Found episode data for S${track.season}E${episodeNumber}`);
             
-            const loreHelpers = require('../helpers/lore-helpers');
-            const characterHelpers = require('../helpers/character-helpers');
+            // TODO: Character matching disabled temporarily due to missing function
+            // const loreHelpers = require('../helpers/lore-helpers');
+            // const characterHelpers = require('../helpers/character-helpers');
             
-            // Get matched characters
-            const matchedCharacters = await characterHelpers.getCharactersForEpisode(
-              track.season, 
-              episodeNumber, 
-              episodeData.keywords || []
-            );
-
-            // Get matched lore
-            const allLore = loreHelpers.getAllLoreSync(false);
+            // For now, just set empty characters array
+            enhancedTrack.characters = [];
             
-            const matchedLore = allLore.filter(lore =>
-              episodeData.keywords?.some(keyword =>
-                lore.keywords?.some(lk => lk.toLowerCase() === keyword.toLowerCase())
-              )
-            ).map(lore => ({
-              id: lore.id,
-              title: lore.name,
-              image: lore.image,
-              type: 'lore',
-              url: `/lore/${lore.id}`
-            }));
-
-            // Combine characters and lore
-            enhancedTrack.characters = [...matchedCharacters, ...matchedLore];
+            // Add episode images for screensaver
+            if (episodeData.image) {
+              enhancedTrack.episodeImage = episodeData.image;
+              console.log(`✅ Added episodeImage: ${episodeData.image}`);
+            }
+            
+            if (episodeData.carouselImages && episodeData.carouselImages.length > 0) {
+              enhancedTrack.images = episodeData.carouselImages;
+              console.log(`✅ Added ${episodeData.carouselImages.length} carousel images`);
+            }
           } else {
             console.log(`⚠️ No episode data found for S${track.season}E${episodeNumber}, using empty characters`);
           }
         } catch (episodeError) {
-          console.error(`⚠️ Episode data fetch failed for S${track.season}E${track.episodeNumber || track.episode}:`, episodeError.message);
+          console.error(`❌ Episode data fetch failed for S${track.season}E${track.episodeNumber || track.episode}:`, episodeError.message);
+          console.error(`❌ Full error stack:`, episodeError.stack);
+          // Continue with empty character array on error
         }
+        
+        console.log(`✅ Final enhanced track keys: ${Object.keys(enhancedTrack).join(', ')}`);
+        console.log(`✅ Enhanced track episodeImage: ${enhancedTrack.episodeImage}`);
+        console.log(`✅ Enhanced track images count: ${enhancedTrack.images?.length || 0}`);
         
         enhancedTracks.push(enhancedTrack);
         console.log(`✅ Added S${track.season}E${track.episodeNumber || track.episode} to enhanced tracks`);
         
       } catch (trackError) {
         console.error(`❌ Failed to process track S${track.season}E${track.episodeNumber || track.episode}:`, trackError.message);
+        console.error(`❌ Track error stack:`, trackError.stack);
         // Still add the basic track even if everything fails
         enhancedTracks.push({ ...track, characters: [] });
       }
@@ -312,7 +302,9 @@ router.get('/api/radio/playlist', optionalAuth, async (req, res) => {
     
     console.log('Radio API request: season=' + season + ', isAdmin=' + isAdmin + ', hostname=' + req.hostname);
     
-    const playlist = await getEnhancedPlaylist(season, isAdmin, false); // includeEpisodeData = false for API
+    console.log('🎵 API: Getting enhanced playlist with episode data...');
+    const playlist = await getEnhancedPlaylist(season, isAdmin, true); // includeEpisodeData = true for screensaver images
+    console.log('🎵 API: Enhanced playlist returned', playlist.length, 'tracks');
     
     console.log('Got playlist: ' + (playlist ? playlist.length : 0) + ' tracks');
     res.json(playlist || []);
@@ -358,26 +350,55 @@ router.post('/api/radio/migrate-playlist', async (req, res) => {
   }
 });
 
+// Debug endpoint to test episode enhancement
+router.get('/api/radio/debug', async (req, res) => {
+  try {
+    console.log('🐛 DEBUG: Testing enhanced playlist...');
+    
+    const playlist = await getEnhancedPlaylist(null, false, true);
+    const firstTrack = playlist[0];
+    
+    console.log('🐛 DEBUG: First track keys:', Object.keys(firstTrack).join(', '));
+    console.log('🐛 DEBUG: episodeImage:', firstTrack.episodeImage);
+    console.log('🐛 DEBUG: images count:', firstTrack.images?.length);
+    
+    res.json({
+      status: 'debug',
+      timestamp: new Date().toISOString(),
+      firstTrack: {
+        title: firstTrack.title,
+        episodeImage: firstTrack.episodeImage,
+        imagesCount: firstTrack.images?.length || 0,
+        hasImages: !!firstTrack.images,
+        allKeys: Object.keys(firstTrack)
+      },
+      playlistLength: playlist.length
+    });
+  } catch (error) {
+    console.error('🐛 DEBUG: Error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: error.message,
+      stack: error.stack
+    });
+  }
+});
+
 // Health check endpoint
 router.get('/api/radio/health', async (req, res) => {
-  const activeSongsService = initializeSongsService();
-  
-  const health = {
-    timestamp: new Date().toISOString(),
-    firebaseService: !!activeSongsService,
-    legacyPlaylistSize: LEGACY_PLAYLIST.length
-  };
-
-  if (activeSongsService) {
-    try {
-      const songs = await activeSongsService.getPublishedSongs();
-      health.firebaseSongs = songs ? songs.length : 0;
-    } catch (error) {
-      health.firebaseError = error.message;
-    }
+  try {
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      playlist: 'available'
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
   }
-
-  res.json(health);
 });
 
 // Manual cache bust endpoint for radio data
