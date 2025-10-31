@@ -789,16 +789,31 @@ class EpisodeCommands {
             const lineHandlers = mainRl.listeners('line').slice(); // Create a copy
             const closeHandlers = mainRl.listeners('close').slice();
             
-            // Close the main readline to free up stdin
-            mainRl.close();
+            // Temporarily remove close handlers to prevent exit on close
+            mainRl.removeAllListeners('close');
             
-            // Small delay to ensure stdin is fully released
+            // Set stdin to raw mode to prevent double input
+            // This ensures only one interface processes input at a time
+            const stdinWasRaw = process.stdin.isRaw;
+            if (!stdinWasRaw) {
+                process.stdin.setRawMode(false);
+                process.stdin.resume();
+            }
+            
+            // Pause the main readline completely
+            if (!mainRl.paused) {
+                mainRl.pause();
+            }
+            mainRl.removeAllListeners('line');
+            
+            // Small delay to ensure stdin state is settled
             await new Promise(resolve => setTimeout(resolve, 100));
             
             // Create readline interface for SongUploadStep
             const rl = readline.createInterface({
                 input: process.stdin,
-                output: process.stdout
+                output: process.stdout,
+                terminal: true
             });
 
             // Create a minimal state manager wrapper for song upload
@@ -842,47 +857,72 @@ class EpisodeCommands {
 
             const songUploadStep = new SongUploadStep(stateManager, rl);
             
-            // Execute song upload
-            await songUploadStep.execute(episode);
-            
-            // Close song upload's readline
-            rl.close();
-            
-            // Small delay to ensure stdin is fully released
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
-            // Recreate the main CLI's readline interface
-            const newRl = readline.createInterface({
-                input: process.stdin,
-                output: process.stdout,
-                prompt: chalk.cyan('wavelength> '),
-                completer: this.cli.autocomplete ? this.cli.autocomplete.bind(this.cli) : undefined
-            });
-            
-            // Restore the original event handlers
-            lineHandlers.forEach(handler => {
-                newRl.on('line', handler);
-            });
-            closeHandlers.forEach(handler => {
-                newRl.on('close', handler);
-            });
-            
-            // Replace the main CLI's readline reference
-            this.cli.rl = newRl;
-            
-            // Restore the prompt
-            newRl.prompt();
-
-            console.log(chalk.green('\n✅ Song uploaded and attached to episode!'));
-            
-            // Refresh episode data
-            const updatedEpisode = await this.episodeService.getEpisodeById(episodeId);
-            Object.assign(episode, updatedEpisode);
+            try {
+                // Execute song upload
+                await songUploadStep.execute(episode);
+                
+                console.log(chalk.green('\n✅ Song uploaded and attached to episode!'));
+                
+                // Refresh episode data
+                const updatedEpisode = await this.episodeService.getEpisodeById(episodeId);
+                Object.assign(episode, updatedEpisode);
+            } catch (uploadError) {
+                // Handle upload errors without exiting CLI
+                if (uploadError.message && !uploadError.message.includes('cancelled')) {
+                    console.log(chalk.red(`\n❌ Song upload failed: ${uploadError.message}`));
+                }
+                // Don't re-throw - allow CLI to continue
+            } finally {
+                // Always restore the main CLI readline, even if upload fails
+                try {
+                    // Close song upload's readline
+                    rl.close();
+                } catch (e) {
+                    // Ignore errors when closing (might already be closed)
+                }
+                
+                // Small delay to ensure stdin is fully released
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Restore stdin state if we changed it
+                if (!stdinWasRaw) {
+                    process.stdin.setRawMode(false);
+                }
+                
+                // Restore the original event handlers to the existing (paused) readline
+                lineHandlers.forEach(handler => {
+                    mainRl.on('line', handler);
+                });
+                closeHandlers.forEach(handler => {
+                    mainRl.on('close', handler);
+                });
+                
+                // Resume the main readline
+                if (mainRl.paused) {
+                    mainRl.resume();
+                }
+                
+                // Restore the prompt
+                mainRl.prompt();
+            }
 
         } catch (error) {
-            console.log(chalk.red(`\n❌ Song upload failed: ${error.message}`));
+            // Outer error handler - restore readline even on unexpected errors
+            console.log(chalk.red(`\n❌ Unexpected error: ${error.message}`));
             if (process.env.DEBUG) {
                 console.error(error.stack);
+            }
+            
+            // Try to restore the main readline
+            try {
+                const mainRl = this.cli.rl;
+                if (mainRl && mainRl.paused) {
+                    mainRl.resume();
+                    mainRl.prompt();
+                }
+            } catch (restoreError) {
+                // If we can't restore, at least log it
+                console.error(chalk.yellow('⚠️  Could not restore CLI readline'));
             }
         }
     }
