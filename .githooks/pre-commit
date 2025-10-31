@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Pre-commit hook for episode content validation
+# Prevents commits of episode content without proper validation
+
+echo "🔍 Pre-commit validation for episode content..."
+
+# Check if Firebase songs data is being modified
+if git diff --cached --name-only | grep -q "firebase\|songs\|radio"; then
+    echo "📱 Episode content detected - running validation..."
+    
+    # Run validation
+    npm run validate:episode-content
+    if [ $? -ne 0 ]; then
+        echo "❌ Episode content validation failed!"
+        echo "🚨 Fix validation errors before committing."
+        exit 1
+    fi
+    
+    echo "✅ Episode content validation passed"
+fi
+
+# Check if audio/media files are being added
+if git diff --cached --name-only | grep -q "\.mp3$\|\.wav$\|\.m4a$"; then
+    echo "🎵 Audio files detected in commit"
+    echo "⚠️  Remember to:"
+    echo "   1. Upload to S3 first"
+    echo "   2. Update Firebase URLs"
+    echo "   3. Run npm run validate:audio-urls"
+fi
+
+echo "✅ Pre-commit checks passed"
