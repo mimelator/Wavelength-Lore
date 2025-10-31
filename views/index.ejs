@@ -156,8 +156,13 @@
             });
             episodeKeys.forEach(episode => {
                 const episodeData = videos[season].episodes[episode];
-                // Skip hidden episodes for non-content creators
-                if (episodeData.visible === false && !isContentCreator) {
+                // Skip hidden/unpublished episodes for non-content creators
+                // Check multiple visibility fields: visible, published, hidden
+                const isHidden = episodeData.visible === false || 
+                                episodeData.published === false || 
+                                episodeData.hidden === true;
+                
+                if (isHidden && !isContentCreator) {
                     return;
                 }
             %>
