@@ -65,6 +65,16 @@ class WavelengthRadio {
     // Enhanced playlist loading with multiple fallback strategies
     loadPlaylist() {
         try {
+            // Check for content creator mode - if enabled, bypass server data and use API
+            const urlParams = new URLSearchParams(window.location.search);
+            const isCreatorMode = urlParams.get('creator') === 'true';
+            
+            if (isCreatorMode) {
+                console.log('🔧 CREATOR MODE detected - loading playlist via API to include drafts');
+                this.loadPlaylistFromAPI();
+                return;
+            }
+
             // Strategy 1: Use window.WAVELENGTH_PLAYLIST if available
             if (window.WAVELENGTH_PLAYLIST && window.WAVELENGTH_PLAYLIST.length > 0) {
                 this.playlist = window.WAVELENGTH_PLAYLIST;
@@ -108,8 +118,13 @@ class WavelengthRadio {
     // Load playlist directly from dynamic Firebase API
     async loadPlaylistFromAPI() {
         try {
-            console.log(`🌐 Loading full playlist from Firebase API...`);
-            const response = await fetch('/api/radio/playlist');
+            // Check for content creator mode
+            const urlParams = new URLSearchParams(window.location.search);
+            const isCreatorMode = urlParams.get('creator') === 'true';
+            const apiUrl = isCreatorMode ? '/api/radio/playlist?creator=true' : '/api/radio/playlist';
+            
+            console.log(`🌐 Loading ${isCreatorMode ? 'CREATOR MODE' : 'full'} playlist from Firebase API...`);
+            const response = await fetch(apiUrl);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

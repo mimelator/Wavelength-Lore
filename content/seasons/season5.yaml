@@ -1,0 +1,12 @@
+season: 5
+description: "Season 5: Mystic Adventures - The journey continues with new mystical discoveries and ancient druid wisdom."
+episodes:
+  - episode: 1
+    title: "Mystic Druids"
+    description: "The party encounters ancient druids who hold the keys to mystical knowledge and forgotten lore."
+    keywords: ["druids", "mystical", "ancient", "knowledge", "lore", "magic", "wisdom", "season5"]
+    characters: []
+    locations: []
+    events: []
+    published: false
+    draft: true

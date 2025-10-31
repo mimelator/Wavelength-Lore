@@ -165,53 +165,70 @@ async function getEnhancedPlaylist(season = null, includeUnpublished = false, in
     
     // Enhance with episode data for full radio player page
     console.log('🔧 Enhancing playlist with episode data...');
-    const enhancedTracks = await Promise.all(playlist.map(async (track) => {
+    console.log('🔧 Input playlist length:', playlist.length);
+    
+    const enhancedTracks = [];
+    
+    // Process each track individually to avoid Promise.all issues
+    for (const track of playlist) {
       try {
-        // Fetch episode data from Firebase with correct path structure  
-        const episodeNumber = track.episodeNumber || track.episode;
-        const episodeData = await fetchDataAsAdmin(`videos/season${track.season}/episodes/episode${episodeNumber}`);
+        console.log(`🔍 Processing S${track.season}E${track.episodeNumber || track.episode}: ${track.title}`);
         
-        if (episodeData) {
-          const loreHelpers = require('../helpers/lore-helpers');
+        // Always add the track, with or without episode data
+        const enhancedTrack = { ...track, characters: [] };
+        
+        try {
+          const episodeNumber = track.episodeNumber || track.episode;
+          const episodeData = await fetchDataAsAdmin(`videos/season${track.season}/episodes/episode${episodeNumber}`);
           
-          return {
-            ...track,
-            characters: await (async () => {
-              // Get matched characters
-              const characterHelpers = require('../helpers/character-helpers');
-              const matchedCharacters = await characterHelpers.getCharactersForEpisode(
-                track.season, 
-                episodeNumber, 
-                episodeData.keywords || []
-              );
+          if (episodeData) {
+            console.log(`✅ Found episode data for S${track.season}E${episodeNumber}`);
+            
+            const loreHelpers = require('../helpers/lore-helpers');
+            const characterHelpers = require('../helpers/character-helpers');
+            
+            // Get matched characters
+            const matchedCharacters = await characterHelpers.getCharactersForEpisode(
+              track.season, 
+              episodeNumber, 
+              episodeData.keywords || []
+            );
 
-              // Get matched lore
-              const allLore = loreHelpers.getAllLoreSync(false);
-              
-              const matchedLore = allLore.filter(lore =>
-                episodeData.keywords?.some(keyword =>
-                  lore.keywords?.some(lk => lk.toLowerCase() === keyword.toLowerCase())
-                )
-              ).map(lore => ({
-                id: lore.id,
-                title: lore.name,
-                image: lore.image,
-                type: 'lore',
-                url: `/lore/${lore.id}`
-              }));
+            // Get matched lore
+            const allLore = loreHelpers.getAllLoreSync(false);
+            
+            const matchedLore = allLore.filter(lore =>
+              episodeData.keywords?.some(keyword =>
+                lore.keywords?.some(lk => lk.toLowerCase() === keyword.toLowerCase())
+              )
+            ).map(lore => ({
+              id: lore.id,
+              title: lore.name,
+              image: lore.image,
+              type: 'lore',
+              url: `/lore/${lore.id}`
+            }));
 
-              // Combine characters and lore
-              return [...matchedCharacters, ...matchedLore];
-            })()
-          };
+            // Combine characters and lore
+            enhancedTrack.characters = [...matchedCharacters, ...matchedLore];
+          } else {
+            console.log(`⚠️ No episode data found for S${track.season}E${episodeNumber}, using empty characters`);
+          }
+        } catch (episodeError) {
+          console.error(`⚠️ Episode data fetch failed for S${track.season}E${track.episodeNumber || track.episode}:`, episodeError.message);
         }
-      } catch (error) {
-        console.error(`Error fetching episode data for S${track.season}E${track.episodeNumber || track.episode}:`, error.message);
+        
+        enhancedTracks.push(enhancedTrack);
+        console.log(`✅ Added S${track.season}E${track.episodeNumber || track.episode} to enhanced tracks`);
+        
+      } catch (trackError) {
+        console.error(`❌ Failed to process track S${track.season}E${track.episodeNumber || track.episode}:`, trackError.message);
+        // Still add the basic track even if everything fails
+        enhancedTracks.push({ ...track, characters: [] });
       }
-
-      // Return track with empty characters array if no data was fetched
-      return { ...track, characters: [] };
-    }));
+    }
+    
+    console.log('🔧 Enhanced tracks length:', enhancedTracks.length);
 
     return enhancedTracks;
     
@@ -254,6 +271,7 @@ router.get('/radio', optionalAuth, async (req, res) => {
     
     const enhancedPlaylist = await getEnhancedPlaylist(null, isAdmin, true); // includeEpisodeData = true for page
     console.log('🎵 Enhanced playlist loaded with', enhancedPlaylist.length, 'tracks (admin:', isAdmin + ')');
+    console.log('🎵 Enhanced playlist seasons:', enhancedPlaylist.map(t => `S${t.season}E${t.episodeNumber || t.episode}`).join(', '));
 
     res.render('radio-player', {
       title: 'Wavelength Radio',
