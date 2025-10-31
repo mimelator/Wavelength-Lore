@@ -542,7 +542,8 @@ class WavelengthContentCLI {
         console.log('  media images approve <asset-id>');
         console.log('  media images reject <asset-id> [--reason="reason"]');
         console.log('  media images regenerate <asset-id>');
-        console.log('  media videos generate --image=<url> --prompt="description"');
+        console.log(chalk.red.bold('  ⚠️  media videos generate --force --image=<url> --prompt="description"'));
+        console.log(chalk.red.bold('      (WARNING: UNTESTED & EXPENSIVE - Requires --force flag)'));
         console.log('  media videos status <operation-id>');
         console.log('  media episode <episode-id> generate [--images=<n>]');
         console.log('  media help                              - Detailed media generation help');
@@ -1204,13 +1205,13 @@ Please provide an enhanced version that improves the item according to the reque
             console.log(chalk.white(`  ${startActionNum}. 🖼️  Manage Image Gallery (view/validate)`));
             console.log(chalk.white(`  ${startActionNum + 1}. 🖼️  Set Primary Image from Gallery`));
             console.log(chalk.white(`  ${startActionNum + 2}. 🎨 Generate AI Image`));
-            console.log(chalk.white(`  ${startActionNum + 3}. 🎬 Generate AI Video`));
+            console.log(chalk.red.bold(`  ${startActionNum + 3}. 🎬 Generate AI Video ${chalk.yellow('(⚠️ UNTESTED & EXPENSIVE)')}`));
             console.log(chalk.white(`  ${startActionNum + 4}. 🤖 AI Enhance All Fields`));
             console.log(chalk.white(`  ${startActionNum + 5}. 💾 Save & Exit`));
         } else {
             console.log(chalk.white(`  ${startActionNum}. 🖼️  Set Primary Image from Gallery`));
             console.log(chalk.white(`  ${startActionNum + 1}. 🎨 Generate AI Image`));
-            console.log(chalk.white(`  ${startActionNum + 2}. 🎬 Generate AI Video`));
+            console.log(chalk.red.bold(`  ${startActionNum + 2}. 🎬 Generate AI Video ${chalk.yellow('(⚠️ UNTESTED & EXPENSIVE)')}`));
             console.log(chalk.white(`  ${startActionNum + 3}. 🤖 AI Enhance All Fields`));
             console.log(chalk.white(`  ${startActionNum + 4}. 💾 Save & Exit`));
         }
@@ -2838,17 +2839,143 @@ Please provide an enhanced version that improves the item according to the reque
 
 
     /**
+     * Display large warning banner for video commands
+     */
+    showVideoWarning() {
+        console.log('');
+        console.log(chalk.red.bold('╔══════════════════════════════════════════════════════════════════════════════╗'));
+        console.log(chalk.red.bold('║                                                                              ║'));
+        console.log(chalk.red.bold('║                    ⚠️  VIDEO GENERATION WARNING ⚠️                          ║'));
+        console.log(chalk.red.bold('║                                                                              ║'));
+        console.log(chalk.red.bold('╠══════════════════════════════════════════════════════════════════════════════╣'));
+        console.log(chalk.red.bold('║                                                                              ║'));
+        console.log(chalk.red.bold('║  🚨 UNTESTED & UNSAFE - USE AT YOUR OWN RISK 🚨                            ║'));
+        console.log(chalk.red.bold('║                                                                              ║'));
+        console.log(chalk.yellow.bold('║  ⚡ Video generation is EXPENSIVE and currently UNTESTED                 ║'));
+        console.log(chalk.yellow.bold('║                                                                              ║'));
+        console.log(chalk.yellow.bold('║  This feature may:                                                         ║'));
+        console.log(chalk.yellow.bold('║    • Charge your API account significantly                                ║'));
+        console.log(chalk.yellow.bold('║    • Not work as expected (untested integration)                          ║'));
+        console.log(chalk.yellow.bold('║    • Produce unexpected results                                           ║'));
+        console.log(chalk.yellow.bold('║                                                                              ║'));
+        console.log(chalk.red.bold('║  ⛔ PROCEED ONLY IF YOU UNDERSTAND THE RISKS ⛔                            ║'));
+        console.log(chalk.red.bold('║                                                                              ║'));
+        console.log(chalk.red.bold('╚══════════════════════════════════════════════════════════════════════════════╝'));
+        console.log('');
+    }
+
+    /**
      * 🎬 Generate AI Video for item
      */
-    async generateAIVideo(item) {
-        console.log(chalk.cyan('🎬 AI VIDEO GENERATION'));
-        console.log(chalk.yellow('This feature will integrate with AI video generation services'));
-        console.log(chalk.gray(`Generating video for: ${item.title}`));
-        console.log(chalk.gray(`Description: ${item.description}`));
+    async generateAIVideo(item, contentType = 'lore') {
+        // Show large warning banner
+        this.showVideoWarning();
         
-        // Placeholder for AI video generation
-        // This would integrate with RunwayML, Pika Labs, or similar
-        console.log(chalk.blue('🔮 Feature framework ready - AI service integration needed'));
+        // Require explicit confirmation
+        const confirmed = await new Promise((resolve) => {
+            this.rl.question(chalk.red.bold('⚠️  Do you understand the risks and want to proceed? (type "YES" to continue): '), (answer) => {
+                resolve(answer.trim() === 'YES');
+            });
+        });
+        
+        if (!confirmed) {
+            console.log(chalk.green('\n✅ Video generation cancelled. Stay safe!'));
+            return;
+        }
+        
+        console.log(chalk.cyan('\n🎬 AI VIDEO GENERATION'));
+        console.log(chalk.gray(`Generating video for: ${item.title || item.name}`));
+        
+        // Determine image source - use primary image or first gallery image
+        let imageUrl = null;
+        
+        if (item.primaryImage || item.image) {
+            imageUrl = item.primaryImage || item.image;
+            // Convert relative paths to full URLs
+            if (imageUrl.startsWith('/') && !imageUrl.startsWith('//')) {
+                const cdnUrl = process.env.CDN_URL || 'https://df5sj8f594cdx.cloudfront.net';
+                imageUrl = `${cdnUrl}${imageUrl}`;
+            }
+        } else if (item.image_gallery && item.image_gallery.length > 0) {
+            imageUrl = item.image_gallery[0];
+            if (imageUrl.startsWith('/') && !imageUrl.startsWith('//')) {
+                const cdnUrl = process.env.CDN_URL || 'https://df5sj8f594cdx.cloudfront.net';
+                imageUrl = `${cdnUrl}${imageUrl}`;
+            }
+        }
+        
+        if (!imageUrl) {
+            console.log(chalk.red('❌ No image found for video generation'));
+            console.log(chalk.yellow('💡 Please add an image to this item first (generate an image or upload one)'));
+            return;
+        }
+        
+        console.log(chalk.gray(`📸 Using image: ${imageUrl.substring(0, 80)}${imageUrl.length > 80 ? '...' : ''}`));
+        
+        // Prompt for video generation prompt
+        const prompt = await new Promise((resolve) => {
+            this.rl.question(chalk.cyan('\n📝 Enter video generation prompt (or press Enter to use description): '), (answer) => {
+                resolve(answer.trim() || item.description || `Cinematic scene featuring ${item.title || item.name}`);
+            });
+        });
+        
+        if (!prompt) {
+            console.log(chalk.yellow('⚠️ Prompt is required for video generation'));
+            return;
+        }
+        
+        // Ask if user wants to wait for completion
+        const waitForCompletion = await new Promise((resolve) => {
+            this.rl.question(chalk.cyan('\n⏳ Wait for video completion? (y/n, default: n): '), (answer) => {
+                resolve(answer.toLowerCase().trim() === 'y');
+            });
+        });
+        
+        try {
+            console.log(chalk.gray('\n🎬 Starting video generation...'));
+            
+            const result = await this.mediaCommands.mediaService.generateVideo({
+                imageUrl,
+                promptText: prompt,
+                contentType,
+                contentId: item.id,
+                waitForCompletion,
+                maxWaitTime: 600000 // 10 minutes for video
+            });
+            
+            if (result.success) {
+                if (result.video.status === 'completed') {
+                    console.log(chalk.green('\n✅ Video generation completed!'));
+                    
+                    if (result.video.videoBuffer) {
+                        // Video was downloaded - upload to S3 and add to gallery
+                        const videoPath = result.video.url || `/images/${contentType}s/${item.id}/video-generated-${Date.now()}.mp4`;
+                        
+                        // Add to gallery if not already there
+                        if (!item.video_gallery) {
+                            item.video_gallery = [];
+                        }
+                        item.video_gallery.push(videoPath);
+                        
+                        console.log(chalk.green(`✅ Video added to gallery: ${videoPath}`));
+                        console.log(chalk.yellow('\n💾 Don\'t forget to save changes to persist the video!'));
+                    }
+                } else {
+                    console.log(chalk.yellow(`\n⏳ Video generation started (async mode)`));
+                    console.log(chalk.gray(`   Operation ID: ${result.video.operationId}`));
+                    console.log(chalk.gray(`   Status: ${result.video.status}`));
+                    console.log(chalk.yellow('\n💡 Use the media commands to check status:'));
+                    console.log(chalk.gray(`   media videos status ${result.video.operationId}`));
+                }
+            } else {
+                console.log(chalk.red('\n❌ Video generation failed'));
+            }
+        } catch (error) {
+            console.log(chalk.red(`\n❌ Video generation error: ${error.message}`));
+            if (error.message.includes('not initialized')) {
+                console.log(chalk.yellow('\n💡 Make sure GOOGLE_API_KEY or GEMINI_API_KEY is set in your .env file'));
+            }
+        }
     }
 
     /**

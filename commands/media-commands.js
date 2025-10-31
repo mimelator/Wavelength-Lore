@@ -457,6 +457,10 @@ class MediaCommands {
             case 'status':
                 return await this.checkVideoStatus(actionArgs);
                 
+            case 'download':
+            case 'dl':
+                return await this.downloadVideo(actionArgs);
+                
             case 'preview':
             case 'view':
                 return await this.previewVideo(actionArgs);
@@ -468,21 +472,59 @@ class MediaCommands {
     }
 
     /**
+     * Display large warning banner for video commands
+     */
+    showVideoWarning() {
+        console.log('');
+        console.log(chalk.red.bold('╔══════════════════════════════════════════════════════════════════════════════╗'));
+        console.log(chalk.red.bold('║                                                                              ║'));
+        console.log(chalk.red.bold('║                    ⚠️  VIDEO GENERATION WARNING ⚠️                          ║'));
+        console.log(chalk.red.bold('║                                                                              ║'));
+        console.log(chalk.red.bold('╠══════════════════════════════════════════════════════════════════════════════╣'));
+        console.log(chalk.red.bold('║                                                                              ║'));
+        console.log(chalk.red.bold('║  🚨 UNTESTED & UNSAFE - USE AT YOUR OWN RISK 🚨                            ║'));
+        console.log(chalk.red.bold('║                                                                              ║'));
+        console.log(chalk.yellow.bold('║  ⚡ Video generation is EXPENSIVE and currently UNTESTED                 ║'));
+        console.log(chalk.yellow.bold('║                                                                              ║'));
+        console.log(chalk.yellow.bold('║  This feature may:                                                         ║'));
+        console.log(chalk.yellow.bold('║    • Charge your API account significantly                                ║'));
+        console.log(chalk.yellow.bold('║    • Not work as expected (untested integration)                          ║'));
+        console.log(chalk.yellow.bold('║    • Produce unexpected results                                           ║'));
+        console.log(chalk.yellow.bold('║                                                                              ║'));
+        console.log(chalk.red.bold('║  ⛔ PROCEED ONLY IF YOU UNDERSTAND THE RISKS ⛔                            ║'));
+        console.log(chalk.red.bold('║                                                                              ║'));
+        console.log(chalk.red.bold('╚══════════════════════════════════════════════════════════════════════════════╝'));
+        console.log('');
+    }
+
+    /**
      * Generate video from image
      */
     async generateVideo(args) {
+        // Show large warning banner
+        this.showVideoWarning();
+        
         const options = this.parseOptions(args);
         
         const {
             image,
             prompt,
             contentType = 'episode',
-            contentId = null
+            contentId = null,
+            force = false
         } = options;
+
+        // Check if --force flag is present
+        if (!force) {
+            console.log(chalk.red.bold('⚠️  Video generation requires explicit confirmation.'));
+            console.log(chalk.yellow('   Add --force flag to proceed: media videos generate --force --image=<url> --prompt="..."'));
+            console.log(chalk.yellow('   Or use the interactive CLI which will prompt for confirmation.\n'));
+            return;
+        }
 
         if (!image) {
             console.log(chalk.red('❌ Image URL is required'));
-            console.log(chalk.yellow('Usage: media videos generate --image=<url> --prompt="description"'));
+            console.log(chalk.yellow('Usage: media videos generate --force --image=<url> --prompt="description"'));
             return;
         }
 
@@ -534,10 +576,14 @@ class MediaCommands {
      * Check video generation status
      */
     async checkVideoStatus(args) {
+        // Show warning for video commands
+        console.log(chalk.yellow.bold('\n⚠️  WARNING: Video generation is UNTESTED and may have issues.\n'));
+        
         const operationId = args[0];
         
         if (!operationId) {
             console.log(chalk.red('❌ Operation ID is required'));
+            console.log(chalk.yellow('Usage: media videos status <operation-id>'));
             return;
         }
 
@@ -548,12 +594,63 @@ class MediaCommands {
             console.log(chalk.gray(`Operation ID: ${operationId}`));
             console.log(chalk.gray(`Status: ${status.status || 'unknown'}`));
             
-            if (status.videoUrl) {
-                console.log(chalk.green(`Video URL: ${status.videoUrl}`));
+            if (status.status === 'succeeded') {
+                console.log(chalk.green('\n✅ Video generation completed!'));
+                if (status.videoFile && status.videoFile.uri) {
+                    console.log(chalk.cyan(`Video URI: ${status.videoFile.uri}`));
+                    console.log(chalk.yellow('\n💡 Download the video:'));
+                    console.log(chalk.gray(`   media videos download ${operationId}`));
+                }
+            } else if (status.status === 'failed') {
+                console.log(chalk.red('\n❌ Video generation failed'));
+                if (status.error) {
+                    console.log(chalk.red(`Error: ${status.error}`));
+                }
+            } else if (status.status === 'processing') {
+                console.log(chalk.yellow('\n⏳ Video is still processing...'));
+                console.log(chalk.gray('   Check again later with:'));
+                console.log(chalk.gray(`   media videos status ${operationId}`));
             }
             console.log('');
         } catch (error) {
             console.error(chalk.red(`❌ Status check failed: ${error.message}`));
+        }
+    }
+
+    /**
+     * Download completed video
+     */
+    async downloadVideo(args) {
+        // Show warning for video commands
+        console.log(chalk.yellow.bold('\n⚠️  WARNING: Video generation is UNTESTED and may have issues.\n'));
+        
+        const operationId = args[0];
+        const outputPath = args[1]; // Optional output path
+        
+        if (!operationId) {
+            console.log(chalk.red('❌ Operation ID is required'));
+            console.log(chalk.yellow('Usage: media videos download <operation-id> [output-path]'));
+            return;
+        }
+
+        try {
+            console.log(chalk.cyan('\n📥 Downloading video...'));
+            console.log(chalk.gray(`Operation ID: ${operationId}`));
+            
+            const result = await this.mediaService.downloadVideo(operationId, outputPath);
+            
+            if (result.success) {
+                console.log(chalk.green('\n✅ Video downloaded successfully!'));
+                if (result.filePath) {
+                    console.log(chalk.cyan(`File path: ${result.filePath}`));
+                }
+                if (result.videoBuffer) {
+                    console.log(chalk.gray(`Size: ${(result.videoBuffer.length / 1024 / 1024).toFixed(2)} MB`));
+                }
+                console.log('');
+            }
+        } catch (error) {
+            console.error(chalk.red(`❌ Download failed: ${error.message}`));
         }
     }
 
@@ -757,8 +854,10 @@ class MediaCommands {
         console.log(chalk.gray('  media images list [--status=all|pending|approved|rejected]'));
         console.log('');
         console.log(chalk.yellow('Videos:'));
-        console.log(chalk.gray('  media videos generate --image=<url> --prompt="description"'));
+        console.log(chalk.red.bold('  ⚠️  WARNING: Video generation is UNTESTED and EXPENSIVE'));
+        console.log(chalk.gray('  media videos generate --force --image=<url> --prompt="description"'));
         console.log(chalk.gray('  media videos status <operation-id>'));
+        console.log(chalk.gray('  media videos download <operation-id> [output-path]'));
         console.log(chalk.gray('  media videos preview <asset-id>'));
         console.log('');
         console.log(chalk.yellow('Testing:'));
@@ -801,13 +900,30 @@ class MediaCommands {
      * Show video help
      */
     showVideoHelp() {
+        console.log('');
+        console.log(chalk.red.bold('╔══════════════════════════════════════════════════════════════════════════════╗'));
+        console.log(chalk.red.bold('║                    ⚠️  VIDEO GENERATION WARNING ⚠️                          ║'));
+        console.log(chalk.red.bold('╠══════════════════════════════════════════════════════════════════════════════╣'));
+        console.log(chalk.yellow.bold('║  🚨 UNTESTED & EXPENSIVE - USE AT YOUR OWN RISK 🚨                       ║'));
+        console.log(chalk.red.bold('╚══════════════════════════════════════════════════════════════════════════════╝'));
+        console.log('');
+        
         console.log(chalk.cyan('\n🎬 Video Generation Commands\n'));
         console.log(chalk.gray('Usage: media videos <command> [options]'));
         console.log('');
         console.log(chalk.yellow('Commands:'));
-        console.log(chalk.gray('  generate --image=<url> --prompt="desc"   Generate video from image'));
-        console.log(chalk.gray('  status <operation-id>                    Check generation status'));
-        console.log(chalk.gray('  preview <asset-id>                       Preview generated video'));
+        console.log(chalk.red.bold('  ⚠️  generate requires --force flag to proceed'));
+        console.log(chalk.gray('  generate --force --image=<url> --prompt="desc"   Generate video from image'));
+        console.log(chalk.gray('  status <operation-id>                            Check generation status'));
+        console.log(chalk.gray('  download <operation-id> [output-path]            Download completed video'));
+        console.log(chalk.gray('  preview <asset-id>                               Preview generated video'));
+        console.log('');
+        console.log(chalk.yellow('Examples:'));
+        console.log(chalk.gray('  media videos generate --force --image="https://example.com/img.jpg" --prompt="Cinematic scene"'));
+        console.log(chalk.gray('  media videos status operations/123456'));
+        console.log(chalk.gray('  media videos download operations/123456 ./output.mp4'));
+        console.log('');
+        console.log(chalk.red.bold('⚠️  REMINDER: Video generation is UNTESTED and may charge your API account.'));
         console.log('');
     }
 }
