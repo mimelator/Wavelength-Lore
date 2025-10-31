@@ -30,6 +30,7 @@ const BatchOperationsCommand = require('./commands/batch-operations');
 
 // Import steps
 const SongUploadStep = require('./steps/song-upload');
+const AssetExtractionStep = require('./steps/asset-extraction');
 
 class EpisodeCreatorCLI {
     constructor() {

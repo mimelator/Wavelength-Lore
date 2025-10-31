@@ -9,6 +9,7 @@
 
 const chalk = require('chalk');
 const FirebaseEpisodeService = require('../services/firebase-episode-service');
+const AssetExtractionService = require('../services/asset-extraction-service');
 
 class EpisodeCommands {
     constructor(cli) {
@@ -76,6 +77,12 @@ class EpisodeCommands {
                     
                 case 'validate':
                     await this.validateEpisode(commandArgs);
+                    break;
+                    
+                case 'extract':
+                case 'extract-assets':
+                case 'assets':
+                    await this.extractAssets(commandArgs);
                     break;
                     
                 case 'search':
@@ -477,6 +484,10 @@ class EpisodeCommands {
         console.log('  episodes search "text" - Search episode titles/descriptions');
         console.log('  episodes validate <id> [--check-images] - Validate episode');
         
+        console.log(chalk.green('\nAsset Extraction:'));
+        console.log('  episodes extract <id> - Extract navigation icons, badges, and game assets');
+        console.log('  episodes assets <id> - Alias for extract');
+        
         console.log(chalk.green('\nPublishing:'));
         console.log('  episodes publish <id> --status=published - Publish episode');
         console.log('  episodes publish <id> --status=draft - Unpublish episode');
@@ -486,6 +497,7 @@ class EpisodeCommands {
         console.log(chalk.gray('  episodes edit s4e9 --title="Battle of the Shire"'));
         console.log(chalk.gray('  episodes list --season=1 --published=false'));
         console.log(chalk.gray('  episodes clone s1e1 "Lucky Charm Remake"'));
+        console.log(chalk.gray('  episodes extract s5e1 - Extract assets from episode images'));
         
         console.log('');
     }
@@ -652,6 +664,74 @@ class EpisodeCommands {
         } else if (choice === '3') {
             console.log(chalk.blue('🔄 Syncing with file system...'));
             console.log(chalk.gray('This would scan the episode directory for new images'));
+        }
+    }
+
+    /**
+     * Extract assets for an episode
+     * @param {Array} args - Command arguments (episode ID)
+     */
+    async extractAssets(args) {
+        if (!args.length) {
+            console.log(chalk.red('❌ Episode ID is required'));
+            console.log(chalk.yellow('Usage: episodes extract <episode-id>'));
+            return;
+        }
+
+        const episodeId = args[0];
+
+        if (!this.episodeService) {
+            console.log(chalk.red('❌ Episode service not initialized'));
+            return;
+        }
+
+        try {
+            // Fetch episode data
+            const episode = await this.episodeService.getEpisodeById(episodeId);
+            
+            if (!episode) {
+                console.log(chalk.red(`❌ Episode not found: ${episodeId}`));
+                return;
+            }
+
+            console.log(chalk.cyan(`\n🎨 Extracting assets for: ${episode.title || episodeId}`));
+
+            // Get source images from episode
+            const sourceImages = episode.approvedImages || episode.images || episode.carouselImages || [];
+            
+            if (sourceImages.length === 0) {
+                console.log(chalk.yellow('⚠️  No images found in episode'));
+                console.log(chalk.gray('   Please add images to the episode first (via image generation or upload)'));
+                return;
+            }
+
+            console.log(chalk.gray(`Found ${sourceImages.length} image(s)`));
+
+            // Initialize asset extraction service
+            const assetService = new AssetExtractionService();
+
+            // Extract assets
+            const result = await assetService.extractEpisodeAssets({
+                episodeId,
+                season: episode.season,
+                episodeNumber: episode.episodeNumber || episode.episode,
+                sourceImages
+            });
+
+            if (result.success) {
+                console.log(chalk.green('\n✅ Asset extraction completed!'));
+                console.log(chalk.cyan(`\n📊 Summary:`));
+                console.log(chalk.gray(`   Navigation icons: ${result.manifest.assets.navigationIcons.length}`));
+                console.log(chalk.gray(`   Badges: ${result.manifest.assets.badges.length}`));
+                console.log(chalk.gray(`   Game assets: ${result.manifest.assets.gameAssets.length}`));
+                console.log(chalk.gray(`   Manifest path: ${result.manifestPath}`));
+            }
+
+        } catch (error) {
+            console.log(chalk.red(`❌ Asset extraction failed: ${error.message}`));
+            if (process.env.DEBUG) {
+                console.error(error.stack);
+            }
         }
     }
 }
