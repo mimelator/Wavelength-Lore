@@ -12,13 +12,24 @@ const axios = require('axios');
 const chalk = require('chalk');
 const FirebaseSongsService = require('../services/firebase-songs-service');
 
-// Get CDN URL from environment
-const CDN_URL = process.env.CDN_URL || 'https://df5sj8f594cdx.cloudfront.net';
+// Get CDN URL - prefer production, allow override with --local flag
+const USE_LOCAL = process.argv.includes('--local');
+const CDN_URL = USE_LOCAL 
+    ? (process.env.CDN_URL || 'http://localhost:3001')
+    : (process.env.CDN_URL || 'https://df5sj8f594cdx.cloudfront.net');
+
+// Production CDN for comparison
+const PROD_CDN_URL = 'https://df5sj8f594cdx.cloudfront.net';
 
 async function validateAllSongUrls() {
-    console.log(chalk.blue.bold('\n🎵 VALIDATING SONG URLs FROM FIREBASE\n'));
-    console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
-    console.log(chalk.gray(`CDN URL: ${CDN_URL}\n`));
+        console.log(chalk.blue.bold('\n🎵 VALIDATING SONG URLs FROM FIREBASE\n'));
+        console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+        if (USE_LOCAL) {
+            console.log(chalk.yellow(`⚠️  Testing against LOCALHOST: ${CDN_URL}\n`));
+            console.log(chalk.yellow(`   Use without --local flag to test production CDN\n`));
+        } else {
+            console.log(chalk.gray(`Testing against PRODUCTION CDN: ${CDN_URL}\n`));
+        }
 
     try {
         // Initialize Firebase Songs Service
@@ -40,7 +51,8 @@ async function validateAllSongUrls() {
             valid: [],
             invalid: [],
             missing: [],
-            errors: []
+            errors: [],
+            normalizedFormat: [] // Track URLs in old normalized format (S4E8.mp3)
         };
 
         // Validate each song URL
@@ -61,6 +73,21 @@ async function validateAllSongUrls() {
                     published: song.published
                 });
                 continue;
+            }
+
+            // Check for normalized format (incorrect pattern)
+            const isNormalizedFormat = song.url.match(/\/images\/seasons\/S\d+E\d+\.mp3$/);
+            if (isNormalizedFormat) {
+                console.log(chalk.yellow(`   ⚠️  Normalized format detected (should be full path)`));
+                results.normalizedFormat.push({
+                    id: songId,
+                    title: song.title,
+                    season: song.season,
+                    episode: song.episodeNumber || song.episode,
+                    url: song.url,
+                    published: song.published,
+                    expectedFormat: `/images/seasons/season${song.season}/episodes/episode${song.episodeNumber || song.episode}/${song.file || 'filename.mp3'}`
+                });
             }
 
             // Construct full URL
@@ -132,6 +159,7 @@ async function validateAllSongUrls() {
         console.log(chalk.green(`   ✅ Valid (200 OK): ${results.valid.length}`));
         console.log(chalk.red(`   ❌ Invalid (non-200): ${results.invalid.length}`));
         console.log(chalk.yellow(`   ⚠️  Missing URL field: ${results.missing.length}`));
+        console.log(chalk.yellow(`   🔧 Normalized format (needs fix): ${results.normalizedFormat.length}`));
         console.log(chalk.red(`   💥 Errors: ${results.errors.length}`));
         console.log(chalk.gray(`   ──────────────────────────────────────────────────────`));
         console.log(chalk.white(`   📋 Total: ${songs.length}\n`));
@@ -173,6 +201,20 @@ async function validateAllSongUrls() {
             });
         }
 
+        // Show normalized format URLs (these need to be fixed)
+        if (results.normalizedFormat.length > 0) {
+            console.log(chalk.yellow.bold('\n🔧 SONGS WITH NORMALIZED FORMAT (NEEDS FIX IN FIREBASE):\n'));
+            console.log(chalk.yellow('   These URLs use the old format /images/seasons/S{Season}E{Episode}.mp3\n'));
+            console.log(chalk.yellow('   Radio player expects: /images/seasons/season{N}/episodes/episode{N}/{filename}.mp3\n'));
+            results.normalizedFormat.forEach(song => {
+                console.log(chalk.yellow(`   ${song.id}: "${song.title}"`));
+                console.log(chalk.red(`      Current: ${song.url}`));
+                console.log(chalk.green(`      Expected: ${song.expectedFormat}`));
+                console.log(chalk.gray(`      Published: ${song.published}`));
+                console.log('');
+            });
+        }
+
         // Show valid URLs (if user wants to see them)
         if (results.valid.length > 0 && process.argv.includes('--show-valid')) {
             console.log(chalk.green.bold('\n✅ VALID URLs:\n'));
@@ -184,7 +226,7 @@ async function validateAllSongUrls() {
         }
 
         // Exit with error code if there are issues
-        if (results.invalid.length > 0 || results.missing.length > 0 || results.errors.length > 0) {
+        if (results.invalid.length > 0 || results.missing.length > 0 || results.errors.length > 0 || results.normalizedFormat.length > 0) {
             console.log(chalk.red.bold('\n⚠️  Validation completed with issues. Please fix the problems above.\n'));
             process.exit(1);
         } else {
