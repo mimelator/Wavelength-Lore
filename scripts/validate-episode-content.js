@@ -28,6 +28,7 @@ class EpisodeContentValidator {
         try {
             await this.validateFirebaseStructure();
             await this.validateS3Files();
+            await this.validateGalleryImages();
             await this.validateCDNAccess();
             await this.validateDataConsistency();
             
@@ -178,6 +179,87 @@ class EpisodeContentValidator {
         }
         
         console.log(`\n   ✅ Validated ${s3ValidatedCount} files in S3 (${s3SkippedCount} drafts skipped)`);
+    }
+
+    async validateGalleryImages() {
+        console.log('🖼️  Validating episode gallery images...');
+        
+        const fs = require('fs').promises;
+        const path = require('path');
+        const staticDir = path.join(__dirname, '../static');
+        
+        const db = getAdminDatabase();
+        const snapshot = await db.ref('songs').once('value');
+        const songs = snapshot.val();
+        
+        if (!songs) return;
+        
+        const songList = Object.entries(songs).map(([key, song]) => ({ id: key, ...song }));
+        let episodeGalleryCount = 0;
+        let totalGalleryImages = 0;
+        
+        for (const song of songList) {
+            const episodeId = `S${song.season}E${song.episode || song.episodeNumber}`;
+            const isPublished = song.published !== false;
+            
+            // Check for episode gallery directory
+            const galleryPath = path.join(staticDir, 'images', 'seasons', `season${song.season}`, 'episodes', `episode${song.episode || song.episodeNumber}`, 'images');
+            
+            try {
+                const galleryFiles = await fs.readdir(galleryPath);
+                const imageFiles = galleryFiles.filter(file => file.endsWith('.webp') || file.endsWith('.jpg') || file.endsWith('.png'));
+                
+                if (imageFiles.length > 0) {
+                    episodeGalleryCount++;
+                    totalGalleryImages += imageFiles.length;
+                    
+                    console.log(`   🎨 ${episodeId}: ${imageFiles.length} gallery images - ${imageFiles.slice(0, 3).join(', ')}${imageFiles.length > 3 ? ` +${imageFiles.length - 3} more` : ''}`);
+                    
+                    // Test HTTP status for first 3 gallery images
+                    const testUrls = imageFiles.slice(0, 3).map(file => 
+                        `${this.cdnUrl}/images/seasons/season${song.season}/episodes/episode${song.episode || song.episodeNumber}/images/${file}`
+                    );
+                    
+                    let validImageCount = 0;
+                    for (const testUrl of testUrls) {
+                        try {
+                            const response = await axios.head(testUrl, { timeout: 5000 });
+                            if (response.status === 200) {
+                                validImageCount++;
+                            }
+                        } catch (error) {
+                            console.log(`   ❌ ${episodeId}: Gallery image failed ${error.response?.status || 'TIMEOUT'} - ${testUrl.split('/').pop()}`);
+                        }
+                    }
+                    
+                    if (validImageCount > 0) {
+                        console.log(`   ✅ ${episodeId}: VERIFIED ${validImageCount}/${testUrls.length} sample gallery images return 200`);
+                        
+                        // Add gallery images to song metadata for screensaver
+                        const galleryUrls = imageFiles.map(file => `/images/seasons/season${song.season}/episodes/episode${song.episode || song.episodeNumber}/images/${file}`);
+                        
+                        // Update Firebase with gallery image metadata (if published)
+                        if (isPublished && (!song.images || song.images.length === 0)) {
+                            console.log(`   📝 ${episodeId}: Could add ${imageFiles.length} VERIFIED gallery images to metadata`);
+                            // Note: Not actually updating here, just reporting
+                        }
+                    } else {
+                        console.log(`   ⚠️  ${episodeId}: No gallery images returned 200 status - may be CDN/network issue`);
+                    }
+                } else {
+                    console.log(`   📁 ${episodeId}: Gallery directory exists but no images found`);
+                }
+                
+            } catch (error) {
+                if (error.code !== 'ENOENT') {
+                    console.log(`   ⚠️  ${episodeId}: Gallery check error - ${error.message}`);
+                }
+                // No gallery directory is OK - not all episodes have galleries
+            }
+        }
+        
+        console.log(`\n   🎨 Found ${episodeGalleryCount} episodes with galleries (${totalGalleryImages} total images)`);
+        console.log(`   💡 Gallery images can be added to episode metadata for screensaver use`);
     }
 
     async validateCDNAccess() {

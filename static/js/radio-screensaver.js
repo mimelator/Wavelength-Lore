@@ -374,44 +374,27 @@ class RadioScreenSaver {
     }
 
     addEpisodeImages(track) {
-        // Try to load images from episode directory structure
-        const season = track.season;
-        const episode = track.episodeNumber;
+        // ONLY USE METADATA - NO GUESSING OR PATTERNS
         
-        // Default images that should exist for most episodes
-        const potentialImages = [
-            `/images/seasons/season${season}/episodes/episode${episode}/image.webp`,
-            `/images/seasons/season${season}/image.webp`
-        ];
+        // Check for episodeImage field in track metadata
+        if (track.episodeImage) {
+            this.images.push(this.radio.cdnUrl + track.episodeImage);
+            console.log(`🎨 Added episodeImage from metadata: ${track.episodeImage}`);
+        }
         
-        // Add these base images
-        potentialImages.forEach(imagePath => {
-            this.images.push(imagePath);
-        });
+        // Check for images array in track metadata
+        if (track.images && Array.isArray(track.images)) {
+            track.images.forEach(img => {
+                this.images.push(this.radio.cdnUrl + img);
+            });
+            console.log(`🎨 Added ${track.images.length} images from metadata array`);
+        }
         
-        // Also try to load from the images/ subdirectory
-        // These are the gallery images we found
-        const episodeImagePatterns = [
-            'MyLuckyCharm', 'JumpRightIn', 'DreamWithMe', 'Daphne', 'Falling', 
-            'OnceMore', 'HistoryLessons', 'LifeInTheShire', 'FeedTheCrows', 'KeepOn', 
-            'BackToTheShire', 'GoblinKing', 'Psychopath', 'Countdown', 'AMiseryOfGoblins',
-            'SlowTime', 'YouWontSeeItComing', 'SayGoodbyeToTheShire', 'IceFortress',
-            'TheIceWhales', 'SneakAttack', 'FrozenPeace', 'RebuildTheShire', 
-            'WereComingForYou', 'PrepareForBattle', 'LockedAndLoaded', 'TheKingHasFled',
-            'GoblinsRule', 'IceBlueGreed', 'TheShireFortress', 'BattleOfTheShire',
-            'SongOfMourning', 'TheShireDream'
-        ];
-        
-        // Try to find images that match episode patterns
-        episodeImagePatterns.forEach(pattern => {
-            for (let i = 1; i <= 20; i++) {
-                const paddedNum = i.toString().padStart(2, '0');
-                const imagePath = `/images/seasons/season${season}/episodes/episode${episode}/images/${pattern}-${paddedNum}.webp`;
-                this.images.push(imagePath);
-            }
-        });
-        
-        console.log(`🎨 Added potential images for S${season}E${episode}: ${track.title}`);
+        // If no metadata images, use fallback image (wavelength default)
+        if (!track.episodeImage && (!track.images || track.images.length === 0)) {
+            this.images.push('/images/wavelength-og-default.webp');
+            console.log(`🎨 No metadata images for S${track.season}E${track.episodeNumber}, using default fallback`);
+        }
     }
 
     exit() {
