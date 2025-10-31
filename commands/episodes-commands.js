@@ -835,7 +835,7 @@ class EpisodeCommands {
      * Interactive workflow to select source image from any gallery
      */
     async selectSourceImageAndEpisode() {
-        const { fetchDataAsAdmin } = require('../services/firebase-admin-utils');
+        const { fetchDataAsAdmin } = require('../helpers/firebase-admin-utils');
         const loreHelpers = require('../utils/lore-helpers');
 
         console.log(chalk.cyan('\n🎨 Asset Extraction from Gallery'));
