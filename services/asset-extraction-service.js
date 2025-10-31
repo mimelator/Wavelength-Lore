@@ -28,6 +28,11 @@ class AssetExtractionService {
         this.s3Bucket = process.env.S3_BUCKET_NAME || 'wavelength-lore-bucket';
         this.cdnUrl = process.env.CDN_URL || 'https://df5sj8f594cdx.cloudfront.net';
         
+        // AI Enhancement Options
+        this.useAIEnhancement = options.useAIEnhancement !== false; // Default: enabled if available
+        this.characterExtractor = null;
+        this.initAIExtractor();
+        
         // Asset type specifications
         this.assetSpecs = {
             navigationIcons: [
@@ -45,6 +50,157 @@ class AssetExtractionService {
                 { type: "ui-element", size: "variable", format: "png" }
             ]
         };
+    }
+
+    /**
+     * Initialize AI-powered character extractor (optional enhancement)
+     */
+    initAIExtractor() {
+        try {
+            const CharacterExtractor = require('../wavelength-tools/character-extractor/CharacterExtractor');
+            // Only initialize if OpenAI API key is available
+            if (!process.env.OPENAI_API_KEY) {
+                console.log(chalk.yellow('⚠️  AI enhancement disabled (OPENAI_API_KEY not set)'));
+                this.useAIEnhancement = false;
+                return;
+            }
+            this.characterExtractor = new CharacterExtractor({ verbose: false });
+            console.log(chalk.green('✅ AI Character Extractor initialized (enhanced extraction enabled)'));
+        } catch (error) {
+            console.log(chalk.yellow('⚠️  AI Character Extractor not available (optional)'));
+            console.log(chalk.gray('   Install rembg: pip install rembg'));
+            console.log(chalk.gray('   Set OPENAI_API_KEY for Vision API features'));
+            this.useAIEnhancement = false;
+        }
+    }
+
+    /**
+     * Parse confidence string to number
+     */
+    parseConfidence(confidence) {
+        if (typeof confidence === 'number') return confidence;
+        if (typeof confidence === 'string') {
+            const lower = confidence.toLowerCase();
+            if (lower === 'high') return 0.9;
+            if (lower === 'medium') return 0.7;
+            if (lower === 'low') return 0.5;
+        }
+        return 0.5;
+    }
+
+    /**
+     * Use AI to detect the best region for extraction
+     * Falls back to center crop if AI is unavailable
+     */
+    async detectBestRegion(imageBuffer, description = 'main subject') {
+        if (!this.useAIEnhancement || !this.characterExtractor) {
+            // Fallback: return center region
+            const metadata = await sharp(imageBuffer).metadata();
+            return {
+                x: Math.floor(metadata.width * 0.25),
+                y: Math.floor(metadata.height * 0.25),
+                width: Math.floor(metadata.width * 0.5),
+                height: Math.floor(metadata.height * 0.5),
+                confidence: 0.5,
+                method: 'center-fallback'
+            };
+        }
+
+        try {
+            // Save buffer to temp file for CharacterExtractor
+            const os = require('os');
+            const tempPath = path.join(os.tmpdir(), `temp-image-${Date.now()}.png`);
+            await fs.writeFile(tempPath, imageBuffer);
+
+            // Use AI to detect best region
+            const { detection } = await this.characterExtractor.detectCharacter(tempPath, description);
+            
+            // Clean up temp file
+            await fs.unlink(tempPath).catch(() => {});
+
+            // Convert percentage-based bounding box to pixel coordinates
+            const metadata = await sharp(imageBuffer).metadata();
+            const boundingBox = detection.boundingBox;
+            
+            return {
+                x: Math.round((boundingBox.x / 100) * metadata.width),
+                y: Math.round((boundingBox.y / 100) * metadata.height),
+                width: Math.round((boundingBox.width / 100) * metadata.width),
+                height: Math.round((boundingBox.height / 100) * metadata.height),
+                confidence: this.parseConfidence(detection.confidence),
+                method: 'ai-vision'
+            };
+        } catch (error) {
+            console.log(chalk.yellow(`   ⚠️  AI detection failed: ${error.message}, using center crop`));
+            // Fallback to center
+            const metadata = await sharp(imageBuffer).metadata();
+            return {
+                x: Math.floor(metadata.width * 0.25),
+                y: Math.floor(metadata.height * 0.25),
+                width: Math.floor(metadata.width * 0.5),
+                height: Math.floor(metadata.height * 0.5),
+                confidence: 0.5,
+                method: 'center-fallback'
+            };
+        }
+    }
+
+    /**
+     * Extract sprite with AI-powered background removal (optional)
+     */
+    async extractSpriteWithAI(imageBuffer, imageUrl, targetSize, outputFormat = 'png') {
+        if (!this.useAIEnhancement || !this.characterExtractor) {
+            // Fallback to simple resize
+            const [width, height] = targetSize.split('x').map(Number);
+            return await sharp(imageBuffer)
+                .resize(width, height, { fit: 'cover', position: 'center' })
+                .toFormat(outputFormat)
+                .toBuffer();
+        }
+
+        try {
+            // Save buffer to temp file
+            const os = require('os');
+            const tempInputPath = path.join(os.tmpdir(), `temp-input-${Date.now()}.png`);
+            const tempOutputPath = path.join(os.tmpdir(), `temp-output-${Date.now()}.png`);
+            
+            await fs.writeFile(tempInputPath, imageBuffer);
+
+            // Extract character with background removal
+            const result = await this.characterExtractor.extractCharacter({
+                imagePath: tempInputPath,
+                description: 'main character or subject',
+                outputFilename: path.basename(tempOutputPath),
+                characterId: 'sprite-extraction',
+                crop: false // Don't crop, just remove background
+            });
+
+            if (!result.success) {
+                throw new Error(result.error || 'AI extraction failed');
+            }
+
+            // Load the transparent PNG and resize to target size
+            const [width, height] = targetSize.split('x').map(Number);
+            const transparentBuffer = await fs.readFile(result.outputPath);
+            const resizedBuffer = await sharp(transparentBuffer)
+                .resize(width, height, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+                .toFormat(outputFormat)
+                .toBuffer();
+
+            // Clean up temp files
+            await fs.unlink(tempInputPath).catch(() => {});
+            await fs.unlink(tempOutputPath).catch(() => {});
+
+            return resizedBuffer;
+        } catch (error) {
+            console.log(chalk.yellow(`   ⚠️  AI sprite extraction failed: ${error.message}, using standard resize`));
+            // Fallback to simple resize
+            const [width, height] = targetSize.split('x').map(Number);
+            return await sharp(imageBuffer)
+                .resize(width, height, { fit: 'cover', position: 'center' })
+                .toFormat(outputFormat)
+                .toBuffer();
+        }
     }
 
     /**
@@ -66,6 +222,11 @@ class AssetExtractionService {
         console.log(chalk.cyan('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
         console.log(chalk.gray(`Episode: S${season}E${episodeNumber} (${episodeId})`));
         console.log(chalk.gray(`Source images: ${sourceImages.length}`));
+        if (this.useAIEnhancement && this.characterExtractor) {
+            console.log(chalk.cyan('🤖 AI Enhancement: ENABLED (smart region detection & background removal)'));
+        } else {
+            console.log(chalk.gray('🤖 AI Enhancement: Disabled (using standard extraction)'));
+        }
         if (skipUpload) {
             console.log(chalk.yellow('⚠️  Preview mode: Assets will NOT be uploaded until approved'));
         }
@@ -268,13 +429,41 @@ class AssetExtractionService {
 
                 // Download and process image
                 const imageBuffer = await this.loadImage(sourceImage);
-                const processedBuffer = await sharp(imageBuffer)
-                    .resize(width, height, {
-                        fit: 'cover',
-                        position: 'center'
-                    })
-                    .toFormat(spec.format)
-                    .toBuffer();
+                
+                // Use AI to detect best region for icon (optional enhancement)
+                let processedBuffer;
+                if (this.useAIEnhancement && this.characterExtractor) {
+                    const region = await this.detectBestRegion(imageBuffer, 'main subject or focal point');
+                    if (region.method === 'ai-vision' && region.confidence > 0.6) {
+                        console.log(chalk.cyan(`   🤖 AI detected best region (confidence: ${(region.confidence * 100).toFixed(0)}%)`));
+                        // Crop to AI-detected region, then resize
+                        processedBuffer = await sharp(imageBuffer)
+                            .extract({
+                                left: region.x,
+                                top: region.y,
+                                width: Math.min(region.width, (await sharp(imageBuffer).metadata()).width - region.x),
+                                height: Math.min(region.height, (await sharp(imageBuffer).metadata()).height - region.y)
+                            })
+                            .resize(width, height, { fit: 'cover' })
+                            .toFormat(spec.format)
+                            .toBuffer();
+                    } else {
+                        // AI confidence too low, use center crop
+                        processedBuffer = await sharp(imageBuffer)
+                            .resize(width, height, { fit: 'cover', position: 'center' })
+                            .toFormat(spec.format)
+                            .toBuffer();
+                    }
+                } else {
+                    // Standard center crop
+                    processedBuffer = await sharp(imageBuffer)
+                        .resize(width, height, {
+                            fit: 'cover',
+                            position: 'center'
+                        })
+                        .toFormat(spec.format)
+                        .toBuffer();
+                }
 
                 const iconData = {
                     id: `icon-${spec.size}-${Date.now()}`,
@@ -331,17 +520,52 @@ class AssetExtractionService {
                 // Download and process image
                 const imageBuffer = await this.loadImage(sourceImage);
                 
-                // For badges, we want square aspect ratio and centered crop
-                const processedBuffer = await sharp(imageBuffer)
-                    .resize(width, height, {
-                        fit: 'cover',
-                        position: 'center'
-                    })
-                    .toFormat(spec.format === 'webp' ? 'webp' : 'png', {
-                        quality: spec.format === 'webp' ? 90 : 100,
-                        compressionLevel: 9
-                    })
-                    .toBuffer();
+                // Use AI to detect best region for badge (optional enhancement)
+                let processedBuffer;
+                if (this.useAIEnhancement && this.characterExtractor) {
+                    const region = await this.detectBestRegion(imageBuffer, 'main subject or focal point for badge');
+                    if (region.method === 'ai-vision' && region.confidence > 0.6) {
+                        console.log(chalk.cyan(`   🤖 AI detected best region for badge (confidence: ${(region.confidence * 100).toFixed(0)}%)`));
+                        // Crop to AI-detected region, then resize
+                        processedBuffer = await sharp(imageBuffer)
+                            .extract({
+                                left: region.x,
+                                top: region.y,
+                                width: Math.min(region.width, (await sharp(imageBuffer).metadata()).width - region.x),
+                                height: Math.min(region.height, (await sharp(imageBuffer).metadata()).height - region.y)
+                            })
+                            .resize(width, height, { fit: 'cover' })
+                            .toFormat(spec.format === 'webp' ? 'webp' : 'png', {
+                                quality: spec.format === 'webp' ? 90 : 100,
+                                compressionLevel: 9
+                            })
+                            .toBuffer();
+                    } else {
+                        // AI confidence too low, use center crop
+                        processedBuffer = await sharp(imageBuffer)
+                            .resize(width, height, {
+                                fit: 'cover',
+                                position: 'center'
+                            })
+                            .toFormat(spec.format === 'webp' ? 'webp' : 'png', {
+                                quality: spec.format === 'webp' ? 90 : 100,
+                                compressionLevel: 9
+                            })
+                            .toBuffer();
+                    }
+                } else {
+                    // Standard center crop for badges
+                    processedBuffer = await sharp(imageBuffer)
+                        .resize(width, height, {
+                            fit: 'cover',
+                            position: 'center'
+                        })
+                        .toFormat(spec.format === 'webp' ? 'webp' : 'png', {
+                            quality: spec.format === 'webp' ? 90 : 100,
+                            compressionLevel: 9
+                        })
+                        .toBuffer();
+                }
 
                 const badgeData = {
                     id: `badge-${spec.size}-${Date.now()}`,
@@ -402,13 +626,22 @@ class AssetExtractionService {
                 console.log(chalk.gray(`   Extracting sprite ${i + 1}/${imagesToProcess.length}...`));
 
                 const imageBuffer = await this.loadImage(sourceImage);
-                const processedBuffer = await sharp(imageBuffer)
-                    .resize(width, height, {
-                        fit: 'cover',
-                        position: 'center'
-                    })
-                    .toFormat(spriteSpec.format)
-                    .toBuffer();
+                
+                // Use AI-powered extraction if available (transparent background)
+                let processedBuffer;
+                if (this.useAIEnhancement && this.characterExtractor) {
+                    console.log(chalk.cyan(`   🤖 Using AI to extract sprite with transparent background...`));
+                    processedBuffer = await this.extractSpriteWithAI(imageBuffer, sourceImage, spriteSpec.size, spriteSpec.format);
+                } else {
+                    // Standard resize with center crop
+                    processedBuffer = await sharp(imageBuffer)
+                        .resize(width, height, {
+                            fit: 'cover',
+                            position: 'center'
+                        })
+                        .toFormat(spriteSpec.format)
+                        .toBuffer();
+                }
 
                 const spriteData = {
                     id: `sprite-${i + 1}-${Date.now()}`,
