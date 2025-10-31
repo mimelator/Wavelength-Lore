@@ -1093,21 +1093,31 @@ class WavelengthRadio {
         const toggle = document.getElementById('radioGameToggle');
         const closeBtn = document.getElementById('closeGameBtn');
 
+        // Only bind if we're on a page with the widget (not the full radio player page)
+        // Check if we're on the full radio player page by looking for full player elements
+        const isFullPlayerPage = document.getElementById('radioPlayer') && 
+                                 document.querySelector('.radio-container');
+        
         if (toggle) {
             toggle.addEventListener('click', () => this.toggleWidget());
             console.log('🎵 Radio widget toggle bound successfully');
-        } else {
-            console.warn('🚫 Radio widget toggle element not found');
+        } else if (!isFullPlayerPage) {
+            // Only warn if we're not on the full radio player page (where widget doesn't exist)
+            // This prevents unnecessary warnings on /radio page
+            console.warn('🚫 Radio widget toggle element not found (expected on /radio page)');
         }
+        // On full player page, widget toggle doesn't exist - that's expected, so no warning
 
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this.hideWidget());
         }
 
-        // Initialize widget state
-        this.isWidgetActive = localStorage.getItem('global_radio_game_active') === 'true';
-        if (this.isWidgetActive) {
-            this.showWidget();
+        // Only initialize widget state if we have the widget elements
+        if (toggle || closeBtn) {
+            this.isWidgetActive = localStorage.getItem('global_radio_game_active') === 'true';
+            if (this.isWidgetActive) {
+                this.showWidget();
+            }
         }
     }
 
