@@ -2312,24 +2312,21 @@
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-/* Neon green horseshoe in profile stats */
+/* Green glowing horseshoe in profile stats - preserves horseshoe visibility */
 .game-stat-item:nth-child(3) .game-stat-icon {
-    filter: drop-shadow(0 0 6px #00ff00)
-            drop-shadow(0 0 12px #39ff14)
-            brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg) !important;
-    animation: neonGreenPulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 4px #00ff00)
+            drop-shadow(0 0 8px #39ff14) !important;
+    animation: horshoeGlow 2s ease-in-out infinite;
 }
 
-@keyframes neonGreenPulse {
+@keyframes horshoeGlow {
     0%, 100% {
-        filter: drop-shadow(0 0 6px #00ff00)
-                drop-shadow(0 0 12px #39ff14)
-                brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg);
+        filter: drop-shadow(0 0 4px #00ff00)
+                drop-shadow(0 0 8px #39ff14);
     }
     50% {
-        filter: drop-shadow(0 0 8px #00ff00)
-                drop-shadow(0 0 15px #39ff14)
-                brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg);
+        filter: drop-shadow(0 0 6px #00ff00)
+                drop-shadow(0 0 12px #39ff14);
     }
 }
 

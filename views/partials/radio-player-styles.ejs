@@ -269,17 +269,16 @@
     text-decoration: underline;
   }
 
-  /* Neon green horseshoe styling */
+  /* Green glowing horseshoe styling - preserves horseshoe visibility */
   .game-stat-mini:nth-child(3) .stat-icon {
-    filter: drop-shadow(0 0 6px #00ff00)
-            drop-shadow(0 0 12px #39ff14)
-            brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg);
-    animation: neonGreenPulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 4px #00ff00)
+            drop-shadow(0 0 8px #39ff14);
+    animation: horshoeGlow 2s ease-in-out infinite;
   }
 
-  @keyframes neonGreenPulse {
-    0%, 100% { filter: drop-shadow(0 0 6px #00ff00) drop-shadow(0 0 12px #39ff14) brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg); }
-    50% { filter: drop-shadow(0 0 10px #00ff00) drop-shadow(0 0 20px #39ff14) brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(10000%) hue-rotate(90deg); }
+  @keyframes horshoeGlow {
+    0%, 100% { filter: drop-shadow(0 0 4px #00ff00) drop-shadow(0 0 8px #39ff14); }
+    50% { filter: drop-shadow(0 0 6px #00ff00) drop-shadow(0 0 12px #39ff14); }
   }
 
   /* Mobile responsive */
