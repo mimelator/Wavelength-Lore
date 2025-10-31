@@ -1,0 +1,842 @@
+{
+  "characters": {
+    "alex": {
+      "contentId": "alex",
+      "filePath": "wavelength/alex.md",
+      "prompts": {
+        "default": [],
+        "versions": {
+          "1": [
+            "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a free spirited quarter-elf lady bows her violin that radiates vivid energy waves.\n\nShe is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks"
+          ],
+          "2": [
+            "A hyper-detailed, photorealistic spring forest at golden hour opens into a surreal field bathed in streaming golden light through towering oaks. At the center stands a tall, athletic, and graceful quarter-elf lady with sandy brown hair, draped in a pale lavender skirt.\n\nShe bows her violin passionately, sending out vivid energy waves that ripple through the air. The vibrant landscape is dotted with quaint halfling houses, each with smoking chimneys, while tree trunks are carved with glowing bioluminescent mushrooms, perched crows, and horseshoe lucky charms.\n\nRich natural textures, dynamic lighting, and atmospheric haze capture the enchanting, magical moment as sunbeams filter through the canopy, illuminating every detail and infusing the scene with a sense of wonder and serene energy."
+          ]
+        },
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "character",
+        "item": {
+          "id": "alex",
+          "title": "Alexandria",
+          "name": "Alexandria",
+          "keywords": [
+            "Alex",
+            "The Daughter",
+            "Quarter Elf",
+            "Music Teacher",
+            "Young Teacher"
+          ],
+          "url": "/character/alex"
+        },
+        "contentId": "alex",
+        "confidence": "high"
+      },
+      "importedAt": "2025-10-31T13:26:41.834Z"
+    },
+    "andrew": {
+      "contentId": "andrew",
+      "filePath": "wavelength/andrew.md",
+      "prompts": {
+        "default": [],
+        "versions": {
+          "1": [
+            "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.\n\nHe is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks"
+          ],
+          "2": [
+            "A hyper-detailed, photorealistic spring forest at golden hour opens to a surreal field where a half-elf with human ears and long snow white hair passionately sings into a modern microphone.\n\nHe strums a glowing lute-guitar, pulsing with vivid energy waves, his lavender eyes illuminated. He wears a long tunic with an upturned collar and a crow pin. Behind him, quaint halfling houses with smoking chimneys dot the rolling grass.\n\nTowering oaks arch overhead, their trunks carved with glowing bioluminescent mushrooms, perched crows, and a horseshoe lucky charm. Streaming golden sunlight pierces the canopy, bathing the fantastical landscape in radiant warmth and brilliant atmosphere."
+          ]
+        },
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "character",
+        "item": {
+          "id": "andrew",
+          "title": "Prince Andrew",
+          "name": "Prince Andrew",
+          "keywords": [
+            "The Prince",
+            "The Leader",
+            "Andrew",
+            "Band Leader",
+            "Father",
+            "Husband"
+          ],
+          "url": "/character/andrew"
+        },
+        "contentId": "andrew",
+        "confidence": "high"
+      },
+      "importedAt": "2025-10-31T13:26:41.834Z"
+    },
+    "daphne": {
+      "contentId": "daphne",
+      "filePath": "wavelength/daphne.md",
+      "prompts": {
+        "default": [],
+        "versions": {
+          "1": [
+            "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a Fiery Red Headed Girl with a black patch over her left eye is furiously drumming at a bright red drum kit.  Radiant Sparks of energy fly off the cymbals, and the drum heads seem to be slightly on fire with blue flames.\n\nOn her other eye, she wears heavy eyeliner to accentuate her mood.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks"
+          ],
+          "2": [
+            "A hyper-detailed, photorealistic spring forest at golden hour morphs into a surreal open field framed by streaming golden light rays cutting through towering oaks.\n\nAt the center, a fiery red-headed girl with a black patch over her left eye and dramatic heavy eyeliner on the other furiously drums at a vivid red drum kit, blue flames curling over fiery drum heads.\n\nRadiant sparks erupt from the cymbals, illuminating her intense expression. The surrounding landscape is dotted with quaint halfling houses featuring smoking chimneys, while tree trunks glow with carved bioluminescent mushrooms, perched black crows, and lucky horseshoes.\n\nThe scene fuses magical realism with raw musical energy, the photorealism capturing every spark, flame, and forest detail with cinematic lighting effects."
+          ]
+        },
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "character",
+        "item": {
+          "id": "daphne",
+          "title": "Daphne",
+          "name": "Daphne",
+          "keywords": [
+            "The Prodigy",
+            "Drummer Girl",
+            "Orphan",
+            "New Drummer",
+            "Choir Master's Daughter"
+          ],
+          "url": "/character/daphne"
+        },
+        "contentId": "daphne",
+        "confidence": "high"
+      },
+      "importedAt": "2025-10-31T13:26:41.834Z"
+    },
+    "eloquence": {
+      "contentId": "eloquence",
+      "filePath": "wavelength/eloquence.md",
+      "prompts": {
+        "default": [],
+        "versions": {
+          "1": [
+            "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. \n\nHis hair is just long enough to cover the back of his neck and reaches one of his eyes.\nHe wears a plaid kilt.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks"
+          ],
+          "2": [
+            "In a hyper-detailed, photorealistic spring forest illuminated by streaming golden hour light, the scene transitions into an expansive, surreal open field.\n\nAt the center stands a tall, sandy-haired teenage boy with hair just long enough to cover the back of his neck and obscuring one of his eyes. He is intensely plucking the strings of an upright bass, fingers blurred in motion. He wears a plaid kilt.\n\nAll around, charming halfling houses with mossy roofs and smoking chimneys nestle beneath towering oaks. Tree trunks are carved with glowing bioluminescent mushrooms, perched crows, and an embedded lucky charm horseshoe.\n\nShafts of brilliant sunlight filter through dense foliage, creating a magical atmosphere that blends fantasy and realism. The lush greenery, intricate textures, and luminous effects evoke a vivid, cinematic landscape teeming with whimsical detail and musical energy."
+          ]
+        },
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "character",
+        "item": {
+          "id": "eloquence",
+          "title": "Eloquence",
+          "name": "Eloquence",
+          "keywords": [
+            "The Son",
+            "Bass Player",
+            "Quarter Elf",
+            "Rhythm Expert",
+            "Best Friend"
+          ],
+          "url": "/character/eloquence"
+        },
+        "contentId": "eloquence",
+        "confidence": "high"
+      },
+      "importedAt": "2025-10-31T13:26:41.835Z"
+    },
+    "jewel": {
+      "contentId": "jewel",
+      "filePath": "wavelength/jewel.md",
+      "prompts": {
+        "default": [],
+        "versions": {
+          "1": [
+            "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a regal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.\n\nThe wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.\n\nShe has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks"
+          ],
+          "2": [
+            "A hyper-detailed, photorealistic spring forest at golden hour transitions into a surreal open field. At the center, a regal half-elf woman with faintly glowing green eyes, short pointed ears, and long golden braids sits gracefully on an elegant stool, plucking a full-sized luminous harp.\n\nThe wooden harp is adorned with sparkling jewel inlays that catch the sunlight, casting radiant prisms and vivid energy waves. She wears a flowing elegant dress and a delicate tiara. All around, quaint halfling houses nestle among towering oaks, their smoking chimneys curling into the warm light.\n\nTree trunks are decorated with carved horseshoe charms, clusters of glowing bioluminescent mushrooms, and perched crows. Streaming golden rays filter through the ancient canopy, illuminating intricate natural textures and magical details in this enchanting and cinematic fantasy landscape."
+          ]
+        },
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "character",
+        "item": {
+          "id": "jewel",
+          "title": "Jewel",
+          "name": "Jewel",
+          "keywords": [
+            "Princess Jewel",
+            "Half Elf",
+            "Musical Talent",
+            "Mother",
+            "Wife",
+            "The Princess"
+          ],
+          "url": "/character/jewel"
+        },
+        "contentId": "jewel",
+        "confidence": "high"
+      },
+      "importedAt": "2025-10-31T13:26:41.835Z"
+    },
+    "lucky": {
+      "contentId": "lucky",
+      "filePath": "wavelength/lucky.md",
+      "prompts": {
+        "default": [],
+        "versions": {
+          "1": [
+            "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, \nAlong a sparkling stream, a tiny leprechaun with a WHITE BEARD and a small golden hoop earing fishes beneath a spectral rainbow as swirling sprites and fairies dance with glowing ribbons. Cinematic spotlights, blue snowlight, and vibrant neon highlights ignite every magical detail of this fantastical forest scene.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks"
+          ]
+        },
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "character",
+        "item": {
+          "id": "lucky",
+          "title": "Lucky",
+          "name": "Lucky",
+          "keywords": [
+            "The Leprechaun",
+            "Wise Elder",
+            "Golden Advice",
+            "Fisher",
+            "Token of Luck",
+            "Singing Fisherman"
+          ],
+          "url": "/character/lucky"
+        },
+        "contentId": "lucky",
+        "confidence": "high"
+      },
+      "importedAt": "2025-10-31T13:26:41.836Z"
+    },
+    "maurice": {
+      "contentId": "maurice",
+      "filePath": "wavelength/maurice.md",
+      "prompts": {
+        "default": [],
+        "versions": {
+          "1": [
+            "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, \nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy. He wears a tie-dye kilt\n\n\nCinematic spotlights, blue snowlight, and vibrant neon highlights ignite every magical detail of this fantastical forest scene.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks"
+          ]
+        },
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "character",
+        "item": {
+          "id": "maurice",
+          "title": "Maurice",
+          "name": "Maurice",
+          "keywords": [
+            "The Merchant",
+            "Percussion Wizard",
+            "Magical Maurice",
+            "The Dwarf",
+            "Big Brother",
+            "Fallen Hero"
+          ],
+          "url": "/character/maurice"
+        },
+        "contentId": "maurice",
+        "confidence": "high"
+      },
+      "importedAt": "2025-10-31T13:26:41.836Z"
+    },
+    "yeti": {
+      "contentId": "yeti",
+      "filePath": "wavelength/yeti.md",
+      "prompts": {
+        "default": [],
+        "versions": {
+          "1": [
+            "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, \nstands a ferocious looking YETI that wears an efficient Nurse's hat, and has a first aid kit in one of his massive hands. \n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks"
+          ],
+          "2": [
+            "A hyper-detailed, photorealistic spring forest at golden hour seamlessly transitions into a surreal open field. At the center stands a ferocious-looking yeti adorned with an efficient nurse's hat, clutching a first aid kit in one massive hand.\n\nThe verdant landscape is dotted with quaint halfling houses, each with mossy roofs and smoking stone chimneys. Towering oaks cast streaming golden light rays, their bark intricately carved and adorned with glowing bioluminescent mushrooms, perched crows, and a lucky charm horseshoe.\n\nCrisp, radiant sunlight and atmospheric mist illuminate fine textures across foliage, fur, and fantasy architecture, evoking magical realism."
+          ]
+        },
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "character",
+        "item": {
+          "id": "yeti",
+          "title": "Yeti",
+          "name": "Yeti",
+          "keywords": [
+            "Ice Beast",
+            "The Nurse",
+            "Clumsy Giant",
+            "Ice Castle Guardian",
+            "Ferocious Healer"
+          ],
+          "url": "/character/yeti"
+        },
+        "contentId": "yeti",
+        "confidence": "high"
+      },
+      "importedAt": "2025-10-31T13:26:41.836Z"
+    }
+  },
+  "locations": {},
+  "lore": {},
+  "unmatched": [
+    {
+      "contentId": "daphne-flower",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field.\n\na few daphne flowers are scattered around the halfling's settlement.  It seems to be emitting a visible fragrance that is attracting bees and other magical pollinators.  A halfling walks up to a daphne and inhales deeply with a dreamy expression on his face.\n\nAt another group of daphne flowers, a group of halflings are busy investigating and enjoying the intoxicating scent of the daphne blossoms.  There should be little radiant power lines oscillating away from the daphne flowers in all different colors and directions.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks"
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "daphne-flower",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.820Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "jewel-singing",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "A hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a regal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.  She is serenading the crows and there are waves of soft energy showing as a neon oscillating glow emanating from her.\n\nThe wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.\n\nShe has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks"
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "jewel-singing",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "locations-burial-bonfire-at-the-shire",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "A photorealistic scene of a concert at a large solemn bonfire.  Surrounding the bonfire are a large circle of stones that have bioluminescent mushrooms and glowing crows carved into them.\n\nNext to the Bonfire, on an improvised stage, there is a band of musicians performing.\n\nAt center stage, a half-elf singer with human ears, long snow white hair, glowing lavender eyes, and a crow pin on his upturned-collar tunic passionately sings into a modern microphone while strumming a luminous lute-guitar that radiates vivid, prismatic waves of energy.\n\nBeside him, a regal half-elf woman with a tiara and long golden braids plays a jewel-encrusted, radiant harp, her faintly glowing green eyes serene above her elegant dress. A tall, athletic quarter-elf woman in a pale lavender skirt bows her energy-laced violin, sandy brown hair flowing; next, a sandy-haired teenage boy intensely plucks an upright bass.\n\nFuriously drumming a blazing blue-flamed kit is a fiery redhead girl with a black eye patch, heavy eyeliner, and sparks flying from cymbals. \n\n\nThe rapt audience of halflings and woodland animals—rabbits, raccoons, squirrels, foxes, chipmunks—mix among luminous crows and fluttering forest faeries under the mossy arch.\n\nThe crowd gathered around the bonfire is full of halflings and woodland creatures including: rabbits, raccoons, squirrels, foxes and chipmunks.  There are glowing crows and forest faeries amongst the audience of the performance.\n\nA YETI and a leprechaun are standing next to each other and the leprechaun has his hat held in his hands.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "locations-burial-bonfire-at-the-shire",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "locations-campsite-towards-the-shire",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "A photorealistic staging campsite that hosts an impromptu surreal neon-lit concert stage next to a large community campfire where the audience is camping out. The Concert stage is a hastily constructed wooden stage that allow the audience to see the performers.  It is set on a high plains grasslands with a long range of tall, white mountains in the background.\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy.  He wears a tie-dye kilt\n\nThe audience includes many small animals like: rabbits, raccoons, squirrels, foxes and chipmunks.\nAlso included are more fantastical creatures like a happy yeti, forest fairies and a leprechaun.  The audience members all have either helmets of war, or spears, or knives, or bows and arrows as they are having a final meeting before battle.\n\nThe Stars twinkle at night and one shooting star streaks aross the sky high in the night above the stage.\n\nA leprechaun attempts to fish out of a small creek that runs next to the side of the stage.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "locations-campsite-towards-the-shire",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "locations-icefortress",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "VERSION ONE -> WIDE SHOTS A LOT\n\nA photorealistic ice fortress carved into the side of a granite mountain in winter light hosts a surreal neon-lit concert stage. The Concert stage is a large fantastical ice stage to allow the audience to see the performers.  Large Ice Dragons circle overhead. There are hanging chandeliers that cast neon colored spotlights to showcase the stage.\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy.\n\nThe audience is full of arctic foxes, snow rabbits, pixies, fairies and many woodland creatures like: rabbits, raccoons, squirrels, foxes, chipmunks.  The crowd stares in raptured silence as they watch the performers on stage.\n\nTowering ancient ceilings of ice arch overhead, with intricate engravings of bioluminescent mushrooms and glowing crows and ICE Whale Skeletons.\nAt the foot of the stage are some goblin gear that has been collected.  It is scattered about like a spear and a helmet.\n\nThere is light falling snow and a leprechaun attempts to fish out of an ice fishing hole on the side of the stage.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene.\n\nVERSION TWO: NO AUDIENCE\n\nA medium shot of photorealistic ice hall hosts surreal neon-lit concert stage. The Concert stage is a large fantastical ice stage to allow the audience to see the performers.  There are hanging chandeliers that cast neon colored spotlights to showcase the stage.\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy.\n\nTowering ancient ceilings of ice arch overhead, with intricate engravings of bioluminescent mushrooms and glowing crows and ICE Whale Skeletons.\nAt the foot of the stage are some goblin gear that has been collected.  It is scattered about like a spear and a helmet.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene.\n\n\nVERSION TWO: FIERY AUDIENCE\n\nA photorealistic ice fortress carved into the side of a granite mountain in winter light hosts a surreal neon-lit concert stage. The Concert stage is a large fantastical ice stage to allow the audience to see the performers.  Large Ice Dragons circle overhead. There are hanging chandeliers that cast neon colored spotlights to showcase the stage.\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy.\n\nThe audience is full of arctic foxes, snow rabbits, pixies, fairies and many woodland creatures like: rabbits, raccoons, squirrels, foxes, chipmunks.  Each animal has a stick, or a rock, or a fiery torch in order to prepare for battle.\n\nTowering ancient ceilings of ice arch overhead, with intricate engravings of bioluminescent mushrooms and glowing crows and ICE Whale Skeletons.\nAt the foot of the stage are some goblin gear that has been collected.  It is scattered about like a spear and a helmet.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "locations-icefortress",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "locations-ruins-of-the-shire",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "CONCERT IN THE RUINS:\n\nA photorealistic spring day in the Shire bathed in dim golden hour light seamlessly transforms into a surreal neon-lit concert stage. The Concert stage is an open grass land, with improvised war debris for the performers to stand on.\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy.  He wears a tie-dye kilt\nThe audience is full of battle weary halflings and woodland creatures including: rabbits, raccoons, squirrels, foxes and chipmunks.  The creatures all have either helmets of war, or spears, or knives, or bows and arrows as they are have recently fought a battle.\n\nThe YETI is tending to the wounded halflings.  There are glowing crows and forest faeries amongst the ruins of the shire, and a leprechaun is looking at the polluted river with a fishing pole in hand, but not using it."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "locations-ruins-of-the-shire",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "locations-shire-evening-amphitheater",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "VERSION ONE\n\nA photorealistic mossy ancient wooden amphitheater hosts surreal neon-lit concert stage.  There are  Lucky Charm horseshoe engravings as well as intricate engravings of bioluminescent mushrooms and glowing crows carved into the amphitheater.\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\n\nNext to him is a Fiery Red Headed Girl with a black patch over her left eye is furiously drumming at a bright red drum kit.  Radiant Sparks of energy fly off the cymbals, and the drum heads seem to be slightly on fire with blue flames.  On her other eye, she wears heavy eyeliner to accentuate her mood.\n\n\nThe audience is full of halflings and woodland creatures including: rabbits, raccoons, squirrels, foxes and chipmunks.\nThere are glowing crows and forest faeries amongst the audience of the performance.\n\nTowering ancient wooden amphitheater of mossy arch overhead, \n\nA leprechaun attempts to fish just off stage where a creek is running past the stage.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene.\n\nVERSION TWO\n\n\nA surreal, photorealistic scene of an ancient moss-covered wooden amphitheater aglow with dynamic blue neon accents and theatrical spotlights. The stage shimmers with Lucky Charm horseshoe engravings and intricate bioluminescent carvings of mushrooms and glowing crows.\n\nAt center, a half-elf singer with human ears, long snow white hair, glowing lavender eyes, and a crow pin on his upturned-collar tunic passionately sings into a modern microphone while strumming a luminous lute-guitar that radiates vivid, prismatic waves of energy.\n\nBeside him, a regal half-elf woman with a tiara and long golden braids plays a jewel-encrusted, radiant harp, her faintly glowing green eyes serene above her elegant dress. A tall, athletic quarter-elf woman in a pale lavender skirt bows her energy-laced violin, sandy brown hair flowing; next, a sandy-haired teenage boy intensely plucks an upright bass.\n\nFuriously drumming a blazing blue-flamed kit is a fiery redhead girl with a black eye patch, heavy eyeliner, and sparks flying from cymbals. The rapt audience of halflings and woodland animals—rabbits, raccoons, squirrels, foxes, chipmunks—mix among luminous crows and fluttering forest faeries under the mossy arch.\n\nOffstage by a babbling creek, a whimsical leprechaun attempts to fish, completing the electrifying enchanted festival atmosphere."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "locations-shire-evening-amphitheater",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "locations-shire-outdoor-spring",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "A photorealistic spring day in the Shire on a concert stage set in front of towering evergreens. \n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy\n\nAround them, overjoyed forest animals—rabbits, raccoons, squirrels, foxes, chipmunks amid radiant mushrooms, early worms, and irridescent-feathered crows.\nThere is streaming golden light rays cast through the towering oaks and a leprechaun attempts to fish on the side of the lake."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "locations-shire-outdoor-spring",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "locations-shire-sanctuary",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "A photorealistic scene of a concert at a great hall at a halfling's village there are towering engraved glass windows behind the stage that allows bright rays of sunlight to stream onto the stage.  The engravings areof Lucky Charm horseshoes bioluminescent mushrooms and glowing crows.\n\nOn the raised dias of the stage,  At the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nNext to him and furiously drumming a blazing blue-flamed kit is a fiery redhead girl with a black eye patch, heavy eyeliner, and sparks flying from cymbals. \n\nThe crowd of halflings and woodland creatures filling the great hall include: rabbits, raccoons, squirrels, foxes and chipmunks.  There are glowing crows and forest faeries flying through the great hall.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "locations-shire-sanctuary",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "locations-shire-wooden-amphitheater",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "VERSION ONE\n\nA photorealistic Towering mossy ancient wooden amphitheater  bathed in distant glowing light (as if from a volcanic eruption)  hosts a surreal neon-lit concert stage. \n\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy.  He wears a tie-dye kilt\n\n\nThe audience is full of battle weary halflings and woodland creatures including: rabbits, raccoons, squirrels, foxes and chipmunks.  The creatures all have either helmets of war, or spears, or knives, or bows and arrows as they are have recently fought a battle.\n\nThe YETI is tending to the wounded halflings.  There are glowing crows and forest faeries amongst the audience of the performance.\n\nTowering ancient wooden amphitheater of mossy arch overhead, with intricate engravings of bioluminescent mushrooms and glowing crows.\n\nA leprechaun attempts to fish just off stage where a creek is running past the stage.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene.\n\nVERSION TWO"
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "locations-shire-wooden-amphitheater",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "lore-goblin-king",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "DEATH SCENE\n\n\nA photorealistic scene of a pig-snouted, grotesquely fat goblin king on a portable throne with his eyes closed, looking peaceful with some drool coming out of his mouth.  \nIn front of the goblin king's mouth is a classic Stage microphone.  \n\nThe Stage Microphone has an shining arrow that has fully bisected the microphone and is slightly sticking into the adam's apple of the Goblin King and just barely touching the adam's apple of the goblin grotesquely fat king's throat.\n\nThe skies are dark and lightning can be seen in the distance."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "lore-goblin-king",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "wavelength-alex",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a free spirited quarter-elf lady bows her violin that radiates vivid energy waves.\n\nShe is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks \n\nVERSION TWO\n\nA hyper-detailed, photorealistic spring forest at golden hour opens into a surreal field bathed in streaming golden light through towering oaks. At the center stands a tall, athletic, and graceful quarter-elf lady with sandy brown hair, draped in a pale lavender skirt.\n\nShe bows her violin passionately, sending out vivid energy waves that ripple through the air. The vibrant landscape is dotted with quaint halfling houses, each with smoking chimneys, while tree trunks are carved with glowing bioluminescent mushrooms, perched crows, and horseshoe lucky charms.\n\nRich natural textures, dynamic lighting, and atmospheric haze capture the enchanting, magical moment as sunbeams filter through the canopy, illuminating every detail and infusing the scene with a sense of wonder and serene energy."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "wavelength-alex",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "wavelength-andrew",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.\n\nHe is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks \n\nVERSION TWO\nA hyper-detailed, photorealistic spring forest at golden hour opens to a surreal field where a half-elf with human ears and long snow white hair passionately sings into a modern microphone.\n\nHe strums a glowing lute-guitar, pulsing with vivid energy waves, his lavender eyes illuminated. He wears a long tunic with an upturned collar and a crow pin. Behind him, quaint halfling houses with smoking chimneys dot the rolling grass.\n\nTowering oaks arch overhead, their trunks carved with glowing bioluminescent mushrooms, perched crows, and a horseshoe lucky charm. Streaming golden sunlight pierces the canopy, bathing the fantastical landscape in radiant warmth and brilliant atmosphere."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "wavelength-andrew",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "wavelength-daphne",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a Fiery Red Headed Girl with a black patch over her left eye is furiously drumming at a bright red drum kit.  Radiant Sparks of energy fly off the cymbals, and the drum heads seem to be slightly on fire with blue flames.\n\nOn her other eye, she wears heavy eyeliner to accentuate her mood.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks \n\nVERSION TWO\n\nA hyper-detailed, photorealistic spring forest at golden hour morphs into a surreal open field framed by streaming golden light rays cutting through towering oaks.\n\nAt the center, a fiery red-headed girl with a black patch over her left eye and dramatic heavy eyeliner on the other furiously drums at a vivid red drum kit, blue flames curling over fiery drum heads.\n\nRadiant sparks erupt from the cymbals, illuminating her intense expression. The surrounding landscape is dotted with quaint halfling houses featuring smoking chimneys, while tree trunks glow with carved bioluminescent mushrooms, perched black crows, and lucky horseshoes.\n\nThe scene fuses magical realism with raw musical energy, the photorealism capturing every spark, flame, and forest detail with cinematic lighting effects."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "wavelength-daphne",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "wavelength-eloquence",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. \n\nHis hair is just long enough to cover the back of his neck and reaches one of his eyes.\nHe wears a plaid kilt.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks \n\nVERSION TWO\n\nIn a hyper-detailed, photorealistic spring forest illuminated by streaming golden hour light, the scene transitions into an expansive, surreal open field.\n\nAt the center stands a tall, sandy-haired teenage boy with hair just long enough to cover the back of his neck and obscuring one of his eyes. He is intensely plucking the strings of an upright bass, fingers blurred in motion. He wears a plaid kilt.\n\nAll around, charming halfling houses with mossy roofs and smoking chimneys nestle beneath towering oaks. Tree trunks are carved with glowing bioluminescent mushrooms, perched crows, and an embedded lucky charm horseshoe.\n\nShafts of brilliant sunlight filter through dense foliage, creating a magical atmosphere that blends fantasy and realism. The lush greenery, intricate textures, and luminous effects evoke a vivid, cinematic landscape teeming with whimsical detail and musical energy."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "wavelength-eloquence",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "wavelength-jewel",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, a regal looking half elf woman sits on an elegant stool while plucks a fullsized luminous harp that radiates vivid energy waves.\n\nThe wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.\n\nShe has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks \n\nVERSION TWO\nA hyper-detailed, photorealistic spring forest at golden hour transitions into a surreal open field. At the center, a regal half-elf woman with faintly glowing green eyes, short pointed ears, and long golden braids sits gracefully on an elegant stool, plucking a full-sized luminous harp.\n\nThe wooden harp is adorned with sparkling jewel inlays that catch the sunlight, casting radiant prisms and vivid energy waves. She wears a flowing elegant dress and a delicate tiara. All around, quaint halfling houses nestle among towering oaks, their smoking chimneys curling into the warm light.\n\nTree trunks are decorated with carved horseshoe charms, clusters of glowing bioluminescent mushrooms, and perched crows. Streaming golden rays filter through the ancient canopy, illuminating intricate natural textures and magical details in this enchanting and cinematic fantasy landscape."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "wavelength-jewel",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "wavelength-lucky",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, \nAlong a sparkling stream, a tiny leprechaun with a WHITE BEARD and a small golden hoop earing fishes beneath a spectral rainbow as swirling sprites and fairies dance with glowing ribbons. Cinematic spotlights, blue snowlight, and vibrant neon highlights ignite every magical detail of this fantastical forest scene.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks \n\nVERSION TWO"
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "wavelength-lucky",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "wavelength-maurice",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, \nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy. He wears a tie-dye kilt\n\n\nCinematic spotlights, blue snowlight, and vibrant neon highlights ignite every magical detail of this fantastical forest scene.\n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks \n\nVERSION TWO"
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "wavelength-maurice",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "wavelength-yeti",
+      "filePath": "prompts.yaml",
+      "prompts": {
+        "default": [
+          "VERSION ONE\nA hyper-detailed, photorealistic spring forest at golden hour transforms into a surreal open field. At the center, \nstands a ferocious looking YETI that wears an efficient Nurse's hat, and has a first aid kit in one of his massive hands. \n\nThe surrounding landscape is filled with quaint halfling houses and smoking chimneys.  The trees are carved with glowing bioluminescent mushrooms and crows and a lucky charm horsehoe.\nThere is streaming golden light rays cast through the towering oaks \n\nVERSION TWO\n\nA hyper-detailed, photorealistic spring forest at golden hour seamlessly transitions into a surreal open field. At the center stands a ferocious-looking yeti adorned with an efficient nurse's hat, clutching a first aid kit in one massive hand.\n\nThe verdant landscape is dotted with quaint halfling houses, each with mossy roofs and smoking stone chimneys. Towering oaks cast streaming golden light rays, their bark intricately carved and adorned with glowing bioluminescent mushrooms, perched crows, and a lucky charm horseshoe.\n\nCrisp, radiant sunlight and atmospheric mist illuminate fine textures across foliage, fur, and fantasy architecture, evoking magical realism."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": null,
+        "item": null,
+        "contentId": "wavelength-yeti",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.826Z",
+      "source": "yaml"
+    },
+    {
+      "contentId": "burial-bonfire-at-the-shire",
+      "filePath": "locations/burial-bonfire-at-the-shire.md",
+      "prompts": {
+        "default": [
+          "A photorealistic scene of a concert at a large solemn bonfire.  Surrounding the bonfire are a large circle of stones that have bioluminescent mushrooms and glowing crows carved into them.\n\nNext to the Bonfire, on an improvised stage, there is a band of musicians performing.\n\nAt center stage, a half-elf singer with human ears, long snow white hair, glowing lavender eyes, and a crow pin on his upturned-collar tunic passionately sings into a modern microphone while strumming a luminous lute-guitar that radiates vivid, prismatic waves of energy.\n\nBeside him, a regal half-elf woman with a tiara and long golden braids plays a jewel-encrusted, radiant harp, her faintly glowing green eyes serene above her elegant dress. A tall, athletic quarter-elf woman in a pale lavender skirt bows her energy-laced violin, sandy brown hair flowing; next, a sandy-haired teenage boy intensely plucks an upright bass.\n\nFuriously drumming a blazing blue-flamed kit is a fiery redhead girl with a black eye patch, heavy eyeliner, and sparks flying from cymbals. \n\n\nThe rapt audience of halflings and woodland animals—rabbits, raccoons, squirrels, foxes, chipmunks—mix among luminous crows and fluttering forest faeries under the mossy arch.\n\nThe crowd gathered around the bonfire is full of halflings and woodland creatures including: rabbits, raccoons, squirrels, foxes and chipmunks.  There are glowing crows and forest faeries amongst the audience of the performance.\n\nA YETI and a leprechaun are standing next to each other and the leprechaun has his hat held in his hands.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "location",
+        "item": null,
+        "contentId": "burial-bonfire-at-the-shire",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.829Z",
+      "suggestedIds": [
+        "burial-bonfire-at-the-shire",
+        "burial-bonfire-at-the-shire"
+      ]
+    },
+    {
+      "contentId": "campsite-towards-the-shire",
+      "filePath": "locations/campsite-towards-the-shire.md",
+      "prompts": {
+        "default": [],
+        "versions": {
+          "1": [
+            "A photorealistic staging campsite that hosts an impromptu surreal neon-lit concert stage next to a large community campfire where the audience is camping out. The Concert stage is a hastily constructed wooden stage that allow the audience to see the performers.  It is set on a high plains grasslands with a long range of tall, white mountains in the background.\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy.  He wears a tie-dye kilt\n\nThe audience includes many small animals like: rabbits, raccoons, squirrels, foxes and chipmunks.\nAlso included are more fantastical creatures like a happy yeti, forest fairies and a leprechaun.  The audience members all have either helmets of war, or spears, or knives, or bows and arrows as they are having a final meeting before battle.\n\nThe Stars twinkle at night and one shooting star streaks aross the sky high in the night above the stage.\n\nA leprechaun attempts to fish out of a small creek that runs next to the side of the stage.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene."
+          ],
+          "2": [
+            "A hyper-realistic nighttime campsite blends into sweeping high plains grasslands, with a striking backdrop of tall, snowcapped white mountains under a star-studded sky. At the campsite’s center, a makeshift wooden concert stage is ablaze with surreal neon lights, illuminating the performers and casting vibrant reflections on the crowd huddled around a large community campfire.\n\nLeading the band, a half-elf with human ears and long snow-white hair passionately sings into a modern microphone, strumming a radiant, glowing lute-guitar emitting vivid energy waves; his glowing lavender eyes and upturned-collar tunic, adorned with a crow pin, shimmer in the colored light.\n\nBeside him, a regal half-elf woman with faintly glowing green eyes, golden braids, a tiara, and an elegant dress gracefully plays a full-sized luminous harp jeweled with prisms, while a graceful, athletic quarter-elf woman in a pale lavender skirt bows her violin, radiating magical colors.\n\nA tall, sandy-haired teen plucks an upright bass with intensity, and a large bearded dwarf in a tie-dye kilt hammers an ancient drum pulsating with energy. The diverse audience—rabbits, raccoons, squirrels, foxes, chipmunks, a jubilant yeti, forest fairies, and a leprechaun—are armed for battle, their helmets, spears, knives, and bows aglow in the neon.\n\nOverhead, a bright shooting star blazes across the night sky, lending a magical, momentous mood to this surreal, cinematic pre-battle concert scene."
+          ],
+          "3": [
+            "A photorealistic staging campsite that hosts an impromptu surreal neon-lit concert stage next to a large community campfire where the audience is camping out. The Concert stage is a hastily constructed wooden stage that allow the audience to see the performers.  It is set on a high plains grasslands with a long range of tall, white mountains in the background.\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy.  He wears a tie-dye kilt\n\nThe audience includes many small animals like: rabbits, raccoons, squirrels, foxes and chipmunks.\nAlso included are more fantastical creatures like a happy yeti, forest fairies and a leprechaun.  The audience members all have either helmets of war, or spears, or knives, or bows and arrows as they are having a final meeting before battle.\n\nThe Stars twinkle at night and one shooting star streaks across the sky high in the night above the stage.\n\nA leprechaun attempts to fish out of a small creek that runs next to the side of the stage.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene."
+          ]
+        },
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "location",
+        "item": null,
+        "contentId": "campsite-towards-the-shire",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.829Z",
+      "suggestedIds": [
+        "campsite-towards-the-shire",
+        "campsite-towards-the-shire"
+      ]
+    },
+    {
+      "contentId": "icefortress",
+      "filePath": "locations/icefortress.md",
+      "prompts": {
+        "default": [],
+        "versions": {
+          "1": [
+            "A photorealistic ice fortress carved into the side of a granite mountain in winter light hosts a surreal neon-lit concert stage. The Concert stage is a large fantastical ice stage to allow the audience to see the performers.  Large Ice Dragons circle overhead. There are hanging chandeliers that cast neon colored spotlights to showcase the stage.\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy.\n\nThe audience is full of arctic foxes, snow rabbits, pixies, fairies and many woodland creatures like: rabbits, raccoons, squirrels, foxes, chipmunks.  The crowd stares in raptured silence as they watch the performers on stage.\n\nTowering ancient ceilings of ice arch overhead, with intricate engravings of bioluminescent mushrooms and glowing crows and ICE Whale Skeletons.\nAt the foot of the stage are some goblin gear that has been collected.  It is scattered about like a spear and a helmet.\n\nThere is light falling snow and a leprechaun attempts to fish out of an ice fishing hole on the side of the stage.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene.\n\nVERSION TWO: NO AUDIENCE\n\nA medium shot of photorealistic ice hall hosts surreal neon-lit concert stage. The Concert stage is a large fantastical ice stage to allow the audience to see the performers.  There are hanging chandeliers that cast neon colored spotlights to showcase the stage.\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy.\n\nTowering ancient ceilings of ice arch overhead, with intricate engravings of bioluminescent mushrooms and glowing crows and ICE Whale Skeletons.\nAt the foot of the stage are some goblin gear that has been collected.  It is scattered about like a spear and a helmet.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene.\n\n\nVERSION TWO: FIERY AUDIENCE\n\nA photorealistic ice fortress carved into the side of a granite mountain in winter light hosts a surreal neon-lit concert stage. The Concert stage is a large fantastical ice stage to allow the audience to see the performers.  Large Ice Dragons circle overhead. There are hanging chandeliers that cast neon colored spotlights to showcase the stage.\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy.\n\nThe audience is full of arctic foxes, snow rabbits, pixies, fairies and many woodland creatures like: rabbits, raccoons, squirrels, foxes, chipmunks.  Each animal has a stick, or a rock, or a fiery torch in order to prepare for battle.\n\nTowering ancient ceilings of ice arch overhead, with intricate engravings of bioluminescent mushrooms and glowing crows and ICE Whale Skeletons.\nAt the foot of the stage are some goblin gear that has been collected.  It is scattered about like a spear and a helmet.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene."
+          ]
+        },
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "location",
+        "item": null,
+        "contentId": "icefortress",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.830Z",
+      "suggestedIds": [
+        "icefortress",
+        "icefortress"
+      ]
+    },
+    {
+      "contentId": "ruins-of-the-shire",
+      "filePath": "locations/ruins-of-the-shire.md",
+      "prompts": {
+        "default": [
+          "CONCERT IN THE RUINS:\n\nA photorealistic spring day in the Shire bathed in dim golden hour light seamlessly transforms into a surreal neon-lit concert stage. The Concert stage is an open grass land, with improvised war debris for the performers to stand on.\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy.  He wears a tie-dye kilt\nThe audience is full of battle weary halflings and woodland creatures including: rabbits, raccoons, squirrels, foxes and chipmunks.  The creatures all have either helmets of war, or spears, or knives, or bows and arrows as they are have recently fought a battle.\n\nThe YETI is tending to the wounded halflings.  There are glowing crows and forest faeries amongst the ruins of the shire, and a leprechaun is looking at the polluted river with a fishing pole in hand, but not using it."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "location",
+        "item": null,
+        "contentId": "ruins-of-the-shire",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.831Z",
+      "suggestedIds": [
+        "ruins-of-the-shire",
+        "ruins-of-the-shire"
+      ]
+    },
+    {
+      "contentId": "shire-evening-amphitheater",
+      "filePath": "locations/shire-evening-amphitheater.md",
+      "prompts": {
+        "default": [],
+        "versions": {
+          "1": [
+            "A photorealistic mossy ancient wooden amphitheater hosts surreal neon-lit concert stage.  There are  Lucky Charm horseshoe engravings as well as intricate engravings of bioluminescent mushrooms and glowing crows carved into the amphitheater.\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\n\nNext to him is a Fiery Red Headed Girl with a black patch over her left eye is furiously drumming at a bright red drum kit.  Radiant Sparks of energy fly off the cymbals, and the drum heads seem to be slightly on fire with blue flames.  On her other eye, she wears heavy eyeliner to accentuate her mood.\n\n\nThe audience is full of halflings and woodland creatures including: rabbits, raccoons, squirrels, foxes and chipmunks.\nThere are glowing crows and forest faeries amongst the audience of the performance.\n\nTowering ancient wooden amphitheater of mossy arch overhead, \n\nA leprechaun attempts to fish just off stage where a creek is running past the stage.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene."
+          ],
+          "2": [
+            "A surreal, photorealistic scene of an ancient moss-covered wooden amphitheater aglow with dynamic blue neon accents and theatrical spotlights. The stage shimmers with Lucky Charm horseshoe engravings and intricate bioluminescent carvings of mushrooms and glowing crows.\n\nAt center, a half-elf singer with human ears, long snow white hair, glowing lavender eyes, and a crow pin on his upturned-collar tunic passionately sings into a modern microphone while strumming a luminous lute-guitar that radiates vivid, prismatic waves of energy.\n\nBeside him, a regal half-elf woman with a tiara and long golden braids plays a jewel-encrusted, radiant harp, her faintly glowing green eyes serene above her elegant dress. A tall, athletic quarter-elf woman in a pale lavender skirt bows her energy-laced violin, sandy brown hair flowing; next, a sandy-haired teenage boy intensely plucks an upright bass.\n\nFuriously drumming a blazing blue-flamed kit is a fiery redhead girl with a black eye patch, heavy eyeliner, and sparks flying from cymbals. The rapt audience of halflings and woodland animals—rabbits, raccoons, squirrels, foxes, chipmunks—mix among luminous crows and fluttering forest faeries under the mossy arch.\n\nOffstage by a babbling creek, a whimsical leprechaun attempts to fish, completing the electrifying enchanted festival atmosphere."
+          ]
+        },
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "location",
+        "item": null,
+        "contentId": "shire-evening-amphitheater",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.831Z",
+      "suggestedIds": [
+        "shire-evening-amphitheater",
+        "shire-evening-amphitheater"
+      ]
+    },
+    {
+      "contentId": "shire-outdoor-spring",
+      "filePath": "locations/shire-outdoor-spring.md",
+      "prompts": {
+        "default": [
+          "A photorealistic spring day in the Shire on a concert stage set in front of towering evergreens. \n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy\n\nAround them, overjoyed forest animals—rabbits, raccoons, squirrels, foxes, chipmunks amid radiant mushrooms, early worms, and irridescent-feathered crows.\nThere is streaming golden light rays cast through the towering oaks and a leprechaun attempts to fish on the side of the lake."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "location",
+        "item": null,
+        "contentId": "shire-outdoor-spring",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.832Z",
+      "suggestedIds": [
+        "shire-outdoor-spring",
+        "shire-outdoor-spring"
+      ]
+    },
+    {
+      "contentId": "shire-sanctuary",
+      "filePath": "locations/shire-sanctuary.md",
+      "prompts": {
+        "default": [
+          "A photorealistic scene of a concert at a great hall at a halfling's village there are towering engraved glass windows behind the stage that allows bright rays of sunlight to stream onto the stage.  The engravings areof Lucky Charm horseshoes bioluminescent mushrooms and glowing crows.\n\nOn the raised dias of the stage,  At the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nNext to him and furiously drumming a blazing blue-flamed kit is a fiery redhead girl with a black eye patch, heavy eyeliner, and sparks flying from cymbals. \n\nThe crowd of halflings and woodland creatures filling the great hall include: rabbits, raccoons, squirrels, foxes and chipmunks.  There are glowing crows and forest faeries flying through the great hall.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene."
+        ],
+        "versions": {},
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "location",
+        "item": null,
+        "contentId": "shire-sanctuary",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.832Z",
+      "suggestedIds": [
+        "shire-sanctuary",
+        "shire-sanctuary"
+      ]
+    },
+    {
+      "contentId": "shire-wooden-amphitheater",
+      "filePath": "locations/shire-wooden-amphitheater.md",
+      "prompts": {
+        "default": [],
+        "versions": {
+          "1": [
+            "A photorealistic Towering mossy ancient wooden amphitheater  bathed in distant glowing light (as if from a volcanic eruption)  hosts a surreal neon-lit concert stage. \n\n\nAt the center, a half-elf with human ears and long snow white hair passionately sings into a modern microphone.  He is strumming a glowing lute-guitar that radiates vivid energy waves. He has glowing lavendar eyes, and wears a long tunic with an up turned collar, and wears a crow pin on his tunic.\n\nNext to him, is a regal looking half elf woman sits on an elegant stool while playing a fullsized luminous harp that radiates vivid energy waves.  The wooden harp has sparkling jewels inlaid into it that catch the light and reflect prisms.  She has faintly glowing green eyes, short ears and wears a long elegant dress with a tiara.  She has long golden braids that run down her back.\n\nNext to her is a free spirited quarter-elf lady bows her violin that radiates vivid energy waves. She is tall, athletic and graceful with sandy brown hair and is wearing a pale lavendar skirt.\n\nNext to her is a tall sandy haired teenage boy is intensely plucking the strings of an upgright bass. His hair is just long enough to cover the back of his neck and reaches one of his eyes.\n\nA heavily bearded large dwarf bangs on an ancient drum which raidates glowing power of energy.  He wears a tie-dye kilt\n\n\nThe audience is full of battle weary halflings and woodland creatures including: rabbits, raccoons, squirrels, foxes and chipmunks.  The creatures all have either helmets of war, or spears, or knives, or bows and arrows as they are have recently fought a battle.\n\nThe YETI is tending to the wounded halflings.  There are glowing crows and forest faeries amongst the audience of the performance.\n\nTowering ancient wooden amphitheater of mossy arch overhead, with intricate engravings of bioluminescent mushrooms and glowing crows.\n\nA leprechaun attempts to fish just off stage where a creek is running past the stage.\n\nCinematic spotlights, dynamic blue neon accents, and electrifying festival atmosphere saturate the scene."
+          ]
+        },
+        "scenes": {}
+      },
+      "match": {
+        "contentType": "location",
+        "item": null,
+        "contentId": "shire-wooden-amphitheater",
+        "confidence": "medium"
+      },
+      "importedAt": "2025-10-31T13:26:41.833Z",
+      "suggestedIds": [
+        "shire-wooden-amphitheater",
+        "shire-wooden-amphitheater"
+      ]
+    }
+  ],
+  "importedAt": "2025-10-31T13:26:41.837Z",
+  "version": "1.0"
+}

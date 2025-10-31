@@ -1,6 +1,6 @@
 {
   "name": "wavelength-lore",
-  "version": "1.1.86",
+  "version": "1.1.88",
   "description": "The Lore Site for the Wavelength Canon",
   "main": "index.js",
   "scripts": {
@@ -71,7 +71,8 @@
     "firebase:validate-prod": "NODE_ENV=production node scripts/firebase-security-validation.js",
     "firebase:validate-all": "scripts/validate-firebase-security.sh",
     "episode:create": "node cli/episode-creator.js",
-    "episode:cli": "node cli/episode-creator.js"
+    "episode:cli": "node cli/episode-creator.js",
+    "prompts:import": "node scripts/import-prompts.js"
   },
   "dependencies": {
     "@aws-sdk/client-apprunner": "^3.917.0",
