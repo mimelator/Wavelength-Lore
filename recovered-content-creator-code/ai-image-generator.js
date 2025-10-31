@@ -26,6 +26,15 @@ const path = require('path');
 const crypto = require('crypto');
 const mime = require('mime');
 
+// Optional chalk for colored output
+let chalk;
+try {
+  chalk = require('chalk');
+} catch (e) {
+  // Fallback if chalk not available
+  chalk = { yellow: (s) => s, red: (s) => s, green: (s) => s };
+}
+
 class AIImageGenerator {
   constructor() {
     this.apiKey = process.env.AI_API_KEY;
@@ -123,13 +132,42 @@ class AIImageGenerator {
           delete requestData.quality;
         }
 
-        response = await axios.post(this.apiEndpoint, requestData, {
-          headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          timeout: 120000
-        });
+        // DALL-E 3 has a 4000 character prompt limit, truncate if needed
+        if (this.modelKey && this.modelKey.includes('dall-e-3') && prompt.length > 4000) {
+          console.log(chalk.yellow(`⚠️  Prompt is ${prompt.length} characters, DALL-E 3 limit is 4000. Truncating...`));
+          requestData.prompt = prompt.substring(0, 3997) + '...';
+        }
+
+        // Retry logic for transient errors (500, 502, 503, 504)
+        let response;
+        let retries = 0;
+        const maxRetries = 3;
+        const retryableStatuses = [500, 502, 503, 504];
+        
+        while (retries <= maxRetries) {
+          try {
+            response = await axios.post(this.apiEndpoint, requestData, {
+              headers: {
+                'Authorization': `Bearer ${this.apiKey}`,
+                'Content-Type': 'application/json'
+              },
+              timeout: 120000
+            });
+            break; // Success, exit retry loop
+          } catch (error) {
+            const status = error.response?.status;
+            const isRetryable = retryableStatuses.includes(status);
+            
+            if (isRetryable && retries < maxRetries) {
+              retries++;
+              const delay = Math.min(1000 * Math.pow(2, retries), 10000); // Exponential backoff, max 10s
+              console.log(chalk.yellow(`⚠️  Server error ${status}, retrying (${retries}/${maxRetries}) in ${delay/1000}s...`));
+              await new Promise(resolve => setTimeout(resolve, delay));
+              continue;
+            }
+            throw error; // Not retryable or max retries reached
+          }
+        }
 
         if (response.data.data && response.data.data[0] && response.data.data[0].b64_json) {
           return {
@@ -273,13 +311,46 @@ class AIImageGenerator {
 
     } catch (error) {
       console.error('❌ AI Generation failed:', error.message);
+      
       if (error.response) {
-        console.error('📋 Response data:', JSON.stringify(error.response.data, null, 2));
+        const status = error.response.status;
+        const errorData = error.response.data;
+        
+        // Better error messages based on status code
+        let errorMessage = error.message;
+        if (status === 400) {
+          errorMessage = `Invalid request: ${errorData?.error?.message || error.message}`;
+        } else if (status === 401) {
+          errorMessage = `Authentication failed: Check your AI_API_KEY`;
+        } else if (status === 429) {
+          errorMessage = `Rate limit exceeded: Please wait and try again`;
+        } else if (status >= 500) {
+          errorMessage = `OpenAI server error: ${errorData?.error?.message || 'Please try again later'}`;
+        }
+        
+        console.error(`📋 Status: ${status}`);
+        console.error(`📋 Response:`, JSON.stringify(errorData, null, 2));
+        
+        return {
+          success: false,
+          error: errorMessage,
+          details: errorData,
+          statusCode: status
+        };
       }
+      
+      if (error.request) {
+        return {
+          success: false,
+          error: 'Network error: No response from API. Check your connection and API endpoint.',
+          details: { code: error.code }
+        };
+      }
+      
       return {
         success: false,
         error: error.message,
-        details: error.response?.data
+        details: error.toString()
       };
     }
   }

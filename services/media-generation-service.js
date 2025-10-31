@@ -96,8 +96,16 @@ class MediaGenerationService {
                     console.log(`✅ Image ${i + 1} generated successfully`);
                 } else {
                     console.error(`❌ Image ${i + 1} failed: ${result.error}`);
+                    if (result.statusCode) {
+                        console.error(`   Status Code: ${result.statusCode}`);
+                    }
                     if (result.details) {
-                        console.error('   Details:', result.details);
+                        console.error('   Details:', JSON.stringify(result.details, null, 2));
+                    }
+                    
+                    // If it's a 500 error, suggest retry
+                    if (result.statusCode >= 500) {
+                        console.error('   💡 This is a server error - you can try again. The prompt may be too long or complex.');
                     }
                     // Continue with other generations
                 }

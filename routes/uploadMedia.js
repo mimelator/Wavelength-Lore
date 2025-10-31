@@ -85,8 +85,20 @@ router.post('/api/upload/media', upload.single('file'), async (req, res) => {
     const prefix = isVideo ? 'video-uploaded' : 'image-uploaded';
     const filename = `${prefix}-${timestamp}-${randomId}${extension}`;
     
-    // Construct S3 key (path) - store in the same location as other images/videos
-    const s3Key = `images/${contentType}s/${contentId}/${filename}`;
+    // Construct S3 key (path) - match the same pattern as AI-generated images
+    // CloudFront serves from /images/* (without /static/ prefix)
+    // S3 bucket stores at: images/{contentType}s/{id}/...
+    let s3Key;
+    if (contentType === 'character') {
+        s3Key = `images/characters/${contentId}/${filename}`;
+    } else if (contentType === 'lore') {
+        s3Key = `images/lore/${contentId}/${filename}`;
+    } else if (contentType === 'season') {
+        s3Key = `images/seasons/${contentId}/${filename}`;
+    } else {
+        // Fallback for other types
+        s3Key = `images/${contentType}s/${contentId}/${filename}`;
+    }
     
     console.log(`   S3 Key: ${s3Key}`);
     
@@ -119,11 +131,11 @@ router.post('/api/upload/media', upload.single('file'), async (req, res) => {
     const command = new PutObjectCommand(uploadParams);
     await s3Client.send(command);
 
-    // Construct the relative path for database storage (same format as AI-generated content)
-    const relativePath = `images/${contentType}s/${contentId}/${filename}`;
+    // Construct the relative path for database storage (match AI-generated content pattern)
+    const relativePath = `/${s3Key}`;
     
     // Construct CDN URL
-    const cdnPath = `${cdnUrl}/${relativePath}`;
+    const cdnPath = `${cdnUrl}${relativePath}`;
 
     console.log(`✅ File uploaded successfully`);
     console.log(`   Relative path: ${relativePath}`);

@@ -11,6 +11,8 @@
 
 const readline = require('readline');
 const chalk = require('chalk');
+const crypto = require('crypto');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { WavelengthChatCLI } = require('./wavelength-chat-cli');
 const loreHelpers = require('./helpers/lore-helpers');
 const characterHelpers = require('./helpers/character-helpers');
@@ -35,6 +37,15 @@ class WavelengthContentCLI {
         this.songsCommands = new SongsCommands(this);
         this.mediaCommands = new MediaCommands(this);
         this.importedPrompts = null; // Loaded prompts from import
+        
+        // Initialize S3 client for image uploads
+        this.s3Client = new S3Client({
+            region: process.env.AWS_REGION || 'us-east-1',
+            credentials: {
+                accessKeyId: process.env.ACCESS_KEY_ID,
+                secretAccessKey: process.env.SECRET_ACCESS_KEY
+            }
+        });
         
         this.rl = readline.createInterface({
             input: process.stdin,
@@ -471,7 +482,25 @@ class WavelengthContentCLI {
             console.log(chalk.red('❌ Error:'), error.message);
         }
         
+        // Show quick command reminder after each command
+        this.showQuickCommands();
         this.showPrompt();
+    }
+
+    /**
+     * Show quick command reminder (condensed version)
+     */
+    showQuickCommands() {
+        console.log(chalk.gray('\n💡 Quick Commands: ') + 
+            chalk.white('ls') + ' | ' +
+            chalk.white('cd') + ' | ' +
+            chalk.white('view') + ' | ' +
+            chalk.white('edit') + ' | ' +
+            chalk.white('search') + ' | ' +
+            chalk.white('media') + ' | ' +
+            chalk.white('preview') + ' | ' +
+            chalk.white('help') + ' | ' +
+            chalk.white('exit'));
     }
 
     showHelp() {
@@ -1164,12 +1193,27 @@ Please provide an enhanced version that improves the item according to the reque
             console.log(chalk.white(`  ${index + 1}. ${field.name}`) + chalk.gray(` - ${field.current || 'Not set'}`));
         });
 
+        // Calculate special action numbers dynamically based on field count
+        const hasGalleryField = editableFields.find(f => f.key === 'gallery');
+        const startActionNum = editableFields.length + 1;
+        
         console.log('');
         console.log(chalk.cyan('Special Actions:'));
-        console.log(chalk.white('  9. 🎨 Generate AI Image'));
-        console.log(chalk.white('  10. 🎬 Generate AI Video'));
-        console.log(chalk.white('  11. 🤖 AI Enhance All Fields'));
-        console.log(chalk.white('  12. 💾 Save & Exit'));
+        
+        if (hasGalleryField) {
+            console.log(chalk.white(`  ${startActionNum}. 🖼️  Manage Image Gallery (view/validate)`));
+            console.log(chalk.white(`  ${startActionNum + 1}. 🖼️  Set Primary Image from Gallery`));
+            console.log(chalk.white(`  ${startActionNum + 2}. 🎨 Generate AI Image`));
+            console.log(chalk.white(`  ${startActionNum + 3}. 🎬 Generate AI Video`));
+            console.log(chalk.white(`  ${startActionNum + 4}. 🤖 AI Enhance All Fields`));
+            console.log(chalk.white(`  ${startActionNum + 5}. 💾 Save & Exit`));
+        } else {
+            console.log(chalk.white(`  ${startActionNum}. 🖼️  Set Primary Image from Gallery`));
+            console.log(chalk.white(`  ${startActionNum + 1}. 🎨 Generate AI Image`));
+            console.log(chalk.white(`  ${startActionNum + 2}. 🎬 Generate AI Video`));
+            console.log(chalk.white(`  ${startActionNum + 3}. 🤖 AI Enhance All Fields`));
+            console.log(chalk.white(`  ${startActionNum + 4}. 💾 Save & Exit`));
+        }
         console.log(chalk.white('  0. Cancel'));
 
         // Start interactive editing session
@@ -1186,28 +1230,45 @@ Please provide an enhanced version that improves the item according to the reque
             });
         };
 
-        const maxChoice = editableFields.length + 4; // 4 special actions (9-12, 0)
+        // Calculate special action numbers dynamically based on field count
+        const hasGalleryField = editableFields.find(f => f.key === 'gallery');
+        const startActionNum = editableFields.length + 1;
+        const manageGalleryNum = hasGalleryField ? startActionNum : null;
+        const setPrimaryNum = hasGalleryField ? startActionNum + 1 : startActionNum;
+        const generateImageNum = hasGalleryField ? startActionNum + 2 : startActionNum + 1;
+        const generateVideoNum = hasGalleryField ? startActionNum + 3 : startActionNum + 2;
+        const enhanceAllNum = hasGalleryField ? startActionNum + 4 : startActionNum + 3;
+        const saveExitNum = hasGalleryField ? startActionNum + 5 : startActionNum + 4;
+        const maxChoice = saveExitNum;
 
         while (true) {
             console.log('');
-            const choice = await prompt(`Enter your choice (1-${editableFields.length}, 9-12, or 0 to cancel): `);
+            const actionRange = hasGalleryField ? 
+                `${startActionNum}-${saveExitNum}` : 
+                `${startActionNum}-${saveExitNum}`;
+            const choice = await prompt(`Enter your choice (1-${editableFields.length}, ${actionRange}, or 0 to cancel): `);
             const choiceNum = parseInt(choice);
 
             if (choiceNum === 0) {
                 console.log(chalk.gray('Edit cancelled'));
                 break;
-            } else if (choiceNum === 12) {
+            } else if (choiceNum === saveExitNum) {
                 await this.saveItemChanges(item, contentType);
                 break;
-            } else if (choiceNum === 11) {
+            } else if (choiceNum === enhanceAllNum) {
                 await this.aiEnhanceAllFields(item, contentType);
-            } else if (choiceNum === 10) {
+            } else if (choiceNum === generateVideoNum) {
                 await this.generateAIVideo(item);
-            } else if (choiceNum === 9) {
+            } else if (choiceNum === generateImageNum) {
                 await this.generateAIImage(item);
+            } else if (choiceNum === setPrimaryNum) {
+                await this.setPrimaryImageFromGallery(item, contentType);
+            } else if (choiceNum === manageGalleryNum && hasGalleryField) {
+                // Quick access to gallery management
+                await this.manageImageGallery(item, contentType);
             } else if (choiceNum >= 1 && choiceNum <= editableFields.length) {
                 const field = editableFields[choiceNum - 1];
-                await this.editField(item, field);
+                await this.editField(item, field, contentType);
             } else {
                 console.log(chalk.red('❌ Invalid choice'));
             }
@@ -1217,7 +1278,20 @@ Please provide an enhanced version that improves the item according to the reque
     /**
      * ✏️ Edit a specific field
      */
-    async editField(item, field) {
+    async editField(item, field, contentType = null) {
+        // If contentType not provided, try to determine it from context or item structure
+        if (!contentType) {
+            if (this.currentContext === 'character') {
+                contentType = 'character';
+            } else if (this.currentContext === 'episode') {
+                contentType = 'episode';
+            } else if (this.currentContext === 'lore') {
+                contentType = 'lore';
+            } else {
+                // Default to lore
+                contentType = 'lore';
+            }
+        }
         const prompt = (question) => {
             return new Promise((resolve) => {
                 this.rl.question(chalk.yellow(question), resolve);
@@ -1243,7 +1317,14 @@ Please provide an enhanced version that improves the item according to the reque
                 console.log(chalk.green('👁️  Item set to visible'));
             }
         } else if (field.key === 'gallery') {
-            await this.manageImageGallery(item);
+            // Determine content type from current context
+            let contentType = 'lore';
+            if (this.currentContext === 'character') {
+                contentType = 'character';
+            } else if (this.currentContext === 'episode') {
+                contentType = 'episode';
+            }
+            await this.manageImageGallery(item, contentType);
         } else if (field.key === 'stakes') {
             // Stakes can be longer, give multi-line hint
             console.log(chalk.gray('(Type your response and press Enter. For longer text, use line breaks)'));
@@ -1272,7 +1353,7 @@ Please provide an enhanced version that improves the item according to the reque
     /**
      * 🖼️ Manage image gallery
      */
-    async manageImageGallery(item) {
+    async manageImageGallery(item, contentType = 'lore') {
         const prompt = (question) => {
             return new Promise((resolve) => {
                 this.rl.question(chalk.yellow(question), resolve);
@@ -1297,6 +1378,8 @@ Please provide an enhanced version that improves the item according to the reque
         console.log('  1. Add image URL');
         console.log('  2. Remove image');
         console.log('  3. Preview all images');
+        console.log('  4. 🔍 Validate all images');
+        console.log('  5. 📤 Upload image file from disk');
         console.log('  0. Back');
         
         const choice = await prompt('Choose action: ');
@@ -1315,7 +1398,101 @@ Please provide an enhanced version that improves the item according to the reque
                 console.log(chalk.green(`✅ Removed: ${removed[0]}`));
             }
         } else if (choice === '3') {
-            await this.previewImages(item.id);
+            await this.previewImages(item.image_gallery, item.id);
+        } else if (choice === '4') {
+            await this.validateImageGallery(item.image_gallery);
+        } else if (choice === '5') {
+            await this.uploadImageFile(item, contentType);
+        }
+    }
+
+    /**
+     * 📤 Upload image file from local filesystem
+     */
+    async uploadImageFile(item, contentType = 'lore') {
+        const prompt = (question) => {
+            return new Promise((resolve) => {
+                this.rl.question(chalk.yellow(question), resolve);
+            });
+        };
+
+        console.log(chalk.cyan('\n📤 UPLOAD IMAGE FILE'));
+        console.log(chalk.gray('─'.repeat(60)));
+
+        const filePath = await prompt('Enter path to image file: ');
+        
+        if (!filePath || !filePath.trim()) {
+            console.log(chalk.yellow('Upload cancelled'));
+            return;
+        }
+
+        try {
+            const fs = require('fs').promises;
+            const path = require('path');
+            
+            // Resolve file path (handle relative and absolute paths)
+            let resolvedPath = filePath.trim();
+            if (!path.isAbsolute(resolvedPath)) {
+                // Try relative to current working directory
+                resolvedPath = path.resolve(process.cwd(), resolvedPath);
+            }
+
+            console.log(chalk.gray(`  Reading file: ${resolvedPath}...`));
+
+            // Read file
+            const fileBuffer = await fs.readFile(resolvedPath);
+            const stats = await fs.stat(resolvedPath);
+            const extension = path.extname(resolvedPath).toLowerCase();
+            
+            // Determine MIME type
+            let mimeType = 'image/png';
+            if (['.jpg', '.jpeg'].includes(extension)) {
+                mimeType = 'image/jpeg';
+            } else if (extension === '.png') {
+                mimeType = 'image/png';
+            } else if (extension === '.webp') {
+                mimeType = 'image/webp';
+            } else if (extension === '.gif') {
+                mimeType = 'image/gif';
+            }
+
+            console.log(chalk.gray(`  File size: ${(stats.size / 1024 / 1024).toFixed(2)}MB`));
+            console.log(chalk.gray(`  MIME type: ${mimeType}`));
+
+            // Upload to S3 using the same method as AI-generated images
+            console.log(chalk.cyan('\n  Uploading to S3...'));
+            const relativePath = await this.uploadImageToS3(
+                fileBuffer,
+                contentType,
+                item.id,
+                {
+                    promptId: `file-upload-${Date.now()}`,
+                    model: 'file-upload',
+                    generatedAt: new Date().toISOString(),
+                    originalFilename: path.basename(resolvedPath)
+                }
+            );
+
+            // Add to gallery
+            if (!item.image_gallery) {
+                item.image_gallery = [];
+            }
+            item.image_gallery.push(relativePath);
+            
+            console.log(chalk.green(`\n✅ Image uploaded and added to gallery!`));
+            console.log(chalk.gray(`   Path: ${relativePath}`));
+            console.log(chalk.yellow('\n💡 Remember to save changes (option 12) to persist to Firebase'));
+
+        } catch (error) {
+            if (error.code === 'ENOENT') {
+                console.log(chalk.red(`\n❌ File not found: ${filePath}`));
+                console.log(chalk.yellow('   Tip: Use an absolute path or a path relative to the current directory'));
+            } else {
+                console.log(chalk.red(`\n❌ Upload failed: ${error.message}`));
+                if (process.env.DEBUG) {
+                    console.error(error.stack);
+                }
+            }
         }
     }
 
@@ -1581,22 +1758,82 @@ Please provide an enhanced version that improves the item according to the reque
                 }
 
                 console.log(chalk.green('\n✅ Image generated successfully!\n'));
-                console.log(chalk.cyan('Image URL:'));
-                console.log(chalk.white(imageUrl));
-
+                
                 // Preview the image
                 console.log(chalk.yellow('\n💡 Would you like to preview this image in your browser?'));
                 const previewChoice = await prompt('Preview? (y/n, default: y): ');
                 
                 if (!previewChoice || previewChoice.toLowerCase() !== 'n') {
-                    // Try to open in browser if open package is available
-                    try {
-                        const open = require('open');
-                        await open(imageUrl);
-                        console.log(chalk.green('✅ Opening in browser...'));
-                    } catch (e) {
-                        console.log(chalk.yellow('💡 Copy the URL above to view in your browser'));
+                    // Handle data URLs by creating a temp HTML file
+                    if (imageUrl.startsWith('data:')) {
+                        try {
+                            const fs = require('fs').promises;
+                            const path = require('path');
+                            const os = require('os');
+                            
+                            // Create temp HTML file with the image
+                            const tempDir = os.tmpdir();
+                            const tempFile = path.join(tempDir, `wavelength-preview-${Date.now()}.html`);
+                            const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wavelength Image Preview</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        img {
+            max-width: 100%;
+            max-height: 100vh;
+            border: 2px solid #333;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <img src="${imageUrl}" alt="Generated Image" />
+</body>
+</html>`;
+                            
+                            await fs.writeFile(tempFile, htmlContent);
+                            
+                            try {
+                                const open = require('open');
+                                await open(tempFile);
+                                console.log(chalk.green('✅ Opening preview in browser...'));
+                                console.log(chalk.gray(`   Temp file: ${tempFile}`));
+                            } catch (e) {
+                                console.log(chalk.yellow(`💡 Could not auto-open. View the file manually:`));
+                                console.log(chalk.white(`   ${tempFile}`));
+                            }
+                        } catch (error) {
+                            console.log(chalk.yellow('💡 Could not create preview file. The image URL is available above.'));
+                        }
+                    } else {
+                        // Regular URL - open directly
+                        try {
+                            const open = require('open');
+                            await open(imageUrl);
+                            console.log(chalk.green('✅ Opening in browser...'));
+                            console.log(chalk.cyan('Image URL:'));
+                            console.log(chalk.white(imageUrl));
+                        } catch (e) {
+                            console.log(chalk.yellow('💡 Copy the URL above to view in your browser'));
+                            console.log(chalk.cyan('Image URL:'));
+                            console.log(chalk.white(imageUrl));
+                        }
                     }
+                } else {
+                    // Show URL even if not previewing
+                    console.log(chalk.cyan('\nImage URL:'));
+                    console.log(chalk.white(imageUrl.substring(0, 100) + (imageUrl.length > 100 ? '...' : '')));
                 }
 
                 // Ask if they want to add to gallery
@@ -1604,14 +1841,48 @@ Please provide an enhanced version that improves the item according to the reque
                 const addChoice = await prompt('Add to gallery? (y/n, default: y): ');
                 
                 if (!addChoice || addChoice.toLowerCase() !== 'n') {
+                    // Determine content type from current context
+                    let contentType = 'lore'; // Default
+                    if (this.currentContext === 'character') {
+                        contentType = 'character';
+                    } else if (this.currentContext === 'episode') {
+                        contentType = 'episode';
+                    } else if (this.currentContext === 'lore') {
+                        contentType = 'lore';
+                    }
+                    
+                    // Upload to S3 if it's a data URL
+                    let galleryPath = imageUrl;
+                    if (imageUrl.startsWith('data:')) {
+                        console.log(chalk.cyan('\n📤 Uploading image to S3...'));
+                        try {
+                            galleryPath = await this.uploadImageToS3(
+                                imageUrl,
+                                contentType,
+                                item.id,
+                                {
+                                    promptId: `cli-${Date.now()}`,
+                                    model: 'openai-dalle-3',
+                                    generatedAt: new Date().toISOString()
+                                }
+                            );
+                            console.log(chalk.green(`✅ Image uploaded to S3: ${galleryPath}`));
+                        } catch (uploadError) {
+                            console.error(chalk.red(`❌ Failed to upload to S3: ${uploadError.message}`));
+                            console.log(chalk.yellow('💡 Storing as data URL instead (not recommended for production)'));
+                            // Continue with data URL if upload fails
+                        }
+                    }
+                    
                     if (!item.image_gallery) {
                         item.image_gallery = [];
                     }
-                    item.image_gallery.push(imageUrl);
+                    item.image_gallery.push(galleryPath);
                     console.log(chalk.green(`✅ Image added to gallery! (Total: ${item.image_gallery.length} images)`));
+                    console.log(chalk.gray(`   Path: ${galleryPath}`));
                     
-                    // Save the changes
-                    await this.saveItemChanges(item, 'lore');
+                    // Save the changes to Firebase
+                    await this.saveItemChanges(item, contentType);
                 } else {
                     console.log(chalk.yellow('Image not added to gallery'));
                 }
@@ -1623,6 +1894,302 @@ Please provide an enhanced version that improves the item according to the reque
             if (process.env.DEBUG) {
                 console.error(error.stack);
             }
+        }
+    }
+
+    /**
+     * 🖼️ Set primary image from gallery
+     */
+    async setPrimaryImageFromGallery(item, contentType = 'lore') {
+        const prompt = (question) => {
+            return new Promise((resolve) => {
+                this.rl.question(chalk.yellow(question), resolve);
+            });
+        };
+
+        console.log(chalk.cyan('\n🖼️  SET PRIMARY IMAGE FROM GALLERY'));
+        console.log(chalk.gray('─'.repeat(50)));
+
+        if (!item.image_gallery || item.image_gallery.length === 0) {
+            console.log(chalk.red('❌ No images in gallery. Generate or add images first.'));
+            return;
+        }
+
+        console.log(chalk.white('\nAvailable images in gallery:'));
+        console.log(chalk.gray('─'.repeat(50)));
+        
+        item.image_gallery.forEach((imagePath, index) => {
+            const isCurrentPrimary = (item.primaryImage === imagePath || item.primary_image === imagePath || item.image === imagePath);
+            const marker = isCurrentPrimary ? chalk.green(' ✓ (CURRENT)') : '';
+            const preview = imagePath.length > 60 ? imagePath.substring(0, 60) + '...' : imagePath;
+            console.log(chalk.white(`  ${index + 1}. ${preview}`) + marker);
+        });
+
+        console.log(chalk.gray('─'.repeat(50)));
+        const choice = await prompt(`\nSelect image to set as primary (1-${item.image_gallery.length}, or 0 to cancel): `);
+        const choiceNum = parseInt(choice);
+
+        if (choiceNum === 0) {
+            console.log(chalk.gray('Cancelled'));
+            return;
+        }
+
+        if (choiceNum < 1 || choiceNum > item.image_gallery.length) {
+            console.log(chalk.red('❌ Invalid selection'));
+            return;
+        }
+
+        const selectedImage = item.image_gallery[choiceNum - 1];
+        
+        // Set primary image based on content type
+        // Lore items use 'primaryImage', characters use 'primary_image', some use 'image'
+        if (contentType === 'lore') {
+            item.primaryImage = selectedImage;
+            // Also set 'image' field for backward compatibility
+            item.image = selectedImage;
+        } else if (contentType === 'character') {
+            item.primary_image = selectedImage;
+            item.image = selectedImage;
+        } else {
+            item.image = selectedImage;
+            item.primaryImage = selectedImage;
+        }
+
+        console.log(chalk.green(`\n✅ Primary image set to:`));
+        console.log(chalk.white(`   ${selectedImage}`));
+        console.log(chalk.yellow('\n💡 Remember to save changes (option 12) to persist to Firebase'));
+    }
+
+    /**
+     * 🔍 Validate image gallery - check which images are accessible
+     */
+    async validateImageGallery(imageGallery) {
+        if (!imageGallery || imageGallery.length === 0) {
+            console.log(chalk.yellow('❌ No images in gallery to validate'));
+            return;
+        }
+
+        console.log(chalk.cyan('\n🔍 VALIDATING IMAGE GALLERY'));
+        console.log(chalk.gray('─'.repeat(60)));
+        
+        const axios = require('axios');
+        // For validation, always use CloudFront to check actual CDN availability
+        // Local CDN_URL is for local dev, but we want to validate production CDN
+        const cloudFrontUrl = 'https://df5sj8f594cdx.cloudfront.net';
+        const localCdnUrl = process.env.CDN_URL || 'http://localhost:3001';
+        
+        const results = [];
+        
+        for (let i = 0; i < imageGallery.length; i++) {
+            const imagePath = imageGallery[i];
+            
+            // Build full URL - use CloudFront for validation to check actual CDN
+            let testUrl;
+            if (imagePath.startsWith('http')) {
+                testUrl = imagePath;
+            } else if (imagePath.startsWith('/')) {
+                // Use CloudFront URL for validation (checks actual CDN, not localhost)
+                testUrl = `${cloudFrontUrl}${imagePath}`;
+            } else {
+                testUrl = `${cloudFrontUrl}/${imagePath}`;
+            }
+            
+            process.stdout.write(chalk.gray(`  Checking ${i + 1}/${imageGallery.length}: ${imagePath.substring(0, 50)}... `));
+            
+            try {
+                const response = await axios.head(testUrl, {
+                    timeout: 5000,
+                    validateStatus: (status) => status < 500, // Accept redirects
+                    maxRedirects: 5
+                });
+                
+                const isAccessible = response.status < 400;
+                const statusEmoji = isAccessible ? '✅' : '❌';
+                const statusColor = isAccessible ? chalk.green : chalk.red;
+                
+                results.push({
+                    path: imagePath,
+                    url: testUrl,
+                    accessible: isAccessible,
+                    status: response.status,
+                    statusText: response.statusText
+                });
+                
+                console.log(statusColor(`${statusEmoji} ${response.status} ${response.statusText || ''}`));
+                
+            } catch (error) {
+                results.push({
+                    path: imagePath,
+                    url: testUrl,
+                    accessible: false,
+                    status: 'error',
+                    error: error.message
+                });
+                console.log(chalk.red(`❌ ${error.message}`));
+            }
+        }
+        
+        console.log(chalk.gray('─'.repeat(60)));
+        const accessibleCount = results.filter(r => r.accessible).length;
+        const totalCount = results.length;
+        
+        console.log(chalk.cyan(`\n📊 Validation Summary:`));
+        console.log(chalk.white(`   Total images: ${totalCount}`));
+        console.log(chalk.green(`   ✅ Accessible: ${accessibleCount}`));
+        console.log(chalk.red(`   ❌ Not accessible: ${totalCount - accessibleCount}`));
+        
+        if (accessibleCount < totalCount) {
+            console.log(chalk.yellow(`\n⚠️  Failed images:`));
+            results.filter(r => !r.accessible).forEach((result, idx) => {
+                console.log(chalk.red(`   ${idx + 1}. ${result.path}`));
+                console.log(chalk.gray(`      URL: ${result.url}`));
+                if (result.error) {
+                    console.log(chalk.gray(`      Error: ${result.error}`));
+                } else if (result.status) {
+                    console.log(chalk.gray(`      Status: ${result.status} ${result.statusText || ''}`));
+                }
+            });
+        }
+        
+        console.log('');
+    }
+
+    /**
+     * 🖼️ Preview images from gallery (overloaded method)
+     */
+    async previewImages(imageGalleryOrItemId, itemId = null) {
+        let imageGallery;
+        let displayItemId;
+        
+        // Handle overload: can be called with itemId (old way) or imageGallery array (new way)
+        if (typeof imageGalleryOrItemId === 'string') {
+            // Old way: previewImages(itemId)
+            displayItemId = imageGalleryOrItemId;
+            const item = loreHelpers.getLoreByIdSync(displayItemId);
+            if (!item) {
+                console.log(chalk.red(`❌ Item "${displayItemId}" not found`));
+                return;
+            }
+            imageGallery = [];
+            if (item.image) imageGallery.push(item.image);
+            if (item.image_gallery && Array.isArray(item.image_gallery)) {
+                imageGallery.push(...item.image_gallery);
+            }
+            if (imageGallery.length === 0) {
+                console.log(chalk.yellow('❌ No images found for this item'));
+                return;
+            }
+        } else if (Array.isArray(imageGalleryOrItemId)) {
+            // New way: previewImages(imageGallery, itemId)
+            imageGallery = imageGalleryOrItemId;
+            displayItemId = itemId || 'gallery';
+        } else {
+            console.log(chalk.red('❌ Invalid arguments for previewImages'));
+            return;
+        }
+
+        console.log(chalk.cyan('\n🖼️  PREVIEW IMAGES'));
+        console.log(chalk.gray('─'.repeat(60)));
+        
+        const cdnUrl = process.env.CDN_URL || 'http://localhost:3001';
+        const fs = require('fs').promises;
+        const path = require('path');
+        const os = require('os');
+        
+        // Build HTML with all images
+        const imageUrls = imageGallery.map(imgPath => {
+            if (imgPath.startsWith('http')) {
+                return imgPath;
+            } else if (imgPath.startsWith('/')) {
+                return `${cdnUrl}${imgPath}`;
+            } else {
+                return `${cdnUrl}/${imgPath}`;
+            }
+        });
+        
+        const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wavelength Image Gallery Preview - ${displayItemId}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #4a47a3;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .image-item {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #333;
+        }
+        .image-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+        .image-path {
+            font-size: 11px;
+            color: #888;
+            word-break: break-all;
+            margin-top: 10px;
+        }
+        .image-number {
+            color: #4a47a3;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Gallery: ${displayItemId}</h1>
+    <div class="gallery">
+        ${imageUrls.map((url, idx) => `
+            <div class="image-item">
+                <div class="image-number">Image ${idx + 1}/${imageUrls.length}</div>
+                <img src="${url}" alt="Gallery Image ${idx + 1}" onerror="this.style.border='3px solid red'; this.alt='Failed to load';">
+                <div class="image-path">${imageGallery[idx]}</div>
+            </div>
+        `).join('')}
+    </div>
+</body>
+</html>`;
+        
+        try {
+            const tempDir = os.tmpdir();
+            const tempFile = path.join(tempDir, `wavelength-gallery-preview-${displayItemId}-${Date.now()}.html`);
+            
+            await fs.writeFile(tempFile, htmlContent);
+            
+            try {
+                const open = require('open');
+                await open(tempFile);
+                console.log(chalk.green(`\n✅ Opening gallery preview in browser...`));
+                console.log(chalk.gray(`   Showing ${imageGallery.length} image(s)`));
+                console.log(chalk.gray(`   Temp file: ${tempFile}`));
+            } catch (e) {
+                console.log(chalk.yellow(`💡 Could not auto-open. View the file manually:`));
+                console.log(chalk.white(`   ${tempFile}`));
+            }
+        } catch (error) {
+            console.log(chalk.red(`❌ Failed to create preview: ${error.message}`));
         }
     }
 
@@ -2324,34 +2891,226 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
     }
 
     /**
+     * 📤 Upload image to S3 and return relative path
+     * @param {string} imageDataUrl - Base64 data URL or image buffer
+     * @param {string} contentType - Content type ('lore', 'character', 'episode')
+     * @param {string} contentId - Content ID (e.g., 'daphne-flower', 'andrew')
+     * @param {object} metadata - Image metadata
+     * @returns {Promise<string>} Relative path (e.g., '/images/lore/daphne-flower/ai-generated-1234567890-abc123.png')
+     */
+    async uploadImageToS3(imageDataUrl, contentType, contentId, metadata = {}) {
+        try {
+            // Convert data URL to buffer
+            let imageBuffer;
+            let mimeType = 'image/png';
+            
+            if (typeof imageDataUrl === 'string' && imageDataUrl.startsWith('data:')) {
+                // Parse data URL: data:image/png;base64,iVBORw0KGgo...
+                const matches = imageDataUrl.match(/^data:([^;]+);base64,(.+)$/);
+                if (!matches) {
+                    throw new Error('Invalid data URL format');
+                }
+                mimeType = matches[1] || 'image/png';
+                const base64Data = matches[2];
+                imageBuffer = Buffer.from(base64Data, 'base64');
+            } else if (Buffer.isBuffer(imageDataUrl)) {
+                imageBuffer = imageDataUrl;
+            } else {
+                throw new Error('Invalid image data format');
+            }
+            
+            // Generate S3 key following the existing pattern
+            // Match existing paths: /static/images/characters/... for characters
+            // For lore items, use /static/images/lore/... or /static/images/lores/...
+            const timestamp = Date.now();
+            const imageId = crypto.randomBytes(8).toString('hex');
+            const extension = mimeType === 'image/jpeg' ? 'jpg' : 'png';
+            
+            // Determine the correct path structure based on content type
+            // IMPORTANT: CloudFront serves from /images/* (without /static/ prefix)
+            // Local dev serves from /static/images/... but CloudFront/CDN uses /images/...
+            // S3 bucket stores at: images/{contentType}s/{id}/... (no static prefix for CloudFront)
+            let s3Key;
+            if (contentType === 'character') {
+                // Characters: images/characters/{contentId}/...
+                s3Key = `images/characters/${contentId}/ai-generated-${timestamp}-${imageId}.${extension}`;
+            } else if (contentType === 'lore') {
+                // Lore items: images/lore/{id}/... (CloudFront serves as /images/lore/...)
+                s3Key = `images/lore/${contentId}/ai-generated-${timestamp}-${imageId}.${extension}`;
+            } else if (contentType === 'episode') {
+                // Episodes: images/seasons/...
+                s3Key = `images/seasons/${contentId}/ai-generated-${timestamp}-${imageId}.${extension}`;
+            } else {
+                // Fallback: images/{contentType}s/...
+                const contentTypePlural = contentType === 'lore' ? 'lores' : `${contentType}s`;
+                s3Key = `images/${contentTypePlural}/${contentId}/ai-generated-${timestamp}-${imageId}.${extension}`;
+            }
+            
+            console.log(chalk.gray(`  📤 Uploading to S3: ${s3Key}...`));
+            
+            // Sanitize metadata values
+            const sanitizeMetadata = (value) => {
+                if (!value) return 'unknown';
+                return String(value)
+                    .replace(/[\r\n\t]/g, ' ')
+                    .replace(/[^\x20-\x7E]/g, '')
+                    .substring(0, 200)
+                    .trim();
+            };
+            
+            const uploadParams = {
+                // Use lore bucket for content images (lore, characters, episodes)
+                // GALLERY_S3_BUCKET is for user gallery uploads, not content images
+                Bucket: process.env.S3_BUCKET_NAME || 'wavelength-lore-bucket',
+                Key: s3Key,
+                Body: imageBuffer,
+                ContentType: mimeType,
+                CacheControl: 'max-age=31536000', // 1 year cache
+                Metadata: {
+                    'generated-by': 'cli-ai-image-generator',
+                    'prompt-id': sanitizeMetadata(metadata.promptId || 'unknown'),
+                    'generated-at': new Date().toISOString(),
+                    'model': sanitizeMetadata(metadata.model || 'unknown'),
+                    'content-type': contentType,
+                    'content-id': contentId
+                }
+            };
+            
+            const command = new PutObjectCommand(uploadParams);
+            
+            console.log(chalk.gray(`  📤 Uploading to S3 bucket: ${uploadParams.Bucket}`));
+            console.log(chalk.gray(`  📤 S3 Key: ${s3Key}`));
+            
+            try {
+                await this.s3Client.send(command);
+                console.log(chalk.green(`  ✅ Successfully uploaded to S3: ${s3Key}`));
+                
+                // Verify the upload by checking if object exists
+                const { HeadObjectCommand } = require('@aws-sdk/client-s3');
+                const headCommand = new HeadObjectCommand({
+                    Bucket: uploadParams.Bucket,
+                    Key: s3Key
+                });
+                
+                try {
+                    await this.s3Client.send(headCommand);
+                    console.log(chalk.green(`  ✅ Verified: Image exists in S3`));
+                    console.log(chalk.cyan(`  🌐 CloudFront URL: https://df5sj8f594cdx.cloudfront.net/${s3Key}`));
+                } catch (verifyError) {
+                    console.log(chalk.yellow(`  ⚠️  Warning: Could not verify upload (might need a moment to propagate)`));
+                    console.log(chalk.yellow(`     Error: ${verifyError.message}`));
+                }
+            } catch (uploadError) {
+                console.error(chalk.red(`  ❌ S3 Upload Error:`));
+                console.error(chalk.red(`     ${uploadError.message}`));
+                if (uploadError.Code) {
+                    console.error(chalk.red(`     Error Code: ${uploadError.Code}`));
+                }
+                if (uploadError.$metadata) {
+                    console.error(chalk.gray(`     Request ID: ${uploadError.$metadata.requestId}`));
+                }
+                throw uploadError;
+            }
+            
+            // Return relative path (with leading slash) as used throughout the system
+            const relativePath = `/${s3Key}`;
+            
+            return relativePath;
+            
+        } catch (error) {
+            console.error(chalk.red(`  ❌ Failed to upload to S3: ${error.message}`));
+            throw error;
+        }
+    }
+
+    /**
      * 💾 Save item changes to Firebase
      */
     async saveItemChanges(item, contentType = 'lore') {
-        console.log(chalk.cyan('💾 Saving changes...'));
+        console.log(chalk.cyan('💾 Saving changes to Firebase...'));
 
         try {
+            if (!item.id) {
+                throw new Error('Item ID is required to save changes');
+            }
+
             // Display what's being saved
             console.log(chalk.yellow(`\n📋 Changes Summary for ${contentType.toUpperCase()}:`));
             console.log(chalk.gray('─'.repeat(50)));
 
+            // Show key fields being saved
+            if (item.title) console.log(chalk.white(`  Title: ${item.title}`));
+            if (item.description) {
+                const descPreview = item.description.substring(0, 100) + (item.description.length > 100 ? '...' : '');
+                console.log(chalk.white(`  Description: ${descPreview}`));
+            }
+            if (item.image_gallery && item.image_gallery.length > 0) {
+                console.log(chalk.white(`  Image Gallery: ${item.image_gallery.length} image(s)`));
+                // Show if any are data URLs (need S3 upload)
+                const dataUrlCount = item.image_gallery.filter(url => url.startsWith('data:')).length;
+                if (dataUrlCount > 0) {
+                    console.log(chalk.yellow(`  ⚠️  ${dataUrlCount} image(s) are data URLs (base64) - consider uploading to S3 for better performance`));
+                }
+            }
+
             // Show character-specific CTA fields if present
             if (contentType === 'character') {
-                if (item.title) console.log(chalk.white(`  Title: ${item.title}`));
                 if (item.tagline) console.log(chalk.white(`  🎭 Tagline: ${item.tagline}`));
                 if (item.stakes) console.log(chalk.white(`  ⚔️ Stakes: ${item.stakes}`));
                 if (item.cta_text) console.log(chalk.white(`  🔗 CTA Text: ${item.cta_text}`));
             }
 
-            // Here we would save to Firebase
-            // For now, we'll update the local cache
-            console.log(chalk.green('\n✅ Changes saved successfully!'));
-            console.log(chalk.yellow('📝 Note: Full Firebase persistence integration pending'));
+            // Determine Firebase path based on content type
+            let firebasePath;
+            if (contentType === 'lore') {
+                firebasePath = `lore/${item.id}`;
+            } else if (contentType === 'character') {
+                firebasePath = `characters/${item.id}`;
+            } else if (contentType === 'location') {
+                firebasePath = `locations/${item.id}`;
+            } else {
+                throw new Error(`Unsupported content type: ${contentType}`);
+            }
 
-            // Update local cache (this is a start)
-            console.log(chalk.gray(`Updated item: ${item.title || item.name}`));
+            // Fetch current data from Firebase
+            const { fetchDataAsAdmin, writeDataAsAdmin } = require('./helpers/firebase-admin-utils');
+            
+            console.log(chalk.gray(`\n  Fetching current data from Firebase: ${firebasePath}...`));
+            const currentData = await fetchDataAsAdmin(firebasePath);
+
+            // Merge updates with existing data
+            const updatedData = {
+                ...(currentData || {}),
+                ...item,
+                updatedAt: new Date().toISOString(),
+                // Preserve Firebase metadata if it exists
+                ...(currentData?.metadata && { metadata: currentData.metadata })
+            };
+
+            // Save to Firebase
+            console.log(chalk.gray(`  Writing updated data to Firebase...`));
+            await writeDataAsAdmin(firebasePath, updatedData);
+
+            console.log(chalk.green('\n✅ Changes saved successfully to Firebase!'));
+            console.log(chalk.gray(`  Path: ${firebasePath}`));
+            console.log(chalk.gray(`  Item: ${item.title || item.name || item.id}`));
+
+            // Warn about data URLs if present
+            if (item.image_gallery) {
+                const dataUrlImages = item.image_gallery.filter(url => url.startsWith('data:'));
+                if (dataUrlImages.length > 0) {
+                    console.log(chalk.yellow(`\n  💡 Note: ${dataUrlImages.length} image(s) stored as data URLs.`));
+                    console.log(chalk.yellow(`     Consider uploading to S3 for better performance and permanence.`));
+                }
+            }
 
         } catch (error) {
-            console.log(chalk.red('❌ Failed to save changes:', error.message));
+            console.log(chalk.red('\n❌ Failed to save changes to Firebase:'));
+            console.log(chalk.red(`   Error: ${error.message}`));
+            if (process.env.DEBUG) {
+                console.error(error.stack);
+            }
+            throw error;
         }
     }
 
