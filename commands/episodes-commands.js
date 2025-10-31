@@ -781,6 +781,19 @@ class EpisodeCommands {
      */
     async uploadSongForEpisode(episodeId, episode) {
         try {
+            // Pause main CLI's readline to prevent input conflicts
+            const mainRl = this.cli.rl;
+            const wasPaused = mainRl.paused;
+            
+            // Store the original line handler to restore later
+            const lineHandlers = mainRl.listeners('line');
+            
+            if (!wasPaused) {
+                mainRl.pause();
+                // Remove the 'line' listener temporarily to prevent double input
+                mainRl.removeAllListeners('line');
+            }
+            
             // Create readline interface for SongUploadStep
             const rl = readline.createInterface({
                 input: process.stdin,
@@ -831,7 +844,19 @@ class EpisodeCommands {
             // Execute song upload
             await songUploadStep.execute(episode);
             
+            // Close song upload's readline
             rl.close();
+            
+            // Restore main CLI's readline
+            if (!wasPaused) {
+                // Restore the original line handlers
+                lineHandlers.forEach(handler => {
+                    mainRl.on('line', handler);
+                });
+                mainRl.resume();
+                // Restore the prompt
+                mainRl.prompt();
+            }
 
             console.log(chalk.green('\n✅ Song uploaded and attached to episode!'));
             
