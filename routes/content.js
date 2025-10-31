@@ -489,7 +489,7 @@ router.get('/characters', async (req, res) => {
           image: c.image,
           visible: c.visible
         })),
-        isContentCreator: showHidden, // Pass the flag to template
+        isContentCreator: res.locals.isContentCreator || false, // Pass the flag to template
         cdnUrl: process.env.CDN_URL,
         version: `v${Date.now()}`,
         req: req
