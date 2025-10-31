@@ -20,6 +20,7 @@ const BackupCommands = require('./commands/backup-commands');
 const CharacterCommands = require('./commands/character-commands');
 const LoreCommands = require('./commands/lore-commands');
 const SongsCommands = require('./commands/songs-commands');
+const MediaCommands = require('./commands/media-commands');
 
 class WavelengthContentCLI {
     constructor() {
@@ -32,6 +33,8 @@ class WavelengthContentCLI {
         this.characterCommands = new CharacterCommands(this);
         this.loreCommands = new LoreCommands(this);
         this.songsCommands = new SongsCommands(this);
+        this.mediaCommands = new MediaCommands(this);
+        this.importedPrompts = null; // Loaded prompts from import
         
         this.rl = readline.createInterface({
             input: process.stdin,
@@ -49,6 +52,9 @@ class WavelengthContentCLI {
 
     async start() {
         console.log(chalk.green('🚀 Initializing Wavelength CLI...'));
+        
+        // Load imported prompts if available
+        await this.loadImportedPrompts();
         
         // Initialize all content helpers
         try {
@@ -382,10 +388,6 @@ class WavelengthContentCLI {
                     await this.duplicateContent(args[0], args[1]);
                     break;
                     
-                case 'template':
-                    await this.showTemplates(args[0]);
-                    break;
-                    
                 case 'search':
                     await this.searchContent(args.slice(0).join(' '));
                     break;
@@ -432,6 +434,14 @@ class WavelengthContentCLI {
                     
                 case 'lore':
                     await this.loreCommands.handleLoreCommands(args);
+                    break;
+                    
+                case 'media':
+                    await this.mediaCommands.handleMediaCommands(args);
+                    break;
+                    
+                case 'prompts':
+                    await this.handlePromptsCommand(args);
                     break;
                     
                 case 'clear':
@@ -481,8 +491,6 @@ class WavelengthContentCLI {
         console.log(chalk.green('\nContent Creation:'));
         console.log('  create <type> <name> - Create new content (lore/character/episode)');
         console.log('  duplicate <item> <new-name> - Clone existing item');
-        console.log('  template <type>  - Show available templates');
-        
         console.log(chalk.green('\nContent Discovery:'));
         console.log('  search <terms>   - Full-text search across all content');
         console.log('  find <pattern>   - Find items by pattern matching');
@@ -499,6 +507,24 @@ class WavelengthContentCLI {
         console.log('  hide <item>      - Hide item from public view');
         console.log('  show <item>      - Make item visible to public');
         
+        console.log(chalk.green('\nMedia Generation (AI):'));
+        console.log('  media images generate "prompt" [--count=<n>]');
+        console.log('  media images preview [asset-id] [--browser]');
+        console.log('  media images approve <asset-id>');
+        console.log('  media images reject <asset-id> [--reason="reason"]');
+        console.log('  media images regenerate <asset-id>');
+        console.log('  media videos generate --image=<url> --prompt="description"');
+        console.log('  media videos status <operation-id>');
+        console.log('  media episode <episode-id> generate [--images=<n>]');
+        console.log('  media help                              - Detailed media generation help');
+        
+        console.log(chalk.green('\nPrompts Management:'));
+        console.log('  prompts list                            - List all imported prompts');
+        console.log('  prompts list --type=<characters|locations|lore> - Filter by type');
+        console.log('  prompts search <query>                  - Search prompts by content ID or text');
+        console.log('  prompts show <content-id>               - Show all prompts for a content item');
+        console.log('  prompts stats                           - Show prompt statistics');
+        console.log('  prompts import                          - Re-import prompts from content/prompts/');
         console.log(chalk.green('\nMedia Management:'));
         console.log('  preview <item>   - Open item images in browser');
         
@@ -1295,17 +1321,954 @@ Please provide an enhanced version that improves the item according to the reque
 
     /**
      * 🎨 Generate AI Image for item
+     * Contextual workflow: show prompts, generate, preview, add to gallery
      */
     async generateAIImage(item) {
-        console.log(chalk.cyan('🎨 AI IMAGE GENERATION'));
-        console.log(chalk.yellow('This feature will integrate with AI image generation services'));
-        console.log(chalk.gray(`Generating image for: ${item.title}`));
-        console.log(chalk.gray(`Description: ${item.description}`));
+        const prompt = (question) => {
+            return new Promise((resolve) => {
+                this.rl.question(chalk.yellow(question), resolve);
+            });
+        };
+
+        console.log(chalk.cyan('\n🎨 AI IMAGE GENERATION'));
+        console.log(chalk.gray(`Generating image for: ${item.title || item.name || item.id}\n`));
+
+        // Generate suggested prompts from item data
+        const suggestedPrompts = this.generatePromptsForItem(item);
         
-        // Placeholder for AI image generation
-        // This would integrate with DALL-E, Midjourney API, or similar
-        console.log(chalk.blue('🔮 Feature framework ready - AI service integration needed'));
+        // Check if we have actual prompts or just the "no prompts" message
+        const hasActualPrompts = suggestedPrompts.length > 0 && 
+                                 suggestedPrompts[0].source !== 'No Prompts';
+        
+        if (hasActualPrompts) {
+            console.log(chalk.green('\n📝 Imported Prompts:'));
+            console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+            
+            suggestedPrompts.forEach((promptObj, index) => {
+                const promptText = typeof promptObj === 'string' ? promptObj : promptObj.text;
+                const source = typeof promptObj === 'string' ? 'Item data' : promptObj.source;
+                const description = typeof promptObj === 'string' ? '' : promptObj.description;
+                
+                // Handle multi-paragraph prompts - show first 200 chars and indicate length
+                const preview = promptText.length > 200 ? promptText.substring(0, 197) + '...' : promptText;
+                const lineCount = promptText.split('\n').length;
+                
+                console.log(chalk.cyan(`  ${index + 1}. [${source}]`));
+                if (promptText) {
+                    console.log(chalk.white(`     ${preview.replace(/\n/g, ' ')}`));
+                    if (promptText.length > 200) {
+                        console.log(chalk.gray(`     ... (${promptText.length} characters, ${lineCount} lines)`));
+                    } else if (lineCount > 1) {
+                        console.log(chalk.gray(`     (${lineCount} lines)`));
+                    }
+                }
+                if (description) {
+                    console.log(chalk.gray(`     ${description}`));
+                }
+                console.log('');
+            });
+        } else {
+            console.log(chalk.yellow('\n⚠️  No imported prompts found for this item.'));
+            console.log(chalk.gray('   Run "npm run prompts:import" to import prompts from content/prompts/\n'));
+        }
+        
+        console.log(chalk.yellow(`  ${hasActualPrompts ? suggestedPrompts.length + 1 : 1}. 📄 Load prompt from file`));
+        console.log(chalk.gray('  0. Cancel\n'));
+
+        const choice = await prompt('Select a prompt (or 0 to cancel): ');
+        const choiceNum = parseInt(choice);
+
+        if (choiceNum === 0) {
+            console.log(chalk.yellow('Cancelled'));
+            return;
+        }
+
+        let selectedPrompt;
+        if (hasActualPrompts && choiceNum > 0 && choiceNum <= suggestedPrompts.length) {
+            const promptObj = suggestedPrompts[choiceNum - 1];
+            selectedPrompt = typeof promptObj === 'string' ? promptObj : promptObj.text;
+            const source = typeof promptObj === 'string' ? 'Item data' : promptObj.source;
+            console.log(chalk.green(`\n✅ Selected prompt [${source}]:`));
+            console.log(chalk.white(`   ${selectedPrompt}`));
+        } else if ((hasActualPrompts && choiceNum === suggestedPrompts.length + 1) || 
+                   (!hasActualPrompts && choiceNum === 1)) {
+            // Load prompt from file
+            const filePath = await prompt('\n📄 Enter path to prompt file: ');
+            if (!filePath.trim()) {
+                console.log(chalk.yellow('Cancelled'));
+                return;
+            }
+            
+            try {
+                const fs = require('fs').promises;
+                const path = require('path');
+                
+                // Resolve the path - try multiple strategies
+                let resolvedPath = filePath.trim();
+                const attemptedPaths = [];
+                
+                // If it's already an absolute path, try it directly
+                if (path.isAbsolute(resolvedPath)) {
+                    attemptedPaths.push(resolvedPath);
+                } else {
+                    // Try multiple relative path strategies
+                    // 1. Relative to current working directory
+                    const cwdPath = path.resolve(process.cwd(), resolvedPath);
+                    attemptedPaths.push(cwdPath);
+                    
+                    // 2. Relative to CLI's directory (Wavelength-Lore.fresh)
+                    const cliDirPath = path.resolve(__dirname, resolvedPath);
+                    attemptedPaths.push(cliDirPath);
+                    
+                    // 3. If path starts with "Wavelength-Lore/Wavelength-Lore.fresh/", strip it
+                    let cleanPath = resolvedPath;
+                    if (cleanPath.startsWith('Wavelength-Lore/Wavelength-Lore.fresh/')) {
+                        cleanPath = cleanPath.replace('Wavelength-Lore/Wavelength-Lore.fresh/', '');
+                        attemptedPaths.push(path.resolve(__dirname, cleanPath));
+                    }
+                    if (cleanPath.startsWith('Wavelength-Lore.fresh/')) {
+                        cleanPath = cleanPath.replace('Wavelength-Lore.fresh/', '');
+                        attemptedPaths.push(path.resolve(__dirname, cleanPath));
+                    }
+                    
+                    // 4. Try relative to project root (one level up from CLI dir)
+                    const projectRootPath = path.resolve(__dirname, '..', resolvedPath);
+                    attemptedPaths.push(projectRootPath);
+                    
+                    // 5. If absolute path was provided, try it too
+                    const absPath = path.resolve(resolvedPath);
+                    if (absPath !== cwdPath && absPath !== cliDirPath) {
+                        attemptedPaths.push(absPath);
+                    }
+                }
+                
+                // Remove duplicates and try each path
+                const uniquePaths = [...new Set(attemptedPaths)];
+                let foundPath = null;
+                
+                for (const tryPath of uniquePaths) {
+                    try {
+                        await fs.access(tryPath);
+                        foundPath = tryPath;
+                        break;
+                    } catch {
+                        // Continue to next path
+                    }
+                }
+                
+                if (!foundPath) {
+                    console.log(chalk.red(`\n❌ File not found. Attempted paths:`));
+                    uniquePaths.forEach(p => console.log(chalk.gray(`   - ${p}`)));
+                    console.log(chalk.yellow(`\n   Current directory: ${process.cwd()}`));
+                    console.log(chalk.yellow(`   CLI directory: ${__dirname}`));
+                    console.log(chalk.yellow('   Tip: Try a relative path like: content/prompts/lore/daphne-flower-prompt.md\n'));
+                    return;
+                }
+                
+                resolvedPath = foundPath;
+                console.log(chalk.gray(`   Loading: ${resolvedPath}`));
+                const fileContent = await fs.readFile(resolvedPath, 'utf-8');
+                
+                selectedPrompt = fileContent.trim();
+                console.log(chalk.green(`\n✅ Loaded prompt from: ${resolvedPath}`));
+                console.log(chalk.gray(`   ${selectedPrompt.length} characters, ${selectedPrompt.split('\n').length} lines`));
+                
+                // Show preview (first 200 chars)
+                const preview = selectedPrompt.length > 200 
+                    ? selectedPrompt.substring(0, 197) + '...' 
+                    : selectedPrompt;
+                console.log(chalk.white(`\n   Preview: ${preview.replace(/\n/g, ' ')}`));
+                
+                // Save this prompt to imported prompts for future use
+                await this.savePromptToImported(item, selectedPrompt, resolvedPath);
+            } catch (error) {
+                console.error(chalk.red(`\n❌ Failed to load file: ${error.message}`));
+                console.log(chalk.yellow('   Please check the file path and try again\n'));
+                return;
+            }
+        } else {
+            console.log(chalk.red('Invalid choice'));
+            return;
+        }
+
+        // Allow editing the prompt via file
+        console.log(chalk.yellow('\n💡 You can edit this prompt before generating.'));
+        const editChoice = await prompt('Edit prompt? (y/n, default: n): ');
+        
+        if (editChoice.toLowerCase() === 'y' || editChoice.toLowerCase() === 'yes') {
+            console.log(chalk.gray('\n   Current prompt:'));
+            const preview = selectedPrompt.length > 300 
+                ? selectedPrompt.substring(0, 297) + '...' 
+                : selectedPrompt;
+            console.log(chalk.white(`   ${preview.split('\n').join('\n   ')}`));
+            console.log(chalk.yellow('\n   📄 Load edited prompt from file (or press Enter to keep current):'));
+            const editFilePath = await prompt('   File path: ');
+            
+            if (editFilePath.trim()) {
+                try {
+                    const fs = require('fs').promises;
+                    const path = require('path');
+                    
+                    // Use the same path resolution logic
+                    let resolvedPath = editFilePath.trim();
+                    if (!path.isAbsolute(resolvedPath)) {
+                        const cwdPath = path.resolve(process.cwd(), resolvedPath);
+                        const cliDirPath = path.resolve(__dirname, resolvedPath);
+                        
+                        let cleanPath = resolvedPath;
+                        if (cleanPath.startsWith('Wavelength-Lore/Wavelength-Lore.fresh/')) {
+                            cleanPath = cleanPath.replace('Wavelength-Lore/Wavelength-Lore.fresh/', '');
+                        }
+                        if (cleanPath.startsWith('Wavelength-Lore.fresh/')) {
+                            cleanPath = cleanPath.replace('Wavelength-Lore.fresh/', '');
+                        }
+                        
+                        const paths = [cwdPath, cliDirPath, path.resolve(__dirname, cleanPath)];
+                        let foundPath = null;
+                        
+                        for (const tryPath of paths) {
+                            try {
+                                await fs.access(tryPath);
+                                foundPath = tryPath;
+                                break;
+                            } catch {}
+                        }
+                        
+                        if (foundPath) {
+                            resolvedPath = foundPath;
+                        } else {
+                            resolvedPath = cwdPath;
+                        }
+                    }
+                    
+                    const editedContent = await fs.readFile(resolvedPath, 'utf-8');
+                    selectedPrompt = editedContent.trim();
+                    console.log(chalk.green(`   ✅ Loaded edited prompt from: ${resolvedPath}`));
+                } catch (error) {
+                    console.log(chalk.yellow(`   ⚠️  Could not load file, keeping current prompt: ${error.message}`));
+                }
+            }
+        }
+
+        // Use prompt directly without templates - user's prompt is complete and ready to use
+        console.log(chalk.cyan('\n🎨 Generating image with your prompt...\n'));
+        
+        try {
+            const result = await this.mediaCommands.mediaService.generateImages({
+                promptText: selectedPrompt,
+                // No template - use prompt as-is
+                count: 1,
+                width: 1024,
+                height: 1024,
+                style: 'photorealistic', // Default style
+                contentType: 'lore',
+                contentId: item.id,
+                metadata: {
+                    itemId: item.id,
+                    itemTitle: item.title || item.name,
+                    generatedBy: 'cli-interactive',
+                    timestamp: Date.now()
+                }
+            });
+
+            if (result.success && result.images && result.images.length > 0) {
+                const generatedImage = result.images[0];
+                const imageUrl = generatedImage.url || generatedImage.previewUrl;
+                
+                if (!imageUrl) {
+                    console.log(chalk.red('❌ Generated image but no URL returned'));
+                    return;
+                }
+
+                console.log(chalk.green('\n✅ Image generated successfully!\n'));
+                console.log(chalk.cyan('Image URL:'));
+                console.log(chalk.white(imageUrl));
+
+                // Preview the image
+                console.log(chalk.yellow('\n💡 Would you like to preview this image in your browser?'));
+                const previewChoice = await prompt('Preview? (y/n, default: y): ');
+                
+                if (!previewChoice || previewChoice.toLowerCase() !== 'n') {
+                    // Try to open in browser if open package is available
+                    try {
+                        const open = require('open');
+                        await open(imageUrl);
+                        console.log(chalk.green('✅ Opening in browser...'));
+                    } catch (e) {
+                        console.log(chalk.yellow('💡 Copy the URL above to view in your browser'));
+                    }
+                }
+
+                // Ask if they want to add to gallery
+                console.log(chalk.yellow('\n💡 Would you like to add this image to the gallery?'));
+                const addChoice = await prompt('Add to gallery? (y/n, default: y): ');
+                
+                if (!addChoice || addChoice.toLowerCase() !== 'n') {
+                    if (!item.image_gallery) {
+                        item.image_gallery = [];
+                    }
+                    item.image_gallery.push(imageUrl);
+                    console.log(chalk.green(`✅ Image added to gallery! (Total: ${item.image_gallery.length} images)`));
+                    
+                    // Save the changes
+                    await this.saveItemChanges(item, 'lore');
+                } else {
+                    console.log(chalk.yellow('Image not added to gallery'));
+                }
+            } else {
+                console.log(chalk.red('❌ Image generation failed - no images returned'));
+            }
+        } catch (error) {
+            console.error(chalk.red(`❌ Generation failed: ${error.message}`));
+            if (process.env.DEBUG) {
+                console.error(error.stack);
+            }
+        }
     }
+
+    /**
+     * Load imported prompts from JSON file
+     */
+    async loadImportedPrompts() {
+        try {
+            const fs = require('fs').promises;
+            const path = require('path');
+            const promptsPath = path.join(__dirname, 'data/imported-prompts.json');
+            
+            const data = await fs.readFile(promptsPath, 'utf-8');
+            this.importedPrompts = JSON.parse(data);
+            console.log(chalk.gray(`   📝 Loaded ${this.getTotalPromptCount()} imported prompts`));
+        } catch (error) {
+            // File doesn't exist or can't be read - that's okay
+            this.importedPrompts = null;
+        }
+    }
+
+    /**
+     * Get total count of imported prompts
+     */
+    getTotalPromptCount() {
+        if (!this.importedPrompts) return 0;
+        
+        let count = 0;
+        if (this.importedPrompts.characters) count += Object.keys(this.importedPrompts.characters).length;
+        if (this.importedPrompts.locations) count += Object.keys(this.importedPrompts.locations).length;
+        if (this.importedPrompts.lore) count += Object.keys(this.importedPrompts.lore).length;
+        return count;
+    }
+
+    /**
+     * Get imported prompts for an item
+     */
+    getImportedPromptsForItem(item) {
+        if (!this.importedPrompts || !item || !item.id) {
+            return [];
+        }
+
+        const prompts = [];
+        const itemId = item.id;
+        const itemTitle = (item.title || '').toLowerCase();
+
+        // Check characters
+        if (this.importedPrompts.characters && this.importedPrompts.characters[itemId]) {
+            const promptData = this.importedPrompts.characters[itemId];
+            this.extractPromptsFromImported(promptData, prompts, 'Imported Character Prompt');
+        }
+
+        // Check locations
+        if (this.importedPrompts.locations && this.importedPrompts.locations[itemId]) {
+            const promptData = this.importedPrompts.locations[itemId];
+            this.extractPromptsFromImported(promptData, prompts, 'Imported Location Prompt');
+        }
+
+        // Check lore
+        if (this.importedPrompts.lore && this.importedPrompts.lore[itemId]) {
+            const promptData = this.importedPrompts.lore[itemId];
+            this.extractPromptsFromImported(promptData, prompts, 'Imported Lore Prompt');
+        }
+
+        // Also check unmatched prompts - they might match by ID or title
+        if (this.importedPrompts.unmatched && this.importedPrompts.unmatched.length > 0) {
+            this.importedPrompts.unmatched.forEach(unmatchedData => {
+                const unmatchedId = (unmatchedData.contentId || '').toLowerCase();
+                const unmatchedTitle = (unmatchedData.match?.item?.title || '').toLowerCase();
+                
+                // Try to match by ID (exact or partial)
+                if (itemId.toLowerCase() === unmatchedId || 
+                    itemId.toLowerCase().includes(unmatchedId) || 
+                    unmatchedId.includes(itemId.toLowerCase())) {
+                    this.extractPromptsFromImported(unmatchedData, prompts, 'Imported Prompt (Unmatched)');
+                    return;
+                }
+                
+                // Try to match by title (if available)
+                if (itemTitle && unmatchedTitle && 
+                    (itemTitle.includes(unmatchedTitle) || unmatchedTitle.includes(itemTitle))) {
+                    this.extractPromptsFromImported(unmatchedData, prompts, 'Imported Prompt (Unmatched)');
+                    return;
+                }
+                
+                // Try fuzzy matching on common patterns
+                // e.g., "daphne-flower" might match "🌸 Daphne 🌸"
+                const cleanItemTitle = itemTitle.replace(/[🌸🌺🌻🌷🌹]/g, '').trim();
+                const cleanUnmatchedId = unmatchedId.replace(/-flower$/, '').trim();
+                if (cleanItemTitle && cleanUnmatchedId && 
+                    (cleanItemTitle.includes(cleanUnmatchedId) || cleanUnmatchedId.includes(cleanItemTitle.replace(/\s+/g, '-')))) {
+                    this.extractPromptsFromImported(unmatchedData, prompts, 'Imported Prompt (Unmatched)');
+                    return;
+                }
+            });
+        }
+
+        return prompts;
+    }
+
+    /**
+     * Extract prompts from imported prompt data
+     */
+    extractPromptsFromImported(promptData, promptsArray, sourceLabel) {
+        // Add default prompts
+        if (promptData.prompts && promptData.prompts.default) {
+            promptData.prompts.default.forEach((promptText, index) => {
+                promptsArray.push({
+                    text: promptText,
+                    source: sourceLabel + (promptData.prompts.default.length > 1 ? ` ${index + 1}` : ''),
+                    description: `Imported from ${promptData.filePath}`
+                });
+            });
+        }
+
+        // Add version prompts
+        if (promptData.prompts && promptData.prompts.versions) {
+            Object.entries(promptData.prompts.versions).forEach(([version, versionPrompts]) => {
+                if (Array.isArray(versionPrompts)) {
+                    versionPrompts.forEach((promptText, index) => {
+                        promptsArray.push({
+                            text: promptText,
+                            source: `${sourceLabel} - Version ${version}`,
+                            description: `Imported version ${version} from ${promptData.filePath}`
+                        });
+                    });
+                }
+            });
+        }
+
+        // Add scene prompts
+        if (promptData.prompts && promptData.prompts.scenes) {
+            Object.entries(promptData.prompts.scenes).forEach(([scene, scenePrompts]) => {
+                if (Array.isArray(scenePrompts)) {
+                    scenePrompts.forEach((promptText, index) => {
+                        const sceneName = scene.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        promptsArray.push({
+                            text: promptText,
+                            source: `${sourceLabel} - ${sceneName} Scene`,
+                            description: `Imported ${sceneName} scene from ${promptData.filePath}`
+                        });
+                    });
+                }
+            });
+        }
+    }
+
+    /**
+     * Generate suggested prompts from item data
+     * Returns array of {text, source, description} objects
+     * 
+     * NOTE: Only returns imported prompts. No auto-generated prompts from item fields.
+     * Prompts are always multi-paragraph text, not short snippets.
+     */
+    generatePromptsForItem(item) {
+        // Only use imported prompts - these are the valuable multi-paragraph prompts
+        const importedPrompts = this.getImportedPromptsForItem(item);
+        
+        // If no imported prompts, provide a helpful message instead of useless auto-generated ones
+        if (importedPrompts.length === 0) {
+            return [{
+                text: '',
+                source: 'No Prompts',
+                description: `No imported prompts found for this item. Run 'npm run prompts:import' to import prompts from content/prompts/`
+            }];
+        }
+        
+        return importedPrompts;
+    }
+
+    /**
+     * Handle prompts command
+     */
+    async handlePromptsCommand(args) {
+        if (!args || args.length === 0 || args[0] === 'list' || args[0] === 'ls') {
+            return this.listPrompts(args);
+        } else if (args[0] === 'search') {
+            return this.searchPrompts(args.slice(1));
+        } else if (args[0] === 'show') {
+            return this.showPromptsForItem(args.slice(1));
+        } else if (args[0] === 'stats') {
+            return this.showPromptStats();
+        } else if (args[0] === 'import') {
+            return this.importPrompts();
+        } else {
+            console.log(chalk.yellow('💡 Prompt Commands:'));
+            console.log(chalk.white('  prompts list [--type=<type>]    - List all prompts'));
+            console.log(chalk.white('  prompts search <query>          - Search prompts'));
+            console.log(chalk.white('  prompts show <content-id>       - Show prompts for item'));
+            console.log(chalk.white('  prompts stats                   - Show statistics'));
+            console.log(chalk.white('  prompts import                  - Re-import prompts\n'));
+        }
+    }
+
+    /**
+     * List all imported prompts
+     */
+    listPrompts(args) {
+        if (!this.importedPrompts) {
+            console.log(chalk.yellow('\n⚠️  No prompts loaded. Run "prompts import" to import prompts.\n'));
+            return;
+        }
+
+        // Parse arguments
+        const filterType = args.find(arg => arg.startsWith('--type='))?.split('=')[1];
+
+        console.log(chalk.cyan('\n📝 Imported Prompts\n'));
+        console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+
+        let totalCount = 0;
+
+        // List characters
+        if (!filterType || filterType === 'characters') {
+            const characters = this.importedPrompts.characters || {};
+            const charIds = Object.keys(characters);
+            if (charIds.length > 0) {
+                console.log(chalk.yellow(`👥 Characters (${charIds.length}):\n`));
+                charIds.forEach(id => {
+                    const data = characters[id];
+                    const defaultCount = data.prompts?.default?.length || 0;
+                    const versionCount = Object.keys(data.prompts?.versions || {}).length;
+                    const sceneCount = Object.keys(data.prompts?.scenes || {}).length;
+                    const totalPrompts = defaultCount + versionCount + sceneCount;
+                    
+                    console.log(chalk.white(`  ${id}`));
+                    console.log(chalk.gray(`    File: ${data.filePath}`));
+                    console.log(chalk.gray(`    Prompts: ${totalPrompts} (${defaultCount} default, ${versionCount} versions, ${sceneCount} scenes)`));
+                    if (data.match?.item) {
+                        console.log(chalk.green(`    Matched: ${data.match.item.title || data.match.item.name || data.match.item.id}`));
+                    }
+                    console.log('');
+                });
+                totalCount += charIds.length;
+            }
+        }
+
+        // List locations
+        if (!filterType || filterType === 'locations') {
+            const locations = this.importedPrompts.locations || {};
+            const locIds = Object.keys(locations);
+            if (locIds.length > 0) {
+                console.log(chalk.yellow(`📍 Locations (${locIds.length}):\n`));
+                locIds.forEach(id => {
+                    const data = locations[id];
+                    const defaultCount = data.prompts?.default?.length || 0;
+                    const versionCount = Object.keys(data.prompts?.versions || {}).length;
+                    const sceneCount = Object.keys(data.prompts?.scenes || {}).length;
+                    const totalPrompts = defaultCount + versionCount + sceneCount;
+                    
+                    console.log(chalk.white(`  ${id}`));
+                    console.log(chalk.gray(`    File: ${data.filePath}`));
+                    console.log(chalk.gray(`    Prompts: ${totalPrompts} (${defaultCount} default, ${versionCount} versions, ${sceneCount} scenes)`));
+                    if (data.match?.item) {
+                        console.log(chalk.green(`    Matched: ${data.match.item.title || data.match.item.name || data.match.item.id}`));
+                    }
+                    console.log('');
+                });
+                totalCount += locIds.length;
+            }
+        }
+
+        // List lore
+        if (!filterType || filterType === 'lore') {
+            const lore = this.importedPrompts.lore || {};
+            const loreIds = Object.keys(lore);
+            if (loreIds.length > 0) {
+                console.log(chalk.yellow(`📚 Lore (${loreIds.length}):\n`));
+                loreIds.forEach(id => {
+                    const data = lore[id];
+                    const defaultCount = data.prompts?.default?.length || 0;
+                    const versionCount = Object.keys(data.prompts?.versions || {}).length;
+                    const sceneCount = Object.keys(data.prompts?.scenes || {}).length;
+                    const totalPrompts = defaultCount + versionCount + sceneCount;
+                    
+                    console.log(chalk.white(`  ${id}`));
+                    console.log(chalk.gray(`    File: ${data.filePath}`));
+                    console.log(chalk.gray(`    Prompts: ${totalPrompts} (${defaultCount} default, ${versionCount} versions, ${sceneCount} scenes)`));
+                    if (data.match?.item) {
+                        console.log(chalk.green(`    Matched: ${data.match.item.title || data.match.item.name || data.match.item.id}`));
+                    }
+                    console.log('');
+                });
+                totalCount += loreIds.length;
+            }
+        }
+
+        // Show unmatched
+        const unmatched = this.importedPrompts.unmatched || [];
+        if (unmatched.length > 0 && !filterType) {
+            console.log(chalk.red(`⚠️  Unmatched (${unmatched.length} - needs manual review):\n`));
+            unmatched.slice(0, 10).forEach(data => {
+                console.log(chalk.white(`  ${data.contentId}`));
+                console.log(chalk.gray(`    File: ${data.filePath}\n`));
+            });
+            if (unmatched.length > 10) {
+                console.log(chalk.gray(`    ... and ${unmatched.length - 10} more\n`));
+            }
+        }
+
+        console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+        console.log(chalk.cyan(`\nTotal: ${totalCount} items with prompts\n`));
+    }
+
+    /**
+     * Search prompts
+     */
+    searchPrompts(args) {
+        if (!this.importedPrompts) {
+            console.log(chalk.yellow('\n⚠️  No prompts loaded. Run "prompts import" to import prompts.\n'));
+            return;
+        }
+
+        const query = args.join(' ').toLowerCase();
+        if (!query) {
+            console.log(chalk.red('❌ Please provide a search query\n'));
+            return;
+        }
+
+        console.log(chalk.cyan(`\n🔍 Searching prompts for: "${query}"\n`));
+        console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+
+        const results = [];
+
+        // Search all prompt data
+        ['characters', 'locations', 'lore'].forEach(type => {
+            const items = this.importedPrompts[type] || {};
+            Object.entries(items).forEach(([id, data]) => {
+                // Check content ID
+                if (id.toLowerCase().includes(query)) {
+                    results.push({ type, id, data, match: 'ID' });
+                    return;
+                }
+
+                // Check file path
+                if (data.filePath && data.filePath.toLowerCase().includes(query)) {
+                    results.push({ type, id, data, match: 'File' });
+                    return;
+                }
+
+                // Check prompt text
+                if (data.prompts) {
+                    const allPrompts = [
+                        ...(data.prompts.default || []),
+                        ...Object.values(data.prompts.versions || {}).flat(),
+                        ...Object.values(data.prompts.scenes || {}).flat()
+                    ];
+                    
+                    const matchingPrompt = allPrompts.find(p => p.toLowerCase().includes(query));
+                    if (matchingPrompt) {
+                        results.push({ type, id, data, match: 'Content', matchingPrompt });
+                        return;
+                    }
+                }
+            });
+        });
+
+        if (results.length === 0) {
+            console.log(chalk.yellow('  No prompts found matching your search.\n'));
+            return;
+        }
+
+        results.forEach(({ type, id, data, match, matchingPrompt }) => {
+            const typeIcon = type === 'characters' ? '👥' : type === 'locations' ? '📍' : '📚';
+            console.log(chalk.cyan(`${typeIcon} ${type.toUpperCase()}: ${id}`));
+            console.log(chalk.gray(`   Matched by: ${match}`));
+            console.log(chalk.gray(`   File: ${data.filePath}`));
+            
+            if (matchingPrompt) {
+                const preview = matchingPrompt.substring(0, 150) + (matchingPrompt.length > 150 ? '...' : '');
+                console.log(chalk.white(`   Preview: ${preview.replace(/\n/g, ' ')}`));
+            }
+            console.log('');
+        });
+
+        console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+        console.log(chalk.cyan(`\nFound: ${results.length} result(s)\n`));
+    }
+
+    /**
+     * Show all prompts for a specific item
+     */
+    showPromptsForItem(args) {
+        if (!this.importedPrompts) {
+            console.log(chalk.yellow('\n⚠️  No prompts loaded. Run "prompts import" to import prompts.\n'));
+            return;
+        }
+
+        const contentId = args[0];
+        if (!contentId) {
+            console.log(chalk.red('❌ Please provide a content ID\n'));
+            console.log(chalk.yellow('Usage: prompts show <content-id>\n'));
+            return;
+        }
+
+        // Try to find in all types
+        let promptData = null;
+        let foundType = null;
+
+        for (const type of ['characters', 'locations', 'lore']) {
+            if (this.importedPrompts[type] && this.importedPrompts[type][contentId]) {
+                promptData = this.importedPrompts[type][contentId];
+                foundType = type;
+                break;
+            }
+        }
+
+        // Also check unmatched prompts
+        if (!promptData) {
+            const unmatched = this.importedPrompts.unmatched || [];
+            const unmatchedItem = unmatched.find(item => 
+                item.contentId === contentId || 
+                item.contentId.toLowerCase() === contentId.toLowerCase()
+            );
+            
+            if (unmatchedItem) {
+                promptData = unmatchedItem;
+                foundType = 'unmatched';
+            }
+        }
+
+        if (!promptData) {
+            console.log(chalk.red(`\n❌ No prompts found for: ${contentId}\n`));
+            console.log(chalk.yellow('💡 Try: prompts search <query> to find prompts\n'));
+            return;
+        }
+
+        const typeIcon = foundType === 'characters' ? '👥' : foundType === 'locations' ? '📍' : foundType === 'unmatched' ? '⚠️' : '📚';
+        const typeLabel = foundType === 'unmatched' ? 'UNMATCHED' : foundType.toUpperCase();
+        console.log(chalk.cyan(`\n📝 Prompts for ${typeLabel}: ${contentId}\n`));
+        console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+
+        if (foundType === 'unmatched') {
+            console.log(chalk.yellow('⚠️  This prompt is not matched to any content item.'));
+            console.log(chalk.gray(`File: ${promptData.filePath}`));
+            if (promptData.suggestedIds && promptData.suggestedIds.length > 0) {
+                console.log(chalk.gray(`Suggested IDs: ${promptData.suggestedIds.join(', ')}`));
+            }
+            console.log('');
+        } else if (promptData.match?.item) {
+            console.log(chalk.green(`Matched Item: ${promptData.match.item.title || promptData.match.item.name || contentId}`));
+            console.log(chalk.gray(`File: ${promptData.filePath}`));
+            console.log('');
+        } else {
+            console.log(chalk.gray(`File: ${promptData.filePath}`));
+            console.log('');
+        }
+
+        // Show default prompts
+        if (promptData.prompts?.default && promptData.prompts.default.length > 0) {
+            console.log(chalk.yellow('📝 Default Prompts:\n'));
+            promptData.prompts.default.forEach((text, index) => {
+                console.log(chalk.cyan(`${index + 1}.`));
+                console.log(chalk.white(text));
+                console.log('');
+            });
+        }
+
+        // Show version prompts
+        if (promptData.prompts?.versions && Object.keys(promptData.prompts.versions).length > 0) {
+            console.log(chalk.yellow('📝 Version Prompts:\n'));
+            Object.entries(promptData.prompts.versions).forEach(([version, texts]) => {
+                texts.forEach((text, index) => {
+                    console.log(chalk.cyan(`Version ${version}${texts.length > 1 ? ` (${index + 1})` : ''}:`));
+                    console.log(chalk.white(text));
+                    console.log('');
+                });
+            });
+        }
+
+        // Show scene prompts
+        if (promptData.prompts?.scenes && Object.keys(promptData.prompts.scenes).length > 0) {
+            console.log(chalk.yellow('📝 Scene Prompts:\n'));
+            Object.entries(promptData.prompts.scenes).forEach(([scene, texts]) => {
+                const sceneName = scene.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                texts.forEach((text, index) => {
+                    console.log(chalk.cyan(`${sceneName} Scene${texts.length > 1 ? ` (${index + 1})` : ''}:`));
+                    console.log(chalk.white(text));
+                    console.log('');
+                });
+            });
+        }
+
+        console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+    }
+
+    /**
+     * Show prompt statistics
+     */
+    showPromptStats() {
+        if (!this.importedPrompts) {
+            console.log(chalk.yellow('\n⚠️  No prompts loaded. Run "prompts import" to import prompts.\n'));
+            return;
+        }
+
+        console.log(chalk.cyan('\n📊 Prompt Statistics\n'));
+        console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+
+        let totalItems = 0;
+        let totalPrompts = 0;
+
+        ['characters', 'locations', 'lore'].forEach(type => {
+            const items = this.importedPrompts[type] || {};
+            const typeIcon = type === 'characters' ? '👥' : type === 'locations' ? '📍' : '📚';
+            const itemCount = Object.keys(items).length;
+            
+            let typePromptCount = 0;
+            Object.values(items).forEach(data => {
+                const defaultCount = data.prompts?.default?.length || 0;
+                const versionCount = Object.values(data.prompts?.versions || {}).reduce((sum, arr) => sum + arr.length, 0);
+                const sceneCount = Object.values(data.prompts?.scenes || {}).reduce((sum, arr) => sum + arr.length, 0);
+                typePromptCount += defaultCount + versionCount + sceneCount;
+            });
+
+            totalItems += itemCount;
+            totalPrompts += typePromptCount;
+
+            console.log(chalk.white(`${typeIcon} ${type.toUpperCase()}:`));
+            console.log(chalk.gray(`   Items: ${itemCount}`));
+            console.log(chalk.gray(`   Total Prompts: ${typePromptCount}`));
+            console.log(chalk.gray(`   Avg per Item: ${itemCount > 0 ? (typePromptCount / itemCount).toFixed(1) : 0}\n`));
+        });
+
+        const unmatched = this.importedPrompts.unmatched || [];
+        console.log(chalk.red(`⚠️  Unmatched: ${unmatched.length} items\n`));
+
+        console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+        console.log(chalk.cyan(`\nTotal: ${totalItems} items, ${totalPrompts} prompts\n`));
+    }
+
+    /**
+     * Save a loaded prompt to the imported prompts system
+     */
+    async savePromptToImported(item, promptText, sourceFilePath) {
+        try {
+            const fs = require('fs').promises;
+            const path = require('path');
+            const promptsPath = path.join(__dirname, 'data/imported-prompts.json');
+            
+            // Load existing prompts or initialize
+            let importedPrompts;
+            try {
+                const data = await fs.readFile(promptsPath, 'utf-8');
+                importedPrompts = JSON.parse(data);
+            } catch {
+                // File doesn't exist, create new structure
+                importedPrompts = {
+                    characters: {},
+                    locations: {},
+                    lore: {},
+                    unmatched: [],
+                    version: '1.0'
+                };
+            }
+            
+            // Determine content type from item or context
+            let contentType = 'lore';
+            let storageKey = 'lore';
+            
+            // Check if it's a character
+            if (item.role || item.type === 'character') {
+                contentType = 'character';
+                storageKey = 'characters';
+            } else if (item.type === 'location' || item.type === 'place' || item.category === 'location') {
+                contentType = 'location';
+                storageKey = 'locations';
+            }
+            
+            // Create prompt data structure
+            const relativePath = sourceFilePath.replace(path.join(__dirname), '').replace(/^\//, '');
+            const promptData = {
+                contentId: item.id,
+                filePath: relativePath,
+                prompts: {
+                    default: [promptText],
+                    versions: {},
+                    scenes: {}
+                },
+                match: {
+                    contentType: contentType,
+                    item: {
+                        id: item.id,
+                        title: item.title || item.name,
+                        name: item.name || item.title
+                    },
+                    contentId: item.id,
+                    confidence: 'high'
+                },
+                importedAt: new Date().toISOString(),
+                source: 'file-loaded'
+            };
+            
+            // Initialize storage key if needed
+            if (!importedPrompts[storageKey]) {
+                importedPrompts[storageKey] = {};
+            }
+            
+            // Check if prompt already exists for this item
+            const existing = importedPrompts[storageKey][item.id];
+            if (existing) {
+                // Add to existing prompts (append to default array)
+                if (!existing.prompts.default.includes(promptText)) {
+                    existing.prompts.default.push(promptText);
+                    existing.source = `${existing.source || 'import'}, file-loaded`;
+                    existing.importedAt = new Date().toISOString();
+                    console.log(chalk.gray(`   📝 Saved to existing prompts for ${item.id} (appended)`));
+                } else {
+                    console.log(chalk.gray(`   ℹ️  Prompt already exists for ${item.id}`));
+                }
+            } else {
+                // Create new entry
+                importedPrompts[storageKey][item.id] = promptData;
+                console.log(chalk.green(`   💾 Saved prompt for future use: ${item.id}`));
+            }
+            
+            // Save to file
+            await fs.writeFile(promptsPath, JSON.stringify(importedPrompts, null, 2));
+            
+            // Reload prompts in memory
+            await this.loadImportedPrompts();
+            
+        } catch (error) {
+            // Don't fail the whole operation if saving fails
+            console.log(chalk.yellow(`   ⚠️  Could not save prompt to imported prompts: ${error.message}`));
+        }
+    }
+
+    /**
+     * Re-import prompts
+     */
+    async importPrompts() {
+        console.log(chalk.cyan('\n📥 Re-importing prompts...\n'));
+        try {
+            const PromptImporter = require('./scripts/import-prompts');
+            const importer = new PromptImporter();
+            await importer.importAllPrompts();
+            await importer.saveImportedPrompts();
+            
+            // Reload prompts
+            await this.loadImportedPrompts();
+            
+            console.log(chalk.green('\n✅ Prompts re-imported and reloaded!\n'));
+        } catch (error) {
+            console.error(chalk.red(`\n❌ Import failed: ${error.message}\n`));
+        }
+    }
+
 
     /**
      * 🎬 Generate AI Video for item
