@@ -5215,7 +5215,7 @@ main.merchandise-main {
   padding: 0;
   max-width: min(400px, 90vw);
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
   z-index: 10001;
   box-shadow: 
     0 20px 40px rgba(0, 0, 0, 0.3),
@@ -5223,6 +5223,8 @@ main.merchandise-main {
   border: 1px solid rgba(0, 212, 255, 0.3);
   pointer-events: auto;
   animation: tourTooltipSlide 0.4s ease-out;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes tourTooltipSlide {
@@ -5268,6 +5270,9 @@ main.merchandise-main {
 
 .tour-content {
   padding: 20px 25px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .tour-content p {
@@ -5423,11 +5428,34 @@ main.merchandise-main {
   border-left: 3px solid rgba(0, 212, 255, 0.4);
 }
 
+/* Ensure tour content scrolls properly while keeping actions visible */
+.tour-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tour-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.tour-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.4);
+  border-radius: 4px;
+}
+
+.tour-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.6);
+}
+
 .tour-actions {
   padding: 15px 25px 25px 25px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 0 0 15px 15px;
+  flex-shrink: 0;
 }
 
 .tour-nav {

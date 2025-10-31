@@ -1626,6 +1626,8 @@ class MerchandiseStore {
     
     // Position tooltip based on placement
     let tooltipLeft, tooltipTop;
+    const viewportHeight = window.innerHeight;
+    const tooltipHeight = Math.min(tooltipRect.height, viewportHeight * 0.9); // Constrain to 90% of viewport
     
     switch (placement) {
       case 'bottom':
@@ -1634,15 +1636,15 @@ class MerchandiseStore {
         break;
       case 'top':
         tooltipLeft = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
-        tooltipTop = targetRect.top - tooltipRect.height - 20;
+        tooltipTop = targetRect.top - tooltipHeight - 20;
         break;
       case 'right':
         tooltipLeft = targetRect.right + 20;
-        tooltipTop = targetRect.top + (targetRect.height / 2) - (tooltipRect.height / 2);
+        tooltipTop = targetRect.top + (targetRect.height / 2) - (tooltipHeight / 2);
         break;
       case 'left':
         tooltipLeft = targetRect.left - tooltipRect.width - 20;
-        tooltipTop = targetRect.top + (targetRect.height / 2) - (tooltipRect.height / 2);
+        tooltipTop = targetRect.top + (targetRect.height / 2) - (tooltipHeight / 2);
         break;
       default:
         tooltipLeft = targetRect.left;
@@ -1651,8 +1653,23 @@ class MerchandiseStore {
     
     // Keep tooltip within viewport with extra safety margin
     const safeMargin = 40;
-    tooltipLeft = Math.max(safeMargin, Math.min(tooltipLeft, window.innerWidth - tooltipRect.width - safeMargin));
-    tooltipTop = Math.max(safeMargin, Math.min(tooltipTop, window.innerHeight - tooltipRect.height - safeMargin));
+    const viewportWidth = window.innerWidth;
+    
+    // Handle horizontal positioning
+    tooltipLeft = Math.max(safeMargin, Math.min(tooltipLeft, viewportWidth - tooltipRect.width - safeMargin));
+    
+    // Handle vertical positioning with special logic for tall tooltips
+    const maxAllowableHeight = viewportHeight - (safeMargin * 2);
+    
+    if (tooltipRect.height > maxAllowableHeight) {
+      // If tooltip is taller than viewport, position it at the top with safe margin
+      // and let CSS max-height and overflow handle the scrolling
+      tooltipTop = safeMargin;
+      console.log('🔧 Tooltip too tall for viewport, positioning at top with scrollable content');
+    } else {
+      // Normal positioning logic for tooltips that fit
+      tooltipTop = Math.max(safeMargin, Math.min(tooltipTop, viewportHeight - tooltipRect.height - safeMargin));
+    }
     
     tooltip.style.left = `${tooltipLeft}px`;
     tooltip.style.top = `${tooltipTop}px`;
