@@ -508,44 +508,60 @@ class AssetExtractionService {
             return Buffer.from(base64Data, 'base64');
         }
 
-        // Handle local file paths
+        // Convert relative paths to full CDN URLs
+        let fullUrl = imagePath;
         if (imagePath.startsWith('/') && !imagePath.startsWith('//') && !imagePath.startsWith('http')) {
-            const fs = require('fs').promises;
-            return await fs.readFile(imagePath);
+            // Relative path like /images/lore/... needs to be converted to full URL
+            const cdnUrl = this.cdnUrl || process.env.CDN_URL || (process.env.NODE_ENV === 'production' 
+                ? 'https://df5sj8f594cdx.cloudfront.net' 
+                : 'http://localhost:3001');
+            fullUrl = `${cdnUrl}${imagePath}`;
+            console.log(chalk.gray(`   Converting relative path to URL: ${fullUrl}`));
         }
 
-        // Handle URLs (HTTP/HTTPS)
-        if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        // Handle URLs (HTTP/HTTPS) - including converted relative paths
+        if (fullUrl.startsWith('http://') || fullUrl.startsWith('https://')) {
             const https = require('https');
             const http = require('http');
-            const url = require('url');
             
             return new Promise((resolve, reject) => {
-                const parsedUrl = new URL(imagePath);
+                const parsedUrl = new URL(fullUrl);
                 const protocol = parsedUrl.protocol === 'https:' ? https : http;
                 
-                protocol.get(imagePath, (response) => {
+                protocol.get(fullUrl, (response) => {
                     if (response.statusCode === 301 || response.statusCode === 302) {
                         return this.loadImage(response.headers.location).then(resolve).catch(reject);
                     }
                     
                     if (response.statusCode !== 200) {
-                        return reject(new Error(`HTTP ${response.statusCode}`));
+                        return reject(new Error(`HTTP ${response.statusCode}: ${response.statusMessage || 'Request failed'}`));
                     }
                     
                     const chunks = [];
                     response.on('data', (chunk) => chunks.push(chunk));
-                    response.on('end', () => resolve(Buffer.concat(chunks)));
+                    response.on('end', () => {
+                        const buffer = Buffer.concat(chunks);
+                        if (buffer.length === 0) {
+                            return reject(new Error('Downloaded image is empty (0 bytes)'));
+                        }
+                        resolve(buffer);
+                    });
                     response.on('error', reject);
-                }).on('error', reject);
+                }).on('error', (error) => {
+                    reject(new Error(`Failed to download image from ${fullUrl}: ${error.message}`));
+                });
             });
         }
 
-        // Try relative path from static directory
+        // Try relative path from static directory (fallback for local files)
         const staticDir = path.join(__dirname, '../static');
         const fullPath = path.join(staticDir, imagePath);
         const fs = require('fs').promises;
-        return await fs.readFile(fullPath);
+        try {
+            return await fs.readFile(fullPath);
+        } catch (error) {
+            throw new Error(`Failed to load image from ${imagePath}: Not found as URL or local file. ${error.message}`);
+        }
     }
 
     /**
