@@ -16,6 +16,8 @@ class EpisodeCommands {
         this.cli = cli;
         this.episodeService = null;
         this.initializeService();
+        // Validate AI extraction setup at startup
+        this.validateAIExtractionSetup();
     }
 
     async initializeService() {
@@ -24,6 +26,22 @@ class EpisodeCommands {
         } catch (error) {
             console.log(chalk.yellow('⚠️ Episode service initialization failed:', error.message));
             console.log(chalk.gray('Episode management commands will show status only'));
+        }
+    }
+
+    /**
+     * Validate AI extraction setup at startup (loud warnings)
+     */
+    validateAIExtractionSetup() {
+        const AssetExtractionService = require('../services/asset-extraction-service');
+        
+        // Create a temporary instance to trigger validation
+        // This will display warnings if OPENAI_API_KEY is missing
+        try {
+            const tempService = new AssetExtractionService();
+            // The constructor calls initAIExtractor which displays warnings
+        } catch (error) {
+            // Silent fail - validation warnings are shown in initAIExtractor
         }
     }
 
