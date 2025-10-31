@@ -11,6 +11,7 @@
 require('dotenv').config();
 const chalk = require('chalk');
 const FirebaseSongsService = require('../services/firebase-songs-service');
+const { formatDuration } = require('../utils/duration-helpers');
 
 // LEGACY_PLAYLIST from routes/radioPlayer.js - source of truth for filenames
 const LEGACY_PLAYLIST = [
@@ -142,16 +143,40 @@ async function fixSongUrls(dryRun = true) {
 
             if (!dryRun) {
                 try {
+                    // Prepare update data - need to handle duration format conversion
+                    // Firebase stores duration as number (seconds) but validator expects MM:SS string
+                    let durationString = song.duration;
+                    
+                    // If duration is a number (seconds), convert to MM:SS format
+                    if (typeof song.duration === 'number') {
+                        durationString = formatDuration(song.duration);
+                    } else if (song.durationFormatted) {
+                        // Use the formatted duration if available
+                        durationString = song.durationFormatted;
+                    } else if (!song.duration || typeof song.duration !== 'string') {
+                        // Try to get from LEGACY_PLAYLIST as fallback
+                        const legacyTrack = LEGACY_PLAYLIST.find(
+                            t => t.season === song.season && t.episode === episodeNum
+                        );
+                        if (legacyTrack) {
+                            durationString = legacyTrack.duration;
+                        } else {
+                            throw new Error(`Cannot determine duration for ${songId}`);
+                        }
+                    }
+
                     // Update the song in Firebase
                     // Use createOrUpdateSong which will preserve other fields
                     const updateData = {
                         ...song,
                         url: correctUrl,
-                        file: filename // Also add/update the file field
+                        file: filename, // Also add/update the file field
+                        duration: durationString // Ensure duration is in correct format
                     };
 
                     // Remove fields that shouldn't be in update
                     delete updateData.id; // ID is not part of the data
+                    delete updateData.durationFormatted; // This is computed, not stored
                     
                     await songsService.createOrUpdateSong(updateData);
                     
