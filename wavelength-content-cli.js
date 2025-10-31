@@ -100,6 +100,17 @@ class WavelengthContentCLI {
                 console.log(chalk.gray('   Song management commands will show status only'));
             }
             
+            // Validate AI extraction setup (loud warnings if misconfigured)
+            console.log(chalk.gray('\n🔍 Validating AI extraction setup...'));
+            try {
+                const AssetExtractionService = require('./services/asset-extraction-service');
+                const tempService = new AssetExtractionService();
+                // Wait a moment for async rembg check
+                await new Promise(resolve => setTimeout(resolve, 500));
+            } catch (error) {
+                // Validation warnings are shown in AssetExtractionService.initAIExtractor()
+            }
+            
             console.log(chalk.green('✅ Content initialization complete'));
         } catch (error) {
             console.log(chalk.red('❌ Critical initialization error:', error.message));
