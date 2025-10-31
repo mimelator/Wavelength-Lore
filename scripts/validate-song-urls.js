@@ -16,7 +16,7 @@ const FirebaseSongsService = require('../services/firebase-songs-service');
 const USE_LOCAL = process.argv.includes('--local');
 const CDN_URL = USE_LOCAL 
     ? (process.env.CDN_URL || 'http://localhost:3001')
-    : (process.env.CDN_URL || 'https://df5sj8f594cdx.cloudfront.net');
+    : 'https://df5sj8f594cdx.cloudfront.net'; // Always use production unless --local
 
 // Production CDN for comparison
 const PROD_CDN_URL = 'https://df5sj8f594cdx.cloudfront.net';
@@ -79,6 +79,17 @@ async function validateAllSongUrls() {
             const isNormalizedFormat = song.url.match(/\/images\/seasons\/S\d+E\d+\.mp3$/);
             if (isNormalizedFormat) {
                 console.log(chalk.yellow(`   ⚠️  Normalized format detected (should be full path)`));
+                
+                // Try to get actual filename from song metadata or construct from URL pattern
+                // The normalized format is /images/seasons/S{season}E{episode}.mp3
+                // We need to figure out what the actual filename should be
+                let expectedFilename = song.file || 'filename.mp3';
+                
+                // If no file field, we can't determine the exact filename, but we know the structure
+                if (!song.file) {
+                    expectedFilename = `[MISSING FILENAME - check LEGACY_PLAYLIST or Firebase metadata]`;
+                }
+                
                 results.normalizedFormat.push({
                     id: songId,
                     title: song.title,
@@ -86,7 +97,9 @@ async function validateAllSongUrls() {
                     episode: song.episodeNumber || song.episode,
                     url: song.url,
                     published: song.published,
-                    expectedFormat: `/images/seasons/season${song.season}/episodes/episode${song.episodeNumber || song.episode}/${song.file || 'filename.mp3'}`
+                    hasFileField: !!song.file,
+                    file: song.file || null,
+                    expectedFormat: `/images/seasons/season${song.season}/episodes/episode${song.episodeNumber || song.episode}/${expectedFilename}`
                 });
             }
 
@@ -206,10 +219,16 @@ async function validateAllSongUrls() {
             console.log(chalk.yellow.bold('\n🔧 SONGS WITH NORMALIZED FORMAT (NEEDS FIX IN FIREBASE):\n'));
             console.log(chalk.yellow('   These URLs use the old format /images/seasons/S{Season}E{Episode}.mp3\n'));
             console.log(chalk.yellow('   Radio player expects: /images/seasons/season{N}/episodes/episode{N}/{filename}.mp3\n'));
+            console.log(chalk.yellow('   Note: Check routes/radioPlayer.js LEGACY_PLAYLIST for actual filenames\n'));
             results.normalizedFormat.forEach(song => {
                 console.log(chalk.yellow(`   ${song.id}: "${song.title}"`));
                 console.log(chalk.red(`      Current: ${song.url}`));
                 console.log(chalk.green(`      Expected: ${song.expectedFormat}`));
+                if (song.hasFileField) {
+                    console.log(chalk.gray(`      File field in Firebase: ${song.file}`));
+                } else {
+                    console.log(chalk.yellow(`      ⚠️  Missing 'file' field in Firebase - check LEGACY_PLAYLIST for filename`));
+                }
                 console.log(chalk.gray(`      Published: ${song.published}`));
                 console.log('');
             });
