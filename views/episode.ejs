@@ -4,7 +4,6 @@
     <%- include('partials/head') %>
     <link rel="stylesheet" href="<%= cdnUrl %>/css/lore_styles.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
     <link rel="stylesheet" href="<%= cdnUrl %>/css/modal_styles.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
-    <link rel="stylesheet" href="<%= cdnUrl %>/css/radio-player.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
     <link rel="stylesheet" href="<%= cdnUrl %>/css/carousel.css?v=<%= typeof version !== 'undefined' ? version : Date.now() %>">
     <%- simpleDisambiguationStyles %>
 </head>
@@ -181,60 +180,19 @@
         </section>
         <% } %>
 
-        <!-- Radio Player Section -->
-        <section class="episode-radio-player">
+        <!-- Simple Episode Audio Player -->
+        <% if (audioUrl) { %>
+        <section class="episode-audio-player" style="text-align: center; margin: 20px 0;">
             <h2>Listen to the Song</h2>
-            <div class="radio-player" id="radioPlayer" style="margin: 20px auto; max-width: 600px;">
-                <div class="player-header">
-                    <h3 class="radio-title" style="font-size: 1.2rem;">Now Playing</h3>
-                </div>
-
-                <!-- Album art -->
-                <div class="album-art-container">
-                    <div class="album-art" id="albumArt">
-                        <div class="vinyl-record"></div>
-                        <div class="album-glow"></div>
-                    </div>
-                </div>
-
-                <!-- Now playing info -->
-                <div class="now-playing">
-                    <div class="track-info">
-                        <h2 id="trackTitle"><%= title %></h2>
-                        <p id="trackEpisode">Season <%= seasonNumber %> • Episode <%= episodeNumber %></p>
-                    </div>
-                    <div class="progress-container">
-                        <div class="time-display">
-                            <span id="currentTime">0:00</span>
-                            <span id="duration">0:00</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressFill"></div>
-                            <div class="progress-handle" id="progressHandle"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Audio element -->
-                <audio id="audioPlayer" preload="metadata">
-                    <source src="<%= audioUrl %>" type="audio/mpeg">
-                </audio>
-
-                <!-- Playback controls -->
-                <div class="controls">
-                    <button class="control-btn play-btn" id="playPauseBtn" title="Play">
-                        <span id="playIcon">▶</span>
-                    </button>
-                </div>
-
-                <!-- Volume control -->
-                <div class="volume-control">
-                    <span class="volume-icon">🔊</span>
-                    <input type="range" id="volumeSlider" min="0" max="100" value="80" class="volume-slider">
-                    <span id="volumeValue">80%</span>
-                </div>
-            </div>
+            <audio controls style="width: 100%; max-width: 500px; margin: 20px auto; display: block;">
+                <source src="<%= audioUrl %>" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <p style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+                Or use the <a href="/radio">📻 Full Radio Player</a> to listen to all songs
+            </p>
         </section>
+        <% } %>
 
         <!-- Related Content Section (Characters & Lore) -->
         <% if (characters && characters.length > 0) { %>
@@ -312,7 +270,6 @@
 
     <%- include('partials/footer') %>
 
-    <script src="<%= cdnUrl %>/js/radio-player.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Simple carousel handling for episode carousel
@@ -347,37 +304,6 @@
                     });
                 }
             });
-            // Initialize radio player for this episode only
-            if (typeof RadioPlayer !== 'undefined') {
-                const episodeData = {
-                    title: '<%= title %>',
-                    season: <%= seasonNumber %>,
-                    episode: <%= episodeNumber %>,
-                    audio: '<%= audioUrl %>',
-                    image: '<%= image %>',
-                    episodeImage: '<%= image %>',
-                    images: <%- JSON.stringify(carouselImages || []) %>
-                };
-
-                const player = new RadioPlayer('<%= cdnUrl %>', '<%= version %>');
-
-                // Create minimal playlist with just this episode
-                const playlistElement = document.createElement('div');
-                playlistElement.className = 'playlist-item';
-                playlistElement.dataset.audio = episodeData.audio;
-                playlistElement.dataset.title = episodeData.title;
-                playlistElement.dataset.season = episodeData.season;
-                playlistElement.dataset.episode = episodeData.episode;
-                playlistElement.dataset.episodeImage = '<%= cdnUrl %>' + episodeData.episodeImage;
-                playlistElement.dataset.images = JSON.stringify(episodeData.images.map(img => '<%= cdnUrl %>' + img));
-                playlistElement.dataset.characters = '<%- JSON.stringify(characters || []) %>';
-
-                player.playlist = [playlistElement];
-                player.currentTrackIndex = 0;
-
-                // Auto-play the track
-                player.playTrack(0);
-            }
         });
 
     </script>
