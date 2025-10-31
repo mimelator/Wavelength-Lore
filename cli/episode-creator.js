@@ -31,6 +31,7 @@ const BatchOperationsCommand = require('./commands/batch-operations');
 // Import steps
 const SongUploadStep = require('./steps/song-upload');
 const AssetExtractionStep = require('./steps/asset-extraction');
+const LoreRegistrationStep = require('./steps/lore-registration');
 
 class EpisodeCreatorCLI {
     constructor() {
@@ -196,11 +197,43 @@ class EpisodeCreatorCLI {
         const progress = this.progressTracker.getProgress(episode);
         console.log(`Continuing from Step ${progress.currentStep}: ${progress.currentStepName}`);
         
-        // For Phase 1, we only have song upload step
+        // Execute the current step
         if (progress.currentStep === 2) {
             await this.handleSongUpload(episode);
+        } else if (progress.currentStep === 6) {
+            await this.handleAssetExtraction(episode);
+        } else if (progress.currentStep === 7) {
+            await this.handleLoreRegistration(episode);
         } else {
-            console.log(chalk.gray('Additional steps will be available in Phase 2'));
+            console.log(chalk.gray(`Step ${progress.currentStep} will be available in future phases`));
+        }
+    }
+
+    async handleAssetExtraction(episode) {
+        console.log(chalk.blue('\n🎨 ASSET EXTRACTION'));
+        console.log(chalk.blue('═══════════════════'));
+        
+        try {
+            const assetExtraction = new AssetExtractionStep(this.stateManager, this.rl);
+            await assetExtraction.execute(episode);
+            
+            console.log(chalk.green('✅ Asset extraction completed'));
+        } catch (error) {
+            console.error(chalk.red('❌ Asset extraction failed:'), error.message);
+        }
+    }
+
+    async handleLoreRegistration(episode) {
+        console.log(chalk.blue('\n📚 LORE REGISTRATION'));
+        console.log(chalk.blue('═══════════════════'));
+        
+        try {
+            const loreRegistration = new LoreRegistrationStep(this.stateManager, this.rl);
+            await loreRegistration.execute(episode);
+            
+            console.log(chalk.green('✅ Lore registration completed'));
+        } catch (error) {
+            console.error(chalk.red('❌ Lore registration failed:'), error.message);
         }
     }
 
