@@ -10,6 +10,10 @@
 const chalk = require('chalk');
 const FirebaseEpisodeService = require('../services/firebase-episode-service');
 const AssetExtractionService = require('../services/asset-extraction-service');
+const FirebaseSongsService = require('../services/firebase-songs-service');
+const SongUploadStep = require('../cli/steps/song-upload');
+const EpisodeStateManager = require('../cli/utils/episode-state-manager');
+const readline = require('readline');
 
 class EpisodeCommands {
     constructor(cli) {
@@ -23,6 +27,7 @@ class EpisodeCommands {
     async initializeService() {
         try {
             this.episodeService = new FirebaseEpisodeService();
+            this.songsService = new FirebaseSongsService();
         } catch (error) {
             console.log(chalk.yellow('⚠️ Episode service initialization failed:', error.message));
             console.log(chalk.gray('Episode management commands will show status only'));
@@ -246,19 +251,22 @@ class EpisodeCommands {
         console.log(chalk.cyan('\nSpecial actions:'));
         console.log(chalk.white('  8. 📋 Manage Gallery Images'));
         console.log(chalk.white('  9. 🤖 AI Content Enhancement'));
-        console.log(chalk.white('  10. 💾 Save & Exit'));
+        console.log(chalk.white('  10. 🎵 Attach/Upload Song'));
+        console.log(chalk.white('  11. 💾 Save & Exit'));
         console.log(chalk.white('  0. Cancel'));
 
         while (true) {
-            const choice = await this.cli.promptUser('\nSelect field to edit (1-10, 0 to cancel): ');
+            const choice = await this.cli.promptUser('\nSelect field to edit (1-11, 0 to cancel): ');
             const choiceNum = parseInt(choice);
 
             if (choiceNum === 0) {
                 console.log(chalk.gray('Edit cancelled'));
                 break;
-            } else if (choiceNum === 10) {
+            } else if (choiceNum === 11) {
                 console.log(chalk.green('✅ Changes saved'));
                 break;
+            } else if (choiceNum === 10) {
+                await this.handleSongAttachment(episodeId, episode);
             } else if (choiceNum === 9) {
                 await this.aiEnhanceEpisode(episodeId, episode);
             } else if (choiceNum === 8) {
@@ -703,6 +711,180 @@ class EpisodeCommands {
             console.log(chalk.blue('🔄 Syncing with file system...'));
             console.log(chalk.gray('This would scan the episode directory for new images'));
         }
+    }
+
+    /**
+     * Handle song attachment/upload for episode
+     * @param {string} episodeId - Episode ID
+     * @param {Object} episode - Episode object
+     */
+    async handleSongAttachment(episodeId, episode) {
+        if (!this.songsService) {
+            console.log(chalk.red('❌ Songs service not available'));
+            return;
+        }
+
+        console.log(chalk.cyan('\n🎵 SONG ATTACHMENT'));
+        console.log(chalk.gray('─'.repeat(50)));
+        console.log(`Episode: ${chalk.cyan(episodeId)} - ${episode.title}`);
+        console.log();
+
+        // Check if episode already has a song
+        const season = episode.season || this.parseSeason(episodeId);
+        const episodeNum = episode.episodeNumber || this.parseEpisodeNumber(episodeId);
+        
+        let existingSong = null;
+        if (season && episodeNum) {
+            try {
+                const allSongs = await this.songsService.getPublishedSongs(null, true); // Include unpublished
+                existingSong = allSongs.find(s => 
+                    s.season === season && 
+                    (s.episodeNumber === episodeNum || s.episode === episodeNum)
+                );
+            } catch (error) {
+                // Song might not exist, continue
+            }
+        }
+
+        if (existingSong) {
+            console.log(chalk.green('✅ Current Song:'));
+            console.log(chalk.white(`  Title: ${existingSong.title}`));
+            console.log(chalk.white(`  Artist: ${existingSong.artist || 'Wavelength'}`));
+            console.log(chalk.white(`  Duration: ${existingSong.durationFormatted || existingSong.duration}`));
+            console.log(chalk.white(`  URL: ${existingSong.url || 'Not set'}`));
+            console.log();
+        } else {
+            console.log(chalk.yellow('⚠️  No song attached to this episode'));
+            console.log();
+        }
+
+        console.log(chalk.yellow('Options:'));
+        console.log(chalk.white('  1. 📤 Upload new song (MP3 file)'));
+        if (existingSong) {
+            console.log(chalk.white('  2. 📋 View song details'));
+        }
+        console.log(chalk.white('  0. Back'));
+
+        const choice = await this.cli.promptUser('\nChoose action: ');
+
+        if (choice === '1') {
+            await this.uploadSongForEpisode(episodeId, episode);
+        } else if (choice === '2' && existingSong) {
+            this.displaySongDetails(existingSong);
+        }
+    }
+
+    /**
+     * Upload a new song file for the episode
+     * @param {string} episodeId - Episode ID
+     * @param {Object} episode - Episode object
+     */
+    async uploadSongForEpisode(episodeId, episode) {
+        try {
+            // Create readline interface for SongUploadStep
+            const rl = readline.createInterface({
+                input: process.stdin,
+                output: process.stdout
+            });
+
+            // Create a minimal state manager wrapper for song upload
+            const stateManager = {
+                updateSongMetadata: async (epId, songMetadata) => {
+                    // Update episode with song metadata
+                    await this.episodeService.updateEpisode(epId, {
+                        audioUrl: songMetadata.url,
+                        songMetadata: songMetadata
+                    });
+
+                    // Also create/update song in Firebase Songs service
+                    const season = episode.season || this.parseSeason(epId);
+                    const episodeNum = episode.episodeNumber || this.parseEpisodeNumber(epId);
+                    
+                    // Format duration: convert seconds to MM:SS if needed
+                    let durationFormatted = songMetadata.durationFormatted;
+                    if (!durationFormatted && songMetadata.duration) {
+                        // Convert seconds to MM:SS format
+                        const minutes = Math.floor(songMetadata.duration / 60);
+                        const seconds = Math.floor(songMetadata.duration % 60);
+                        durationFormatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    }
+                    
+                    await this.songsService.createOrUpdateSong({
+                        id: epId,
+                        season: season,
+                        episodeNumber: episodeNum,
+                        title: songMetadata.title,
+                        artist: songMetadata.artist,
+                        duration: durationFormatted || songMetadata.duration,
+                        url: songMetadata.url,
+                        lyrics: songMetadata.lyrics,
+                        published: episode.published || false
+                    });
+                },
+                completeStep: async () => {
+                    // Step completion not needed in edit mode
+                }
+            };
+
+            const songUploadStep = new SongUploadStep(stateManager, rl);
+            
+            // Execute song upload
+            await songUploadStep.execute(episode);
+            
+            rl.close();
+
+            console.log(chalk.green('\n✅ Song uploaded and attached to episode!'));
+            
+            // Refresh episode data
+            const updatedEpisode = await this.episodeService.getEpisodeById(episodeId);
+            Object.assign(episode, updatedEpisode);
+
+        } catch (error) {
+            console.log(chalk.red(`\n❌ Song upload failed: ${error.message}`));
+            if (process.env.DEBUG) {
+                console.error(error.stack);
+            }
+        }
+    }
+
+    /**
+     * Display detailed song information
+     * @param {Object} song - Song object
+     */
+    displaySongDetails(song) {
+        console.log(chalk.cyan('\n📋 SONG DETAILS'));
+        console.log(chalk.gray('─'.repeat(50)));
+        console.log(chalk.white(`  Title: ${song.title}`));
+        console.log(chalk.white(`  Artist: ${song.artist || 'Wavelength'}`));
+        console.log(chalk.white(`  Duration: ${song.durationFormatted || song.duration}`));
+        console.log(chalk.white(`  Season: ${song.season}, Episode: ${song.episodeNumber || song.episode}`));
+        console.log(chalk.white(`  Published: ${song.published ? 'Yes' : 'No'}`));
+        console.log(chalk.white(`  URL: ${song.url || 'Not set'}`));
+        
+        if (song.lyrics) {
+            const lyricsPreview = song.lyrics.substring(0, 200);
+            console.log(chalk.gray(`  Lyrics: ${lyricsPreview}${song.lyrics.length > 200 ? '...' : ''}`));
+        }
+        
+        console.log();
+    }
+
+    /**
+     * Parse season number from episode ID (e.g., "s5e1" -> 5)
+     */
+    parseSeason(episodeId) {
+        if (!episodeId) return undefined;
+        const match = episodeId.match(/[sS](\d+)/);
+        return match ? parseInt(match[1]) : undefined;
+    }
+
+    /**
+     * Parse episode number from episode ID (e.g., "s5e1" -> 1)
+     */
+    parseEpisodeNumber(episodeId) {
+        if (!episodeId) return undefined;
+        const match = episodeId.match(/[eE](\d+)/);
+        return match ? parseInt(match[1]) : undefined;
     }
 
     /**
