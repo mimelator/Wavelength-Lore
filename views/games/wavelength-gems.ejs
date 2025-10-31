@@ -570,7 +570,10 @@
     <!-- Wavelength Site Tour System -->
     <script src="<%= cdnUrl || '' %>/js/wavelength-site-tour.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
     <script>
-        // Auto-start games tour for first-time visitors on games page
+        // Games tour disabled - no longer auto-starts for new visitors
+        // Tour functionality remains available but requires manual trigger
+        // Uncomment below to re-enable auto-start:
+        /*
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 if (window.wavelengthSiteTour) {
@@ -592,6 +595,7 @@
                 }
             }
         }
+        */
     </script>
     
     <script>

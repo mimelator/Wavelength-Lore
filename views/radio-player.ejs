@@ -464,7 +464,10 @@
     <script src="<%= cdnUrl %>/js/radio-player-init.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
     <script src="<%= cdnUrl %>/js/wavelength-site-tour.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
     <script>
-        // Auto-start radio tour for first-time visitors on radio player page
+        // Radio tour disabled - no longer auto-starts for new visitors
+        // Tour functionality remains available but requires manual trigger
+        // Uncomment below to re-enable auto-start:
+        /*
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 if (window.wavelengthSiteTour) {
@@ -486,6 +489,7 @@
                 }
             }
         }
+        */
     </script>
     
     <!-- Minimal footer without radio components -->
