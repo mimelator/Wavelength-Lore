@@ -190,8 +190,13 @@ router.get('/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
     const episode = await fetchDataAsAdmin(`videos/season${seasonNumber}/episodes/episode${episodeNumber}`);
 
     if (episode) {
-      // Check visibility - if hidden and user is not a content creator, show 404
-      if (episode.hidden && !res.locals.isContentCreator) {
+      // Check visibility - if hidden/unpublished and user is not a content creator, show 404
+      // Check multiple visibility fields: visible, published, hidden
+      const isHidden = episode.visible === false || 
+                      episode.published === false || 
+                      episode.hidden === true;
+      
+      if (isHidden && !res.locals.isContentCreator) {
         return res.status(404).send('Episode not found');
       }
 
