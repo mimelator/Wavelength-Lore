@@ -282,6 +282,9 @@ class MerchandiseModalRenderer {
                   <button class="btn-primary update-preview-btn" data-product-id="${product.id}">
                     <span>🔄</span> Update Preview
                   </button>
+                  <button class="btn-secondary random-settings-btn" data-product-id="${product.id}">
+                    <span>🎲</span> Choose Random Settings
+                  </button>
                   <small>Click to apply selected effects</small>
                 </div>
 
@@ -2251,6 +2254,13 @@ class MerchandiseModalRenderer {
         this.handleUpdatePreview(productId, modal);
       }
 
+      // Random settings button
+      if (e.target.classList.contains('random-settings-btn')) {
+        const productId = e.target.dataset.productId;
+        console.log('🎲 Choose Random Settings button clicked:', productId);
+        this.randomizeSettings(modal);
+      }
+
       // Preview finished product button
       if (e.target.classList.contains('preview-finished-product-btn')) {
         console.log('🚨🚨🚨 BUTTON CLICKED!!! 🚨🚨🚨');
@@ -3007,6 +3017,7 @@ class MerchandiseModalRenderer {
 
       const result = await response.json();
       console.log('✨ API result:', result);
+      console.log('✨ API result (stringified):', JSON.stringify(result, null, 2));
 
       if (this.debugMode) {
         this.debugLog(`Preview effects applied successfully`, 'success', result);
@@ -3019,50 +3030,141 @@ class MerchandiseModalRenderer {
         hasCustomizedImageUrl: !!(result && result.metadata && result.metadata.customizedImageUrl),
         customizedImageUrl: result?.metadata?.customizedImageUrl,
         resultKeys: result ? Object.keys(result) : [],
-        metadataKeys: result?.metadata ? Object.keys(result.metadata) : []
+        metadataKeys: result?.metadata ? Object.keys(result.metadata) : [],
+        fullResult: JSON.stringify(result, null, 2)
       });
 
-      if (previewImage && result.metadata && result.metadata.customizedImageUrl) {
-        console.log('✅ UPDATING PREVIEW IMAGE');
-        console.log('  - Original src:', previewImage.src);
-        console.log('  - New customized URL:', result.metadata.customizedImageUrl);
-        
-        // Add cache-busting and load verification
-        const customizedUrl = result.metadata.customizedImageUrl + '?t=' + Date.now();
-        console.log('  - Cache-busted URL:', customizedUrl);
-        
-        previewImage.onload = () => {
-          console.log('✅ CUSTOMIZED IMAGE LOADED SUCCESSFULLY');
-          previewImage.style.opacity = '1';
-        };
-        
-        previewImage.onerror = (e) => {
-          console.error('❌ CUSTOMIZED IMAGE FAILED TO LOAD:', e);
-          console.error('  - Failed URL:', customizedUrl);
-          previewImage.style.opacity = '1'; // Show original even if customized fails
-        };
-        
-        previewImage.src = customizedUrl;
-        
-        // Show success status
+      // 🔍 CRITICAL: Check if previewImage element exists
+      if (!previewImage) {
+        console.error('❌ PREVIEW IMAGE ELEMENT NOT FOUND!');
+        console.error('  - Looking for selector: #customization-preview-image-' + productId);
+        console.error('  - Modal ID:', modal.dataset.modalId);
+        console.error('  - Available image elements:', Array.from(modal.querySelectorAll('img')).map(img => ({
+          id: img.id,
+          className: img.className,
+          src: img.src?.substring(0, 80)
+        })));
         if (statusText) {
-          statusText.textContent = '✅ Preview updated';
-          statusText.style.color = '#155724';
-        } else {
-          this.showVariantStatusMessage('', '✅ Preview updated', 'success');
+          statusText.textContent = '⚠️ Preview element not found';
+          statusText.style.color = '#856404';
         }
-
-        // Store the customized image URL in modal state
-        modal.dataset.customizedImageUrl = result.metadata.customizedImageUrl;
-        console.log('  - Stored in modal dataset:', modal.dataset.customizedImageUrl);
-
-        // CRITICAL: Update the customization summary after successful preview update
-        this.updateCustomizationSummary(modal);
-      } else if (statusText) {
-        // Show "no preview available" message for variants without mockup images
-        statusText.textContent = '⚠️ No preview available';
-        statusText.style.color = '#856404';
+        return;
       }
+
+      // 🔍 Check if result has the expected structure
+      if (!result || !result.metadata) {
+        console.error('❌ API RESULT MISSING METADATA!');
+        console.error('  - Full result:', result);
+        if (statusText) {
+          statusText.textContent = '⚠️ Invalid API response';
+          statusText.style.color = '#856404';
+        }
+        return;
+      }
+
+      if (!result.metadata.customizedImageUrl) {
+        console.error('❌ CUSTOMIZED IMAGE URL MISSING FROM RESPONSE!');
+        console.error('  - Metadata keys:', Object.keys(result.metadata));
+        console.error('  - Full metadata:', JSON.stringify(result.metadata, null, 2));
+        if (statusText) {
+          statusText.textContent = '⚠️ Image URL not in response';
+          statusText.style.color = '#856404';
+        }
+        return;
+      }
+
+      console.log('✅ UPDATING PREVIEW IMAGE');
+      console.log('  - Preview image element found:', !!previewImage);
+      console.log('  - Preview image ID:', previewImage.id);
+      console.log('  - Preview image class:', previewImage.className);
+      console.log('  - Original src:', previewImage.src?.substring(0, 100));
+      console.log('  - New customized URL from API:', result.metadata.customizedImageUrl);
+      
+      // Ensure URL is properly formatted (handle relative URLs)
+      let customizedUrl = result.metadata.customizedImageUrl;
+      if (customizedUrl && !customizedUrl.startsWith('http') && !customizedUrl.startsWith('//')) {
+        // It's a relative URL, ensure it starts with /
+        if (!customizedUrl.startsWith('/')) {
+          customizedUrl = '/' + customizedUrl;
+        }
+      }
+      
+      // Add cache-busting and load verification
+      customizedUrl = customizedUrl + '?t=' + Date.now();
+      console.log('  - Final cache-busted URL:', customizedUrl);
+      
+      // Set opacity to 0.5 while loading
+      previewImage.style.opacity = '0.5';
+      previewImage.style.transition = 'opacity 0.3s ease';
+      
+      let imageLoaded = false;
+      let retryCount = 0;
+      const maxRetries = 3;
+      const retryDelay = 500; // 500ms delay between retries
+      
+      const loadImage = (url, attempt = 1) => {
+        console.log(`  - Loading image (attempt ${attempt}/${maxRetries}):`, url);
+        
+        const img = new Image();
+        
+        img.onload = () => {
+          if (!imageLoaded) {
+            imageLoaded = true;
+            console.log('✅ CUSTOMIZED IMAGE LOADED SUCCESSFULLY');
+            console.log('  - Image dimensions:', img.naturalWidth, 'x', img.naturalHeight);
+            console.log('  - Setting preview image src');
+            
+            // Only update the preview image src once the new image has fully loaded
+            previewImage.src = url;
+            previewImage.style.opacity = '1';
+            
+            // Show success status
+            if (statusText) {
+              statusText.textContent = '✅ Preview updated';
+              statusText.style.color = '#155724';
+            }
+          }
+        };
+        
+        img.onerror = (e) => {
+          console.warn(`⚠️ Image load attempt ${attempt} failed:`, url);
+          
+          if (attempt < maxRetries) {
+            // Retry with exponential backoff
+            const retryTimeout = retryDelay * attempt;
+            console.log(`  - Retrying in ${retryTimeout}ms...`);
+            setTimeout(() => {
+              loadImage(url, attempt + 1);
+            }, retryTimeout);
+          } else {
+            // All retries failed
+            console.error('❌ CUSTOMIZED IMAGE FAILED TO LOAD after all retries');
+            console.error('  - Final failed URL:', url);
+            previewImage.style.opacity = '1'; // Show original even if customized fails
+            
+            if (statusText) {
+              statusText.textContent = '⚠️ Failed to load preview';
+              statusText.style.color = '#856404';
+            }
+          }
+        };
+        
+        // Start loading the image
+        img.src = url;
+      };
+      
+      // Add a small delay to ensure the server has finished writing the file
+      // This helps avoid race conditions where the file isn't fully written yet
+      setTimeout(() => {
+        loadImage(customizedUrl);
+      }, 100);
+      
+      // Store the customized image URL in modal state
+      modal.dataset.customizedImageUrl = result.metadata.customizedImageUrl;
+      console.log('  - Stored in modal dataset:', modal.dataset.customizedImageUrl);
+
+      // CRITICAL: Update the customization summary after successful preview update
+      this.updateCustomizationSummary(modal);
 
     } catch (error) {
       console.error('❌ Error updating preview:', error);
@@ -3729,9 +3831,164 @@ class MerchandiseModalRenderer {
   }
 
   /**
-   * Update customization summary text
+   * Randomize all customization settings
    * @param {HTMLElement} modal - Modal element
    */
+  randomizeSettings(modal) {
+    console.log('🎲 Randomizing settings...');
+    
+    // Helper function to get random boolean (50% chance)
+    const randomBool = () => Math.random() < 0.5;
+    
+    // Helper function to get random integer in range [min, max]
+    const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    
+    // Helper function to get random element from array
+    const randomChoice = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    
+    // Define all available options
+    const colorEffects = ['vibrancy', 'sepia', 'coolness'];
+    const atmosphericEffects = ['staticLightning', 'staticFireflies', 'staticSparkles', 'staticSnow', 'staticVignette'];
+    const borderWidths = [
+      { value: 1, label: 'Thin', pixels: 10 },
+      { value: 2, label: 'Medium', pixels: 20 },
+      { value: 3, label: 'Thick', pixels: 30 },
+      { value: 4, label: 'Extra Thick', pixels: 40 }
+    ];
+    
+    // Border colors (36 colors from the dropdown)
+    const borderColors = [
+      { name: 'Red', hex: '#FF0000' },
+      { name: 'Blue', hex: '#0000FF' },
+      { name: 'Yellow', hex: '#FFFF00' },
+      { name: 'Green', hex: '#00AA00' },
+      { name: 'Purple', hex: '#AA00AA' },
+      { name: 'Orange', hex: '#FF8800' },
+      { name: 'Soft Pink', hex: '#FFB6C1' },
+      { name: 'Soft Blue', hex: '#ADD8E6' },
+      { name: 'Soft Yellow', hex: '#FFFFE0' },
+      { name: 'Soft Green', hex: '#90EE90' },
+      { name: 'Soft Purple', hex: '#DDA0DD' },
+      { name: 'Soft Peach', hex: '#FFDAB9' },
+      { name: 'Dark Red', hex: '#8B0000' },
+      { name: 'Dark Blue', hex: '#00008B' },
+      { name: 'Dark Green', hex: '#006400' },
+      { name: 'Dark Purple', hex: '#4B0082' },
+      { name: 'Dark Brown', hex: '#654321' },
+      { name: 'Dark Gray', hex: '#404040' },
+      { name: 'Gold', hex: '#FFD700' },
+      { name: 'Silver', hex: '#C0C0C0' },
+      { name: 'Rose Gold', hex: '#B76E79' },
+      { name: 'Bronze', hex: '#CD7F32' },
+      { name: 'Copper', hex: '#B87333' },
+      { name: 'Platinum', hex: '#E5E4E2' },
+      { name: 'Hot Pink', hex: '#FF1493' },
+      { name: 'Neon Green', hex: '#39FF14' },
+      { name: 'Neon Blue', hex: '#0080FF' },
+      { name: 'Electric Purple', hex: '#BF00FF' },
+      { name: 'Cyan', hex: '#00FFFF' },
+      { name: 'Lime', hex: '#BFFF00' },
+      { name: 'White', hex: '#FFFFFF' },
+      { name: 'Black', hex: '#000000' },
+      { name: 'Light Gray', hex: '#D3D3D3' },
+      { name: 'Medium Gray', hex: '#808080' },
+      { name: 'Cream', hex: '#FFFDD0' },
+      { name: 'Beige', hex: '#F5F5DC' }
+    ];
+    
+    // 1. Randomize Color Effects
+    const selectedEffects = {};
+    colorEffects.forEach(effect => {
+      selectedEffects[effect] = randomBool();
+      const checkbox = modal.querySelector(`.effect-toggle[data-effect="${effect}"][data-section="color"]`);
+      if (checkbox) {
+        checkbox.checked = selectedEffects[effect];
+      }
+    });
+    
+    // 2. Randomize Atmospheric Effects
+    atmosphericEffects.forEach(effect => {
+      selectedEffects[effect] = randomBool();
+      const checkbox = modal.querySelector(`.effect-toggle[data-effect="${effect}"][data-section="atmospheric"]`);
+      if (checkbox) {
+        checkbox.checked = selectedEffects[effect];
+      }
+    });
+    
+    // 3. Randomize Border Settings
+    const borderEnabled = randomBool();
+    const borderCheckbox = modal.querySelector('#border-enable-checkbox');
+    if (borderCheckbox) {
+      borderCheckbox.checked = borderEnabled;
+      modal.dataset.borderEnabled = borderEnabled;
+      
+      // Show/hide border options container
+      const optionsContainer = modal.querySelector('#border-options-container');
+      if (optionsContainer) {
+        optionsContainer.style.display = borderEnabled ? 'block' : 'none';
+      }
+      
+      if (borderEnabled) {
+        // Random border width
+        const randomWidth = randomChoice(borderWidths);
+        const widthRadio = modal.querySelector(`input[name="border-width"][value="${randomWidth.value}"]`);
+        if (widthRadio) {
+          // Uncheck all width radios first
+          modal.querySelectorAll('input[name="border-width"]').forEach(radio => {
+            radio.checked = false;
+          });
+          widthRadio.checked = true;
+          modal.dataset.selectedBorderWidth = randomWidth.value.toString();
+          modal.dataset.selectedBorderPixels = randomWidth.pixels.toString();
+        }
+        
+        // Random border color
+        const randomColor = randomChoice(borderColors);
+        const colorSelect = modal.querySelector('.border-color-select');
+        if (colorSelect) {
+          colorSelect.value = randomColor.hex;
+          
+          // Update color preview
+          const colorSwatch = modal.querySelector('#border-color-swatch');
+          const colorLabel = modal.querySelector('#border-color-label');
+          if (colorSwatch) {
+            colorSwatch.style.backgroundColor = randomColor.hex;
+          }
+          if (colorLabel) {
+            colorLabel.textContent = randomColor.name;
+          }
+          
+          modal.dataset.selectedBorderColor = randomColor.hex;
+          
+          // Update border selection display
+          this.updateBorderSelectionDisplay(modal);
+        }
+      } else {
+        // Clear border settings when disabled
+        modal.dataset.selectedBorderWidth = '';
+        modal.dataset.selectedBorderPixels = '';
+        modal.dataset.selectedBorderColor = '';
+        const selectionDisplay = modal.querySelector('#border-selection-display');
+        if (selectionDisplay) {
+          selectionDisplay.textContent = 'None';
+        }
+      }
+    }
+    
+    // 4. Update modal dataset with selected effects
+    modal.dataset.selectedEffects = JSON.stringify(selectedEffects);
+    
+    // 5. Update customization summary
+    this.updateCustomizationSummary(modal);
+    
+    console.log('✅ Settings randomized!', {
+      effects: selectedEffects,
+      borderEnabled: borderEnabled,
+      borderWidth: modal.dataset.selectedBorderWidth,
+      borderColor: modal.dataset.selectedBorderColor
+    });
+  }
+
   updateCustomizationSummary(modal) {
     // Try multiple selectors to find the summary element
     let summaryEl = modal.querySelector('[id$="-summary"]');

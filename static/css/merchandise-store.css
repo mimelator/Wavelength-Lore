@@ -4422,13 +4422,15 @@ main.merchandise-main {
   margin-bottom: 24px;
   padding-bottom: 16px;
   border-bottom: 2px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.update-preview-section .update-preview-btn {
+.update-preview-section .update-preview-btn,
+.update-preview-section .random-settings-btn {
   width: 100%;
   padding: 12px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
@@ -4441,12 +4443,31 @@ main.merchandise-main {
   gap: 8px;
 }
 
+.update-preview-section .update-preview-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
 .update-preview-section .update-preview-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
 }
 
 .update-preview-section .update-preview-btn:active {
+  transform: translateY(0);
+}
+
+.update-preview-section .random-settings-btn {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.update-preview-section .random-settings-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(245, 87, 108, 0.4);
+}
+
+.update-preview-section .random-settings-btn:active {
   transform: translateY(0);
 }
 

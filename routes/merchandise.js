@@ -4443,6 +4443,28 @@ router.post('/openai-upscaler/apply-effects', ensureAuthenticated, groupAuth.req
 
     console.log(`✅ Effects applied in ${duration}ms`);
 
+    // Construct full URL for customized image (use CDN_URL or localhost base URL)
+    let customizedImageUrl = null;
+    if (saveResult && saveResult.url) {
+      // If saveResult.url is already a full URL, use it as-is
+      if (saveResult.url.startsWith('http://') || saveResult.url.startsWith('https://')) {
+        customizedImageUrl = saveResult.url;
+      } else {
+        // Construct full URL using CDN_URL or default to localhost
+        const cdnUrl = process.env.CDN_URL || (process.env.NODE_ENV === 'production' 
+          ? 'https://df5sj8f594cdx.cloudfront.net' 
+          : `http://localhost:${process.env.PORT || 3001}`);
+        
+        // Ensure saveResult.url starts with / if it's relative
+        const relativePath = saveResult.url.startsWith('/') ? saveResult.url : '/' + saveResult.url;
+        customizedImageUrl = `${cdnUrl}${relativePath}`;
+        
+        console.log(`🔗 Constructed customized image URL: ${customizedImageUrl}`);
+        console.log(`   - Base CDN URL: ${cdnUrl}`);
+        console.log(`   - Relative path: ${relativePath}`);
+      }
+    }
+
     // Return success
     res.json({
       success: true,
@@ -4456,7 +4478,7 @@ router.post('/openai-upscaler/apply-effects', ensureAuthenticated, groupAuth.req
       metadata: {
         originalUrl: upscaledImageUrl,
         effectParams: finalEffectParams,
-        customizedImageUrl: saveResult ? saveResult.url : null,
+        customizedImageUrl: customizedImageUrl,
         customizedImagePath: saveResult ? saveResult.path : null,
         timestamp: new Date().toISOString()
       }

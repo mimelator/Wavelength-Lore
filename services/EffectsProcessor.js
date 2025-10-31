@@ -189,69 +189,71 @@ class EffectsProcessor {
       
       console.log(`🎨 Applying static overlays to ${width}x${height} image`);
       
+      // 🔥 CRITICAL FIX: Collect all overlays into a single composite array
+      // Multiple .composite() calls replace each other - we need ONE composite call with all overlays
+      const compositeOverlays = [];
+      
       // Lightning overlay
       if (params.staticLightning) {
         console.log('⚡ Applying static lightning overlay...');
         const lightningOverlay = await this.loadAndResizeOverlay('lightning', width, height);
-        pipeline = pipeline.composite([
-          {
-            input: lightningOverlay,
-            blend: 'screen',
-            opacity: 0.8
-          }
-        ]);
+        compositeOverlays.push({
+          input: lightningOverlay,
+          blend: 'screen',
+          opacity: 0.8
+        });
       }
       
       // Snow overlay
       if (params.staticSnow) {
         console.log('❄️ Applying static snow overlay...');
         const snowOverlay = await this.loadAndResizeOverlay('snow', width, height);
-        pipeline = pipeline.composite([
-          {
-            input: snowOverlay,
-            blend: 'screen',
-            opacity: 0.7
-          }
-        ]);
+        compositeOverlays.push({
+          input: snowOverlay,
+          blend: 'screen',
+          opacity: 0.7
+        });
       }
       
       // Fireflies overlay
       if (params.staticFireflies) {
         console.log('🐛 Applying static fireflies overlay...');
         const firefliesOverlay = await this.loadAndResizeOverlay('fireflies', width, height);
-        pipeline = pipeline.composite([
-          {
-            input: firefliesOverlay,
-            blend: 'screen',
-            opacity: 0.6
-          }
-        ]);
+        compositeOverlays.push({
+          input: firefliesOverlay,
+          blend: 'screen',
+          opacity: 0.6
+        });
       }
       
       // Sparkles overlay
       if (params.staticSparkles) {
         console.log('✨ Applying static sparkles overlay...');
         const sparklesOverlay = await this.loadAndResizeOverlay('sparkles', width, height);
-        pipeline = pipeline.composite([
-          {
-            input: sparklesOverlay,
-            blend: 'screen',
-            opacity: 0.5
-          }
-        ]);
+        compositeOverlays.push({
+          input: sparklesOverlay,
+          blend: 'screen',
+          opacity: 0.5
+        });
       }
       
       // Vignette overlay (separate from dynamic vignette)
       if (params.staticVignette) {
         console.log('🎭 Applying static vignette overlay...');
         const vignetteOverlay = await this.loadAndResizeOverlay('vignette', width, height);
-        pipeline = pipeline.composite([
-          {
-            input: vignetteOverlay,
-            blend: 'multiply',
-            opacity: 0.8
-          }
-        ]);
+        compositeOverlays.push({
+          input: vignetteOverlay,
+          blend: 'multiply',
+          opacity: 0.8
+        });
+      }
+
+      // Apply all overlays in a single composite operation
+      if (compositeOverlays.length > 0) {
+        console.log(`✅ Applying ${compositeOverlays.length} overlay(s) in single composite operation`);
+        pipeline = pipeline.composite(compositeOverlays);
+      } else {
+        console.log('ℹ️ No static overlays to apply');
       }
 
       return pipeline;
