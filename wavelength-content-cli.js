@@ -23,6 +23,7 @@ const CharacterCommands = require('./commands/character-commands');
 const LoreCommands = require('./commands/lore-commands');
 const SongsCommands = require('./commands/songs-commands');
 const MediaCommands = require('./commands/media-commands');
+const EpisodeCommands = require('./commands/episodes-commands');
 
 class WavelengthContentCLI {
     constructor() {
@@ -36,6 +37,7 @@ class WavelengthContentCLI {
         this.loreCommands = new LoreCommands(this);
         this.songsCommands = new SongsCommands(this);
         this.mediaCommands = new MediaCommands(this);
+        this.episodeCommands = new EpisodeCommands(this);
         this.importedPrompts = null; // Loaded prompts from import
         
         // Initialize S3 client for image uploads
@@ -443,6 +445,11 @@ class WavelengthContentCLI {
                     await this.backupCommands.handleBackupCommands(args);
                     break;
                     
+                case 'episodes':
+                case 'episode':
+                    await this.episodeCommands.handleEpisodeCommands(args);
+                    break;
+                    
                 case 'lore':
                     await this.loreCommands.handleLoreCommands(args);
                     break;
@@ -573,6 +580,17 @@ class WavelengthContentCLI {
         console.log('  songs sync --episode=s4e9               - Sync with episode');
         console.log('  songs help                              - Detailed song commands');
         console.log('  radio <command>                         - Radio player management');
+        
+        console.log(chalk.green('\nEpisode Management:'));
+        console.log('  episodes create [title]                 - Create new episode');
+        console.log('  episodes edit <episode-id>              - Edit episode interactively');
+        console.log('  episodes view <episode-id>              - View episode details');
+        console.log('  episodes list [--season=N]              - List episodes');
+        console.log('  episodes extract [episode-id]           - Extract assets from any gallery');
+        console.log('  episodes extract                        - Browse gallery & extract assets');
+        console.log('  episodes publish <episode-id>           - Publish episode');
+        console.log('  episodes validate <episode-id>          - Validate episode');
+        console.log('  episodes help                           - Detailed episode commands');
         
         console.log(chalk.green('\nCharacter Management:'));
         console.log('  character create --name="Name" [options]  - Create new character');

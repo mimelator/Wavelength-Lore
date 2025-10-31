@@ -485,7 +485,8 @@ class EpisodeCommands {
         console.log('  episodes validate <id> [--check-images] - Validate episode');
         
         console.log(chalk.green('\nAsset Extraction:'));
-        console.log('  episodes extract <id> - Extract navigation icons, badges, and game assets');
+        console.log('  episodes extract [episode-id] - Extract assets from episode images or any gallery');
+        console.log('  episodes extract                - Interactive gallery browser (lore/characters/episodes)');
         console.log('  episodes assets <id> - Alias for extract');
         
         console.log(chalk.green('\nPublishing:'));
@@ -498,6 +499,7 @@ class EpisodeCommands {
         console.log(chalk.gray('  episodes list --season=1 --published=false'));
         console.log(chalk.gray('  episodes clone s1e1 "Lucky Charm Remake"'));
         console.log(chalk.gray('  episodes extract s5e1 - Extract assets from episode images'));
+        console.log(chalk.gray('  episodes extract      - Browse any gallery and extract assets'));
         
         console.log('');
     }
