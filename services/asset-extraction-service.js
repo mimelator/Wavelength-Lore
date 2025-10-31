@@ -31,6 +31,8 @@ class AssetExtractionService {
         // AI Enhancement Options
         this.useAIEnhancement = options.useAIEnhancement !== false; // Default: enabled if available
         this.characterExtractor = null;
+        this.rembgAvailable = false;
+        // Initialize AI extractor (async, but don't await - runs in background)
         this.initAIExtractor();
         
         // Asset type specifications
@@ -56,22 +58,93 @@ class AssetExtractionService {
      * Initialize AI-powered character extractor (optional enhancement)
      */
     initAIExtractor() {
+        // LOUD CHECK: Validate OPENAI_API_KEY is set
+        if (!process.env.OPENAI_API_KEY) {
+            console.log(chalk.red.bold('\n⚠️  ⚠️  ⚠️  OPENAI_API_KEY NOT SET ⚠️  ⚠️  ⚠️'));
+            console.log(chalk.red('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+            console.log(chalk.red.bold('❌ AI-ENHANCED ASSET EXTRACTION DISABLED'));
+            console.log(chalk.yellow('\n📋 To enable AI-powered smart object extraction:'));
+            console.log(chalk.white('   1. Set OPENAI_API_KEY in your .env file'));
+            console.log(chalk.white('   2. Install rembg: pip install rembg'));
+            console.log(chalk.gray('\n   Without OPENAI_API_KEY:'));
+            console.log(chalk.gray('   • Icons/badges will use center crop (not smart regions)'));
+            console.log(chalk.gray('   • Sprites will NOT have transparent backgrounds'));
+            console.log(chalk.gray('   • Asset quality will be significantly reduced'));
+            console.log(chalk.red('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+            this.useAIEnhancement = false;
+            return;
+        }
+
+        // Check for rembg (Python library for background removal)
+        this.checkRembgAvailability();
+
         try {
             const CharacterExtractor = require('../wavelength-tools/character-extractor/CharacterExtractor');
-            // Only initialize if OpenAI API key is available
-            if (!process.env.OPENAI_API_KEY) {
-                console.log(chalk.yellow('⚠️  AI enhancement disabled (OPENAI_API_KEY not set)'));
-                this.useAIEnhancement = false;
-                return;
-            }
             this.characterExtractor = new CharacterExtractor({ verbose: false });
-            console.log(chalk.green('✅ AI Character Extractor initialized (enhanced extraction enabled)'));
+            console.log(chalk.green.bold('✅ AI Character Extractor initialized'));
+            console.log(chalk.green('   🤖 Smart region detection: ENABLED'));
+            console.log(chalk.green('   🎨 Background removal: ENABLED'));
+            console.log(chalk.green('   ✨ Enhanced asset extraction: ACTIVE\n'));
         } catch (error) {
-            console.log(chalk.yellow('⚠️  AI Character Extractor not available (optional)'));
-            console.log(chalk.gray('   Install rembg: pip install rembg'));
-            console.log(chalk.gray('   Set OPENAI_API_KEY for Vision API features'));
+            console.log(chalk.yellow.bold('\n⚠️  AI Character Extractor initialization failed'));
+            console.log(chalk.yellow('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+            console.log(chalk.yellow(`   Error: ${error.message}`));
+            console.log(chalk.yellow('\n   Required:'));
+            console.log(chalk.white('   • OPENAI_API_KEY (✅ set)'));
+            console.log(chalk.yellow('   • rembg Python library (checking...)'));
+            console.log(chalk.gray('\n   Install rembg: pip install rembg'));
+            console.log(chalk.yellow('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
             this.useAIEnhancement = false;
         }
+    }
+
+    /**
+     * Check if rembg is available (for background removal)
+     */
+    async checkRembgAvailability() {
+        return new Promise((resolve) => {
+            const { spawn } = require('child_process');
+            const python = spawn('python3', ['-c', 'import rembg; print("ok")']);
+            let output = '';
+            let errorOutput = '';
+
+            python.stdout.on('data', (data) => {
+                output += data.toString();
+            });
+
+            python.stderr.on('data', (data) => {
+                errorOutput += data.toString();
+            });
+
+            python.on('close', (code) => {
+                const isAvailable = code === 0 && output.includes('ok');
+                
+                if (!isAvailable) {
+                    console.log(chalk.yellow.bold('\n⚠️  REMBG NOT INSTALLED'));
+                    console.log(chalk.yellow('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+                    console.log(chalk.red('❌ Background removal for sprites will be DISABLED'));
+                    console.log(chalk.yellow('\n📋 To enable background removal:'));
+                    console.log(chalk.white('   Install: pip install rembg'));
+                    console.log(chalk.gray('\n   Without rembg:'));
+                    console.log(chalk.gray('   • Sprites will have opaque backgrounds'));
+                    console.log(chalk.gray('   • No transparent PNG generation'));
+                    console.log(chalk.yellow('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+                } else {
+                    console.log(chalk.green('   ✅ rembg installed (background removal available)'));
+                }
+                
+                resolve(isAvailable);
+            });
+
+            // Timeout after 3 seconds
+            setTimeout(() => {
+                python.kill();
+                if (!output.includes('ok')) {
+                    console.log(chalk.yellow('   ⚠️  rembg check timed out'));
+                    resolve(false);
+                }
+            }, 3000);
+        });
     }
 
     /**

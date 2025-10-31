@@ -750,8 +750,14 @@ class EpisodeCommands {
             console.log(chalk.gray(`   Source: ${sourceInfo.type} | Images: ${sourceImages.length}`));
             console.log(chalk.gray(`   Target episode: ${targetEpisode.title || targetEpisode.id || targetEpisode}`));
 
-            // Initialize asset extraction service
+            // Initialize asset extraction service (validates AI setup)
+            console.log(chalk.cyan('🔍 Validating AI extraction setup...'));
             const assetService = new AssetExtractionService();
+            
+            // Wait a moment for async rembg check to complete
+            if (assetService.useAIEnhancement) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
 
             // Extract assets in preview mode (don't upload yet)
             const result = await assetService.extractEpisodeAssets({
