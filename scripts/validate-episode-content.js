@@ -70,27 +70,64 @@ class EpisodeContentValidator {
         
         const songList = Object.entries(songs).map(([key, song]) => ({ id: key, ...song }));
         
+        let publishedCount = 0;
+        let draftCount = 0;
+        let incompleteCount = 0;
+        
+        console.log('\n📊 Episode Analysis:');
+        console.log('===================');
+        
         for (const song of songList) {
-            // Check required fields
-            if (!song.title) this.errors.push(`Song ${song.id}: Missing title`);
-            if (!song.season) this.errors.push(`Song ${song.id}: Missing season`);
-            if (!song.episode && !song.episodeNumber) this.errors.push(`Song ${song.id}: Missing episode number`);
+            const episodeId = `S${song.season}E${song.episode || song.episodeNumber}`;
+            const isPublished = song.published !== false;
             
-            // Check URL format
-            if (!song.url) {
-                this.errors.push(`Song ${song.id}: Missing URL field`);
-            } else if (song.url.startsWith('http')) {
-                this.warnings.push(`Song ${song.id}: Has full URL instead of relative path - ${song.url}`);
-            } else if (!song.url.startsWith('/images/seasons/S')) {
-                this.warnings.push(`Song ${song.id}: Non-standard URL format - ${song.url}`);
+            // Required fields check
+            const missingFields = [];
+            if (!song.title) missingFields.push('title');
+            if (!song.season) missingFields.push('season');
+            if (!song.episode && !song.episodeNumber) missingFields.push('episode');
+            if (!song.url) missingFields.push('url');
+            
+            // Determine episode status
+            if (missingFields.length > 0) {
+                incompleteCount++;
+                console.log(`   🚧 ${episodeId}: INCOMPLETE (missing: ${missingFields.join(', ')})`);
+                
+                // Only error on missing critical fields for published episodes
+                if (isPublished) {
+                    this.errors.push(`Published ${episodeId}: Missing critical fields - ${missingFields.join(', ')}`);
+                } else {
+                    this.warnings.push(`Draft ${episodeId}: Missing fields - ${missingFields.join(', ')} (OK for draft)`);
+                }
+            } else if (!isPublished) {
+                draftCount++;
+                console.log(`   📝 ${episodeId}: DRAFT (complete but unpublished) - "${song.title}"`);
+            } else {
+                publishedCount++;
+                console.log(`   ✅ ${episodeId}: PUBLISHED - "${song.title}"`);
+                
+                // Validate published episodes more strictly
+                if (song.url.startsWith('http')) {
+                    this.warnings.push(`Published ${episodeId}: Has full URL instead of relative path - ${song.url}`);
+                } else if (!song.url.startsWith('/images/seasons/S')) {
+                    this.warnings.push(`Published ${episodeId}: Non-standard URL format - ${song.url}`);
+                }
             }
         }
         
-        console.log(`   ✅ Validated ${songList.length} songs in Firebase`);
+        console.log('\n📈 Episode Status Summary:');
+        console.log(`   ✅ Published episodes: ${publishedCount}`);
+        console.log(`   📝 Draft episodes: ${draftCount}`);
+        console.log(`   🚧 Incomplete episodes: ${incompleteCount}`);
+        console.log(`   📊 Total episodes: ${songList.length}`);
+        
+        this.validatedFiles = publishedCount; // Only count published for validation
+        
+        console.log(`\n   ✅ Validated ${songList.length} total episodes (${publishedCount} published)`);
     }
 
     async validateS3Files() {
-        console.log('📁 Validating S3 file existence...');
+        console.log('\n📁 Validating S3 file existence...');
         
         const db = getAdminDatabase();
         const snapshot = await db.ref('songs').once('value');
@@ -99,26 +136,48 @@ class EpisodeContentValidator {
         if (!songs) return;
         
         const songList = Object.entries(songs).map(([key, song]) => ({ id: key, ...song }));
+        let s3ValidatedCount = 0;
+        let s3SkippedCount = 0;
         
         for (const song of songList) {
-            if (!song.url) continue;
+            const episodeId = `S${song.season}E${song.episode || song.episodeNumber}`;
+            const isPublished = song.published !== false;
+            
+            // Skip validation for incomplete drafts
+            if (!song.url) {
+                if (isPublished) {
+                    this.errors.push(`Published ${episodeId}: Missing URL - cannot validate S3 file`);
+                } else {
+                    s3SkippedCount++;
+                    console.log(`   ⏩ ${episodeId}: Skipped S3 check (draft without URL)`);
+                }
+                continue;
+            }
             
             // Convert URL to S3 key
             const s3Key = song.url.startsWith('/') ? song.url.substring(1) : song.url;
             
             try {
                 await this.s3.headObject({ Bucket: this.bucket, Key: s3Key }).promise();
-                this.validatedFiles++;
+                s3ValidatedCount++;
+                console.log(`   ✅ ${episodeId}: S3 file exists - ${s3Key}`);
             } catch (error) {
                 if (error.code === 'NotFound') {
-                    this.errors.push(`Song ${song.id} (${song.title}): File not found in S3 - ${s3Key}`);
+                    if (isPublished) {
+                        this.errors.push(`Published ${episodeId}: File not found in S3 - ${s3Key}`);
+                        console.log(`   ❌ ${episodeId}: S3 file MISSING - ${s3Key}`);
+                    } else {
+                        this.warnings.push(`Draft ${episodeId}: File not found in S3 - ${s3Key} (OK for draft)`);
+                        console.log(`   ⚠️  ${episodeId}: S3 file missing (draft) - ${s3Key}`);
+                    }
                 } else {
-                    this.warnings.push(`Song ${song.id}: S3 access error - ${error.message}`);
+                    this.warnings.push(`${episodeId}: S3 access error - ${error.message}`);
+                    console.log(`   🔄 ${episodeId}: S3 access error - ${error.message}`);
                 }
             }
         }
         
-        console.log(`   ✅ Validated ${this.validatedFiles} files in S3`);
+        console.log(`\n   ✅ Validated ${s3ValidatedCount} files in S3 (${s3SkippedCount} drafts skipped)`);
     }
 
     async validateCDNAccess() {
@@ -158,7 +217,7 @@ class EpisodeContentValidator {
     }
 
     async validateDataConsistency() {
-        console.log('🔄 Validating data consistency...');
+        console.log('\n🔄 Validating data consistency...');
         
         const db = getAdminDatabase();
         const snapshot = await db.ref('songs').once('value');
@@ -173,28 +232,55 @@ class EpisodeContentValidator {
         for (const song of songList) {
             const episodeKey = `S${song.season}E${song.episode || song.episodeNumber}`;
             if (seenEpisodes.has(episodeKey)) {
-                this.warnings.push(`Duplicate episode detected: ${episodeKey}`);
+                this.errors.push(`Duplicate episode detected: ${episodeKey}`);
+                console.log(`   ❌ Duplicate: ${episodeKey}`);
+            } else {
+                seenEpisodes.add(episodeKey);
             }
-            seenEpisodes.add(episodeKey);
         }
         
-        // Check for gaps in episodes
+        // Analyze season structure
         const seasonEpisodes = {};
         for (const song of songList) {
+            if (!song.season) continue;
             if (!seasonEpisodes[song.season]) seasonEpisodes[song.season] = [];
-            seasonEpisodes[song.season].push(song.episode || song.episodeNumber);
+            const episodeNum = song.episode || song.episodeNumber;
+            if (episodeNum) {
+                seasonEpisodes[song.season].push({
+                    episode: episodeNum,
+                    published: song.published !== false,
+                    title: song.title || 'Untitled'
+                });
+            }
         }
         
+        console.log('\n🏗️  Season Structure Analysis:');
         for (const [season, episodes] of Object.entries(seasonEpisodes)) {
-            episodes.sort((a, b) => a - b);
-            for (let i = 1; i < episodes[episodes.length - 1]; i++) {
-                if (!episodes.includes(i)) {
-                    this.warnings.push(`Season ${season}: Missing episode ${i}`);
+            episodes.sort((a, b) => a.episode - b.episode);
+            const publishedCount = episodes.filter(e => e.published).length;
+            const draftCount = episodes.length - publishedCount;
+            
+            console.log(`   📺 Season ${season}: ${episodes.length} episodes (${publishedCount} published, ${draftCount} drafts)`);
+            
+            // Check for gaps in published episodes only
+            const publishedEpisodes = episodes.filter(e => e.published).map(e => e.episode);
+            if (publishedEpisodes.length > 0) {
+                for (let i = 1; i < Math.max(...publishedEpisodes); i++) {
+                    if (!publishedEpisodes.includes(i)) {
+                        // Check if there's a draft for this episode
+                        const hasDraft = episodes.some(e => e.episode === i && !e.published);
+                        if (hasDraft) {
+                            console.log(`      📝 Episode ${i}: Draft exists (not published yet)`);
+                        } else {
+                            this.warnings.push(`Season ${season}: Published episodes skip episode ${i} (no draft found)`);
+                            console.log(`      ⚠️  Episode ${i}: Missing (gap in published sequence)`);
+                        }
+                    }
                 }
             }
         }
         
-        console.log(`   ✅ Validated data consistency across ${Object.keys(seasonEpisodes).length} seasons`);
+        console.log(`\n   ✅ Validated data consistency across ${Object.keys(seasonEpisodes).length} seasons`);
     }
 
     printResults() {
