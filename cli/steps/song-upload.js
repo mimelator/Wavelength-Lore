@@ -20,7 +20,7 @@ class SongUploadStep {
             region: process.env.AWS_REGION || 'us-east-1'
         });
         
-        this.bucketName = process.env.S3_BUCKET_NAME || 'wavelength-assets';
+        this.bucketName = process.env.S3_BUCKET_NAME || 'wavelength-lore-bucket';
     }
 
     async execute(episode) {
