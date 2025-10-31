@@ -462,6 +462,31 @@
     <script src="<%= cdnUrl %>/js/radio-screensaver.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
     <script src="<%= cdnUrl %>/js/radio-player.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
     <script src="<%= cdnUrl %>/js/radio-player-init.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+    <script src="<%= cdnUrl %>/js/wavelength-site-tour.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+    <script>
+        // Auto-start radio tour for first-time visitors on radio player page
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                if (window.wavelengthSiteTour) {
+                    const tourCompleted = localStorage.getItem('wavelength_radio_tour_completed') === 'true';
+                    if (!tourCompleted) {
+                        setTimeout(() => {
+                            window.wavelengthSiteTour.startRadioTour();
+                        }, 2000);
+                    }
+                }
+            });
+        } else {
+            if (window.wavelengthSiteTour) {
+                const tourCompleted = localStorage.getItem('wavelength_radio_tour_completed') === 'true';
+                if (!tourCompleted) {
+                    setTimeout(() => {
+                        window.wavelengthSiteTour.startRadioTour();
+                    }, 2000);
+                }
+            }
+        }
+    </script>
     
     <!-- Minimal footer without radio components -->
     <footer>

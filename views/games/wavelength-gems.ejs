@@ -567,6 +567,33 @@
     <script src="/js/games/wavelength-gems/ui-polish-test-suite.js"></script>
     <script src="/js/games/wavelength-gems/master-test-suite.js"></script>
     
+    <!-- Wavelength Site Tour System -->
+    <script src="<%= cdnUrl || '' %>/js/wavelength-site-tour.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+    <script>
+        // Auto-start games tour for first-time visitors on games page
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                if (window.wavelengthSiteTour) {
+                    const tourCompleted = localStorage.getItem('wavelength_games_tour_completed') === 'true';
+                    if (!tourCompleted) {
+                        setTimeout(() => {
+                            window.wavelengthSiteTour.startGamesTour();
+                        }, 2000);
+                    }
+                }
+            });
+        } else {
+            if (window.wavelengthSiteTour) {
+                const tourCompleted = localStorage.getItem('wavelength_games_tour_completed') === 'true';
+                if (!tourCompleted) {
+                    setTimeout(() => {
+                        window.wavelengthSiteTour.startGamesTour();
+                    }, 2000);
+                }
+            }
+        }
+    </script>
+    
     <script>
         // Validator available but disabled by default (major bugs fixed!)
         // To enable validation: startValidation(1000) in console

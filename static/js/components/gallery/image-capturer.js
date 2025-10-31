@@ -24,9 +24,11 @@ class ImageCapturer {
     };
     
     this.captureButtons = [];      // Track buttons added to the page
+    this.processedImages = new WeakSet(); // Track images that have been processed
     this.enabled = false;          // Is the capturer enabled
     this.processPageTimeout = null; // Debounce timer for processPage
     this.debounceDelay = 500;      // Wait 500ms before reprocessing
+    this.isProcessing = false;     // Flag to prevent recursive processing
 
     // Bind methods
     this.enable = this.enable.bind(this);
@@ -53,6 +55,9 @@ class ImageCapturer {
     
     // Create mutation observer to detect new images
     this.observer = new MutationObserver((mutations) => {
+      // Skip if we're currently processing (to avoid infinite loops)
+      if (this.isProcessing) return;
+      
       let shouldProcess = false;
       for (const mutation of mutations) {
         if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
@@ -64,8 +69,19 @@ class ImageCapturer {
               target.closest('#lore-carousel')) {
             continue; // Skip carousel mutations
           }
-          shouldProcess = true;
-          break;
+          
+          // Skip if the added node is from our own button/wrapper creation
+          const isOurMutation = Array.from(mutation.addedNodes).some(node => {
+            return node.classList && (
+              node.classList.contains('image-capture-button') ||
+              node.querySelector && node.querySelector('.image-capture-button')
+            );
+          });
+          
+          if (!isOurMutation) {
+            shouldProcess = true;
+            break;
+          }
         }
       }
       if (shouldProcess) {
@@ -104,6 +120,10 @@ class ImageCapturer {
 
     // Remove all buttons
     this.cleanupButtons();
+    
+    // Reset processed images tracking
+    this.processedImages = new WeakSet();
+    this.isProcessing = false;
 
     console.log('❌ Image Capturer: Disabled');
   }
@@ -129,38 +149,57 @@ class ImageCapturer {
    * Process the page to find images and add capture buttons
    */
   processPage() {
-    if (!this.enabled) return;
+    if (!this.enabled || this.isProcessing) return;
     
-    console.log('🔍 Image Capturer: Processing page for images');
+    this.isProcessing = true;
     
-    // Find all images that meet our criteria
-    const images = Array.from(document.querySelectorAll('img')).filter(img => {
-      // Skip small images
-      if (img.naturalWidth < this.options.minImageSize || 
-          img.naturalHeight < this.options.minImageSize) {
-        return false;
-      }
-      
-      // Skip images with excluded selectors
-      for (const selector of this.options.excludeSelectors) {
-        if (img.matches(selector)) {
+    try {
+      // Find all images that meet our criteria
+      const images = Array.from(document.querySelectorAll('img')).filter(img => {
+        // Skip if we've already processed this image
+        if (this.processedImages.has(img)) {
           return false;
         }
+        
+        // Skip small images
+        if (img.naturalWidth < this.options.minImageSize || 
+            img.naturalHeight < this.options.minImageSize) {
+          return false;
+        }
+        
+        // Skip images with excluded selectors
+        for (const selector of this.options.excludeSelectors) {
+          if (img.matches(selector)) {
+            return false;
+          }
+        }
+        
+        // Skip images that already have a capture button (double check)
+        const wrapper = img.parentElement;
+        if (wrapper && wrapper.querySelector('.image-capture-button')) {
+          this.processedImages.add(img); // Mark as processed even if button exists
+          return false;
+        }
+        
+        return true;
+      });
+      
+      // Only log if images were found
+      if (images.length > 0) {
+        console.log(`📷 Image Capturer: Added ${images.length} capture button(s)`);
       }
       
-      // Skip images that already have a capture button
-      if (img.parentElement && 
-          img.parentElement.querySelector('.image-capture-button')) {
-        return false;
-      }
-      
-      return true;
-    });
-    
-    console.log(`📷 Image Capturer: Found ${images.length} images`);
-    
-    // Add buttons to each image
-    images.forEach(this.addCaptureButtonToImage);
+      // Add buttons to each image
+      images.forEach(img => {
+        this.processedImages.add(img); // Mark as processed before adding button
+        this.addCaptureButtonToImage(img);
+      });
+    } finally {
+      // Reset processing flag after a small delay to ensure DOM has settled
+      setTimeout(() => {
+        this.isProcessing = false;
+      }, 100);
+    }
   }
   
   /**
@@ -222,8 +261,6 @@ class ImageCapturer {
       button,
       wrapper
     });
-    
-    console.log('➕ Added capture button to image:', img.src.substring(0, 50) + '...');
   }
   
   /**
