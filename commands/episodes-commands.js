@@ -1,0 +1,659 @@
+/**
+ * Episode Management Commands for Wavelength CLI
+ * 
+ * Provides full CRUD operations for episodes through the CLI
+ * Integrates with Firebase Episode Service for data persistence
+ * 
+ * GitHub Issue: #152 - Milestone 2.1.2: CLI CRUD Activities
+ */
+
+const chalk = require('chalk');
+const FirebaseEpisodeService = require('../services/firebase-episode-service');
+
+class EpisodeCommands {
+    constructor(cli) {
+        this.cli = cli;
+        this.episodeService = null;
+        this.initializeService();
+    }
+
+    async initializeService() {
+        try {
+            this.episodeService = new FirebaseEpisodeService();
+        } catch (error) {
+            console.log(chalk.yellow('⚠️ Episode service initialization failed:', error.message));
+            console.log(chalk.gray('Episode management commands will show status only'));
+        }
+    }
+
+    /**
+     * Handle episode-related commands
+     * @param {Array} args - Command arguments
+     */
+    async handleEpisodeCommands(args) {
+        if (!args.length) {
+            this.showEpisodeHelp();
+            return;
+        }
+
+        const subCommand = args[0].toLowerCase();
+        const commandArgs = args.slice(1);
+
+        try {
+            switch (subCommand) {
+                case 'create':
+                    await this.createEpisode(commandArgs);
+                    break;
+                    
+                case 'edit':
+                case 'update':
+                    await this.editEpisode(commandArgs);
+                    break;
+                    
+                case 'delete':
+                case 'remove':
+                    await this.deleteEpisode(commandArgs);
+                    break;
+                    
+                case 'view':
+                case 'show':
+                    await this.viewEpisode(commandArgs);
+                    break;
+                    
+                case 'list':
+                case 'ls':
+                    await this.listEpisodes(commandArgs);
+                    break;
+                    
+                case 'clone':
+                case 'duplicate':
+                    await this.cloneEpisode(commandArgs);
+                    break;
+                    
+                case 'publish':
+                    await this.publishEpisode(commandArgs);
+                    break;
+                    
+                case 'validate':
+                    await this.validateEpisode(commandArgs);
+                    break;
+                    
+                case 'search':
+                    await this.searchEpisodes(commandArgs);
+                    break;
+                    
+                case 'help':
+                default:
+                    this.showEpisodeHelp();
+                    break;
+            }
+        } catch (error) {
+            console.log(chalk.red('❌ Episode command failed:'), error.message);
+        }
+    }
+
+    /**
+     * Create new episode
+     * @param {Array} args - Command arguments
+     */
+    async createEpisode(args) {
+        if (!this.episodeService) {
+            console.log(chalk.red('❌ Episode service not available'));
+            return;
+        }
+
+        console.log(chalk.cyan.bold('\n🎬 CREATE NEW EPISODE'));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        // Parse title from args or prompt
+        let title = args.join(' ');
+        if (!title) {
+            title = await this.cli.promptUser('Episode title: ');
+        }
+
+        if (!title) {
+            console.log(chalk.red('❌ Episode title is required'));
+            return;
+        }
+
+        // Gather episode details
+        const episodeData = {
+            title: title.trim(),
+            season: parseInt(await this.cli.promptUser('Season number: ')) || 1,
+            episodeNumber: parseInt(await this.cli.promptUser('Episode number: ')) || 1,
+            description: await this.cli.promptUser('Description (optional): ') || '',
+            youtubeLink: await this.cli.promptUser('YouTube link (optional): ') || '',
+            published: (await this.cli.promptUser('Publish immediately? (y/n): ')).toLowerCase() === 'y'
+        };
+
+        try {
+            console.log(chalk.blue('\n🔄 Creating episode...'));
+            const episodeId = await this.episodeService.createEpisode(episodeData);
+            
+            console.log(chalk.green(`\n✅ Episode created successfully!`));
+            console.log(chalk.white(`📺 Episode ID: ${episodeId}`));
+            console.log(chalk.white(`🎬 Title: ${episodeData.title}`));
+            console.log(chalk.white(`📅 Season ${episodeData.season}, Episode ${episodeData.episodeNumber}`));
+            console.log(chalk.white(`🔍 Status: ${episodeData.published ? 'Published' : 'Draft'}`));
+            
+            console.log(chalk.yellow('\n💡 Next steps:'));
+            console.log(chalk.gray(`  • episodes edit ${episodeId} --interactive`));
+            console.log(chalk.gray(`  • episodes validate ${episodeId} --check-images`));
+
+        } catch (error) {
+            console.log(chalk.red('❌ Failed to create episode:'), error.message);
+        }
+    }
+
+    /**
+     * Edit existing episode
+     * @param {Array} args - Command arguments
+     */
+    async editEpisode(args) {
+        if (!this.episodeService) {
+            console.log(chalk.red('❌ Episode service not available'));
+            return;
+        }
+
+        const episodeId = args[0];
+        if (!episodeId) {
+            console.log(chalk.red('❌ Please specify episode ID'));
+            console.log(chalk.gray('Usage: episodes edit <episode-id> [--field=value]'));
+            return;
+        }
+
+        // Check if episode exists
+        const episode = await this.episodeService.getEpisodeById(episodeId);
+        if (!episode) {
+            console.log(chalk.red(`❌ Episode "${episodeId}" not found`));
+            return;
+        }
+
+        console.log(chalk.cyan.bold(`\n📝 EDITING EPISODE: ${episode.title}`));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        // Check for inline field updates
+        const fieldUpdates = this.parseFieldUpdates(args.slice(1));
+        if (Object.keys(fieldUpdates).length > 0) {
+            try {
+                await this.episodeService.updateEpisode(episodeId, fieldUpdates);
+                console.log(chalk.green(`✅ Updated ${Object.keys(fieldUpdates).join(', ')}`));
+            } catch (error) {
+                console.log(chalk.red('❌ Update failed:'), error.message);
+            }
+            return;
+        }
+
+        // Interactive editing
+        if (args.includes('--interactive')) {
+            await this.interactiveEpisodeEdit(episodeId, episode);
+        } else {
+            // Show current values and editing options
+            this.displayEpisodeForEdit(episode);
+            console.log(chalk.yellow('\n💡 Use --interactive for guided editing'));
+            console.log(chalk.gray('Or specify field directly: episodes edit s1e1 --field=value'));
+        }
+    }
+
+    /**
+     * Interactive episode editing session
+     * @param {string} episodeId - Episode identifier
+     * @param {Object} episode - Current episode data
+     */
+    async interactiveEpisodeEdit(episodeId, episode) {
+        const editableFields = [
+            { key: 'title', name: 'Title', current: episode.title },
+            { key: 'description', name: 'Description', current: episode.description || 'Not set' },
+            { key: 'youtubeLink', name: 'YouTube Link', current: episode.youtubeLink || 'Not set' },
+            { key: 'keywords', name: 'Keywords', current: episode.keywords?.join(', ') || 'None' },
+            { key: 'characters', name: 'Characters', current: episode.characters?.join(', ') || 'None' },
+            { key: 'published', name: 'Published', current: episode.published ? 'Yes' : 'No' }
+        ];
+
+        console.log(chalk.yellow('\nEditable fields:'));
+        editableFields.forEach((field, index) => {
+            const truncated = field.current.length > 50 
+                ? field.current.substring(0, 50) + '...' 
+                : field.current;
+            console.log(chalk.white(`  ${index + 1}. ${field.name}`) + chalk.gray(` - ${truncated}`));
+        });
+
+        console.log(chalk.cyan('\nSpecial actions:'));
+        console.log(chalk.white('  8. 📋 Manage Gallery Images'));
+        console.log(chalk.white('  9. 🤖 AI Content Enhancement'));
+        console.log(chalk.white('  10. 💾 Save & Exit'));
+        console.log(chalk.white('  0. Cancel'));
+
+        while (true) {
+            const choice = await this.cli.promptUser('\nSelect field to edit (1-10, 0 to cancel): ');
+            const choiceNum = parseInt(choice);
+
+            if (choiceNum === 0) {
+                console.log(chalk.gray('Edit cancelled'));
+                break;
+            } else if (choiceNum === 10) {
+                console.log(chalk.green('✅ Changes saved'));
+                break;
+            } else if (choiceNum === 9) {
+                await this.aiEnhanceEpisode(episodeId, episode);
+            } else if (choiceNum === 8) {
+                await this.manageEpisodeGallery(episodeId, episode);
+            } else if (choiceNum >= 1 && choiceNum <= editableFields.length) {
+                const field = editableFields[choiceNum - 1];
+                await this.editEpisodeField(episodeId, field);
+            } else {
+                console.log(chalk.red('❌ Invalid choice'));
+            }
+        }
+    }
+
+    /**
+     * Delete episode
+     * @param {Array} args - Command arguments
+     */
+    async deleteEpisode(args) {
+        if (!this.episodeService) {
+            console.log(chalk.red('❌ Episode service not available'));
+            return;
+        }
+
+        const episodeId = args[0];
+        if (!episodeId) {
+            console.log(chalk.red('❌ Please specify episode ID'));
+            return;
+        }
+
+        const hardDelete = args.includes('--hard');
+        const confirm = args.includes('--confirm');
+
+        // Get episode for confirmation
+        const episode = await this.episodeService.getEpisodeById(episodeId);
+        if (!episode) {
+            console.log(chalk.red(`❌ Episode "${episodeId}" not found`));
+            return;
+        }
+
+        console.log(chalk.red.bold(`\n🗑️ DELETE EPISODE: ${episode.title}`));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        if (hardDelete) {
+            console.log(chalk.red('⚠️ PERMANENT DELETION - This cannot be undone!'));
+        } else {
+            console.log(chalk.yellow('🔒 Soft delete - Episode will be hidden but recoverable'));
+        }
+
+        if (!confirm) {
+            const confirmation = await this.cli.promptUser(`Delete "${episode.title}"? Type "yes" to confirm: `);
+            if (confirmation.toLowerCase() !== 'yes') {
+                console.log(chalk.gray('Delete cancelled'));
+                return;
+            }
+        }
+
+        try {
+            await this.episodeService.deleteEpisode(episodeId, hardDelete);
+            
+            if (hardDelete) {
+                console.log(chalk.red(`🗑️ Episode "${episodeId}" permanently deleted`));
+            } else {
+                console.log(chalk.yellow(`🔒 Episode "${episodeId}" hidden (soft deleted)`));
+            }
+
+        } catch (error) {
+            console.log(chalk.red('❌ Delete failed:'), error.message);
+        }
+    }
+
+    /**
+     * View episode details
+     * @param {Array} args - Command arguments
+     */
+    async viewEpisode(args) {
+        if (!this.episodeService) {
+            console.log(chalk.red('❌ Episode service not available'));
+            return;
+        }
+
+        const episodeId = args[0];
+        if (!episodeId) {
+            console.log(chalk.red('❌ Please specify episode ID'));
+            return;
+        }
+
+        const episode = await this.episodeService.getEpisodeById(episodeId);
+        if (!episode) {
+            console.log(chalk.red(`❌ Episode "${episodeId}" not found`));
+            return;
+        }
+
+        console.log(chalk.blue.bold(`\n📺 EPISODE: ${episode.title}`));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        console.log(chalk.cyan('ID:'), episode.id);
+        console.log(chalk.cyan('Season:'), episode.season);
+        console.log(chalk.cyan('Episode:'), episode.episodeNumber);
+        console.log(chalk.cyan('Status:'), episode.published ? chalk.green('Published') : chalk.yellow('Draft'));
+        
+        if (episode.description) {
+            console.log(chalk.cyan('\nDescription:'));
+            console.log(chalk.white(episode.description));
+        }
+
+        if (episode.youtubeLink) {
+            console.log(chalk.cyan('\nYouTube:'), chalk.blue(episode.youtubeLink));
+        }
+
+        if (episode.keywords && episode.keywords.length > 0) {
+            console.log(chalk.cyan('\nKeywords:'));
+            console.log(chalk.gray(episode.keywords.join(', ')));
+        }
+
+        if (episode.characters && episode.characters.length > 0) {
+            console.log(chalk.cyan('\nCharacters:'));
+            console.log(chalk.gray(episode.characters.join(', ')));
+        }
+
+        if (episode.carouselImages && episode.carouselImages.length > 0) {
+            console.log(chalk.cyan('\nGallery Images:'), chalk.white(episode.carouselImages.length));
+        }
+
+        if (episode.createdAt) {
+            console.log(chalk.cyan('\nCreated:'), new Date(episode.createdAt).toLocaleDateString());
+        }
+
+        console.log('');
+    }
+
+    /**
+     * List episodes with filtering
+     * @param {Array} args - Command arguments
+     */
+    async listEpisodes(args) {
+        if (!this.episodeService) {
+            console.log(chalk.red('❌ Episode service not available'));
+            return;
+        }
+
+        // Parse filters from args
+        const filters = this.parseListFilters(args);
+        
+        console.log(chalk.blue.bold('\n📺 EPISODES'));
+        if (Object.keys(filters).length > 0) {
+            console.log(chalk.gray(`Filters: ${JSON.stringify(filters)}`));
+        }
+        console.log(chalk.gray('=' .repeat(50)));
+
+        try {
+            const episodes = await this.episodeService.getAllEpisodes(filters);
+            
+            if (episodes.length === 0) {
+                console.log(chalk.yellow('No episodes found matching criteria'));
+                return;
+            }
+
+            episodes.forEach((episode, index) => {
+                const statusIcon = episode.published ? '✅' : '📝';
+                const hiddenIcon = episode.hidden ? '🔒' : '';
+                console.log(chalk.white(`${index + 1}. ${statusIcon}${hiddenIcon} ${episode.id}`));
+                console.log(chalk.cyan(`   ${episode.title}`));
+                console.log(chalk.gray(`   S${episode.season}E${episode.episodeNumber} • ${episode.keywords?.length || 0} keywords • ${episode.carouselImages?.length || 0} images`));
+            });
+
+            console.log(chalk.blue(`\nTotal: ${episodes.length} episodes`));
+
+        } catch (error) {
+            console.log(chalk.red('❌ Failed to list episodes:'), error.message);
+        }
+    }
+
+    /**
+     * Clone episode
+     * @param {Array} args - Command arguments
+     */
+    async cloneEpisode(args) {
+        if (!this.episodeService) {
+            console.log(chalk.red('❌ Episode service not available'));
+            return;
+        }
+
+        const sourceId = args[0];
+        const newTitle = args.slice(1).join(' ');
+
+        if (!sourceId) {
+            console.log(chalk.red('❌ Please specify source episode ID'));
+            console.log(chalk.gray('Usage: episodes clone <source-id> "New Episode Title"'));
+            return;
+        }
+
+        if (!newTitle) {
+            console.log(chalk.red('❌ Please specify new episode title'));
+            return;
+        }
+
+        console.log(chalk.blue.bold('\n📄 CLONE EPISODE'));
+        console.log(chalk.gray('=' .repeat(50)));
+
+        // Get new season and episode number
+        const newSeason = parseInt(await this.cli.promptUser('New season number: ')) || 1;
+        const newEpisodeNumber = parseInt(await this.cli.promptUser('New episode number: ')) || 1;
+
+        const newData = {
+            title: newTitle,
+            season: newSeason,
+            episodeNumber: newEpisodeNumber,
+            published: false // Clone as draft by default
+        };
+
+        try {
+            const newEpisodeId = await this.episodeService.cloneEpisode(sourceId, newData);
+            
+            console.log(chalk.green(`\n✅ Episode cloned successfully!`));
+            console.log(chalk.white(`📺 Original: ${sourceId}`));
+            console.log(chalk.white(`📺 Clone: ${newEpisodeId}`));
+            console.log(chalk.white(`🎬 Title: ${newTitle}`));
+
+        } catch (error) {
+            console.log(chalk.red('❌ Clone failed:'), error.message);
+        }
+    }
+
+    /**
+     * Show episode help
+     */
+    showEpisodeHelp() {
+        console.log(chalk.blue.bold('\n📺 EPISODE MANAGEMENT COMMANDS'));
+        console.log(chalk.gray('=' .repeat(50)));
+        
+        console.log(chalk.green('\nCreation & Modification:'));
+        console.log('  episodes create "Title" - Create new episode interactively');
+        console.log('  episodes edit <id> --interactive - Interactive episode editor');
+        console.log('  episodes edit <id> --field=value - Quick field update');
+        console.log('  episodes delete <id> [--soft|--hard] - Delete episode');
+        console.log('  episodes clone <id> "New Title" - Clone episode with new data');
+        
+        console.log(chalk.green('\nViewing & Discovery:'));
+        console.log('  episodes view <id> - View episode details');
+        console.log('  episodes list [--season=N] [--published] - List episodes');
+        console.log('  episodes search "text" - Search episode titles/descriptions');
+        console.log('  episodes validate <id> [--check-images] - Validate episode');
+        
+        console.log(chalk.green('\nPublishing:'));
+        console.log('  episodes publish <id> --status=published - Publish episode');
+        console.log('  episodes publish <id> --status=draft - Unpublish episode');
+        
+        console.log(chalk.yellow('\n💡 Examples:'));
+        console.log(chalk.gray('  episodes create "The Final Battle"'));
+        console.log(chalk.gray('  episodes edit s4e9 --title="Battle of the Shire"'));
+        console.log(chalk.gray('  episodes list --season=1 --published=false'));
+        console.log(chalk.gray('  episodes clone s1e1 "Lucky Charm Remake"'));
+        
+        console.log('');
+    }
+
+    // Helper Methods
+
+    /**
+     * Parse field updates from command arguments
+     * @param {Array} args - Command arguments
+     * @returns {Object} - Field updates object
+     */
+    parseFieldUpdates(args) {
+        const updates = {};
+        
+        args.forEach(arg => {
+            if (arg.startsWith('--') && arg.includes('=')) {
+                const [key, ...valueParts] = arg.substring(2).split('=');
+                const value = valueParts.join('=');
+                
+                // Parse different value types
+                if (value === 'true' || value === 'false') {
+                    updates[key] = value === 'true';
+                } else if (!isNaN(value) && value.trim() !== '') {
+                    updates[key] = parseFloat(value);
+                } else {
+                    updates[key] = value;
+                }
+            }
+        });
+        
+        return updates;
+    }
+
+    /**
+     * Parse list filters from command arguments
+     * @param {Array} args - Command arguments
+     * @returns {Object} - Filters object
+     */
+    parseListFilters(args) {
+        const filters = {};
+        
+        args.forEach(arg => {
+            if (arg.startsWith('--') && arg.includes('=')) {
+                const [key, value] = arg.substring(2).split('=');
+                
+                switch (key) {
+                    case 'season':
+                        filters.season = parseInt(value);
+                        break;
+                    case 'published':
+                        filters.published = value === 'true';
+                        break;
+                    case 'hidden':
+                        filters.hidden = value === 'true';
+                        break;
+                    case 'search':
+                        filters.search = value;
+                        break;
+                }
+            }
+        });
+        
+        return filters;
+    }
+
+    /**
+     * Display episode data for editing
+     * @param {Object} episode - Episode object
+     */
+    displayEpisodeForEdit(episode) {
+        console.log(chalk.cyan('Current Values:'));
+        console.log(chalk.white(`  Title: ${episode.title}`));
+        console.log(chalk.white(`  Season: ${episode.season}, Episode: ${episode.episodeNumber}`));
+        console.log(chalk.white(`  Description: ${episode.description || 'Not set'}`));
+        console.log(chalk.white(`  YouTube: ${episode.youtubeLink || 'Not set'}`));
+        console.log(chalk.white(`  Keywords: ${episode.keywords?.join(', ') || 'None'}`));
+        console.log(chalk.white(`  Published: ${episode.published ? 'Yes' : 'No'}`));
+        console.log(chalk.white(`  Gallery Images: ${episode.carouselImages?.length || 0}`));
+    }
+
+    /**
+     * Edit individual episode field
+     * @param {string} episodeId - Episode ID
+     * @param {Object} field - Field configuration
+     */
+    async editEpisodeField(episodeId, field) {
+        console.log(chalk.cyan(`\n📝 Editing: ${field.name}`));
+        console.log(chalk.gray(`Current: ${field.current}`));
+        
+        const newValue = await this.cli.promptUser(`Enter new ${field.name.toLowerCase()}: `);
+        
+        if (newValue.trim()) {
+            const updates = {};
+            
+            // Handle special field types
+            if (field.key === 'published') {
+                updates[field.key] = newValue.toLowerCase() === 'true' || newValue.toLowerCase() === 'yes';
+            } else if (field.key === 'keywords' || field.key === 'characters') {
+                updates[field.key] = newValue.split(',').map(item => item.trim()).filter(item => item);
+            } else {
+                updates[field.key] = newValue.trim();
+            }
+            
+            try {
+                await this.episodeService.updateEpisode(episodeId, updates);
+                console.log(chalk.green(`✅ ${field.name} updated`));
+            } catch (error) {
+                console.log(chalk.red(`❌ Failed to update ${field.name}:`, error.message));
+            }
+        }
+    }
+
+    /**
+     * AI enhance episode content
+     * @param {string} episodeId - Episode ID
+     * @param {Object} episode - Episode object
+     */
+    async aiEnhanceEpisode(episodeId, episode) {
+        console.log(chalk.cyan('\n🤖 AI EPISODE ENHANCEMENT'));
+        console.log(chalk.yellow('This feature will integrate with AI services for content enhancement'));
+        console.log(chalk.gray(`Enhancing episode: ${episode.title}`));
+        console.log(chalk.blue('🔮 Feature framework ready - AI service integration needed'));
+    }
+
+    /**
+     * Manage episode gallery images
+     * @param {string} episodeId - Episode ID
+     * @param {Object} episode - Episode object
+     */
+    async manageEpisodeGallery(episodeId, episode) {
+        console.log(chalk.cyan('\n📋 EPISODE GALLERY MANAGEMENT'));
+        
+        const currentImages = episode.carouselImages || [];
+        console.log(chalk.gray(`Current images: ${currentImages.length}`));
+        
+        if (currentImages.length > 0) {
+            currentImages.forEach((img, i) => {
+                console.log(chalk.white(`  ${i + 1}. ${img}`));
+            });
+        }
+        
+        console.log('\nOptions:');
+        console.log('  1. Add image URL');
+        console.log('  2. Remove image');
+        console.log('  3. Sync with file system');
+        console.log('  0. Back');
+        
+        const choice = await this.cli.promptUser('Choose action: ');
+        
+        if (choice === '1') {
+            const imageUrl = await this.cli.promptUser('Image URL: ');
+            if (imageUrl.trim()) {
+                currentImages.push(imageUrl.trim());
+                await this.episodeService.updateEpisode(episodeId, { carouselImages: currentImages });
+                console.log(chalk.green('✅ Image added'));
+            }
+        } else if (choice === '2' && currentImages.length > 0) {
+            const index = parseInt(await this.cli.promptUser('Image number to remove: ')) - 1;
+            if (index >= 0 && index < currentImages.length) {
+                currentImages.splice(index, 1);
+                await this.episodeService.updateEpisode(episodeId, { carouselImages: currentImages });
+                console.log(chalk.green('✅ Image removed'));
+            }
+        } else if (choice === '3') {
+            console.log(chalk.blue('🔄 Syncing with file system...'));
+            console.log(chalk.gray('This would scan the episode directory for new images'));
+        }
+    }
+}
+
+module.exports = EpisodeCommands;

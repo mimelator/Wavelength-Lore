@@ -16,6 +16,10 @@ const loreHelpers = require('./helpers/lore-helpers');
 const characterHelpers = require('./helpers/character-helpers');
 const episodeHelpers = require('./helpers/episode-helpers');
 const FirebaseSongsService = require('./services/firebase-songs-service');
+const BackupCommands = require('./commands/backup-commands');
+const CharacterCommands = require('./commands/character-commands');
+const LoreCommands = require('./commands/lore-commands');
+const SongsCommands = require('./commands/songs-commands');
 
 class WavelengthContentCLI {
     constructor() {
@@ -24,6 +28,10 @@ class WavelengthContentCLI {
         this.currentItem = null;
         this.chatCLI = new WavelengthChatCLI();
         this.songsService = null; // Initialize later in start()
+        this.backupCommands = new BackupCommands(this);
+        this.characterCommands = new CharacterCommands(this);
+        this.loreCommands = new LoreCommands(this);
+        this.songsCommands = new SongsCommands(this);
         
         this.rl = readline.createInterface({
             input: process.stdin,
@@ -405,11 +413,25 @@ class WavelengthContentCLI {
                     
                 // Song Management Commands for Episode Creation Pipeline
                 case 'songs':
-                    await this.handleSongCommands(args);
+                    await this.songsCommands.handleSongsCommands(args);
                     break;
                     
                 case 'radio':
                     await this.handleRadioCommands(args);
+                    break;
+                    
+                case 'character':
+                case 'characters':
+                case 'char':
+                    await this.characterCommands.handleCharacterCommands(args);
+                    break;
+                    
+                case 'backup':
+                    await this.backupCommands.handleBackupCommands(args);
+                    break;
+                    
+                case 'lore':
+                    await this.loreCommands.handleLoreCommands(args);
                     break;
                     
                 case 'clear':
@@ -486,10 +508,49 @@ class WavelengthContentCLI {
         console.log('  publish validate <id> - Validate item before publishing');
         
         console.log(chalk.green('\nSong & Radio Management:'));
-        console.log('  songs <command>  - Manage songs in Firebase (list, add, publish, hide)');
-        console.log('  radio <command>  - Radio player management (playlist, health, test)');
-        console.log('  songs help       - Show detailed song management commands');
-        console.log('  radio help       - Show detailed radio player commands');
+        console.log('  songs create --title="Title" [options]   - Create new song');
+        console.log('  songs list [--season=4] [--detailed]     - List all songs');
+        console.log('  songs show <id>                         - Show song details');
+        console.log('  songs update <id> --field=value         - Update song');
+        console.log('  songs publish <id>                      - Publish song to radio');
+        console.log('  songs playlist [--season=4]             - Show playlist');
+        console.log('  songs sync --episode=s4e9               - Sync with episode');
+        console.log('  songs help                              - Detailed song commands');
+        console.log('  radio <command>                         - Radio player management');
+        
+        console.log(chalk.green('\nCharacter Management:'));
+        console.log('  character create --name="Name" [options]  - Create new character');
+        console.log('  character list [--role=type] [--detailed] - List all characters');
+        console.log('  character show <id>                      - Show character details');
+        console.log('  character update <id> --field=value      - Update character');
+        console.log('  character delete <id> --confirm          - Delete character');
+        console.log('  character cta <id> --score               - CTA completeness score');
+        console.log('  character validate <id> [--check-cta]    - Validate character');
+        console.log('  character help                           - Detailed character commands');
+        
+        console.log(chalk.green('\nLore Management:'));
+        console.log('  lore create --title="Title" [options]    - Create new lore entry');
+        console.log('  lore list [--category=place] [--detailed] - List all lore entries');
+        console.log('  lore show <id>                          - Show lore details');
+        console.log('  lore update <id> --field=value          - Update lore entry');
+        console.log('  lore delete <id> --confirm              - Delete lore entry');
+        console.log('  lore search <term> [--category=type]    - Search lore content');
+        console.log('  lore categories                         - Show all categories');
+        console.log('  lore tags                              - Show all tags');
+        console.log('  lore quality <id>                      - Assess content quality');
+        console.log('  lore help                              - Detailed lore commands');
+        
+        console.log(chalk.green('\nBackup & Recovery:'));
+        console.log('  backup create --type=all         - Create full database backup');
+        console.log('  backup create --type=episodes    - Create episodes backup');
+        console.log('  backup create --type=characters  - Create characters backup');
+        console.log('  backup create --type=songs       - Create songs backup');
+        console.log('  backup create --type=lore        - Create lore backup');
+        console.log('  backup list                      - List available backups');
+        console.log('  backup status                    - Show backup system status');
+        console.log('  backup restore <key>             - Restore from backup');
+        console.log('  backup validate <key>            - Validate backup integrity');
+        console.log('  backup help                      - Detailed backup commands');
         
         console.log(chalk.green('\nAdmin Tools:'));
         console.log(chalk.red('  admin            - Access pristine admin toolkit'));
@@ -1387,7 +1448,7 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
             'help', '?', 'ls', 'dir', 'cd', 'pwd', 'view', 'cat', 'edit', 
             'enhance', 'hide', 'show', 'preview', 'admin', 'clear', 'exit', 'quit',
             'create', 'duplicate', 'clone', 'template', 'search', 'find', 'recent',
-            'batch', 'bulk-edit', 'songs', 'radio', 'publish', 'query'
+            'batch', 'bulk-edit', 'songs', 'radio', 'publish', 'query', 'character', 'backup', 'lore'
         ];
 
         if (args.length === 1) {
@@ -1563,6 +1624,84 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
                         // Suggest season numbers for playlist command
                         const seasons = ['1', '2', '3', '4', '5'];
                         completions.push(...seasons.filter(s => s.startsWith(partial)));
+                    }
+                    break;
+
+                case 'character':
+                case 'characters':
+                case 'char':
+                    if (args.length === 2) {
+                        // Character subcommands
+                        const characterCommands = ['create', 'list', 'show', 'update', 'delete', 'publish', 'unpublish', 'validate', 'clone', 'cta', 'ai', 'avatar', 'help'];
+                        completions.push(...characterCommands.filter(cmd => cmd.startsWith(partial)));
+                    } else if (args.length >= 3 && ['create', 'update'].includes(args[1])) {
+                        // Character create/update options
+                        if (partial.startsWith('--')) {
+                            const options = ['--name=', '--role=protagonist', '--role=supporting', '--role=antagonist', '--description=', '--tagline=', '--stakes=', '--cta-text=', '--species=', '--age='];
+                            completions.push(...options.filter(opt => opt.startsWith(partial)));
+                        }
+                    } else if (args.length >= 3 && ['list'].includes(args[1])) {
+                        // Character list options
+                        if (partial.startsWith('--')) {
+                            const options = ['--role=protagonist', '--role=supporting', '--role=antagonist', '--published=true', '--published=false', '--detailed'];
+                            completions.push(...options.filter(opt => opt.startsWith(partial)));
+                        }
+                    } else if (args.length >= 3 && ['cta'].includes(args[1])) {
+                        // CTA management options
+                        if (partial.startsWith('--')) {
+                            const options = ['--score', '--enhance', '--tagline=', '--stakes=', '--cta-text=', '--cta-hook=', '--power-statement='];
+                            completions.push(...options.filter(opt => opt.startsWith(partial)));
+                        }
+                    }
+                    break;
+                    
+                case 'backup':
+                    if (args.length === 2) {
+                        // Backup subcommands
+                        const backupCommands = ['create', 'list', 'restore', 'status', 'validate', 'cleanup', 'help'];
+                        completions.push(...backupCommands.filter(cmd => cmd.startsWith(partial)));
+                    } else if (args.length >= 3 && args[1] === 'create') {
+                        // Backup create options
+                        if (partial.startsWith('--type=')) {
+                            const types = ['all', 'episodes', 'characters', 'songs', 'lore'];
+                            const typePrefix = '--type=';
+                            completions.push(...types.map(type => typePrefix + type).filter(opt => opt.startsWith(partial)));
+                        } else if (partial.startsWith('--')) {
+                            const options = ['--type=all', '--type=episodes', '--type=characters', '--type=songs', '--type=lore', '--export=', '--timestamp='];
+                            completions.push(...options.filter(opt => opt.startsWith(partial)));
+                        }
+                    } else if (args.length >= 3 && args[1] === 'list') {
+                        // Backup list options
+                        if (partial.startsWith('--')) {
+                            const options = ['--type=daily', '--type=weekly', '--type=manual', '--limit='];
+                            completions.push(...options.filter(opt => opt.startsWith(partial)));
+                        }
+                    } else if (args.length >= 3 && args[1] === 'restore') {
+                        // Backup restore options
+                        if (partial.startsWith('--')) {
+                            const options = ['--dry-run', '--force', '--target-path='];
+                            completions.push(...options.filter(opt => opt.startsWith(partial)));
+                        }
+                    }
+                    break;
+                    
+                case 'lore':
+                    if (args.length === 2) {
+                        // Lore subcommands
+                        const loreCommands = ['create', 'list', 'show', 'update', 'delete', 'search', 'categories', 'tags', 'quality', 'publish', 'unpublish', 'help'];
+                        completions.push(...loreCommands.filter(cmd => cmd.startsWith(partial)));
+                    } else if (args.length >= 3 && ['create', 'update'].includes(args[1])) {
+                        // Lore create/update options
+                        if (partial.startsWith('--')) {
+                            const options = ['--title=', '--category=place', '--category=thing', '--category=villain', '--category=nature', '--category=band', '--description=', '--tags=', '--image='];
+                            completions.push(...options.filter(opt => opt.startsWith(partial)));
+                        }
+                    } else if (args.length >= 3 && ['list', 'search'].includes(args[1])) {
+                        // Lore list/search options
+                        if (partial.startsWith('--')) {
+                            const options = ['--category=place', '--category=thing', '--category=villain', '--category=nature', '--category=band', '--detailed', '--published=true', '--published=false', '--tags='];
+                            completions.push(...options.filter(opt => opt.startsWith(partial)));
+                        }
                     }
                     break;
             }
@@ -2259,7 +2398,8 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
     getSuggestions(command) {
         const baseCommands = [
             'help', '?', 'ls', 'dir', 'cd', 'pwd', 'view', 'cat', 'edit', 
-            'enhance', 'hide', 'show', 'preview', 'admin', 'clear', 'exit', 'quit'
+            'enhance', 'hide', 'show', 'preview', 'admin', 'clear', 'exit', 'quit',
+            'songs', 'radio', 'character', 'backup', 'publish', 'query'
         ];
 
         // Simple fuzzy matching based on edit distance

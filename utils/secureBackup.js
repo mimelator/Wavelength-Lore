@@ -6,7 +6,6 @@
 const { S3Client, CreateBucketCommand, HeadBucketCommand, PutBucketEncryptionCommand, 
          PutBucketVersioningCommand, PutBucketLifecycleConfigurationCommand, 
          PutObjectCommand, ListObjectsV2Command, GetObjectCommand } = require('@aws-sdk/client-s3');
-const { fromEnv } = require('@aws-sdk/credential-providers');
 const admin = require('firebase-admin');
 const fs = require('fs').promises;
 const path = require('path');
@@ -35,9 +34,15 @@ class SecureDatabaseBackup {
       ...config
     };
 
+    // Configure AWS credentials - use backup-specific credentials first, then fall back to general AWS credentials
+    const awsCredentials = {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID || process.env.ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || process.env.SECRET_ACCESS_KEY
+    };
+
     this.s3Client = new S3Client({
       region: this.config.region,
-      credentials: fromEnv(),
+      credentials: awsCredentials,
       maxAttempts: 3,
       retryMode: 'adaptive'
     });
@@ -291,20 +296,59 @@ class SecureDatabaseBackup {
    */
   async exportFirebaseData() {
     try {
-      // Initialize Firebase Admin if not already initialized
+      // Initialize Firebase Admin if not already initialized using the same pattern as the main app
       if (!admin.apps.length) {
+        let credential;
+
+        // Check if service account is provided via environment variables (production)
+        if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+          try {
+            const serviceAccountJson = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            credential = admin.credential.cert(serviceAccountJson);
+            console.log('🔥 Using Firebase service account from environment variable for backup');
+          } catch (parseError) {
+            throw new Error('Failed to parse FIREBASE_SERVICE_ACCOUNT environment variable: ' + parseError.message);
+          }
+        }
+        // Fall back to individual environment variables
+        else if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+          credential = admin.credential.cert({
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+          });
+          console.log('🔥 Using Firebase credentials from individual environment variables for backup');
+        }
+        // Fall back to file-based authentication (local development)
+        else {
+          const path = require('path');
+          const fs = require('fs');
+          const serviceAccountPath = path.join(__dirname, '../firebaseServiceAccountKey.json');
+
+          if (!fs.existsSync(serviceAccountPath)) {
+            throw new Error(
+              'Firebase service account not found. Either:\n' +
+              '  1. Add FIREBASE_SERVICE_ACCOUNT environment variable (production), or\n' +
+              '  2. Add individual Firebase environment variables, or\n' +
+              '  3. Place firebaseServiceAccountKey.json in project root (local dev)'
+            );
+          }
+
+          credential = admin.credential.cert(serviceAccountPath);
+          console.log('🔥 Using Firebase service account from file for backup');
+        }
+
         admin.initializeApp({
-          credential: admin.credential.cert({
-            projectId: process.env.PROJECT_ID,
-            clientEmail: process.env.CLIENT_EMAIL,
-            privateKey: process.env.PRIVATE_KEY?.replace(/\\n/g, '\n')
-          }),
-          databaseURL: process.env.DATABASE_URL
-        });
+          credential: credential,
+          databaseURL: process.env.DATABASE_URL,
+          storageBucket: process.env.STORAGE_BUCKET
+        }, 'secureBackup');
         console.log('🔥 Firebase Admin initialized for backup');
       }
 
-      const database = admin.database();
+      // Use the named app instance for database operations
+      const backupApp = admin.app('secureBackup');
+      const database = backupApp.database();
       const snapshot = await database.ref('/').once('value');
       const data = snapshot.val();
 
