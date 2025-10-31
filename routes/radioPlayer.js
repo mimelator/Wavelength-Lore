@@ -5,6 +5,11 @@ const characterHelpers = require('../helpers/character-helpers');
 const { isDevelopmentBypass, getTestUser } = require('../middleware/auth');
 const { verifyToken, optionalAuth } = require('../middleware/firebaseAuth');
 
+// Cache management for radio playlist
+let playlistCache = null;
+let cacheTimestamp = null;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
+
 // Lazy-load Firebase Songs Service after Firebase Admin is ready
 let FirebaseSongsService;
 let songsService;
@@ -98,6 +103,16 @@ const LEGACY_PLAYLIST = [
  */
 async function getEnhancedPlaylist(season = null, includeUnpublished = false, includeEpisodeData = false) {
   try {
+    // Check cache first (only for published data without episode enhancement)
+    const cacheKey = `${season || 'all'}_${includeUnpublished}_${includeEpisodeData}`;
+    if (playlistCache && cacheTimestamp && !includeEpisodeData) {
+      const cacheAge = Date.now() - cacheTimestamp;
+      if (cacheAge < CACHE_TTL) {
+        console.log(`🎵 Using cached playlist (${Math.round(cacheAge/1000)}s old)`);
+        return season ? playlistCache.filter(song => song.season === season) : playlistCache;
+      }
+    }
+
     // Try to initialize Firebase Songs Service if not already done
     const activeSongsService = initializeSongsService();
     
@@ -135,6 +150,13 @@ async function getEnhancedPlaylist(season = null, includeUnpublished = false, in
     }
     
     console.log(`🎵 Using playlist with ${playlist.length} songs`);
+    
+    // Cache the basic playlist (without episode data enhancement)
+    if (!includeEpisodeData && !includeUnpublished) {
+      playlistCache = playlist;
+      cacheTimestamp = Date.now();
+      console.log('💾 Cached playlist data');
+    }
     
     // If episode data enhancement is not requested, return the basic playlist
     if (!includeEpisodeData) {
@@ -328,6 +350,39 @@ router.get('/api/radio/health', async (req, res) => {
   }
 
   res.json(health);
+});
+
+// Manual cache bust endpoint for radio data
+router.post('/api/radio/cache-bust', verifyToken, async (req, res) => {
+  try {
+    console.log('🔄 Manual cache bust triggered for radio data');
+    
+    // Clear any in-memory cache
+    playlistCache = null;
+    cacheTimestamp = null;
+    
+    // Trigger CloudFront cache invalidation
+    const CloudFrontCacheBuster = require('../scripts/cloudfront-cache-bust');
+    const cacheBuster = new CloudFrontCacheBuster('primary');
+    
+    const radioPaths = ['/api/radio/*', '/radio*'];
+    await cacheBuster.invalidateCache(radioPaths);
+    
+    res.json({
+      success: true,
+      message: 'Radio cache busted successfully',
+      timestamp: new Date().toISOString(),
+      paths: radioPaths
+    });
+    
+  } catch (error) {
+    console.error('❌ Cache bust failed:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Cache bust failed',
+      message: error.message
+    });
+  }
 });
 
 module.exports = router;

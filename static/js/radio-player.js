@@ -1158,7 +1158,10 @@ class WavelengthRadio {
             }
         });
         this.audio.addEventListener('error', (e) => {
-            console.error('Audio error:', e);
+            const currentTrack = this.playlist[this.currentTrackIndex];
+            console.error(`🚨 AUDIO ERROR on track ${this.currentTrackIndex}:`, e);
+            console.error(`🚨 FAILED AUDIO SRC:`, this.audio.src);
+            console.error(`🚨 CURRENT TRACK DATA:`, currentTrack);
             // Try next track if current fails
             this.next();
         });
@@ -1169,15 +1172,33 @@ class WavelengthRadio {
         return track.episodeNumber || track.episode;
     }
 
-    // Helper method to get audio URL from track (handles both legacy and Firebase formats)  
-    getAudioUrl(track) {
-        // Firebase format has CDN URL in track.url
-        if (track.url && !track.file) {
-            return this.cdnUrl + track.url;
+    // Helper method to safely construct URLs (handles both relative and absolute URLs)
+    safeUrlConstruct(path) {
+        if (!path) return '';
+        
+        // If path is already a full URL, return as-is
+        if (path.startsWith('http://') || path.startsWith('https://')) {
+            return path;
         }
-        // Legacy format builds path from track.file
-        const episodeNum = this.getEpisodeNumber(track);
-        return `${this.cdnUrl}/images/seasons/season${track.season}/episodes/episode${episodeNum}/${track.file}`;
+        
+        // If relative path, prepend CDN URL
+        return this.cdnUrl + path;
+    }
+
+    // Helper method to get audio URL from track - ONLY uses normalized url field
+    getAudioUrl(track) {
+        if (!track.url) {
+            console.error(`🚨 TRACK MISSING URL FIELD:`, track);
+            return '';
+        }
+        
+        // Check if track.url is already a full URL (starts with http)
+        if (track.url.startsWith('http://') || track.url.startsWith('https://')) {
+            return track.url;
+        }
+        
+        // Construct full CDN URL at runtime using the configured CDN base URL
+        return this.cdnUrl + track.url;
     }
 
     // Play specific track
@@ -1195,6 +1216,16 @@ class WavelengthRadio {
 
         // Get audio path (handles both Firebase and legacy formats)
         const audioPath = this.getAudioUrl(track);
+        
+        // LOG THE FUCKING URL SO WE CAN DEBUG THIS SHIT
+        console.log(`🔗 TRACK ${index} URL CONSTRUCTED:`, audioPath);
+        console.log(`🔍 TRACK ${index} RAW DATA:`, {
+            title: track.title,
+            url: track.url || 'NO URL FIELD',
+            file: track.file || 'NO FILE FIELD', 
+            season: track.season,
+            episode: track.episode
+        });
 
         this.audio.src = audioPath;
         this.audio.load();
@@ -1223,7 +1254,9 @@ class WavelengthRadio {
                 this.savePlaybackState();
                 // Screensaver notification handled by audio 'play' event listener
             }).catch(error => {
-                console.error('Playback error:', error);
+                console.error(`💥 PLAYBACK ERROR for track ${index}:`, error);
+                console.error(`💥 FAILED URL:`, audioPath);
+                console.error(`💥 TRACK DATA:`, track);
             });
         }
     }
