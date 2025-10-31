@@ -4247,13 +4247,18 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
      */
     promptUser(question) {
         return new Promise((resolve) => {
-            const tempRL = readline.createInterface({
-                input: process.stdin,
-                output: process.stdout
-            });
+            // Use the main readline interface to avoid conflicts
+            // Temporarily pause it if needed
+            const wasPaused = this.rl.paused;
+            if (!wasPaused) {
+                this.rl.pause();
+            }
             
-            tempRL.question(chalk.yellow(question), (answer) => {
-                tempRL.close();
+            this.rl.question(chalk.yellow(question), (answer) => {
+                // Resume if it was running before
+                if (!wasPaused) {
+                    this.rl.resume();
+                }
                 resolve(answer);
             });
         });
