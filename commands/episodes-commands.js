@@ -525,6 +525,24 @@ class EpisodeCommands {
     // Helper Methods
 
     /**
+     * Parse season number from episode ID (e.g., "s5e1" -> 5)
+     */
+    parseSeason(episodeId) {
+        if (!episodeId) return undefined;
+        const match = episodeId.match(/[sS](\d+)/);
+        return match ? parseInt(match[1]) : undefined;
+    }
+
+    /**
+     * Parse episode number from episode ID (e.g., "s5e1" -> 1)
+     */
+    parseEpisodeNumber(episodeId) {
+        if (!episodeId) return undefined;
+        const match = episodeId.match(/[eE](\d+)/);
+        return match ? parseInt(match[1]) : undefined;
+    }
+
+    /**
      * Parse field updates from command arguments
      * @param {Array} args - Command arguments
      * @returns {Object} - Field updates object
@@ -755,13 +773,22 @@ class EpisodeCommands {
                     return;
                 }
 
-                targetEpisode = await this.episodeService.getEpisodeById(episodeId);
-                if (!targetEpisode) {
+                const fetchedEpisode = await this.episodeService.getEpisodeById(episodeId);
+                if (!fetchedEpisode) {
                     console.log(chalk.red(`❌ Episode not found: ${episodeId}`));
                     return;
                 }
 
+                // Ensure episode has season and episodeNumber
+                targetEpisode = {
+                    id: fetchedEpisode.id || episodeId,
+                    season: fetchedEpisode.season || fetchedEpisode.seasonNumber || this.parseSeason(episodeId),
+                    episodeNumber: fetchedEpisode.episodeNumber || fetchedEpisode.episode || fetchedEpisode.number || this.parseEpisodeNumber(episodeId),
+                    title: fetchedEpisode.title
+                };
+
                 console.log(chalk.green(`✅ Assets will be saved for: ${targetEpisode.title || episodeId}`));
+                console.log(chalk.gray(`   Season ${targetEpisode.season}, Episode ${targetEpisode.episodeNumber}`));
             }
 
             console.log(chalk.cyan(`\n🎨 Extracting assets from: ${sourceInfo.title || sourceInfo.id}`));
