@@ -331,6 +331,9 @@ class WavelengthRadio {
             this.initHealthMonitoring();
         }
         
+        // Initialize cross-tab audio coordination
+        this.initCrossTabCoordination();
+        
         // Make this instance globally accessible for debugging
         window.radioPlayer = this;
     }
@@ -424,7 +427,13 @@ class WavelengthRadio {
 
             // Only restore if it was playing
             if (state.isPlaying && state.trackIndex >= 0 && state.trackIndex < this.playlist.length) {
-                console.log(`📻 Resuming from global player: Track ${state.trackIndex} at ${Math.floor(state.currentTime)}s`);
+                // Check with cross-tab manager before auto-resuming
+                if (this.crossTabManager && !this.crossTabManager.canAutoResume()) {
+                    console.log(`� Cross-tab coordination prevents auto-resume - another tab may be playing`);
+                    return;
+                }
+                
+                console.log(`�📻 Resuming from global player: Track ${state.trackIndex} at ${Math.floor(state.currentTime)}s`);
 
                 // Set volume to match global player
                 if (state.volume !== undefined) {
@@ -436,8 +445,8 @@ class WavelengthRadio {
                 }
 
                 // Play the track at the saved position after a small delay
-                setTimeout(() => {
-                    this.playTrack(state.trackIndex);
+                setTimeout(async () => {
+                    await this.playTrack(state.trackIndex);
                     // Set the current time once metadata is loaded
                     this.audio.addEventListener('loadedmetadata', () => {
                         if (state.currentTime > 0 && state.currentTime < this.audio.duration) {
@@ -506,9 +515,16 @@ class WavelengthRadio {
 
     // Handle state changes from other tabs/players
     handleRemoteStateChange(newState) {
-        // Only sync if this isn't the active player (avoid feedback loops)
+        // Skip remote state sync if cross-tab coordination is active
+        // (cross-tab manager handles audio coordination directly)
+        if (this.crossTabManager) {
+            console.log('🔄 Cross-tab coordination active - skipping remote state sync');
+            return;
+        }
+        
+        // Legacy behavior: Only sync if this isn't the active player (avoid feedback loops)
         if (!this.isPlaying && newState.isPlaying) {
-            console.log('📻 Remote player started - syncing state');
+            console.log('📻 Remote player started - syncing state (legacy mode)');
             this.syncToRemoteState(newState);
         }
     }
@@ -592,17 +608,35 @@ class WavelengthRadio {
                         
                         // Resume playback if it was playing when we navigated away
                         if (state.isPlaying) {
-                            console.log(`📻 Mini player resuming playback at ${Math.floor(state.currentTime)}s`);
-                            this.audio.play().then(() => {
-                                this.isPlaying = true;
-                                this.updatePlayButton();
-                                console.log(`✅ Mini player: Successfully resumed playback`);
-                            }).catch(error => {
-                                console.warn('🚫 Mini player autoplay prevented:', error);
-                                // Update UI to show ready-to-play state
+                            // Check with cross-tab manager before auto-resuming
+                            if (this.crossTabManager && !this.crossTabManager.canAutoResume()) {
+                                console.log(`� Cross-tab coordination prevents mini player auto-resume - another tab may be playing`);
                                 this.isPlaying = false;
                                 this.updatePlayButton();
-                            });
+                                return;
+                            }
+                            
+                            console.log(`�📻 Mini player resuming playback at ${Math.floor(state.currentTime)}s`);
+                            
+                            // Request cross-tab coordination before playing
+                            const resumePlay = async () => {
+                                try {
+                                    if (this.crossTabManager) {
+                                        await this.crossTabManager.requestPlay();
+                                    }
+                                    await this.audio.play();
+                                    this.isPlaying = true;
+                                    this.updatePlayButton();
+                                    console.log(`✅ Mini player: Successfully resumed playback`);
+                                } catch (error) {
+                                    console.warn('🚫 Mini player autoplay prevented:', error);
+                                    // Update UI to show ready-to-play state
+                                    this.isPlaying = false;
+                                    this.updatePlayButton();
+                                }
+                            };
+                            
+                            resumePlay();
                         }
                     }, { once: true });
                     
@@ -1163,6 +1197,8 @@ class WavelengthRadio {
             if (this.screensaver) {
                 this.screensaver.onRadioPlay();
             }
+            // Note: crossTabManager.requestPlay() should already have been called
+            // before this event fires, so we don't need to notify again here
         });
         this.audio.addEventListener('pause', () => {
             this.isPlaying = false;
@@ -1170,6 +1206,10 @@ class WavelengthRadio {
             // Notify screensaver when audio pauses
             if (this.screensaver) {
                 this.screensaver.onRadioStop();
+            }
+            // Notify cross-tab manager that playback stopped
+            if (this.crossTabManager) {
+                this.crossTabManager.notifyPlayStopped();
             }
         });
         this.audio.addEventListener('error', (e) => {
@@ -1217,7 +1257,7 @@ class WavelengthRadio {
     }
 
     // Play specific track
-    playTrack(index) {
+    async playTrack(index) {
         if (index < 0 || index >= this.playlist.length) {
             console.warn(`🚫 Cannot play track ${index}: playlist has ${this.playlist.length} tracks`);
             return;
@@ -1264,6 +1304,11 @@ class WavelengthRadio {
         // Save state immediately when track changes (before playing)
         this.savePlaybackState();
 
+        // Request exclusive playback before starting
+        if (this.crossTabManager) {
+            await this.crossTabManager.requestPlay();
+        }
+
         // Play
         const playPromise = this.audio.play();
         if (playPromise !== undefined) {
@@ -1284,7 +1329,7 @@ class WavelengthRadio {
     }
 
     // Toggle play/pause
-    togglePlay() {
+    async togglePlay() {
         if (this.currentTrackIndex === -1) {
             // Check if playlist is loaded
             if (!this.playlist || this.playlist.length === 0) {
@@ -1303,8 +1348,18 @@ class WavelengthRadio {
             this.isPlaying = false;
             const albumArt = document.querySelector('.album-art');
             if (albumArt) albumArt.classList.remove('playing');
+            
+            // Notify cross-tab manager that playback stopped
+            if (this.crossTabManager) {
+                this.crossTabManager.notifyPlayStopped();
+            }
             // Screensaver notification handled by audio 'pause' event listener
         } else {
+            // Request exclusive playback before starting
+            if (this.crossTabManager) {
+                await this.crossTabManager.requestPlay();
+            }
+            
             const playPromise = this.audio.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
@@ -3064,6 +3119,16 @@ class WavelengthRadio {
         navigator.mediaSession.playbackState = 'playing';
 
         console.log(`📱 Updated media session: ${track.title}`);
+    }
+
+    initCrossTabCoordination() {
+        // Initialize cross-tab audio coordination to prevent multiple streams
+        if (typeof CrossTabAudioManager !== 'undefined') {
+            this.crossTabManager = new CrossTabAudioManager(this);
+            console.log('✅ Cross-tab audio coordination initialized');
+        } else {
+            console.warn('⚠️ CrossTabAudioManager not available - multiple tabs may play simultaneously');
+        }
     }
 
     initVisibilityHandling() {

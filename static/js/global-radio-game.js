@@ -37,6 +37,9 @@ class GlobalRadioGame {
         this.favorites = JSON.parse(localStorage.getItem('wavelength_favorites') || '[]');
         this.isShuffle = this.playMode === 'random';
 
+        // Cross-tab coordination
+        this.crossTabManager = null;
+
         this.init();
     }
 
@@ -59,6 +62,14 @@ class GlobalRadioGame {
         this.initSoundSystem();
         await this.loadPlaylist();
         this.bindRadioControls();
+
+        // Initialize cross-tab audio coordination
+        // Note: Even if WavelengthRadio is active on this page, GlobalRadioGame 
+        // may still need coordination for other tabs
+        if (typeof CrossTabAudioManager !== 'undefined') {
+            this.crossTabManager = new CrossTabAudioManager(this);
+            console.log('✅ Cross-tab coordination initialized for GlobalRadioGame');
+        }
 
         // Restore previous active state
         if (this.isActive) {
@@ -156,17 +167,22 @@ class GlobalRadioGame {
         }
     }
 
-    togglePlay() {
+    async togglePlay() {
         if (this.isPlaying) {
             this.pause();
         } else {
-            this.play();
+            await this.play();
         }
     }
 
-    play() {
+    async play() {
+        // Request exclusive playback before starting
+        if (this.crossTabManager) {
+            await this.crossTabManager.requestPlay();
+        }
+
         if (this.currentTrackIndex === -1 && this.playlist.length > 0) {
-            this.playTrack(0);
+            await this.playTrack(0);
         } else if (this.audio) {
             this.audio.play();
             this.isPlaying = true;
@@ -181,11 +197,21 @@ class GlobalRadioGame {
             this.isPlaying = false;
             this.updatePlayButton();
             this.stopSpawning(); // Stop spawning when music pauses
+            
+            // Notify cross-tab manager that playback stopped
+            if (this.crossTabManager) {
+                this.crossTabManager.notifyPlayStopped();
+            }
         }
     }
 
-    playTrack(index, startTime = 0) {
+    async playTrack(index, startTime = 0) {
         if (index < 0 || index >= this.playlist.length) return;
+
+        // Request exclusive playback before starting
+        if (this.crossTabManager) {
+            await this.crossTabManager.requestPlay();
+        }
 
         this.currentTrackIndex = index;
         const track = this.playlist[index];
@@ -262,7 +288,13 @@ class GlobalRadioGame {
 
             // Restore track and position if it was playing
             if (state.isPlaying && this.playlist.length > 0) {
-                console.log(`📻 Resuming playback: Track ${state.trackIndex} at ${Math.floor(state.currentTime)}s`);
+                // Check with cross-tab manager before auto-resuming
+                if (this.crossTabManager && !this.crossTabManager.canAutoResume()) {
+                    console.log(`� Cross-tab coordination prevents GlobalRadioGame auto-resume - another tab may be playing`);
+                    return;
+                }
+                
+                console.log(`�📻 Resuming playback: Track ${state.trackIndex} at ${Math.floor(state.currentTime)}s`);
 
                 // Set volume
                 if (state.volume !== undefined) {
@@ -273,9 +305,9 @@ class GlobalRadioGame {
                     }
                 }
 
-                // Resume playback
-                setTimeout(() => {
-                    this.playTrack(state.trackIndex, state.currentTime);
+                // Resume playback with cross-tab coordination
+                setTimeout(async () => {
+                    await this.playTrack(state.trackIndex, state.currentTime);
                 }, 500); // Small delay to ensure everything is loaded
             } else if (!state.isPlaying) {
                 // If it was paused, restore the track and position but don't auto-play

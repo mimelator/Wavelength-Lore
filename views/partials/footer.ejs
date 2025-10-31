@@ -116,6 +116,8 @@
 </div>
 
 <!-- Radio Player Scripts (loaded globally except on /forum/* and /radio pages) -->
+<script src="<%= cdnUrl %>/js/cross-tab-audio-manager.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+<script src="<%= cdnUrl %>/js/cross-tab-radio-debug.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
 <script src="<%= cdnUrl %>/js/radio-player.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
 <% } %>
 
