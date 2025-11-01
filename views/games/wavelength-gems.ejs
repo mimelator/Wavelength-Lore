@@ -567,8 +567,7 @@
     <script src="/js/games/wavelength-gems/ui-polish-test-suite.js"></script>
     <script src="/js/games/wavelength-gems/master-test-suite.js"></script>
     
-    <!-- Wavelength Site Tour System -->
-    <script src="<%= cdnUrl || '' %>/js/wavelength-site-tour.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+    <!-- Wavelength Site Tour System (loaded globally in footer) -->
     <script>
         // Games tour disabled - no longer auto-starts for new visitors
         // Tour functionality remains available but requires manual trigger

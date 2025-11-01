@@ -38,10 +38,15 @@ class WavelengthSiteTour {
   startMainSiteTour(forceStart = false) {
     const tourCompleted = !forceStart && localStorage.getItem('wavelength_site_tour_completed') === 'true';
     
+    console.log('🌊 startMainSiteTour called - forceStart:', forceStart, '| tourCompleted:', tourCompleted, '| localStorage value:', localStorage.getItem('wavelength_site_tour_completed'));
+    
     if (tourCompleted && !forceStart) {
+      console.log('🌊 Tour already completed, showing replay option instead');
       this.showTourReplayOption();
       return;
     }
+
+    console.log('🌊 Starting main site tour...');
 
     this.tourId = 'main-site';
     this.currentTourStep = 0;
@@ -477,27 +482,59 @@ class WavelengthSiteTour {
     localStorage.removeItem('wavelength_games_tour_completed');
     console.log('🌊 Tour state reset - reload page to see tour again');
   }
+
+  /**
+   * Check current tour completion status (for debugging)
+   */
+  checkTourStatus() {
+    const mainCompleted = localStorage.getItem('wavelength_site_tour_completed') === 'true';
+    const radioCompleted = localStorage.getItem('wavelength_radio_tour_completed') === 'true';
+    const gamesCompleted = localStorage.getItem('wavelength_games_tour_completed') === 'true';
+    
+    console.log('🌊 Tour Status Check:');
+    console.log('  Main Site Tour:', mainCompleted ? '✅ Completed' : '❌ Not Completed');
+    console.log('  Radio Tour:', radioCompleted ? '✅ Completed' : '❌ Not Completed');
+    console.log('  Games Tour:', gamesCompleted ? '✅ Completed' : '❌ Not Completed');
+    console.log('  Current page:', window.location.pathname);
+    console.log('  localStorage values:', {
+      main: localStorage.getItem('wavelength_site_tour_completed'),
+      radio: localStorage.getItem('wavelength_radio_tour_completed'),
+      games: localStorage.getItem('wavelength_games_tour_completed')
+    });
+    
+    return { mainCompleted, radioCompleted, gamesCompleted };
+  }
 }
 
 // Initialize on DOM ready
 if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      window.wavelengthSiteTour = new WavelengthSiteTour();
-      
-      // Auto-start main site tour for first-time visitors on homepage
-      if (window.location.pathname === '/' || window.location.pathname === '/lore') {
-        const tourCompleted = localStorage.getItem('wavelength_site_tour_completed') === 'true';
-        if (!tourCompleted) {
-          // Wait a bit for page to fully load
-          setTimeout(() => {
-            window.wavelengthSiteTour.startMainSiteTour();
-          }, 1500);
-        }
-      }
-    });
-  } else {
+  // Function to initialize tour and check for auto-start
+  const initializeAndStartTour = () => {
+    if (window.wavelengthSiteTour) return; // Prevent double initialization
+    
     window.wavelengthSiteTour = new WavelengthSiteTour();
+    
+    // Auto-start main site tour for first-time visitors on homepage
+    if (window.location.pathname === '/' || window.location.pathname === '/lore') {
+      const tourCompleted = localStorage.getItem('wavelength_site_tour_completed') === 'true';
+      if (!tourCompleted) {
+        console.log('🌊 First time visitor detected, starting tour in 1.5 seconds...');
+        // Wait a bit for page to fully load
+        setTimeout(() => {
+          if (window.wavelengthSiteTour) {
+            window.wavelengthSiteTour.startMainSiteTour();
+          }
+        }, 1500);
+      } else {
+        console.log('🌊 Returning visitor detected (tour completed:', tourCompleted, ')');
+      }
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAndStartTour);
+  } else {
+    initializeAndStartTour();
   }
 }
 
