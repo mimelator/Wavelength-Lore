@@ -41,13 +41,28 @@ class WavelengthContentCLI {
         this.importedPrompts = null; // Loaded prompts from import
         
         // Initialize S3 client for image uploads
-        this.s3Client = new S3Client({
-            region: process.env.AWS_REGION || 'us-east-1',
-            credentials: {
-                accessKeyId: process.env.ACCESS_KEY_ID,
-                secretAccessKey: process.env.SECRET_ACCESS_KEY
+        // Prefer dev credentials, fallback to standard credentials
+        const credentials = process.env.aws_wavelength_dev_access_key_id && process.env.aws_wavelength_dev_secret_access_key
+            ? {
+                accessKeyId: process.env.aws_wavelength_dev_access_key_id,
+                secretAccessKey: process.env.aws_wavelength_dev_secret_access_key
             }
-        });
+            : (process.env.ACCESS_KEY_ID && process.env.SECRET_ACCESS_KEY
+                ? {
+                    accessKeyId: process.env.ACCESS_KEY_ID,
+                    secretAccessKey: process.env.SECRET_ACCESS_KEY
+                }
+                : undefined); // Let AWS SDK use default credentials
+        
+        const s3Config = {
+            region: process.env.AWS_REGION || 'us-east-1'
+        };
+        
+        if (credentials) {
+            s3Config.credentials = credentials;
+        }
+        
+        this.s3Client = new S3Client(s3Config);
         
         this.rl = readline.createInterface({
             input: process.stdin,

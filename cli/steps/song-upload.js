@@ -15,10 +15,28 @@ class SongUploadStep {
         this.stateManager = stateManager;
         this.rl = rl;
         
-        // Initialize S3
-        this.s3 = new AWS.S3({
+        // Initialize S3 with dev credentials (prefer dev user, fallback to standard)
+        const credentials = process.env.aws_wavelength_dev_access_key_id && process.env.aws_wavelength_dev_secret_access_key
+            ? {
+                accessKeyId: process.env.aws_wavelength_dev_access_key_id,
+                secretAccessKey: process.env.aws_wavelength_dev_secret_access_key
+            }
+            : (process.env.ACCESS_KEY_ID && process.env.SECRET_ACCESS_KEY
+                ? {
+                    accessKeyId: process.env.ACCESS_KEY_ID,
+                    secretAccessKey: process.env.SECRET_ACCESS_KEY
+                }
+                : undefined); // Let AWS SDK use default credentials
+        
+        const s3Config = {
             region: process.env.AWS_REGION || 'us-east-1'
-        });
+        };
+        
+        if (credentials) {
+            s3Config.credentials = credentials;
+        }
+        
+        this.s3 = new AWS.S3(s3Config);
         
         this.bucketName = process.env.S3_BUCKET_NAME || 'wavelength-lore-bucket';
     }
