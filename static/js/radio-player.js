@@ -1224,10 +1224,35 @@ class WavelengthRadio {
         });
         this.audio.addEventListener('error', (e) => {
             const currentTrack = this.playlist[this.currentTrackIndex];
-            console.error(`🚨 AUDIO ERROR on track ${this.currentTrackIndex}:`, e);
+            const errorDetails = {
+                code: this.audio.error?.code,
+                message: this.audio.error?.message,
+                networkState: this.audio.networkState,
+                readyState: this.audio.readyState,
+                src: this.audio.src,
+                currentSrc: this.audio.currentSrc
+            };
+            
+            console.error(`🚨 AUDIO ERROR on track ${this.currentTrackIndex} (S${currentTrack.season}E${currentTrack.episodeNumber || currentTrack.episode}):`, errorDetails);
             console.error(`🚨 FAILED AUDIO SRC:`, this.audio.src);
+            console.error(`🚨 CONSTRUCTED FROM:`, currentTrack.url);
+            console.error(`🚨 CDN URL:`, this.cdnUrl || window.CDN_URL || 'NOT SET');
             console.error(`🚨 CURRENT TRACK DATA:`, currentTrack);
-            // Try next track if current fails
+            
+            // Check if it's a network/loading error vs format error
+            if (this.audio.error) {
+                const errorMessages = {
+                    1: 'MEDIA_ERR_ABORTED - User aborted',
+                    2: 'MEDIA_ERR_NETWORK - Network error while loading',
+                    3: 'MEDIA_ERR_DECODE - Error decoding audio',
+                    4: 'MEDIA_ERR_SRC_NOT_SUPPORTED - Format not supported'
+                };
+                console.error(`🚨 Error Code ${this.audio.error.code}: ${errorMessages[this.audio.error.code] || 'Unknown error'}`);
+            }
+            
+            // Don't auto-skip - let user see the error and decide
+            // User can manually skip if needed
+            console.warn(`⚠️  Audio failed to load. Track skipped automatically. Use next/previous to try another track.`);
             this.next();
         });
     }
