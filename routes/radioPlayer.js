@@ -299,12 +299,19 @@ router.get('/api/radio/playlist', optionalAuth, async (req, res) => {
       isAdmin = true;
       console.log('🔧 DEV MODE: Content creator mode enabled via ?creator=true');
     }
+    // Also check res.locals.isContentCreator (set by template locals middleware)
+    else if (res.locals && res.locals.isContentCreator) {
+      isAdmin = true;
+      console.log('🔐 API Content creator detected via res.locals.isContentCreator');
+    }
     // Production: Check if user is authenticated and is a content creator
     else if (req.user && (req.user.isContentCreator || (req.user.groups && req.user.groups.includes('content_manager')))) {
       isAdmin = true;
       console.log('🔐 API Content creator detected:', req.user.email);
     } else {
       console.log('👤 API Regular user (no access to unpublished content)');
+      console.log('   req.user:', req.user ? 'exists' : 'null');
+      console.log('   res.locals.isContentCreator:', res.locals ? res.locals.isContentCreator : 'res.locals not set');
     }
     
     console.log('Radio API request: season=' + season + ', isAdmin=' + isAdmin + ', hostname=' + req.hostname);
