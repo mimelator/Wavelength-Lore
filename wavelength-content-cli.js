@@ -1235,15 +1235,50 @@ Please provide an enhanced version that improves the item according to the reque
             } catch (error) {
                 // Fall through
             }
+        } else if (this.currentPath.includes('/episodes/')) {
+            try {
+                item = episodeHelpers.getEpisodeByIdSync(itemId);
+                contentType = 'episode';
+            } catch (error) {
+                // Fall through - will search all contexts below
+            }
+        }
+
+        // If not found in current context, search all contexts
+        if (!item) {
+            try {
+                item = episodeHelpers.getEpisodeByIdSync(itemId);
+                if (item) contentType = 'episode';
+            } catch (error) {
+                // Continue searching
+            }
+        }
+
+        if (!item) {
+            try {
+                item = characterHelpers.getCharacterByIdSync(itemId);
+                if (item) contentType = 'character';
+            } catch (error) {
+                // Continue searching
+            }
         }
 
         if (!item) {
             item = loreHelpers.getLoreByIdSync(itemId);
-            contentType = 'lore';
+            if (item) contentType = 'lore';
         }
 
         if (!item) {
-            console.log(chalk.red(`❌ Item "${itemId}" not found`));
+            // Check if it looks like an episode ID but with wrong format
+            if (itemId.includes('mystic') || itemId.includes('season') || itemId.includes('episode')) {
+                console.log(chalk.red(`❌ Item "${itemId}" not found`));
+                console.log(chalk.yellow('\n💡 Did you mean to edit an episode?'));
+                console.log(chalk.gray('   Episode IDs use format: s5e1 (season 5, episode 1)'));
+                console.log(chalk.gray('   Try: episodes edit s5e1 --interactive'));
+            } else {
+                console.log(chalk.red(`❌ Item "${itemId}" not found`));
+                console.log(chalk.gray('\n💡 Tip: Use "view" command to see available items'));
+            }
             return;
         }
 
@@ -1270,6 +1305,19 @@ Please provide an enhanced version that improves the item according to the reque
                 { key: 'stakes', name: '⚔️ Stakes', current: item.stakes || 'Not set' },
                 { key: 'cta_text', name: '🔗 CTA Button Text', current: item.cta_text || 'Not set' }
             );
+        } else if (contentType === 'episode') {
+            // Episode-specific fields
+            editableFields.push(
+                { key: 'season', name: 'Season', current: item.season || 'Not set' },
+                { key: 'episodeNumber', name: 'Episode Number', current: item.episodeNumber || item.episode || 'Not set' },
+                { key: 'published', name: 'Published', current: item.published ? 'Yes' : 'No' },
+                { key: 'hidden', name: 'Hidden', current: item.hidden ? 'Yes' : 'No' },
+                { key: 'youtube', name: 'YouTube Link', current: item.youtube || 'Not set' }
+            );
+            // Note: For episodes, we should use the episode commands for full functionality
+            console.log(chalk.yellow('\n💡 Tip: For full episode editing features, use:'));
+            console.log(chalk.gray(`   episodes edit ${item.id || itemId} --interactive`));
+            console.log(chalk.gray('   This includes song upload, asset extraction, and more.\n'));
         } else if (contentType === 'lore') {
             editableFields.push(
                 { key: 'type', name: 'Type', current: item.type },
