@@ -21,6 +21,15 @@ class PrintifyService {
     
     console.log(`🔧 PrintifyService initialized with baseURL: ${this.baseUrl}`);
     
+    // Availability cache to reduce API calls and prevent showing discontinued products
+    this.availabilityCache = new Map();
+    this.cacheTimeout = 30 * 60 * 1000; // 30 minutes
+    
+    // Bulk validation cache for product lists
+    this.bulkValidationCache = null;
+    this.bulkCacheTimestamp = null;
+    this.bulkCacheTimeout = 15 * 60 * 1000; // 15 minutes for bulk results
+    
     // Configure axios instance
     this.api = axios.create({
       baseURL: this.baseUrl,
@@ -340,21 +349,37 @@ class PrintifyService {
       const blueprintId = 5; // Unisex Cotton Crew Tee
       const printProviderId = 61; // Dimona Tee
 
-      // Create product payload
+      // CRITICAL FIX: Validate product availability before creating
+      console.log(`🔍 Validating product availability before creation (Blueprint ${blueprintId} + Provider ${printProviderId})`);
+      const availability = await this.validateProductAvailability(blueprintId, printProviderId);
+      
+      if (!availability.available) {
+        console.error(`❌ Cannot create product - blueprint/provider combination unavailable:`);
+        console.error(`   Reason: ${availability.reason}`);
+        throw new Error(`Product unavailable: ${availability.reason} (Blueprint ${blueprintId}, Provider ${printProviderId})`);
+      }
+      
+      console.log(`✅ Product availability confirmed - proceeding with creation (${availability.variantCount} variants available)`);
+
+      // Use actual available variants instead of hardcoded ones
+      const defaultPrice = 2099; // Fallback price
+      
+      const variants = availability.enabledVariants.slice(0, 4).map(variant => ({
+        id: variant.id,
+        price: variant.price || defaultPrice,
+        is_enabled: true // We set this for product creation
+      }));
+
+      // Create product payload with validated variants
       const productData = {
         title: title || 'Custom Wavelength Merchandise',
         description: description || 'Premium custom t-shirt featuring your favorite Wavelength Lore moment',
         blueprint_id: blueprintId,
         print_provider_id: printProviderId,
-        variants: [
-          { id: 17391, price: 2099, is_enabled: true }, // Heather Grey / S
-          { id: 17392, price: 2099, is_enabled: true }, // Heather Grey / M
-          { id: 17393, price: 2099, is_enabled: true }, // Heather Grey / L
-          { id: 17394, price: 2099, is_enabled: true }  // Heather Grey / XL
-        ],
+        variants: variants,
         print_areas: [
           {
-            variant_ids: [17391, 17392, 17393, 17394],
+            variant_ids: variants.map(v => v.id),
             placeholders: [
               {
                 position: 'front',
@@ -578,11 +603,15 @@ class PrintifyService {
   async getBlueprintDetails(blueprintId, printProviderId) {
     try {
       // Use the new getBlueprintVariants method
-      const variants = await this.getBlueprintVariants(blueprintId, printProviderId);
+      const variantsResult = await this.getBlueprintVariants(blueprintId, printProviderId);
+      
+      if (!variantsResult.success) {
+        return variantsResult; // Return the error from getBlueprintVariants
+      }
       
       return {
         success: true,
-        variants: variants
+        variants: variantsResult.variants
       };
       
     } catch (error) {
@@ -859,6 +888,272 @@ class PrintifyService {
       };
     }
   }
+
+  /**
+   * Get cached availability result or create cache key
+   * @param {number} blueprintId 
+   * @param {number} printProviderId 
+   * @returns {string} Cache key
+   */
+  getCacheKey(blueprintId, printProviderId) {
+    return `${blueprintId}:${printProviderId}`;
+  }
+
+  /**
+   * Check if cached availability result is still valid
+   * @param {Object} cacheEntry - Cached entry with timestamp and result
+   * @returns {boolean} True if cache is valid
+   */
+  isCacheValid(cacheEntry) {
+    if (!cacheEntry || !cacheEntry.timestamp) return false;
+    return (Date.now() - cacheEntry.timestamp) < this.cacheTimeout;
+  }
+
+  /**
+   * Validate if a blueprint+provider combination is currently available on Printify
+   * @param {number} blueprintId - Blueprint ID to check
+   * @param {number} printProviderId - Print provider ID to check
+   * @param {boolean} useCache - Whether to use cached results (default: true)
+   * @returns {Object} Validation result with availability status
+   */
+  async validateProductAvailability(blueprintId, printProviderId, useCache = true) {
+    const cacheKey = this.getCacheKey(blueprintId, printProviderId);
+    
+    // Check cache first
+    if (useCache && this.availabilityCache.has(cacheKey)) {
+      const cacheEntry = this.availabilityCache.get(cacheKey);
+      if (this.isCacheValid(cacheEntry)) {
+        console.log(`� Using cached availability result for ${cacheKey}`);
+        return cacheEntry.result;
+      }
+    }
+
+    try {
+      console.log(`�🔍 Validating availability: Blueprint ${blueprintId} + Provider ${printProviderId}`);
+      
+      // Step 1: Check if blueprint exists
+      const blueprintsResult = await this.getBlueprints();
+      if (!blueprintsResult.success) {
+        const result = {
+          available: false,
+          reason: 'Failed to fetch blueprint catalog',
+          error: blueprintsResult.error
+        };
+        this.cacheAvailabilityResult(cacheKey, result);
+        return result;
+      }
+      
+      const blueprint = blueprintsResult.blueprints.find(bp => bp.id === blueprintId);
+      if (!blueprint) {
+        const result = {
+          available: false,
+          reason: 'Blueprint not found',
+          blueprintId
+        };
+        this.cacheAvailabilityResult(cacheKey, result);
+        return result;
+      }
+      
+      // Step 2: Check if print provider exists for this blueprint
+      const providersResult = await this.getPrintProviders(blueprintId);
+      if (!providersResult.success) {
+        const result = {
+          available: false,
+          reason: 'Failed to fetch print providers',
+          error: providersResult.error,
+          blueprintId
+        };
+        this.cacheAvailabilityResult(cacheKey, result);
+        return result;
+      }
+      
+      const provider = providersResult.providers.find(p => p.id === printProviderId);
+      if (!provider) {
+        const result = {
+          available: false,
+          reason: 'Print provider not available for this blueprint',
+          blueprintId,
+          printProviderId
+        };
+        this.cacheAvailabilityResult(cacheKey, result);
+        return result;
+      }
+      
+      // Step 3: Check if variants are available
+      const variantsResult = await this.getBlueprintVariants(blueprintId, printProviderId);
+      if (!variantsResult.success) {
+        const result = {
+          available: false,
+          reason: 'Failed to fetch variants',
+          error: variantsResult.error,
+          blueprintId,
+          printProviderId
+        };
+        this.cacheAvailabilityResult(cacheKey, result);
+        return result;
+      }
+      
+      // CRITICAL FIX: Printify API doesn't return is_enabled field
+      // All variants returned by the API are considered available/enabled
+      const availableVariants = variantsResult.variants || [];
+      if (availableVariants.length === 0) {
+        const result = {
+          available: false,
+          reason: 'No variants available for this blueprint/provider combination',
+          blueprintId,
+          printProviderId
+        };
+        this.cacheAvailabilityResult(cacheKey, result);
+        return result;
+      }
+      
+      console.log(`✅ Product available: Blueprint ${blueprintId} + Provider ${printProviderId} (${availableVariants.length} variants)`);
+      
+      const result = {
+        available: true,
+        blueprint: blueprint,
+        provider: provider,
+        enabledVariants: availableVariants,
+        variantCount: availableVariants.length
+      };
+      
+      this.cacheAvailabilityResult(cacheKey, result);
+      return result;
+      
+    } catch (error) {
+      console.error(`❌ Error validating product availability (${blueprintId}+${printProviderId}):`, error);
+      const result = {
+        available: false,
+        reason: 'Validation error',
+        error: error.message,
+        blueprintId,
+        printProviderId
+      };
+      this.cacheAvailabilityResult(cacheKey, result);
+      return result;
+    }
+  }
+
+  /**
+   * Cache availability validation result
+   * @param {string} cacheKey 
+   * @param {Object} result 
+   */
+  cacheAvailabilityResult(cacheKey, result) {
+    this.availabilityCache.set(cacheKey, {
+      result,
+      timestamp: Date.now()
+    });
+  }
+
+  /**
+   * Bulk validate multiple products for availability
+   * @param {Array} products - Array of {blueprintId, printProviderId} objects
+   * @param {Object} options - Validation options
+   * @returns {Object} Results with available and unavailable products
+   */
+  async bulkValidateAvailability(products, options = {}) {
+    const { 
+      maxConcurrent = 5,  // Limit concurrent requests to avoid rate limits
+      includeReasons = false,
+      useCache = true
+    } = options;
+    
+    // Check if we have a recent bulk cache
+    if (useCache && this.bulkValidationCache && this.bulkCacheTimestamp) {
+      const cacheAge = Date.now() - this.bulkCacheTimestamp;
+      if (cacheAge < this.bulkCacheTimeout) {
+        console.log(`💾 Using cached bulk validation results (${Math.round(cacheAge / 1000)}s old)`);
+        return this.bulkValidationCache;
+      }
+    }
+    
+    console.log(`🔍 Bulk validating ${products.length} products (max ${maxConcurrent} concurrent)`);
+    
+    const results = {
+      available: [],
+      unavailable: [],
+      errors: [],
+      cached: 0,
+      validated: 0
+    };
+    
+    // Process in batches to avoid rate limiting
+    for (let i = 0; i < products.length; i += maxConcurrent) {
+      const batch = products.slice(i, i + maxConcurrent);
+      console.log(`📦 Processing batch ${Math.floor(i / maxConcurrent) + 1}/${Math.ceil(products.length / maxConcurrent)}`);
+      
+      const batchPromises = batch.map(async (product) => {
+        try {
+          const validation = await this.validateProductAvailability(
+            product.blueprintId, 
+            product.printProviderId, 
+            useCache
+          );
+          
+          // Track cache usage
+          const cacheKey = this.getCacheKey(product.blueprintId, product.printProviderId);
+          if (useCache && this.availabilityCache.has(cacheKey)) {
+            const cacheEntry = this.availabilityCache.get(cacheKey);
+            if (this.isCacheValid(cacheEntry)) {
+              results.cached++;
+            } else {
+              results.validated++;
+            }
+          } else {
+            results.validated++;
+          }
+          
+          if (validation.available) {
+            results.available.push({
+              ...product,
+              validation: includeReasons ? validation : undefined
+            });
+          } else {
+            results.unavailable.push({
+              ...product,
+              reason: validation.reason,
+              validation: includeReasons ? validation : undefined
+            });
+          }
+        } catch (error) {
+          console.error(`❌ Batch validation error for ${product.blueprintId}+${product.printProviderId}:`, error);
+          results.errors.push({
+            ...product,
+            error: error.message
+          });
+        }
+      });
+      
+      await Promise.allSettled(batchPromises);
+      
+      // Small delay between batches to be respectful to API
+      if (i + maxConcurrent < products.length) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+    }
+    
+    console.log(`✅ Bulk validation complete: ${results.available.length} available, ${results.unavailable.length} unavailable, ${results.errors.length} errors`);
+    console.log(`💾 Cache performance: ${results.cached} cached, ${results.validated} validated`);
+    
+    // Cache the bulk results
+    if (useCache) {
+      this.bulkValidationCache = results;
+      this.bulkCacheTimestamp = Date.now();
+    }
+    
+    return results;
+  }
+
+  /**
+   * Clear availability caches (useful for testing or force refresh)
+   */
+  clearAvailabilityCache() {
+    this.availabilityCache.clear();
+    this.bulkValidationCache = null;
+    this.bulkCacheTimestamp = null;
+    console.log('🗑️ Availability cache cleared');
+  }
   
   /**
    * Get variants for a specific blueprint and print provider combination
@@ -873,11 +1168,17 @@ class PrintifyService {
         `/catalog/blueprints/${blueprintId}/print_providers/${printProviderId}/variants.json`
       );
       
-      return response.data.variants || response.data;
+      return {
+        success: true,
+        variants: response.data.variants || response.data
+      };
       
     } catch (error) {
-      // Re-throw the error so the test can catch 404s specifically
-      throw error;
+      console.error(`Error getting blueprint variants (${blueprintId}+${printProviderId}):`, error.response?.data || error.message);
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to get blueprint variants'
+      };
     }
   }
   

@@ -32,6 +32,11 @@ const {
   getAllProducts,
 } = require('../config/product-types');
 
+const { 
+  filterAvailableProducts,
+  getDisabledProductStats 
+} = require('../config/discontinued-products');
+
 // Helper function to sanitize Firebase keys
 function sanitizeFirebaseKey(key) {
   if (!key) return 'unknown';
@@ -364,14 +369,108 @@ router.get('/categories', async (req, res) => {
 /**
  * GET /api/merchandise/product-types
  * Get available product types for guided creation (public endpoint)
+ * VALIDATION: Checks Printify API connectivity and blueprint/provider existence
+ * NOTE: Printify has no API to detect discontinued products - only email notifications
  */
 router.get('/product-types', async (req, res) => {
   try {
-    // Keep it simple - return the same structure that admin catalog expects
-    res.json({
-      success: true,
-      allProducts: getAllProducts() // Both admin and merchandise store use this
-    });
+    const { skipValidation = false } = req.query;
+    
+    // Get all products from catalog
+    const allProducts = getAllProducts();
+    
+    // STEP 1: Filter manually disabled/discontinued products first
+    const manuallyFilteredProducts = filterAvailableProducts(allProducts);
+    const disabledStats = getDisabledProductStats();
+    
+    console.log(`📋 Manual product filtering: ${manuallyFilteredProducts.length}/${allProducts.length} products after filtering`);
+    if (disabledStats.total > 0) {
+      console.log(`🚫 Filtered out: ${disabledStats.discontinued} discontinued + ${disabledStats.manuallyDisabled} manually disabled`);
+    }
+    
+    // STEP 2: Optional Printify API connectivity validation
+    // NOTE: This validates API connectivity, not discontinued status (Printify has no API for that)
+    const validationEnabled = process.env.VALIDATE_PRODUCT_AVAILABILITY === 'true' || 
+                             process.env.NODE_ENV === 'production'; // Always validate in production
+    
+    if (!skipValidation && validationEnabled) {
+      console.log('🔍 Validating product connectivity against Printify API...');
+      
+      try {
+        const printifyService = new PrintifyService();
+        
+        // Prepare products for bulk validation (only validate manually filtered products)
+        const productsToValidate = manuallyFilteredProducts.map(product => ({
+          id: product.id,
+          blueprintId: product.blueprintId,
+          printProviderId: product.printProviderId,
+          name: product.name,
+          category: product.category
+        }));
+        
+        // Bulk validate availability
+        const validationResults = await printifyService.bulkValidateAvailability(productsToValidate, {
+          maxConcurrent: 3 // Conservative to avoid rate limits
+        });
+        
+        // Filter to only available products
+        const availableProductIds = new Set(validationResults.available.map(p => p.id));
+        const filteredProducts = manuallyFilteredProducts.filter(product => availableProductIds.has(product.id));
+        
+        console.log(`✅ Product connectivity validation complete: ${filteredProducts.length}/${manuallyFilteredProducts.length} products accessible`);
+        
+        if (validationResults.unavailable.length > 0) {
+          console.warn('⚠️ Products with connectivity issues filtered out:');
+          validationResults.unavailable.slice(0, 5).forEach(product => {
+            console.warn(`   - ${product.id}: ${product.reason}`);
+          });
+          if (validationResults.unavailable.length > 5) {
+            console.warn(`   ... and ${validationResults.unavailable.length - 5} more`);
+          }
+        }
+        
+        res.json({
+          success: true,
+          allProducts: filteredProducts,
+          validation: {
+            enabled: true,
+            total: allProducts.length,
+            manuallyFiltered: manuallyFilteredProducts.length,
+            available: validationResults.available.length,
+            unavailable: validationResults.unavailable.length,
+            errors: validationResults.errors.length,
+            manuallyDisabled: disabledStats
+          }
+        });
+        
+      } catch (validationError) {
+        console.error('❌ Product validation failed, returning unfiltered products:', validationError);
+        
+        // Fallback: Return manually filtered products but mark validation as failed
+        res.json({
+          success: true,
+          allProducts: manuallyFilteredProducts,
+          validation: {
+            enabled: true,
+            failed: true,
+            error: validationError.message,
+            manuallyDisabled: disabledStats
+          }
+        });
+      }
+      
+    } else {
+      // Return manually filtered products without API validation
+      res.json({
+        success: true,
+        allProducts: manuallyFilteredProducts,
+        validation: {
+          enabled: false,
+          manuallyDisabled: disabledStats
+        }
+      });
+    }
+    
   } catch (error) {
     console.error('Error fetching product types:', error);
     res.status(500).json({
