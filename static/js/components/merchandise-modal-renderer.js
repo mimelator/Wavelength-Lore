@@ -3073,7 +3073,7 @@ class MerchandiseModalRenderer {
         return;
       }
 
-      console.log('✅ UPDATING PREVIEW IMAGE');
+        console.log('✅ UPDATING PREVIEW IMAGE');
       console.log('  - Preview image element found:', !!previewImage);
       console.log('  - Preview image ID:', previewImage.id);
       console.log('  - Preview image class:', previewImage.className);
@@ -3088,11 +3088,11 @@ class MerchandiseModalRenderer {
           customizedUrl = '/' + customizedUrl;
         }
       }
-      
-      // Add cache-busting and load verification
+        
+        // Add cache-busting and load verification
       customizedUrl = customizedUrl + '?t=' + Date.now();
       console.log('  - Final cache-busted URL:', customizedUrl);
-      
+        
       // Set opacity to 0.5 while loading
       previewImage.style.opacity = '0.5';
       previewImage.style.transition = 'opacity 0.3s ease';
@@ -3117,11 +3117,11 @@ class MerchandiseModalRenderer {
             // Only update the preview image src once the new image has fully loaded
             previewImage.src = url;
             previewImage.style.opacity = '1';
-            
-            // Show success status
-            if (statusText) {
-              statusText.textContent = '✅ Preview updated';
-              statusText.style.color = '#155724';
+        
+        // Show success status
+        if (statusText) {
+          statusText.textContent = '✅ Preview updated';
+          statusText.style.color = '#155724';
             }
           }
         };
@@ -3136,7 +3136,7 @@ class MerchandiseModalRenderer {
             setTimeout(() => {
               loadImage(url, attempt + 1);
             }, retryTimeout);
-          } else {
+        } else {
             // All retries failed
             console.error('❌ CUSTOMIZED IMAGE FAILED TO LOAD after all retries');
             console.error('  - Final failed URL:', url);
@@ -3158,13 +3158,13 @@ class MerchandiseModalRenderer {
       setTimeout(() => {
         loadImage(customizedUrl);
       }, 100);
-      
-      // Store the customized image URL in modal state
-      modal.dataset.customizedImageUrl = result.metadata.customizedImageUrl;
-      console.log('  - Stored in modal dataset:', modal.dataset.customizedImageUrl);
 
-      // CRITICAL: Update the customization summary after successful preview update
-      this.updateCustomizationSummary(modal);
+        // Store the customized image URL in modal state
+        modal.dataset.customizedImageUrl = result.metadata.customizedImageUrl;
+        console.log('  - Stored in modal dataset:', modal.dataset.customizedImageUrl);
+
+        // CRITICAL: Update the customization summary after successful preview update
+        this.updateCustomizationSummary(modal);
 
     } catch (error) {
       console.error('❌ Error updating preview:', error);

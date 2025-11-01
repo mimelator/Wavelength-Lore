@@ -1,9 +1,9 @@
 {
-  "version": "1.1.90",
-  "buildDate": "2025-10-31T15:41:39Z",
-  "commitHash": "b87618796f5c6c7d63e315275cc8e2b2b319e720",
-  "commitShort": "b876187",
-  "buildNumber": "manual-1761925299",
+  "version": "1.1.92",
+  "buildDate": "2025-10-31T23:37:14Z",
+  "commitHash": "2c67708de9747e297b45cad03600f1e4712a5197",
+  "commitShort": "2c67708",
+  "buildNumber": "manual-1761953834",
   "environment": "production",
   "workflowId": "manual-build",
   "deploymentStatus": "deployed"

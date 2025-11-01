@@ -1273,7 +1273,13 @@ class WavelengthRadio {
         }
         
         // Construct full CDN URL at runtime using the configured CDN base URL
-        return this.cdnUrl + track.url;
+        // Ensure we have a CDN URL configured (fallback to CloudFront if missing)
+        const baseUrl = this.cdnUrl || window.CDN_URL || 'https://df5sj8f594cdx.cloudfront.net';
+        
+        // Ensure URL path starts with / if relative
+        const urlPath = track.url.startsWith('/') ? track.url : `/${track.url}`;
+        
+        return baseUrl + urlPath;
     }
 
     // Play specific track

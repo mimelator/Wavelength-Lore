@@ -27,7 +27,7 @@ const week1_deliverables = {
   infrastructure: [
     'Set up canonnode.com domain and DNS',
     'Configure Firebase project for multi-tenant architecture',
-    'Deploy shared EC2 instance for analytics PostgreSQL',
+    'Set up S3 buckets for tenant file storage',
     'Set up CloudFlare CDN and SSL certificates',
     'Configure monitoring (error tracking, performance)'
   ],
@@ -140,6 +140,14 @@ const week5_deliverables = {
     'Create product catalog data models',
     'Build revenue sharing calculation system',
     'Design LoreMaster payout dashboard'
+  ],
+  
+  analytics_planning: [
+    'Design Firebase-based analytics using aggregation',
+    'Plan cross-tenant reporting strategy (Firebase only)',
+    'Evaluate need for PostgreSQL analytics (optional)',
+    'Create cost-effective metrics collection system',
+    'Design LoreMaster dashboard analytics'
   ]
 };
 ```
@@ -265,7 +273,7 @@ const week10_deliverables = {
 ```javascript
 const week11_deliverables = {
   advanced_features: [
-    'Cross-tenant analytics dashboard',
+    'Cross-tenant analytics dashboard (Firebase-based)',
     'Advanced AI features (video generation)',
     'Community features (forums, events)',
     'SEO optimization and site performance',
