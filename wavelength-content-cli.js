@@ -117,8 +117,12 @@ class WavelengthContentCLI {
                 console.log(chalk.gray('   Song management commands will show status only'));
             }
             
+            // Validate chatbot API key (loud warnings if misconfigured)
+            console.log(chalk.gray('\n🔍 Validating chatbot setup...'));
+            this.validateChatbotSetup();
+            
             // Validate AI extraction setup (loud warnings if misconfigured)
-            console.log(chalk.gray('\n🔍 Validating AI extraction setup...'));
+            console.log(chalk.gray('🔍 Validating AI extraction setup...'));
             try {
                 const AssetExtractionService = require('./services/asset-extraction-service');
                 const tempService = new AssetExtractionService();
@@ -136,6 +140,43 @@ class WavelengthContentCLI {
         this.showWelcome();
         this.showPrompt();
         this.setupEventHandlers();
+    }
+
+    /**
+     * Validate chatbot setup at startup (loud warnings if misconfigured)
+     */
+    async validateChatbotSetup() {
+        const apiKey = process.env.CHATBOT_API_KEY;
+        
+        if (!apiKey) {
+            console.log(chalk.red.bold('\n⚠️  ⚠️  ⚠️  CHATBOT_API_KEY NOT SET ⚠️  ⚠️  ⚠️'));
+            console.log(chalk.red('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+            console.log(chalk.red.bold('❌ CHATBOT FEATURES DISABLED'));
+            console.log(chalk.yellow('\n📋 Chatbot integration requires CHATBOT_API_KEY:'));
+            console.log(chalk.white('   1. Set CHATBOT_API_KEY in your .env file'));
+            console.log(chalk.white('   2. Get your API key from Firebase Cloud Functions configuration'));
+            console.log(chalk.gray('\n   Without CHATBOT_API_KEY:'));
+            console.log(chalk.gray('   • CTA generation will not work'));
+            console.log(chalk.gray('   • AI Chatbot Assistant menu option will be unavailable'));
+            console.log(chalk.gray('   • Content enhancement features will not work'));
+            console.log(chalk.gray('   • Field enhancement suggestions will not work'));
+            console.log(chalk.red('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+            return;
+        }
+        
+        // Test chatbot connection
+        try {
+            const isAvailable = await this.chatbotService.checkHealth();
+            if (isAvailable) {
+                console.log(chalk.green('✅ Chatbot service connected and available'));
+            } else {
+                console.log(chalk.yellow('⚠️  Chatbot API key is set but service is not responding'));
+                console.log(chalk.yellow('   Chatbot features may not work correctly'));
+            }
+        } catch (error) {
+            console.log(chalk.yellow('⚠️  Could not verify chatbot connection:'), error.message);
+            console.log(chalk.yellow('   Chatbot features may not work correctly'));
+        }
     }
 
     showWelcome() {
