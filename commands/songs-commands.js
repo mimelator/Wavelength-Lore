@@ -350,9 +350,15 @@ class SongsCommands {
                 console.log(chalk.white(`URL: ${song.url}`));
                 
                 // Validate URL accessibility
+                // Always test against production CloudFront CDN (not localhost)
+                // This ensures we validate the actual accessible URL
                 const axios = require('axios');
-                const cdnUrl = process.env.CDN_URL || 'https://df5sj8f594cdx.cloudfront.net';
-                const fullUrl = song.url.startsWith('http') ? song.url : `${cdnUrl}${song.url}`;
+                const productionCdnUrl = 'https://df5sj8f594cdx.cloudfront.net';
+                const fullUrl = song.url.startsWith('http') 
+                    ? song.url 
+                    : song.url.startsWith('/')
+                        ? `${productionCdnUrl}${song.url}`
+                        : `${productionCdnUrl}/${song.url}`;
                 
                 process.stdout.write(chalk.gray('   Validating URL accessibility... '));
                 try {
