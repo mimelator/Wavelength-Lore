@@ -10,6 +10,7 @@
 const discontinuedProducts = new Set([
   // Add product IDs as they become discontinued
   // Example format: 'validated-413', 'validated-238', etc.
+  'validated-15', // Men's Very Important Tee - District DT6000 discontinued (Nov 1, 2025)
 ]);
 
 // Products with known issues or manual disabling
