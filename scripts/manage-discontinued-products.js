@@ -11,7 +11,8 @@ const {
   markProductDiscontinued,
   disableProduct,
   enableProduct,
-  getDisabledProductStats
+  getDisabledProductStats,
+  testFiltering
 } = require('../config/discontinued-products');
 const { getAllProducts, findProductById } = require('../config/product-types');
 
@@ -30,6 +31,7 @@ COMMANDS:
   discontinue <productId>       - Mark product as discontinued by Printify
   enable <productId>            - Re-enable a disabled product
   search <term>                 - Search products by name/category
+  test-filtering                - Test filtering against full product catalog
   
 EXAMPLES:
   # List all disabled products
@@ -199,7 +201,7 @@ function searchProducts(term) {
 }
 
 // Main CLI handler
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   const command = args[0];
   
@@ -231,6 +233,10 @@ function main() {
       
     case 'search':
       searchProducts(args[1]);
+      break;
+      
+    case 'test-filtering':
+      await testFiltering();
       break;
       
     case 'help':

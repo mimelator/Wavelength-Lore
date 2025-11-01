@@ -19,6 +19,26 @@ const manuallyDisabledProducts = new Set([
   // Example: 'validated-1234'
 ]);
 
+// 🔍 STARTUP DIAGNOSTICS: Log discontinued products when module loads
+console.log('\n🚨 DISCONTINUED PRODUCTS MODULE LOADED:');
+console.log('=' .repeat(50));
+console.log(`📋 Discontinued products configured: ${discontinuedProducts.size}`);
+console.log(`📋 Manually disabled products configured: ${manuallyDisabledProducts.size}`);
+if (discontinuedProducts.size > 0) {
+  console.log('❌ DISCONTINUED PRODUCTS:');
+  Array.from(discontinuedProducts).forEach(id => {
+    console.log(`   - ${id}`);
+  });
+}
+if (manuallyDisabledProducts.size > 0) {
+  console.log('🚫 MANUALLY DISABLED PRODUCTS:');
+  Array.from(manuallyDisabledProducts).forEach(id => {
+    console.log(`   - ${id}`);
+  });
+}
+console.log('🎯 Module ready for filtering operations');
+console.log('=' .repeat(50));
+
 /**
  * Check if a product should be filtered out
  * @param {string} productId - Product ID to check
@@ -109,6 +129,48 @@ function getDisabledProductStats() {
   };
 }
 
+/**
+ * Test the filtering system with current product catalog
+ * @param {Array} products - Array of product objects to test filtering on
+ * @returns {Object} Detailed filtering results
+ */
+function testFiltering(products) {
+  console.log('\n🧪 TESTING PRODUCT FILTERING:');
+  console.log('=' .repeat(40));
+  
+  if (!products) {
+    console.log('⚠️  No products provided - this function needs to be called with a product array');
+    console.log('💡 Use this from the API route or provide product data');
+    return { error: 'No products provided' };
+  }
+  
+  const originalCount = products.length;
+  const filteredProducts = filterAvailableProducts(products);
+  const filteredCount = filteredProducts.length;
+  const removedCount = originalCount - filteredCount;
+  
+  console.log(`📋 Original products: ${originalCount}`);
+  console.log(`✅ After filtering: ${filteredCount}`);
+  console.log(`❌ Filtered out: ${removedCount}`);
+  
+  if (removedCount > 0) {
+    const removedProducts = products.filter(p => !filteredProducts.some(fp => fp.id === p.id));
+    console.log('\n🚫 REMOVED PRODUCTS:');
+    removedProducts.forEach(product => {
+      const reason = getDisabledReason(product.id);
+      console.log(`   - ${product.id}: ${product.name} (${reason})`);
+    });
+  }
+  
+  console.log('\n' + '='.repeat(40));
+  return {
+    original: originalCount,
+    filtered: filteredCount,
+    removed: removedCount,
+    removedProducts: products.filter(p => !filteredProducts.some(fp => fp.id === p.id))
+  };
+}
+
 module.exports = {
   isProductDisabled,
   getDisabledReason,
@@ -116,5 +178,6 @@ module.exports = {
   disableProduct,
   enableProduct,
   filterAvailableProducts,
-  getDisabledProductStats
+  getDisabledProductStats,
+  testFiltering
 };

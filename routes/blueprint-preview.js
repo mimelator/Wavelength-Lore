@@ -16,6 +16,7 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express');
 const router = express.Router();
 const PrintifyService = require('../services/printify-service');
+const { isProductDisabled } = require('../config/discontinued-products');
 
 // Initialize Printify service
 const printifyService = new PrintifyService();
@@ -202,6 +203,30 @@ router.post('/blueprint-previews', async (req, res) => {
         
         console.log(`🔍 Batch fetching previews for ${blueprintIds.length} blueprints`);
         
+        // Filter out blueprints for discontinued products
+        const { getAllProducts } = require('../config/product-types');
+        const allProducts = getAllProducts();
+        
+        // Create a map of blueprint ID to product ID for filtering
+        const blueprintToProductMap = new Map();
+        allProducts.forEach(product => {
+            blueprintToProductMap.set(product.blueprintId, product.id);
+        });
+        
+        // Filter out discontinued blueprints
+        const filteredBlueprintIds = blueprintIds.filter(blueprintId => {
+            const productId = blueprintToProductMap.get(parseInt(blueprintId));
+            if (!productId) return true; // Keep unknown blueprints for now
+            
+            const isDisabled = isProductDisabled(productId);
+            if (isDisabled) {
+                console.log(`🚫 [BLUEPRINT-PREVIEWS] Filtered out blueprint ${blueprintId} (product ${productId}) - discontinued`);
+            }
+            return !isDisabled;
+        });
+        
+        console.log(`📊 [BLUEPRINT-PREVIEWS] Original: ${blueprintIds.length}, After filtering: ${filteredBlueprintIds.length}`);
+        
         const results = [];
         
         // Get all blueprints once
@@ -210,8 +235,8 @@ router.post('/blueprint-previews', async (req, res) => {
             throw new Error('Failed to fetch blueprints from Printify');
         }
         
-        // Process each requested blueprint
-        for (const blueprintId of blueprintIds) {
+        // Process each filtered blueprint
+        for (const blueprintId of filteredBlueprintIds) {
             const cacheKey = `blueprint_${blueprintId}`;
             
             // Check cache first

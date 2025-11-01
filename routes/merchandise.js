@@ -30,6 +30,7 @@ const {
   generateProductTags,
   findProductById,
   getAllProducts,
+  getProductsByCategory
 } = require('../config/product-types');
 
 const { 
@@ -383,10 +384,35 @@ router.get('/product-types', async (req, res) => {
     const manuallyFilteredProducts = filterAvailableProducts(allProducts);
     const disabledStats = getDisabledProductStats();
     
-    console.log(`📋 Manual product filtering: ${manuallyFilteredProducts.length}/${allProducts.length} products after filtering`);
+    // 🔍 ENHANCED DIAGNOSTICS
+    console.log('\n🔍 DISCONTINUED PRODUCTS DIAGNOSTICS:');
+    console.log('=' .repeat(50));
+    console.log(`📋 Total products in catalog: ${allProducts.length}`);
+    console.log(`📋 Products after manual filtering: ${manuallyFilteredProducts.length}`);
+    console.log(`🚫 Total disabled products: ${disabledStats.total}`);
+    console.log(`   - Discontinued by Printify: ${disabledStats.discontinued}`);
+    console.log(`   - Manually disabled: ${disabledStats.manuallyDisabled}`);
+    
     if (disabledStats.total > 0) {
-      console.log(`🚫 Filtered out: ${disabledStats.discontinued} discontinued + ${disabledStats.manuallyDisabled} manually disabled`);
+      console.log('\n❌ FILTERED PRODUCTS:');
+      disabledStats.discontinuedList.forEach(productId => {
+        const product = allProducts.find(p => p.id === productId);
+        console.log(`   - ${productId}: ${product?.name || 'Unknown'} (DISCONTINUED)`);
+      });
+      disabledStats.manuallyDisabledList.forEach(productId => {
+        const product = allProducts.find(p => p.id === productId);
+        console.log(`   - ${productId}: ${product?.name || 'Unknown'} (MANUALLY DISABLED)`);
+      });
     }
+    
+    // Verify the specific product we're tracking
+    const testProduct = allProducts.find(p => p.id === 'validated-15');
+    const testProductFiltered = manuallyFilteredProducts.find(p => p.id === 'validated-15');
+    console.log(`\n🎯 TRACKING validated-15 (Men's Very Important Tee):`);
+    console.log(`   - Found in original catalog: ${!!testProduct}`);
+    console.log(`   - Found in filtered results: ${!!testProductFiltered}`);
+    console.log(`   - Should be filtered: ${disabledStats.discontinuedList.includes('validated-15')}`);
+    console.log('=' .repeat(50));
     
     // STEP 2: Optional Printify API connectivity validation
     // NOTE: This validates API connectivity, not discontinued status (Printify has no API for that)
@@ -489,7 +515,12 @@ router.get('/product-types', async (req, res) => {
 router.get('/product-types/:category', async (req, res) => {
   try {
     const { category } = req.params;
-    const products = getProductsByCategory(category);
+    const allProducts = getProductsByCategory(category);
+    
+    // Apply discontinued product filtering
+    const products = filterAvailableProducts(allProducts);
+    
+    console.log(`📊 [CATEGORY ${category.toUpperCase()}] Original: ${allProducts.length}, After filtering: ${products.length}`);
     
     if (!products.length && !ProductTypes[category]) {
       return res.status(404).json({
@@ -2727,17 +2758,29 @@ router.get('/product-catalog', async (req, res) => {
   try {
     console.log('📚 Fetching complete product catalog...');
 
+    // Get all products and apply discontinued product filtering
+    const allProducts = getAllProducts();
+    const availableProducts = filterAvailableProducts(allProducts);
+    
+    console.log(`📊 [PRODUCT-CATALOG] Original: ${allProducts.length}, After filtering: ${availableProducts.length}`);
+    
     const catalog = {
       success: true,
-      allProducts: getAllProducts(),
+      allProducts: availableProducts,
       categories: Object.keys(ProductTypes).map(key => ({
         id: key,
         name: ProductTypes[key].name,
         description: ProductTypes[key].description,
         icon: ProductTypes[key].icon
       })),
-      totalProducts: getAllProducts().length,
-      timestamp: new Date().toISOString()
+      totalProducts: availableProducts.length,
+      timestamp: new Date().toISOString(),
+      filtering: {
+        enabled: true,
+        originalCount: allProducts.length,
+        filteredCount: availableProducts.length,
+        removedCount: allProducts.length - availableProducts.length
+      }
     };
 
     res.json(catalog);
