@@ -396,9 +396,23 @@ class WavelengthSiteTour {
    * Skip the tour
    */
   skipTour() {
+    console.log('🌊 User skipped tour, marking as completed to prevent future prompts');
+    
+    // Mark tour as completed so it won't show again
+    // User chose to skip, so respect that preference permanently
+    if (this.tourId === 'main-site') {
+      localStorage.setItem('wavelength_site_tour_completed', 'true');
+      console.log('🌊 Set localStorage: wavelength_site_tour_completed = true');
+    } else if (this.tourId === 'radio') {
+      localStorage.setItem('wavelength_radio_tour_completed', 'true');
+      console.log('🌊 Set localStorage: wavelength_radio_tour_completed = true');
+    } else if (this.tourId === 'games') {
+      localStorage.setItem('wavelength_games_tour_completed', 'true');
+      console.log('🌊 Set localStorage: wavelength_games_tour_completed = true');
+    }
+    
     this.removeTourOverlay();
     this.isActive = false;
-    // Don't mark as completed if skipped
   }
 
   /**
