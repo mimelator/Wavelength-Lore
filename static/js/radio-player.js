@@ -1078,13 +1078,52 @@ class WavelengthRadio {
             refreshBtn.addEventListener('click', () => this.refreshPlaylist());
         }
 
-        // Mobile expand button
+        // Mobile expand button with enhanced functionality
         const expandBtn = document.getElementById('mobileExpandBtn');
         const radioPlayer = document.getElementById('radioPlayer');
         if (expandBtn && radioPlayer) {
             expandBtn.addEventListener('click', () => {
+                const isExpanded = radioPlayer.classList.contains('expanded');
                 radioPlayer.classList.toggle('expanded');
+                
+                // Scroll to top when expanding to ensure controls are visible
+                if (!isExpanded) {
+                    setTimeout(() => {
+                        radioPlayer.scrollTop = 0;
+                        // Also scroll the page to ensure the player is in view
+                        if (radioPlayer.scrollIntoView) {
+                            radioPlayer.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'nearest' 
+                            });
+                        }
+                    }, 100);
+                }
+                
+                // Provide haptic feedback on mobile (if available)
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+                
+                console.log(`📱 Mobile player ${isExpanded ? 'collapsed' : 'expanded'}`);
             });
+
+            // Handle viewport changes (for mobile orientation changes)
+            const handleViewportChange = () => {
+                if (radioPlayer.classList.contains('expanded')) {
+                    // Adjust player height on viewport change
+                    setTimeout(() => {
+                        const vh = window.innerHeight;
+                        const safeAreaTop = parseInt(getComputedStyle(document.documentElement)
+                            .getPropertyValue('--sat') || '0');
+                        const maxHeight = Math.min(vh * 0.85, vh - safeAreaTop - 40);
+                        radioPlayer.style.setProperty('--dynamic-max-height', `${maxHeight}px`);
+                    }, 100);
+                }
+            };
+
+            window.addEventListener('orientationchange', handleViewportChange);
+            window.addEventListener('resize', handleViewportChange);
         }
     }
 
