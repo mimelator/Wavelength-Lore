@@ -14,6 +14,7 @@ const chalk = require('chalk');
 const crypto = require('crypto');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { WavelengthChatCLI } = require('./wavelength-chat-cli');
+const ChatbotService = require('./services/chatbot-service');
 const loreHelpers = require('./helpers/lore-helpers');
 const characterHelpers = require('./helpers/character-helpers');
 const episodeHelpers = require('./helpers/episode-helpers');
@@ -31,6 +32,7 @@ class WavelengthContentCLI {
         this.currentContext = 'root';
         this.currentItem = null;
         this.chatCLI = new WavelengthChatCLI();
+        this.chatbotService = new ChatbotService(); // New chatbot service for content editing
         this.songsService = null; // Initialize later in start()
         this.backupCommands = new BackupCommands(this);
         this.characterCommands = new CharacterCommands(this);
@@ -1250,14 +1252,16 @@ Please provide an enhanced version that improves the item according to the reque
             console.log(chalk.white(`  ${startActionNum + 1}. 🖼️  Set Primary Image from Gallery`));
             console.log(chalk.white(`  ${startActionNum + 2}. 🎨 Generate AI Image`));
             console.log(chalk.red.bold(`  ${startActionNum + 3}. 🎬 Generate AI Video ${chalk.yellow('(⚠️ UNTESTED & EXPENSIVE)')}`));
-            console.log(chalk.white(`  ${startActionNum + 4}. 🤖 AI Enhance All Fields`));
-            console.log(chalk.white(`  ${startActionNum + 5}. 💾 Save & Exit`));
+            console.log(chalk.white(`  ${startActionNum + 4}. 🤖 AI Chatbot Assistant`));
+            console.log(chalk.white(`  ${startActionNum + 5}. 🤖 AI Enhance All Fields`));
+            console.log(chalk.white(`  ${startActionNum + 6}. 💾 Save & Exit`));
         } else {
             console.log(chalk.white(`  ${startActionNum}. 🖼️  Set Primary Image from Gallery`));
             console.log(chalk.white(`  ${startActionNum + 1}. 🎨 Generate AI Image`));
             console.log(chalk.red.bold(`  ${startActionNum + 2}. 🎬 Generate AI Video ${chalk.yellow('(⚠️ UNTESTED & EXPENSIVE)')}`));
-            console.log(chalk.white(`  ${startActionNum + 3}. 🤖 AI Enhance All Fields`));
-            console.log(chalk.white(`  ${startActionNum + 4}. 💾 Save & Exit`));
+            console.log(chalk.white(`  ${startActionNum + 3}. 🤖 AI Chatbot Assistant`));
+            console.log(chalk.white(`  ${startActionNum + 4}. 🤖 AI Enhance All Fields`));
+            console.log(chalk.white(`  ${startActionNum + 5}. 💾 Save & Exit`));
         }
         console.log(chalk.white('  0. Cancel'));
 
@@ -1282,8 +1286,9 @@ Please provide an enhanced version that improves the item according to the reque
         const setPrimaryNum = hasGalleryField ? startActionNum + 1 : startActionNum;
         const generateImageNum = hasGalleryField ? startActionNum + 2 : startActionNum + 1;
         const generateVideoNum = hasGalleryField ? startActionNum + 3 : startActionNum + 2;
-        const enhanceAllNum = hasGalleryField ? startActionNum + 4 : startActionNum + 3;
-        const saveExitNum = hasGalleryField ? startActionNum + 5 : startActionNum + 4;
+        const chatbotAssistantNum = hasGalleryField ? startActionNum + 4 : startActionNum + 3;
+        const enhanceAllNum = hasGalleryField ? startActionNum + 5 : startActionNum + 4;
+        const saveExitNum = hasGalleryField ? startActionNum + 6 : startActionNum + 5;
         const maxChoice = saveExitNum;
 
         while (true) {
@@ -1302,6 +1307,8 @@ Please provide an enhanced version that improves the item according to the reque
                 break;
             } else if (choiceNum === enhanceAllNum) {
                 await this.aiEnhanceAllFields(item, contentType);
+            } else if (choiceNum === chatbotAssistantNum) {
+                await this.startChatbotAssistant(item, contentType);
             } else if (choiceNum === generateVideoNum) {
                 await this.generateAIVideo(item);
             } else if (choiceNum === generateImageNum) {
@@ -1345,6 +1352,20 @@ Please provide an enhanced version that improves the item according to the reque
 
         console.log(chalk.cyan(`\n📝 Editing: ${field.name}`));
         console.log(chalk.gray(`Current value: ${field.current || 'Not set'}`));
+
+        // Offer chatbot enhancement for certain fields
+        const enhanceableFields = ['description', 'title', 'tagline', 'stakes', 'cta_text', 'cta_hook'];
+        if (enhanceableFields.includes(field.key)) {
+            const useAI = await prompt('🤖 Get AI enhancement? (y/n, default: n): ');
+            if (useAI.toLowerCase() === 'y') {
+                try {
+                    await this.enhanceFieldWithChatbot(item, field.key, contentType);
+                    return; // Field already updated
+                } catch (error) {
+                    console.log(chalk.yellow(`⚠️  AI enhancement failed, continuing with manual edit`));
+                }
+            }
+        }
 
         if (field.key === 'keywords') {
             const newValue = await prompt('Enter keywords (comma-separated): ');
@@ -3058,6 +3079,262 @@ Please provide enhanced descriptions, dramatic taglines, and compelling calls-to
             await this.enhanceWithAI(item.id, enhancePrompt);
         } catch (error) {
             console.log(chalk.red('❌ AI enhancement failed:', error.message));
+        }
+    }
+
+    /**
+     * 🤖 Start interactive chatbot assistant for content editing
+     */
+    async startChatbotAssistant(item, contentType = 'lore') {
+        const prompt = (question) => {
+            return new Promise((resolve) => {
+                this.rl.question(chalk.yellow(question), resolve);
+            });
+        };
+
+        // Set chatbot context
+        this.chatbotService.setContext(item);
+
+        console.log(chalk.cyan('\n🤖 AI CHATBOT ASSISTANT'));
+        console.log(chalk.gray('─'.repeat(60)));
+        console.log(chalk.white(`📝 Context: ${item.title || item.id || 'Content'}`));
+        console.log(chalk.gray(`Type: ${contentType}`));
+        console.log('');
+
+        // Check if chatbot is available
+        const isAvailable = await this.chatbotService.checkHealth();
+        if (!isAvailable) {
+            console.log(chalk.red('❌ Chatbot service unavailable'));
+            console.log(chalk.yellow('   Please check your CHATBOT_API_KEY in .env'));
+            return;
+        }
+
+        console.log(chalk.green('✅ Chatbot connected!'));
+        console.log('');
+        console.log(chalk.cyan('Available actions:'));
+        console.log(chalk.white('  1. 🎯 Generate CTAs (tagline, cliffhanger, hook, tease)'));
+        console.log(chalk.white('  2. ✏️  Enhance Description'));
+        console.log(chalk.white('  3. 📝 Enhance Title'));
+        console.log(chalk.white('  4. 💬 Chat about this content'));
+        console.log(chalk.white('  5. 🔄 Get suggestions for improvements'));
+        console.log(chalk.white('  0. Back'));
+        console.log('');
+
+        while (true) {
+            const choice = await prompt('Choose action (0-5): ');
+            
+            if (choice === '0') {
+                break;
+            } else if (choice === '1') {
+                await this.generateCTAsWithChatbot(item, contentType);
+            } else if (choice === '2') {
+                await this.enhanceFieldWithChatbot(item, 'description', contentType);
+            } else if (choice === '3') {
+                await this.enhanceFieldWithChatbot(item, 'title', contentType);
+            } else if (choice === '4') {
+                await this.chatAboutContent(item);
+            } else if (choice === '5') {
+                await this.getChatbotSuggestions(item);
+            } else {
+                console.log(chalk.red('❌ Invalid choice'));
+            }
+        }
+
+        // Clear context when done
+        this.chatbotService.clearContext();
+    }
+
+    /**
+     * 🎯 Generate CTAs using chatbot
+     */
+    async generateCTAsWithChatbot(item, contentType = 'lore') {
+        const prompt = (question) => {
+            return new Promise((resolve) => {
+                this.rl.question(chalk.yellow(question), resolve);
+            });
+        };
+
+        console.log(chalk.cyan('\n🎯 GENERATING CTAs'));
+        console.log(chalk.gray('─'.repeat(60)));
+
+        const ctaTypes = ['tagline', 'hook', 'cliffhanger', 'tease', 'stakes', 'power_statement'];
+        const ctaNames = {
+            tagline: 'Tagline',
+            hook: 'Hook',
+            cliffhanger: 'Cliffhanger',
+            tease: 'Next Episode Tease',
+            stakes: 'Stakes',
+            power_statement: 'Power Statement'
+        };
+
+        const results = {};
+
+        for (const ctaType of ctaTypes) {
+            try {
+                console.log(chalk.gray(`\n🤔 Generating ${ctaNames[ctaType]}...`));
+                const generated = await this.chatbotService.generateCTA(ctaType, item);
+                
+                console.log(chalk.green(`\n✅ Generated ${ctaNames[ctaType]}:`));
+                console.log(chalk.white(generated));
+                console.log('');
+
+                const action = await prompt('Options: (1) Use as-is, (2) Edit, (3) Skip, (4) Regenerate: ');
+                
+                if (action === '1') {
+                    results[ctaType] = generated;
+                    console.log(chalk.green(`✅ ${ctaNames[ctaType]} saved`));
+                } else if (action === '2') {
+                    const edited = await prompt(`Edit ${ctaNames[ctaType]}: `);
+                    if (edited.trim()) {
+                        results[ctaType] = edited.trim();
+                        console.log(chalk.green(`✅ ${ctaNames[ctaType]} saved (edited)`));
+                    }
+                } else if (action === '4') {
+                    // Regenerate - loop back
+                    const idx = ctaTypes.indexOf(ctaType);
+                    if (idx >= 0) {
+                        // Move this type back in the queue
+                        ctaTypes.splice(idx, 1);
+                        ctaTypes.unshift(ctaType);
+                    }
+                    continue;
+                } else {
+                    console.log(chalk.gray(`⏭️  ${ctaNames[ctaType]} skipped`));
+                }
+            } catch (error) {
+                console.log(chalk.red(`❌ Failed to generate ${ctaNames[ctaType]}: ${error.message}`));
+            }
+        }
+
+        // Apply results to item
+        if (Object.keys(results).length > 0) {
+            console.log(chalk.cyan('\n📋 Apply CTAs to item?'));
+            const apply = await prompt('Apply all generated CTAs? (y/n): ');
+            
+            if (apply.toLowerCase() === 'y') {
+                Object.entries(results).forEach(([key, value]) => {
+                    // Map CTA types to item fields
+                    const fieldMap = {
+                        tagline: 'tagline',
+                        hook: 'cta_hook',
+                        cliffhanger: 'cliffhanger_hook',
+                        tease: 'next_episode_tease',
+                        stakes: 'stakes',
+                        power_statement: 'power_statement'
+                    };
+                    
+                    const field = fieldMap[key];
+                    if (field) {
+                        item[field] = value;
+                        console.log(chalk.green(`✅ Applied ${ctaNames[key]} to ${field}`));
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * ✏️ Enhance a field using chatbot
+     */
+    async enhanceFieldWithChatbot(item, fieldName, contentType = 'lore') {
+        const prompt = (question) => {
+            return new Promise((resolve) => {
+                this.rl.question(chalk.yellow(question), resolve);
+            });
+        };
+
+        console.log(chalk.cyan(`\n✏️ ENHANCING ${fieldName.toUpperCase()}`));
+        console.log(chalk.gray('─'.repeat(60)));
+        console.log(chalk.gray(`Current: ${item[fieldName] || 'Not set'}`));
+        console.log('');
+
+        try {
+            console.log(chalk.gray('🤔 Asking chatbot...'));
+            const enhanced = await this.chatbotService.enhanceField(item, fieldName);
+
+            console.log(chalk.green('\n✅ Enhanced version:'));
+            console.log(chalk.white(enhanced));
+            console.log('');
+
+            const action = await prompt('Options: (1) Use as-is, (2) Edit, (3) Discard: ');
+            
+            if (action === '1') {
+                item[fieldName] = enhanced;
+                console.log(chalk.green(`✅ ${fieldName} updated`));
+            } else if (action === '2') {
+                const edited = await prompt(`Edit ${fieldName}: `);
+                if (edited.trim()) {
+                    item[fieldName] = edited.trim();
+                    console.log(chalk.green(`✅ ${fieldName} updated (edited)`));
+                }
+            } else {
+                console.log(chalk.gray('⏭️  Enhancement discarded'));
+            }
+        } catch (error) {
+            console.log(chalk.red(`❌ Failed to enhance ${fieldName}: ${error.message}`));
+        }
+    }
+
+    /**
+     * 💬 Chat about content
+     */
+    async chatAboutContent(item) {
+        const prompt = (question) => {
+            return new Promise((resolve) => {
+                this.rl.question(chalk.yellow(question), resolve);
+            });
+        };
+
+        console.log(chalk.cyan('\n💬 CHAT ABOUT CONTENT'));
+        console.log(chalk.gray('─'.repeat(60)));
+        console.log(chalk.white(`Context: ${item.title || item.id}`));
+        console.log(chalk.gray('Type your questions about this content. Type "exit" to return.'));
+        console.log('');
+
+        while (true) {
+            const question = await prompt('💬 Your question: ');
+            
+            if (question.toLowerCase() === 'exit') {
+                break;
+            }
+
+            if (!question.trim()) {
+                continue;
+            }
+
+            try {
+                console.log(chalk.gray('\n🤔 Thinking...'));
+                const result = await this.chatbotService.ask(question);
+
+                if (result.success) {
+                    console.log(chalk.green('\n🤖 Chatbot:'));
+                    console.log(chalk.white(result.response));
+                    console.log('');
+                } else {
+                    console.log(chalk.red(`❌ Error: ${result.error}`));
+                }
+            } catch (error) {
+                console.log(chalk.red(`❌ Failed: ${error.message}`));
+            }
+        }
+    }
+
+    /**
+     * 🔄 Get suggestions for improvements
+     */
+    async getChatbotSuggestions(item) {
+        console.log(chalk.cyan('\n🔄 GETTING SUGGESTIONS'));
+        console.log(chalk.gray('─'.repeat(60)));
+
+        try {
+            console.log(chalk.gray('🤔 Analyzing content...'));
+            const suggestions = await this.chatbotService.getSuggestions(item);
+
+            console.log(chalk.green('\n✅ Suggestions:'));
+            console.log(chalk.white(suggestions.suggestions));
+            console.log('');
+        } catch (error) {
+            console.log(chalk.red(`❌ Failed to get suggestions: ${error.message}`));
         }
     }
 
