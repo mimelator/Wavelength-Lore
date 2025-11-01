@@ -310,9 +310,18 @@ class SongUploadStep {
         try {
             const result = await this.s3.upload(uploadParams).promise();
             
+            // Construct CloudFront CDN URL instead of using S3 direct URL
+            // This ensures songs are accessible via CloudFront (which has proper permissions)
+            const cdnUrl = process.env.CDN_URL || 'https://df5sj8f594cdx.cloudfront.net';
+            const cdnUrlPath = `/${s3Key}`; // Add leading slash for relative path
+            const cdnUrlFull = `${cdnUrl}${cdnUrlPath}`;
+            
+            console.log(chalk.gray(`   S3 Key: ${s3Key}`));
+            console.log(chalk.gray(`   CDN URL: ${cdnUrlFull}`));
+            
             return {
                 s3Key: s3Key,
-                url: result.Location,
+                url: cdnUrlFull, // Use CloudFront CDN URL instead of S3 direct URL
                 etag: result.ETag
             };
             
