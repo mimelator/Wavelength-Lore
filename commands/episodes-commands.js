@@ -848,6 +848,16 @@ class EpisodeCommands {
                         lyrics: songMetadata.lyrics,
                         published: episode.published || false
                     });
+                    
+                    // Log song creation with visibility info
+                    console.log(chalk.green(`\n✅ Song "${songMetadata.title}" saved to Firebase!`));
+                    console.log(chalk.gray(`   ID: ${epId} (S${season}E${episodeNum})`));
+                    console.log(chalk.gray(`   URL: ${songMetadata.url}`));
+                    if (!episode.published) {
+                        console.log(chalk.yellow(`   ⚠️  Song is unpublished (matches episode status)`));
+                        console.log(chalk.gray(`   💡 Use "songs list --all" to see unpublished songs`));
+                        console.log(chalk.gray(`   💡 Or "songs show ${epId}" to view this song`));
+                    }
                 },
                 completeStep: async () => {
                     // Step completion not needed in edit mode
