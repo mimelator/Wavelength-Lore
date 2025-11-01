@@ -476,17 +476,38 @@ class SongsCommands {
                 return;
             }
 
-            // Prepare update data
-            const updateData = { ...options };
-            updateData.updatedAt = new Date().toISOString();
+            // Prepare update data - merge existing song with updates
+            const updateData = {
+                ...existingSong,
+                ...options,
+                id: songId // Ensure ID is preserved
+            };
+            
+            // Ensure duration is in MM:SS format (validator requirement)
+            // Convert if it's stored as number (seconds) or use durationFormatted if available
+            if (updateData.duration && typeof updateData.duration === 'number') {
+                // Convert seconds to MM:SS format
+                const minutes = Math.floor(updateData.duration / 60);
+                const seconds = Math.floor(updateData.duration % 60);
+                updateData.duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            } else if (!updateData.duration && existingSong.durationFormatted) {
+                // Use durationFormatted if duration is missing
+                updateData.duration = existingSong.durationFormatted;
+            } else if (!updateData.duration) {
+                // Fallback: try to construct from durationFormatted
+                if (existingSong.durationFormatted) {
+                    updateData.duration = existingSong.durationFormatted;
+                } else {
+                    console.log(chalk.yellow('⚠️  Warning: Duration format may be invalid'));
+                }
+            }
+            
+            // Remove fields that shouldn't be passed to createOrUpdateSong
+            delete updateData.durationFormatted; // This is computed, not stored
 
             // Apply updates using the existing service
             console.log(chalk.yellow('🎵 Updating song...'));
-            await this.songsService.createOrUpdateSong({
-                id: songId,
-                ...existingSong,
-                ...updateData
-            });
+            await this.songsService.createOrUpdateSong(updateData);
 
             console.log(chalk.green.bold('✅ Song updated successfully!'));
             
