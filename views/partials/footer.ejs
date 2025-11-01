@@ -121,8 +121,10 @@
 <script src="<%= cdnUrl %>/js/radio-player.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
 <% } %>
 
-<!-- Wavelength Site Tour System (load globally for all pages) -->
+<!-- Wavelength Site Tour System (load globally for all pages except /radio) -->
+<% if (typeof currentPage === 'undefined' || currentPage !== '/radio') { %>
 <script src="<%= cdnUrl || '' %>/js/wavelength-site-tour.js?v=<%= typeof version !== 'undefined' ? version : Date.now() %>"></script>
+<% } %>
 
 <footer>
   <!-- Enhanced Footer CTA Section -->
