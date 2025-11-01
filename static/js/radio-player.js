@@ -1298,13 +1298,25 @@ class WavelengthRadio {
         }
         
         // Construct full CDN URL at runtime using the configured CDN base URL
-        // Ensure we have a CDN URL configured (fallback to CloudFront if missing)
-        const baseUrl = this.cdnUrl || window.CDN_URL || 'https://df5sj8f594cdx.cloudfront.net';
+        // IMPORTANT: For songs, always use CloudFront CDN (not localhost)
+        // Songs are stored in S3 and served via CloudFront, not the local server
+        const baseUrl = 'https://df5sj8f594cdx.cloudfront.net';
         
         // Ensure URL path starts with / if relative
         const urlPath = track.url.startsWith('/') ? track.url : `/${track.url}`;
         
-        return baseUrl + urlPath;
+        const fullUrl = baseUrl + urlPath;
+        
+        // Log URL construction for debugging
+        console.log(`🔗 URL Construction for S${track.season}E${track.episodeNumber || track.episode}:`, {
+            original: track.url,
+            path: urlPath,
+            baseUrl: baseUrl,
+            fullUrl: fullUrl,
+            cdnUrl: this.cdnUrl || window.CDN_URL || 'NOT SET'
+        });
+        
+        return fullUrl;
     }
 
     // Play specific track
