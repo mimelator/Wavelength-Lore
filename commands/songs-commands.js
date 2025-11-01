@@ -348,6 +348,36 @@ class SongsCommands {
             }
             if (song.url) {
                 console.log(chalk.white(`URL: ${song.url}`));
+                
+                // Validate URL accessibility
+                const axios = require('axios');
+                const cdnUrl = process.env.CDN_URL || 'https://df5sj8f594cdx.cloudfront.net';
+                const fullUrl = song.url.startsWith('http') ? song.url : `${cdnUrl}${song.url}`;
+                
+                process.stdout.write(chalk.gray('   Validating URL accessibility... '));
+                try {
+                    const response = await axios.head(fullUrl, {
+                        timeout: 5000,
+                        validateStatus: (status) => status < 500
+                    });
+                    
+                    if (response.status === 200) {
+                        console.log(chalk.green(`✅ Accessible (${response.status} OK)`));
+                        console.log(chalk.gray(`   Full URL: ${fullUrl}`));
+                    } else {
+                        console.log(chalk.yellow(`⚠️  ${response.status} ${response.statusText}`));
+                        console.log(chalk.gray(`   Full URL: ${fullUrl}`));
+                    }
+                } catch (error) {
+                    const status = error.response?.status || 'NETWORK_ERROR';
+                    console.log(chalk.red(`❌ Not accessible (${status})`));
+                    console.log(chalk.gray(`   Full URL: ${fullUrl}`));
+                    if (error.response) {
+                        console.log(chalk.gray(`   Error: ${error.response.statusText}`));
+                    } else {
+                        console.log(chalk.gray(`   Error: ${error.message}`));
+                    }
+                }
             } else {
                 console.log(chalk.gray('URL: (not set)'));
             }
