@@ -119,7 +119,7 @@ class WavelengthContentCLI {
             
             // Validate chatbot API key (loud warnings if misconfigured)
             console.log(chalk.gray('\n🔍 Validating chatbot setup...'));
-            this.validateChatbotSetup();
+            await this.validateChatbotSetup();
             
             // Validate AI extraction setup (loud warnings if misconfigured)
             console.log(chalk.gray('🔍 Validating AI extraction setup...'));
