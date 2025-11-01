@@ -25,6 +25,7 @@ const LoreCommands = require('./commands/lore-commands');
 const SongsCommands = require('./commands/songs-commands');
 const MediaCommands = require('./commands/media-commands');
 const EpisodeCommands = require('./commands/episodes-commands');
+const SocialMediaCommands = require('./commands/social-media-commands');
 
 class WavelengthContentCLI {
     constructor() {
@@ -40,6 +41,7 @@ class WavelengthContentCLI {
         this.songsCommands = new SongsCommands(this);
         this.mediaCommands = new MediaCommands(this);
         this.episodeCommands = new EpisodeCommands(this);
+        this.socialMediaCommands = new SocialMediaCommands(this);
         this.importedPrompts = null; // Loaded prompts from import
         
         // Initialize S3 client for image uploads
@@ -527,6 +529,25 @@ class WavelengthContentCLI {
                     await this.mediaCommands.handleMediaCommands(args);
                     break;
                     
+                case 'social-media':
+                case 'social':
+                case 'sm':
+                    if (args.length === 0 || args[0] === 'help' || args[0] === '--help' || args[0] === '-h') {
+                        await this.socialMediaCommands.showHelp();
+                    } else {
+                        const subCommand = args[0].toLowerCase();
+                        const subArgs = args.slice(1);
+                        if (subCommand === 'generate') {
+                            await this.socialMediaCommands.generate(subArgs);
+                        } else if (subCommand === 'variations') {
+                            await this.socialMediaCommands.variations(subArgs);
+                        } else {
+                            console.log(chalk.red(`❌ Unknown social media command: ${subCommand}`));
+                            await this.socialMediaCommands.showHelp();
+                        }
+                    }
+                    break;
+                    
                 case 'prompts':
                     await this.handlePromptsCommand(args);
                     break;
@@ -648,6 +669,12 @@ class WavelengthContentCLI {
         console.log('  songs playlist [--season=4]             - Show playlist');
         console.log('  songs sync --episode=s4e9               - Sync with episode');
         console.log('  songs help                              - Detailed song commands');
+        
+        console.log(chalk.green('\nSocial Media Announcements:'));
+        console.log('  social-media generate <content-id> [platforms] - Generate announcements');
+        console.log('  social-media variations <content-id> <platform> [--count=3] - A/B testing');
+        console.log(chalk.gray('     Platforms: twitter, instagram, facebook (default: all)'));
+        console.log(chalk.gray('     Example: social-media generate s5e1 twitter instagram'));
         console.log('  radio <command>                         - Radio player management');
         
         console.log(chalk.green('\nEpisode Management:'));

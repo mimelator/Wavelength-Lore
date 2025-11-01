@@ -252,19 +252,22 @@ class EpisodeCommands {
         console.log(chalk.white('  8. 📋 Manage Gallery Images'));
         console.log(chalk.white('  9. 🤖 AI Content Enhancement'));
         console.log(chalk.white('  10. 🎵 Attach/Upload Song'));
-        console.log(chalk.white('  11. 💾 Save & Exit'));
+        console.log(chalk.white('  11. 📱 Generate Social Media Announcements'));
+        console.log(chalk.white('  12. 💾 Save & Exit'));
         console.log(chalk.white('  0. Cancel'));
 
         while (true) {
-            const choice = await this.cli.promptUser('\nSelect field to edit (1-11, 0 to cancel): ');
+            const choice = await this.cli.promptUser('\nSelect field to edit (1-12, 0 to cancel): ');
             const choiceNum = parseInt(choice);
 
             if (choiceNum === 0) {
                 console.log(chalk.gray('Edit cancelled'));
                 break;
-            } else if (choiceNum === 11) {
+            } else if (choiceNum === 12) {
                 console.log(chalk.green('✅ Changes saved'));
                 break;
+            } else if (choiceNum === 11) {
+                await this.handleSocialMediaGeneration(episodeId, episode);
             } else if (choiceNum === 10) {
                 await this.handleSongAttachment(episodeId, episode);
             } else if (choiceNum === 9) {
@@ -710,6 +713,57 @@ class EpisodeCommands {
         } else if (choice === '3') {
             console.log(chalk.blue('🔄 Syncing with file system...'));
             console.log(chalk.gray('This would scan the episode directory for new images'));
+        }
+    }
+
+    /**
+     * Handle social media announcement generation
+     * @param {string} episodeId - Episode ID
+     * @param {Object} episode - Episode object
+     */
+    async handleSocialMediaGeneration(episodeId, episode) {
+        try {
+            const SocialMediaStep = require('../cli/steps/social-media');
+            
+            // Create a mock state manager for the step
+            const stateManager = {
+                updateEpisode: async (epId, updates) => {
+                    await this.episodeService.updateEpisode(epId, updates);
+                    console.log(chalk.green('\n✅ Episode updated with social media announcements'));
+                }
+            };
+
+            // Create a mock readline that uses the main CLI's promptUser
+            const mainRl = this.cli.rl;
+            const mockRl = {
+                question: (prompt, callback) => {
+                    // Use the main CLI's promptUser
+                    this.cli.promptUser(prompt).then(answer => {
+                        if (callback) callback(answer);
+                    }).catch(err => {
+                        if (callback) callback('');
+                    });
+                },
+                close: () => {},
+                paused: false,
+                pause: () => {},
+                resume: () => {},
+                prompt: () => {}
+            };
+
+            const socialMediaStep = new SocialMediaStep(stateManager, mockRl);
+            
+            try {
+                await socialMediaStep.execute(episode);
+            } catch (error) {
+                if (error.message && !error.message.includes('cancelled')) {
+                    console.log(chalk.red(`\n❌ Social media generation failed: ${error.message}`));
+                }
+            }
+
+        } catch (error) {
+            console.log(chalk.red(`\n❌ Unexpected error: ${error.message}`));
+            if (process.env.DEBUG) { console.error(error.stack); }
         }
     }
 
