@@ -20,7 +20,10 @@ const fallbackLore = [
     image_gallery: [
       '/images/seasons/season3/episodes/episode5/images/RebuildTheShire-12.webp',
       '/images/seasons/season4/episodes/episode2/images/TheKingHasFled-15.webp'
-    ]
+    ],
+    published: true,
+    visible: true,
+    hidden: false
   },
   {
     id: 'ice-castle',
@@ -32,7 +35,10 @@ const fallbackLore = [
     image: '/images/episodes/IceBlueGreed-08.webp',
     image_gallery: [
       '/images/episodes/FrozenPeace-16.webp'
-    ]
+    ],
+    published: true,
+    visible: true,
+    hidden: false
   },
   {
     id: 'wavelength-band',
@@ -106,6 +112,7 @@ async function fetchLoreFromDatabase() {
             image: loreItem.image,
             image_gallery: loreItem.image_gallery,
             type: loreItem.type,
+            published: loreItem.published, // Required for visibility
             visible: loreItem.visible, // Legacy field (keep for backwards compatibility)
             hidden: loreItem.hidden // New visibility field
           };
@@ -159,12 +166,11 @@ async function fetchLoreFromDatabase() {
       console.log(`📚 Loaded ${allLore.length} lore items from Firebase`);
       return allLore;
     } else {
-      console.warn('No lore found in database, using fallback');
-      return fallbackLore;
+      throw new Error('No lore found in database - Firebase connection may be down');
     }
   } catch (error) {
     console.error('Error fetching lore from database:', error);
-    return fallbackLore;
+    throw new Error(`Failed to fetch lore from database: ${error.message}`);
   }
 }
 
@@ -252,7 +258,12 @@ async function getLoreByType(type) {
  * @returns {object|null} Lore object or null if not found
  */
 function getLoreByIdSync(id) {
-  const lore = cacheUtils.getSync(loreCache, fallbackLore);
+  const lore = cacheUtils.getSync(loreCache, null);
+  
+  if (!lore) {
+    throw new Error('Lore cache not initialized - call initializeLoreCache() first');
+  }
+  
   return lore.find(loreItem => loreItem.id === id) || null;
 }
 
@@ -278,7 +289,12 @@ function generateLoreLinkSync(id, customText = null) {
  * @returns {string} Text with lore names replaced by links
  */
 function linkifyLoreMentionsSync(text) {
-  const lore = cacheUtils.getSync(loreCache, fallbackLore);
+  const lore = cacheUtils.getSync(loreCache, null);
+  
+  if (!lore) {
+    throw new Error('Lore cache not initialized - call initializeLoreCache() first');
+  }
+  
   return linkingUtils.linkifyItemMentions(text, lore, 'lore');
 }
 
@@ -288,7 +304,11 @@ function linkifyLoreMentionsSync(text) {
  * @returns {array} Array of all lore
  */
 function getAllLoreSync(showHidden = false) {
-  const allLore = cacheUtils.getSync(loreCache, fallbackLore);
+  const allLore = cacheUtils.getSync(loreCache, null);
+  
+  if (!allLore) {
+    throw new Error('Lore cache not initialized - call initializeLoreCache() first');
+  }
   
   // Filter out hidden lore for public users
   if (!showHidden) {
@@ -304,7 +324,12 @@ function getAllLoreSync(showHidden = false) {
  * @returns {array} Array of lore matching the type
  */
 function getLoreByTypeSync(type) {
-  const lore = cacheUtils.getSync(loreCache, fallbackLore);
+  const lore = cacheUtils.getSync(loreCache, null);
+  
+  if (!lore) {
+    throw new Error('Lore cache not initialized - call initializeLoreCache() first');
+  }
+  
   return lore.filter(loreItem => loreItem.type === type);
 }
 
@@ -348,7 +373,7 @@ module.exports = {
   setDatabaseInstance: firebaseUtils.setDatabaseInstance,
   
   // Backward compatibility aliases
-  lore: getAllLoreSync(), // This will be empty initially
+  get lore() { return getAllLoreSync(); }, // Lazy evaluation prevents module load errors
   generateLoreLink: generateLoreLinkSync,
   linkifyLoreMentions: linkifyLoreMentionsSync
 };

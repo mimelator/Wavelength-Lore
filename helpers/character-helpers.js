@@ -14,56 +14,80 @@ const fallbackCharacters = [
     title: 'Prince Andrew',
     name: 'Prince Andrew',
     keywords: ['The Prince', 'The Leader', 'Andrew', 'Band Leader', 'Father', 'Husband'],
-    url: '/character/andrew'
+    url: '/character/andrew',
+    published: true,
+    visible: true,
+    hidden: false
   },
   {
     id: 'jewel',
     title: 'Jewel',
     name: 'Jewel',
     keywords: ['Princess Jewel', 'Half Elf', 'Musical Talent', 'Mother', 'Wife', 'The Princess'],
-    url: '/character/jewel'
+    url: '/character/jewel',
+    published: true,
+    visible: true,
+    hidden: false
   },
   {
     id: 'alex',
     title: 'Alexandria',
     name: 'Alexandria',
     keywords: ['Alex', 'The Daughter', 'Quarter Elf', 'Music Teacher', 'Young Teacher'],
-    url: '/character/alex'
+    url: '/character/alex',
+    published: true,
+    visible: true,
+    hidden: false
   },
   {
     id: 'eloquence',
     title: 'Eloquence',
     name: 'Eloquence',
     keywords: ['The Son', 'Bass Player', 'Quarter Elf', 'Rhythm Expert', 'Best Friend'],
-    url: '/character/eloquence'
+    url: '/character/eloquence',
+    published: true,
+    visible: true,
+    hidden: false
   },
   {
     id: 'daphne',
     title: 'Daphne',
     name: 'Daphne',
     keywords: ['The Prodigy', 'Drummer Girl', 'Orphan', 'New Drummer', 'Choir Master\'s Daughter'],
-    url: '/character/daphne'
+    url: '/character/daphne',
+    published: true,
+    visible: true,
+    hidden: false
   },
   {
     id: 'lucky',
     title: 'Lucky',
     name: 'Lucky',
     keywords: ['The Leprechaun', 'Wise Elder', 'Golden Advice', 'Fisher', 'Token of Luck', 'Singing Fisherman'],
-    url: '/character/lucky'
+    url: '/character/lucky',
+    published: true,
+    visible: true,
+    hidden: false
   },
   {
     id: 'yeti',
     title: 'Yeti',
     name: 'Yeti',
     keywords: ['Ice Beast', 'The Nurse', 'Clumsy Giant', 'Ice Castle Guardian', 'Ferocious Healer'],
-    url: '/character/yeti'
+    url: '/character/yeti',
+    published: true,
+    visible: true,
+    hidden: false
   },
   {
     id: 'maurice',
     title: 'Maurice',
     name: 'Maurice',
     keywords: ['The Merchant', 'Percussion Wizard', 'Magical Maurice', 'The Dwarf', 'Big Brother', 'Fallen Hero'],
-    url: '/character/maurice'
+    url: '/character/maurice',
+    published: true,
+    visible: true,
+    hidden: false
   }
 ];
 
@@ -88,18 +112,18 @@ async function fetchCharactersFromDatabase() {
         url: `/character/${char.id}`,
         description: char.description,
         image: char.image,
+        published: char.published, // Required for visibility
         visible: char.visible, // Legacy field (keep for backwards compatibility)
         hidden: char.hidden // New visibility field
       }));
       
       return allCharacters;
     } else {
-      console.warn('No characters found in database, using fallback');
-      return fallbackCharacters;
+      throw new Error('No characters found in database - Firebase connection may be down');
     }
   } catch (error) {
     console.error('Error fetching characters from database:', error);
-    return fallbackCharacters;
+    throw new Error(`Failed to fetch characters from database: ${error.message}`);
   }
 }
 
@@ -176,7 +200,12 @@ async function linkifyCharacterMentions(text) {
  * @returns {object|null} Character object or null if not found
  */
 function getCharacterByIdSync(id) {
-  const characters = cacheUtils.getSync(charactersCache, fallbackCharacters);
+  const characters = cacheUtils.getSync(charactersCache, null);
+  
+  if (!characters) {
+    throw new Error('Characters cache not initialized - call initializeCharacterCache() first');
+  }
+  
   return characters.find(character => character.id === id) || null;
 }
 
@@ -203,7 +232,11 @@ function generateCharacterLinkSync(id, customText = null) {
  * @returns {string} Text with character names replaced by links
  */
 function linkifyCharacterMentionsSync(text, user = null) {
-  const allCharacters = cacheUtils.getSync(charactersCache, fallbackCharacters);
+  const allCharacters = cacheUtils.getSync(charactersCache, null);
+  
+  if (!allCharacters) {
+    throw new Error('Characters cache not initialized - call initializeCharacterCache() first');
+  }
   
   // Filter by visibility before linking
   const visibilityHelpers = require('./visibility-helpers');
@@ -218,7 +251,11 @@ function linkifyCharacterMentionsSync(text, user = null) {
  * @returns {array} Array of characters visible to user
  */
 function getAllCharactersSync(user = null) {
-  const allCharacters = cacheUtils.getSync(charactersCache, fallbackCharacters);
+  const allCharacters = cacheUtils.getSync(charactersCache, null);
+  
+  if (!allCharacters) {
+    throw new Error('Characters cache not initialized - call initializeCharacterCache() first');
+  }
   
   // Use unified visibility system
   const visibilityHelpers = require('./visibility-helpers');
@@ -264,7 +301,7 @@ module.exports = {
   setDatabaseInstance: firebaseUtils.setDatabaseInstance,
   
   // Backward compatibility aliases
-  characters: getAllCharactersSync(), // This will be empty initially
+  get characters() { return getAllCharactersSync(); }, // Lazy evaluation prevents module load errors
   generateCharacterLink: generateCharacterLinkSync,
   linkifyCharacterMentions: linkifyCharacterMentionsSync
 };

@@ -85,6 +85,7 @@ async function fetchEpisodesFromDatabase() {
                 youtubeLink: episodeData.youtubeLink,
                 image: episodeData.image,
                 keywords: episodeData.keywords || [], // Include keywords field
+                published: episodeData.published, // Required for visibility
                 visible: episodeData.visible, // Legacy field (keep for backwards compatibility)
                 hidden: episodeData.hidden // New visibility field
               });
@@ -113,12 +114,11 @@ async function fetchEpisodesFromDatabase() {
       
       return allEpisodes;
     } else {
-      console.warn('No episode data found in database, using fallback');
-      return fallbackEpisodes;
+      throw new Error('No episode data found in database - Firebase connection may be down');
     }
   } catch (error) {
     console.error('Error fetching episodes from database:', error);
-    return fallbackEpisodes;
+    throw new Error(`Failed to fetch episodes from database: ${error.message}`);
   }
 }
 
@@ -217,7 +217,12 @@ async function getAllEpisodes(showHidden = false) {
  * @returns {object|null} Episode object or null if not found
  */
 function getEpisodeByIdSync(id) {
-  const episodes = cacheUtils.getSync(episodeCache, fallbackEpisodes);
+  const episodes = cacheUtils.getSync(episodeCache, null);
+  
+  if (!episodes) {
+    throw new Error('Episodes cache not initialized - call initializeEpisodeCache() first');
+  }
+  
   return episodes.find(episode => episode.id === id) || null;
 }
 
@@ -227,7 +232,11 @@ function getEpisodeByIdSync(id) {
  * @returns {Array} Array of episodes in the season
  */
 function getEpisodesBySeasonSync(season) {
-  const episodes = cacheUtils.getSync(episodeCache, fallbackEpisodes);
+  const episodes = cacheUtils.getSync(episodeCache, null);
+  
+  if (!episodes) {
+    throw new Error('Episodes cache not initialized - call initializeEpisodeCache() first');
+  }
   return episodes.filter(episode => episode.season === season);
 }
 
@@ -250,7 +259,12 @@ function generateEpisodeLinkSync(episodeId) {
  * @returns {string} Text with episode names replaced by links
  */
 function linkifyEpisodeMentionsSync(text) {
-  const episodes = cacheUtils.getSync(episodeCache, fallbackEpisodes);
+  const episodes = cacheUtils.getSync(episodeCache, null);
+  
+  if (!episodes) {
+    throw new Error('Episodes cache not initialized - call initializeEpisodeCache() first');
+  }
+  
   return linkingUtils.linkifyItemMentions(text, episodes, 'episode');
 }
 
@@ -260,7 +274,11 @@ function linkifyEpisodeMentionsSync(text) {
  * @returns {Array} Array of all episodes
  */
 function getAllEpisodesSync(showHidden = false) {
-  const allEpisodes = cacheUtils.getSync(episodeCache, fallbackEpisodes);
+  const allEpisodes = cacheUtils.getSync(episodeCache, null);
+  
+  if (!allEpisodes) {
+    throw new Error('Episodes cache not initialized - call initializeEpisodeCache() first');
+  }
   
   // Filter out hidden episodes for public users
   if (!showHidden) {

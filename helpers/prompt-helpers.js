@@ -276,7 +276,12 @@ async function generatePromptLink(id, customText = null) {
  * @returns {object|null} Prompt object or null if not found
  */
 function getPromptByIdSync(id) {
-  const prompts = cacheUtils.getSync(promptsCache, fallbackPrompts);
+  const prompts = cacheUtils.getSync(promptsCache, null);
+  
+  if (!prompts) {
+    throw new Error('Prompts cache not initialized - call initializePromptCache() first');
+  }
+  
   return prompts.find(prompt => prompt.id === id && prompt.isActive) || null;
 }
 
@@ -286,7 +291,12 @@ function getPromptByIdSync(id) {
  * @returns {Array} Array of prompts linked to the character
  */
 function getPromptsByCharacterSync(characterId) {
-  const prompts = cacheUtils.getSync(promptsCache, fallbackPrompts);
+  const prompts = cacheUtils.getSync(promptsCache, null);
+  
+  if (!prompts) {
+    throw new Error('Prompts cache not initialized - call initializePromptCache() first');
+  }
+  
   return prompts.filter(prompt =>
     prompt.isActive &&
     prompt.linkedCharacters &&
@@ -300,7 +310,12 @@ function getPromptsByCharacterSync(characterId) {
  * @returns {Array} Array of prompts linked to the episode
  */
 function getPromptsByEpisodeSync(episodeId) {
-  const prompts = cacheUtils.getSync(promptsCache, fallbackPrompts);
+  const prompts = cacheUtils.getSync(promptsCache, null);
+  
+  if (!prompts) {
+    throw new Error('Prompts cache not initialized - call initializePromptCache() first');
+  }
+  
   return prompts.filter(prompt =>
     prompt.isActive &&
     prompt.linkedEpisodes &&
@@ -314,7 +329,12 @@ function getPromptsByEpisodeSync(episodeId) {
  * @returns {Array} Array of prompts linked to the lore item
  */
 function getPromptsByLoreSync(loreId) {
-  const prompts = cacheUtils.getSync(promptsCache, fallbackPrompts);
+  const prompts = cacheUtils.getSync(promptsCache, null);
+  
+  if (!prompts) {
+    throw new Error('Prompts cache not initialized - call initializePromptCache() first');
+  }
+  
   return prompts.filter(prompt =>
     prompt.isActive &&
     prompt.linkedLore &&
@@ -328,7 +348,12 @@ function getPromptsByLoreSync(loreId) {
  * @returns {Array} Array of prompts matching the category
  */
 function getPromptsByCategorySync(category) {
-  const prompts = cacheUtils.getSync(promptsCache, fallbackPrompts);
+  const prompts = cacheUtils.getSync(promptsCache, null);
+  
+  if (!prompts) {
+    throw new Error('Prompts cache not initialized - call initializePromptCache() first');
+  }
+  
   return prompts.filter(prompt =>
     prompt.isActive &&
     prompt.category === category
@@ -341,7 +366,12 @@ function getPromptsByCategorySync(category) {
  * @returns {Array} Array of matching prompts
  */
 function searchPromptsSync(query) {
-  const prompts = cacheUtils.getSync(promptsCache, fallbackPrompts);
+  const prompts = cacheUtils.getSync(promptsCache, null);
+  
+  if (!prompts) {
+    throw new Error('Prompts cache not initialized - call initializePromptCache() first');
+  }
+  
   const searchTerm = query.toLowerCase();
 
   return prompts.filter(prompt => {
@@ -381,7 +411,12 @@ function searchPromptsSync(query) {
  * @returns {Array} Array of prompts with the specified tag
  */
 function getPromptsByTagSync(tag) {
-  const prompts = cacheUtils.getSync(promptsCache, fallbackPrompts);
+  const prompts = cacheUtils.getSync(promptsCache, null);
+  
+  if (!prompts) {
+    throw new Error('Prompts cache not initialized - call initializePromptCache() first');
+  }
+  
   return prompts.filter(prompt =>
     prompt.isActive &&
     prompt.tags &&
@@ -394,7 +429,12 @@ function getPromptsByTagSync(tag) {
  * @returns {Array} Array of all active prompts
  */
 function getAllPromptsSync() {
-  const prompts = cacheUtils.getSync(promptsCache, fallbackPrompts);
+  const prompts = cacheUtils.getSync(promptsCache, null);
+  
+  if (!prompts) {
+    throw new Error('Prompts cache not initialized - call initializePromptCache() first');
+  }
+  
   return prompts.filter(prompt => prompt.isActive);
 }
 
@@ -403,7 +443,12 @@ function getAllPromptsSync() {
  * @returns {Array} Array of unique category names
  */
 function getPromptCategoriesSync() {
-  const prompts = cacheUtils.getSync(promptsCache, fallbackPrompts);
+  const prompts = cacheUtils.getSync(promptsCache, null);
+  
+  if (!prompts) {
+    throw new Error('Prompts cache not initialized - call initializePromptCache() first');
+  }
+  
   const categories = new Set();
 
   prompts.forEach(prompt => {
@@ -420,7 +465,12 @@ function getPromptCategoriesSync() {
  * @returns {Array} Array of unique tag names
  */
 function getPromptTagsSync() {
-  const prompts = cacheUtils.getSync(promptsCache, fallbackPrompts);
+  const prompts = cacheUtils.getSync(promptsCache, null);
+  
+  if (!prompts) {
+    throw new Error('Prompts cache not initialized - call initializePromptCache() first');
+  }
+  
   const tags = new Set();
 
   prompts.forEach(prompt => {
